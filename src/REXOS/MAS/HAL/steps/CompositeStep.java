@@ -1,5 +1,7 @@
 package HAL.steps;
 
+import generic.ProductStep;
+
 import java.io.Serializable;
 
 import HAL.Module;

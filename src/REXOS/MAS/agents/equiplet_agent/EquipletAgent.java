@@ -38,6 +38,9 @@
  **/
 package agents.equiplet_agent;
 
+import generic.ProductStep;
+import generic.Service;
+
 import java.util.ArrayList;
 
 import agents.data_classes.MessageType;
@@ -48,8 +51,6 @@ import com.google.gson.JsonParser;
 import HAL.HardwareAbstractionLayer;
 import HAL.steps.HardwareStep;
 import HAL.Module;
-import HAL.steps.ProductStep;
-import HAL.Service;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;

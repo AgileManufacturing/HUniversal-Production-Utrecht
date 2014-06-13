@@ -38,10 +38,11 @@
  **/
 package agents.equiplet_agent;
 
+import generic.ProductStep;
+import generic.Service;
+
 import com.google.gson.JsonObject;
 
-import HAL.Service;
-import HAL.steps.ProductStep;
 
 public class Job {
 	

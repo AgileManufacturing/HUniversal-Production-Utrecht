@@ -6,9 +6,9 @@
  *           .MMMMMMM#=`.gNMMMMM.       \_| \_|\____/\/   \/ \___/ \____/
  *             7HMM9`   .MMMMMM#`		
  *                     ...MMMMMF .      
- *         dN.       .jMN, TMMM`.MM     	@file 	ProductStep
- *         .MN.      MMMMM;  ?^ ,THM		@brief 	This class creates new productStep information objects.
- *          dM@      dMMM3  .ga...g,    	@date Created:	2014-05-20
+ *         dN.       .jMN, TMMM`.MM     	@file 	ServerConfigurations
+ *         .MN.      MMMMM;  ?^ ,THM		@brief 	This class holds global variables for the grid_server and WIMP
+ *          dM@      dMMM3  .ga...g,    	@date Created:	2014-06-06
  *       ..MMM#      ,MMr  .MMMMMMMMr   
  *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Bas Voskuijlen && Tom Oosterwijk
  *   .dMMMMMF           7Y=d9  dMMMMMr    
@@ -36,52 +36,14 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package grid_server;
 
-import java.io.Serializable;
+package configuration;
 
-import com.google.gson.JsonObject;
-
-	
-	public class ProductStep implements Serializable {
-		 private static final long serialVersionUID = 6788269249283740246L;
-		 private Service service;
-		 private JsonObject criteria;
-		 private int id;
-		 
-		 public ProductStep(int id, JsonObject criteria, Service service){
-		  this.id = id;
-		  this.criteria = criteria;
-		  this.service = service;
-		 }
-		 
-		 public ProductStep(JsonObject json){
-		  if (json.has("id")){
-		   this.id = json.get("id").getAsInt();
-		  }
-		  if (json.has("service")){
-		   this.service = new Service(json.get("service").getAsString());
-		  }
-		  if (json.has("criteria")){
-		   this.criteria = json.get("criteria").getAsJsonObject();
-		  }
-		 }
-		 
-		 public Service getService(){
-		  return this.service;
-		 }
-		 public JsonObject getCriteria(){
-		  return this.criteria;
-		 }
-		 public int getId(){
-		  return this.id;
-		 }
-		 
-		 public String toJSON(){
-		  return  "{" +
-		    " id:" + id + ",\n" +
-		    " service:" + service.toJSON() + ",\n" +
-		    " criteria: {" + criteria + "}\n" +
-		    "}";
-		 }
-		}
+public class ServerConfigurations {
+	public final static String WSS_URI = "ws://10.0.1.227:8887";
+	public final static String WSS_PORT = "8887";
+	public final static String GS_IP = "10.0.1.227";
+	public final static String GS_PORT = "1234";
+	public final static String GS_NAME = "Grid@Platform2";
+	public final static String GS_ADDRESS = "http://Tommy-PC.wired.hu.nl:7778/acc";	
+}

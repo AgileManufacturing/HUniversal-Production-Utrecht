@@ -1,11 +1,12 @@
 package HAL.listeners;
 
+import generic.ProductStep;
+
 import java.util.ArrayList;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.steps.HardwareStep;
-import HAL.steps.ProductStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.testerClasses.HALTesterClass;
 /**

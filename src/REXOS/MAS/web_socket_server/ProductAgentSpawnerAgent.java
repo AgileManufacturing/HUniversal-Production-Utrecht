@@ -1,6 +1,6 @@
 package web_socket_server;
 
-import grid_server.ServerConfigurations;
+import configuration.ServerConfigurations;
 
 import jade.core.AID;
 import jade.core.Agent;

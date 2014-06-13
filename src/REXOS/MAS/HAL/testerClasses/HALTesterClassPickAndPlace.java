@@ -1,5 +1,8 @@
 package HAL.testerClasses;
 
+import generic.ProductStep;
+import generic.Service;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -13,10 +16,8 @@ import org.apache.commons.codec.binary.Base64;
 import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.Service;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-import HAL.steps.ProductStep;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

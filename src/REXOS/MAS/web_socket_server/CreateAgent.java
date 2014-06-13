@@ -38,10 +38,11 @@
  **/
 package web_socket_server;
 
-import grid_server.ServerConfigurations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import configuration.ServerConfigurations;
 
 import web_socket_server.java.org.java_websocket.client.WebSocketClient;
 import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;

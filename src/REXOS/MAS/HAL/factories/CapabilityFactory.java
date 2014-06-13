@@ -1,5 +1,7 @@
 package HAL.factories;
 
+import generic.Service;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,7 +26,6 @@ import libraries.utillities.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.ModuleIdentifier;
-import HAL.Service;
 import HAL.capabilities.Capability;
 import HAL.exceptions.FactoryException;
 

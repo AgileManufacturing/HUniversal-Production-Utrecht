@@ -22,6 +22,26 @@ public abstract class Module implements BlackboardListener {
 	protected ModuleListener moduleListener;
 	protected ProcessListener processListener;
 	
+	private static final String GET_MOUNT_POSITION = 
+			"SELECT mountPointX, mountPointY FROM Module " +
+			"	WHERE manufacturer = ?" +
+			" 		AND typeNumber = ?" +
+			" 		AND serialNumber = ?";
+	private static final String GET_PARENT_MODULE =
+			"SELECT * FROM Module " +
+			"	WHERE attachedToLeft < (" +
+			"		SELECT attachedToLeft FROM Module " +
+			"			WHERE manufacturer = ?" +
+			"				AND typeNumber = ?" +
+			"				AND serialNumber = ?" +
+			"	) AND attachedToRight > (" +
+ 			"		SELECT attachedToRight FROM Module " +
+ 			"			WHERE manufacturer = ?" +
+ 			"				AND typeNumber = ?" +
+ 			"				AND serialNumber = ?" +
+ 			"	) " +
+ 			"	ORDER BY abs(attachedToLeft - attachedToRight) ASC LIMIT 1";
+	
 	/**
 	 * Constructs a new Module and subscribes to the blackboardHandler.
 	 * @param moduleIdentifier
@@ -49,12 +69,10 @@ public abstract class Module implements BlackboardListener {
 	 * @return An integer array with 2 elements containing the zero-indexed x and y position on the mountplate (corresponding with the x and the -z axis in the equiplet coordinate system).
 	 */
 	public int[] getMountPosition() {
-		String sql = "SELECT mountPointX, mountPointY FROM Module " +
-				"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
-				"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
-				"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
-				"'";
-		Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
+		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_MOUNT_POSITION, 
+																moduleIdentifier.getManufacturer(), 
+																moduleIdentifier.getTypeNumber(), 
+																moduleIdentifier.getSerialNumber());
 		if (resultSet.length == 1){
 			int[] position = new int[2];
 			position[0] = (int) resultSet[0].get("mountPointX");
@@ -69,21 +87,14 @@ public abstract class Module implements BlackboardListener {
 	 * @return The parent module or null if no parent module exists
 	 * @throws FactoryException
 	 */
-	public Module getParentModule() throws FactoryException {
-		String sql = "SELECT * FROM Module " +
-						"WHERE attachedToLeft < (" +
-							"SELECT attachedToLeft FROM Module " +
-								"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
-								"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
-								"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
-						"') AND attachedToRight > (" +
- 							"SELECT attachedToRight FROM Module " +
- 								"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
- 								"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
- 								"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
- 						"') ORDER BY abs(attachedToLeft - attachedToRight) ASC LIMIT 1";
-		
-		Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
+	public Module getParentModule() throws FactoryException {		
+		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_PARENT_MODULE,
+																moduleIdentifier.getManufacturer(),
+																moduleIdentifier.getTypeNumber(),
+																moduleIdentifier.getSerialNumber(),
+																moduleIdentifier.getManufacturer(),
+																moduleIdentifier.getTypeNumber(),
+																moduleIdentifier.getSerialNumber());
 		
 		if (resultSet.length == 1){
 			ModuleIdentifier moduleIdentifier = new ModuleIdentifier(

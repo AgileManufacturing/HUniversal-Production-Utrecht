@@ -38,7 +38,6 @@
  **/
 package web_socket_server;
 
-import grid_server.ServerConfigurations;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,6 +54,8 @@ import web_socket_server.java.org.java_websocket.server.WebSocketServer;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import configuration.ServerConfigurations;
 
 
 /**

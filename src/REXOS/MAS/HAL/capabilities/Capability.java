@@ -1,5 +1,7 @@
 package HAL.capabilities;
 
+import generic.ProductStep;
+
 import java.util.ArrayList;
 
 import libraries.dynamicloader.JarFileLoaderException;
@@ -13,7 +15,6 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import HAL.steps.ProductStep;
 
 /**
  * 

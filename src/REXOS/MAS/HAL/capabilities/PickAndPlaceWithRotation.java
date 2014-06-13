@@ -34,6 +34,8 @@
 
 package HAL.capabilities;
 
+import generic.ProductStep;
+
 import java.util.ArrayList;
 
 import libraries.utillities.log.LogLevel;
@@ -44,7 +46,6 @@ import HAL.exceptions.CapabilityException;
 import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import HAL.steps.ProductStep;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

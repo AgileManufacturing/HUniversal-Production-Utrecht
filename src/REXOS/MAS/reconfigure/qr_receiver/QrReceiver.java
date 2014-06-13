@@ -39,6 +39,8 @@
  
 package reconfigure.qr_receiver;
 
+import generic.ProductStep;
+
 import java.util.ArrayList;
 
 import javax.jws.WebParam;
@@ -58,7 +60,6 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-import HAL.steps.ProductStep;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
