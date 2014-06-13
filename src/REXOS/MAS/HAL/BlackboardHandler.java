@@ -16,6 +16,7 @@ import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
 import HAL.exceptions.BlackboardUpdateException;
+import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.BlackboardModuleListener;
 
 import com.google.gson.JsonObject;
@@ -31,8 +32,9 @@ import configuration.ConfigurationFiles;
  *
  */
 public class BlackboardHandler implements BlackboardSubscriber {
-	
-	private ArrayList<BlackboardModuleListener> updateSubscribers;
+
+	private ArrayList<BlackboardModuleListener> moduleSubscribers;
+	private ArrayList<BlackboardEquipletListener> equipletSubscribers;
 	
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
@@ -42,7 +44,6 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	private FieldUpdateSubscription modeSubscription;
 	private FieldUpdateSubscription statusSubscription;
 	
-	private String equipletName;
 	private String state = null;
 	private String mode = null;
 	
@@ -51,8 +52,8 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * 
 	 */
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
-		this.equipletName = equipletName;
-		updateSubscribers = new ArrayList<BlackboardModuleListener>();
+		moduleSubscribers = new ArrayList<BlackboardModuleListener>();
+		equipletSubscribers = new ArrayList<BlackboardEquipletListener>();
 			
 		try {
 			stateSubscription = new FieldUpdateSubscription("state", this);
@@ -90,9 +91,34 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * 
 	 * @param blackboardListener
 	 */
-	public void addBlackboardListener(BlackboardModuleListener blackboardListener){
-		updateSubscribers.add(blackboardListener);
+	public void addBlackboardModuleListener(BlackboardModuleListener blackboardListener){
+		moduleSubscribers.add(blackboardListener);
 	}
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void addBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
+		equipletSubscribers.add(blackboardListener);
+	}
+	
+
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void removeBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
+		equipletSubscribers.remove(blackboardListener);
+	}
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void removeBlackboardModuleListener(BlackboardModuleListener blackboardListener){
+		moduleSubscribers.remove(blackboardListener);
+	}
+	
+	
 
 	/**
 	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
@@ -106,16 +132,15 @@ public class BlackboardHandler implements BlackboardSubscriber {
 					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ state or mode changed");
 					dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
-						equipletName = dbObject.get("equipletName").toString();
 						if(dbObject.containsField("state")){
 							state = dbObject.get("state").toString();
 						}
 						if(dbObject.containsField("mode")){
 							mode = dbObject.get("mode").toString();
 						}	
-						for(BlackboardModuleListener listener: updateSubscribers){
-							listener.OnEquipletStateChanged(equipletName,state);
-							listener.OnEquipletModeChanged(equipletName, mode);
+						for(BlackboardEquipletListener listener: equipletSubscribers){
+							listener.OnEquipletStateChanged(state);
+							listener.OnEquipletModeChanged(mode);
 						}
 					}
 					break;
@@ -125,7 +150,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 						String status = dbObject.get("status").toString();
 						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed");
 						
-						for(BlackboardModuleListener listener: updateSubscribers) {
+						for(BlackboardModuleListener listener: moduleSubscribers) {
 							listener.onProcessStatusChanged(status); 
 						}
 					}

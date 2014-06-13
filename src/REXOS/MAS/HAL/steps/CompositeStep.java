@@ -2,7 +2,6 @@ package HAL.steps;
 
 import generic.ProductStep;
 
-import java.io.Serializable;
 
 import HAL.Module;
 import HAL.capabilities.Capability;
@@ -15,8 +14,7 @@ import com.google.gson.JsonObject;
  * @author Tommas Bakker
  *
  */
-public class CompositeStep implements Serializable{
-	private static final long serialVersionUID = 1206944727256435741L;
+public class CompositeStep{
 	private ProductStep productStep;
 	private JsonObject command;
 	

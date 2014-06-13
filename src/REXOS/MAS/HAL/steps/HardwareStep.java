@@ -1,7 +1,5 @@
 package HAL.steps;
 
-import java.io.Serializable;
-
 import HAL.Module;
 import HAL.ModuleIdentifier;
 
@@ -13,8 +11,7 @@ import com.google.gson.JsonObject;
  * @author Tommas Bakker
  *
  */
-public class HardwareStep implements Serializable {
-	private static final long serialVersionUID = 3031019032556167945L;
+public class HardwareStep {
 	private CompositeStep compositeStep;
 	private JsonObject rosCommand;
 	private ModuleIdentifier moduleIdentifier;

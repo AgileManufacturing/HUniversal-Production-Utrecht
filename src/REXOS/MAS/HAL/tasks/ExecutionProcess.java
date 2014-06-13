@@ -6,7 +6,6 @@ import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;
 import HAL.Module;
-import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
@@ -57,7 +56,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	 * Do not call this method! 
 	 */
 	@Override
-	public synchronized void onProcessStateChanged(String status, long hardwareStepSerialId, Module module) throws HardwareAbstractionLayerProcessException{
+	public synchronized void onProcessStateChanged(String status, long hardwareStepSerialId, Module module) {
 		Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "The status of hardwareStep identified by " + 
 				hardwareStepSerialId + " (being processed by module " + module + ") has changed to " + status);
 		if(status.equals("DONE")){
@@ -74,7 +73,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 				this.notify();
 			}
 			else {
-				throw new HardwareAbstractionLayerProcessException("No more hardwareSteps while there should be at least one more");
+				throw new RuntimeException("No more hardwareSteps while there should be at least one more");
 			}
 		}
 		else {

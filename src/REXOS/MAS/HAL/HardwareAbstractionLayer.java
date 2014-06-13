@@ -15,6 +15,7 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
+import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
@@ -25,7 +26,7 @@ import HAL.tasks.TranslationProcess;
  * @author Bas Voskuijlen
  * @see http://wiki.agilemanufacturing.nl/index.php/HAL
  */
-public class HardwareAbstractionLayer implements ModuleListener {
+public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquipletListener {
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
@@ -51,7 +52,7 @@ public class HardwareAbstractionLayer implements ModuleListener {
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
 		blackboardHandler = new BlackboardHandler(equipletName);
-		
+		blackboardHandler.addBlackboardEquipletListener(this);
 	}
 	/**
 	 * This method will attempt to execute the set of hardware steps provided. This is a asynchronous call. 
@@ -132,16 +133,14 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 */
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-		
+		hardwareAbstractionLayerListener.onModuleStateChanged(state, module);
 	}
 	/**
 	 * This method will be called by the blackboard handler when the mode of the equiplet has changed. Do not call this method!
 	 */
 	@Override
 	public void onModuleModeChanged(String mode, Module module) {
-		// TODO Auto-generated method stub
-		
+		hardwareAbstractionLayerListener.onModuleModeChanged(mode, module);
 	}
 
 	/**
@@ -155,5 +154,15 @@ public class HardwareAbstractionLayer implements ModuleListener {
 	 */
 	public BlackboardHandler getBlackBoardHandler() {
 		return blackboardHandler;
+	}
+
+	@Override
+	public void OnEquipletStateChanged(String state) {
+		hardwareAbstractionLayerListener.onEquipletStateChanged(state);		
+	}
+
+	@Override
+	public void OnEquipletModeChanged(String mode) {
+		hardwareAbstractionLayerListener.onEquipletModeChanged(mode);
 	}
 }

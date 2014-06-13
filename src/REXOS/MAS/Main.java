@@ -1,6 +1,4 @@
-package HAL;
 
-import HAL.Ball.BallColor;
 
 public class Main {
 
@@ -115,7 +113,7 @@ class Crate {
 			for(int x = 0; x < amountOfBallsInWidth; x++){
 				balls[y*amountOfBallsInWidth + x] = new Ball(DISTANCE_BETWEEN_BORDER_AND_BALL + x * DISTANCE_BETWEEN_BALLS, 
 						DISTANCE_BETWEEN_BORDER_AND_BALL + y * DISTANCE_BETWEEN_BALLS, 
-						BallColor.RED
+						Ball.BallColor.RED
 				);
 			}
 		}

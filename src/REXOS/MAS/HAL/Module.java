@@ -54,7 +54,7 @@ public abstract class Module implements BlackboardModuleListener {
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
 		
-		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardListener(this);
+		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardModuleListener(this);
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -111,30 +111,5 @@ public abstract class Module implements BlackboardModuleListener {
 	public String getProperties() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	
-	/**
-	 * This method is called by the {@link BlackboardHandler} but is ignored.
-	 */
-	@Override
-	public void OnEquipletStateChanged(String equipletName, String state) {
-		// ignore
-	}
-
-	/**
-	 * This method is called by the {@link BlackboardHandler} but is ignored.
-	 */
-	@Override
-	public void OnEquipletModeChanged(String equipletName, String mode) {
-		// ignore
-	}
-
-	/**
-	 * This method is called by the {@link BlackboardHandler} but is ignored.
-	 */
-	@Override
-	public void OnEquipletIpChanged(String ip) {
-		// ignore
 	}
 }
