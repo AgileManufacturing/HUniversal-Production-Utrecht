@@ -14,74 +14,60 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class Gripper extends ModuleActor {
-	//Gonna be loaded from KDB:
-	private static final double GRIPPER_SIZE = 46.54; 
-	
+	// Gonna be loaded from KDB:
+	private static final double GRIPPER_SIZE = 46.54;
+
 	private static final String ACTIVATE = "activate";
 	private static final String DEACTIVATE = "deactivate";
 	private static final String PICK = "pick";
 	private static final String PLACE = "place";
 
-	
 	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory, moduleListener);
 	}
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
-		ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
-		JsonObject jsonCommand = compositeStep.getCommand();
-		JsonObject command = jsonCommand.remove(HardwareStep.COMMAND).getAsJsonObject();
+		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
+		compositeStep = adjustMoveWithDimensions(compositeStep, new Vector3(0, 0, GRIPPER_SIZE));
 		
-		command = adjustMoveWithDimensions(command, new Vector3(0, 0, GRIPPER_SIZE));
-		JsonElement pick = command.remove(PICK);
-		JsonElement place = command.remove(PLACE);
-		command.addProperty("forceStraightLine", false);
-		
-		jsonCommand.add(HardwareStep.COMMAND, command);
-		
-		compositeStep = new CompositeStep(compositeStep.getProductStep(),jsonCommand, null);		
-		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
-		int placeholderId = -1;
-		if (hStep != null){
-			hardwareSteps.addAll(hStep);
-			for (int i=0;i<hStep.size();i++){
-				if (hStep.get(i) == null){
-					placeholderId = i;
-					i = hStep.size();
-				}
-			}
+		//Pop command identifier
+		boolean isPick = false, isPlace = false;
+		if (compositeStep.getCommand().get(PICK) != null) {
+			compositeStep.popCommandIdentifier(PICK);
+			isPick = true;
+		} else {
+			compositeStep.popCommandIdentifier(PLACE);
+			isPlace = true;
 		}
-		
-		//Set hardwareSteps
-		if (pick != null || place != null){
-			JsonObject hardwareCommand = new JsonObject();
-			if (pick != null){
-				JsonObject instructionData = new JsonObject();
-				instructionData.addProperty(HardwareStep.COMMAND, ACTIVATE);
-				hardwareCommand.add("instructionData", instructionData);
+
+		translatedHardwareSteps.addAll(forwardCompositeStep(compositeStep));
+		int placeholderId = getPlaceholderID(translatedHardwareSteps);
+
+		// Set hardwareSteps
+		if (isPick || isPlace) {
+			HardwareStep harwareStep;
+			JsonObject instructionData = new JsonObject();
+			if (isPick) {
+				instructionData.add(ACTIVATE, null);
+				harwareStep = new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData);
+			} else {
+				instructionData.add(DEACTIVATE, null);
+				harwareStep = new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData);
 			}
-			else{
-				JsonObject instructionData = new JsonObject();
-				instructionData.addProperty(HardwareStep.COMMAND, DEACTIVATE);
-				hardwareCommand.add("instructionData", instructionData);
-			}
-			hardwareCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());
-			hardwareCommand.addProperty("status","WAITING");
 			
-			if (placeholderId == -1){
-				hardwareSteps.add(new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
-			}
-			else {
-				hardwareSteps.set(placeholderId, new HardwareStep(compositeStep,hardwareCommand,moduleIdentifier));
+			if (placeholderId == -1) {
+				translatedHardwareSteps.add(harwareStep);
+			} else {
+				translatedHardwareSteps.set(placeholderId, harwareStep);
 			}
 		}
-		
-		return hardwareSteps;
+
+		return translatedHardwareSteps;
 	}
 }

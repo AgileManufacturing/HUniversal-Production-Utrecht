@@ -70,7 +70,7 @@ public class StewartGough extends ModuleActor {
 			
 			
 			JsonObject hardwareJsonCommand = new JsonObject();
-			hardwareJsonCommand.add("moduleIdentifier",moduleIdentifier.getAsJSON());
+			hardwareJsonCommand.add("moduleIdentifier",moduleIdentifier.toJSON());
 			hardwareJsonCommand.addProperty("status","WAITING");
 			
 			//Add hopping a.k.a. safe movement pane

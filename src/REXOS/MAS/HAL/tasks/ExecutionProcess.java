@@ -11,6 +11,7 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 /**
  * The thread that manages the execution of hardware steps
  * @author Bas Voskuijlen
@@ -61,7 +62,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	public synchronized void onProcessStateChanged(String status, long hardwareStepSerialId, Module module) {
 		Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "The status of hardwareStep identified by " + 
 				hardwareStepSerialId + " (being processed by module " + module + ") has changed to " + status);
-		if(status.equals(HardwareStep.STATUS_DONE)){
+		if(status.equals(HardwareStepStatus.DONE)){
 			if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = hardwareSteps.get(0);
 				hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
@@ -81,7 +82,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 				throw new RuntimeException("No more hardwareSteps while there should be at least one more");
 			}
 		}
-		else if(status.equals(HardwareStep.STATUS_FAILED)) {
+		else if(status.equals(HardwareStepStatus.FAILED)) {
 			Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Module is unable to execute hardwareStep");
 			hardwareAbstractionLayerListener.onExecutionFailed();
 		}

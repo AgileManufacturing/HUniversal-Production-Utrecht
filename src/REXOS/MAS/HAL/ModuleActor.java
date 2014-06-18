@@ -13,6 +13,7 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
@@ -30,6 +31,7 @@ import libraries.log.Logger;
  */
 public abstract class ModuleActor extends Module {
 	protected static final String MODULE_COMMAND = "module_command";
+	protected static final String APPROACH = "approach";
 	protected static final String DESTINATION = "destination";
 	protected static final String NULL = "NULL";
 	protected static final String MAX_ACCELERATION = "maxAcceleration";
@@ -44,8 +46,6 @@ public abstract class ModuleActor extends Module {
 	
 	protected static final String MOVE = "move";
 	
-	protected ArrayList<HardwareStep> translatedHardwareSteps;
-	
 	
 	/**
 	 * Constructs a new ModuleActor and connects to the blackboard.
@@ -59,8 +59,6 @@ public abstract class ModuleActor extends Module {
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
-		
-		translatedHardwareSteps = new ArrayList<HardwareStep>();
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
@@ -93,7 +91,11 @@ public abstract class ModuleActor extends Module {
 	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ModuleActor moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null) {
-			return(moduleActor.translateCompositeStep(compositeStep));
+			ArrayList<HardwareStep> hardwareSteps = moduleActor.translateCompositeStep(compositeStep);
+			if (hardwareSteps != null){
+				return hardwareSteps;
+			}
+			return new ArrayList<HardwareStep>();
 		} else {
 			// root module, no more parents			
 			// if commands remain then the modules were not able to fully translate the compositeStep
@@ -102,7 +104,9 @@ public abstract class ModuleActor extends Module {
 				throw new ModuleTranslatingException("The compositestep isn't completely empty." + 
 						compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject(), compositeStep);
 			} else {
-				return null;
+				//TODO
+				//Logger
+				return new ArrayList<HardwareStep>();
 			}
 		}
 	}
@@ -114,7 +118,7 @@ public abstract class ModuleActor extends Module {
 	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
 		this.processListener = processListener;
-		JsonObject command = hardwareStep.getRosCommand();
+		JsonObject command = hardwareStep.toJSON();
 		executeMongoCommand(command);
 	}
 	/**
@@ -140,6 +144,26 @@ public abstract class ModuleActor extends Module {
 		moduleListener.onModuleModeChanged(mode, this);
 	}
 	
+	/**
+	 * Returns -1 if not found.
+	 * 
+	 */
+	protected int getPlaceholderID(ArrayList<HardwareStep> hardwareSteps){
+		if (hardwareSteps != null){
+			for (int i=0;i<hardwareSteps.size();i++){
+				if (hardwareSteps.get(i) == null){
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	protected CompositeStep adjustMoveWithDimensions(CompositeStep compositeStep, Vector3 offsetVector){
+		JsonObject command = compositeStep.getCommand();
+		command = adjustMoveWithDimensions(command, offsetVector);
+		return new CompositeStep(compositeStep.getProductStep(), command, compositeStep.getRelativeTo());
+	}
 	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector){
 		return adjustMoveWithDimensions(compositeCommand, offsetVector, new RotationAngles(0, 0, 0));
 	}
@@ -148,21 +172,27 @@ public abstract class ModuleActor extends Module {
 				", offsetVector: " + offsetVector + " directionAngles: " + directionAngles);
 		
 		JsonObject originalMove = compositeCommand.remove(MOVE).getAsJsonObject();
-		double originalX = originalMove.get(MOVE_X).getAsDouble();
-		double originalY = originalMove.get(MOVE_Y).getAsDouble();
-		double originalZ = originalMove.get(MOVE_Z).getAsDouble();
-		
-		Matrix rotationMatrix = directionAngles.generateRotationMatrix();
-		
-		Vector3 originalVector = offsetVector;
-		Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
-		
-		JsonObject adjustedMove = new JsonObject();
-		adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
-		adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
-		adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
-		
-		compositeCommand.add(MOVE, adjustedMove);
+		if (originalMove != null){
+			double originalX = originalMove.get(MOVE_X).getAsDouble();
+			double originalY = originalMove.get(MOVE_Y).getAsDouble();
+			double originalZ = originalMove.get(MOVE_Z).getAsDouble();
+			
+			Matrix rotationMatrix = directionAngles.generateRotationMatrix();
+			
+			Vector3 originalVector = offsetVector;
+			Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
+			
+			JsonObject adjustedMove = new JsonObject();
+			adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
+			adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
+			adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
+			
+			compositeCommand.add(MOVE, adjustedMove);
+		}
+		else {
+			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, 
+					"CompositeStep command does not contain any move key to adjust. " + compositeCommand);
+		}
 		return compositeCommand;
 	}
 	
@@ -172,7 +202,7 @@ public abstract class ModuleActor extends Module {
 	public void onProcessStatusChanged(String status) {
 		if(processListener != null){
 			processListener.onProcessStateChanged(status, 0, this);
-			if(status.equals(HardwareStep.STATUS_DONE) || status.equals(HardwareStep.STATUS_FAILED)){
+			if(status.equals(HardwareStepStatus.DONE) || status.equals(HardwareStepStatus.FAILED)){
 				processListener = null;
 			}
 		}

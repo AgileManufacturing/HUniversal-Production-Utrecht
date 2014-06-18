@@ -15,11 +15,8 @@ import HAL.listeners.ModuleListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 
-import com.google.gson.JsonObject;
-
 public class Pen extends ModuleActor {
-	private static final String COMMAND_IDENTIFIER = "draw";
-	
+	private static final String COMMAND_IDENTIFIER = "draw";	
 	private static final double PEN_SIZE = 102.6; // in mm
 	private static final int MAX_ACCELERATION = 50;
 
@@ -29,22 +26,15 @@ public class Pen extends ModuleActor {
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
+		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		compositeStep.popCommandIdentifier(COMMAND_IDENTIFIER);
 		
-		JsonObject command = compositeStep.getCommand();		
-			
 		//Adjust the move with the Pen module it's height.
-		command = adjustMoveWithDimensions(command, new Vector3(0, 0, PEN_SIZE));
-		command.addProperty(ModuleActor.MAX_ACCELERATION, MAX_ACCELERATION);
-		command.addProperty(FORCE_STRAIGHT_LINE, false);
-			
-		//Translate it's parents composite steps into hardware steps.
-		compositeStep = new CompositeStep(compositeStep.getProductStep(), command, compositeStep.getRelativeTo());	
-		ArrayList<HardwareStep> hStep = forwardCompositeStep(compositeStep);
-		if (hStep != null){
-			translatedHardwareSteps.addAll(hStep);
-		}
+		compositeStep = adjustMoveWithDimensions(compositeStep, new Vector3(0, 0, PEN_SIZE));
+		compositeStep.getCommand().addProperty(ModuleActor.MAX_ACCELERATION, MAX_ACCELERATION);
 		
+		//Translate it's parents composite steps into hardware steps.
+		translatedHardwareSteps.addAll(forwardCompositeStep(compositeStep));
 		return translatedHardwareSteps;
 	}
 }
