@@ -46,6 +46,8 @@ public abstract class ModuleActor extends Module {
 	
 	protected static final String MOVE = "move";
 	
+	protected ProcessListener processListener;
+	
 	
 	/**
 	 * Constructs a new ModuleActor and connects to the blackboard.
