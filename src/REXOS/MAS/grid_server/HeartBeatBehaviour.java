@@ -72,7 +72,7 @@ public class HeartBeatBehaviour extends TickerBehaviour {
 				AID aid = equipletAgents[i].getName();
 				sendMessage(MessageType.PULSE_UPDATE, myAgent.getAID(), aid, pulseMessage, "meta");
 			}
-			System.out.println(equipletAgents.length + " size of found EA");
+			//System.out.println(equipletAgents.length + " size of found EA");
 		}catch (FIPAException e) {
 			System.out.println("DF Search Error");
 			e.printStackTrace();

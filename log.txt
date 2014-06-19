@@ -1,0 +1,47 @@
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[ERROR] [             ] 2014-06-19 16:00:16.760 @ libraries.blackboard_client.OplogMonitorThread.run(OplogMonitorThread.java:161)
+                        OplogMonitorThread ending due to exception: 
+                        com.mongodb.MongoInterruptedException: A driver operation has been interrupted
+                        	at com.mongodb.DBPortPool.get(DBPortPool.java:211)
+                        	at com.mongodb.DBTCPConnector$MyPort.get(DBTCPConnector.java:413)
+                        	at com.mongodb.DBTCPConnector.innerCall(DBTCPConnector.java:277)
+                        	at com.mongodb.DBTCPConnector.call(DBTCPConnector.java:256)
+                        	at com.mongodb.DBTCPConnector.call(DBTCPConnector.java:225)
+                        	at com.mongodb.DBApiLayer$Result._advance(DBApiLayer.java:431)
+                        	at com.mongodb.DBApiLayer$Result.hasNext(DBApiLayer.java:400)
+                        	at com.mongodb.DBCursor._hasNext(DBCursor.java:464)
+                        	at com.mongodb.DBCursor.hasNext(DBCursor.java:484)
+                        	at libraries.blackboard_client.OplogMonitorThread.run(OplogMonitorThread.java:140)
+                        Caused by: java.lang.InterruptedException
+                        	at java.util.concurrent.locks.AbstractQueuedSynchronizer.tryAcquireSharedNanos(Unknown Source)
+                        	at java.util.concurrent.Semaphore.tryAcquire(Unknown Source)
+                        	at com.mongodb.util.SimplePool.permitAcquired(SimplePool.java:148)
+                        	at com.mongodb.util.SimplePool.get(SimplePool.java:110)
+                        	at com.mongodb.DBPortPool.get(DBPortPool.java:209)
+                        	... 9 more
+
+[ERROR] [             ] 2014-06-19 16:00:18.257 @ libraries.blackboard_client.OplogMonitorThread.run(OplogMonitorThread.java:161)
+                        OplogMonitorThread ending due to exception: 
+                        com.mongodb.MongoInterruptedException: A driver operation has been interrupted
+                        	at com.mongodb.DBPortPool.get(DBPortPool.java:211)
+                        	at com.mongodb.DBTCPConnector$MyPort.get(DBTCPConnector.java:413)
+                        	at com.mongodb.DBTCPConnector.innerCall(DBTCPConnector.java:277)
+                        	at com.mongodb.DBTCPConnector.call(DBTCPConnector.java:256)
+                        	at com.mongodb.DBTCPConnector.call(DBTCPConnector.java:225)
+                        	at com.mongodb.DBApiLayer$Result._advance(DBApiLayer.java:431)
+                        	at com.mongodb.DBApiLayer$Result.hasNext(DBApiLayer.java:400)
+                        	at com.mongodb.DBCursor._hasNext(DBCursor.java:464)
+                        	at com.mongodb.DBCursor.hasNext(DBCursor.java:484)
+                        	at libraries.blackboard_client.OplogMonitorThread.run(OplogMonitorThread.java:140)
+                        Caused by: java.lang.InterruptedException
+                        	at java.util.concurrent.locks.AbstractQueuedSynchronizer.tryAcquireSharedNanos(Unknown Source)
+                        	at java.util.concurrent.Semaphore.tryAcquire(Unknown Source)
+                        	at com.mongodb.util.SimplePool.permitAcquired(SimplePool.java:148)
+                        	at com.mongodb.util.SimplePool.get(SimplePool.java:110)
+                        	at com.mongodb.DBPortPool.get(DBPortPool.java:209)
+                        	... 9 more
+
