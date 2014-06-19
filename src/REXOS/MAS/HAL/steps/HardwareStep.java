@@ -52,11 +52,11 @@ public class HardwareStep {
 	
 	
 	
-	public HardwareStep(CompositeStep compositeStep, JsonObject rosCommand, ModuleIdentifier moduleIdentifier) {
+	/*public HardwareStep(CompositeStep compositeStep, JsonObject rosCommand, ModuleIdentifier moduleIdentifier) {
 		this.moduleIdentifier = moduleIdentifier;
 		//this.rosCommand = rosCommand;
 		this.compositeStep = compositeStep;
-	}
+	}*/
 	
 	
 

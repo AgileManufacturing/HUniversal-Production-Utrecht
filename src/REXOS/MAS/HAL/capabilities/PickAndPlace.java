@@ -51,7 +51,6 @@ import HAL.steps.HardwareStep;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 /**
  * Pick and place capability class that translate
@@ -59,6 +58,7 @@ import com.google.gson.JsonParser;
  *
  */
 public class PickAndPlace extends Capability {
+	public final static String SERVICE_IDENTIFIER = "place";
 	
 	/**
 	 * 
@@ -74,44 +74,41 @@ public class PickAndPlace extends Capability {
 	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
-		// TODO Auto-generated method stub
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
-		String serviceName = productStep.getService().getName();
-		JsonObject productStepCriteria = productStep.getCriteria();
-		JsonObject target = productStepCriteria.get(ProductStep.TARGET).getAsJsonObject();
-		JsonArray subjects = productStepCriteria.get(ProductStep.SUBJECTS).getAsJsonArray();
+		JsonObject target = productStep.getCriteria().get(ProductStep.TARGET).getAsJsonObject();
+		JsonArray subjects = productStep.getCriteria().get(ProductStep.SUBJECTS).getAsJsonArray();
 		
-		Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "productStep criteria " + productStep.getCriteria());
-		if(serviceName.equals("place") && subjects != null && target != null){	
+		if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) && subjects != null && target != null){	
 			for(int i = 0; i < subjects.getAsJsonArray().size(); i++){
+				//Pick
 				JsonObject subjectMoveCommand = subjects.getAsJsonArray().get(i).getAsJsonObject().get("move").getAsJsonObject();
 				
 				JsonObject pickCommand = new JsonObject();
 				pickCommand.addProperty("pick" , "null");
 				pickCommand.add("move" ,  subjectMoveCommand);
 				
-				JsonObject pickJsonCommand = new JsonObject();
-				pickJsonCommand.add("command", pickCommand);
-				pickJsonCommand.addProperty("look_up", subjects.getAsJsonArray().get(i).getAsJsonObject().get("identifier").getAsString());
+				JsonObject pickRelativeTo = new JsonObject();
+				pickRelativeTo.add(CompositeStep.LOOK_UP, subjects.getAsJsonArray().get(i).getAsJsonObject().get(CompositeStep.IDENTIFIER));
+
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "command: " + pickCommand + ", relativeTo: " + pickRelativeTo);
+				CompositeStep pick = new CompositeStep(productStep, pickCommand, pickRelativeTo);
 				
-				JsonObject command = new JsonParser().parse(pickJsonCommand.toString()).getAsJsonObject();
 				
-				CompositeStep pick = new CompositeStep(productStep, command, null);
-				
+				//Place
 				JsonObject targetMoveCommand = target.getAsJsonObject().get("move").getAsJsonObject();
 				
 				JsonObject placeCommand = new JsonObject();
 				placeCommand.addProperty("place", "null");
 				placeCommand.add("move" ,  targetMoveCommand);
 				
-				JsonObject placeJsonCommand = new JsonObject();
-				placeJsonCommand.add("command", placeCommand);	
-				placeJsonCommand.addProperty("look_up", target.get("identifier").getAsString());
+				JsonObject placeRelativeTo = new JsonObject();
+				placeRelativeTo.add(CompositeStep.LOOK_UP, target.get(CompositeStep.IDENTIFIER));
 				
-				command = new JsonParser().parse(placeJsonCommand.toString()).getAsJsonObject();
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "command: " + placeCommand + ", relativeTo: " + placeRelativeTo);
+				CompositeStep place = new CompositeStep(productStep, placeCommand, null);
 				
-				CompositeStep place = new CompositeStep(productStep, command, null);
 				
+				//Translate to hardwareSteps
 				ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 				ArrayList<CompositeStep> capabilities = new ArrayList<CompositeStep>();
 				capabilities.add(pick);
@@ -120,9 +117,7 @@ public class PickAndPlace extends Capability {
 				
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
 			}
-		}
-			
+		}			
 		return hardwareSteps;
 	}
-
 }

@@ -51,7 +51,7 @@ public class DeltaRobot extends ModuleActor {
 		
 		//Add OriginPlacement
 		JsonObject parameters = new JsonObject();
-		parameters.addProperty("ID", compositeStep.getCommand().get(HardwareStep.LOOK_UP).getAsString());
+		parameters.addProperty("ID", compositeStep.getCommand().get(CompositeStep.LOOK_UP).getAsString());
 		OriginPlacement originPlacement = new OriginPlacement(OriginIdentifier.RELATIVE_TO_IDENTIFIER, parameters);
 
 		

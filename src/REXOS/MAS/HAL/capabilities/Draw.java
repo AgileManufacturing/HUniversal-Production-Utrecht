@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
  *
  */
 public class Draw extends Capability {	
+	public final static String SERVICE_IDENTIFIER = "draw";
 	/**
 	 * 
 	 * @param moduleFactory
@@ -35,13 +36,10 @@ public class Draw extends Capability {
 	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
-		
 		ArrayList<HardwareStep> hardwareSteps = new ArrayList<>();
-		String serviceName = productStep.getService().getName();
-		JsonObject productStepCriteria = productStep.getCriteria();
-		JsonObject target = productStepCriteria.get(ProductStep.TARGET).getAsJsonObject();
+		JsonObject target = productStep.getCriteria().get(ProductStep.TARGET).getAsJsonObject();
 		
-		if(serviceName.equals("draw") && target != null){
+		if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) && target != null) {
 			JsonObject moveCommand = target.get("move").getAsJsonObject();
 
 			JsonObject command = new JsonObject();
@@ -49,7 +47,7 @@ public class Draw extends Capability {
 			command.add("move", moveCommand);
 
 			JsonObject relativeTo = new JsonObject();
-			relativeTo.add("identifier", target.get("identifier"));
+			relativeTo.add(CompositeStep.LOOK_UP, target.get(CompositeStep.IDENTIFIER));
 
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "command: " + command + ", relativeTo: " + relativeTo);
 			

@@ -87,7 +87,7 @@ public class StewartGough extends ModuleActor {
 					
 					hardwareCommand.add("payload",entry_move);
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
-					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+					//hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
 					
 					//Actual point
 					JsonObject actual_move = new JsonParser().parse(move.toString()).getAsJsonObject();
@@ -95,7 +95,7 @@ public class StewartGough extends ModuleActor {
 					hardwareCommand.add("payload",actual_move);
 					hardwareJsonCommand.remove("instructionData");
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
-					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+					//hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
 					
 					//Exit point
 					JsonObject exit_move = new JsonParser().parse(move.toString()).getAsJsonObject();
@@ -103,14 +103,14 @@ public class StewartGough extends ModuleActor {
 					hardwareCommand.add("payload",exit_move);
 					hardwareJsonCommand.remove("instructionData");
 					hardwareJsonCommand.add("instructionData",hardwareCommand);
-					hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
+					//hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));
 				}
 			}
 			else {
 				//Straight line
 				hardwareCommand.add("payload",move);
 				hardwareJsonCommand.add("instructionData",hardwareCommand);
-				hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));				
+				//hardwareSteps.add(new HardwareStep(compositeStep,hardwareJsonCommand,moduleIdentifier));				
 			}
 			
 			jsonCommand.add(HardwareStep.COMMAND, command);
