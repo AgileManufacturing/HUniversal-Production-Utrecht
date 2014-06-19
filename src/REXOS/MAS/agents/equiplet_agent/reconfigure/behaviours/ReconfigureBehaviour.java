@@ -7,6 +7,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import agents.equiplet_agent.EquipletAgent;
 import agents.equiplet_agent.reconfigure.ModuleDataManager;
 import agents.equiplet_agent.reconfigure.datatypes.ModuleTree;
 
@@ -22,34 +23,50 @@ import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 
 public class ReconfigureBehaviour extends Behaviour{
-	int i = 0;
 	public HardwareAbstractionLayer HAL;
+	public boolean serverHosted = false;
 	public ReconfigureBehaviour(HardwareAbstractionLayer hal) {
 		this.HAL = hal;
 	}
 
 	@Override
 	public void action() {
-		// TODO Auto-generated method stub
-		if(i == 0){
-	        try {
-				QrReceiver qr = new QrReceiver();
+		QrReceiver qr = new QrReceiver();
 
-				Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-							":9191/QrReceiver", qr);
-				System.out.println("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-						":9191/QrReceiver published");
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (KnowledgeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		// TODO Auto-generated method stub
+		if(serverHosted){
+			System.out.println("ServerHosted");
+			if(!((EquipletAgent.machineState.equals("OFFLINE") || EquipletAgent.machineState.equals("SAVE") ) 
+					&& EquipletAgent.machineMode.equals("SERVICE"))){				
+				try {
+					Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
+							":9191/QrReceiver", qr).stop();
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				serverHosted=false;
 			}
 	        
-		}i++;
+		}else{
+			if(((EquipletAgent.machineState.equals("OFFLINE") || EquipletAgent.machineState.equals("SAVE") ) 
+					&& EquipletAgent.machineMode.equals("SERVICE"))){
+				 try {
+						Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
+									":9191/QrReceiver", qr);
+						System.out.println("http://" + Inet4Address.getLocalHost().getHostAddress() + 
+								":9191/QrReceiver published");
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (KnowledgeException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				 serverHosted=true;
+			}
+		}
 	}
-
 	@Override
 	public boolean done() {
 		// TODO Auto-generated method stub

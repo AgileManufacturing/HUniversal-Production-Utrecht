@@ -65,18 +65,18 @@ import libraries.knowledgedb_client.KnowledgeException;
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener{
 		
 	/**
-	  * @var productStepFailedCounter
-	  * The productStepFailedCounter keeps track off all the failed productSteps.
-	  * This information is displayed in the WIMP.
+	  * @var machineState
+	  * Stores the current state that the equiplet is in.
+	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
 	  */
-	private String machineState = "";
+	public static String machineState = "123";
 	
 	/**
-	  * @var productStepFailedCounter
-	  * The productStepFailedCounter keeps track off all the failed productSteps.
-	  * This information is displayed in the WIMP.
+	  * @var machineMode
+	  * Stores the current mode that the equiplet is in.
+	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
 	  */
-	private String machineMode = "";
+	public static String machineMode = "321";
 	
 
 	private static final long serialVersionUID = -4551409467306407788L;
@@ -366,13 +366,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		// TODO Auto-generated method stub
 		return EQName;
 	}
-//Save of offline
+
 	@Override
 	public void onEquipletStateChanged(String state) {
 		// TODO Auto-generated method stub
 		machineState = state;
 	}
-//mode Service
+
 	@Override
 	public void onEquipletModeChanged(String mode) {
 		// TODO Auto-generated method stub
