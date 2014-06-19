@@ -46,10 +46,19 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
 public class GridAgent extends Agent{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long productAgentCounter =0;
 	protected void setup(){	
 		addBehaviour(new CyclicBehaviour()
 		{ 				
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void action() {
 				ACLMessage msg = receive();
                 if (msg!=null) {

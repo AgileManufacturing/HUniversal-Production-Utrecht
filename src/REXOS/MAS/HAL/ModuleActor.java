@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import com.google.gson.JsonObject;
 
 import HAL.exceptions.FactoryException;
-import HAL.exceptions.HardwareAbstractionLayerProcessException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
@@ -14,44 +13,39 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import libraries.blackboard_client.BlackboardClient;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import libraries.blackboard_client.data_classes.InvalidJSONException;
-import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.math.Matrix;
 import libraries.math.RotationAngles;
 import libraries.math.Vector3;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
  *
  */
 public abstract class ModuleActor extends Module {
-	protected static final String COMMAND = "command";
 	protected static final String MODULE_COMMAND = "module_command";
+	protected static final String APPROACH = "approach";
 	protected static final String DESTINATION = "destination";
-	protected static final String LOOK_UP = "look_up";
 	protected static final String NULL = "NULL";
-	protected static final String X = "x";
-	protected static final String Y = "y";
-	protected static final String Z = "z";
+	protected static final String MAX_ACCELERATION = "maxAcceleration";
+	protected static final String FORCE_STRAIGHT_LINE = "forceStraightLine";
+	protected static final String MOVE_X = "x";
+	protected static final String MOVE_Y = "y";
+	protected static final String MOVE_Z = "z";
 	
-	//TODO Check this (added by Rolf)
 	protected static final String ROTATION_X = "rotationX";
 	protected static final String ROTATION_Y = "rotationY";
 	protected static final String ROTATION_Z = "rotationZ";
 	
 	protected static final String MOVE = "move";
 	
-	
-	/**
-	 * The blackboard client used for writing the hardware steps.
-	 * The results from ROS are not processed with this client.
-	 */
-	protected BlackboardClient mongoClient;
-	protected static final String MONGO_HOST = "145.89.191.131";
 	
 	/**
 	 * Constructs a new ModuleActor and connects to the blackboard.
@@ -65,14 +59,6 @@ public abstract class ModuleActor extends Module {
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
-		mongoClient = new BlackboardClient(MONGO_HOST);
-		try {
-			mongoClient.setDatabase(moduleFactory.getHAL().getEquipletName());
-			mongoClient.setCollection("EquipletStepsBlackBoard");
-		} catch (InvalidDBNamespaceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
@@ -82,15 +68,15 @@ public abstract class ModuleActor extends Module {
 	 * @param command
 	 * @throws ModuleExecutingException
 	 */
-	protected void executeMongoCommand(String command) throws ModuleExecutingException{
+	protected void executeMongoCommand(JsonObject command){
 		try {
-			mongoClient.insertDocument(command.toString());
+			moduleFactory.getHAL().getBlackBoardHandler().postHardwareStep(command);
 		} catch (InvalidJSONException ex) {
-			throw new ModuleExecutingException("Executing invalid JSON", ex);
+			throw new RuntimeException("Executing invalid JSON", ex);
 		} catch (InvalidDBNamespaceException ex) {
-			throw new ModuleExecutingException("Executing invalid DBNamespace", ex);
+			throw new RuntimeException("Executing invalid DBNamespace", ex);
 		} catch (GeneralMongoException ex) {
-			throw new ModuleExecutingException("General mongo exception while trying to execute", ex);
+			throw new RuntimeException("General mongo exception while trying to execute", ex);
 		}
 	}
 	
@@ -101,23 +87,27 @@ public abstract class ModuleActor extends Module {
 	 * @return The hardware steps resulted from the translation of the CompositeStep done by the parent modules.
 	 * @throws ModuleTranslatingException if the CompositeStep could not completely be translated (which is the case if there is no parent module and the CompositeStep is not empty)  
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException{
+	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ModuleActor moduleActor = (ModuleActor) getParentModule();
-		if (moduleActor != null){
-			return(moduleActor.translateCompositeStep(compositeStep));
-		}
-		else { //Root module, no more parents			
-			//Check for remaining commands, then not capable
-			if (compositeStep.getCommand().get(COMMAND).getAsJsonObject() == null){
-				throw new ModuleTranslatingException("The compositestep doesn't contain any \"command\" key.");
+		if (moduleActor != null) {
+			ArrayList<HardwareStep> hardwareSteps = moduleActor.translateCompositeStep(compositeStep);
+			if (hardwareSteps != null){
+				return hardwareSteps;
 			}
-			if (!compositeStep.getCommand().get(COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
+			return new ArrayList<HardwareStep>();
+		} else {
+			// root module, no more parents			
+			// if commands remain then the modules were not able to fully translate the compositeStep
+			// TODO better comparison method
+			if (!compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty." + 
-						compositeStep.getCommand().get(COMMAND).getAsJsonObject());
+						compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject(), compositeStep);
+			} else {
+				//TODO
+				//Logger
+				return new ArrayList<HardwareStep>();
 			}
-			return null;
 		}
 	}
 	/**
@@ -126,10 +116,10 @@ public abstract class ModuleActor extends Module {
 	 * @param hardwareStep
 	 * @throws ModuleExecutingException
 	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws ModuleExecutingException{
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
 		this.processListener = processListener;
-		JsonObject command = hardwareStep.getRosCommand();
-		executeMongoCommand(command.toString());
+		JsonObject command = hardwareStep.toJSON();
+		executeMongoCommand(command);
 	}
 	/**
 	 * This method will translate the {@link CompositeStep} and forward the remainder to its parent.
@@ -137,9 +127,8 @@ public abstract class ModuleActor extends Module {
 	 * @return The hardware steps resulted from the translation of the CompositeStep. 
 	 * @throws ModuleTranslatingException
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JarFileLoaderException;
+	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException;
 	/**
 	 * This method will forward the changed MAST module state to the {@link ModuleListener}
 	 * Do not call this method!
@@ -155,53 +144,67 @@ public abstract class ModuleActor extends Module {
 		moduleListener.onModuleModeChanged(mode, this);
 	}
 	
+	/**
+	 * Returns -1 if not found.
+	 * 
+	 */
+	protected int getPlaceholderID(ArrayList<HardwareStep> hardwareSteps){
+		if (hardwareSteps != null){
+			for (int i=0;i<hardwareSteps.size();i++){
+				if (hardwareSteps.get(i) == null){
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	protected CompositeStep adjustMoveWithDimensions(CompositeStep compositeStep, Vector3 offsetVector){
+		JsonObject command = compositeStep.getCommand();
+		command = adjustMoveWithDimensions(command, offsetVector);
+		return new CompositeStep(compositeStep.getProductStep(), command, compositeStep.getRelativeTo());
+	}
 	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector){
 		return adjustMoveWithDimensions(compositeCommand, offsetVector, new RotationAngles(0, 0, 0));
 	}
 	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector, RotationAngles directionAngles){
-		System.out.println("Adjusting move with dimentions: " + compositeCommand.toString() + 
+		Logger.log(LogSection.HAL_MODULES, LogLevel.DEBUG, "Adjusting move with dimentions: " + compositeCommand.toString() + 
 				", offsetVector: " + offsetVector + " directionAngles: " + directionAngles);
 		
 		JsonObject originalMove = compositeCommand.remove(MOVE).getAsJsonObject();
-		double originalX = originalMove.get(X).getAsDouble();
-		double originalY = originalMove.get(Y).getAsDouble();
-		double originalZ = originalMove.get(Z).getAsDouble();
-		
-		Matrix rotationMatrix = directionAngles.generateRotationMatrix();
-		
-		Vector3 originalVector = offsetVector;
-		Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
-		
-		JsonObject adjustedMove = new JsonObject();
-		adjustedMove.addProperty(X, originalX + rotatedVector.x);
-		adjustedMove.addProperty(Y, originalY + rotatedVector.y);
-		adjustedMove.addProperty(Z, originalZ + rotatedVector.z);
-		
-		/*
-		//TODO added by Rolf, Check this!!!!!!!!!!!!!!!!!!!
-		adjustedMove.addProperty(ROTATION_X, originalMove.get(ROTATION_X).getAsDouble());
-		adjustedMove.addProperty(ROTATION_Y, originalMove.get(ROTATION_Y).getAsDouble());
-		adjustedMove.addProperty(ROTATION_Z, originalMove.get(ROTATION_Z).getAsDouble());
-		*/
-		compositeCommand.add(MOVE, adjustedMove);
+		if (originalMove != null){
+			double originalX = originalMove.get(MOVE_X).getAsDouble();
+			double originalY = originalMove.get(MOVE_Y).getAsDouble();
+			double originalZ = originalMove.get(MOVE_Z).getAsDouble();
+			
+			Matrix rotationMatrix = directionAngles.generateRotationMatrix();
+			
+			Vector3 originalVector = offsetVector;
+			Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
+			
+			JsonObject adjustedMove = new JsonObject();
+			adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
+			adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
+			adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
+			
+			compositeCommand.add(MOVE, adjustedMove);
+		}
+		else {
+			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, 
+					"CompositeStep command does not contain any move key to adjust. " + compositeCommand);
+		}
 		return compositeCommand;
 	}
 	
 
 
 	@Override
-	public void onProcessStatusChanged(String state) {
-		// TODO Auto-generated method stub
-		try {
-			if(processListener != null){
-				processListener.onProcessStateChanged(state, 0, this);
-				if(state.equals("DONE")){
-					processListener =null;
-				}
+	public void onProcessStatusChanged(String status) {
+		if(processListener != null){
+			processListener.onProcessStateChanged(status, 0, this);
+			if(status.equals(HardwareStepStatus.DONE) || status.equals(HardwareStepStatus.FAILED)){
+				processListener = null;
 			}
-		} catch (HardwareAbstractionLayerProcessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

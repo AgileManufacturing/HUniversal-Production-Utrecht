@@ -2,11 +2,9 @@ package HAL;
 
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
-import HAL.listeners.BlackboardListener;
+import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
-import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
@@ -15,12 +13,32 @@ import libraries.knowledgedb_client.Row;
  * @author Bas Voskuijlen
  *
  */
-public abstract class Module implements BlackboardListener { 
+public abstract class Module implements BlackboardModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
 	protected ModuleListener moduleListener;
 	protected ProcessListener processListener;
+	
+	private static final String GET_MOUNT_POSITION = 
+			"SELECT mountPointX, mountPointY FROM Module " +
+			"	WHERE manufacturer = ?" +
+			" 		AND typeNumber = ?" +
+			" 		AND serialNumber = ?";
+	private static final String GET_PARENT_MODULE =
+			"SELECT * FROM Module " +
+			"	WHERE attachedToLeft < (" +
+			"		SELECT attachedToLeft FROM Module " +
+			"			WHERE manufacturer = ?" +
+			"				AND typeNumber = ?" +
+			"				AND serialNumber = ?" +
+			"	) AND attachedToRight > (" +
+ 			"		SELECT attachedToRight FROM Module " +
+ 			"			WHERE manufacturer = ?" +
+ 			"				AND typeNumber = ?" +
+ 			"				AND serialNumber = ?" +
+ 			"	) " +
+ 			"	ORDER BY abs(attachedToLeft - attachedToRight) ASC LIMIT 1";
 	
 	/**
 	 * Constructs a new Module and subscribes to the blackboardHandler.
@@ -36,7 +54,7 @@ public abstract class Module implements BlackboardListener {
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
 		
-		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardListener(this);
+		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardModuleListener(this);
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -49,64 +67,41 @@ public abstract class Module implements BlackboardListener {
 	 * @return An integer array with 2 elements containing the zero-indexed x and y position on the mountplate (corresponding with the x and the -z axis in the equiplet coordinate system).
 	 */
 	public int[] getMountPosition() {
-		try{
-			String sql = "SELECT mountPointX, mountPointY FROM Module " +
-					"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
-					"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
-					"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
-					"'";
-			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
-			if (resultSet.length == 1){
-				int[] position = new int[2];
-				position[0] = (int) resultSet[0].get("mountPointX");
-				position[1] = (int) resultSet[0].get("mountPointY");
-				return position;
-			}
-			return null;
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
+		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_MOUNT_POSITION, 
+																moduleIdentifier.getManufacturer(), 
+																moduleIdentifier.getTypeNumber(), 
+																moduleIdentifier.getSerialNumber());
+		if (resultSet.length == 1){
+			int[] position = new int[2];
+			position[0] = (int) resultSet[0].get("mountPointX");
+			position[1] = (int) resultSet[0].get("mountPointY");
+			return position;
 		}
+		return null;
 	}
 	
 	/**
 	 * This method will return the parent module of this module
 	 * @return The parent module or null if no parent module exists
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	public Module getParentModule() throws FactoryException, JarFileLoaderException {
-		try{
-			String sql = "SELECT * FROM Module " +
-							"WHERE attachedToLeft < (" +
-								"SELECT attachedToLeft FROM Module " +
-									"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
-									"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
-									"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
-							"') AND attachedToRight > (" +
-	 							"SELECT attachedToRight FROM Module " +
-	 								"WHERE manufacturer = '" + moduleIdentifier.getManufacturer() +
-	 								"' AND typeNumber = '" + moduleIdentifier.getTypeNumber() +
-	 								"' AND serialNumber = '" + moduleIdentifier.getSerialNumber() +
-	 						"') ORDER BY abs(attachedToLeft - attachedToRight) ASC LIMIT 1";
-			
-			Row[] resultSet = knowledgeDBClient.executeSelectQuery(sql);
-			
-			if (resultSet.length == 1){
-				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(
-						resultSet[0].get("manufacturer").toString(),
-						resultSet[0].get("typeNumber").toString(),
-						resultSet[0].get("serialNumber").toString());
-				return this.moduleFactory.getModuleByIdentifier(moduleIdentifier);
-			}
-			else return null;
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			// this is impossible!
-			System.err.println("HAL::Module::getParentModule(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
-			return null;
+	public Module getParentModule() throws FactoryException {		
+		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_PARENT_MODULE,
+																moduleIdentifier.getManufacturer(),
+																moduleIdentifier.getTypeNumber(),
+																moduleIdentifier.getSerialNumber(),
+																moduleIdentifier.getManufacturer(),
+																moduleIdentifier.getTypeNumber(),
+																moduleIdentifier.getSerialNumber());
+		
+		if (resultSet.length == 1){
+			ModuleIdentifier moduleIdentifier = new ModuleIdentifier(
+					resultSet[0].get("manufacturer").toString(),
+					resultSet[0].get("typeNumber").toString(),
+					resultSet[0].get("serialNumber").toString());
+			return this.moduleFactory.getModuleByIdentifier(moduleIdentifier);
 		}
+		else return null;
 	}
 
 	/**
@@ -116,30 +111,5 @@ public abstract class Module implements BlackboardListener {
 	public String getProperties() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	
-	/**
-	 * This method is called by the {@link BlackboardHandler} but is ignored.
-	 */
-	@Override
-	public void OnEquipletStateChanged(String equipletName, String state) {
-		// ignore
-	}
-
-	/**
-	 * This method is called by the {@link BlackboardHandler} but is ignored.
-	 */
-	@Override
-	public void OnEquipletModeChanged(String equipletName, String mode) {
-		// ignore
-	}
-
-	/**
-	 * This method is called by the {@link BlackboardHandler} but is ignored.
-	 */
-	@Override
-	public void OnEquipletIpChanged(String ip) {
-		// ignore
 	}
 }

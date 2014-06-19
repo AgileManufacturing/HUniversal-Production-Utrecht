@@ -27,7 +27,7 @@ public class ModuleIdentifier {
 		return this.serialNumber;
 	}
 	
-	public JsonObject getAsJSON(){
+	public JsonObject toJSON(){
 		JsonObject moduleIdentifier = new JsonObject();
 		moduleIdentifier.addProperty("manufacturer", manufacturer);
 		moduleIdentifier.addProperty("typeNumber", typeNumber);

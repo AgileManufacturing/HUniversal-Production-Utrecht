@@ -46,7 +46,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-import agents.data_classes.ProductStep;
+import generic.ProductStep;
 import agents.data_classes.Proposal;
 
 import jade.core.AID;

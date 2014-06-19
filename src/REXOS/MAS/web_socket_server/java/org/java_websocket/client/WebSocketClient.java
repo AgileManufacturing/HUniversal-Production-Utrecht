@@ -68,8 +68,6 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 
 	private CountDownLatch closeLatch = new CountDownLatch( 1 );
 
-	private int timeout = 0;
-
 	private WebSocketClientFactory wsfactory = new DefaultWebSocketClientFactory( this );
 
 	private InetSocketAddress proxyAddress = null;
@@ -97,7 +95,6 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 		this.uri = serverUri;
 		this.draft = draft;
 		this.headers = headers;
-		this.timeout = connecttimeout;
 
 		try {
 			channel = SelectorProvider.provider().openSocketChannel();
@@ -215,7 +212,6 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 			channel.connect( new InetSocketAddress( host, port ) );
 			conn.channel = wrappedchannel = createProxyChannel( wsfactory.wrapChannel( channel, null, host, port ) );
 
-			timeout = 0; // since connect is over
 			sendHandshake();
 			readthread = new Thread( new WebsocketWriteThread() );
 			readthread.start();

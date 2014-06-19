@@ -14,10 +14,13 @@ import libraries.dynamicloader.DynamicClassDescription;
 import libraries.dynamicloader.DynamicClassFactory;
 import libraries.dynamicloader.InstantiateClassException;
 import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
+import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.Module;
@@ -25,7 +28,6 @@ import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.Mutation;
 import HAL.RosSoftware;
-import HAL.capabilities.Capability;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.listeners.ModuleListener;
@@ -317,51 +319,46 @@ public class ModuleFactory extends Factory {
 	 * @param treeNumber
 	 * @return
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	public ArrayList<ModuleActor> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber) throws FactoryException, JarFileLoaderException{
+	public ArrayList<ModuleActor> getBottomModulesForFunctionalModuleTree(Capability capability, int treeNumber){
 		ArrayList<ModuleActor> modules = new ArrayList<ModuleActor>();
 		
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType, 
-					capability.getName(), treeNumber, hal.getEquipletName());
-			for (Row row : rows) {
-				String manufacturer = (String) row.get("manufacturer");
-				String typeNumber = (String) row.get("typeNumber");
-				String serialNumber = (String) row.get("serialNumber");
-				ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType, 
+				capability.getName(), treeNumber, hal.getEquipletName());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType", rows);
+		for (Row row : rows) {
+			String manufacturer = (String) row.get("manufacturer");
+			String typeNumber = (String) row.get("typeNumber");
+			String serialNumber = (String) row.get("serialNumber");
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			try{
 				modules.add((ModuleActor) this.getModuleByIdentifier(identifier));
+			} catch (FactoryException ex) {
+				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.ERROR, "Unable to get module with identifier: " + identifier, ex);
 			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::ModuleFactory::getBottomModules(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
+				
 		}
-		System.out.println(modules);
+		Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.DEBUG, "Found bottomModules for function module tree " + treeNumber + " of capability " + capability.getName() + ":", 
+				modules);
 		return modules;
 	}
 	/**
 	 * This method gets all the bottomModules of the equiplet.
 	 * @return
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	public ArrayList<Module> getBottomModules() throws FactoryException, JarFileLoaderException {
+	public ArrayList<Module> getBottomModules() throws FactoryException {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersForBotomModules, hal.getEquipletName());
-			for (Row row : rows) {
-				String manufacturer = (String) row.get("manufacturer");
-				String typeNumber = (String) row.get("typeNumber");
-				String serialNumber = (String) row.get("serialNumber");
-				
-				ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-				modules.add(this.getModuleByIdentifier(identifier));
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			// this is impossible!
-			System.err.println("HAL::ModuleFactory::getBottomModules(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleIdentifiersForBotomModules, hal.getEquipletName());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleIdentifiersForBotomModules", rows);
+		for (Row row : rows) {
+			String manufacturer = (String) row.get("manufacturer");
+			String typeNumber = (String) row.get("typeNumber");
+			String serialNumber = (String) row.get("serialNumber");
+			
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			modules.add(this.getModuleByIdentifier(identifier));
 		}
 		
 		return modules;
@@ -371,10 +368,9 @@ public class ModuleFactory extends Factory {
 	 * @param processListener
 	 * @param hardwareStep
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 * @throws ModuleExecutingException
 	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException, JarFileLoaderException, ModuleExecutingException{
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException{
 		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
 		module.executeHardwareStep(processListener, hardwareStep);
 	}
@@ -385,9 +381,8 @@ public class ModuleFactory extends Factory {
 	 * @param moduleIdentifier
 	 * @return
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
+	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) throws FactoryException{
 		for (ModuleIdentifier loadedModuleIdentifier : loadedModules.keySet()) {
 			if(moduleIdentifier.equals(loadedModuleIdentifier) == true) {
 				return loadedModules.get(loadedModuleIdentifier);
@@ -405,6 +400,8 @@ public class ModuleFactory extends Factory {
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException ex) {
 			throw new FactoryException("well, we are fucked", ex);
+		} catch (JarFileLoaderException ex) {
+			throw new FactoryException("Unable to load the jarFile of the module");
 		}
 	}
 	/**
@@ -413,16 +410,11 @@ public class ModuleFactory extends Factory {
 	 * @return true if the moduleType is known in the knowledge database, false otherwise.
 	 */
 	private boolean isModuleTypeKnown(ModuleIdentifier moduleIdentifier) {
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-			if(rows.length == 1) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::ModuleFactory::isModuleTypeKnown(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleType", rows);
+		if(rows.length == 1) {
+			return true;
+		} else {
 			return false;
 		}
 	}
@@ -476,8 +468,7 @@ public class ModuleFactory extends Factory {
 				deserializeModuleCalibrationData(calibrationEntries);
 				
 			} catch(Exception ex) {
-				System.err.println("HAL::ModuleFactory::insertModule(): Error occured while inserting module " + ex);
-				ex.printStackTrace();
+				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.ERROR, "Error occured while inserting module ", ex);
 				knowledgeDBClient.getConnection().rollback();
 				knowledgeDBClient.getConnection().setAutoCommit(true);
 				return false;
@@ -504,52 +495,49 @@ public class ModuleFactory extends Factory {
 	 * @param moduleIdentifier
 	 * @return the static information of the module.
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException
 	 */
-	public JsonObject removeModule(ModuleIdentifier moduleIdentifier) throws FactoryException, JarFileLoaderException{
-		try{
-			JsonObject output = new JsonObject();
-			output.addProperty("manufacturer", moduleIdentifier.getManufacturer());
-			output.addProperty("typeNumber", moduleIdentifier.getTypeNumber());
-			output.addProperty("serialNumber", moduleIdentifier.getSerialNumber());
-			
-			JsonObject type = new JsonObject();
-			Module module = this.getModuleByIdentifier(moduleIdentifier);
-			String moduleProperties = module.getProperties();
-			type.addProperty("properties", moduleProperties);
-			
-			// fetch halSoftware
-			JavaSoftware halSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier);
-			type.add("halSoftware", halSoftware.serialize());
-			// fetch rosSoftware
-			RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier);
-			type.add("rosSoftware", rosSoftware.serialize());
-			
-			type.add("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
-			Mutation.removeSupportedMutations(moduleIdentifier, knowledgeDBClient);
-			
-			output.add("calibrationData", serializeModuleCalibrationData(moduleIdentifier));
-			knowledgeDBClient.executeUpdateQuery(removeAllCalibrationDataForModule, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
-			
-			Row[] moduleTypeRows = knowledgeDBClient.executeSelectQuery(getModuleType, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-			type.addProperty("properties", (String) moduleTypeRows[0].get("moduleTypeProperties"));
-			
-			Row[] moduleRows = knowledgeDBClient.executeSelectQuery(getModule, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
-			output.addProperty("properties", (String) moduleRows[0].get("moduleProperties"));
-			
-			removeSpace(moduleIdentifier);
-			knowledgeDBClient.executeUpdateQuery(removeModule, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
-			knowledgeDBClient.executeUpdateQuery(removeModuleTypesWithNoModules);
-			
-			output.add("type", type);
-			return output;
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			throw new FactoryException("deletion of module failed :(", ex);
-		}
+	public JsonObject removeModule(ModuleIdentifier moduleIdentifier) throws FactoryException {
+		JsonObject output = new JsonObject();
+		output.addProperty("manufacturer", moduleIdentifier.getManufacturer());
+		output.addProperty("typeNumber", moduleIdentifier.getTypeNumber());
+		output.addProperty("serialNumber", moduleIdentifier.getSerialNumber());
+		
+		JsonObject type = new JsonObject();
+		Module module = this.getModuleByIdentifier(moduleIdentifier);
+		String moduleProperties = module.getProperties();
+		type.addProperty("properties", moduleProperties);
+		
+		// fetch halSoftware
+		JavaSoftware halSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier);
+		type.add("halSoftware", halSoftware.serialize());
+		// fetch rosSoftware
+		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier);
+		type.add("rosSoftware", rosSoftware.serialize());
+		
+		type.add("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
+		Mutation.removeSupportedMutations(moduleIdentifier, knowledgeDBClient);
+		
+		output.add("calibrationData", serializeModuleCalibrationData(moduleIdentifier));
+		knowledgeDBClient.executeUpdateQuery(removeAllCalibrationDataForModule, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
+		
+		Row[] moduleTypeRows = knowledgeDBClient.executeSelectQuery(getModuleType, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleType", moduleTypeRows);
+		type.addProperty("properties", (String) moduleTypeRows[0].get("moduleTypeProperties"));
+		
+		Row[] moduleRows = knowledgeDBClient.executeSelectQuery(getModule, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModule", moduleRows);
+		output.addProperty("properties", (String) moduleRows[0].get("moduleProperties"));
+		
+		removeSpace(moduleIdentifier);
+		knowledgeDBClient.executeUpdateQuery(removeModule, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
+		knowledgeDBClient.executeUpdateQuery(removeModuleTypesWithNoModules);
+		
+		output.add("type", type);
+		return output;
 	}
 	
 	/**
@@ -610,27 +598,25 @@ public class ModuleFactory extends Factory {
 	 */
 	private void updateModuleType(ModuleIdentifier moduleIdentifier, JsonObject type) {
 		JsonObject halSoftwareObject = type.get("halSoftware").getAsJsonObject();
+		
 		JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 		int currentJavaSoftwareBuildNumber = javaSoftware.getBuildNumber();
-		
 		int newJavaSoftwareBuildNumber = JavaSoftware.getBuildNumber(halSoftwareObject);
-		
 		if(newJavaSoftwareBuildNumber > currentJavaSoftwareBuildNumber) {
 			// update the halSoftware
+			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating HAL software for module " + moduleIdentifier);
 			javaSoftware.updateJavaSoftware(halSoftwareObject);
 		}
-		System.out.println(type.toString());
+		
 		JsonObject rosSoftwareObject = type.get("rosSoftware").getAsJsonObject();
 		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 		int currentRosSoftwareBuildNumber = rosSoftware.getBuildNumber();
-		
 		int newRosSoftwareBuildNumber = RosSoftware.getBuildNumber(rosSoftwareObject);
-		
 		if(newRosSoftwareBuildNumber > currentRosSoftwareBuildNumber) {
-			// update the halSoftware
+			// update the rosSoftware
+			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating ROS software for module " + moduleIdentifier);
 			rosSoftware.updateRosSoftware(rosSoftwareObject);
 		}
-		
 	}
 	
 	/**
@@ -641,40 +627,37 @@ public class ModuleFactory extends Factory {
 	 */
 	private JsonArray serializeModuleCalibrationData(ModuleIdentifier moduleIdentifier) {
 		JsonArray calibrationEntries = new JsonArray();
-		try {
-			Row[] calibrationDataRows = knowledgeDBClient.executeSelectQuery(getAllModuleCalibrationDataForModule, 
-					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
-			for (Row calibrationDataRow : calibrationDataRows) {
-				Integer moduleCalibrationId = (Integer) calibrationDataRow.get("id");
-				String dateTime = ((Timestamp) calibrationDataRow.get("date")).toString();
-				String properties = (String) calibrationDataRow.get("properties");
+		Row[] calibrationDataRows = knowledgeDBClient.executeSelectQuery(getAllModuleCalibrationDataForModule, 
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getAllModuleCalibrationDataForModule", calibrationDataRows);
+		for (Row calibrationDataRow : calibrationDataRows) {
+			Integer moduleCalibrationId = (Integer) calibrationDataRow.get("id");
+			String dateTime = ((Timestamp) calibrationDataRow.get("date")).toString();
+			String properties = (String) calibrationDataRow.get("properties");
+			
+			JsonObject calibrationDataEntry = new JsonObject();
+			calibrationDataEntry.addProperty("date", dateTime);
+			calibrationDataEntry.addProperty("data", properties);
+			
+			// fetch the moduleSet for the calibration data
+			JsonArray moduleEntries = new JsonArray();
+			Row[] moduleSetrows = knowledgeDBClient.executeSelectQuery(getModuleSetForModuleCalibrationData, moduleCalibrationId);
+			logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleSetForModuleCalibrationData", calibrationDataRows);
+			for (Row moduleSetrow : moduleSetrows) {
+				String manufacturer = (String) moduleSetrow.get("manufacturer");
+				String typeNumber = (String) moduleSetrow.get("typeNumber");
+				String serialNumber = (String) moduleSetrow.get("serialNumber");
 				
-				JsonObject calibrationDataEntry = new JsonObject();
-				calibrationDataEntry.addProperty("date", dateTime);
-				calibrationDataEntry.addProperty("data", properties);
+				JsonObject moduleEntry = new JsonObject();
+				moduleEntry.addProperty("manufacturer", manufacturer);
+				moduleEntry.addProperty("typeNumber", typeNumber);
+				moduleEntry.addProperty("serialNumber", serialNumber);
 				
-				// fetch the moduleSet for the calibration data
-				JsonArray moduleEntries = new JsonArray();
-				Row[] moduleSetrows = knowledgeDBClient.executeSelectQuery(getModuleSetForModuleCalibrationData, moduleCalibrationId);
-				for (Row moduleSetrow : moduleSetrows) {
-					String manufacturer = (String) moduleSetrow.get("manufacturer");
-					String typeNumber = (String) moduleSetrow.get("typeNumber");
-					String serialNumber = (String) moduleSetrow.get("serialNumber");
-					
-					JsonObject moduleEntry = new JsonObject();
-					moduleEntry.addProperty("manufacturer", manufacturer);
-					moduleEntry.addProperty("typeNumber", typeNumber);
-					moduleEntry.addProperty("serialNumber", serialNumber);
-					
-					moduleEntries.add(moduleEntry);
-				}
-				calibrationDataEntry.add("moduleSet", moduleEntries);
-				
-				calibrationEntries.add(calibrationDataEntry);
+				moduleEntries.add(moduleEntry);
 			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::ModuleFactory::serializeCalibrationData(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
+			calibrationDataEntry.add("moduleSet", moduleEntries);
+			
+			calibrationEntries.add(calibrationDataEntry);
 		}
 		return calibrationEntries;
 	}
@@ -683,27 +666,22 @@ public class ModuleFactory extends Factory {
 	 * @param moduleCalibrationEntries
 	 */
 	private void deserializeModuleCalibrationData(JsonArray moduleCalibrationEntries) {
-		try {
-			for (JsonElement moduleCalibrationEntryElement : moduleCalibrationEntries) {
-				JsonObject moduleCalibrationEntry = moduleCalibrationEntryElement.getAsJsonObject();
-				String dateTime = moduleCalibrationEntry.get("date").getAsString();
-				String properties = moduleCalibrationEntry.get("data").getAsString();
-				int calibrationDataId = knowledgeDBClient.executeUpdateQuery(addModuleCalibrationData, dateTime, properties);
+		for (JsonElement moduleCalibrationEntryElement : moduleCalibrationEntries) {
+			JsonObject moduleCalibrationEntry = moduleCalibrationEntryElement.getAsJsonObject();
+			String dateTime = moduleCalibrationEntry.get("date").getAsString();
+			String properties = moduleCalibrationEntry.get("data").getAsString();
+			int calibrationDataId = knowledgeDBClient.executeUpdateQuery(addModuleCalibrationData, dateTime, properties);
+			
+			JsonArray moduleSetEntries = moduleCalibrationEntry.get("moduleSet").getAsJsonArray();
+			for (JsonElement moduleSetEntryElement : moduleSetEntries) {
+				JsonObject moduleSetEntry = moduleSetEntryElement.getAsJsonObject();
 				
-				JsonArray moduleSetEntries = moduleCalibrationEntry.get("moduleSet").getAsJsonArray();
-				for (JsonElement moduleSetEntryElement : moduleSetEntries) {
-					JsonObject moduleSetEntry = moduleSetEntryElement.getAsJsonObject();
-					
-					String manufacturer = moduleSetEntry.get("manufacturer").getAsString();
-					String typeNumber = moduleSetEntry.get("typeNumber").getAsString();
-					String serialNumber = moduleSetEntry.get("serialNumber").getAsString();
-					knowledgeDBClient.executeUpdateQuery(addModuleToCalibrationData, 
-							calibrationDataId, manufacturer, typeNumber, serialNumber);
-				}
+				String manufacturer = moduleSetEntry.get("manufacturer").getAsString();
+				String typeNumber = moduleSetEntry.get("typeNumber").getAsString();
+				String serialNumber = moduleSetEntry.get("serialNumber").getAsString();
+				knowledgeDBClient.executeUpdateQuery(addModuleToCalibrationData, 
+						calibrationDataId, manufacturer, typeNumber, serialNumber);
 			}
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::ModuleFactory::serializeCalibrationData(): Error occured which is considered to be impossible " + ex);
-			ex.printStackTrace();
 		}
 	}
 	

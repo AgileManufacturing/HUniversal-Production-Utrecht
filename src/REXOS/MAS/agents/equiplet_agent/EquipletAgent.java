@@ -38,6 +38,9 @@
  **/
 package agents.equiplet_agent;
 
+import generic.ProductStep;
+import generic.Service;
+
 import java.util.ArrayList;
 
 import agents.data_classes.MessageType;
@@ -48,8 +51,6 @@ import com.google.gson.JsonParser;
 import HAL.HardwareAbstractionLayer;
 import HAL.steps.HardwareStep;
 import HAL.Module;
-import HAL.steps.ProductStep;
-import HAL.Service;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -170,6 +171,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			public void action() {
 				ACLMessage msg = receive();
 				if (msg!=null) {
+					System.out.println(msg.getSender() + msg.getContent());
 					if(!msg.getSender().equals(this.getAgent().getAID())) {  
                     	if(msg.getPerformative()==MessageType.CAN_EXECUTE_PRODUCT_STEP){
                     		String result =canExecute(msg.getContent());
@@ -299,9 +301,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
-			Module module, HardwareStep hardwareStep) {
-		if(state.equals("FAILED")){
+	public void onProcessStatusChanged(String status, Module module, HardwareStep hardwareStep) {
+		if(status.equals("FAILED")){
 			equipletActive=false;
 			scheduleCounter=0;
 			equipletSchedule.clear();
@@ -332,7 +333,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onIncapableCapabilities(ProductStep productStep) {
+	public void onTranslationFailed(ProductStep productStep) {
 	}
 
 	@Override
@@ -349,13 +350,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state, Module module) {
+	public void onEquipletStateChanged(String state) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode, Module module) {
+	public void onEquipletModeChanged(String mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onExecutionFailed() {
 		// TODO Auto-generated method stub
 		
 	}

@@ -1,14 +1,10 @@
 package web_socket_server;
-import grid_server.ServerConfigurations;
 
-import com.google.gson.JsonArray;
+import configuration.ServerConfigurations;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.Profile;
-import jade.core.ProfileImpl;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 

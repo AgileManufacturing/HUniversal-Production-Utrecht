@@ -5,7 +5,6 @@ import java.util.HashMap;
 import libraries.dynamicloader.DynamicClassDescription;
 import libraries.dynamicloader.JarFileLoader;
 import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KeyNotFoundException;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
@@ -65,13 +64,7 @@ public class JavaSoftware implements JarFileLoader {
 	 * @return the now stored java software
 	 */
 	public static JavaSoftware insertJavaSoftware(JsonObject javaSoftware) {
-		try{
-			return insertJavaSoftware(javaSoftware, new KnowledgeDBClient());
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::JavaSoftware::insertJavaSoftware(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		return insertJavaSoftware(javaSoftware, new KnowledgeDBClient());
 	}
 	/**
 	 * Deserializes java software from a JsonObject and stores in in the knowledge database using the provided KnowledgeDBClient.
@@ -80,19 +73,13 @@ public class JavaSoftware implements JarFileLoader {
 	 * @return the now stored java software
 	 */
 	public static JavaSoftware insertJavaSoftware(JsonObject javaSoftware, KnowledgeDBClient knowledgeDBClient) {
-		try {
-			byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
-			int buildNumber = getBuildNumber(javaSoftware);
-			String className = getClassName(javaSoftware);
-			
-			int id = knowledgeDBClient.executeUpdateQuery(addJavaSoftware, 
-					buildNumber, className, jarFile);
-			return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::JavaSoftware::insertJavaSoftware(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
+		int buildNumber = getBuildNumber(javaSoftware);
+		String className = getClassName(javaSoftware);
+		
+		int id = knowledgeDBClient.executeUpdateQuery(addJavaSoftware, 
+				buildNumber, className, jarFile);
+		return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
 	}
 	/**
 	 * This method allows the extraction of the build number of the javaSoftware from the JsonObject. Used for updating.
@@ -163,22 +150,16 @@ public class JavaSoftware implements JarFileLoader {
 	 * @return
 	 */
 	public static JavaSoftware getJavaSoftwareForModuleIdentifier(ModuleIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-			
-			int id = (Integer) rows[0].get("id");
-			int buildNumber = (Integer) rows[0].get("buildNumber");
-			String className = (String) rows[0].get("className");
-			
-			if(javaSoftwareInstances.containsKey(id) == true) {
-				return javaSoftwareInstances.get(id);
-			} else {
-				return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::JavaSoftware::getJavaSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+		
+		int id = (Integer) rows[0].get("id");
+		int buildNumber = (Integer) rows[0].get("buildNumber");
+		String className = (String) rows[0].get("className");
+		
+		if(javaSoftwareInstances.containsKey(id) == true) {
+			return javaSoftwareInstances.get(id);
+		} else {
+			return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
 		}
 	}
 	/**
@@ -188,22 +169,17 @@ public class JavaSoftware implements JarFileLoader {
 	 * @return
 	 */
 	public static JavaSoftware getJavaSoftwareForCapabilityName(String capabilityName) {
-		try{
-			KnowledgeDBClient knowledgeDBClient = new KnowledgeDBClient();
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForCapabilityName, capabilityName);
-			
-			int id = (Integer) rows[0].get("id");
-			int buildNumber = (Integer) rows[0].get("buildNumber");
-			String className = (String) rows[0].get("className");
-			
-			if(javaSoftwareInstances.containsKey(id) == true) {
-				return javaSoftwareInstances.get(id);
-			} else {
-				return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
-			}
-		} catch(KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::JavaSoftware::getJavaSoftwareForCapabilityName(): Error occured which is considered to be impossible " + ex);
-			return null;
+		KnowledgeDBClient knowledgeDBClient = new KnowledgeDBClient();
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForCapabilityName, capabilityName);
+		
+		int id = (Integer) rows[0].get("id");
+		int buildNumber = (Integer) rows[0].get("buildNumber");
+		String className = (String) rows[0].get("className");
+		
+		if(javaSoftwareInstances.containsKey(id) == true) {
+			return javaSoftwareInstances.get(id);
+		} else {
+			return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
 		}
 	}
 	/**
@@ -220,38 +196,27 @@ public class JavaSoftware implements JarFileLoader {
 	 * @return The JsonObject for the JavaSoftware
 	 */
 	public JsonObject serialize() {
-		try{
-			JsonObject javaSoftware = new JsonObject();
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForId, this.id);
-			javaSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
-			javaSoftware.addProperty("className", (String) rows[0].get("className"));
-			byte[] jarFile = (byte[]) rows[0].get("jarFile");
-			javaSoftware.addProperty("jarFile", new String(Base64.encodeBase64(jarFile)));
-			return javaSoftware;
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::JavaSoftware::serializeJavaSoftwareForModuleIdentifier(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
-		}
+		JsonObject javaSoftware = new JsonObject();
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForId, this.id);
+		javaSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
+		javaSoftware.addProperty("className", (String) rows[0].get("className"));
+		byte[] jarFile = (byte[]) rows[0].get("jarFile");
+		javaSoftware.addProperty("jarFile", new String(Base64.encodeBase64(jarFile)));
+		return javaSoftware;
 	}
 	
 	/**
 	 * This method will load the jar file from the knowledge database and will return the contents of it.
+	 * @throws JarFileLoaderException if the loading of the jarFile failed
 	 */
 	@Override
 	public byte[] loadJarFile() throws JarFileLoaderException {
-		try {
-			Row[] rows = knowledgeDBClient.executeSelectQuery(getJarFileForDescription, this.id);
-			if(rows.length != 0) {
-				byte[] jarFile = (byte[]) rows[0].get("jarFile");
-				return jarFile;
-			} else {
-				throw new JarFileLoaderException("HAL::Factory::loadJarFile(): Unable to retrieve the software");
-			}
-		} catch (KnowledgeException | KeyNotFoundException ex) {
-			System.err.println("HAL::Factory::loadJarFile(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-			return null;
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getJarFileForDescription, this.id);
+		if(rows.length != 0) {
+			byte[] jarFile = (byte[]) rows[0].get("jarFile");
+			return jarFile;
+		} else {
+			throw new JarFileLoaderException("Unable to retrieve the software");
 		}
 	}
 	
@@ -260,16 +225,10 @@ public class JavaSoftware implements JarFileLoader {
 	 * @param javaSoftware
 	 */
 	public void updateJavaSoftware(JsonObject javaSoftware) {
-		try {
-			byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
-			int buildNumber = getBuildNumber(javaSoftware);
-			String className = getClassName(javaSoftware);
-			
-			knowledgeDBClient.executeUpdateQuery(updateJavaSoftware, 
-					buildNumber, className, jarFile);
-		} catch (KnowledgeException ex) {
-			System.err.println("HAL::JavaSoftware::deserializeJavaSoftware(): Error occured which is considered to be impossible" + ex);
-			ex.printStackTrace();
-		}
+		byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
+		int buildNumber = getBuildNumber(javaSoftware);
+		String className = getClassName(javaSoftware);
+		
+		knowledgeDBClient.executeUpdateQuery(updateJavaSoftware, buildNumber, className, jarFile);
 	}	
 }

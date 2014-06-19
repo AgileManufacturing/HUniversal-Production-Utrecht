@@ -1,10 +1,6 @@
-package HAL.steps;
+package generic;
 
-import java.io.Serializable;
-
-import HAL.Module;
-import HAL.Service;
-import HAL.capabilities.Capability;
+import HAL.Capability;
 
 import com.google.gson.JsonObject;
 
@@ -15,11 +11,30 @@ import com.google.gson.JsonObject;
  * @author Tommas Bakker
  *
  */
-public class ProductStep implements Serializable {
-	private static final long serialVersionUID = 6788269249283740246L;
+public class ProductStep {
+	public static final String TARGET = "target";
+	public static final String SUBJECTS = "subjects";
+
+	public static final String CRITERIA = "criteria";
+	public static final String SERVICE = "service";
+	public static final String ID = "id";
+	
+	
 	private Service service;
 	private JsonObject criteria;
 	private String id;
+	
+	public ProductStep(JsonObject json){
+		if (json.has(ID)){
+			this.id = json.get(ID).getAsString();
+		}
+		if (json.has(SERVICE)){
+			this.service = new Service(json.get(SERVICE).getAsString());
+		}
+		if (json.has("CRITERIA")){
+			this.criteria = json.get("CRITERIA").getAsJsonObject();
+		}
+	}
 	
 	public ProductStep(String productStepId, JsonObject criteria, Service service){
 		this.id = productStepId;
@@ -35,5 +50,13 @@ public class ProductStep implements Serializable {
 	}
 	public String getId(){
 		return this.id;
+	}
+	
+	public String toJSON(){
+		  return  "{" +
+		    " " + ID + ":" + id + ",\n" +
+		    " " + SERVICE + ":" + service.toJSON() + ",\n" +
+		    " " + CRITERIA + ": {" + criteria + "}\n" +
+		    "}";
 	}
 }

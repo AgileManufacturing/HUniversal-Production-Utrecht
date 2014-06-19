@@ -1,5 +1,7 @@
 package grid_server;
 
+import generic.ProductStep;
+
 import java.util.ArrayList;
 
 import agents.data_classes.MessageType;

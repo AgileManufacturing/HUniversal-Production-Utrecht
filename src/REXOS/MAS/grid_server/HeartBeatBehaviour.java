@@ -38,7 +38,6 @@
  **/
 package grid_server;
 
-import java.util.ArrayList;
 
 import agents.data_classes.MessageType;
 
@@ -48,10 +47,13 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 public class HeartBeatBehaviour extends TickerBehaviour {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final String pulseMessage = "Update status";
 	Agent a;
 	public HeartBeatBehaviour(Agent a, long period) {

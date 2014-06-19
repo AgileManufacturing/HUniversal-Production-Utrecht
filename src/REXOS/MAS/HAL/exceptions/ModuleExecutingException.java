@@ -6,5 +6,8 @@ public class ModuleExecutingException extends Exception {
 	public ModuleExecutingException(String message, Exception exception) {
 		super(message,exception);		
 	}
+	public ModuleExecutingException(String message) {
+		super(message);		
+	}
 
 }

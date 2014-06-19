@@ -9,13 +9,17 @@ import libraries.blackboard_client.data_classes.FieldUpdateSubscription;
 import libraries.blackboard_client.data_classes.FieldUpdateSubscription.MongoUpdateLogOperation;
 import libraries.blackboard_client.data_classes.GeneralMongoException;
 import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.InvalidJSONException;
 import libraries.blackboard_client.data_classes.MongoOperation;
 import libraries.blackboard_client.data_classes.OplogEntry;
-import libraries.utillities.log.LogLevel;
-import libraries.utillities.log.Logger;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import HAL.exceptions.BlackboardUpdateException;
-import HAL.listeners.BlackboardListener;
+import HAL.listeners.BlackboardEquipletListener;
+import HAL.listeners.BlackboardModuleListener;
 
+import com.google.gson.JsonObject;
 import com.mongodb.DBObject;
 
 import configuration.Configuration;
@@ -28,8 +32,9 @@ import configuration.ConfigurationFiles;
  *
  */
 public class BlackboardHandler implements BlackboardSubscriber {
-	
-	private ArrayList<BlackboardListener> updateSubscribers;
+
+	private ArrayList<BlackboardModuleListener> moduleSubscribers;
+	private ArrayList<BlackboardEquipletListener> equipletSubscribers;
 	
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
@@ -39,7 +44,6 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	private FieldUpdateSubscription modeSubscription;
 	private FieldUpdateSubscription statusSubscription;
 	
-	private String equipletName;
 	private String state = null;
 	private String mode = null;
 	
@@ -48,8 +52,8 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * 
 	 */
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
-		this.equipletName = equipletName;
-		updateSubscribers = new ArrayList<BlackboardListener>();
+		moduleSubscribers = new ArrayList<BlackboardModuleListener>();
+		equipletSubscribers = new ArrayList<BlackboardEquipletListener>();
 			
 		try {
 			stateSubscription = new FieldUpdateSubscription("state", this);
@@ -87,9 +91,34 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * 
 	 * @param blackboardListener
 	 */
-	public void addBlackboardListener(BlackboardListener blackboardListener){
-		updateSubscribers.add(blackboardListener);
+	public void addBlackboardModuleListener(BlackboardModuleListener blackboardListener){
+		moduleSubscribers.add(blackboardListener);
 	}
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void addBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
+		equipletSubscribers.add(blackboardListener);
+	}
+	
+
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void removeBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
+		equipletSubscribers.remove(blackboardListener);
+	}
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void removeBlackboardModuleListener(BlackboardModuleListener blackboardListener){
+		moduleSubscribers.remove(blackboardListener);
+	}
+	
+	
 
 	/**
 	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
@@ -100,18 +129,18 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		try{
 			switch (entry.getNamespace().split("\\.")[1]) {
 				case "equipletState":
+					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ state or mode changed");
 					dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
-						equipletName = dbObject.get("equipletName").toString();
 						if(dbObject.containsField("state")){
 							state = dbObject.get("state").toString();
 						}
 						if(dbObject.containsField("mode")){
 							mode = dbObject.get("mode").toString();
 						}	
-						for(BlackboardListener listener: updateSubscribers){
-							listener.OnEquipletStateChanged(equipletName,state);
-							listener.OnEquipletModeChanged(equipletName, mode);
+						for(BlackboardEquipletListener listener: equipletSubscribers){
+							listener.OnEquipletStateChanged(state);
+							listener.OnEquipletModeChanged(mode);
 						}
 					}
 					break;
@@ -119,21 +148,23 @@ public class BlackboardHandler implements BlackboardSubscriber {
 					dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
 						String status = dbObject.get("status").toString();
-						System.out.println("EQ step process status changed");
+						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed");
 						
-						//if(!status.equals("IN_PROGRESS")) {
-							for(BlackboardListener listener: updateSubscribers) {
-								listener.onProcessStatusChanged(status); 
-							}
-						//}
+						for(BlackboardModuleListener listener: moduleSubscribers) {
+							listener.onProcessStatusChanged(status); 
+						}
 					}
 				    break;
 				default:
 					break;
 			}
 		}catch(InvalidDBNamespaceException | GeneralMongoException ex) {
-			Logger.log(LogLevel.ERROR, "", ex);
+			Logger.log(LogLevel.ERROR, "Unknown exception occured:", ex);
 		}
+	}
+	
+	public void postHardwareStep(JsonObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		equipletStepBBClient.insertDocument(hardwareStep.toString());
 	}
 
 }

@@ -32,7 +32,7 @@ package libraries.knowledgedb_client;
 /**
  * Thrown when a key is not found in a collection.
  **/
-public class KeyNotFoundException extends Exception {
+public class KeyNotFoundException extends RuntimeException {
 
 	/**
 	 * @var long serialVersionUID
