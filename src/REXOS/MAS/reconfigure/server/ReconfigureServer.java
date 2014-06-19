@@ -62,7 +62,7 @@ public class ReconfigureServer {
 	 
 	 /**
 	  * main()
-	  * Starts the web service on the local host IP, port 9191.	  
+	  * Starts the web service on the local host IP, port 9190.	  
 	  */
 	public static void main(String[] args) 
 			throws Exception {
@@ -70,9 +70,9 @@ public class ReconfigureServer {
 		// TODO Auto-generated method stub
 		QrReceiver qr = new QrReceiver();
         Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-					":9190/QrReceiver", qr); 
+					":9191/QrReceiver", qr); 
         System.out.println("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-					":9190/QrReceiver published");
+					":9191/QrReceiver published");
 	}
 
 }

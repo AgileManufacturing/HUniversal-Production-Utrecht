@@ -40,6 +40,8 @@ package grid_server;
 
 import java.util.ArrayList;
 
+import agents.data_classes.MessageType;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;

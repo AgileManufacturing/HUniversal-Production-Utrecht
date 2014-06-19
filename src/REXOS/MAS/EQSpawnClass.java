@@ -42,6 +42,7 @@ import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 
 import agents.equiplet_agent.EquipletAgent;
+import agents.laurens_agent.LaurensAgent;
 
 public class EQSpawnClass extends Agent {
 	/**
@@ -54,7 +55,7 @@ public class EQSpawnClass extends Agent {
 	  * @var MAIN_PORT
 	  * The string has the PORT of the server that is hosting the Grid Agent Container.
 	  */
-	private static final String MAIN_PORT = "1234";
+	private static final String MAIN_PORT = "1099";
 	
 	/**
 	  * @var CONTAINER_NAME
@@ -80,7 +81,7 @@ public class EQSpawnClass extends Agent {
 		Agent agent = new EquipletAgent();
 		agent.setArguments(args);
 		AgentController ac = container.acceptNewAgent( "EquipletAgent"+date.getTime(), agent);
-		ac.start();
+		ac.start();		
 		
 	}
 }

@@ -225,7 +225,7 @@ public class QrReceiver implements HardwareAbstractionLayerListener {
 	@Override
 	public String getEquipletName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "EQ2";
 	}
 
 	@Override
