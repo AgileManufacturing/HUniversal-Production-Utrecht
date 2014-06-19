@@ -39,6 +39,8 @@
  
 package reconfigure.qr_receiver;
 
+import generic.ProductStep;
+
 import java.util.ArrayList;
 
 import javax.jws.WebParam;
@@ -46,6 +48,9 @@ import javax.jws.WebService;
 
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
 import reconfigure.ModuleDataManager;
 import reconfigure.datatypes.ModuleTree;
 import HAL.HardwareAbstractionLayer;
@@ -55,7 +60,6 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-import HAL.steps.ProductStep;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -168,74 +172,55 @@ public class QrReceiver implements HardwareAbstractionLayerListener {
 			e.printStackTrace();
 		}
 	}
-	/**
-	 * (non-Javadoc)
-	 * @see HAL.listeners.HardwareAbstractionLayerListener#onProcessStateChanged(java.lang.String, long, HAL.Module, HAL.HardwareStep)
-	 */
 	@Override
-	public void onProcessStatusChanged(String state, long hardwareStepSerialId,
-			Module module, HardwareStep hardwareStep) {
-		// TODO Auto-generated method stub		
+	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 	}
-	/**
-	 * (non-Javadoc)
-	 * @see HAL.listeners.HardwareAbstractionLayerListener#onModuleStateChanged(java.lang.String, HAL.Module)
-	 */
+
+	@Override
+	public void onTranslationFailed(ProductStep productStep) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
+	}
+
+	@Override
+	public void onProcessStatusChanged(String status, 
+			Module module, HardwareStep hardwareStep) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
+	}
+
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
-	/**
-	 * (non-Javadoc)
-	 * @see HAL.listeners.HardwareAbstractionLayerListener#onModuleModeChanged(java.lang.String, HAL.Module)
-	 */
+
 	@Override
 	public void onModuleModeChanged(String mode, Module module) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * @see HAL.listeners.HardwareAbstractionLayerListener#onTranslationFinished(HAL.ProductStep, java.util.ArrayList)
-	 */
-	@Override
-	public void onTranslationFinished(ProductStep productStep,
-			ArrayList<HardwareStep> hardwareStep) {
-		// TODO Auto-generated method stub
-
-	}
-	/**
-	 * (non-Javadoc)
-	 * @see HAL.listeners.HardwareAbstractionLayerListener#onIncapableCapabilities(HAL.ProductStep)
-	 */
-	@Override
-	public void onIncapableCapabilities(ProductStep productStep) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onExecutionFinished() {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
 	}
 
 	@Override
 	public String getEquipletName() {
-		// TODO Auto-generated method stub
+		// TODO hardcoded!!!!!!
 		return "EQ2";
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
-		
+	public void onExecutionFinished() {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode, Module module) {
+	public void onEquipletStateChanged(String state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
+	}
+
+	@Override
+	public void onEquipletModeChanged(String mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
+	}
+
+	@Override
+	public void onExecutionFailed() {
 		// TODO Auto-generated method stub
 		
 	}

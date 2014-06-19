@@ -42,7 +42,6 @@ import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 
 import agents.equiplet_agent.EquipletAgent;
-import agents.laurens_agent.LaurensAgent;
 
 public class EQSpawnClass extends Agent {
 	/**

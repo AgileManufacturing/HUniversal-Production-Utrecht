@@ -1,6 +1,6 @@
 package grid_server;
 
-import grid_server.ServerConfigurations;
+import configuration.ServerConfigurations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
