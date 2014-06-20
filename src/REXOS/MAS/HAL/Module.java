@@ -4,7 +4,6 @@ import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
-import HAL.listeners.ProcessListener;
 import libraries.knowledgedb_client.KnowledgeDBClient;
 import libraries.knowledgedb_client.KnowledgeException;
 import libraries.knowledgedb_client.Row;
@@ -18,7 +17,6 @@ public abstract class Module implements BlackboardModuleListener {
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
 	protected ModuleListener moduleListener;
-	protected ProcessListener processListener;
 	
 	private static final String GET_MOUNT_POSITION = 
 			"SELECT mountPointX, mountPointY FROM Module " +

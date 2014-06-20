@@ -4,6 +4,8 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
+import agents.data_classes.MessageType;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -125,7 +127,7 @@ public class ProductAgent extends Agent{
 				String message = productStepList.get(currentPlannedProductStep).getAsJsonObject().toString();
 				AID supplierAgent = new AID();
 				supplierAgent.addAddresses("http://Tommy-PC.wired.hu.nl:7778/acc");
-				supplierAgent.setName("PartsAgent@Platform2");
+				supplierAgent.setName("'SupplyAgent@Platform2");
 				System.out.println("PA SEND=" +message);
 				sendMessage(MessageType.SUPPLIER_REQUEST, getAID(), supplierAgent, message, "meta");
 			}

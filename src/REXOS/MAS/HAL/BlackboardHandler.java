@@ -139,8 +139,8 @@ public class BlackboardHandler implements BlackboardSubscriber {
 							mode = dbObject.get("mode").toString();
 						}	
 						for(BlackboardEquipletListener listener: equipletSubscribers){
-							listener.OnEquipletStateChanged(state);
-							listener.OnEquipletModeChanged(mode);
+							listener.onEquipletStateChanged(state);
+							listener.onEquipletModeChanged(mode);
 						}
 					}
 					break;

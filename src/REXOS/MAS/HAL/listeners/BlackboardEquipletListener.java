@@ -11,11 +11,11 @@ public interface BlackboardEquipletListener {
 	 * @param equipletName
 	 * @param state
 	 */
-	public void OnEquipletStateChanged(String state);
+	public void onEquipletStateChanged(String state);
 	/**
 	 * This method is called when the MAST mode of the equiplet changes
 	 * @param equipletName
 	 * @param state
 	 */
-	public void OnEquipletModeChanged(String mode);
+	public void onEquipletModeChanged(String mode);
 }

@@ -20,7 +20,6 @@ public class HardwareStep {
 	}
 	
 	public static final String COMMAND = "command";
-	public static final String LOOK_UP = "look_up";
 	public static final String INSTRUCTION_DATA = "instructionData";
 	public static final String PAYLOAD = "payload";
 	public static final String STATUS = "status";
@@ -52,11 +51,11 @@ public class HardwareStep {
 	
 	
 	
-	public HardwareStep(CompositeStep compositeStep, JsonObject rosCommand, ModuleIdentifier moduleIdentifier) {
+	/*public HardwareStep(CompositeStep compositeStep, JsonObject rosCommand, ModuleIdentifier moduleIdentifier) {
 		this.moduleIdentifier = moduleIdentifier;
 		//this.rosCommand = rosCommand;
 		this.compositeStep = compositeStep;
-	}
+	}*/
 	
 	
 

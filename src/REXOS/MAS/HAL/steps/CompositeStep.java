@@ -21,6 +21,9 @@ public class CompositeStep{
 	private JsonObject command;
 	private JsonObject relativeTo;
 	
+	public static final String IDENTIFIER = "identifier";
+	public static final String LOOK_UP = "look_up";
+	
 	public CompositeStep(ProductStep productStep, JsonObject command, JsonObject relativeTo){
 		this.command = command;
 		this.relativeTo = relativeTo;

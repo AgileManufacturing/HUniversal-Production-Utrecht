@@ -44,6 +44,7 @@ import generic.Service;
 import java.util.ArrayList;
 
 import agents.data_classes.MessageType;
+import agents.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -63,6 +64,21 @@ import libraries.knowledgedb_client.KnowledgeException;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener{
 		
+	/**
+	  * @var machineState
+	  * Stores the current state that the equiplet is in.
+	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
+	  */
+	public static String machineState = "123";
+	
+	/**
+	  * @var machineMode
+	  * Stores the current mode that the equiplet is in.
+	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
+	  */
+	public static String machineMode = "321";
+	
+
 	private static final long serialVersionUID = -4551409467306407788L;
 	
 	/**
@@ -139,9 +155,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * The EquipletAgent then registers himself, with his service types to the DF.
 	  * Main task is to wait for incoming ACLMessaged to communicate with ProductAgents.
 	  */
-	protected void setup(){				
+	protected void setup(){		
 		try {
 			hal = new HardwareAbstractionLayer(this);
+			addBehaviour(new ReconfigureBehaviour(hal));
+
 			System.out.println("HAL created");
 			serviceList = hal.getSupportedServices();
 		} catch (KnowledgeException e) {
@@ -352,13 +370,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onEquipletStateChanged(String state) {
 		// TODO Auto-generated method stub
-		
+		machineState = state;
 	}
 
 	@Override
 	public void onEquipletModeChanged(String mode) {
 		// TODO Auto-generated method stub
-		
+		machineMode = mode;
 	}
 
 	@Override
