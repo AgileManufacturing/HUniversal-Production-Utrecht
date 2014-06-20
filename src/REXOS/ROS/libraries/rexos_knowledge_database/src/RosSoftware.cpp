@@ -4,9 +4,8 @@
 #include <cppconn/resultset.h>
 #include <cppconn/prepared_statement.h>
 
-namespace rexos_knowledge_database{
-	RosSoftware::RosSoftware(ModuleIdentifier moduleIdentifier)
-	{
+namespace rexos_knowledge_database {
+	RosSoftware::RosSoftware(ModuleIdentifier moduleIdentifier) {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
@@ -34,8 +33,7 @@ namespace rexos_knowledge_database{
 		delete result;
 		delete preparedStmt;
 	}
-	RosSoftware::RosSoftware(std::string equipletName)
-	{
+	RosSoftware::RosSoftware(std::string equipletName) {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
@@ -60,7 +58,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 	}
 	
-	std::istream* RosSoftware::getRosFile(){
+	std::istream* RosSoftware::getRosFile() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT zipFile \
 		FROM RosSoftware \
@@ -79,7 +77,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return rosFile;
 	}
-	std::string RosSoftware::getCommand(){
+	std::string RosSoftware::getCommand() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT command \
 		FROM RosSoftware \

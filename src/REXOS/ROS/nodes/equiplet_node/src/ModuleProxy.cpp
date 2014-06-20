@@ -6,6 +6,7 @@
  */
 
 #include "equiplet_node/ModuleProxy.h"
+#include <actionlib/client/simple_action_client.h>
 #include <node_spawner_node/spawnNode.h>
 
 namespace equiplet_node {
@@ -81,9 +82,15 @@ void ModuleProxy::changeState(rexos_statemachine::State state) {
 		}
 	}
 	
+	desiredState = state;
+	
 	rexos_statemachine::ChangeStateGoal goal;
-	goal.desiredState = state;
-	changeStateActionClient.sendGoal(goal);
+	goal.desiredState = desiredState;
+	changeStateActionClient.waitForServer();
+	changeStateActionClient.sendGoal(goal, 
+			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleDoneCallback(), 
+			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleActiveCallback(), 
+			boost::bind(&ModuleProxy::onModuleTransitionFeedbackCallback, this, _1));
 }
 
 void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
@@ -105,6 +112,15 @@ void ModuleProxy::setInstruction(std::string OID, JSONNode n) {
 	goal.OID = OID;
 
 	setInstructionActionClient.sendGoal(goal, boost::bind(&ModuleProxy::onInstructionServiceCallback, this, _1, _2), NULL, NULL);
+}
+void ModuleProxy::goToNextTransitionPhase() {
+	rexos_statemachine::ChangeStateGoal goal;
+	goal.desiredState = desiredState;
+	changeStateActionClient.waitForServer();
+	changeStateActionClient.sendGoal(goal, 
+			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleDoneCallback(), 
+			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleActiveCallback(), 
+			boost::bind(&ModuleProxy::onModuleTransitionFeedbackCallback, this, _1));
 }
 
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
@@ -140,6 +156,23 @@ void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoal
 	else
 		moduleProxyListener->onInstructionStepCompleted(this, result->OID, false);
 }
+
+void ModuleProxy::onModuleTransitionFeedbackCallback(const rexos_statemachine::ChangeStateFeedbackConstPtr& feedback) {
+	std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations;
+	for(int i = 0; i < feedback->gainedSupportedMutations.size(); i++) {
+		rexos_knowledge_database::SupportedMutation supportedMutation(
+				feedback->gainedSupportedMutations.at(i));
+		supportedMutations.push_back(supportedMutation);
+	}
+	std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations;
+	for(int i = 0; i < feedback->requiredMutationsRequiredForNextPhase.size(); i++) {
+		rexos_knowledge_database::RequiredMutation requiredMutation(
+				feedback->requiredMutationsRequiredForNextPhase.at(i).mutation, feedback->requiredMutationsRequiredForNextPhase.at(i).isOptional);
+		requiredMutations.push_back(requiredMutation);
+	}
+	moduleProxyListener->onModuleTransitionPhaseCompleted(this, supportedMutations, requiredMutations);
+}
+
 void ModuleProxy::onBondCallback(rexos_bond::Bond* bond, Event event){
 	if(event == FORMED) {
 		ROS_INFO("Bond has been formed");

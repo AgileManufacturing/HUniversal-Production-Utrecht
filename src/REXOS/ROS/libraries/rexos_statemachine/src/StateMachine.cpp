@@ -28,6 +28,7 @@
  **/
 
 #include "rexos_statemachine/StateMachine.h"
+#include <actionlib/client/simple_action_client.h>
 #include <boost/bind.hpp>
 
 #include <cstdlib>
@@ -203,39 +204,59 @@ bool StateMachine::_changeState(rexos_statemachine::State newState) {
 	if (!statePossibleInMode(changeStateEntry.transition->transitionState, currentMode) )
 		return false;
 
-	_setState(changeStateEntry.transition->transitionState);		//set the currentState on the transitionState
-	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
+	
+	// set the currentState to the transitionState
+	_setState(changeStateEntry.transition->transitionState);
+	
+	// wait until the transition has completed
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	TransitionGoal goal;
-	transitionActionClient->sendGoal(goal);
+	TransitionActionClient* transitionActionClient = changeStateEntry.transition->transitionActionClient;
+	transitionActionClient->waitForServer();
+	transitionActionClient->sendGoal(goal, 
+			actionlib::SimpleActionClient<rexos_statemachine::TransitionAction>::SimpleDoneCallback(), 
+			actionlib::SimpleActionClient<rexos_statemachine::TransitionAction>::SimpleActiveCallback(), 
+			boost::bind(&StateMachine::onTransitionFeedbackCallback, this, _1));
 	transitionActionClient->waitForResult();
-	while( rexos_statemachine::is_transition_state[currentState] ){
-		if(currentState == changeStateEntry.transition->transitionState){
-			if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-				_setState(changeStateEntry.statePair.second);
-			} else if(changeStateEntry.abortTransition == NULL) {
-				throw std::logic_error("Trying to access a null abortTransitions state");
-			} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::PREEMPTED) {
-			} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::PENDING) {
-			} else{
-				_setState(changeStateEntry.abortTransition->transitionState);
-				transitionActionClient = changeStateEntry.abortTransition->transitionActionClient;
-			}
-		}else if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-			_setState(changeStateEntry.statePair.first);
-			TransitionGoal goal;
-			transitionActionClient->sendGoal(goal);
-			transitionActionClient->waitForResult();
-		}else{
-			//ABORT TRANSITION FAILED
-			_setState(changeStateEntry.statePair.first);
-			TransitionGoal goal;
-			transitionActionClient->sendGoal(goal);
-			transitionActionClient->waitForResult();
+	
+	if (transitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+		// transition succeeded
+		_setState(changeStateEntry.statePair.second);
+	} else if(transitionActionClient->getState() == actionlib::SimpleClientGoalState::ABORTED) {
+		// transition failed, attempt to revert by calling the abort transition
+		ROS_WARN_STREAM("Transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << "failed");
+		if(changeStateEntry.abortTransition == NULL) {
+			throw std::logic_error("Trying to access a null abortTransitions state");
 		}
+		_setState(changeStateEntry.abortTransition->transitionState);
+		TransitionActionClient* abortTransitionActionClient = changeStateEntry.abortTransition->transitionActionClient;
+		abortTransitionActionClient->sendGoal(goal);
+		abortTransitionActionClient->waitForResult();
+		
+		if (abortTransitionActionClient->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+			// abort transition succeeded, revert to original state
+			_setState(changeStateEntry.statePair.first);
+		} else if(abortTransitionActionClient->getState() == actionlib::SimpleClientGoalState::ABORTED) {
+			// abort transition failed, TODO what to do now?
+			ROS_ERROR_STREAM("Abort transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << "failed");
+		} else {
+			throw std::runtime_error("Revieved a SimpleClientGoalState from abortTransitionActionClient which was not expected");
+		}
+	} else {
+		throw std::runtime_error("Revieved a SimpleClientGoalState from transitionActionClient which was not expected");
 	}
-
+	
 	_forceToAllowedState();
-
+	
+	// if change state was successful, we should be in the second state
 	return currentState == it->first.second;
 }
 
@@ -275,10 +296,21 @@ void StateMachine::_forceToAllowedState() {
 		case STATE_STANDBY:
 			_changeState(STATE_SAFE);
 			break;
+		case STATE_SAFE:
+			_changeState(STATE_OFFLINE);
+			break;
 		default:
 			break;
 		}
 	}
+}
+
+void StateMachine::onTransitionFeedbackCallback(const rexos_statemachine::TransitionFeedbackConstPtr& feedback) {
+	std::cout << "Processing some feedback" << std::endl;
+	rexos_statemachine::ChangeStateFeedback output;
+	output.gainedSupportedMutations = feedback->gainedSupportedMutations;
+	output.requiredMutationsRequiredForNextPhase = feedback->requiredMutationsRequiredForNextPhase;
+	changeStateActionServer.publishFeedback(output);
 }
 
 void StateMachine::setListener(Listener* listener) {

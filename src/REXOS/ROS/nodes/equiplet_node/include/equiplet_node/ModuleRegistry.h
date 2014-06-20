@@ -18,6 +18,8 @@
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_knowledge_database/Equiplet.h>
+#include <rexos_knowledge_database/RequiredMutation.h>
+#include <rexos_knowledge_database/SupportedMutation.h>
 
 namespace equiplet_node {
 
@@ -39,6 +41,10 @@ public:
 	void onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
 	
 	void onModuleDied(ModuleProxy* moduleProxy);
+	
+	void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
+			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase);
 
 	std::vector<ModuleProxy*> getRegisteredModules();
 

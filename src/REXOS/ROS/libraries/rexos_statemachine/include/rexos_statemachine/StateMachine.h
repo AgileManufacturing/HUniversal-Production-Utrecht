@@ -120,6 +120,8 @@ private:
 	void _setMode(rexos_statemachine::Mode state);
 
 	void _forceToAllowedState();
+	
+	void onTransitionFeedbackCallback(const rexos_statemachine::TransitionFeedbackConstPtr& feedback);
 
 	std::string nodeName;
 

@@ -4,3 +4,5 @@ int32 desiredState
 # Define the result
 ---
 # Define the feedback
+string[] gainedSupportedMutations
+RequiredMutation[] requiredMutationsRequiredForNextPhase

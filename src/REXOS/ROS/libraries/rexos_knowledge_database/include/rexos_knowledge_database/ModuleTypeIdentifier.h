@@ -44,4 +44,5 @@ namespace rexos_knowledge_database {
 	private:
 		std::string manufacturer, typeNumber;
 	};
+	std::ostream& operator<<(std::ostream& os, const ModuleTypeIdentifier& obj);
 }

@@ -11,4 +11,9 @@ namespace rexos_knowledge_database{
 	std::string ModuleTypeIdentifier::getTypeNumber() const {
 		return typeNumber;
 	}
+	std::ostream& operator<<(std::ostream& os, const ModuleTypeIdentifier& obj) {
+		os << "manufacturer: " << obj.getManufacturer();
+		os << "typeNumber: " << obj.getTypeNumber();
+		return os;
+	}
 }

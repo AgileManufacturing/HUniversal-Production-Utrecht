@@ -1,4 +1,7 @@
 #include <equiplet_node/state_machine/EquipletStateMachine.h>
+#include <equiplet_node/CyclicDependencyException.h>
+
+#include <rexos_knowledge_database/ModuleType.h>
 
 using namespace equiplet_node;
 
@@ -29,6 +32,23 @@ EquipletStateMachine::~EquipletStateMachine(){
 
 void EquipletStateMachine::changeModuleStates(rexos_statemachine::State desiredState){
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+/*	if(desiredState == rexos_statemachine::STATE_STANDBY && 
+			this->getCurrentState() == rexos_statemachine::STATE_SAFE) {*/
+	if(true) {
+		// we are calibrating the modules, use the required and supported calibration mutations to determine the right order.
+		currenntlySupportedMutations = new std::vector<rexos_knowledge_database::SupportedMutation>();
+		pendingTransitionPhases = new std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>();
+		try{
+			std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> calibrationSteps = calculateOrderOfCalibrationSteps();
+			for (int i = 0; i < modules.size(); i++) {
+				modules[i]->changeState(desiredState);
+			}
+		} catch(CyclicDependencyException ex) {
+			ROS_WARN("Cyclic dependency detected");
+		}
+		delete pendingTransitionPhases;
+		delete currenntlySupportedMutations;
+	}
 	for (int i = 0; i < modules.size(); i++) {
 		modules[i]->changeState(desiredState);
 	}
@@ -79,6 +99,29 @@ void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_s
 
 void EquipletStateMachine::onModuleDied(ModuleProxy* moduleProxy){
 	ROS_ERROR("module has died!");
+}
+
+void EquipletStateMachine::onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
+		std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
+		std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase) {
+	ROS_INFO_STREAM("Module " << moduleProxy->getModuleIdentifier() << " done with transition");
+	for(int i = 0; i < gainedSupportedMutations.size(); i++) {
+		currenntlySupportedMutations->push_back(gainedSupportedMutations.at(i));
+	}
+	// insertion will be automatically performed when key does not exists, see http://en.cppreference.com/w/cpp/container/map/operator_at
+	(*pendingTransitionPhases)[moduleProxy].clear();
+	for(int i = 0; i < requiredMutationsRequiredForNextPhase.size(); i++) {
+		(*pendingTransitionPhases)[moduleProxy].push_back(requiredMutationsRequiredForNextPhase.at(i));
+	}
+	
+	for(std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>::iterator it = pendingTransitionPhases->begin(); 
+			it != pendingTransitionPhases->end(); it++) {
+		bool canContinue = areAllRequiredMutationsAvailiable(it->second, *currenntlySupportedMutations);
+		if(canContinue == true) {
+			ROS_INFO_STREAM("Module " << it->first->getModuleIdentifier() << " can now continue");
+			it->first->goToNextTransitionPhase();
+		}
+	}
 }
 
 bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State desiredState){
@@ -151,4 +194,85 @@ void EquipletStateMachine::transitionStop(rexos_statemachine::TransitionActionSe
 		condit.wait( lock );
 	}
 	as->setSucceeded();
+}
+std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStateMachine::calculateOrderOfCalibrationSteps() {
+	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+	std::vector<rexos_knowledge_database::TransitionPhase> pendingTransitionPhases;
+	std::vector<rexos_knowledge_database::SupportedMutation> availiableSupportedMutations;
+	for(int i = 0; i < modules.size(); i++) {
+		rexos_knowledge_database::ModuleType moduleType = rexos_knowledge_database::ModuleType(modules.at(i)->getModuleIdentifier());
+		std::vector<rexos_knowledge_database::TransitionPhase> transitionPhases =  moduleType.getTransitionPhases();
+		
+		// add all to the pendingTransitionPhases
+		for(int j = 0; j < transitionPhases.size(); j++) {
+			pendingTransitionPhases.push_back(transitionPhases.at(j));
+			ROS_INFO_STREAM(transitionPhases.at(j));
+		}
+	}
+	
+	std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> output;
+	// actually resolve the graph
+	while(pendingTransitionPhases.size() != 0) {
+		ROS_INFO("New round");
+		std::vector<rexos_knowledge_database::TransitionPhase> currentRound;
+		
+		std::vector<rexos_knowledge_database::TransitionPhase>::iterator it = pendingTransitionPhases.begin();
+		while(it != pendingTransitionPhases.end()) {
+			ROS_INFO_STREAM("-" << *it);
+			bool areAllRequiredMutationsAreAvailiable = areAllRequiredMutationsAvailiable(
+					it->getRequiredMutations(), availiableSupportedMutations);
+			ROS_INFO_STREAM("-reqava " << areAllRequiredMutationsAreAvailiable);
+			if(areAllRequiredMutationsAreAvailiable == true) {
+				ROS_INFO("a");
+				// we can perform this calibrationStep
+				currentRound.push_back(*it);
+				ROS_INFO("a");
+				// we just removed an item from the list, but the erase gives an iterator to the next item
+				it = pendingTransitionPhases.erase(it);
+				ROS_INFO("a");
+			} else {
+				ROS_INFO("b");
+				// just try the next one
+				it++;
+			}
+		}
+		ROS_INFO("c");
+		if(currentRound.size() == 0) {
+			// there was a cyclic dependency (or a depencency is just not supported) as no new transition phase could be performed
+			// add the remaining pendingTransitionPhases to the output in sequentional order
+			for(int i = 0; i < pendingTransitionPhases.size(); i++) {
+				std::vector<rexos_knowledge_database::TransitionPhase> transitionPhasesToAdd;
+				transitionPhasesToAdd.push_back(pendingTransitionPhases.at(i));
+				output.push_back(transitionPhasesToAdd);
+			}
+			throw CyclicDependencyException(output);
+		} else {
+			// we succesfully completed a round, add the gained transition phases to the availiable list
+			for(int i = 0; i < currentRound.size(); i++) {
+				std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations = currentRound.at(i).getSupportedMutations();
+				for(int j = 0; j < supportedMutations.size(); j++) {
+					availiableSupportedMutations.push_back(supportedMutations.at(j));
+				}
+			}
+		}
+	}
+	ROS_INFO("done");
+	return output;
+}
+bool EquipletStateMachine::areAllRequiredMutationsAvailiable(std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations, 
+		std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations) {
+	bool areAllRequiredMutationsAreAvailiable = true;
+	for(int j = 0; j < requiredMutations.size(); j++) {
+		rexos_knowledge_database::RequiredMutation requiredMutation = requiredMutations.at(j);
+		
+		bool isCurrentRequiredMutationsAreAvailiable = false;
+		for(int k = 0; k < supportedMutations.size(); k++) {
+			if(requiredMutation == supportedMutations.at(k)) isCurrentRequiredMutationsAreAvailiable = true;
+		}
+		ROS_INFO_STREAM("-reqcurrava " << isCurrentRequiredMutationsAreAvailiable);
+		if(isCurrentRequiredMutationsAreAvailiable == false) {
+			areAllRequiredMutationsAreAvailiable = false;
+		}
+	}
+	return areAllRequiredMutationsAreAvailiable;
 }

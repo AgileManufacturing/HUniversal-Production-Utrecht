@@ -10,6 +10,11 @@ add_action_files(
 DIRECTORY action
 FILES ${actions} )
 
+file(GLOB_RECURSE messages RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
+add_message_files(
+DIRECTORY msg
+FILES ${messages} )
+
 generate_messages (
 	DEPENDENCIES actionlib_msgs std_msgs
 )

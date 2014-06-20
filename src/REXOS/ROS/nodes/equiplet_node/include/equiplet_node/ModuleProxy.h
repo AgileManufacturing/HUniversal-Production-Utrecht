@@ -54,15 +54,16 @@ public:
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
 	void setInstruction(std::string OID, JSONNode n);
+	void goToNextTransitionPhase();
 
-	private:
+private:
 	std::string moduleNamespaceName;
 	std::string equipletNamespaceName;
 	
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
 	void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result);
-	void onModuleDied();
+	void onModuleTransitionFeedbackCallback(const rexos_statemachine::ChangeStateFeedbackConstPtr& feedback);
 
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
 
@@ -79,6 +80,7 @@ public:
 	ros::ServiceServer instructionUpdateServiceServer;
 
 	rexos_statemachine::State currentState;
+	rexos_statemachine::State desiredState;
 	rexos_statemachine::Mode currentMode;
 	
 	boost::condition_variable nodeStartupCondition;

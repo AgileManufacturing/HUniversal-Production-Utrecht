@@ -30,27 +30,15 @@
 #pragma once
 
 #include <string>
-#include <vector>
-#include <map>
-#include <memory>
-#include <rexos_knowledge_database/ModuleTypeIdentifier.h>
-#include <rexos_knowledge_database/RequiredMutation.h>
-#include <rexos_knowledge_database/SupportedMutation.h>
-#include <rexos_knowledge_database/TransitionPhase.h>
-
-#include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
-	class ModuleType{
+	class SupportedMutation {
 	private:
-		ModuleTypeIdentifier moduleTypeIdentifier;
-		std::unique_ptr<sql::Connection> connection;
+		std::string mutation;
 	public:
-		ModuleType(ModuleTypeIdentifier moduleTypeIdentifier);
+		SupportedMutation(std::string mutation);
 		
-		std::string getModuleTypeProperties();
-		std::vector<TransitionPhase> getTransitionPhases();
-		std::map<int, std::vector<RequiredMutation>> getRequiredMutations();
-		std::map<int, std::vector<SupportedMutation>> getSupportedMutations();
+		std::string getMutation() const;
 	};
+	std::ostream& operator<<(std::ostream& os, const SupportedMutation& obj);
 }

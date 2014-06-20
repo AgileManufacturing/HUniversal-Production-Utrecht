@@ -417,7 +417,21 @@ void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer
 	
 	workPlaneWidth = 80;
 	workPlaneHeight = 80;
-
+	
+	rexos_statemachine::TransitionFeedback feedback;
+	std::vector<rexos_statemachine::RequiredMutation> requiredMutations;
+	rexos_statemachine::RequiredMutation requiredMutation;
+	requiredMutation.mutation = "move";
+	requiredMutation.isOptional = false;
+	requiredMutations.push_back(requiredMutation);
+	feedback.requiredMutationsRequiredForNextPhase = requiredMutations;
+	
+	as->publishFeedback(rexos_statemachine::TransitionFeedback());
+	while(as->isNewGoalAvailable() == false) {
+		ros::Duration(0.1).sleep();
+	}
+	as->acceptNewGoal();
+	
 	ROS_INFO("Press any key after mover has calibrated");
 	cin.get();
 	cin.ignore();
@@ -632,7 +646,7 @@ void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer
 	ROS_WARN_STREAM("--------------------------------------------------------------");
 	
 	
-	double x = 0 + workPlaneWidth / 2;
+	/*double x = 0 + workPlaneWidth / 2;
 	double y = 0 - workPlaneHeight / 2;
 	Vector3 v = Vector3(x, y, 1);
 	ROS_INFO_STREAM(v);
@@ -640,7 +654,7 @@ void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer
 	ROS_INFO_STREAM(v);
 	v.z = -15;
 	v = convertToEquipletCoordinate(v);
-	ROS_INFO_STREAM(v);
+	ROS_INFO_STREAM(v);*/
 	
 	
 	x = 0 + workPlaneWidth / 2;

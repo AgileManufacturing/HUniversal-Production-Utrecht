@@ -1,5 +1,5 @@
 #include <rexos_knowledge_database/ModuleIdentifier.h>
-#include <string.h>
+
 namespace rexos_knowledge_database{
 	ModuleIdentifier::ModuleIdentifier(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 			ModuleTypeIdentifier(manufacturer, typeNumber), 

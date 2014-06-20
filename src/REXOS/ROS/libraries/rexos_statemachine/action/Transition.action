@@ -1,2 +1,4 @@
 ---
 ---
+string[] gainedSupportedMutations
+RequiredMutation[] requiredMutationsRequiredForNextPhase

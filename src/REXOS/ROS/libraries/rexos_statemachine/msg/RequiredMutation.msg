@@ -1,0 +1,2 @@
+string mutation
+bool isOptional

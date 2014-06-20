@@ -400,30 +400,30 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		
 		// preform the actual query
-		preparedStmt = connection->prepareStatement("\n\
-		SELECT id \n\
-		FROM ModuleCalibration \n\
-		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \n\
-		WHERE manufacturer = ? AND \n\
-		typeNumber = ? AND \n\
-		serialNumber = ? AND \n\
-		( -- to narrow group. The number of modules in this group must match the number of other modules \n\
-			SELECT count(*) \n\
-			FROM ModuleCalibrationModuleSet AS inListGroup \n\
-			JOIN otherModules ON \n\
-				inListGroup.manufacturer = otherModules.manufacturer AND \n\
-				inListGroup.typeNumber = otherModules.typeNumber AND \n\
-				inListGroup.serialNumber = otherModules.serialNumber \n\
-			WHERE ModuleCalibrationModuleSet.ModuleCalibration = inListGroup.ModuleCalibration \n\
-		) = ? AND \n\
-		( -- to wide group. The number of modules in this group must match the number of other modules \n\
-			SELECT count(*) \n\
-			FROM ModuleCalibrationModuleSet AS listGroup \n\
-			WHERE ModuleCalibrationModuleSet.ModuleCalibration = listGroup.ModuleCalibration AND ( \n\
-				listGroup.manufacturer != ModuleCalibrationModuleSet.manufacturer OR \n\
-				listGroup.typeNumber != ModuleCalibrationModuleSet.typeNumber OR \n\
-				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \n\
-			) \n\
+		preparedStmt = connection->prepareStatement("\
+		SELECT id \
+		FROM ModuleCalibration \
+		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \
+		WHERE manufacturer = ? AND \
+		typeNumber = ? AND \
+		serialNumber = ? AND \
+		( -- to narrow group. The number of modules in this group must match the number of other modules \
+			SELECT count(*) \
+			FROM ModuleCalibrationModuleSet AS inListGroup \
+			JOIN otherModules ON \
+				inListGroup.manufacturer = otherModules.manufacturer AND \
+				inListGroup.typeNumber = otherModules.typeNumber AND \
+				inListGroup.serialNumber = otherModules.serialNumber \
+			WHERE ModuleCalibrationModuleSet.ModuleCalibration = inListGroup.ModuleCalibration \
+		) = ? AND \
+		( -- to wide group. The number of modules in this group must match the number of other modules \
+			SELECT count(*) \
+			FROM ModuleCalibrationModuleSet AS listGroup \
+			WHERE ModuleCalibrationModuleSet.ModuleCalibration = listGroup.ModuleCalibration AND ( \
+				listGroup.manufacturer != ModuleCalibrationModuleSet.manufacturer OR \
+				listGroup.typeNumber != ModuleCalibrationModuleSet.typeNumber OR \
+				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \
+			) \
 		) = ?;");
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());

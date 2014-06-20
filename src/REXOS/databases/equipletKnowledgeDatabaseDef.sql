@@ -75,24 +75,26 @@ create table SupportedMutation(
   mutation char(200) NOT NULL,
   primary key (manufacturer, typeNumber, mutation),
   foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
-);  
+);
 
 create table RequiredCalibrationMutation(
   manufacturer char(200) NOT NULL,
   typeNumber char(200) NOT NULL,
+  phase int NOT NULL,
   mutation char(200) NOT NULL,
   isOptional tinyint(1) NOT NULL,
-  primary key (manufacturer, typeNumber, mutation),
+  primary key (manufacturer, typeNumber, phase, mutation),
   foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
-);  
+);
 
 create table SupportedCalibrationMutation(
   manufacturer char(200) NOT NULL,
   typeNumber char(200) NOT NULL,
+  phase int NOT NULL,
   mutation char(200) NOT NULL,
-  primary key (manufacturer, typeNumber, mutation),
+  primary key (manufacturer, typeNumber, phase, mutation),
   foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
-);  
+);
 
 create table ModuleCalibration(
   id int NOT NULL AUTO_INCREMENT,

@@ -142,7 +142,7 @@ void OplogMonitor::run()
 			}
 			boost::this_thread::interruption_point();
 		}
-		std::cout << "Cursor is dead. Blackboard might be empty." << std::endl;
+		std::cout << "Cursor is dead. Blackboard (" << oplogNamespace << ") might be empty." << std::endl;
 	} catch (boost::thread_interrupted& e) {
 		// Thread has been interrupted, work is done.
 		std::cout << "Interrupted cursorid: " << currentCursorId << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl;

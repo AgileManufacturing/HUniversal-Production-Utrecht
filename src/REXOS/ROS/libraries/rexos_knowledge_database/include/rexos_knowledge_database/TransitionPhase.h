@@ -1,12 +1,13 @@
 /**
- * @file DatabaseConnection.h
- * @brief Coordinate system for communication between nodes
- * @date Created: 2012-01-??  TODO: Date
- *
+ * @file States.h
+ * @brief States for  in module
+ * @date Created: 2013-21-03
+ * StateBlackboard
  * @author Tommas Bakker
  *
  * @section LICENSE
- * Copyright © 2012, HU University of Applied Sciences Utrecht.
+ * License: newBSD
+ * Copyright © 2013, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,33 +25,29 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  **/
-
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
-#include <rexos_knowledge_database/ModuleTypeIdentifier.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_knowledge_database/RequiredMutation.h>
 #include <rexos_knowledge_database/SupportedMutation.h>
-#include <rexos_knowledge_database/TransitionPhase.h>
 
-#include "mysql_connection.h"
-
-namespace rexos_knowledge_database {
-	class ModuleType{
+namespace rexos_knowledge_database{
+	class TransitionPhase {
 	private:
-		ModuleTypeIdentifier moduleTypeIdentifier;
-		std::unique_ptr<sql::Connection> connection;
+		rexos_knowledge_database::ModuleTypeIdentifier moduleTypeIdentifier;
+		int phase;
+		std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations;
+		std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations;
 	public:
-		ModuleType(ModuleTypeIdentifier moduleTypeIdentifier);
+		TransitionPhase(rexos_knowledge_database::ModuleTypeIdentifier moduleTypeIdentifier, int phase, 
+				std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations, 
+				std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations);
 		
-		std::string getModuleTypeProperties();
-		std::vector<TransitionPhase> getTransitionPhases();
-		std::map<int, std::vector<RequiredMutation>> getRequiredMutations();
-		std::map<int, std::vector<SupportedMutation>> getSupportedMutations();
+		rexos_knowledge_database::ModuleTypeIdentifier getModuleTypeIdentifier() const;
+		int getPhase() const;
+		std::vector<rexos_knowledge_database::RequiredMutation> getRequiredMutations() const;
+		std::vector<rexos_knowledge_database::SupportedMutation> getSupportedMutations() const;
 	};
+	std::ostream& operator<<(std::ostream& os, const TransitionPhase& obj);
 }

@@ -51,24 +51,58 @@ ImageStreamNode::~ImageStreamNode() {
 
 void ImageStreamNode::run() {
 	ros::Rate frameRate(10);
-	IplImage* img = cvLoadImage(pathToImageFile);
-	if(img == 0){
+	//IplImage* img = cvLoadImage(pathToImageFile);
+	cv::Mat src, dst;
+	 /// Load image
+	//src = cv::imread(pathToImageFile, 1 );
+	/// Convert to grayscale
+   /* cvtColor( src, src, CV_BGR2GRAY );
+	
+	
+	equalizeHist( src, dst );
+	
+    cvtColor( dst, dst, CV_GRAY2BGR );*/
+	
+	
+	
+	
+	
+std::cout << "a" << std::endl;
+	
+	
+cv::Mat img = cv::imread(pathToImageFile, CV_LOAD_IMAGE_GRAYSCALE);
+std::cout << "b" << std::endl;
+
+//create a CLAHE object (Arguments are optional).
+cv::CLAHE* clahe = cv::createCLAHE(4.0, cv::Size(8, 8));
+std::cout << "clahe ptr: " << (long) clahe << std::endl;
+//clahe->setClipLimit(4.0);
+
+clahe->apply(img, dst);
+
+	
+	
+	
+	
+
+	/*if(img == 0){
 		ROS_ERROR("Loading image failed");
 		exit(-2);
-	}
+	}*//*
 	while(ros::ok()) {
 		ros::Time time = ros::Time::now();
 		cv_bridge::CvImage cvi;
 		cvi.header.stamp = time;
 		cvi.header.frame_id = "image";
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
-		cvi.image = img;
+		//cvi.image = img;
+		cvi.image = dst;
 		
 		publisher.publish(cvi.toImageMsg());
 
 		frameRate.sleep();
 		ros::spinOnce();
-	}
+	}*/
 }
 
 /**

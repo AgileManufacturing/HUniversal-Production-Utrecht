@@ -46,6 +46,10 @@
 
 #include <equiplet_node/scada/EquipletScada.h>
 
+#include <rexos_knowledge_database/RequiredMutation.h>
+#include <rexos_knowledge_database/SupportedMutation.h>
+#include <rexos_knowledge_database/TransitionPhase.h>
+
 namespace equiplet_node{
 
 class EquipletStateMachine : 
@@ -67,6 +71,10 @@ protected:
 	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
 
 	void onModuleDied(ModuleProxy* moduleProxy);
+	
+	void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
+			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase);
 private:
 	bool allModulesInDesiredState(rexos_statemachine::State desiredState);
 
@@ -87,6 +95,12 @@ private:
 
 	boost::condition_variable condit;
 	boost::mutex mutexit;
+private:
+	std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> calculateOrderOfCalibrationSteps();
+	bool areAllRequiredMutationsAvailiable(std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations, 
+			std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations);
+	std::vector<rexos_knowledge_database::SupportedMutation>* currenntlySupportedMutations;
+	std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>* pendingTransitionPhases;
 };
 
 }

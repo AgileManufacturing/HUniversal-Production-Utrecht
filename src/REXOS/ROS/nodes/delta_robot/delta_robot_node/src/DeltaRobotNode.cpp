@@ -262,6 +262,7 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
 
 void deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Initialize transition called");
+	
 	as->setSucceeded();
 }
 
@@ -286,6 +287,10 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 		ROS_ERROR("Calibration FAILED. EXITING.");
 			as->setAborted();
 	} else {
+		rexos_statemachine::TransitionFeedback feedback;
+		feedback.gainedSupportedMutations.push_back("move");
+		
+		as->publishFeedback(rexos_statemachine::TransitionFeedback());
 		as->setSucceeded();
 	}
 }

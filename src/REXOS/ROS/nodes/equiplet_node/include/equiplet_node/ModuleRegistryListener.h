@@ -9,6 +9,8 @@
 #include "equiplet_node/ModuleProxy.h"
 #include <rexos_statemachine/State.h>
 #include <rexos_statemachine/Mode.h>
+#include <rexos_knowledge_database/RequiredMutation.h>
+#include <rexos_knowledge_database/SupportedMutation.h>
 
 namespace equiplet_node {
 
@@ -18,6 +20,9 @@ public:
 	virtual void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode) = 0;
 	virtual void onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed) = 0;
 	virtual void onModuleDied(ModuleProxy* moduleProxy) = 0;
+	virtual void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
+			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase) = 0;
 };
 
 }

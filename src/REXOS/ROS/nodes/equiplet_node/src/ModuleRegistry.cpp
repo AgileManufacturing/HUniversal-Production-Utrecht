@@ -125,4 +125,9 @@ void ModuleRegistry::onModuleDied(ModuleProxy* moduleProxy){
 	}
 }
 
+	void ModuleRegistry::onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
+			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase) {
+		moduleRegistryListener->onModuleTransitionPhaseCompleted(moduleProxy, gainedSupportedMutations, requiredMutationsRequiredForNextPhase);
+	}
 } /* namespace equiplet_node */
