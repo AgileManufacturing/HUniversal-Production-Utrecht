@@ -12,7 +12,7 @@ import HAL.exceptions.CapabilityException;
 import HAL.factories.CapabilityFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-import agents.equiplet_agent.EquipletAgent;
+
 /**
  * The thread that manages the translation of ProductSteps.
  * Although translation usually does not take very long, complex cases may take some milliseconds. This will jam the {@link EquipletAgent} which is considered to be undesirable.

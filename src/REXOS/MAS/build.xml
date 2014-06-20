@@ -100,9 +100,9 @@
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
-	<target name="allpackages" depends="HAL, configuration, libraries, tools"/>
+	<target name="allpackages" depends="HAL, configuration, generic, libraries, tools"/>
 
-	<target name="HAL" depends="configuration, libraries">
+	<target name="HAL" depends="configuration, libraries, generic">
     	<ant antfile="build.xml" target="all" dir="HAL" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
@@ -114,6 +114,10 @@
    		<ant antfile="build.xml" target="all" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
+	<target name="generic">
+   		<ant antfile="build.xml" target="all" dir="generic" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	</target>
+
 	<target name="tools">
    		<ant antfile="build.xml" target="all" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
@@ -123,6 +127,7 @@
 		<delete file="${export-classpath-file}" />
     	<delete dir="${buildpath}" />
     	<ant antfile="build.xml" target="clean" dir="HAL" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+    	<ant antfile="build.xml" target="clean" dir="generic" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="libraries" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  

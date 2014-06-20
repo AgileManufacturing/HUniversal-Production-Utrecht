@@ -1,7 +1,5 @@
 package generic;
 
-import HAL.Capability;
-
 import com.google.gson.JsonObject;
 
 /**
