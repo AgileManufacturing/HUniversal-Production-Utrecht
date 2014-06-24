@@ -307,22 +307,22 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 
 
 
-void stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as){
+bool stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(){
 	ROS_INFO("Initialize transition called");
-	as->setSucceeded();
+	return true;
 }
 
-void stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as){
+bool stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(){
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
-	as->setSucceeded();
+	return true;
 }
 
 /**
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-void stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+bool stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 
 	// Power on the deltarobot and calibrate the motors.
@@ -331,9 +331,9 @@ void stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(rexos_statemac
 
 	if(!stewartGough->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
-		as->setAborted();
+		return false;
 	} else {
-		as->setSucceeded();
+		return true;
 	}
 }
 
@@ -342,30 +342,30 @@ void stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(rexos_statemac
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-void stewartGoughNodeNamespace::StewartGoughNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+bool stewartGoughNodeNamespace::StewartGoughNode::transitionShutdown(){
 	ROS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	stewartGough->powerOff();
-	as->setSucceeded();
+	return true;
 }
 
 /**
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-void stewartGoughNodeNamespace::StewartGoughNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+bool stewartGoughNodeNamespace::StewartGoughNode::transitionStart(){
 	ROS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
-	as->setSucceeded();
+	return true;
 }
 /**
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-void stewartGoughNodeNamespace::StewartGoughNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
 	ROS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
-		as->setSucceeded();
+		return true;
 	// Go to base (Motors on 0 degrees)
 }
 

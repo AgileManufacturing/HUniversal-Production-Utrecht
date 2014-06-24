@@ -75,8 +75,8 @@ public:
 	void onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
 
 private:
-	virtual void onStateChanged();
-	virtual void onModeChanged();
+	virtual void onStateChanged(rexos_statemachine::State state);
+	virtual void onModeChanged(rexos_statemachine::Mode mode);
 
 	std::map<std::string, std::string> callLookupHandler(std::string lookupType, std::map<std::string, std::string> lookupParameters, std::map<std::string, std::string> payloadMap);
 

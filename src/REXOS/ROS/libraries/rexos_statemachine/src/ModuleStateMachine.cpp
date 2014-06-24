@@ -13,7 +13,10 @@ ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge
 			actorModule ? rexos_statemachine::MODE_CRITICAL_ERROR : rexos_statemachine::MODE_ERROR,
 			rexos_statemachine::MODE_E_STOP}
 		), 
-		equipletName(equipletName), moduleIdentifier(moduleIdentifier), actorModule(actorModule), bond(NULL) {
+		equipletName(equipletName), moduleIdentifier(moduleIdentifier), actorModule(actorModule), bond(NULL),
+		transitionActionClient(nodeHandle, equipletName + 
+			"/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/transition") 
+		{
 	std::string moduleNamespaceName = moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber();
 	std::string equipletNamespaceName = equipletName;
 
@@ -31,7 +34,6 @@ ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge
 
 	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
 	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
-	setListener(this);
 	
 	ROS_INFO_STREAM("binding A on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
 	bond = new rexos_bond::Bond(equipletNamespaceName + "/bond", moduleNamespaceName, this);
@@ -42,21 +44,23 @@ ModuleStateMachine::~ModuleStateMachine(){
 	delete bond;
 }
 
-void ModuleStateMachine::onStateChanged() {
+void ModuleStateMachine::onStateChanged(rexos_statemachine::State state) {
+	ROS_WARN("onStateChanged");
 	rexos_statemachine_srvs::StateUpdateRequest req;
 	rexos_statemachine_srvs::StateUpdateResponse res;
 	req.state = getCurrentState();
 	changeStateNotificationClient.call(req, res);
 }
 
-void ModuleStateMachine::onModeChanged() {
+void ModuleStateMachine::onModeChanged(rexos_statemachine::Mode mode) {
+	ROS_WARN("onModeChanged");
 	rexos_statemachine_srvs::ModeUpdateRequest req;
 	rexos_statemachine_srvs::ModeUpdateResponse res;
 	req.mode = getCurrentMode();
 	changeModeNotificationClient.call(req, res);
 }
 
-void ModuleStateMachine::setInError(){
+void ModuleStateMachine::setInError() {
 	if(actorModule)
 		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
 	else

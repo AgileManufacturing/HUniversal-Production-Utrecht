@@ -247,13 +247,13 @@ void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::str
 
 }
 
-void EquipletNode::onStateChanged(){
-	EquipletStateMachine::onStateChanged();
+void EquipletNode::onStateChanged(rexos_statemachine::State state){
+	EquipletStateMachine::onStateChanged(state);
 	updateEquipletStateOnBlackboard();
 }
 
-void EquipletNode::onModeChanged(){
-	EquipletStateMachine::onModeChanged();
+void EquipletNode::onModeChanged(rexos_statemachine::Mode mode){
+	EquipletStateMachine::onModeChanged(mode);
 	updateEquipletStateOnBlackboard();
 }
 

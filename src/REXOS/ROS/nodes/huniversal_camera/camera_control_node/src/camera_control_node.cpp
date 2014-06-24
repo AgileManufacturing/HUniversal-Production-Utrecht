@@ -143,26 +143,25 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	return true;
 }
 
-void CameraControlNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+bool CameraControlNode::transitionInitialize() {
 	ROS_INFO("Initialize transition called");
-	as->setSucceeded();
+	return true;
 }
 
-void CameraControlNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+bool CameraControlNode::transitionDeinitialize() {
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
-	as->setSucceeded();
+	return true;
 }
 
 
-void CameraControlNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+bool CameraControlNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 	
 	std::vector<rexos_knowledge_database::ModuleIdentifier> children = this->getChildModulesIdentifiers();
 	if(children.size() != 1){
 		ROS_ERROR_STREAM("CameraControlNode::transitionSetup: Expected 1 child module (the lens), got " << children.size());
-		as->setAborted();
-		return;
+		return false;
 	}
 	
 	try{
@@ -195,8 +194,7 @@ ROS_INFO("c");
 ROS_INFO("d");
 		if(distCoeffs == NULL || cameraMatrix == NULL){
 			if(mannuallyCalibrateLens() == false){
-				as->setAborted();
-				return;
+				return false;
 			} 
 		} else if(cameraMatrix->size() != 9){
 			throw std::runtime_error("The camera matrix does not contain 9 entries" + boost::to_string(cameraMatrix->size()));
@@ -220,34 +218,34 @@ ROS_INFO("d");
 		fishEyeServiceCall.request.enable = true;
 		fishEyeCorrectionClient.call(fishEyeServiceCall);
 
-		as->setSucceeded();
+		return true;
 	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
 ROS_INFO("e");
-		if(mannuallyCalibrateLens() == false) as->setAborted();
-		else as->setSucceeded();
+		if(mannuallyCalibrateLens() == false) return false;
+		else return true;
 	}
 	
 }
-void CameraControlNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+bool CameraControlNode::transitionShutdown(){
 	ROS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
-	as->setSucceeded();
+	return true;
 }
-void CameraControlNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+bool CameraControlNode::transitionStart(){
 	ROS_INFO("Start transition called");
 	vision_node::enableComponent serviceCall;
 	serviceCall.request.enable = true;
 	enableCameraClient.call(serviceCall);
 	
-	as->setSucceeded();
+	return true;
 }
-void CameraControlNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+bool CameraControlNode::transitionStop(){
 	ROS_INFO("Stop transition called");
 	vision_node::enableComponent serviceCall;
 	serviceCall.request.enable = false;
 	enableCameraClient.call(serviceCall);
 	
-	as->setSucceeded();
+	return true;
 }
 
 int main(int argc, char* argv[]) {

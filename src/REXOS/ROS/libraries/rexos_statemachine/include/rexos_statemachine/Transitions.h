@@ -43,12 +43,12 @@ public:
 	virtual ~Transitions() {
 	}
 protected:
-	virtual void transitionDeinitialize(TransitionActionServer* as) = 0;
-	virtual void transitionInitialize(TransitionActionServer* as) = 0;
-	virtual void transitionStart(TransitionActionServer* as) = 0;
-	virtual void transitionStop(TransitionActionServer* as) = 0;
-	virtual void transitionSetup(TransitionActionServer* as) = 0;
-	virtual void transitionShutdown(TransitionActionServer* as) = 0;
+	virtual bool transitionDeinitialize() = 0;
+	virtual bool transitionInitialize() = 0;
+	virtual bool transitionStart() = 0;
+	virtual bool transitionStop() = 0;
+	virtual bool transitionSetup() = 0;
+	virtual bool transitionShutdown() = 0;
 };
 
 }

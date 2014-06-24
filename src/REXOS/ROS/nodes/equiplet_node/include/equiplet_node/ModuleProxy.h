@@ -15,6 +15,7 @@
 #include <rexos_statemachine/State.h>
 #include <rexos_statemachine/Mode.h>
 
+#include <rexos_statemachine/StateMachine.h>
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
 #include <rexos_statemachine/SetInstructionAction.h>
@@ -63,12 +64,12 @@ private:
 	bool onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res);
 	bool onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res);
 	void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result);
-	void onModuleTransitionFeedbackCallback(const rexos_statemachine::ChangeStateFeedbackConstPtr& feedback);
+	void onModuleTransitionGoalCallback(const rexos_statemachine::TransitionGoalConstPtr& feedback);
 
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
 
 	ModuleProxyListener* moduleProxyListener;
-
+	
 	ros::NodeHandle nodeHandle;
 
 	ChangeStateActionClient changeStateActionClient;
@@ -78,13 +79,17 @@ private:
 	ros::ServiceServer stateUpdateServiceServer;
 	ros::ServiceServer modeUpdateServiceServer;
 	ros::ServiceServer instructionUpdateServiceServer;
-
+	rexos_statemachine::TransitionActionServer transitionActionServer;
+	
 	rexos_statemachine::State currentState;
 	rexos_statemachine::State desiredState;
 	rexos_statemachine::Mode currentMode;
 	
 	boost::condition_variable nodeStartupCondition;
 	boost::mutex nodeStartupMutex;
+	boost::condition_variable transitionPhaseCondition;
+	boost::mutex transitionPhaseMutex;
+	bool allowedToContinue;
 	
 	bool connectedWithNode;
 	/**

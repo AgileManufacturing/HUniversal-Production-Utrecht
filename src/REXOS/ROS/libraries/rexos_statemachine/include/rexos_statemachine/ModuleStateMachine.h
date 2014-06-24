@@ -10,7 +10,7 @@
 
 namespace rexos_statemachine{
 
-class ModuleStateMachine : public StateMachine, public Listener, public rexos_bond::BondListener {
+class ModuleStateMachine : public StateMachine, public rexos_bond::BondListener {
 	std::string equipletName;
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
 
@@ -20,12 +20,13 @@ public:
 	ModuleStateMachine(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, bool actorModule);
 	~ModuleStateMachine();
 protected:
-	virtual void onStateChanged();
-	virtual void onModeChanged();
+	virtual void onStateChanged(rexos_statemachine::State state);
+	virtual void onModeChanged(rexos_statemachine::Mode mode);
 
 	void setInError();
 
 	bool actorModule;
+	TransitionActionClient transitionActionClient;
 
 private:
 	/**

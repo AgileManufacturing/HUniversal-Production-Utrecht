@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 			return 0;
 		} else if (arg == "--blackboard") {
 			if (i + 1 < argc) {
-				blackboardIP = argv[i++];
+				blackboardIP = argv[++i];
 			} else {
 				std::cerr << "--blackboard requires one argument";
 				return -1;

@@ -84,28 +84,28 @@ public:
 	PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 	void run();
 	
-	virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
+	virtual bool transitionInitialize();
+	virtual bool transitionDeinitialize();
 	/**
 	 * MAST transition from safe to standby is handled by this method. 
 	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
 	 **/
-	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
+	virtual bool transitionSetup();
 	/**
 	 * MAST transition from standby to safe is handled by this method. 
 	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
 	 **/
-	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
+	virtual bool transitionShutdown();
 	/**
 	 * MAST transition from standby to normal is handled by this method. 
 	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
 	 **/
-	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
+	virtual bool transitionStart();
 	/**
 	 * MAST transition from normal to standby is handled by this method. 
 	 * see http://wiki.agilemanufacturing.nl/index.php/Vision_system#camera_control_node
 	 **/
-	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
+	virtual bool transitionStop();
 private:
 	/**
 	 * The first known position of the top left corner

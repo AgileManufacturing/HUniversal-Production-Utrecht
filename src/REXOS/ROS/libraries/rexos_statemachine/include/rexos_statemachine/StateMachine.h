@@ -32,6 +32,7 @@
 
 #include <map>
 #include <vector>
+#include <boost/function.hpp>
 
 #include "rexos_statemachine/Transitions.h"
 #include "rexos_statemachine/State.h"
@@ -48,9 +49,10 @@ namespace rexos_statemachine {
 
 typedef actionlib::SimpleActionServer<ChangeStateAction> ChangeStateActionServer;
 typedef actionlib::SimpleActionServer<ChangeModeAction> ChangeModeActionServer;
+typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
+
 typedef actionlib::SimpleActionClient<ChangeStateAction> ChangeStateActionClient;
 typedef actionlib::SimpleActionClient<ChangeModeAction> ChangeModeActionClient;
-typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
 typedef actionlib::SimpleActionClient<TransitionAction> TransitionActionClient;
 
 class StateMachine: public rexos_statemachine::Transitions {
@@ -88,15 +90,6 @@ public:
 	**/
 	void onChangeModeAction(const ChangeModeGoalConstPtr& goal);
 
-private:
-	//the statemachine call transitions by an action, so it starts by an own thread
-	void onTransitionDeinitializeAction(TransitionActionServer* as);
-	void onTransitionInitializeAction(TransitionActionServer* as);
-	void onTransitionSetupAction(TransitionActionServer* as);
-	void onTransitionShutdownAction(TransitionActionServer* as);
-	void onTransitionStartAction(TransitionActionServer* as);
-	void onTransitionStopAction(TransitionActionServer* as);
-
 protected:
 	void changeState(State desiredState);
 
@@ -109,20 +102,22 @@ protected:
 	ros::NodeHandle nodeHandle;
 
 private:
-	bool _changeState(State newState);
+	bool transitionToState(State newState);
 
-	bool _changeMode(Mode newMode);
+	bool transitionToMode(Mode newMode);
 
 	bool statePossibleInMode(rexos_statemachine::State state, rexos_statemachine::Mode modi);
 
 	void _setState(rexos_statemachine::State state);
 
-	void _setMode(rexos_statemachine::Mode state);
+	void _setMode(rexos_statemachine::Mode mode);
+
+	virtual void onStateChanged(rexos_statemachine::State state) = 0;
+
+	virtual void onModeChanged(rexos_statemachine::Mode mode) = 0;
 
 	void _forceToAllowedState();
 	
-	void onTransitionFeedbackCallback(const rexos_statemachine::TransitionFeedbackConstPtr& feedback);
-
 	std::string nodeName;
 
 	/**
@@ -131,11 +126,6 @@ private:
 	**/
 	std::vector<rexos_statemachine::Mode> modes;
 
-	/**
-	 *@var Listener* listener
-	 *Listener of the statemachine for callback when state/mode changed
-	**/
-	Listener* listener;
 
 	/**
 	 * @var MOSTState currentState
@@ -154,15 +144,7 @@ private:
 	 * Possible states of all modus
 	 **/
 	std::map<rexos_statemachine::Mode, std::vector<rexos_statemachine::State> > modePossibleStates;
-
-	/**
-	typedef std::pair<rexos_statemachine::State, rexos_statemachine::State> StatePair;
-	 * Used by transitions
-	 * key is src state
-	 * value is dest state
-	 **/
-	typedef std::pair<rexos_statemachine::State, rexos_statemachine::State> StatePair;
-
+	
 	/**
 	 * Transition object
 	**/
@@ -171,7 +153,7 @@ private:
 		 * @var TransitionActionClient *transitionActionClient
 		 * A actionClient to send / activate the transition method
 		**/
-		TransitionActionClient *transitionActionClient;
+		boost::function<bool(void)>& transitionMethod;
 
 		/**
 		 * @var rexos_statemachine::State transitionState
@@ -179,10 +161,18 @@ private:
 		**/
 		rexos_statemachine::State transitionState;
 	};
-
+	
+	
+	/**
+	typedef std::pair<rexos_statemachine::State, rexos_statemachine::State> StatePair;
+	 * Used by transitions
+	 * key is src state
+	 * value is dest state
+	 **/
+	typedef std::pair<rexos_statemachine::State, rexos_statemachine::State> StatePair;
 	
 	struct ChangeStateEntry{
-		Transition *transition,*abortTransition;
+		Transition* transition, * abortTransition;
 		StatePair statePair;
 	};
 
@@ -193,13 +183,14 @@ private:
 	ChangeModeActionServer changeModeActionServer;
 	ChangeStateActionClient changeStateActionClient;
 	ChangeModeActionClient changeModeActionClient;
-
-	TransitionActionServer transitionDeinitializeServer;
-	TransitionActionServer transitionInitializeServer;
-	TransitionActionServer transitionSetupServer;
-	TransitionActionServer transitionShutdownServer;
-	TransitionActionServer transitionStartServer;
-	TransitionActionServer transitionStopServer;
+	
+	boost::function<bool(void)> transitionDeinitializeMethod;
+	boost::function<bool(void)> transitionInitializeMethod;
+	boost::function<bool(void)> transitionShutdownMethod;
+	boost::function<bool(void)> transitionSetupMethod;
+	boost::function<bool(void)> transitionStopMethod;
+	boost::function<bool(void)> transitionStartMethod;
+	
 };
 
 }

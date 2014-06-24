@@ -12,18 +12,20 @@
 namespace equiplet_node {
 
 ModuleProxy::ModuleProxy(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, ModuleProxyListener* mpl) :
-	moduleNamespaceName(moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber()),
-	equipletNamespaceName(equipletName),
-	moduleIdentifier(moduleIdentifier),
-	changeStateActionClient(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/change_state"),
-	changeModeActionClient(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/change_mode"),
-	setInstructionActionClient(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/set_instruction"),
-	currentMode(rexos_statemachine::Mode::MODE_SERVICE),
-	currentState(rexos_statemachine::State::STATE_OFFLINE),
-	moduleProxyListener(mpl),
-	connectedWithNode(false),
-	bond(NULL)
-{
+		moduleNamespaceName(moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber()),
+		equipletNamespaceName(equipletName),
+		moduleIdentifier(moduleIdentifier),
+		changeStateActionClient(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/change_state"),
+		changeModeActionClient(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/change_mode"),
+		setInstructionActionClient(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/set_instruction"),
+		transitionActionServer(nodeHandle, equipletNamespaceName + "/" + moduleNamespaceName + "/transition", 
+			boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), false),
+		allowedToContinue(false),
+		currentMode(rexos_statemachine::Mode::MODE_SERVICE),
+		currentState(rexos_statemachine::State::STATE_OFFLINE),
+		moduleProxyListener(mpl),
+		connectedWithNode(false),
+		bond(NULL) {
 	stateUpdateServiceServer = nodeHandle.advertiseService(
 			equipletNamespaceName + "/" + moduleNamespaceName + "/state_update",
 			&ModuleProxy::onStateChangeServiceCallback, this);
@@ -32,9 +34,14 @@ ModuleProxy::ModuleProxy(std::string equipletName, rexos_knowledge_database::Mod
 			equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update",
 			&ModuleProxy::onModeChangeServiceCallback, this);
 	
+	transitionActionServer.start();
+	
 	ROS_INFO_STREAM("Setting state action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/change_state");
 	ROS_INFO_STREAM("Setting mode action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/change_mode");
 	ROS_INFO_STREAM("Setting instruction action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/set_instruction");
+	ROS_INFO_STREAM("Setting state update server: " << equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
+	ROS_INFO_STREAM("Setting mode update server: " << equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
+	
 
 }
 
@@ -94,10 +101,7 @@ void ModuleProxy::changeState(rexos_statemachine::State state) {
 	goal.desiredState = desiredState;
 	changeStateActionClient.waitForServer();
 	ROS_INFO("g");
-	changeStateActionClient.sendGoal(goal, 
-			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleDoneCallback(), 
-			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleActiveCallback(), 
-			boost::bind(&ModuleProxy::onModuleTransitionFeedbackCallback, this, _1));
+	changeStateActionClient.sendGoal(goal);
 	ROS_INFO("h");
 }
 
@@ -122,13 +126,10 @@ void ModuleProxy::setInstruction(std::string OID, JSONNode n) {
 	setInstructionActionClient.sendGoal(goal, boost::bind(&ModuleProxy::onInstructionServiceCallback, this, _1, _2), NULL, NULL);
 }
 void ModuleProxy::goToNextTransitionPhase() {
-	rexos_statemachine::ChangeStateGoal goal;
-	goal.desiredState = desiredState;
-	changeStateActionClient.waitForServer();
-	changeStateActionClient.sendGoal(goal, 
-			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleDoneCallback(), 
-			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleActiveCallback(), 
-			boost::bind(&ModuleProxy::onModuleTransitionFeedbackCallback, this, _1));
+	transitionActionServer.setSucceeded();
+	boost::unique_lock<boost::mutex> lock(transitionPhaseMutex);
+	allowedToContinue = true;
+	transitionPhaseCondition.notify_one();
 }
 
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
@@ -165,21 +166,26 @@ void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoal
 		moduleProxyListener->onInstructionStepCompleted(this, result->OID, false);
 }
 
-void ModuleProxy::onModuleTransitionFeedbackCallback(const rexos_statemachine::ChangeStateFeedbackConstPtr& feedback) {
-	ROS_INFO("Recieved a feedback call");
+void ModuleProxy::onModuleTransitionGoalCallback(const rexos_statemachine::TransitionGoalConstPtr& goal) {
+	ROS_INFO("Recieved a goal call");
 	std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations;
-	for(int i = 0; i < feedback->gainedSupportedMutations.size(); i++) {
+	for(int i = 0; i < goal->gainedSupportedMutations.size(); i++) {
 		rexos_knowledge_database::SupportedMutation supportedMutation(
-				feedback->gainedSupportedMutations.at(i));
+				goal->gainedSupportedMutations.at(i));
 		supportedMutations.push_back(supportedMutation);
 	}
 	std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations;
-	for(int i = 0; i < feedback->requiredMutationsRequiredForNextPhase.size(); i++) {
+	for(int i = 0; i < goal->requiredMutationsRequiredForNextPhase.size(); i++) {
 		rexos_knowledge_database::RequiredMutation requiredMutation(
-				feedback->requiredMutationsRequiredForNextPhase.at(i).mutation, feedback->requiredMutationsRequiredForNextPhase.at(i).isOptional);
+				goal->requiredMutationsRequiredForNextPhase.at(i).mutation, goal->requiredMutationsRequiredForNextPhase.at(i).isOptional);
 		requiredMutations.push_back(requiredMutation);
 	}
 	moduleProxyListener->onModuleTransitionPhaseCompleted(this, supportedMutations, requiredMutations);
+	
+	boost::unique_lock<boost::mutex> lock(transitionPhaseMutex);
+	while(allowedToContinue == false) transitionPhaseCondition.wait(lock);
+	allowedToContinue = false;
+	ROS_WARN("Leaving method");
 }
 
 void ModuleProxy::onBondCallback(rexos_bond::Bond* bond, Event event){

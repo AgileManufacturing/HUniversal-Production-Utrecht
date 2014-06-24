@@ -54,7 +54,6 @@ namespace equiplet_node{
 
 class EquipletStateMachine : 
 	public rexos_statemachine::StateMachine, 
-	public rexos_statemachine::Listener,
 	ModuleRegistryListener {
 
 public:
@@ -63,8 +62,8 @@ public:
 	virtual ~EquipletStateMachine();
 
 protected:
-	virtual void onStateChanged();
-	virtual void onModeChanged();
+	virtual void onStateChanged(rexos_statemachine::State state);
+	virtual void onModeChanged(rexos_statemachine::Mode mode);
 
 	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
 
@@ -80,12 +79,12 @@ private:
 
 	void changeModuleStates(rexos_statemachine::State desiredState);
 
-	virtual void transitionInitialize(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionDeinitialize(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionSetup(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionShutdown(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStart(rexos_statemachine::TransitionActionServer* as);
-	virtual void transitionStop(rexos_statemachine::TransitionActionServer* as);
+	virtual bool transitionInitialize();
+	virtual bool transitionDeinitialize();
+	virtual bool transitionSetup();
+	virtual bool transitionShutdown();
+	virtual bool transitionStart();
+	virtual bool transitionStop();
 
 protected:
 	equiplet_node::ModuleRegistry moduleRegistry; 

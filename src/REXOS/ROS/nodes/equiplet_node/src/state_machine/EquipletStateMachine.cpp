@@ -20,10 +20,7 @@ EquipletStateMachine::EquipletStateMachine(std::string equipletName):
 	moduleRegistry(equipletName),
 	desiredState(rexos_statemachine::STATE_NOSTATE)
 {
-	rexos_statemachine::StateMachine::setListener(this);
-
 	moduleRegistry.setModuleRegistryListener(this);
-
 	moduleRegistry.setNewRegistrationsAllowed(true);
 }
 
@@ -59,11 +56,11 @@ void EquipletStateMachine::changeModuleStates(rexos_statemachine::State desiredS
 	ROS_INFO("E");
 }
 
-void EquipletStateMachine::onStateChanged(){
+void EquipletStateMachine::onStateChanged(rexos_statemachine::State state){
 	ROS_INFO("State Changed to %s",rexos_statemachine::state_txt[getCurrentState()]);
 }
 
-void EquipletStateMachine::onModeChanged(){
+void EquipletStateMachine::onModeChanged(rexos_statemachine::Mode mode){
 	ROS_INFO("Mode Changed to %s",rexos_statemachine::mode_txt[getCurrentMode()]);
 	bool changeModuleModes = false;
 
@@ -122,15 +119,18 @@ void EquipletStateMachine::onModuleTransitionPhaseCompleted(ModuleProxy* moduleP
 		(*pendingTransitionPhases)[moduleProxy].push_back(requiredMutationsRequiredForNextPhase.at(i));
 	}
 	
+	
 	for(std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>::iterator it = pendingTransitionPhases->begin(); 
 			it != pendingTransitionPhases->end(); it++) {
 		bool canContinue = areAllRequiredMutationsAvailiable(it->second, *currenntlySupportedMutations);
 		if(canContinue == true) {
 			ROS_INFO_STREAM("Module " << it->first->getModuleIdentifier() << " can now continue");
 			it->first->goToNextTransitionPhase();
+			// TODO is this safe?
+			pendingTransitionPhases->erase(it);
 		}
-	}
 }
+	}
 
 bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State desiredState){
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
@@ -142,7 +142,7 @@ bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State de
 	return true;
 }
 
-void EquipletStateMachine::transitionInitialize(rexos_statemachine::TransitionActionServer* as){
+bool EquipletStateMachine::transitionInitialize(){
 	ROS_INFO( "transitionInitialize called");
 	changeModuleStates(rexos_statemachine::STATE_SAFE);
 	
@@ -151,9 +151,9 @@ void EquipletStateMachine::transitionInitialize(rexos_statemachine::TransitionAc
 		condit.wait( lock );
 	}
 	
-	as->setSucceeded();
+	return true;
 }
-void EquipletStateMachine::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as){
+bool EquipletStateMachine::transitionDeinitialize(){
 	ROS_INFO( "transitionDeinitialize called");
 	changeModuleStates(rexos_statemachine::STATE_OFFLINE);
 	
@@ -162,9 +162,9 @@ void EquipletStateMachine::transitionDeinitialize(rexos_statemachine::Transition
 		condit.wait( lock );
 	}
 	
-	as->setSucceeded();
+	return true;
 }
-void EquipletStateMachine::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+bool EquipletStateMachine::transitionSetup(){
 	ROS_INFO( "transitionSetup called");
 	moduleRegistry.setNewRegistrationsAllowed(false);
 
@@ -175,10 +175,10 @@ void EquipletStateMachine::transitionSetup(rexos_statemachine::TransitionActionS
 		condit.wait( lock );
 	}
 	
-	as->setSucceeded();
+	return true;
 }
 
-void EquipletStateMachine::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+bool EquipletStateMachine::transitionShutdown(){
 	ROS_INFO( "transitionShutdown called");
 	changeModuleStates(rexos_statemachine::STATE_SAFE);
 
@@ -187,22 +187,19 @@ void EquipletStateMachine::transitionShutdown(rexos_statemachine::TransitionActi
 		condit.wait( lock );
 	}
 	moduleRegistry.setNewRegistrationsAllowed(true);
-	as->setSucceeded();
+	return true;
 }
 
-void EquipletStateMachine::transitionStart(rexos_statemachine::TransitionActionServer* as){
+bool EquipletStateMachine::transitionStart(){
 	ROS_INFO( "transitionStart called");
-	as->setSucceeded();
+	return true;
 }
 
-void EquipletStateMachine::transitionStop(rexos_statemachine::TransitionActionServer* as){
+bool EquipletStateMachine::transitionStop(){
 	ROS_INFO( "transitionStop called");
-	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_STANDBY)) {
-		boost::unique_lock<boost::mutex> lock( mutexit );
-		condit.wait( lock );
-	}
-	as->setSucceeded();
+	return true;
 }
+
 std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStateMachine::calculateOrderOfCalibrationSteps() {
 	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 	std::vector<rexos_knowledge_database::TransitionPhase> pendingTransitionPhases;

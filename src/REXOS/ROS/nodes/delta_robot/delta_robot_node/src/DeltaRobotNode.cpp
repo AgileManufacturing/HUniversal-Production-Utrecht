@@ -226,12 +226,9 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 
 	if(deltaRobot->checkPath(oldLocation, newLocation)){
-
 		deltaRobot->moveTo(newLocation, maxAcceleration);
-
 		return true;
 	}
-
 	return false;
 } 
 
@@ -260,23 +257,23 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToRelativePoint(double x, doub
 }
 
 
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize() {
 	ROS_INFO("Initialize transition called");
 	
-	as->setSucceeded();
+	return true;
 }
 
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize() {
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
-	as->setSucceeded();
+	return true;
 }
 
 /**
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 	// Generate the effector boundaries with voxel size 2
 	deltaRobot->generateBoundaries(2);
@@ -285,13 +282,13 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 	// Calibrate the motors
 	if(!deltaRobot->calibrateMotors()){
 		ROS_ERROR("Calibration FAILED. EXITING.");
-			as->setAborted();
+			return false;
 	} else {
-		rexos_statemachine::TransitionFeedback feedback;
-		feedback.gainedSupportedMutations.push_back("move");
+		rexos_statemachine::TransitionGoal goal;
+		goal.gainedSupportedMutations.push_back("move");
 		
-		as->publishFeedback(feedback);
-		as->setSucceeded();
+		transitionActionClient.sendGoal(goal);
+		return true;
 	}
 }
 
@@ -300,30 +297,30 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown(){
 	ROS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	deltaRobot->powerOff();
-	as->setSucceeded();
+	return true;
 }
 
 /**
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStart(){
 	ROS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
-	as->setSucceeded();
+	return true;
 }
 /**
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-void deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStop(){
 	ROS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
-		as->setSucceeded();
+		return true;
 	// Go to base (Motors on 0 degrees)
 }
 

@@ -394,19 +394,19 @@ void PartLocatorNode::run() {
 	ros::Subscriber sub = nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
 	ros::spin();
 }
-void PartLocatorNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
+bool PartLocatorNode::transitionInitialize() {
 	ROS_INFO("Initialize transition called");
-	as->setSucceeded();
+	return true;
 }
 
-void PartLocatorNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
+bool PartLocatorNode::transitionDeinitialize() {
 	ROS_INFO("Deinitialize transition called");
 	ros::shutdown();
-	as->setSucceeded();
+	return true;
 }
 
 
-void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer* as){
+bool PartLocatorNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 	
 	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
@@ -417,24 +417,18 @@ void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer
 	workPlaneWidth = 80;
 	workPlaneHeight = 80;
 	
-	rexos_statemachine::TransitionFeedback feedback;
+	rexos_statemachine::TransitionGoal goal2;
 	std::vector<rexos_statemachine::RequiredMutation> requiredMutations;
 	rexos_statemachine::RequiredMutation requiredMutation;
 	requiredMutation.mutation = "move";
 	requiredMutation.isOptional = false;
 	requiredMutations.push_back(requiredMutation);
-	feedback.requiredMutationsRequiredForNextPhase = requiredMutations;
+	goal2.requiredMutationsRequiredForNextPhase = requiredMutations;
 	
-	as->publishFeedback(rexos_statemachine::TransitionFeedback());
+	transitionActionClient.sendGoal(goal2);
+	transitionActionClient.waitForResult();
 
-	ROS_INFO("Press any key after mover has calibrated");
-	while(as->isNewGoalAvailable() == false) {
-		ros::Duration(0.1).sleep();
-	}
-	as->acceptNewGoal();
-	
-	cin.get();
-	cin.ignore();
+	ROS_INFO("Continuing calibration");
 	
 	double x;
 	double y;
@@ -734,19 +728,19 @@ void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer
 	
 
 
-	as->setSucceeded();
+	return true;
 }
-void PartLocatorNode::transitionShutdown(rexos_statemachine::TransitionActionServer* as){
+bool PartLocatorNode::transitionShutdown(){
 	ROS_INFO("Shutdown transition called");
-	as->setSucceeded();
+	return true;
 }
-void PartLocatorNode::transitionStart(rexos_statemachine::TransitionActionServer* as){
+bool PartLocatorNode::transitionStart(){
 	ROS_INFO("Start transition called");
-	as->setSucceeded();
+	return true;
 }
-void PartLocatorNode::transitionStop(rexos_statemachine::TransitionActionServer* as){
+bool PartLocatorNode::transitionStop(){
 	ROS_INFO("Stop transition called");
-	as->setSucceeded();
+	return true;
 }
 
 int main(int argc, char* argv[]) {
