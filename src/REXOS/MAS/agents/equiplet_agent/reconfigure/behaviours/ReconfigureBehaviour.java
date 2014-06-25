@@ -24,9 +24,12 @@ import libraries.knowledgedb_client.KnowledgeException;
 
 public class ReconfigureBehaviour extends Behaviour{
 	public HardwareAbstractionLayer HAL;
+	public EquipletAgent equipletAgent;
 	public boolean serverHosted = false;
-	public ReconfigureBehaviour(HardwareAbstractionLayer hal) {
+	public ReconfigureBehaviour(HardwareAbstractionLayer hal, EquipletAgent ea) {
+		super();
 		this.HAL = hal;
+		equipletAgent = ea;
 	}
 
 	@Override
@@ -41,6 +44,7 @@ public class ReconfigureBehaviour extends Behaviour{
 				try {
 					Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
 							":9191/QrReceiver", qr).stop();
+					equipletAgent.register();
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -56,6 +60,7 @@ public class ReconfigureBehaviour extends Behaviour{
 									":9191/QrReceiver", qr);
 						System.out.println("http://" + Inet4Address.getLocalHost().getHostAddress() + 
 								":9191/QrReceiver published");
+						equipletAgent.deregister();
 					} catch (UnknownHostException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

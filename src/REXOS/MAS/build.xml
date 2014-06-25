@@ -121,6 +121,9 @@
 	<target name="tools">
    		<ant antfile="build.xml" target="all" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
+	<target name ="grid_server">
+		<ant antfile="build.xml" target="all" dir="grid_server" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>    
+	</target>
 
 	<!-- clean target, cleans rexos and tools -->
 	<target name="clean">    	
@@ -130,7 +133,9 @@
     	<ant antfile="build.xml" target="clean" dir="generic" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="configuration" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
     	<ant antfile="build.xml" target="clean" dir="libraries" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
-    	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
+    	<ant antfile="build.xml" target="clean" dir="tools" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/> 
+    	<ant antfile="build.xml" target="clean" dir="grid_server" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
+    	
     </target>
 	
     <target name="Launch">

@@ -52,6 +52,7 @@ import com.google.gson.JsonParser;
 import HAL.HardwareAbstractionLayer;
 import HAL.steps.HardwareStep;
 import HAL.Module;
+import HAL.exceptions.BlackboardUpdateException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -69,14 +70,14 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * Stores the current state that the equiplet is in.
 	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
 	  */
-	public static String machineState = "123";
+	public static String machineState = "";
 	
 	/**
 	  * @var machineMode
 	  * Stores the current mode that the equiplet is in.
 	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
 	  */
-	public static String machineMode = "321";
+	public static String machineMode = "";
 	
 
 	private static final long serialVersionUID = -4551409467306407788L;
@@ -112,7 +113,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * The string serverLists Holds all the services that the equiplet can exectute.
 	  * This variable is used in the WIMP.
 	  */
-	private String serverLists = "";
+	public String serverLists = "";
 	
 	
 	/**
@@ -156,31 +157,20 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * Main task is to wait for incoming ACLMessaged to communicate with ProductAgents.
 	  */
 	protected void setup(){		
-		try {
-			hal = new HardwareAbstractionLayer(this);
-			addBehaviour(new ReconfigureBehaviour(hal));
-
+		
+			try {
+				hal = new HardwareAbstractionLayer(this);
+			} catch (KnowledgeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BlackboardUpdateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			register();
+			addBehaviour(new ReconfigureBehaviour(hal, this));
 			System.out.println("HAL created");
-			serviceList = hal.getSupportedServices();
-		} catch (KnowledgeException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		DFAgentDescription dfd = new DFAgentDescription();
-		for(int i =0; i < serviceList.size(); i++){
-	        ServiceDescription sd  = new ServiceDescription();
-	        sd.setName( serviceList.get(i).getName() );
-	        sd.setType(serviceList.get(i).getName());
-	        dfd.addServices(sd);
-	        serverLists += serviceList.get(i).getName() +",";
-		}
-		try {
-			DFService.register(this, dfd );
-		} catch (FIPAException e) {
-			e.printStackTrace();
-		}  
+			  
 
 		addBehaviour(new CyclicBehaviour()
 		{   
@@ -244,6 +234,39 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				block();    
 			}  
 		});  
+	}
+	public void deregister(){
+		try {
+			DFService.deregister(this);
+		} catch (FIPAException e) {
+			e.printStackTrace();
+		}
+	}
+	public void register(){
+		
+		serverLists = "";
+		serviceList.clear();
+		try {
+		serviceList = hal.getSupportedServices();
+	} catch (KnowledgeException e) {
+		e.printStackTrace();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	DFAgentDescription dfd = new DFAgentDescription();
+	for(int i =0; i < serviceList.size(); i++){
+        ServiceDescription sd  = new ServiceDescription();
+        sd.setName( serviceList.get(i).getName() );
+        sd.setType(serviceList.get(i).getName());
+        dfd.addServices(sd);
+        serverLists += serviceList.get(i).getName() +",";
+	}
+	try {
+		DFService.register(this, dfd );
+	} catch (FIPAException e) {
+		e.printStackTrace();
+	}
 	}
 	
 	/**
