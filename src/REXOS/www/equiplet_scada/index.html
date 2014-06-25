@@ -3,9 +3,12 @@
 <link rel="stylesheet" type="text/css" href="script/style.css">
 <title>SCADA Equiplet (...)</title>
 <script type="text/javascript" src="script/jquery.js"></script>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script type="text/javascript">
 	var equipletInfo = {};
 	var moduleInfo = {};
+	var qrCorrection = {};
 	
 	//Enable the equiplet mode buttons
 	$(document).ready(
@@ -76,6 +79,66 @@
 							return false;
 						});
 			});
+
+//Start humonInteraction polling
+	$(document).ready(
+			function() {
+				(function worker() {
+					$.ajax({
+						dataType : "json",
+						url : 'remote/humanInteractionGet',
+						success : function(data) {
+							if(!data==""){
+			 						$( "#dialog" ).dialog();
+					  				console.log(data);
+					  				$( "#dialog-form" ).dialog( "open" );
+					  		}
+						},
+						complete : function() {
+							setTimeout(worker, 5000);
+						}
+					});
+				})();
+			});
+
+$( "#dialog-form" ).dialog({
+      autoOpen: false,
+      height: 300,
+      width: 350,
+      modal: true,
+      buttons: {
+        "Create an account": function() {
+        var myJSONObject = {"topLeftX" : $("#topLeftX").val() ,
+        "topLeftY" : $("#topLeftY").val() ,
+        "topRightX" : $("#topRightX").val() ,
+        "topRightY" : $("#topRightY").val() ,
+        "bottomRightX" : $("#bottomRightX").val() ,
+        "bottomRightY" : $("#bottomRightY").val()}
+        
+				(function worker() {
+					$.ajax({
+						dataType : "json",
+						url : 'remote/humanInteractionSubmit',
+						success : function() {							
+						},
+						complete : function() {
+							setTimeout(worker, 5000);
+						}
+					});
+				})();         
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+      $( this ).dialog( "close" );
+      }
+    });
+
+
+
+
 
 	//Start equipletInfo polling
 	$(document).ready(
@@ -202,5 +265,27 @@
 		</div>
 		<div id="footer" class="border"></div>
 	</div>
+	
+	
+	<div id="dialog-form" title="Calibrating">
+  <p class="validateTips">All form fields are required.</p>
+ 
+  <form>
+  <fieldset>
+    <label for="topLeftX">topLeftX</label >
+    <input type="text" name="topLeftX" id="topLeftX" class="text ui-widget-content ui-corner-all" float="left">
+    <label for="topLeftY">topLeftY</label>
+    <input type="text" name="topLeftY" id="topLeftY" class="text ui-widget-content ui-corner-all" float="left">
+    <label for="topRightX">topRightX</label>
+    <input type="text" name="topRightX" id="topRightX" class="text ui-widget-content ui-corner-all" float="left">
+    <label for="topRightY">topRightY</label>
+    <input type="text" name="topRightY" id="topRightY" class="text ui-widget-content ui-corner-all" float="left">
+    <label for="bottomRightX">bottomRightX</label>
+    <input type="text" name="bottomRightX" id="bottomRightX" class="text ui-widget-content ui-corner-all" float="left">
+    <label for="bottomRightY">bottomRightY</label>
+    <input type="text" name="bottomRightY" id="bottomRightY" class="text ui-widget-content ui-corner-all" float="left">
+  </fieldset>
+  </form>
+</div> 
 </body>
 </html>
