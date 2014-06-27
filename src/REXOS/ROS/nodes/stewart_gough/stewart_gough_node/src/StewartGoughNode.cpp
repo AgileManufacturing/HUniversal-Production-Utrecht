@@ -136,6 +136,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 				rotationZ = stewartGough->getEffectorRotationZ();
 			}
 			
+			std::cout << "rotationX: " << rotationX << std::endl;
 			
 			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
 			//Bit dangerous tho, what happends if they are all exactly 0?
@@ -264,6 +265,10 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
 bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration){
+
+	std::cout << "moveTo rotation: " << rotationX << " " << rotationY << " " << rotationZ << std::endl;
+		
+	
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 

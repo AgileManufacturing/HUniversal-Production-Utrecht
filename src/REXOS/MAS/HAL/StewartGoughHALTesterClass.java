@@ -116,7 +116,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 			+ "		]"
 			+ "	},"
 			+ "	\"properties\":\"{"
-			+ "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\","
+			+ "	\\\"modbusIp\\\" : \\\"192.168.0.32\\\","
 			+ "	\\\"modbusPort\\\" : 502"
 			+ "}\","
 			+ "	\"calibrationData\":["
@@ -134,7 +134,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 			+ "	],"
 			+ "	\"attachedTo\":null,"
 			+ "\"mountPointX\":3,"
-			+ "\"mountPointY\":2"
+			+ "\"mountPointY\":0"
 			+ "}";
 	// pen
 	static String moduleB_01 = "{"
@@ -298,72 +298,72 @@ public static void main(String[] args) throws Exception {
 	
 	System.out.println("Start insertig module");
 	
-	File stewartGoughJar = new File("C:/Users/Aristides/Desktop/Six Axis/StewartGough.jar");
+	File stewartGoughJar = new File("/home/agileman/Desktop/StewartGough.jar");
 	fis = new FileInputStream(stewartGoughJar);
 	content = new byte[(int) stewartGoughJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Module = new String(Base64.encodeBase64(content));
 	
-	File stewartGoughZip = new File("C:/Users/Aristides/Desktop/Six Axis/nodes.zip");
+	File stewartGoughZip = new File("/home/agileman/Desktop/nodes.zip");
 	fis = new FileInputStream(stewartGoughZip);
 	content = new byte[(int) stewartGoughZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 	
-	File gripperZip = new File("C:/Users/Aristides/Desktop/Six Axis/nodes.zip");
+	File gripperZip = new File("/home/agileman/Desktop/nodes.zip");
 	fis = new FileInputStream(gripperZip);
 	content = new byte[(int) gripperZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64GripperRos = new String(Base64.encodeBase64(content));
 	
-	File cameraZip = new File("C:/Users/Aristides/Desktop/Six Axis/nodes.zip");
+	File cameraZip = new File("/home/agileman/Desktop/nodes.zip");
 	fis = new FileInputStream(cameraZip);
 	content = new byte[(int) cameraZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64CameraRos = new String(Base64.encodeBase64(content));
 	
-	File workplaneZip = new File("C:/Users/Aristides/Desktop/Six Axis/nodes.zip");
+	File workplaneZip = new File("/home/agileman/Desktop/nodes.zip");
 	fis = new FileInputStream(workplaneZip);
 	content = new byte[(int) workplaneZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 	
-	File penJar = new File("C:/Users/Aristides/Desktop/Six Axis/Pen.jar");
+	File penJar = new File("/home/agileman/Desktop/Pen.jar");
 	fis = new FileInputStream(penJar);
 	content = new byte[(int) penJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Pen = new String(Base64.encodeBase64(content));
 	
-	File gripperJar = new File("C:/Users/Aristides/Desktop/Six Axis/Gripper.jar");
+	File gripperJar = new File("/home/agileman/Desktop/Gripper.jar");
 	fis = new FileInputStream(gripperJar);
 	content = new byte[(int) gripperJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Gripper = new String(Base64.encodeBase64(content));
 	
-	File drawJar = new File("C:/Users/Aristides/Desktop/Six Axis/Draw.jar");
+	File drawJar = new File("/home/agileman/Desktop/Draw.jar");
 	fis = new FileInputStream(drawJar);
 	content = new byte[(int) drawJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Draw = new String(Base64.encodeBase64(content));
 	
-	File pickAndPlaceJar = new File("C:/Users/Aristides/Desktop/Six Axis/PickAndPlaceWithRotation.jar");
+	File pickAndPlaceJar = new File("/home/agileman/Desktop/PickAndPlaceWithRotation.jar");
 	fis = new FileInputStream(pickAndPlaceJar);
 	content = new byte[(int) pickAndPlaceJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64PickAndPlace = new String(Base64.encodeBase64(content));
 	
+	System.out.println("Finished reading moduleFiles, starting insertion of modules...");
 	
-	
-	/*// gripper
+	// six axis
 	String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64Module + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
 	JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 	hal.insertModule(a, a);
@@ -391,7 +391,7 @@ public static void main(String[] args) throws Exception {
 	// workplane
 	String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 	JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-	hal.insertModule(e, e);*/
+	hal.insertModule(e, e);
 
 
 		JsonObject criteria = new JsonObject();
@@ -457,7 +457,7 @@ public static void main(String[] args) throws Exception {
 	@Override
 	public String getEquipletName() {
 		// TODO hardcoded!!!!!!
-		return "EQ2";
+		return "EQ3";
 	}
 
 	@Override

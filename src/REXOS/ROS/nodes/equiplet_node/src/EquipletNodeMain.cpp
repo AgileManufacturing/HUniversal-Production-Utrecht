@@ -30,7 +30,7 @@
 
 #include <equiplet_node/EquipletNode.h>
 
-const char* DEFAULT_BLACKBOARD_IP = "145.89.191.131";
+const char* DEFAULT_BLACKBOARD_IP = "10.0.1.227";
 
 static void show_usage(std::string name) {
 	std::cerr << "Usage: " << name << " <options(s)>\n" << "Options:\n"

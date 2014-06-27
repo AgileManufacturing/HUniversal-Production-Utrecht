@@ -891,9 +891,9 @@ bool SixAxisCalculations::isValidMove(double angles[6]){
 
 bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ){
 	
-		std::cout << "path check start" << std::endl;
-    	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
-		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
+		//std::cout << "path check start" << std::endl;
+    	//std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
+		//std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
 
 		//Calculate lengths to travel
     	double x_length = to.x - from.x;
@@ -901,14 +901,26 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
     	double z_length = to.z - from.z;
 		
 		
+		double rotationX_length = endRotationX - startRotationX;
+    	double rotationY_length = endRotationY - startRotationY;
+    	double rotationZ_length = endRotationZ - startRotationZ;
+		
+		
 		
     	double largest_length = (double)	(fabs(x_length) > fabs(y_length) ?
-												(fabs(x_length) > fabs(z_length) ? fabs(x_length) : fabs(z_length)) :
-												(fabs(y_length) > fabs(z_length) ? fabs(y_length) : fabs(z_length))	);
+											(fabs(x_length) > fabs(z_length) ? fabs(x_length) : fabs(z_length)) :
+											(fabs(y_length) > fabs(z_length) ? fabs(y_length) : fabs(z_length))	);
 
     	double stepLengthX = x_length / largest_length;
     	double stepLengthY = y_length / largest_length;
     	double stepLengthZ = z_length / largest_length;
+		
+		
+		double stepLengthRotationX = rotationX_length / largest_length;
+    	double stepLengthRotationY = rotationY_length / largest_length;
+    	double stepLengthRotationZ = rotationZ_length / largest_length;
+		
+		
  
 		std::cout << "path length: " << largest_length << std::endl;
 		
@@ -917,6 +929,10 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 			double x = (from.x + stepLengthX * step);
 			double y = (from.y + stepLengthY * step);
 			double z = (from.z + stepLengthZ * step);
+			
+			double rotationX = (startRotationX + stepLengthRotationX * step);
+			double rotationY = (startRotationY + stepLengthRotationY * step);
+			double rotationZ = (startRotationZ + stepLengthRotationZ * step);
 			
 			//std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
 			
@@ -941,7 +957,7 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 				//return false;
 			//}
 			
-			EffectorMove move = getMotorAngles(Point3D(x, y, z), 0, 0, 0);
+			EffectorMove move = getMotorAngles(Point3D(x, y, z), rotationX, rotationY, rotationZ);
 			if(!move.validMove){
 				std::cout << "invalid position in path: " << move.moveTo << std::endl;
 				return false;
