@@ -679,6 +679,7 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationZ = 0;
 		
 		
+		/*
 		double ac = 50;
 		
 		
@@ -731,6 +732,10 @@ namespace rexos_stewart_gough{
 			}
 		
 		}
+		 */
+		 
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 0.9, 0, 0, 0);
+		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		
         return true;

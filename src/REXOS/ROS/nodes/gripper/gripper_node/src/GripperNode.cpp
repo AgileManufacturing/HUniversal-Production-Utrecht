@@ -38,7 +38,7 @@
 /**
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.2"
+#define MODBUS_IP "192.168.0.32"
 /**
  * The port we are connecting to
  **/
@@ -118,6 +118,7 @@ void GripperNode::error() {
 
 void GripperNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
 	ROS_INFO("Initialize transition called");
+	as->setSucceeded();
 }
 
 void GripperNode::transitionDeinitialize(rexos_statemachine::TransitionActionServer* as) {
