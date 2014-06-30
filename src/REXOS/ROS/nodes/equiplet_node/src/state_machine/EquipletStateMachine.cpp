@@ -31,27 +31,32 @@ EquipletStateMachine::~EquipletStateMachine(){
 }
 
 void EquipletStateMachine::changeModuleStates(rexos_statemachine::State desiredState){
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-/*	if(desiredState == rexos_statemachine::STATE_STANDBY && 
-			this->getCurrentState() == rexos_statemachine::STATE_SAFE) {*/
-	if(true) {
-		// we are calibrating the modules, use the required and supported calibration mutations to determine the right order.
+	ROS_INFO("\n\n\n\n\n\n\n\n\n\n");
 		currenntlySupportedMutations = new std::vector<rexos_knowledge_database::SupportedMutation>();
 		pendingTransitionPhases = new std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>();
+
+	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+	if(desiredState == rexos_statemachine::STATE_STANDBY && 
+			this->getCurrentState() == rexos_statemachine::STATE_SETUP) {
+		ROS_INFO("A");
+		// we are calibrating the modules, use the required and supported calibration mutations to determine the right order.
+		ROS_INFO("B");
 		try{
 			std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> calibrationSteps = calculateOrderOfCalibrationSteps();
 			for (int i = 0; i < modules.size(); i++) {
+				ROS_INFO("C");
 				modules[i]->changeState(desiredState);
 			}
+			ROS_INFO("D");
 		} catch(CyclicDependencyException ex) {
 			ROS_WARN("Cyclic dependency detected");
 		}
-		delete pendingTransitionPhases;
-		delete currenntlySupportedMutations;
+		return;
 	}
 	for (int i = 0; i < modules.size(); i++) {
 		modules[i]->changeState(desiredState);
 	}
+	ROS_INFO("E");
 }
 
 void EquipletStateMachine::onStateChanged(){
@@ -83,8 +88,11 @@ void EquipletStateMachine::onModuleStateChanged(ModuleProxy* moduleProxy,rexos_s
 			moduleProxy->getModuleIdentifier().toString().c_str(),
 			rexos_statemachine::state_txt[previousState],
 			rexos_statemachine::state_txt[newState]);
-	if(rexos_statemachine::is_transition_state[getCurrentState()] && allModulesInDesiredState(desiredState) )
+	if(rexos_statemachine::is_transition_state[getCurrentState()] && allModulesInDesiredState(desiredState) ) {
 		condit.notify_one();
+		delete pendingTransitionPhases;
+		delete currenntlySupportedMutations;
+	}
 }
 
 void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode){

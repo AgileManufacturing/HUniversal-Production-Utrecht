@@ -248,10 +248,10 @@ bool StateMachine::_changeState(rexos_statemachine::State newState) {
 			// abort transition failed, TODO what to do now?
 			ROS_ERROR_STREAM("Abort transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << "failed");
 		} else {
-			throw std::runtime_error("Revieved a SimpleClientGoalState from abortTransitionActionClient which was not expected");
+			throw std::runtime_error("Recieved a SimpleClientGoalState from abortTransitionActionClient which was not expected");
 		}
 	} else {
-		throw std::runtime_error("Revieved a SimpleClientGoalState from transitionActionClient which was not expected");
+		throw std::runtime_error("Recieved a SimpleClientGoalState from transitionActionClient which was not expected");
 	}
 	
 	_forceToAllowedState();

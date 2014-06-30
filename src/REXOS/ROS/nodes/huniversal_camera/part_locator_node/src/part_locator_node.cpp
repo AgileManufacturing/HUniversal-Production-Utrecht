@@ -392,7 +392,6 @@ Matrix3 PartLocatorNode::calculateScaleMatrix() {
 void PartLocatorNode::run() {
 	ROS_INFO("waiting for camera/qr_codes");
 	ros::Subscriber sub = nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
-	transitionSetup(NULL);
 	ros::spin();
 }
 void PartLocatorNode::transitionInitialize(rexos_statemachine::TransitionActionServer* as) {
@@ -427,12 +426,13 @@ void PartLocatorNode::transitionSetup(rexos_statemachine::TransitionActionServer
 	feedback.requiredMutationsRequiredForNextPhase = requiredMutations;
 	
 	as->publishFeedback(rexos_statemachine::TransitionFeedback());
+
+	ROS_INFO("Press any key after mover has calibrated");
 	while(as->isNewGoalAvailable() == false) {
 		ros::Duration(0.1).sleep();
 	}
 	as->acceptNewGoal();
 	
-	ROS_INFO("Press any key after mover has calibrated");
 	cin.get();
 	cin.ignore();
 	

@@ -62,8 +62,11 @@ void ModuleProxy::setModuleProxyListener(ModuleProxyListener* mpl){
 void ModuleProxy::changeState(rexos_statemachine::State state) {
 	ROS_INFO("ModuleProxy of %s send new state goal %s", moduleIdentifier.toString().c_str(), rexos_statemachine::state_txt[state]);
 	ROS_INFO_STREAM("state " << rexos_statemachine::state_txt[state] << " " << rexos_statemachine::state_txt[getCurrentState()]);
+	ROS_INFO("a");
 	if(state == rexos_statemachine::State::STATE_SAFE && getCurrentState() == rexos_statemachine::State::STATE_OFFLINE) {
+	ROS_INFO("b");
 		if(connectedWithNode == false) {
+	ROS_INFO("c");
 			ros::ServiceClient spanNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
 			ROS_INFO_STREAM("Spawning node for " << moduleIdentifier);
 			node_spawner_node::spawnNode spawnNodeCall;
@@ -73,7 +76,9 @@ void ModuleProxy::changeState(rexos_statemachine::State state) {
 			spanNodeClient.call(spawnNodeCall);
 			
 			// wait for the node to come online
+	ROS_INFO("d");
 			if(connectedWithNode == false) {
+	ROS_INFO("e");
 				boost::unique_lock<boost::mutex> lock(nodeStartupMutex);
 				nodeStartupCondition.wait(lock);
 			}
@@ -82,15 +87,18 @@ void ModuleProxy::changeState(rexos_statemachine::State state) {
 		}
 	}
 	
+	ROS_INFO("f");
 	desiredState = state;
 	
 	rexos_statemachine::ChangeStateGoal goal;
 	goal.desiredState = desiredState;
 	changeStateActionClient.waitForServer();
+	ROS_INFO("g");
 	changeStateActionClient.sendGoal(goal, 
 			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleDoneCallback(), 
 			actionlib::SimpleActionClient<rexos_statemachine::ChangeStateAction>::SimpleActiveCallback(), 
 			boost::bind(&ModuleProxy::onModuleTransitionFeedbackCallback, this, _1));
+	ROS_INFO("h");
 }
 
 void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
@@ -158,6 +166,7 @@ void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoal
 }
 
 void ModuleProxy::onModuleTransitionFeedbackCallback(const rexos_statemachine::ChangeStateFeedbackConstPtr& feedback) {
+	ROS_INFO("Recieved a feedback call");
 	std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations;
 	for(int i = 0; i < feedback->gainedSupportedMutations.size(); i++) {
 		rexos_knowledge_database::SupportedMutation supportedMutation(

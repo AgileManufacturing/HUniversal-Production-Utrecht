@@ -290,7 +290,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup(rexos_statemachine
 		rexos_statemachine::TransitionFeedback feedback;
 		feedback.gainedSupportedMutations.push_back("move");
 		
-		as->publishFeedback(rexos_statemachine::TransitionFeedback());
+		as->publishFeedback(feedback);
 		as->setSucceeded();
 	}
 }
