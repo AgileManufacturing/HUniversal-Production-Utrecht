@@ -262,11 +262,13 @@ namespace rexos_stewart_gough{
 
 
 	void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration){
-		moveTo(point, maxAcceleration, 0, 0, 0);
+		moveTo(point, maxAcceleration, 0.0, 0.0, 0.0);
 	}
 
 
     void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ){
+		
+		std::cout << "moveTo: point(x:" << point.x << ", y:" << point.y << ", z:" << point.z << ") rotation(x:" << rotationX << ", y:" << rotationY << ", z:" << rotationZ << ")" << std::endl;
 		
 		// check whether the motors are powered on.
 		if(!motorManager->isPoweredOn()){
@@ -305,16 +307,20 @@ namespace rexos_stewart_gough{
 			
 			
 			
-			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, point.z), rotationX, rotationY, rotationZ);
+			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, -point.z), rotationX, rotationY, rotationZ);
 			
 			
+		//std::cout << "Rotation args from effectorMove: " << effectorMove.effectorRotationX << " " << effectorMove.effectorRotationY << " " << effectorMove.effectorRotationZ << std::endl;
+		
 			
 			//calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
 			if(!effectorMove.validMove){
 				throw std::out_of_range("invalid angles"); 
 			}
 			for(int i = 0; i < 6;i++){
+			
 				rotations[i]->angle = effectorMove.angles[i];
+				//std::cout << "Angle " << i << " from calculations: " << rotations[i]->angle << std::endl;
 			}
 			
             //kinematics->destinationPointToMotorRotations(point, rotations);
@@ -431,13 +437,16 @@ namespace rexos_stewart_gough{
                         rotations[i]->angle = motors[i]->getCurrentAngle();
                     }
                 }
+				
+				//std::cout << "Hardware motor " << i << " rotation: " << rotations[i]->angle << std::endl;
+				
                 motors[i]->writeRotationData(*rotations[i], currentMotionSlot);
             }
 			
 			
 			long timer2 = rexos_utilities::timeNow();
             motorManager->startMovement(currentMotionSlot);
-			std::cout << "start movement time: " << rexos_utilities::timeNow() - timer2 << "ms" << std::endl;
+			std::cout << "startMovement time: " << rexos_utilities::timeNow() - timer2 << "ms" << std::endl;
 		
 			
 			
@@ -669,32 +678,37 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationY = 0;
 		currentEffectorRotationZ = 0;
 		
+		
 		/*
-		double ac = 1;
+		double ac = 50;
 		
 		
 		int x, y, z;
 		double xr, yr, zr;
 		
-		int minX = -50;
-		int maxX = 50;
+		int minX = -100;
+		int maxX = 100; // -150 -- 150
 		
-		int minY = -50;
-		int maxY = 50;
+		int minY = -100;
+		int maxY = 100; // -150 -- 150
 		
-		int minZ = -270;
-		int maxZ = -310;
-		
-		
-		
-		int minRotation = -60;
-		int maxRotation = 60;
-		*/
-		
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 30, 0, 0, 0);
+		int minZ = -300;
+		int maxZ = -320; // -280 -- -340
 		
 		
-		/*for(int i = 0; i < 2000000; i++){
+		
+		int minRotation = -40;
+		int maxRotation = 40;
+		
+		
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 0.9, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(80, 0, -300), 0.9, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(-80, 0, -300), 0.9, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(0, 80, -300), 0.9, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(0, -80, -300), 0.9, 0, 0, 0);
+		
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -300), 0.9, 0, 0, 0);	
+		for(int i = 0; i < 2000000; i++){
 			
 			x = (rand() % (maxX-minX))+minX;
 			y = (rand() % (maxY-minY))+minY;
@@ -713,11 +727,15 @@ namespace rexos_stewart_gough{
 				moveTo(rexos_datatypes::Point3D<double>(x, y, z), ac, xr, yr, zr);
 			} catch(std::out_of_range& ex){
 				std::cout << "Invalid position" << std::endl;
-				std::cout << "Position: " << x << ", " << y << ", " << z << std::endl; 
-				std::cout << "Rotation: " << xr << ", " << yr << ", " << zr << std::endl; 
+				//std::cout << "Position: " << x << ", " << y << ", " << z << std::endl; 
+				//std::cout << "Rotation: " << xr << ", " << yr << ", " << zr << std::endl; 
 			}
 		
-		}*/
+		}
+		 */
+		 
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 0.9, 0, 0, 0);
+		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		
         return true;

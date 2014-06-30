@@ -190,7 +190,7 @@
 
 	<target name="Launch-HAL">
 		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="HAL.HALTesterClass" failonerror="true" fork="yes">
+		<java classname="HAL.StewartGoughHALTesterClass" failonerror="true" fork="yes">
 			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
 			<classpath refid="java" />
 			<classpath>

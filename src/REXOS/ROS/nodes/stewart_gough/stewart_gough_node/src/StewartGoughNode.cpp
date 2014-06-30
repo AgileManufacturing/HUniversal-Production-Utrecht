@@ -107,6 +107,11 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 	
 	double angle, rotatedX, rotatedY;
     JSONNode::const_iterator i = instructionDataNode.begin();
+	
+	std::cout << "Json data: " << goal->json << std::endl;
+	
+	
+	
     while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
@@ -117,6 +122,11 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 			lookupResultPoint = parseLookup(*i);
 			std::string angleValue = parseNodeValue("angle", *i);
 			angle = rexos_utilities::stringToDouble(angleValue);
+			
+			
+			
+			
+			
 			
 			std::string rotationValueX = parseNodeValue("rotationX", *i);
 			rotationX = rexos_utilities::stringToDouble(rotationValueX);
@@ -135,6 +145,10 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 			if(rotationValueZ.empty()){
 				rotationZ = stewartGough->getEffectorRotationZ();
 			}
+			
+			std::cout << "rotationX: " << rotationX << std::endl;
+			std::cout << "rotationY: " << rotationY << std::endl;
+			std::cout << "rotationZ: " << rotationZ << std::endl;
 			
 			
 			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
@@ -264,6 +278,10 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
 bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration){
+
+	std::cout << "moveTo rotation: " << rotationX << " " << rotationY << " " << rotationZ << std::endl;
+		
+	
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
 
@@ -280,6 +298,9 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
 
 
 
+
+
+
 /**
  * Function that moves the stewart int that is relative to the current. 
  *
@@ -290,6 +311,8 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
  * 
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
+ 
+ /*
 bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, double y, double z, double maxAcceleration){
 	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
 	rexos_datatypes::Point3D<double> newLocation(x,y,z);
@@ -303,7 +326,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, 
 	}
 	
 }
-
+*/
 
 
 

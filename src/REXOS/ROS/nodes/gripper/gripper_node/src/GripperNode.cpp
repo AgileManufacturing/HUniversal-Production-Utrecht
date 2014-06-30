@@ -38,7 +38,7 @@
 /**
  * The IP of the modbus we are connecting to
  **/
-#define MODBUS_IP "192.168.0.2"
+#define MODBUS_IP "192.168.0.32"
 /**
  * The port we are connecting to
  **/
@@ -57,7 +57,6 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 				false) {
 	ROS_INFO("GripperNode Constructor entering...");
 	ROS_INFO("1");
-	// get the properties and combine them for the deltarobot
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();

@@ -374,6 +374,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	fis.close();
 	String base64PickAndPlaceWithRotation = new String(Base64.encodeBase64(content));
 	
+	System.out.println("Finished reading moduleFiles, starting insertion of modules...");
 	
 	
 	// gripper

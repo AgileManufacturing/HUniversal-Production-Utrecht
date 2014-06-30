@@ -88,7 +88,7 @@ namespace stewartGoughNodeNamespace{
 		// Main functions to be called from the services
 		bool calibrate();
 		bool moveToPoint(double x, double y, double z, double maxAcceleration);
-		bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
+		//bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
 
 		bool moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration);
 		
