@@ -45,3 +45,1352 @@
                         	at com.mongodb.DBPortPool.get(DBPortPool.java:209)
                         	... 9 more
 
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 10:31:36.666 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 10:31:37.081 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362000 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 10:31:38.294 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362017 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 10:31:38.340 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 10:31:39.381 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:457)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:393)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Column 'attachedToLeft' cannot be null
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 10:31:39.450 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 10:31:40.444 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 10:31:40.623 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 10:31:41.843 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@673ed2a2
+[ERROR] [halTransl    ] 2014-06-30 10:31:41.862 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:49)
+                        This equiplet has no capabilities for the service in product step: generic.ProductStep@673ed2a2. This should never happen as the equiplet should know which services are supported.
+[NOTE ] [             ] 2014-06-30 10:31:41.863 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFailed(StewartGoughHALTesterClass.java:468)
+                        Translation failed of the following product step:
+                        generic.ProductStep@673ed2a2
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 10:34:50.293 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 10:34:50.685 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362000 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 10:34:52.027 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362017 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 10:34:52.100 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 10:34:53.207 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:457)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:393)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Column 'attachedToLeft' cannot be null
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 10:34:53.347 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 10:34:53.442 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 10:34:53.589 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 10:34:55.021 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@3535cb29
+[ERROR] [halTransl    ] 2014-06-30 10:34:55.024 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:49)
+                        This equiplet has no capabilities for the service in product step: generic.ProductStep@3535cb29. This should never happen as the equiplet should know which services are supported.
+[NOTE ] [             ] 2014-06-30 10:34:55.025 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFailed(StewartGoughHALTesterClass.java:468)
+                        Translation failed of the following product step:
+                        generic.ProductStep@3535cb29
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 10:49:57.780 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 10:49:58.169 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362232 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 10:49:59.997 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362301 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 10:50:00.275 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 10:50:00.598 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:394)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362227 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[DEBUG] [halModFactSql] 2014-06-30 10:50:00.724 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 10:50:03.166 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 10:50:03.313 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 10:50:04.787 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@28f9d196
+[ERROR] [halTransl    ] 2014-06-30 10:50:04.947 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:49)
+                        This equiplet has no capabilities for the service in product step: generic.ProductStep@28f9d196. This should never happen as the equiplet should know which services are supported.
+[NOTE ] [             ] 2014-06-30 10:50:04.948 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFailed(StewartGoughHALTesterClass.java:469)
+                        Translation failed of the following product step:
+                        generic.ProductStep@28f9d196
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 11:02:28.267 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:02:28.776 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362232 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 11:02:30.564 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362301 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:02:30.803 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:02:31.102 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:394)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362227 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:02:31.222 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:02:31.948 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:02:32.106 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 11:02:33.315 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@5b12af55
+[ERROR] [halTransl    ] 2014-06-30 11:02:33.319 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:49)
+                        This equiplet has no capabilities for the service in product step: generic.ProductStep@5b12af55. This should never happen as the equiplet should know which services are supported.
+[NOTE ] [             ] 2014-06-30 11:02:33.319 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFailed(StewartGoughHALTesterClass.java:469)
+                        Translation failed of the following product step:
+                        generic.ProductStep@5b12af55
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 11:37:46.833 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:37:47.218 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362232 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 11:37:48.746 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362301 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:37:48.946 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:37:49.260 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:394)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362227 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:37:49.398 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:37:50.119 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:37:50.277 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 11:37:51.667 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@358a7786
+[ERROR] [halTransl    ] 2014-06-30 11:37:51.670 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:49)
+                        This equiplet has no capabilities for the service in product step: generic.ProductStep@358a7786. This should never happen as the equiplet should know which services are supported.
+[NOTE ] [             ] 2014-06-30 11:37:51.671 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFailed(StewartGoughHALTesterClass.java:469)
+                        Translation failed of the following product step:
+                        generic.ProductStep@358a7786
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [             ] 2014-06-30 11:41:00.682 @ HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:308)
+                        Starting
+[DEBUG] [halModFactSql] 2014-06-30 11:41:06.314 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:41:07.588 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:447)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:381)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`rexos`.`module`, CONSTRAINT `module_ibfk_1` FOREIGN KEY (`equiplet`) REFERENCES `equiplet` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:41:10.922 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:41:11.858 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:457)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:391)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Column 'attachedToLeft' cannot be null
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:41:12.061 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+                        libraries.knowledgedb_client.Row{ moduleTypeProperties="" halSoftware="3" typeNumber="DFK_22AUC03" rosSoftware="2" manufacturer="The_Imaging_Source_Europe_GmbH" }
+
+[ERROR] [halModFact   ] 2014-06-30 11:41:12.088 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:447)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:396)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry 'The_Imaging_Source_Europe_GmbH-DFK_22AUC03-1' for key 'PRIMARY'
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:41:12.091 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+                        libraries.knowledgedb_client.Row{ moduleTypeProperties="" halSoftware="4" typeNumber="Cheap_ass_lens" rosSoftware="null" manufacturer="The_Imaging_Source_Europe_GmbH" }
+
+[ERROR] [halModFact   ] 2014-06-30 11:41:12.093 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        java.lang.IllegalStateException: This is not a JSON Object.
+                        	at com.google.gson.JsonElement.getAsJsonObject(JsonElement.java:83)
+                        	at HAL.factories.ModuleFactory.updateModuleType(ModuleFactory.java:611)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:436)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:401)
+
+[DEBUG] [halModFactSql] 2014-06-30 11:41:12.099 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+                        libraries.knowledgedb_client.Row{ moduleTypeProperties="{     "midPointX" : 175.0,     "midPointY" : -200.0,     "midPointZ" : 33.33,     "topLeftValue" : "_WP_TL",     "topRightValue" : "_WP_TR",     "bottomRightValue" : "_WP_BR",     "workPlaneWidth" : 80.0,     "workPlaneHeight" : 80.0}" halSoftware="5" typeNumber="workplane_type_A" rosSoftware="3" manufacturer="HU" }
+
+[ERROR] [halModFact   ] 2014-06-30 11:41:12.113 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:447)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:406)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry 'HU-workplane_type_A-1' for key 'PRIMARY'
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [             ] 2014-06-30 11:41:53.169 @ HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:308)
+                        Starting
+[DEBUG] [halModFactSql] 2014-06-30 11:41:58.506 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:41:59.361 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:447)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:381)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`rexos`.`module`, CONSTRAINT `module_ibfk_1` FOREIGN KEY (`equiplet`) REFERENCES `equiplet` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:42:01.071 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:42:01.394 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:457)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:391)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Column 'attachedToLeft' cannot be null
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:42:01.503 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:42:02.359 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:447)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:396)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`rexos`.`module`, CONSTRAINT `module_ibfk_1` FOREIGN KEY (`equiplet`) REFERENCES `equiplet` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:42:02.419 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:42:02.433 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:457)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:401)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Column 'attachedToLeft' cannot be null
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:42:02.478 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:42:02.510 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:447)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:406)
+                        Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`rexos`.`module`, CONSTRAINT `module_ibfk_1` FOREIGN KEY (`equiplet`) REFERENCES `equiplet` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+                        	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+                        	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+                        	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+                        	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+                        	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+                        	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1041)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4120)
+                        	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4052)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2503)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 3 more
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [             ] 2014-06-30 11:43:43.906 @ HAL.testerClasses.HALTesterClassPickAndPlace.main(HALTesterClassPickAndPlace.java:308)
+                        Starting
+[DEBUG] [halModFactSql] 2014-06-30 11:43:49.035 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:43:52.152 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:43:53.212 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:43:53.814 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:43:53.916 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 11:50:11.064 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:50:11.474 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362232 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 11:50:12.709 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362301 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:50:12.970 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 11:50:13.311 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:394)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362227 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[DEBUG] [halModFactSql] 2014-06-30 11:50:13.437 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:50:14.244 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 11:50:14.402 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 11:50:15.879 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@73f547d
+[ERROR] [halTransl    ] 2014-06-30 11:50:15.882 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:49)
+                        This equiplet has no capabilities for the service in product step: generic.ProductStep@73f547d. This should never happen as the equiplet should know which services are supported.
+[NOTE ] [             ] 2014-06-30 11:50:15.882 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFailed(StewartGoughHALTesterClass.java:469)
+                        Translation failed of the following product step:
+                        generic.ProductStep@73f547d
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:00:11.462 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 12:00:11.937 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362232 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[WARN ] [halCapFact   ] 2014-06-30 12:00:13.476 @ HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:335)
+                        Error occured while inserting capability 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.CapabilityFactory.insertCapabilityTypes(CapabilityFactory.java:320)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:85)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:383)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362301 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 4 more
+
+[DEBUG] [halModFactSql] 2014-06-30 12:00:13.694 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[ERROR] [halModFact   ] 2014-06-30 12:00:13.991 @ HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:471)
+                        Error occured while inserting module 
+                        libraries.knowledgedb_client.KnowledgeException: Error reading from the knowledge database.
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:221)
+                        	at HAL.JavaSoftware.insertJavaSoftware(JavaSoftware.java:80)
+                        	at HAL.factories.ModuleFactory.insertModuleType(ModuleFactory.java:574)
+                        	at HAL.factories.ModuleFactory.insertModule(ModuleFactory.java:438)
+                        	at HAL.HardwareAbstractionLayer.insertModule(HardwareAbstractionLayer.java:83)
+                        	at HAL.testerClasses.StewartGoughHALTesterClass.main(StewartGoughHALTesterClass.java:394)
+                        Caused by: com.mysql.jdbc.PacketTooBigException: Packet for query is too large (9362227 > 1048576). You can change this value on the server by setting the max_allowed_packet' variable.
+                        	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3798)
+                        	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2484)
+                        	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2664)
+                        	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2815)
+                        	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2155)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2458)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2375)
+                        	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2359)
+                        	at libraries.knowledgedb_client.KnowledgeDBClient.executeUpdateQuery(KnowledgeDBClient.java:212)
+                        	... 5 more
+
+[DEBUG] [halModFactSql] 2014-06-30 12:00:14.126 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:00:14.697 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:00:14.801 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:06:15.352 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:06:25.548 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:06:29.019 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:06:30.164 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:06:30.298 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:07:34.673 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@264470b8
+[DEBUG] [halCap       ] 2014-06-30 12:07:35.014 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:07:35.016 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:07:35.020 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:07:35.418 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@2505e06b]
+
+[DEBUG] [halMod       ] 2014-06-30 12:07:35.456 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:14:49.381 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@173cbcd2
+[DEBUG] [halCap       ] 2014-06-30 12:14:50.566 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:14:50.568 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:14:50.573 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:14:50.946 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@457cbcbe]
+
+[DEBUG] [halMod       ] 2014-06-30 12:14:50.954 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:18:57.074 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@617c7027
+[DEBUG] [halCap       ] 2014-06-30 12:18:57.444 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:18:57.446 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:18:57.450 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:18:57.705 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@1c7833f4]
+
+[DEBUG] [halMod       ] 2014-06-30 12:18:57.714 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:19:33.770 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@2f69ecb9
+[DEBUG] [halCap       ] 2014-06-30 12:19:34.237 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:19:34.239 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:19:34.243 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:19:34.496 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@65b33050]
+
+[DEBUG] [halMod       ] 2014-06-30 12:19:34.505 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:21:17.310 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@7c23cea1
+[DEBUG] [halCap       ] 2014-06-30 12:21:17.728 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:21:17.730 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:21:17.734 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:21:18.114 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7e5b291f]
+
+[DEBUG] [halMod       ] 2014-06-30 12:21:18.124 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:22:53.962 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@44a09c42
+[DEBUG] [halCap       ] 2014-06-30 12:22:54.399 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:22:54.402 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:22:54.407 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:22:54.649 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7ef7d620]
+
+[DEBUG] [halMod       ] 2014-06-30 12:22:54.659 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:24:14.484 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@44a09c42
+[DEBUG] [halCap       ] 2014-06-30 12:24:14.925 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:24:14.927 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:24:14.931 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:24:15.282 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7ef7d620]
+
+[DEBUG] [halMod       ] 2014-06-30 12:24:15.289 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:33:21.373 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@617c7027
+[DEBUG] [halCap       ] 2014-06-30 12:33:21.788 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:33:21.790 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:33:21.795 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:33:22.088 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@1c7833f4]
+
+[DEBUG] [halMod       ] 2014-06-30 12:33:22.105 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:39:37.209 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@5eefe3d4
+[DEBUG] [halCap       ] 2014-06-30 12:39:37.647 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:39:37.649 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:39:37.653 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:39:37.982 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@611ab4e5]
+
+[DEBUG] [halMod       ] 2014-06-30 12:39:37.993 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:41:06.985 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:41:16.948 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:41:21.192 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:41:21.908 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:41:21.999 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 12:41:22.240 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@321fe9c1
+[DEBUG] [halCap       ] 2014-06-30 12:41:22.585 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:41:22.586 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:41:22.602 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:41:23.293 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@424fa061]
+
+[DEBUG] [halMod       ] 2014-06-30 12:41:23.303 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:42:28.957 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:42:39.244 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:42:43.410 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:42:44.012 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:42:44.235 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 12:42:45.045 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@5b255c86
+[DEBUG] [halCap       ] 2014-06-30 12:42:45.467 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:42:45.468 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:42:45.471 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:42:45.795 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@1d0dc697]
+
+[DEBUG] [halMod       ] 2014-06-30 12:42:45.806 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:47:47.788 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:47:58.606 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:48:02.332 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:48:02.820 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:48:03.458 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 12:48:03.564 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@6d3a8c67
+[DEBUG] [halCap       ] 2014-06-30 12:48:03.896 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:48:03.897 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:48:03.917 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:48:04.206 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@427b7c0b]
+
+[DEBUG] [halMod       ] 2014-06-30 12:48:04.215 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:51:27.419 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:51:38.275 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:51:42.360 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:51:43.138 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:51:43.853 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 12:51:44.067 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@575b80b1
+[DEBUG] [halCap       ] 2014-06-30 12:51:44.410 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:51:44.412 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:51:44.415 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:51:44.716 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7a1c16db]
+
+[DEBUG] [halMod       ] 2014-06-30 12:51:44.726 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 12:55:29.381 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:55:40.058 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:55:43.765 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:55:44.598 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 12:55:45.302 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 12:55:45.422 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@16b31f1a
+[DEBUG] [halCap       ] 2014-06-30 12:55:45.837 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:55:45.838 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:55:45.842 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:55:46.139 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@5d12f507]
+
+[DEBUG] [halMod       ] 2014-06-30 12:55:46.149 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 12:58:56.569 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@57abc5ad
+[DEBUG] [halCap       ] 2014-06-30 12:58:56.986 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 12:58:56.988 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 12:58:56.992 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 12:58:57.593 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@13e9ab10]
+
+[DEBUG] [halMod       ] 2014-06-30 12:58:57.603 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 13:02:08.148 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@d52e60f
+[DEBUG] [halCap       ] 2014-06-30 13:02:08.601 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 13:02:08.604 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 13:02:08.610 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 13:02:08.929 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@3ecb2f1a]
+
+[DEBUG] [halMod       ] 2014-06-30 13:02:08.936 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 13:11:54.631 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@64c20eec
+[DEBUG] [halCap       ] 2014-06-30 13:11:55.039 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 13:11:55.042 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 13:11:55.047 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 13:11:55.380 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@acc43e8]
+
+[DEBUG] [halMod       ] 2014-06-30 13:11:55.388 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 13:24:26.253 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@ab4659f
+[DEBUG] [halCap       ] 2014-06-30 13:24:26.675 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 13:24:26.678 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 13:24:26.683 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 13:24:27.005 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@5db51f6e]
+
