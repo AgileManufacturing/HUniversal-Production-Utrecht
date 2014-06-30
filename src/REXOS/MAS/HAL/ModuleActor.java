@@ -45,6 +45,7 @@ public abstract class ModuleActor extends Module {
 	protected static final String ROTATION_Z = "rotationZ";
 	
 	protected static final String MOVE = "move";
+	protected static final String ROTATE = "rotate";
 	
 	protected ProcessListener processListener;
 	

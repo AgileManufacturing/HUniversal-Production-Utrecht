@@ -59,6 +59,8 @@ public abstract class Capability {
 			ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 			try {
 				for (CompositeStep compositeStep : compositeSteps) {
+					System.out.println("CompositeStep: "+compositeStep.getCommand());
+					System.out.println("CompositeStep LOOK: "+compositeStep.getCommand().get(CompositeStep.LOOK_UP).toString());
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(compositeStep));
 				}
 				return hardwareSteps;

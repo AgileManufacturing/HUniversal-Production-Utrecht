@@ -28,6 +28,9 @@ public class CompositeStep{
 		this.command = command;
 		this.relativeTo = relativeTo;
 		this.productStep = productStep;
+		System.out.println("Command: "+ command);
+		System.out.println("relativeTo: "+ relativeTo);
+		System.out.println("productStep: "+ productStep);
 	}
 	
 	public ProductStep getProductStep(){
@@ -39,11 +42,11 @@ public class CompositeStep{
 	public JsonObject getRelativeTo(){
 		return this.relativeTo;
 	}
-	public JsonObject popCommandIdentifier(String identifier) throws ModuleTranslatingException{
+	public JsonElement popCommandIdentifier(String identifier) throws ModuleTranslatingException{
 		JsonElement jsonIdentifier = command.remove(identifier);
 		if (jsonIdentifier == null){
 			throw new ModuleTranslatingException ("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command, this);
-		}		
-		return jsonIdentifier.getAsJsonObject();
+		}
+		return jsonIdentifier;
 	}
 }
