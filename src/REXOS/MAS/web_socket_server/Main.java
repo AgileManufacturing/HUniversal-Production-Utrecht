@@ -62,6 +62,7 @@ import configuration.ServerConfigurations;
  * A simple WebSocketServer implementation. Keeps track of a "chatroom".
  */
 public class Main extends WebSocketServer {
+	private int numProductAgents = 0;
 
 	public Main( int port ) throws UnknownHostException {
 		super( new InetSocketAddress( port ) );
@@ -88,14 +89,11 @@ public class Main extends WebSocketServer {
 		System.out.println( conn + ": " + receivedMessage );
 		
 		JsonObject message = new JsonParser().parse(receivedMessage).getAsJsonObject();
-		if (message.get("receiver").getAsString().equals("webSocketServer"))
-			try {
-				CreateAgent ca = new CreateAgent();
-				ca.createAgent(receivedMessage);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (message.get("receiver").getAsString().equals("webSocketServer")){
+			CreateAgent ca = new CreateAgent();
+			ca.createAgent(receivedMessage, numProductAgents);
+			numProductAgents++;
+		}
 		else {
 			this.sendToAll( receivedMessage );
 		}

@@ -66,7 +66,7 @@ public class CreateAgent {
 	  * Spawns the ProductAgent on the server.
 	  * @throws ControllerException 
 	  */
-	public void createAgent(String args){
+	public void createAgent(String args, int identifier){
 		java.util.Date date= new java.util.Date();
 		//Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
@@ -79,37 +79,26 @@ public class CreateAgent {
 			jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
 			ProductAgentSpawnerAgent agent = new ProductAgentSpawnerAgent();
 			agent.setProductSteps(args);
+			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 			try{		
-				AgentController ac = container.acceptNewAgent( container.getContainerName(), agent);
+				AgentController ac = container.acceptNewAgent( container.getContainerName()+identifier, agent);
 				ac.start();		
+				mws.setCreated(true);
 			}
 			catch(ControllerException e){
-				AgentController ac;
-				try {
-					ac = container.acceptNewAgent( container.getContainerName()+"12", agent);
-					ac.start();
-				} catch (ControllerException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				mws.setCreated(false);
 			}
-			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-			mws.setCreated(true);
-			boolean connected = mws.connectBlocking();
-			System.out.println(connected);
+			mws.connect();
 		}
 		catch(Exception ex){
-			System.out.println("create exception");
 			try {
 				MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-				boolean connected = mws.connectBlocking();
-				System.out.println(connected);
+				mws.setCreated(false);
+				mws.connectBlocking();
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("create exception2");
+				System.out.println("Impossible, URL format incorrect: " + ServerConfigurations.WSS_URI);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
