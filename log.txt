@@ -1394,3 +1394,574 @@
                         Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
                         [HAL.modules.Gripper@5db51f6e]
 
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 13:37:07.247 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@778494ba
+[DEBUG] [halCap       ] 2014-06-30 13:37:07.645 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 13:37:07.648 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 13:37:07.720 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 13:37:08.073 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@4cece6bb]
+
+[DEBUG] [halMod       ] 2014-06-30 13:37:08.082 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 13:50:41.988 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:50:53.010 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:50:57.065 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:50:57.913 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:50:58.231 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 13:50:58.931 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@3bbb8522
+[DEBUG] [halCap       ] 2014-06-30 13:50:59.278 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 13:50:59.280 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 13:50:59.284 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 13:50:59.688 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@6c4f298]
+
+[DEBUG] [halMod       ] 2014-06-30 13:50:59.698 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 13:54:00.863 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:54:11.693 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:54:15.855 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:54:16.577 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 13:54:16.821 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 13:54:17.409 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@2ac071c5
+[DEBUG] [halCap       ] 2014-06-30 13:54:18.389 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 13:54:18.390 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 13:54:18.447 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 13:54:18.845 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@123c046b]
+
+[DEBUG] [halMod       ] 2014-06-30 13:54:18.854 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [halModFactSql] 2014-06-30 14:27:24.885 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 14:27:35.067 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 14:27:39.721 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 14:27:40.913 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[DEBUG] [halModFactSql] 2014-06-30 14:27:42.208 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleType:
+[INFO ] [halTransl    ] 2014-06-30 14:27:42.661 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@4dbcefa7
+[DEBUG] [halCap       ] 2014-06-30 14:27:43.130 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:27:43.132 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:27:43.135 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:27:44.348 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@68cd670f]
+
+[DEBUG] [halMod       ] 2014-06-30 14:27:44.357 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:34:02.182 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@50d25d87
+[DEBUG] [halCap       ] 2014-06-30 14:34:02.569 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:34:02.571 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:34:02.578 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:34:02.939 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@16f8413c]
+
+[DEBUG] [halMod       ] 2014-06-30 14:34:02.947 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:35:29.341 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@86b241a
+[DEBUG] [halCap       ] 2014-06-30 14:35:29.669 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:35:29.671 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:35:29.676 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:35:30.009 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@3b5dd904]
+
+[DEBUG] [halMod       ] 2014-06-30 14:35:30.020 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:36:03.997 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@3ccd0274
+[DEBUG] [halCap       ] 2014-06-30 14:36:04.323 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:36:04.326 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:36:04.331 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:36:04.743 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@2e682543]
+
+[DEBUG] [halMod       ] 2014-06-30 14:36:04.750 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:36:21.579 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@18a5b082
+[DEBUG] [halCap       ] 2014-06-30 14:36:21.958 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:36:21.960 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:36:21.972 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:36:22.252 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@1aad24bd]
+
+[DEBUG] [halMod       ] 2014-06-30 14:36:22.260 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:40:36.792 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@255de36a
+[DEBUG] [halCap       ] 2014-06-30 14:40:37.797 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:40:37.800 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:40:37.804 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:40:38.152 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7ca71e4e]
+
+[DEBUG] [halMod       ] 2014-06-30 14:40:38.159 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:41:21.399 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@1a9bc7a1
+[DEBUG] [halCap       ] 2014-06-30 14:41:21.760 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:41:21.763 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:41:21.768 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:41:22.092 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@62712d57]
+
+[DEBUG] [halMod       ] 2014-06-30 14:41:22.099 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:41:52.067 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@778494ba
+[DEBUG] [halCap       ] 2014-06-30 14:41:52.951 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:41:52.953 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:41:52.957 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:41:53.317 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@4cece6bb]
+
+[DEBUG] [halMod       ] 2014-06-30 14:41:53.326 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:42:20.565 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@664f7ccb
+[DEBUG] [halCap       ] 2014-06-30 14:42:21.199 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:42:21.201 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:42:21.206 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:42:21.533 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@2a4924d6]
+
+[DEBUG] [halMod       ] 2014-06-30 14:42:21.541 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-06-30 14:42:21.940 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-06-30 14:42:21.944 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@355d047c, HAL.steps.HardwareStep@161bc98a, HAL.steps.HardwareStep@6f6e25ac, HAL.steps.HardwareStep@34d234b3]
+[INFO ] [             ] 2014-06-30 14:42:21.945 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-06-30 14:42:21.948 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@355d047c, HAL.steps.HardwareStep@161bc98a, HAL.steps.HardwareStep@6f6e25ac, HAL.steps.HardwareStep@34d234b3]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:45:54.705 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@6c3760e5
+[DEBUG] [halCap       ] 2014-06-30 14:45:55.440 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:45:55.443 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:45:55.448 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:45:55.785 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@6740695a]
+
+[DEBUG] [halMod       ] 2014-06-30 14:45:55.792 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-06-30 14:45:56.236 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-06-30 14:45:56.241 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@68d56c1d, HAL.steps.HardwareStep@2471807f, HAL.steps.HardwareStep@728736ec, HAL.steps.HardwareStep@6fd7cd7]
+[INFO ] [             ] 2014-06-30 14:45:56.241 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-06-30 14:45:56.243 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@68d56c1d, HAL.steps.HardwareStep@2471807f, HAL.steps.HardwareStep@728736ec, HAL.steps.HardwareStep@6fd7cd7]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:48:23.503 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@414ad65e
+[DEBUG] [halCap       ] 2014-06-30 14:48:24.502 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:48:24.504 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:48:24.509 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:48:24.885 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@103678a2]
+
+[DEBUG] [halMod       ] 2014-06-30 14:48:24.895 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-06-30 14:48:25.279 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-06-30 14:48:25.284 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@3b78c1bf, HAL.steps.HardwareStep@26c83cf5, HAL.steps.HardwareStep@26ee16a6, HAL.steps.HardwareStep@25d4c36]
+[INFO ] [             ] 2014-06-30 14:48:25.284 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-06-30 14:48:25.287 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@3b78c1bf, HAL.steps.HardwareStep@26c83cf5, HAL.steps.HardwareStep@26ee16a6, HAL.steps.HardwareStep@25d4c36]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:55:43.223 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@3b870aed
+[DEBUG] [halCap       ] 2014-06-30 14:55:43.638 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:55:43.641 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:55:43.646 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:55:43.988 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@20163791]
+
+[DEBUG] [halMod       ] 2014-06-30 14:55:44.000 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-06-30 14:55:44.439 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-06-30 14:55:44.445 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@7d4ec62a, HAL.steps.HardwareStep@72a4f43a, HAL.steps.HardwareStep@4890cba6, HAL.steps.HardwareStep@18315d3c]
+[INFO ] [             ] 2014-06-30 14:55:44.445 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-06-30 14:55:44.449 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@7d4ec62a, HAL.steps.HardwareStep@72a4f43a, HAL.steps.HardwareStep@4890cba6, HAL.steps.HardwareStep@18315d3c]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 14:56:47.368 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@420c4dd4
+[DEBUG] [halCap       ] 2014-06-30 14:56:47.813 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 14:56:47.816 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 14:56:47.821 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 14:56:48.188 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7f15f950]
+
+[DEBUG] [halMod       ] 2014-06-30 14:56:48.195 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-06-30 14:56:48.543 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-06-30 14:56:48.547 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@63c0a261, HAL.steps.HardwareStep@5cf9c3c4, HAL.steps.HardwareStep@de926bf, HAL.steps.HardwareStep@1ab1b4f1]
+[INFO ] [             ] 2014-06-30 14:56:48.548 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-06-30 14:56:48.551 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@63c0a261, HAL.steps.HardwareStep@5cf9c3c4, HAL.steps.HardwareStep@de926bf, HAL.steps.HardwareStep@1ab1b4f1]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-06-30 15:33:05.721 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@bf085dd
+[DEBUG] [halCap       ] 2014-06-30 15:33:06.176 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-06-30 15:33:06.178 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-06-30 15:33:06.183 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-06-30 15:33:06.590 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@2239d9f6]
+
+[DEBUG] [halMod       ] 2014-06-30 15:33:06.596 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-06-30 15:33:07.116 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-06-30 15:33:07.121 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@2b3ea4f6, HAL.steps.HardwareStep@5a01b49d, HAL.steps.HardwareStep@3f7da13e, HAL.steps.HardwareStep@49176ec0]
+[INFO ] [             ] 2014-06-30 15:33:07.121 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-06-30 15:33:07.124 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@2b3ea4f6, HAL.steps.HardwareStep@5a01b49d, HAL.steps.HardwareStep@3f7da13e, HAL.steps.HardwareStep@49176ec0]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-07-01 13:19:06.145 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@61deb549
+[DEBUG] [halCap       ] 2014-07-01 13:19:06.587 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-07-01 13:19:06.589 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-07-01 13:19:06.594 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-07-01 13:19:07.043 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@489016da]
+
+[DEBUG] [halMod       ] 2014-07-01 13:19:07.055 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-07-01 13:19:07.954 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-07-01 13:19:07.958 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@1222dbee, HAL.steps.HardwareStep@6180ef7a, HAL.steps.HardwareStep@4b69eb23, HAL.steps.HardwareStep@519a99a2]
+[INFO ] [             ] 2014-07-01 13:19:07.959 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-07-01 13:19:07.962 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@1222dbee, HAL.steps.HardwareStep@6180ef7a, HAL.steps.HardwareStep@4b69eb23, HAL.steps.HardwareStep@519a99a2]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-07-01 14:03:48.747 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@415ecc0f
+[DEBUG] [halCap       ] 2014-07-01 14:03:49.185 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-07-01 14:03:49.187 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-07-01 14:03:49.192 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-07-01 14:03:49.447 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@281d3f1c]
+
+[DEBUG] [halMod       ] 2014-07-01 14:03:49.458 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-07-01 14:03:49.850 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-07-01 14:03:49.854 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@5917e24d, HAL.steps.HardwareStep@3332dfd7, HAL.steps.HardwareStep@81e87c1, HAL.steps.HardwareStep@24ca578c]
+[INFO ] [             ] 2014-07-01 14:03:49.855 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-07-01 14:03:49.857 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@5917e24d, HAL.steps.HardwareStep@3332dfd7, HAL.steps.HardwareStep@81e87c1, HAL.steps.HardwareStep@24ca578c]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-07-01 14:04:28.921 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@4cef53e9
+[DEBUG] [halCap       ] 2014-07-01 14:04:29.351 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-07-01 14:04:29.353 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-07-01 14:04:29.357 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-07-01 14:04:29.708 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@7c878]
+
+[DEBUG] [halMod       ] 2014-07-01 14:04:29.715 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-07-01 14:04:30.145 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-07-01 14:04:30.149 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@6ce8d38e, HAL.steps.HardwareStep@e855487, HAL.steps.HardwareStep@48696acd, HAL.steps.HardwareStep@2e7f569]
+[INFO ] [             ] 2014-07-01 14:04:30.149 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-07-01 14:04:30.151 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@6ce8d38e, HAL.steps.HardwareStep@e855487, HAL.steps.HardwareStep@48696acd, HAL.steps.HardwareStep@2e7f569]
+
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-07-01 14:29:43.946 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@27d22628
+[DEBUG] [halCap       ] 2014-07-01 14:29:44.585 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-07-01 14:29:44.587 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-07-01 14:29:44.592 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-07-01 14:29:44.951 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@41729b39]
+
+[DEBUG] [halMod       ] 2014-07-01 14:29:44.959 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":5.5,"y":5.5,"z":25.0},"rotate":{"x":4,"y":4,"z":4}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-07-01 14:29:45.346 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:175)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":5.5,"y":5.5,"z":25.0,"maxAcceleration":2},"rotate":{"x":5,"y":5,"z":5}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-07-01 14:29:45.350 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@3dd05e1, HAL.steps.HardwareStep@784a307e, HAL.steps.HardwareStep@44710ceb, HAL.steps.HardwareStep@4fde7cd1]
+[INFO ] [             ] 2014-07-01 14:29:45.350 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:461)
+                        Translation finished
+[INFO ] [halexec      ] 2014-07-01 14:29:45.353 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@3dd05e1, HAL.steps.HardwareStep@784a307e, HAL.steps.HardwareStep@44710ceb, HAL.steps.HardwareStep@4fde7cd1]
+

@@ -60,7 +60,7 @@ public abstract class Capability {
 			try {
 				for (CompositeStep compositeStep : compositeSteps) {
 					System.out.println("CompositeStep: "+compositeStep.getCommand());
-					System.out.println("CompositeStep LOOK: "+compositeStep.getCommand().get(CompositeStep.LOOK_UP).toString());
+					System.out.println("CompositeStep LOOK: "+compositeStep.getCommand().get(CompositeStep.LOOK_UP));
 					hardwareSteps.addAll(moduleActor.translateCompositeStep(compositeStep));
 				}
 				return hardwareSteps;

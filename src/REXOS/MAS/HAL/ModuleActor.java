@@ -103,7 +103,7 @@ public abstract class ModuleActor extends Module {
 			// root module, no more parents			
 			// if commands remain then the modules were not able to fully translate the compositeStep
 			// TODO better comparison method
-			if (!compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject().toString().trim().equalsIgnoreCase("{}")){
+			if (!compositeStep.getCommand().toString().trim().equalsIgnoreCase("{}")){
 				throw new ModuleTranslatingException("The compositestep isn't completely empty." + 
 						compositeStep.getCommand().get(HardwareStep.COMMAND).getAsJsonObject(), compositeStep);
 			} else {
@@ -122,6 +122,7 @@ public abstract class ModuleActor extends Module {
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
 		this.processListener = processListener;
 		JsonObject command = hardwareStep.toJSON();
+		System.out.println(command);
 		executeMongoCommand(command);
 	}
 	/**

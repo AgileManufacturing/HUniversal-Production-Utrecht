@@ -164,6 +164,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	}
 	
 	public void postHardwareStep(JsonObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		System.out.println(hardwareStep);
 		equipletStepBBClient.insertDocument(hardwareStep.toString());
 	}
 

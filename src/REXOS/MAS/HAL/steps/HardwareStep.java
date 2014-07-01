@@ -3,7 +3,10 @@ package HAL.steps;
 import HAL.Module;
 import HAL.ModuleIdentifier;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * A HardwareStep is a step that is completely translated and can be processed by the ROS node corresponding to this HardwareStep.
@@ -25,6 +28,11 @@ public class HardwareStep {
 	public static final String STATUS = "status";
 	public static final String MODULE_IDENTIFIER = "moduleIdentifier";
 	
+	/*
+	public static final String MODULE_IDENTIFIER_MANUFACTURER = "manufacturer";
+	public static final String MODULE_IDENTIFIER_TYPE_NUMBER = "typeNumber";
+	public static final String MODULE_IDENTIFIER_SERIAL_NUMBER = "serialNumber";
+*/
 
 	private ModuleIdentifier moduleIdentifier;
 	private CompositeStep compositeStep;
@@ -48,8 +56,6 @@ public class HardwareStep {
 		this.hardwareStepStatus = hardwareStepStatus;
 		this.originPlacement = originPlacement;
 	}
-	
-	
 	
 	/*public HardwareStep(CompositeStep compositeStep, JsonObject rosCommand, ModuleIdentifier moduleIdentifier) {
 		this.moduleIdentifier = moduleIdentifier;
@@ -78,8 +84,47 @@ public class HardwareStep {
 	
 	public JsonObject toJSON() {
 		
+		JsonObject returnValue = new JsonObject();
+		returnValue.add(MODULE_IDENTIFIER, moduleIdentifier.toJSON());
+		
+		returnValue.add(STATUS, new JsonPrimitive(hardwareStepStatus.toString()));
+		
+
 		
 		
-		return null;
+		JsonObject instuctionDataNew = new JsonObject();
+		if(this.instructionData.has("move")){
+			instuctionDataNew.add("command", new JsonPrimitive("move"));
+			instuctionDataNew.add("look_up", new JsonPrimitive("FIND_ID"));
+			
+			
+			JsonElement lookUpParametersID = getCompositeStep().getRelativeTo().get("look_up");
+			
+			JsonObject lookUpParameters = new JsonObject();
+			lookUpParameters.add("ID", lookUpParametersID.getAsJsonPrimitive());
+			instuctionDataNew.add("look_up_parameters", lookUpParameters);
+			
+			
+			JsonObject payLoad = new JsonObject();
+			JsonObject move = this.instructionData.getAsJsonObject("move");
+			
+			payLoad.add("x", move.get("x"));
+			payLoad.add("y", move.get("y"));
+			payLoad.add("z", move.get("z"));
+			payLoad.add("maxAcceleration", move.get("maxAcceleration"));
+			
+			
+			
+			instuctionDataNew.add("payload", payLoad);
+			
+			
+			returnValue.add(INSTRUCTION_DATA, instuctionDataNew);
+			
+			System.out.println("HardwareStep JSON: " + returnValue.toString());
+			
+			return returnValue;
+		} else {
+			throw new IllegalArgumentException("move not found in instuctionData");
+		}
 	}
 }

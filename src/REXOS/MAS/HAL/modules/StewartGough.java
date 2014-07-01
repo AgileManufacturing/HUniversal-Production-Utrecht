@@ -52,7 +52,13 @@ public class StewartGough extends ModuleActor {
 		
 		//Add OriginPlacement
 		JsonObject parameters = new JsonObject();
-		parameters.addProperty("ID", compositeStep.getCommand().get(CompositeStep.LOOK_UP).getAsString());
+		if(compositeStep.getCommand().get(CompositeStep.LOOK_UP)==null){
+			parameters.addProperty("ID", "null");
+		}
+		else{
+			parameters.addProperty("ID", compositeStep.getCommand().get(CompositeStep.LOOK_UP).getAsString());
+		}
+		
 		OriginPlacement originPlacement = new OriginPlacement(OriginIdentifier.RELATIVE_TO_IDENTIFIER, parameters);
 
 		
@@ -75,12 +81,12 @@ public class StewartGough extends ModuleActor {
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
 		} else {
 			//Approach
-			JsonObject commandApproach = new JsonParser().parse(commandMove.get(APPROACH).toString()).getAsJsonObject();
+			/*JsonObject commandApproach = new JsonParser().parse(commandMove.get(APPROACH).toString()).getAsJsonObject();
 			JsonObject approachInstructionData = new JsonObject();
-			approachInstructionData.add(MOVE, commandApproach);
+			approachInstructionData.add(MOVE, commandApproach);*/
 			
 			//Entry point
-			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 			
 			//Actual point
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));
@@ -89,7 +95,7 @@ public class StewartGough extends ModuleActor {
 			translatedHardwareSteps.add(null);
 
 			//Exit point
-			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 		}
 		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(), compositeStep.getCommand(), compositeStep.getRelativeTo()));
