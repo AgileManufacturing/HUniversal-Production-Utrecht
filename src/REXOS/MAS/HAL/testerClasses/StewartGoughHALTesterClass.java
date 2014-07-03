@@ -31,7 +31,8 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static BlackboardHandler blackboardUpdated;
 	
 	static final String baseDir = "/home/agileman/Desktop/";
-	static final String AriDir = "C:/users/Aristides/Desktop/Six Axis/";
+	static final String Aridir = "C:/users/Aristides/Desktop/Six Axis/";
+	static final String dir = baseDir;
 	
 	// six_axis robot
 	static String moduleA_01 = "{"
@@ -312,63 +313,63 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	
 	System.out.println("Start insertig module");
 	
-	File stewartGoughJar = new File(AriDir + "StewartGough.jar");
+	File stewartGoughJar = new File(dir + "StewartGough.jar");
 	fis = new FileInputStream(stewartGoughJar);
 	content = new byte[(int) stewartGoughJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64DeltaRobot = new String(Base64.encodeBase64(content));
 	
-	File stewartGoughZip = new File(AriDir + "nodes.zip");
+	File stewartGoughZip = new File(dir + "nodes.zip");
 	fis = new FileInputStream(stewartGoughZip);
 	content = new byte[(int) stewartGoughZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 	
-	File gripperZip = new File(AriDir + "nodes.zip");
+	File gripperZip = new File(dir + "nodes.zip");
 	fis = new FileInputStream(gripperZip);
 	content = new byte[(int) gripperZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64GripperRos = new String(Base64.encodeBase64(content));
 	
-	File cameraZip = new File(AriDir + "nodes.zip");
+	File cameraZip = new File(dir + "nodes.zip");
 	fis = new FileInputStream(cameraZip);
 	content = new byte[(int) cameraZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64CameraRos = new String(Base64.encodeBase64(content));
 	
-	File workplaneZip = new File(AriDir + "nodes.zip");
+	File workplaneZip = new File(dir + "nodes.zip");
 	fis = new FileInputStream(workplaneZip);
 	content = new byte[(int) workplaneZip.length()];
 	fis.read(content);
 	fis.close();
 	String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 	
-	File penJar = new File(AriDir + "Pen.jar");
+	File penJar = new File(dir + "Pen.jar");
 	fis = new FileInputStream(penJar);
 	content = new byte[(int) penJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Pen = new String(Base64.encodeBase64(content));
 	
-	File gripperJar = new File(AriDir + "Gripper.jar");
+	File gripperJar = new File(dir + "Gripper.jar");
 	fis = new FileInputStream(gripperJar);
 	content = new byte[(int) gripperJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Gripper = new String(Base64.encodeBase64(content));
 	
-	File drawJar = new File(AriDir + "Draw.jar");
+	File drawJar = new File(dir + "Draw.jar");
 	fis = new FileInputStream(drawJar);
 	content = new byte[(int) drawJar.length()];
 	fis.read(content);
 	fis.close();
 	String base64Draw = new String(Base64.encodeBase64(content));
 	
-	File pickAndPlaceJar = new File(AriDir + "PickAndPlaceWithRotation.jar");
+	File pickAndPlaceJar = new File(dir + "PickAndPlaceWithRotation.jar");
 	fis = new FileInputStream(pickAndPlaceJar);
 	content = new byte[(int) pickAndPlaceJar.length()];
 	fis.read(content);
@@ -392,7 +393,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	// gripper
 	String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
 	JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-	hal.insertModule(b, b);
+	//hal.insertModule(b, b);
 	System.out.println("Module B inserted");
 	// camera
 	String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
@@ -448,7 +449,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		criteria.add("subjects",subjects);
 		
 		
-		hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
+		//hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);

@@ -69,6 +69,7 @@ protected:
 	std::string bottomRightValue;
 	double workPlaneWidth;
 	double workPlaneHeight;
+	double workSpaceHeight;
 	
 	double actualWorkPlaneWidth;
 	double actualWorkPlaneHeight;
@@ -77,11 +78,12 @@ protected:
 	double bottomRightOffsetX, bottomRightOffsetY;
 	
 	std::string equipletName;
+	std::string equipletIdentifier;
 	
 	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 
 public:
-	PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+	PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, std::string equipletIdentifier);
 	void run();
 	
 	virtual bool transitionInitialize();

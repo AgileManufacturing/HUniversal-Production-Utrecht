@@ -320,7 +320,7 @@ namespace rexos_stewart_gough{
 			for(int i = 0; i < 6;i++){
 			
 				rotations[i]->angle = effectorMove.angles[i];
-				//std::cout << "Angle " << i << " from calculations: " << rotations[i]->angle << std::endl;
+				std::cout << "Angle for motor: " << i << " = " << effectorMove.angles[i] << std::endl;
 			}
 			
             //kinematics->destinationPointToMotorRotations(point, rotations);
@@ -679,6 +679,31 @@ namespace rexos_stewart_gough{
 		currentEffectorRotationZ = 0;
 		
 		
+		
+		
+			
+		std::cout << "Debuging sixaxis calculations" << std::endl;
+		
+		SixAxisCalculations::EffectorMove effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(0, 0, 300), 0, 0, 0);
+		std::cout << "Move: " << effectorMove.moveTo << std::endl;
+		for(int i = 0; i < 6; i++){
+			std::cout << "Angle for motor " << i << " =" << effectorMove.angles[i] << std::endl;
+		}
+		
+		effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(60, 0, 300), 0, 0, 0);
+		std::cout << "Move: " << effectorMove.moveTo << std::endl;
+		for(int i = 0; i < 6; i++){
+			std::cout << "Angle for motor " << i << " =" << effectorMove.angles[i] << std::endl;
+		}
+		
+		effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(0, 60, 300), 0, 0, 0);
+		
+		std::cout << "Move: " << effectorMove.moveTo << std::endl;
+		for(int i = 0; i < 6; i++){
+			std::cout << "Angle for motor " << i << " =" << effectorMove.angles[i] << std::endl;
+		}
+		
+		
 		/*
 		double ac = 50;
 		
@@ -734,7 +759,7 @@ namespace rexos_stewart_gough{
 		}
 		 */
 		 
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 0.9, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(0, 60, -280), 0.9, 0, 0, 0);
 		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		

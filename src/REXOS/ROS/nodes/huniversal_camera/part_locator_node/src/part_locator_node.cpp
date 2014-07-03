@@ -54,7 +54,8 @@ const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
 
-PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier):
+PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, std::string equipletIdentifier):
+		equipletIdentifier(equipletIdentifier),
 		equipletName(equipletName),
 		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
@@ -123,13 +124,13 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 			oldCoor.z = 1;
 		
 			//ROS_DEBUG_STREAM("QrCode \t" << message.qrCodes[i].value << " corner \t" << j);
-			if(j == 1) ROS_INFO_STREAM("value: " << message.qrCodes[i].value);
-			if(j == 1) ROS_INFO_STREAM("oldCoor: " << oldCoor);
+			//if(j == 1) ROS_INFO_STREAM("value: " << message.qrCodes[i].value);
+			//if(j == 1) ROS_INFO_STREAM("oldCoor: " << oldCoor);
 			Vector3 newCoor = totalMatrix * oldCoor;
-			if(j == 1) ROS_INFO_STREAM("newCoor: " << newCoor);
+			//if(j == 1) ROS_INFO_STREAM("newCoor: " << newCoor);
 			newCoor = postCorrectionTotalMatrix * newCoor;
-			if(j == 1) ROS_INFO_STREAM("newCoor: " << newCoor);
-			if(j == 1) ROS_INFO_STREAM("eqlCoor: " << convertToEquipletCoordinate(newCoor));
+			//if(j == 1) ROS_INFO_STREAM("newCoor: " << newCoor);
+			//if(j == 1) ROS_INFO_STREAM("eqlCoor: " << convertToEquipletCoordinate(newCoor));
 			/*if(message.qrCodes[i].value == "GC4x4MB_1") {
 				ROS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
 			}*/
@@ -281,7 +282,7 @@ void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location
 
 void PartLocatorNode::updateMatrices() {
 	totalMatrix = calculateScaleMatrix() * calculateRotationMatrix() * calculateOffsetMatrix();
-	ROS_INFO_STREAM("totalMatrix " << totalMatrix);
+	//ROS_INFO_STREAM("totalMatrix " << totalMatrix);
 	
 }
 Matrix3 PartLocatorNode::calculateOffsetMatrix() {
@@ -409,37 +410,46 @@ bool PartLocatorNode::transitionDeinitialize() {
 bool PartLocatorNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 	
-	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
+	// Select either deltarobot or six_axisrobot
+	//	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
+	//  actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/six_axis_type_A/1/set_instruction");
+		actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/" +equipletIdentifier+"/1/set_instruction");
 	std::string hardwareStep;
 	rexos_statemachine::SetInstructionGoal* goal;
 	
 	
 	workPlaneWidth = 80;
 	workPlaneHeight = 80;
+	workSpaceHeight = 80;
 	
-	rexos_statemachine::TransitionGoal goal2;
+	/*rexos_statemachine::TransitionGoal goal2;
 	std::vector<rexos_statemachine::RequiredMutation> requiredMutations;
 	rexos_statemachine::RequiredMutation requiredMutation;
 	requiredMutation.mutation = "move";
 	requiredMutation.isOptional = false;
 	requiredMutations.push_back(requiredMutation);
 	goal2.requiredMutationsRequiredForNextPhase = requiredMutations;
-	
+	ROS_INFO("SendGoal");
 	transitionActionClient.sendGoal(goal2);
 	transitionActionClient.waitForResult();
-
+*/
 	ROS_INFO("Continuing calibration");
 	
 	double x;
 	double y;
-	rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
+	double z;
+	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
+	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "six_axis_type_A", "1"));
+	rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU",equipletIdentifier, "1"));
+	
 	rexos_coordinates::Module drModule = rexos_coordinates::Module(&drKnowMod);
 	Vector3 v;
 
 	ROS_INFO("Moving to top left corner");
 	x = 0 - workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
-	v = Vector3(x, y, -15);
+	z = workSpaceHeight;
+	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
@@ -448,18 +458,19 @@ bool PartLocatorNode::transitionSetup(){
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 1;
-	ROS_ERROR_STREAM(*goal);
+	ROS_WARN_STREAM(*goal);
 
 	setInstructionActionClient.sendGoal(*goal);
-	ROS_INFO("X");
+	ROS_INFO("enter diff to X");
 	std::cin >> topLeftOffsetX;
-	ROS_INFO("Y");
+	ROS_INFO("enter diff to Y");
 	std::cin >> topLeftOffsetY;
 	
 	ROS_INFO("Moving to top right corner");
 	x = 0 + workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
-	v = Vector3(x, y, -15);
+	z = workSpaceHeight;
+	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
@@ -468,32 +479,33 @@ bool PartLocatorNode::transitionSetup(){
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 2;
-	ROS_ERROR_STREAM(*goal);
+	ROS_WARN_STREAM(*goal);
 	
 	setInstructionActionClient.sendGoal(*goal);
-	ROS_INFO("X");
+	ROS_INFO("enter diff to X");
 	std::cin >> topRightOffsetX;
-	ROS_INFO("Y");
+	ROS_INFO("enter diff to Y");
 	std::cin >> topRightOffsetY;
 	
 	ROS_INFO("Moving to bottom right corner");
 	x = 0 + workPlaneWidth / 2;
 	y = 0 - workPlaneHeight / 2;
-	v = Vector3(x, y, -15);
+	z = workSpaceHeight;
+	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
 	ROS_WARN_STREAM(hardwareStep);
-	ROS_ERROR_STREAM(*goal);
+	ROS_WARN_STREAM(*goal);
 		
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 3;
 	
 	setInstructionActionClient.sendGoal(*goal);
-	ROS_INFO("X");
+	ROS_INFO("enter diff to X");
 	std::cin >> bottomRightOffsetX;
-	ROS_INFO("Y");
+	ROS_INFO("enter diff to Y");
 	std::cin >> bottomRightOffsetY;
 	
 	/*topLeftOffsetX = 0;
@@ -712,7 +724,7 @@ bool PartLocatorNode::transitionSetup(){
 	ROS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
 	ROS_INFO_STREAM(v);
-	v.z = -15;
+	v.z = 80; //Changed from -15 to -10
 	ROS_INFO_STREAM(v);
 	v = convertToEquipletCoordinate(v);
 	ROS_INFO_STREAM(v);
@@ -750,12 +762,22 @@ int main(int argc, char* argv[]) {
 		ROS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
+	for(int i=0; i<argc; i++)
+		std::cout << argv[i] << i << " " << std::endl;
+	std::string eqIdentifier;	
+	if(argc >= 5) {
+		std::cout << "Setting equipletIdentifier to " << argv[5] << std::endl;
+		eqIdentifier = argv[5];
+	} else {
+		std::cout << "Setting equipletIdentifier default \"six_axis_type_A\"" << std::endl;
+		eqIdentifier = "six_axis_type_A"; // Default to something...
+	}
 	
-	std::string equipletName = argv[1];
+	std::string equipletName = argv[1]; // = EQ3
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 
 	ROS_INFO("Creating PartLocatorNode");
-	PartLocatorNode node(equipletName, moduleIdentifier);
+	PartLocatorNode node(equipletName, moduleIdentifier, eqIdentifier);
 	node.run();
 	
 	return 0;

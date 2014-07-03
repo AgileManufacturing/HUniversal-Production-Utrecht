@@ -8,4 +8,11 @@
 		<node pkg="camera_calibration_node" type="camera_calibration_node" name="camera_calibration_node"/>
 		<node pkg="camera_control_node" type="camera_control_node" name="camera_control_node" args="$(arg equipletName) $(arg manufacturer) $(arg typeNumber) $(arg serialNumber)"/>
 	</group>
+
+	<group>
+		<node pkg="image_view" type="image_view" name="image_view" args="image:=camera/qr_debug_image" />
+		<node pkg="environment_cache" type="environment_cache" name="environment_cache" />
+		<node pkg="lookup_handler" type="lookup_handler" name="lookup_handler" />
+		<node pkg="node_spawner_node" type="node_spawner_node" name="node_spawner_node" args="EQ3" />
+	</group>
 </launch>

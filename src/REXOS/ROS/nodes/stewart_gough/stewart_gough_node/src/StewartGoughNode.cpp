@@ -124,27 +124,35 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 			angle = rexos_utilities::stringToDouble(angleValue);
 			
 			
+			//std::string rotateString = parseNodeValue("rotate", *i);
 			
+			//std::cout << "Rotate value: " << rotateString << std::endl;
+				
+			//if(!rotateString.empty()){
+				
+				
+				//JSONNode::const_iterator rotateIterator = libjson::parse(rotateString).begin();
+				
+				
+				std::string rotationValueX = parseNodeValue("rotationX", *i);
+				rotationX = rexos_utilities::stringToDouble(rotationValueX);
+				if(rotationValueX.empty()){
+					rotationX = stewartGough->getEffectorRotationX();
+				}
+				
+				std::string rotationValueY = parseNodeValue("rotationY", *i);
+				rotationY = rexos_utilities::stringToDouble(rotationValueY);
+				if(rotationValueY.empty()){
+					rotationY = stewartGough->getEffectorRotationY();
+				}
+				
+				std::string rotationValueZ = parseNodeValue("rotationZ", *i);
+				rotationZ = rexos_utilities::stringToDouble(rotationValueZ);
+				if(rotationValueZ.empty()){
+					rotationZ = stewartGough->getEffectorRotationZ();
+				
+				}
 			
-			
-			
-			std::string rotationValueX = parseNodeValue("rotationX", *i);
-			rotationX = rexos_utilities::stringToDouble(rotationValueX);
-			if(rotationValueX.empty()){
-				rotationX = stewartGough->getEffectorRotationX();
-			}
-			
-			std::string rotationValueY = parseNodeValue("rotationY", *i);
-			rotationY = rexos_utilities::stringToDouble(rotationValueY);
-			if(rotationValueY.empty()){
-				rotationY = stewartGough->getEffectorRotationY();
-			}
-			
-			std::string rotationValueZ = parseNodeValue("rotationZ", *i);
-			rotationZ = rexos_utilities::stringToDouble(rotationValueZ);
-			if(rotationValueZ.empty()){
-				rotationZ = stewartGough->getEffectorRotationZ();
-			}
 			
 			std::cout << "rotationX: " << rotationX << std::endl;
 			std::cout << "rotationY: " << rotationY << std::endl;

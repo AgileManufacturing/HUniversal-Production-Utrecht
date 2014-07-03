@@ -165,12 +165,12 @@ bool CameraControlNode::transitionSetup(){
 	}
 	
 	try{
-		ROS_INFO("a");
+		ROS_INFO("Trying transition setup a1");
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
-		ROS_INFO("a");
+		ROS_INFO("Trying transition setup a2");
 		ROS_INFO(properties.c_str());
 		JSONNode jsonNode = libjson::parse(properties);
-		ROS_INFO("a");
+		ROS_INFO("Trying transition setup a3");
 		
 		JSONNode* distCoeffs = NULL;
 		JSONNode* cameraMatrix = NULL;

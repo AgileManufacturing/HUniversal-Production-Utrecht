@@ -265,17 +265,21 @@ namespace rexos_knowledge_database{
 		return properties;
 	}
 	std::string Module::getCalibrationDataForModuleAndChilds(){
+		ROS_INFO("getCalibrationDataForModuleAndChilds a1");
 		std::vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
-		return getCalibrationDataForModuleAndOtherModules(childs);
+		ROS_INFO("getCalibrationDataForModuleAndChilds a2, vector size = %lu", childs.size());
+		std::string returnValue = getCalibrationDataForModuleAndOtherModules(childs);
+		ROS_INFO("%s", returnValue.c_str());
+		return returnValue;
 	}
 	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
+		ROS_INFO("getCalibrationDataForModuleAndOtherModules b1" );
 		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT properties \
-		FROM ModuleCalibration \
-		WHERE id = ?;");
+		std::string query = "SELECT properties FROM ModuleCalibration WHERE id = ?;";
+		ROS_INFO("getCalibrationDataForModuleAndOtherModules b2, SQL query = %s", query.c_str());
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement(query);
 		preparedStmt->setInt(1, calibrationId);
-
+		ROS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find calibration entry");
@@ -374,23 +378,28 @@ namespace rexos_knowledge_database{
 	
 	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
 		// create a temp table for storing the modules
+		ROS_INFO("getCalibrationGroupForModuleAndOtherModules c1");
 		sql::PreparedStatement* preparedStmt;
-		preparedStmt = connection->prepareStatement("\
+		std::string query = "\
 		CREATE TEMPORARY TABLE otherModules( \
 			manufacturer char(200) NOT NULL, \
 			typeNumber char(200) NOT NULL, \
 			serialNumber char(200) NOT NULL \
-		);");
+		);";
+		ROS_INFO("%s", query.c_str());
+		preparedStmt = connection->prepareStatement(query);
 		preparedStmt->executeQuery();
 		delete preparedStmt;
 		
 		// store the modules
-		preparedStmt = connection->prepareStatement("\
+		query = "\
 		INSERT INTO otherModules( \
 			manufacturer, typeNumber, serialNumber \
 		) VALUES ( \
 			?, ?, ? \
-		);");
+		);";
+		ROS_INFO("%s", query.c_str());
+		preparedStmt = connection->prepareStatement(query);
 		for(int i = 0; i < moduleIdentifiers.size(); i++){
 				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
 				preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
@@ -400,14 +409,14 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		
 		// preform the actual query
-		preparedStmt = connection->prepareStatement("\
+		query = "\
 		SELECT id \
 		FROM ModuleCalibration \
 		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
 		serialNumber = ? AND \
-		( -- to narrow group. The number of modules in this group must match the number of other modules \
+		( \
 			SELECT count(*) \
 			FROM ModuleCalibrationModuleSet AS inListGroup \
 			JOIN otherModules ON \
@@ -416,7 +425,7 @@ namespace rexos_knowledge_database{
 				inListGroup.serialNumber = otherModules.serialNumber \
 			WHERE ModuleCalibrationModuleSet.ModuleCalibration = inListGroup.ModuleCalibration \
 		) = ? AND \
-		( -- to wide group. The number of modules in this group must match the number of other modules \
+		( \
 			SELECT count(*) \
 			FROM ModuleCalibrationModuleSet AS listGroup \
 			WHERE ModuleCalibrationModuleSet.ModuleCalibration = listGroup.ModuleCalibration AND ( \
@@ -424,7 +433,9 @@ namespace rexos_knowledge_database{
 				listGroup.typeNumber != ModuleCalibrationModuleSet.typeNumber OR \
 				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \
 			) \
-		) = ?;");
+		) = ?;";
+		ROS_INFO("%s", query.c_str());
+		preparedStmt = connection->prepareStatement(query);
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
@@ -433,6 +444,7 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
+			ROS_INFO("result...");
 			// delete the temp table for storing the modules
 			preparedStmt = connection->prepareStatement("\
 			DROP TEMPORARY TABLE otherModules;");
