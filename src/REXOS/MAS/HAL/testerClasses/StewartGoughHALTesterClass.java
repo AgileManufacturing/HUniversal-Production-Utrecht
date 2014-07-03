@@ -415,14 +415,14 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
 		JsonObject targetRotate = new JsonObject();
-		targetMove.addProperty("x", 5.5);
-		targetMove.addProperty("y", 5.5);
-		targetMove.addProperty("z", 25.0);
+		targetMove.addProperty("x", 3.5);
+		targetMove.addProperty("y", 0);
+		targetMove.addProperty("z", 50.0);
 		targetMove.addProperty("maxAcceleration", 2);
 		
-		targetRotate.addProperty("x", 5);
-		targetRotate.addProperty("y", 5);
-		targetRotate.addProperty("z", 5);
+		targetRotate.addProperty("x", 0.17);
+		targetRotate.addProperty("y", 0);
+		targetRotate.addProperty("z", 0);
 		target.add("move",targetMove);
 		target.add("rotate",targetRotate);
 		target.addProperty("identifier", "GC4x4MB_3");
@@ -431,13 +431,13 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
 		JsonObject subjectRotate = new JsonObject();
-		subjectMove.addProperty("x", 5.5);
-		subjectMove.addProperty("y", 5.5);
-		subjectMove.addProperty("z", 25.0);
+		subjectMove.addProperty("x", 3.5);
+		subjectMove.addProperty("y", 0);
+		subjectMove.addProperty("z", 35.0);
 		
-		subjectRotate.addProperty("x", 4);
-		subjectRotate.addProperty("y", 4);
-		subjectRotate.addProperty("z", 4);
+		subjectRotate.addProperty("x", 0.10);
+		subjectRotate.addProperty("y", 0);
+		subjectRotate.addProperty("z", 0);
 		
 		
 		subject.add("move",subjectMove);

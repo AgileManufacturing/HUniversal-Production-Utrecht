@@ -28,9 +28,6 @@ public class CompositeStep{
 		this.command = command;
 		this.relativeTo = relativeTo;
 		this.productStep = productStep;
-		System.out.println("Command: "+ command);
-		System.out.println("relativeTo: "+ relativeTo);
-		System.out.println("productStep: "+ productStep);
 	}
 	
 	public ProductStep getProductStep(){
