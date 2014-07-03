@@ -34,7 +34,6 @@ public class StewartGough extends ModuleActor {
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		JsonObject commandMove = compositeStep.popCommandIdentifier(MOVE_COMMAND_IDENTIFIER).getAsJsonObject();
-		
 		//Adjust for maxAcceleration
 		int maxAcceleration = MAX_ACCELERATION;
 		if (commandMove.get(ModuleActor.MAX_ACCELERATION) != null){
@@ -76,10 +75,10 @@ public class StewartGough extends ModuleActor {
 		JsonObject commandRotate = compositeStep.popCommandIdentifier(ROTATE_COMMAND_IDENTIFIER).getAsJsonObject();
 		instructionData.add(ROTATE, commandRotate);
 		
-		if (forceStraightLine){
+		/*if (forceStraightLine){
 			//Straight line
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
-		} else {
+		} else {*/
 			//Approach
 			/*JsonObject commandApproach = new JsonParser().parse(commandMove.get(APPROACH).toString()).getAsJsonObject();
 			JsonObject approachInstructionData = new JsonObject();
@@ -96,7 +95,7 @@ public class StewartGough extends ModuleActor {
 
 			//Exit point
 			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
-		}
+		//}
 		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(), compositeStep.getCommand(), compositeStep.getRelativeTo()));
 		if (hStep != null){
