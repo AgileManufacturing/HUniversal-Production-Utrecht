@@ -42,27 +42,14 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	public synchronized void run() {
 		Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Execution started with the following hardware steps:", hardwareSteps);
 		
-		System.out.println("hardwareSteps size: "+ hardwareSteps.size());
-		for(int i =0 ; i<hardwareSteps.size();i++){
+		while (hardwareSteps.size() > 0){
 			try {
-				System.out.println("Executing: "+hardwareSteps.get(i));
-				moduleFactory.executeHardwareStep(this, hardwareSteps.get(i));
-				//this.wait();
-				System.out.println("After the wait");
-			} catch (FactoryException e) {
+				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
+				this.wait();
+			} catch (InterruptedException | FactoryException e) {
 				Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Module is unable to execute hardwareStep: " + e);
 			}
 		}
-		/*while (hardwareSteps.size() > 0){
-			try {
-				System.out.println("Executing: "+hardwareSteps.get(0));
-				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
-				//this.wait();
-				System.out.println("After the wait");
-			} catch (FactoryException e) {
-				Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Module is unable to execute hardwareStep: " + e);
-			}
-		}*/
 		hardwareAbstractionLayerListener.onExecutionFinished();
 	}
 	

@@ -89,6 +89,9 @@ public class HardwareStep {
 		
 		returnValue.add(STATUS, new JsonPrimitive(hardwareStepStatus.toString()));
 		
+
+		
+		
 		JsonObject instuctionDataNew = new JsonObject();
 		if(this.instructionData.has("move")){
 			instuctionDataNew.add("command", new JsonPrimitive("move"));
@@ -104,18 +107,13 @@ public class HardwareStep {
 			
 			JsonObject payLoad = new JsonObject();
 			JsonObject move = this.instructionData.getAsJsonObject("move");
-
 			
 			payLoad.add("x", move.get("x"));
 			payLoad.add("y", move.get("y"));
 			payLoad.add("z", move.get("z"));
 			payLoad.add("maxAcceleration", move.get("maxAcceleration"));
-			if(this.instructionData.has("rotate")) {
-				JsonObject rotate = this.instructionData.getAsJsonObject("rotate");
-				payLoad.add("rotationX", rotate.get("x"));
-				payLoad.add("rotationY", rotate.get("y"));
-				payLoad.add("rotationZ", rotate.get("z"));
-			}
+			
+			
 			
 			instuctionDataNew.add("payload", payLoad);
 			
@@ -123,20 +121,10 @@ public class HardwareStep {
 			returnValue.add(INSTRUCTION_DATA, instuctionDataNew);
 			
 			System.out.println("HardwareStep JSON: " + returnValue.toString());
-
-		} else if(this.instructionData.has("activate")){
-			instuctionDataNew.add("command", new JsonPrimitive("activate"));
-			returnValue.add(INSTRUCTION_DATA, instuctionDataNew);
-
-		}
-		else if(this.instructionData.has("deactivate") ){
-			instuctionDataNew.add("command", new JsonPrimitive("deactivate"));
-			returnValue.add(INSTRUCTION_DATA, instuctionDataNew);
+			
+			return returnValue;
 		} else {
-			System.out.println("NOTFOUND: "+this.instructionData.toString());
+			throw new IllegalArgumentException("move not found in instuctionData");
 		}
-		System.out.println("RETURNVALUE: "+returnValue.toString());
-		return returnValue;
 	}
-	
 }

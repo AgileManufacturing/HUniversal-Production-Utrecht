@@ -122,6 +122,7 @@ public abstract class ModuleActor extends Module {
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
 		this.processListener = processListener;
 		JsonObject command = hardwareStep.toJSON();
+		System.out.println(command);
 		executeMongoCommand(command);
 	}
 	/**
