@@ -16,5 +16,7 @@
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/mongo-2.9.3.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/mysql-connector-java-5.1.24-bin.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/sqlite-jdbc-3.7.2.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/jcommon-1.0.21.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
