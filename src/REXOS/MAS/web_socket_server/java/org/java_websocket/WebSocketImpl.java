@@ -14,12 +14,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import web_socket_server.java.org.java_websocket.drafts.Draft;
+import web_socket_server.java.org.java_websocket.drafts.Draft.CloseHandshakeType;
+import web_socket_server.java.org.java_websocket.drafts.Draft.HandshakeState;
 import web_socket_server.java.org.java_websocket.drafts.Draft_10;
 import web_socket_server.java.org.java_websocket.drafts.Draft_17;
 import web_socket_server.java.org.java_websocket.drafts.Draft_75;
 import web_socket_server.java.org.java_websocket.drafts.Draft_76;
-import web_socket_server.java.org.java_websocket.drafts.Draft.CloseHandshakeType;
-import web_socket_server.java.org.java_websocket.drafts.Draft.HandshakeState;
 import web_socket_server.java.org.java_websocket.exceptions.IncompleteHandshakeException;
 import web_socket_server.java.org.java_websocket.exceptions.InvalidDataException;
 import web_socket_server.java.org.java_websocket.exceptions.InvalidHandshakeException;

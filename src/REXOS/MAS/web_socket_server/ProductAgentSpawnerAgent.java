@@ -1,11 +1,10 @@
 package web_socket_server;
 
-import configuration.ServerConfigurations;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.StaleProxyException;
+import configuration.ServerConfigurations;
 
 
 public class ProductAgentSpawnerAgent extends Agent {

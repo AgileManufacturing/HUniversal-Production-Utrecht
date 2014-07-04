@@ -26,7 +26,6 @@
  **/
 package libraries.knowledgedb_client;
 
-import java.lang.reflect.Array;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

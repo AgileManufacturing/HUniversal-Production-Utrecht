@@ -39,19 +39,16 @@
  **/
 package grid_server;
 
-import configuration.ServerConfigurations;
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import web_socket_server.java.org.java_websocket.client.WebSocketClient;
 import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentController;
-import jade.wrapper.ContainerController;
-import jade.wrapper.StaleProxyException;
+import configuration.ServerConfigurations;
 
 public class MonitoringAgent extends Agent{
 	/**

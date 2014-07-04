@@ -3,8 +3,16 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.google.gson.JsonObject;
-
+import libraries.blackboard_client.data_classes.GeneralMongoException;
+import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import libraries.blackboard_client.data_classes.InvalidJSONException;
+import libraries.knowledgedb_client.KnowledgeException;
+import libraries.log.LogLevel;
+import libraries.log.LogSection;
+import libraries.log.Logger;
+import libraries.math.Matrix;
+import libraries.math.RotationAngles;
+import libraries.math.Vector3;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
@@ -14,16 +22,8 @@ import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
-import libraries.blackboard_client.data_classes.GeneralMongoException;
-import libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import libraries.blackboard_client.data_classes.InvalidJSONException;
-import libraries.knowledgedb_client.KnowledgeException;
-import libraries.math.Matrix;
-import libraries.math.RotationAngles;
-import libraries.math.Vector3;
-import libraries.log.LogLevel;
-import libraries.log.LogSection;
-import libraries.log.Logger;
+
+import com.google.gson.JsonObject;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen

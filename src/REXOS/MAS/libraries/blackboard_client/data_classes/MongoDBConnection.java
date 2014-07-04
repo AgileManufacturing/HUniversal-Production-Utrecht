@@ -32,9 +32,6 @@ package libraries.blackboard_client.data_classes;
 
 import java.util.Hashtable;
 
-import libraries.log.LogLevel;
-import libraries.log.Logger;
-
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;

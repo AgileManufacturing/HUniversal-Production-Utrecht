@@ -40,20 +40,6 @@ package agents.equiplet_agent;
 
 import generic.ProductStep;
 import generic.Service;
-
-import java.util.ArrayList;
-
-import agents.data_classes.MessageType;
-import agents.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import HAL.HardwareAbstractionLayer;
-import HAL.steps.HardwareStep;
-import HAL.Module;
-import HAL.exceptions.BlackboardUpdateException;
-import HAL.listeners.HardwareAbstractionLayerListener;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -61,7 +47,20 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+
+import java.util.ArrayList;
+
 import libraries.knowledgedb_client.KnowledgeException;
+import HAL.HardwareAbstractionLayer;
+import HAL.Module;
+import HAL.exceptions.BlackboardUpdateException;
+import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.steps.HardwareStep;
+import agents.data_classes.MessageType;
+import agents.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener{
 		

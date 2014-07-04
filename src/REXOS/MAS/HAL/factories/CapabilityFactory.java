@@ -7,11 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
 import libraries.dynamicloader.DynamicClassDescription;
 import libraries.dynamicloader.DynamicClassFactory;
 import libraries.dynamicloader.InstantiateClassException;
@@ -27,6 +22,11 @@ import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * The CapabilityFactory is the factory for the {@link Capability}. 

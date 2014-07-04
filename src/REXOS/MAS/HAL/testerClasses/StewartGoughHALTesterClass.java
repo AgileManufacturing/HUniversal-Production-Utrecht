@@ -1,7 +1,6 @@
 package HAL.testerClasses;
 
 import generic.ProductStep;
-import generic.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,13 +15,11 @@ import org.apache.commons.codec.binary.Base64;
 import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListener {
 	static StewartGoughHALTesterClass htc = new StewartGoughHALTesterClass();

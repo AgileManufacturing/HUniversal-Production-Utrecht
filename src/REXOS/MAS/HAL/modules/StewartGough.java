@@ -13,13 +13,11 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import HAL.steps.OriginPlacement;
 import HAL.steps.HardwareStep.HardwareStepStatus;
+import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacement.OriginIdentifier;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class StewartGough extends ModuleActor {
 	public final static int MAX_ACCELERATION = 4;

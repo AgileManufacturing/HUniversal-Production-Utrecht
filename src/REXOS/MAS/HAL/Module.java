@@ -1,12 +1,12 @@
 package HAL;
 
+import libraries.knowledgedb_client.KnowledgeDBClient;
+import libraries.knowledgedb_client.KnowledgeException;
+import libraries.knowledgedb_client.Row;
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
-import libraries.knowledgedb_client.KnowledgeDBClient;
-import libraries.knowledgedb_client.KnowledgeException;
-import libraries.knowledgedb_client.Row;
 /**
  * Abstract representation of a module in the HAL.
  * @author Bas Voskuijlen

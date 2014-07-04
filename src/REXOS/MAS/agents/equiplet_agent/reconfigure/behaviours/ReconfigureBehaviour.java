@@ -38,6 +38,8 @@
  **/
 package agents.equiplet_agent.reconfigure.behaviours;
 
+import jade.core.behaviours.Behaviour;
+
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
@@ -45,20 +47,17 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import libraries.dynamicloader.JarFileLoaderException;
+import libraries.knowledgedb_client.KnowledgeException;
+import HAL.HardwareAbstractionLayer;
+import HAL.ModuleIdentifier;
+import HAL.exceptions.FactoryException;
 import agents.equiplet_agent.EquipletAgent;
 import agents.equiplet_agent.reconfigure.ModuleDataManager;
 import agents.equiplet_agent.reconfigure.datatypes.ModuleTree;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import HAL.HardwareAbstractionLayer;
-import HAL.ModuleIdentifier;
-import HAL.exceptions.FactoryException;
-
-import jade.core.behaviours.Behaviour;
-import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KnowledgeException;
 
 public class ReconfigureBehaviour extends Behaviour{
 	public HardwareAbstractionLayer HAL;

@@ -5,9 +5,6 @@ import generic.Service;
 
 import java.util.ArrayList;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import libraries.dynamicloader.JarFileLoaderException;
 import libraries.knowledgedb_client.KnowledgeException;
 import HAL.exceptions.BlackboardUpdateException;
@@ -21,6 +18,9 @@ import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 /**
  * The main interface of the HAL for the equiplet agent. This class manages the factories and the blackboard handler.
  * @author Bas Voskuijlen

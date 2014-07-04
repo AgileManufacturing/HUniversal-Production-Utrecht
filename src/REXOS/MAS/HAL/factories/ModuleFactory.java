@@ -6,10 +6,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import libraries.dynamicloader.DynamicClassDescription;
 import libraries.dynamicloader.DynamicClassFactory;
 import libraries.dynamicloader.InstantiateClassException;
@@ -33,6 +29,10 @@ import HAL.exceptions.ModuleExecutingException;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * The ModuleFactory is the factory for the {@link Module}s. 
