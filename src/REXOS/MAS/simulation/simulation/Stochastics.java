@@ -19,7 +19,8 @@ class Stochastics {
 	}
 
 	public double generateProductArrival() {
-		return time(config.getProductArrival());
+		return 35; // TODO too deterministic
+		// return time(config.getProductArrival());
 	}
 
 	public double generateDeadline() {

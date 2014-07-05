@@ -10,6 +10,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -32,6 +33,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import simulation.mas.Equiplet;
+import simulation.mas.Product;
 import simulation.simulation.Simulation;
 import simulation.util.Triple;
 
@@ -102,16 +104,28 @@ public class SimInterface {
 		final JPanel timeDivisionView = new JPanel();
 		tabbedPane.addTab("Equiplet time division", null, timeDivisionView, null);
 		timeDivisionView.setLayout(new BoxLayout(timeDivisionView, BoxLayout.X_AXIS));
+		
+		final ProductView productView = new ProductView();
+		tabbedPane.addTab("Products", null, productView, null);
 
 		ChangeListener changeListener = new ChangeListener() {
 			public void stateChanged(ChangeEvent changeEvent) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
 				int index = sourceTabbedPane.getSelectedIndex();
-				if (index == 2) {
+				if (index == 1) {
+					Map<String, Triple<Double, Double, Double>> history = simulation.getEquipletHistory();
+					System.out.println("HISTORY: " + history);
+					chartPanel.removeAll();
+					
+					List<Product> agents = new ArrayList<Product> (simulation.getProducts().values());
+					chartPanel.add(GanttChart.createChartPanel(agents));
+				}else if (index == 2) {
 					Map<String, Triple<Double, Double, Double>> history = simulation.getEquipletHistory();
 					System.out.println("HISTORY: " + history);
 					timeDivisionView.removeAll();
 					timeDivisionView.add(StackedBarChart.createChartPanel(history));
+				}else if(index == 3) {
+					productView.update(simulation.getProducts());
 				}
 				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 			}

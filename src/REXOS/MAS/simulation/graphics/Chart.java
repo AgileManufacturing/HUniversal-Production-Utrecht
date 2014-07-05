@@ -20,6 +20,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
@@ -136,23 +138,23 @@ public class Chart {
 		plot.setRangeGridlinePaint(Color.white);
 
 		// TODO uncomment this 
-//		ValueAxis axis = plot.getRangeAxis();
-//		axis.setRange(0, 25.5);
-//
-//		final StandardXYItemRenderer renderer = new StandardXYItemRenderer();
-//		// renderer.setSeriesLinesVisible(0, false);
-//		// renderer.setSeriesShapesVisible(1, false);
-//		plot.setRenderer(0, renderer);
-//
-//
-//		// change the auto tick unit selection to integer units only...
-//		final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-//		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-//
-//		final NumberAxis axis2 = new NumberAxis("Density");
-//		axis2.setAutoRangeIncludesZero(false);
-//		axis2.setRange(0.0, 0.11);
-//		plot.setRangeAxis(1, axis2);
+		ValueAxis axis = plot.getRangeAxis();
+		axis.setRange(0, 25.5);
+
+		final StandardXYItemRenderer renderer = new StandardXYItemRenderer();
+		// renderer.setSeriesLinesVisible(0, false);
+		// renderer.setSeriesShapesVisible(1, false);
+		plot.setRenderer(0, renderer);
+
+
+		// change the auto tick unit selection to integer units only...
+		final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+		final NumberAxis axis2 = new NumberAxis("Density");
+		axis2.setAutoRangeIncludesZero(false);
+		axis2.setRange(0.0, 0.11);
+		plot.setRangeAxis(1, axis2);
 		plot.setDataset(1, dataset.first);
 		plot.mapDatasetToRangeAxis(1, 1);
 

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -112,7 +113,7 @@ public class GanttChart extends ApplicationFrame {
 		return chart;
 	}
 
-	public static JPanel createChartPanel(ArrayList<Product> agents) {
+	public static JPanel createChartPanel(List<Product> agents) {
 		ArrayList<TaskSeries> tasks = new ArrayList<>();
 		for (Product agent : agents) {
 			LinkedList<ProductionStep> path = agent.getProductionPath();

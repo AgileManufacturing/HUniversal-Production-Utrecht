@@ -105,7 +105,7 @@ public class Equiplet {
 	public int getScheduled() {
 		return schedule.size();
 	}
-	
+
 	public int executedJobs() {
 		return history.size();
 	}
@@ -194,26 +194,6 @@ public class Equiplet {
 		}
 	}
 
-	public void notifyProductArrived(double time, String product, String service) {
-		// check if it is needed to also check the criteria
-		int i = 0;
-		for (Job job : schedule) {
-			if (job.getProductAgent().equalsIgnoreCase(product) && job.getService().equalsIgnoreCase(service) && !job.isReady()) {
-				job.setReady();
-				
-				// check if there are job that can be executed before the first job
-				if (i == 0) { // first job in schedule
-					executing = job;
-					schedule.remove(job);
-					historyUpdate(time);
-					state = EquipletState.BUSY;
-				}
-				break;
-			}
-			i++;
-		}
-	}
-
 	/**
 	 * The simulation need to check if the just scheduled product step is going
 	 * to be executed
@@ -237,6 +217,41 @@ public class Equiplet {
 	}
 
 	/**
+	 * Notify a product is arrived by the equiplet and is ready to be let the
+	 * equiplet execute his product step
+	 * 
+	 * @param time
+	 *            of the the product arrival
+	 * @param product
+	 *            name of the product agent
+	 * @param service
+	 *            name of the service that the equiplet is ask to perform for
+	 *            the product
+	 */
+	public void notifyProductArrived(double time, String product, String service) {
+		// check if it is needed to also check the criteria
+		// TODO possible service not necessary, if making the constraint that a product can only have one job ready by an equiplet
+		for (Job job : schedule) {
+			if (job.getProductAgent().equalsIgnoreCase(product) && job.getService().equalsIgnoreCase(service) && !job.isReady()) {
+				job.setReady();
+				break;
+			}
+		}
+
+		// TODO combine the set ready loop above with the possibility to execute a job that is later in the schedule but can already be performed
+
+		// execute the first job in the schedule if the job is ready
+		if (state == EquipletState.IDLE &&  schedule.first().isReady()) {
+			historyUpdate(time);
+			state = EquipletState.BUSY;
+			executing = schedule.pollFirst();
+		} else if (state == EquipletState.ERROR) {
+			executing = schedule.pollFirst();
+		}
+			
+	}
+
+	/**
 	 * Notify the executing job is finished
 	 * 
 	 * @param time
@@ -254,16 +269,17 @@ public class Equiplet {
 			if (isExecuting()) {
 				history.add(executing);
 
-				if (schedule.isEmpty() || schedule.first().isReady()) {
-					state = EquipletState.IDLE;
-					executing = null;
-				} else {
+				if (!schedule.isEmpty() && schedule.first().isReady()) {
 					state = EquipletState.BUSY;
 					executing = schedule.pollFirst();
+				} else {
+					state = EquipletState.IDLE;
+					executing = null;
 				}
 			} else {
 				executing = null;
 				state = EquipletState.IDLE;
+				System.out.println("FAIL: job finished a non executing job");
 			}
 		}
 	}

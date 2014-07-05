@@ -101,13 +101,17 @@ public class Product {
 		return created;
 	}
 
+	public ProductState getState() {
+		return state;
+	}
+	
 	public Position getPosition() {
 		return position;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Product: %s [state=%s, created=%.2f, product steps=%s, current step=%s]", name, state, created, Arrays.toString(productSteps.toArray()), (productionPath.size() > 0 ? productionPath.peek() : "ERROR"));
+		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", name, state, created, position, (productionPath.size() > 0 ? productionPath.peek() : "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
 	}
 
 	public LinkedList<ProductionStep> getProductionPath() {
@@ -142,5 +146,4 @@ public class Product {
 	public void notifyProductProcessing() {
 		state = ProductState.PROCESSING;
 	}
-
 }
