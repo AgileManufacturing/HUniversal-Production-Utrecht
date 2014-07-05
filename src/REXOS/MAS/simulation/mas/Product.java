@@ -17,7 +17,7 @@ import simulation.util.Tuple;
 
 public class Product {
 
-	private enum ProductState {
+	public enum ProductState {
 		SCHEDULING, TRAVELING, WAITING, PROCESSING, FINISHED, ERROR
 	}
 

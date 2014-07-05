@@ -102,7 +102,7 @@ public class SimInterface {
 		chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.X_AXIS));
 		
 		final JPanel timeDivisionView = new JPanel();
-		tabbedPane.addTab("Equiplet time division", null, timeDivisionView, null);
+		tabbedPane.addTab("Equiplet Utilization", null, timeDivisionView, null);
 		timeDivisionView.setLayout(new BoxLayout(timeDivisionView, BoxLayout.X_AXIS));
 		
 		final ProductView productView = new ProductView();

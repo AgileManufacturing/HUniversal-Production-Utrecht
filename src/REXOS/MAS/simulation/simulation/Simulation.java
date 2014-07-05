@@ -14,6 +14,7 @@ import simulation.graphics.SimInterface;
 import simulation.mas.Equiplet;
 import simulation.mas.EquipletState;
 import simulation.mas.Product;
+import simulation.mas.Product.ProductState;
 import simulation.util.Position;
 import simulation.util.ProductStep;
 import simulation.util.ProductionStep;
@@ -318,6 +319,12 @@ public class Simulation extends Thread {
 
 		for (Event e : eventStack) {
 			productNames.remove(e.getProduct());
+		}
+		
+		for(String pName : productNames) {
+			if (products.get(pName).getState() == ProductState.WAITING) {
+				productNames.remove(pName);
+			}
 		}
 		
 		System.out.println("VALIDATION of product events " + productNames.isEmpty() + " : " + productNames + "- " + products);
