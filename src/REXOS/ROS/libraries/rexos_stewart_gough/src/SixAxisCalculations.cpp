@@ -7,7 +7,6 @@
 
 #include "rexos_stewart_gough/SixAxisCalculations.h"
 using namespace std;
-
 void SixAxisCalculations::get4x4TransalationMatrix(double result[], Point3D point){
 	result[GET_INDEX(0, 0, 4)] = 1;
 	result[GET_INDEX(0, 1, 4)] = 0;
@@ -159,33 +158,6 @@ void SixAxisCalculations::get3x3TransalationMatrix(double result[], double x, do
 	result[GET_INDEX(2, 2, 3)] = 1;
 }
 
-
-void SixAxisCalculations::matrixTest(){
-
-
-
-	double matrixA[] = MATRIX_IDENTITY_4X4;
-	double matrixB[] = MATRIX_POINT_4X1;
-	double result[] = MATRIX_EMPTY_4X1;
-
-
-
-	getMultiplyMatrix(result, matrixA, 4, 4, matrixB, 4, 1);
-
-
-
-
-	for(int i = 0; i < 4; i++){
-		for(int x = 0; x < 1; x++){
-			std::cout << result[GET_INDEX(i, x, 1)];
-		}
-		std::cout << std::endl;
-	}
-
-
-}
-
-
 void SixAxisCalculations::getMultiplyMatrix(double result[], double matrixA[], int rowsA, int colsA, double matrixB[], int rowsB, int colsB){
 	if (colsA != rowsB) {
 			throw std::length_error("MatrixA:Columns did not match MatrixB:Rows!");
@@ -261,10 +233,10 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 	 * Get the right motor angles for the given effector joint angle.
 	 */
 	double rad = DEGREES_TO_RADIANS(-groupPositionOnCircle);
-	
+
 	//std::cout << "Angle: " << (-groupPositionOnCircle) << std::endl;
 
-	
+
 
 
 
@@ -280,26 +252,26 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 
 	//std::cout << "xTrans: " << xTrans << std::endl;
 	//std::cout << "yTrans: " << yTrans << std::endl;
-	
+
 	double upperArmJointY = cos(motorAngle) * upperArmLength;
 	double upperArmJointZ = sin(motorAngle) * upperArmLength;
 	Point3D upperArmJointPosition(xTrans, upperArmJointY + yTrans, upperArmJointZ);
-	
-	
+
+
 	//std::cout << "upperArmJointPosition: " << upperArmJointPosition << std::endl;
-	
+
 
 
 
 	//Identity
 	double matrixIdentity[] = MATRIX_IDENTITY_3X3;
-	
+
 	//Rotation
 	double matrixRotation[3*3];
 	get3x3RotationMatrix(matrixRotation, rad);
 
 
-	
+
 
 
 
@@ -317,56 +289,56 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 
 	double rotatedPointMatrix[3*1];
 	get1x3PointMatrix(rotatedPointMatrix, upperArmJointPosition);
-	
-	
+
+
 
 	//Calculate the translated and rotated position of the 3d rotated point from step 1
 	double resultPoint[3*1];
 	getMultiplyMatrix(resultPoint, matrixRotationAndIdentity, 3, 3, rotatedPointMatrix, 3, 1);
-	
-	
-	
-	
+
+
+
+
 	Point3D rotatedUpperArmJointPosition(
 	resultPoint[GET_INDEX(0, 0, 1)] - effectorJointPosition.x,
 	resultPoint[GET_INDEX(1, 0, 1)] - effectorJointPosition.y,
 	upperArmJointPosition.z - effectorJointPosition.z);
-	
-	
+
+
 		//Point3D rotatedUpperArmJointPositionTemp(
 	//resultPoint[GET_INDEX(0, 0, 1)],
 	//resultPoint[GET_INDEX(1, 0, 1)],
 	//upperArmJointPosition.z);
-	
+
 
 	//std::cout << "rotated UpperArmJoint pos: " << rotatedUpperArmJointPositionTemp << std::endl;
-	
+
 	//std::cout << "neighbourEffectorJointPosition: " << neighbourEffectorJointPosition << std::endl;
-	
+
 	//std::cout << "effectorJointPosition: " << effectorJointPosition << std::endl;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//double motorX = sin(rad) * motorAxisToCenterDistance;
 	//double motorY = cos(rad) * motorAxisToCenterDistance;
@@ -377,7 +349,7 @@ double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition,
 }
 
 bool SixAxisCalculations::isValidPosition(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double motorAngle, double groupPositionOnCircle, double motorPositionOnCircle){
-	if(std::isnan(motorAngle) == true){
+	if(__isnan(motorAngle) == true){
 		return false;
 	}
 
@@ -391,7 +363,7 @@ bool SixAxisCalculations::isValidPosition(Point3D effectorJointPosition, Point3D
 }
 
 
-double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ){
+double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double motorJointPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ){
 	/**
 	 * The six-axis math in four steps
 	 *
@@ -419,6 +391,15 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 
 	//xJoint = getXEffectorPositionForEngineRotation(degreesToRadians(effectorJointPositionOnCircle));
 	//yJoint = getYEffectorPositionForEngineRotation(degreesToRadians(effectorJointPositionOnCircle));
+
+
+	double xMotorPos, yMotorPos;
+
+	double radius = motorAxisToCenterDistance / cos(abs(groupPositionOnCircle - motorJointPositionOnCircle));
+
+	xMotorPos = sin(DEGREES_TO_RADIANS(motorJointPositionOnCircle)) * radius;
+	yMotorPos = cos(DEGREES_TO_RADIANS(motorJointPositionOnCircle)) * radius;
+
 
 
 	/**
@@ -456,7 +437,7 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	//std::cout << resultMatrix[GET_INDEX(1, 0, 1)] << std::endl;
 	//std::cout << resultMatrix[GET_INDEX(2, 0, 1)] << std::endl;
 
-	
+
 
 
 	//Ugly cache method, so 6 matrix 3d rotations can be skipped in the calculation of the safety angles
@@ -473,12 +454,12 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C2_POS){
 		this->effectorJointPositionCache[5] = rotatedPoint;
 	}
-	
 
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * Step 3: Rotate around the z axis and translate the joint position as if the engine would be at position 0, 0, 0
 	 */
@@ -491,68 +472,38 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	vector< vector<double> >  matrixRotation = get3x3RotationMatrix(degreesToRadians(groupPositionOnCircle));
 	 */
 
-	double matrixIdentity[] = MATRIX_IDENTITY_3X3;
+	//double matrixIdentity[] = MATRIX_IDENTITY_3X3;
 	double matrixRotation[3*3];
-
 	get3x3RotationMatrix(matrixRotation, DEGREES_TO_RADIANS(groupPositionOnCircle));
 
 
-	//Calculate the needed translation on the x axis
-	double xTrans = tan(DEGREES_TO_RADIANS((effectorJointPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
-	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
-
-	/*
-	vector< vector<double> >  matrixTransalation = get3x3TransalationMatrix(xTrans, -motorAxisToCenterDistance);
+	//Point to rotate from the orgin
+		double rotatedPointMatrix[3*1];
+		get1x3PointMatrix(rotatedPointMatrix, rotatedPoint);
 
 
-	//Calculate the complete rotation and translation matrix, and create the point matrix
-	vector< vector<double> >  matrixRotationAndIdentity = multiplyMatrix(matrixIdentity, 3, 3, matrixRotation, 3, 3);
-	vector< vector<double> >  calculationMatrix = multiplyMatrix(matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
+		//Prepare transformation
+		double xTrans = tan(DEGREES_TO_RADIANS((groupPositionOnCircle - motorJointPositionOnCircle))) * motorAxisToCenterDistance;
 
-	vector< vector<double> >  rotatedPointMatrix = get1x3PointMatrix(rotatedPoint);
-
-
-	//Calculate the translated and rotated position of the 3d rotated point from step 1
-	vector< vector<double> >  resultPoint = multiplyMatrix(calculationMatrix, 3, 3, rotatedPointMatrix, 3, 1);
-	*/
+		double yTrans = -motorAxisToCenterDistance;
 
 
-	double matrixTransalation[3*3];
-	get3x3TransalationMatrix(matrixTransalation, xTrans, -motorAxisToCenterDistance);
+
+		//Do matrix rotation
+		double resultPoint[3*1];
+		getMultiplyMatrix(resultPoint, matrixRotation, 3, 3, rotatedPointMatrix, 3, 1);
 
 
-	//Calculate the complete rotation and translation matrix, and create the point matrix
-	double matrixRotationAndIdentity[3*3];
-	getMultiplyMatrix(matrixRotationAndIdentity, matrixIdentity, 3, 3, matrixRotation, 3, 3);
+		//Create result point and do transformation
+		SixAxisCalculations::Point3D moveToTransalated( resultPoint[GET_INDEX(0, 0, 1)] + xTrans, resultPoint[GET_INDEX(1, 0, 1)] + yTrans, rotatedPoint.z);
 
-	double calculationMatrix[3*3];
-	getMultiplyMatrix(calculationMatrix, matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
-
-	double rotatedPointMatrix[3*1];
-	get1x3PointMatrix(rotatedPointMatrix, rotatedPoint);
-
-
-	//Calculate the translated and rotated position of the 3d rotated point from step 1
-	double resultPoint[3*1];
-	getMultiplyMatrix(resultPoint, calculationMatrix, 3, 3, rotatedPointMatrix, 3, 1);
+		std::cout << moveToTransalated << std::endl;
 
 
 
 
 
-
-
-
-
-
-	SixAxisCalculations::Point3D moveToTransalated( resultPoint[GET_INDEX(0, 0, 1)], resultPoint[GET_INDEX(1, 0, 1)], rotatedPoint.z);
-
-
-
-
-
-
-	SixAxisCalculations::Point3D engine(0, 0, 0);
+		SixAxisCalculations::Point3D engine(0, 0, 0);
 
 	/**
 	 * Step 4: Inverse kinematics.
@@ -588,8 +539,8 @@ SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(Point3D mo
 
 
 	//Group A
-	result.angles[0] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_A_POS, SixAxisCalculations::EFFECTOR_JOINT_A1_POS, xRotation, yRotation, zRotation);
-	result.angles[1] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_A_POS, SixAxisCalculations::EFFECTOR_JOINT_A2_POS, xRotation, yRotation, zRotation);
+	result.angles[0] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_A_POS,  SixAxisCalculations::MOTOR_A1_POS, SixAxisCalculations::EFFECTOR_JOINT_A1_POS, xRotation, yRotation, zRotation);
+	result.angles[1] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_A_POS,  SixAxisCalculations::MOTOR_A2_POS, SixAxisCalculations::EFFECTOR_JOINT_A2_POS, xRotation, yRotation, zRotation);
 
 	if(!isValidPosition(effectorJointPositionCache[0], effectorJointPositionCache[1], result.angles[0], SixAxisCalculations::GROUP_A_POS, SixAxisCalculations::MOTOR_A1_POS)){
 		result.validMove = false;
@@ -602,8 +553,8 @@ SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(Point3D mo
 
 
 	//Group B
-	result.angles[2] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_B_POS, SixAxisCalculations::EFFECTOR_JOINT_B1_POS, xRotation, yRotation, zRotation);
-	result.angles[3] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_B_POS, SixAxisCalculations::EFFECTOR_JOINT_B2_POS, xRotation, yRotation, zRotation);
+	result.angles[2] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_B_POS, SixAxisCalculations::MOTOR_B1_POS,  SixAxisCalculations::EFFECTOR_JOINT_B1_POS, xRotation, yRotation, zRotation);
+	result.angles[3] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_B_POS,  SixAxisCalculations::MOTOR_B2_POS, SixAxisCalculations::EFFECTOR_JOINT_B2_POS, xRotation, yRotation, zRotation);
 
 	if(!isValidPosition(effectorJointPositionCache[2], effectorJointPositionCache[3], result.angles[2], SixAxisCalculations::GROUP_B_POS, SixAxisCalculations::MOTOR_B1_POS)){
 		result.validMove = false;
@@ -616,8 +567,8 @@ SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(Point3D mo
 
 
 	//Group C
-	result.angles[4] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_C_POS, SixAxisCalculations::EFFECTOR_JOINT_C1_POS, xRotation, yRotation, zRotation);
-	result.angles[5] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_C_POS, SixAxisCalculations::EFFECTOR_JOINT_C2_POS, xRotation, yRotation, zRotation);
+	result.angles[4] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_C_POS, SixAxisCalculations::MOTOR_C1_POS, SixAxisCalculations::EFFECTOR_JOINT_C1_POS, xRotation, yRotation, zRotation);
+	result.angles[5] = getAngleForMotor(moveTo, SixAxisCalculations::GROUP_C_POS, SixAxisCalculations::MOTOR_C2_POS, SixAxisCalculations::EFFECTOR_JOINT_C2_POS, xRotation, yRotation, zRotation);
 
 	if(!isValidPosition(effectorJointPositionCache[4], effectorJointPositionCache[5], result.angles[4], SixAxisCalculations::GROUP_C_POS, SixAxisCalculations::MOTOR_C1_POS)){
 		result.validMove = false;
@@ -652,7 +603,7 @@ double * SixAxisCalculations::getAngles(double angles[6], Point3D moveTo, double
 
 bool SixAxisCalculations::isValidMove(double angles[6]){
 	for(int i = 0; i < 6;i++){
-		if(std::isnan(angles[i]) == 1){
+		if(__isnan(angles[i]) == 1){
 			return false;
 		}
 	}
@@ -662,23 +613,17 @@ bool SixAxisCalculations::isValidMove(double angles[6]){
 
 
 bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ){
-	
-		//std::cout << "path check start" << std::endl;
-    	//std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
-		//std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
-
 		//Calculate lengths to travel
     	double x_length = to.x - from.x;
     	double y_length = to.y - from.y;
     	double z_length = to.z - from.z;
-		
-		
+
+
 		double rotationX_length = endRotationX - startRotationX;
     	double rotationY_length = endRotationY - startRotationY;
     	double rotationZ_length = endRotationZ - startRotationZ;
-		
-		
-		
+
+
     	double largest_length = (double)	(fabs(x_length) > fabs(y_length) ?
 											(fabs(x_length) > fabs(z_length) ? fabs(x_length) : fabs(z_length)) :
 											(fabs(y_length) > fabs(z_length) ? fabs(y_length) : fabs(z_length))	);
@@ -686,67 +631,34 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
     	double stepLengthX = x_length / largest_length;
     	double stepLengthY = y_length / largest_length;
     	double stepLengthZ = z_length / largest_length;
-		
-		
+
 		double stepLengthRotationX = rotationX_length / largest_length;
     	double stepLengthRotationY = rotationY_length / largest_length;
     	double stepLengthRotationZ = rotationZ_length / largest_length;
-		
-		
- 
+
+
 		std::cout << "path length: " << largest_length << std::endl;
-		
+
 		for(double step = 1; step <= largest_length; step++){
-			
+
 			double x = (from.x + stepLengthX * step);
 			double y = (from.y + stepLengthY * step);
 			double z = (from.z + stepLengthZ * step);
-			
+
 			double rotationX = (startRotationX + stepLengthRotationX * step);
 			double rotationY = (startRotationY + stepLengthRotationY * step);
 			double rotationZ = (startRotationZ + stepLengthRotationZ * step);
-			
-			//std::cout << "checking coordinate: " << x << ", " << y << ", " << z << std::endl;
-			
-			////BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
-			//int index = temp.x + temp.y * width + temp.z * width * depth;
 
-			//if(temp.x < 0 || temp.y < 0 || temp.z < 0) {
-				//std::cout << "temp.x: " << temp.x << " or temp.y: " << temp.y << std::endl;
-				//return false;
-			//}
 
-			//if(temp.x > width){
-				//std::cout << "temp.x: " << temp.x << " > width: " << width << std::endl;
-			//	return false;
-			//}
-			//if(temp.y > depth){
-				//std::cout << "temp.y: " << temp.y << " > depth: " << depth << std::endl;
-				//return false;
-			//}
-			//if(temp.z > height){
-				//std::cout << "temp.z: " << temp.z << " > height: " << height << std::endl;
-				//return false;
-			//}
-			
 			EffectorMove move = getMotorAngles(Point3D(x, y, z), rotationX, rotationY, rotationZ);
 			if(!move.validMove){
 				std::cout << "invalid position in path: " << move.moveTo << std::endl;
 				return false;
 			}
-			
-			
-			//if(boundariesBitmap[index] != VALID){
-				//std::cout << "boundariesBitmap[index]: " << boundariesBitmap[index] << "!= VALID: " << VALID << std::endl;
-				//return false;
-			//}
 		}
         return true;
-	
+
 }
-
-
-
 
 
 
