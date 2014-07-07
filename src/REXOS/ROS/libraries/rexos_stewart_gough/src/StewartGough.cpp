@@ -111,8 +111,8 @@ namespace rexos_stewart_gough{
 			stewartGoughMeasures->base,
 			//stewartGoughMeasures->effector,
 			55.0, //effector retuns wrong value: 44.x, 19-05-2014
-			//stewartGoughMeasures->maxAngleHipAnkle
-			0.26
+			stewartGoughMeasures->maxAngleHipAnkle
+			//0.26
 			);
 
 		std::cout << " max angle: " << stewartGoughMeasures->maxAngleHipAnkle << std::endl; 
@@ -267,8 +267,12 @@ namespace rexos_stewart_gough{
 
 
     void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ){
-		
+		maxAcceleration = 1;
 		std::cout << "moveTo: point(x:" << point.x << ", y:" << point.y << ", z:" << point.z << ") rotation(x:" << rotationX << ", y:" << rotationY << ", z:" << rotationZ << ")" << std::endl;
+		
+		rexos_datatypes::Point3D<double> roundedPoint(roundf(point.x), roundf(point.y), roundf(point.z));
+		std::cout << "moveTo (rounded): point(x:" << roundedPoint.x << ", y:" << roundedPoint.y << ", z:" << roundedPoint.z << ")" << std::endl;
+		
 		
 		// check whether the motors are powered on.
 		if(!motorManager->isPoweredOn()){
@@ -277,7 +281,7 @@ namespace rexos_stewart_gough{
 
 		//check if the requested location is the effectors current location,
 		//if so the method can be cut short.
-        if(effectorLocation == point
+        if(effectorLocation == roundedPoint
 				&& currentEffectorRotationX == rotationX
 				&& currentEffectorRotationY == rotationY
 				&& currentEffectorRotationZ == rotationZ){
@@ -307,7 +311,7 @@ namespace rexos_stewart_gough{
 			
 			
 			
-			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, point.y, -point.z), rotationX, rotationY, rotationZ);
+			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(roundedPoint.x, roundedPoint.y, -roundedPoint.z), rotationX, rotationY, rotationZ);
 			
 			
 		//std::cout << "Rotation args from effectorMove: " << effectorMove.effectorRotationX << " " << effectorMove.effectorRotationY << " " << effectorMove.effectorRotationZ << std::endl;
@@ -444,9 +448,9 @@ namespace rexos_stewart_gough{
             }
 			
 			
-			long timer2 = rexos_utilities::timeNow();
+			//long timer2 = rexos_utilities::timeNow();
             motorManager->startMovement(currentMotionSlot);
-			std::cout << "startMovement time: " << rexos_utilities::timeNow() - timer2 << "ms" << std::endl;
+			//std::cout << "startMovement time: " << rexos_utilities::timeNow() - timer2 << "ms" << std::endl;
 		
 			
 			
@@ -758,8 +762,20 @@ namespace rexos_stewart_gough{
 		
 		}
 		 */
-		 
-		moveTo(rexos_datatypes::Point3D<double>(0, 60, -280), 0.9, 0, 0, 0);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -350), 0.9, 0, 0, 0);
+		sleep(4);
+		moveTo(rexos_datatypes::Point3D<double>(-100, 0, -350), 0.9, 0, 0, 0);
+		//sleep(4);
+		//moveTo(rexos_datatypes::Point3D<double>(0, -100, -350), 0.9, 0, 0, 0);
+		//sleep(4);	
+		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -350), 0.9, 0, 0, 0);
+		//sleep(4);
+		//moveTo(rexos_datatypes::Point3D<double>(100, 0, -350), 0.9, 0, 0, 0);
+		//sleep(4);
+		//moveTo(rexos_datatypes::Point3D<double>(-100, 0, -350), 0.9, 0, 0, 0);
+		//sleep(4);
+		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -350), 0.9, 0, 0, 0);
+		
 		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
 		
