@@ -32,7 +32,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	
 	static final String baseDir = "/home/agileman/Desktop/";
 	static final String Aridir = "C:/users/Aristides/Desktop/Six Axis/";
-	static final String dir = baseDir;
+	static final String dir = Aridir;
 	
 	// six_axis robot
 	static String moduleA_01 = "{"
@@ -307,7 +307,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		hal = new HardwareAbstractionLayer(htc);
 
 		
-		FileInputStream fis;
+		/*FileInputStream fis;
 		byte[] content;
 
 	
@@ -379,7 +379,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	System.out.println("Finished reading moduleFiles, starting insertion of modules...");
 	
 	
-	/*// gripper
+	// gripper
 	String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlaceWithRotation + moduleA_05; 
 	JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
 	hal.insertModule(a, a);
@@ -415,12 +415,12 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
 		JsonObject targetRotate = new JsonObject();
-		targetMove.addProperty("x", 3.5);
-		targetMove.addProperty("y", 0);
-		targetMove.addProperty("z", 50.0);
+		targetMove.addProperty("x", 1.0);
+		targetMove.addProperty("y", 1.0);
+		targetMove.addProperty("z", -16.0);
 		targetMove.addProperty("maxAcceleration", 2);
 		
-		targetRotate.addProperty("x", 0.17);
+		targetRotate.addProperty("x", 0);
 		targetRotate.addProperty("y", 0);
 		targetRotate.addProperty("z", 0);
 		target.add("move",targetMove);
@@ -431,11 +431,11 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
 		JsonObject subjectRotate = new JsonObject();
-		subjectMove.addProperty("x", 3.5);
-		subjectMove.addProperty("y", 0);
-		subjectMove.addProperty("z", 35.0);
+		subjectMove.addProperty("x", 2.5);
+		subjectMove.addProperty("y", 2.5);
+		subjectMove.addProperty("z", -16.0);
 		
-		subjectRotate.addProperty("x", 0.10);
+		subjectRotate.addProperty("x", 0);
 		subjectRotate.addProperty("y", 0);
 		subjectRotate.addProperty("z", 0);
 		
@@ -449,7 +449,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		criteria.add("subjects",subjects);
 		
 		
-		//hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
+		hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
