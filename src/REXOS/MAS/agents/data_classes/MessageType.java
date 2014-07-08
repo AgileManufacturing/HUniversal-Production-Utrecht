@@ -40,6 +40,8 @@ package agents.data_classes;
 
 import jade.lang.acl.ACLMessage;
 
+// TODO replace all "ACLMessage.xxxx" with integers ... as they are just integers ...
+// When replacing with integers be sure to assign from 22 or higher (as ACLMessage performatives already use 0-21)
 public class MessageType {
 	/**
 	  * @var CAN_EXECUTE_PRODUCT_STEP

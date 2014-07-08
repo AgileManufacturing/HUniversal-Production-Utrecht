@@ -63,113 +63,115 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener{
-		
+
 	/**
-	  * @var machineState
-	  * Stores the current state that the equiplet is in.
-	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
-	  */
+	 * @var machineState
+	 * Stores the current state that the equiplet is in.
+	 * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
+	 */
 	public static String machineState = "";
-	
+
 	/**
-	  * @var machineMode
-	  * Stores the current mode that the equiplet is in.
-	  * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
-	  */
+	 * @var machineMode
+	 * Stores the current mode that the equiplet is in.
+	 * This variable is used in the ReconfigureBehaviour to start the reconfigServer.
+	 */
 	public static String machineMode = "";
-	
+
 
 	private static final long serialVersionUID = -4551409467306407788L;
-	
+
 	/**
-	  * @var equipletSchedule
-	  * The ArrayList equipletSchedules holds all the Job objects that the EQ needs to execute.
-	  */
+	 * @var equipletSchedule
+	 * The ArrayList equipletSchedules holds all the Job objects that the EQ needs to execute.
+	 */
 	private ArrayList<Job> equipletSchedule= new ArrayList<Job>();
-	
+
 	/**
-	  * @var serviceList
-	  * The ArrayList serviceList holds all the services that the equiplet can execute.
-	  */
+	 * @var serviceList
+	 * The ArrayList serviceList holds all the services that the equiplet can execute.
+	 */
 	private ArrayList<Service> serviceList=null;
-	
+
 	/**
-	  * @var scheduleCounter
-	  * Counts the amount of schedules that have been executed.	  
-	  */
+	 * @var scheduleCounter
+	 * Counts the amount of schedules that have been executed.	  
+	 */
 	private int scheduleCounter = 0;
-	
+
 	/**
-	  * @var hal
-	  * The Object HAL is used to execute the planned jobs.
-	  */
+	 * @var hal
+	 * The Object HAL is used to execute the planned jobs.
+	 */
 	private HardwareAbstractionLayer hal;
-	
-	
-	
+
+
+
 	/**
-	  * @var serverLists
-	  * The string serverLists Holds all the services that the equiplet can exectute.
-	  * This variable is used in the WIMP.
-	  */
+	 * @var serverLists
+	 * The string serverLists Holds all the services that the equiplet can exectute.
+	 * This variable is used in the WIMP.
+	 */
 	public String serverLists = "";
-	
-	
+
+
 	/**
-	  * @var EQName
-	  * Hardcoded EquipletName. This should be changed in the future.
-	  */
+	 * @var EQName
+	 * Hardcoded EquipletName. This should be changed in the future.
+	 * 
+	 * TODO replace hardcode ...
+	 */
 	private String EQName = "EQ2";
-	
+
 	/**
-	  * @var equipletActive
-	  * The boolean equipletActive keeps track wether or not the equiplet is currently in use or not.
-	  * This information is displayed in the WIMP.
-	  */
+	 * @var equipletActive
+	 * The boolean equipletActive keeps track wether or not the equiplet is currently in use or not.
+	 * This information is displayed in the WIMP.
+	 */
 	private boolean equipletActive = false;
-	
+
 	/**
-	  * @var productStepCounter
-	  * The productStepCounter keeps track off all the planned productSteps.
-	  * This information is displayed in the WIMP.
-	  */
+	 * @var productStepCounter
+	 * The productStepCounter keeps track off all the planned productSteps.
+	 * This information is displayed in the WIMP.
+	 */
 	private int productStepCounter = 0;
-	
+
 	/**
-	  * @var productStepFailedCounter
-	  * The productStepFailedCounter keeps track off all the failed productSteps.
-	  * This information is displayed in the WIMP.
-	  */
+	 * @var productStepFailedCounter
+	 * The productStepFailedCounter keeps track off all the failed productSteps.
+	 * This information is displayed in the WIMP.
+	 */
 	private int productStepFailedCounter =0;
-	
+
 	/**
-	  * @var productStepSuccesCounter
-	  * The productStepSuccesCounter keeps track off all the successfully executed productSteps.
-	  * This information is displayed in the WIMP.
-	  */
+	 * @var productStepSuccesCounter
+	 * The productStepSuccesCounter keeps track off all the successfully executed productSteps.
+	 * This information is displayed in the WIMP.
+	 */
 	private int productStepSuccesCounter =0;
-	
+
 	/**
-	  * setup()
-	  * The function setup creates the HAL object and initialized the serviceList.
-	  * The EquipletAgent then registers himself, with his service types to the DF.
-	  * Main task is to wait for incoming ACLMessaged to communicate with ProductAgents.
-	  */
+	 * setup()
+	 * The function setup creates the HAL object and initialized the serviceList.
+	 * The EquipletAgent then registers himself, with his service types to the DF.
+	 * Main task is to wait for incoming ACLMessaged to communicate with ProductAgents.
+	 */
 	protected void setup(){		
-		
-			try {
-				hal = new HardwareAbstractionLayer(this);
-			} catch (KnowledgeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (BlackboardUpdateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			register();
-			addBehaviour(new ReconfigureBehaviour(hal, this));
-			System.out.println("HAL created");
-			  
+
+		try {
+			hal = new HardwareAbstractionLayer(this);
+		} catch (KnowledgeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BlackboardUpdateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		register();
+		addBehaviour(new ReconfigureBehaviour(hal, this));
+		System.out.println("HAL created");
+
 
 		addBehaviour(new CyclicBehaviour()
 		{   
@@ -180,54 +182,56 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				if (msg!=null) {
 					System.out.println(msg.getSender() + msg.getContent());
 					if(!msg.getSender().equals(this.getAgent().getAID())) {  
-                    	if(msg.getPerformative()==MessageType.CAN_EXECUTE_PRODUCT_STEP){
-                    		String result =canExecute(msg.getContent());
-                    		System.out.println(result);
-                    		if(!result.equals("false")){
-                    			ACLMessage reply = msg.createReply();
-        	                    reply.setPerformative( MessageType.AVAILABLE_TO_PLAN );
-        	                    reply.setContent(result);
-        	                    send(reply);
-                    		}
-                    	}                    	
-                    	if(msg.getPerformative()==MessageType.PLAN_PRODUCT_STEP){
-                    		String result =schedule(msg.getContent());
-                			ACLMessage reply = msg.createReply();
-    	                    reply.setPerformative( MessageType.CONFIRM_PLANNED );
-    	                    reply.setContent(result);
-    	                    send(reply);                    		
-                    	}
-                    	if(msg.getPerformative()==MessageType.PULSE_UPDATE){
-                    		
-                    		//This is the update information for the WIMP!
-                    		JsonObject equipletUpdate = new JsonObject();
-                    		equipletUpdate.addProperty("receiver", "interface");
-                    		equipletUpdate.addProperty("subject", "update_equiplet");
-                    		equipletUpdate.addProperty("id", EQName);
-                    		equipletUpdate.addProperty("services", serverLists);
-                    		JsonObject status = new JsonObject();
-                    		status.addProperty("type", "success");
-                    		status.addProperty("content", "NORMAL");
-                    		equipletUpdate.add("status", status);
-                    		
-                    		JsonObject mode = new JsonObject();
-                    		mode.addProperty("type", "success");
-                    		mode.addProperty("content", "NORMAL");
-                    		equipletUpdate.add("mode", mode);
+						if(msg.getPerformative()==MessageType.CAN_EXECUTE_PRODUCT_STEP){
+							String result =canExecute(msg.getContent());
+							System.out.println(result);
+							if(!result.equals("false")){
+								ACLMessage reply = msg.createReply();
+								reply.setPerformative( MessageType.AVAILABLE_TO_PLAN );	//Can you always plan if the step can be executed ..?
+								reply.setContent(result);
+								send(reply);
+							}
+						}                    	
+						if(msg.getPerformative()==MessageType.PLAN_PRODUCT_STEP){
+							String result =schedule(msg.getContent());
+							ACLMessage reply = msg.createReply();
+							reply.setPerformative( MessageType.CONFIRM_PLANNED );
+							reply.setContent(result);
+							send(reply);                    		
+						}
+						if(msg.getPerformative()==MessageType.PULSE_UPDATE){
 
-                    		JsonObject equipletDetails = new JsonObject();
-                    		equipletDetails.addProperty("status", equipletActive);
-                    		equipletDetails.addProperty("plannedSteps", productStepCounter);
-                    		equipletDetails.addProperty("successfulSteps", productStepSuccesCounter);
-                    		equipletDetails.addProperty("failedSteps", productStepFailedCounter);
-                    		
-                    		equipletUpdate.add("details", equipletDetails);
-                    		
-                    		ACLMessage reply = msg.createReply();
-    	                    reply.setPerformative( MessageType.PULSE_UPDATE );
-    	                    reply.setContent(equipletUpdate.toString());
-    	                    send(reply);
-                    	}
+							//TODO Make this into a function like "canExecute()" and "schedule()"
+							
+							//This is the update information for the WI!
+							JsonObject equipletUpdate = new JsonObject();
+							equipletUpdate.addProperty("receiver", "interface");
+							equipletUpdate.addProperty("subject", "update_equiplet");
+							equipletUpdate.addProperty("id", EQName);
+							equipletUpdate.addProperty("services", serverLists);
+							JsonObject status = new JsonObject();
+							status.addProperty("type", "success");
+							status.addProperty("content", "NORMAL");
+							equipletUpdate.add("status", status);
+
+							JsonObject mode = new JsonObject();
+							mode.addProperty("type", "success");
+							mode.addProperty("content", "NORMAL");
+							equipletUpdate.add("mode", mode);
+
+							JsonObject equipletDetails = new JsonObject();
+							equipletDetails.addProperty("status", equipletActive);
+							equipletDetails.addProperty("plannedSteps", productStepCounter);
+							equipletDetails.addProperty("successfulSteps", productStepSuccesCounter);
+							equipletDetails.addProperty("failedSteps", productStepFailedCounter);
+
+							equipletUpdate.add("details", equipletDetails);
+
+							ACLMessage reply = msg.createReply();
+							reply.setPerformative( MessageType.PULSE_UPDATE );
+							reply.setContent(equipletUpdate.toString());
+							send(reply);
+						}
 					}
 				}
 				block();    
@@ -242,91 +246,101 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		}
 	}
 	public void register(){
-		
+
 		serverLists = "";
 		serviceList.clear();
 		try {
-		serviceList = hal.getSupportedServices();
-	} catch (KnowledgeException e) {
-		e.printStackTrace();
-	} catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+			serviceList = hal.getSupportedServices();
+		} catch (KnowledgeException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		DFAgentDescription dfd = new DFAgentDescription();
+		for(int i =0; i < serviceList.size(); i++){
+			ServiceDescription sd  = new ServiceDescription();
+			sd.setName( serviceList.get(i).getName() );
+			sd.setType(serviceList.get(i).getName());
+			dfd.addServices(sd);
+			serverLists += serviceList.get(i).getName() +",";
+		}
+		try {
+			DFService.register(this, dfd );
+		} catch (FIPAException e) {
+			e.printStackTrace();
+		}
 	}
-	DFAgentDescription dfd = new DFAgentDescription();
-	for(int i =0; i < serviceList.size(); i++){
-        ServiceDescription sd  = new ServiceDescription();
-        sd.setName( serviceList.get(i).getName() );
-        sd.setType(serviceList.get(i).getName());
-        dfd.addServices(sd);
-        serverLists += serviceList.get(i).getName() +",";
-	}
-	try {
-		DFService.register(this, dfd );
-	} catch (FIPAException e) {
-		e.printStackTrace();
-	}
-	}
-	
+
 	/**
-	  * canExecute()
-	  * This function checks if the requested service can be executed on this Equiplet.
-	  * @return false if the service can't be executed, returns an startTime, duration and ID of the product step if it can be executed.
-	  */
+	 * canExecute()
+	 * This function checks if the requested service can be executed on this Equiplet.
+	 * @return false if the service can't be executed, returns an startTime, duration and ID of the product step if it can be executed.
+	 * 
+	 * TODO fix hardcoded data ...
+	 * TODO Can you always execute only if the equiplet has valid capabilities ...? How about time?
+	 */
 	private String canExecute(String msg){
 		System.out.println("Can execute?");
 		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
 		for(int i =0; i < serviceList.size(); i++){
-	        if(serviceList.get(i).getName().equals(productSteps.get("service").getAsString())){
-	        	
-	        	JsonObject message = new JsonObject();
-	        	message.addProperty("startTime", "0");
-	        	message.addProperty("duration", "100");
-	        	message.addProperty("productStepId", productSteps.get("id").getAsString());	       	
-	        	
-	        	return message.toString();
-	        }	        
+			if(serviceList.get(i).getName().equals(productSteps.get("service").getAsString())){
+
+				JsonObject message = new JsonObject();
+				message.addProperty("startTime", "0");
+				message.addProperty("duration", "100");
+				message.addProperty("productStepId", productSteps.get("id").getAsString());
+
+				return message.toString();
+			}
 		}
 		return "false";
 	}
 	/**
-	  * schedule()
-	  * This function schedules a job for the equiplet and places it in the equipletSchedule arraylist.
-	  * @return true if the planning has been done succesfull.
-	  */
+	 * schedule()
+	 * This function schedules a job for the equiplet and places it in the equipletSchedule arraylist.
+	 * @return true if the planning has been done succesfully.
+	 * 
+	 * TODO Always returns true ...
+	 * TODO Check if it fits in the schedule ..?
+	 */
 	private String schedule(String msg){
 		System.out.println("Can Schedule?");
 
 		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
-		Job job = new Job(productSteps.get("startTime").getAsString(),productSteps.get("duration").getAsString(),productSteps.get("productStepId").getAsString(),productSteps.get("productStep").getAsJsonObject());
-    	equipletSchedule.add(job);
-    	productStepCounter++;
+		Job job = new Job(
+				productSteps.get("startTime").getAsString(),
+				productSteps.get("duration").getAsString(),
+				productSteps.get("productStepId").getAsString(),
+				productSteps.get("productStep").getAsJsonObject());
+		equipletSchedule.add(job);
+		productStepCounter++;
 		System.out.println(equipletSchedule.size()+" =Length");
 		if(scheduleCounter == 0){
 			executeProductStep();
 		}
 		return "true";		
 	}
-	
+
 	/**
-	  * takeDown()
-	  * This function is being called on when the Agent is being terminated. 
-	  * The EquipletAgent deregisters himself at the DF so that ProductAgents wont find him anymore.	  
-	  */
+	 * takeDown()
+	 * This function is being called on when the Agent is being terminated. 
+	 * The EquipletAgent deregisters himself at the DF so that ProductAgents wont find him anymore.	  
+	 */
 	@Override
 	protected void takeDown(){
 		try { 
 			DFService.deregister(this); 
 			getContainerController().kill();				
 		}
-        catch (Exception e) {}
+		catch (Exception e) {}
 	}
-	
+
 	/**
-	  * executeProductStep()
-	  * This function lets the HAL executes a product step.
-	  * The onTranslationFinished function is being called upon when this process has finished.
-	  */
+	 * executeProductStep()
+	 * This function lets the HAL executes a product step.
+	 * The onTranslationFinished function is being called upon when this process has finished.
+	 */
 	private void executeProductStep(){
 		if(scheduleCounter < equipletSchedule.size()){
 			equipletActive = true;
@@ -355,13 +369,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onModuleModeChanged(String mode, Module module) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -369,7 +383,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			java.util.ArrayList<HardwareStep> hardwareStep) {
 		System.out.println("Translating finished, Hardwarestep created");
 		System.out.println(hardwareStep.size());
-			hal.executeHardwareSteps(hardwareStep);
+		hal.executeHardwareSteps(hardwareStep);
 	}
 
 	@Override
@@ -404,7 +418,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onExecutionFailed() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }
