@@ -85,7 +85,7 @@ public class SimInterface {
 		frmRexosSimulation.setBounds(100, 100, 800, 500);
 		frmRexosSimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frmRexosSimulation.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
 		gridView = new GridView();
@@ -93,18 +93,25 @@ public class SimInterface {
 		tabbedPane.addTab("Grid", null, gridView, null);
 		tabbedPane.setFocusable(false);
 
-		JScrollPane scrollPane = new JScrollPane();
+		final JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		tabbedPane.addTab("Schedule", null, scrollPane, null);
 
 		chartPanel = new JPanel();
 		scrollPane.setViewportView(chartPanel);
 		chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.X_AXIS));
-		
+
 		final JPanel timeDivisionView = new JPanel();
 		tabbedPane.addTab("Equiplet Utilization", null, timeDivisionView, null);
 		timeDivisionView.setLayout(new BoxLayout(timeDivisionView, BoxLayout.X_AXIS));
+
+		final JPanel equipletSchedule = new JPanel();
+		equipletSchedule.setLayout(new BoxLayout(equipletSchedule, BoxLayout.Y_AXIS));
 		
+		final JScrollPane eScheduleScroll = new JScrollPane();
+		eScheduleScroll.setViewportView(equipletSchedule);
+		tabbedPane.addTab("Equiplet schedule", null, eScheduleScroll, null);
+
 		final ProductView productView = new ProductView();
 		tabbedPane.addTab("Products", null, productView, null);
 
@@ -112,19 +119,23 @@ public class SimInterface {
 			public void stateChanged(ChangeEvent changeEvent) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
 				int index = sourceTabbedPane.getSelectedIndex();
-				if (index == 1) {
+				if (index == tabbedPane.indexOfComponent(scrollPane)) {
 					Map<String, Triple<Double, Double, Double>> history = simulation.getEquipletHistory();
 					System.out.println("HISTORY: " + history);
 					chartPanel.removeAll();
-					
-					List<Product> agents = new ArrayList<Product> (simulation.getProducts().values());
-					chartPanel.add(GanttChart.createChartPanel(agents));
-				}else if (index == 2) {
+
+					List<Product> agents = new ArrayList<Product>(simulation.getProducts().values());
+					chartPanel.add(GanttChart.createChartPanelProducts(agents));
+				} else if (index == tabbedPane.indexOfComponent(timeDivisionView)) {
 					Map<String, Triple<Double, Double, Double>> history = simulation.getEquipletHistory();
 					System.out.println("HISTORY: " + history);
 					timeDivisionView.removeAll();
 					timeDivisionView.add(StackedBarChart.createChartPanel(history));
-				}else if(index == 3) {
+				} else if (index == tabbedPane.indexOfComponent(eScheduleScroll)) {
+					List<Equiplet> equiplets = simulation.getEquiplets();
+					equipletSchedule.removeAll();
+					equipletSchedule.add(GanttChart.createChartPanelEquiplets(equiplets));
+				} else if (index == tabbedPane.indexOfComponent(productView)) {
 					productView.update(simulation.getProducts());
 				}
 				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
@@ -198,7 +209,7 @@ public class SimInterface {
 		gbc_lblProductsText.gridx = 0;
 		gbc_lblProductsText.gridy = 5;
 		optionsPanel.add(lblProductsText, gbc_lblProductsText);
-		
+
 		JLabel lblProductsSubText = new JLabel("in Grid (created) (steps)");
 		GridBagConstraints gbc_lblProductsSubText = new GridBagConstraints();
 		gbc_lblProductsSubText.insets = new Insets(0, 0, 5, 0);
@@ -357,9 +368,8 @@ public class SimInterface {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
 		}
 
-
-        NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-        nf.setMaximumFractionDigits(1);
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		nf.setMaximumFractionDigits(1);
 
 		lblTime.setText(nf.format(time));
 		lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
@@ -376,8 +386,8 @@ public class SimInterface {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
 		}
 
-        NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-        nf.setMaximumFractionDigits(1);
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		nf.setMaximumFractionDigits(1);
 
 		lblTime.setText(nf.format(time));
 		lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));

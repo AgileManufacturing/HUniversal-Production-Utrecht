@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeSet;
 
 import simulation.config.Config;
@@ -106,7 +105,7 @@ public class Simulation extends Thread {
 					case PRODUCT:
 						productEvent();
 						break;
-					case START:
+					case ARRIVED:
 						startEvent(e.getProduct(), e.getEquiplet());
 						break;
 					case FINISHED:
@@ -174,7 +173,7 @@ public class Simulation extends Thread {
 
 		//schedule START time + travelTime, equiplet, product
 		double travelTime = grid.getTravelTime(startPosition, equipletAgent.getPosition());
-		eventStack.add(new Event(time + travelTime, EventType.START, product, equiplet, "PRODUCT event [time=" + time + "]"));
+		eventStack.add(new Event(time + travelTime, EventType.ARRIVED, product, equiplet, "PRODUCT event [time=" + time + "]"));
 		products.put(product, productAgent);
 		traveling++;
 
@@ -245,7 +244,7 @@ public class Simulation extends Thread {
 
 				double travelTime = grid.getTravelTime(productAgent.getPosition(), nextEquipletAgent.getPosition());
 				// schedule START time + travelTime, equiplet, product
-				eventStack.add(new Event(time + travelTime, EventType.START, product, nextEquiplet, "FINISHED event [time=" + time + "]"));
+				eventStack.add(new Event(time + travelTime, EventType.ARRIVED, product, nextEquiplet, "FINISHED event [time=" + time + "]"));
 				System.out.printf("Simulation: schedule event START for next product step %.0f + %.0f, %s, %s\n", time, travelTime, product, nextEquiplet);
 			}
 
@@ -388,6 +387,10 @@ public class Simulation extends Thread {
 		return products;
 	}
 
+	public List<Equiplet> getEquiplets() {
+		return new ArrayList<Equiplet>(grid.getEquiplets().values());
+	}
+	
 	public Map<String, Triple<Double, Double, Double>> getEquipletHistory() {
 		Map<String, Triple<Double, Double, Double>> histories = new HashMap<String, Triple<Double, Double, Double>>();
 		for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {

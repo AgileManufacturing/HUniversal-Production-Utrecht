@@ -110,6 +110,10 @@ public class Equiplet {
 		return history.size();
 	}
 
+	public List<Job> getHistory() {
+		return history;
+	}
+
 	public boolean schedule(double start, double deadline, String product, String service, Map<String, Object> criteria) {
 		double duration = estimateService(service);
 

@@ -89,7 +89,7 @@ class Event implements Comparable<Event> {
 	public String toString() {
 		if (type == EventType.PRODUCT || type == EventType.DONE) {
 			return String.format("Evt[time=%.2f, type=%s, debug=%s]", time, type, debug);
-		} else if (type == EventType.START) {
+		} else if (type == EventType.ARRIVED) {
 			return String.format("Evt[time=%.2f, type=%s, product=%s, equipet=%s, debug=%s]", time, type, product, equiplet, debug);
 		} else {
 			if (type == EventType.FINISHED) {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -67,6 +68,7 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 
 		//Create the schedule panel.
 		scheduleView = new JPanel();
+		scheduleView.setLayout(new BoxLayout(scheduleView, BoxLayout.X_AXIS));
 		
 		JScrollPane htmlView = new JScrollPane(scheduleView);
 
@@ -107,7 +109,7 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 			scheduleView.removeAll();
 			List<Product> list = new ArrayList<Product>();
 			list.add(product);
-			scheduleView.add(GanttChart.createChartPanel(list));
+			scheduleView.add(GanttChart.createChartPanelProducts(list));
 			scheduleView.revalidate();
 		}
 	}

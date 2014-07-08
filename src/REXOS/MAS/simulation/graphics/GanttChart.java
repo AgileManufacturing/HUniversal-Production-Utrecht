@@ -26,6 +26,8 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.ApplicationFrame;
 
+import simulation.mas.Equiplet;
+import simulation.mas.Job;
 import simulation.mas.Product;
 import simulation.util.ProductionStep;
 
@@ -40,7 +42,7 @@ public class GanttChart extends ApplicationFrame {
 		super(title);
 
 		final IntervalCategoryDataset dataset = createDataset(tasks);
-		final JFreeChart chart = createChart(title, dataset);
+		final JFreeChart chart = createChart(title, title, dataset);
 
 		// add the chart to a panel...
 		final ChartPanel chartPanel = new ChartPanel(chart);
@@ -53,7 +55,7 @@ public class GanttChart extends ApplicationFrame {
 	 * 
 	 * @return The dataset.
 	 */
-	private static IntervalCategoryDataset createDataset(ArrayList<TaskSeries> tasks) {
+	private static IntervalCategoryDataset createDataset(List<TaskSeries> tasks) {
 		final TaskSeriesCollection collection = new TaskSeriesCollection();
 		for (TaskSeries task : tasks) {
 			collection.add(task);
@@ -70,10 +72,10 @@ public class GanttChart extends ApplicationFrame {
 	 * 
 	 * @return The chart.
 	 */
-	private static JFreeChart createChart(final String title, final IntervalCategoryDataset dataset) {
+	private static JFreeChart createChart(final String title, final String yLabel, final IntervalCategoryDataset dataset) {
 
 		final JFreeChart chart = ChartFactory.createGanttChart(title, // chart title
-				"Equiplets", // x axis label
+				yLabel, // x axis label
 				"Time", // y axis label
 				dataset, // data
 				true, // include legend
@@ -112,8 +114,18 @@ public class GanttChart extends ApplicationFrame {
 
 		return chart;
 	}
+	
+	public static JPanel createChartPanel(List<TaskSeries> tasks, String yLabel)  {
+		final IntervalCategoryDataset dataset = createDataset(tasks);
+		final JFreeChart chart = createChart("Schedule", yLabel, dataset);
 
-	public static JPanel createChartPanel(List<Product> agents) {
+		final ChartPanel chartPanel = new ChartPanel(chart);
+		// chartPanel.setPreferredSize(new Dimension(800, 400));
+		return chartPanel;
+	}
+
+
+	public static JPanel createChartPanelProducts(List<Product> agents) {
 		ArrayList<TaskSeries> tasks = new ArrayList<>();
 		for (Product agent : agents) {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
@@ -124,12 +136,35 @@ public class GanttChart extends ApplicationFrame {
 			tasks.add(serie);
 		}
 
+		return createChartPanel(tasks, "Equiplets");
+	}
+	
+	public static JPanel createChartPanelEquiplets(List<Equiplet> equiplets) {
+		int productCount = 0;
+		ArrayList<TaskSeries> tasks = new ArrayList<>();
+		for (Equiplet equiplet : equiplets) {
+			
+			List<Job> history = equiplet.getHistory();
+			TaskSeries serie = new TaskSeries(equiplet.getName());
+			for (Job job : history) {
+				serie.add(new Task(job.getProductAgent(), new SimpleTimePeriod((long)job.getStartTime(), (long)job.getDueTime())));
+				productCount++;
+			}
+			tasks.add(serie);
+		}
+		
 		final IntervalCategoryDataset dataset = createDataset(tasks);
-		final JFreeChart chart = createChart("Schedule", dataset);
+		final JFreeChart chart = createChart("Schedule", "Products", dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		// chartPanel.setPreferredSize(new Dimension(800, 400));
-		return chartPanel;
-	}
+		// chartPanel.setMinimumSize(new Dimension(600, productCount * 100));
+		//chartPanel.setSize(600, productCount * 100);
 
+		//chartPanel.setPreferredSize(new Dimension(800, productCount * 10));
+		//chartPanel.revalidate();
+		//System.out.println("(" + 600 + ", " + productCount * 100 + ")");
+		return chartPanel;
+
+		// return createChartPanel(tasks, "Products");
+	}
 }

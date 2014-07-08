@@ -3,7 +3,7 @@ package simulation.mas;
 import java.util.HashMap;
 import java.util.Map;
 
-class Job implements Comparable<Job> {
+public class Job implements Comparable<Job> {
 
 	private String service;
 	private String product;
