@@ -83,7 +83,7 @@ public class Simulation extends Thread {
 		int equipletCounter = 0;
 		for (simulation.mas.Equiplet equiplet : config.getEquipletList()) {
 			Position position = new Position(equiplet.getPosition().getX(), equiplet.getPosition().getY());
-			equiplets.put(equipletCounter, new Equiplet(equiplet.getName(), equiplet.getServices(), position));
+			equiplets.put(equipletCounter, new Equiplet(equiplet.getEquipletName(), equiplet.getServices(), position));
 			B.put(equipletCounter, 0.0);
 
 			scheduleBreakdown(time, equipletCounter);

@@ -344,7 +344,7 @@ public class Simulation extends Thread {
 			List<Triple<String, List<String>, Triple<String, Integer, Integer>>> equipletStates = new ArrayList<>();
 			for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
 				Equiplet equiplet = entry.getValue();
-				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getName(), equiplet.getServices(), new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
+				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getEquipletName(), equiplet.getServices(), new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
 			}
 
 			System.out.printf("Update: [time=%.2f, product=%d, equiplets=%s]\n\n", time, products.size(), equipletStates);
@@ -389,7 +389,7 @@ public class Simulation extends Thread {
 	public Map<String, Triple<Double, Double, Double>> getEquipletHistory() {
 		Map<String, Triple<Double, Double, Double>> histories = new HashMap<String, Triple<Double, Double, Double>>();
 		for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
-			histories.put(entry.getValue().getName(), entry.getValue().getStatistics(time));
+			histories.put(entry.getValue().getEquipletName(), entry.getValue().getStatistics(time));
 		}
 		return histories;
 	}

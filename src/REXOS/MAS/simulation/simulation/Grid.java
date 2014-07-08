@@ -43,7 +43,7 @@ public class Grid {
 
 		// fill equiplets
 		for (Equiplet equiplet : config.getEquipletList()) {
-			equiplets.put(equiplet.getName(), equiplet);
+			equiplets.put(equiplet.getEquipletName(), equiplet);
 		}
 
 		System.out.println("GRID: config " + config);

@@ -11,7 +11,7 @@ import simulation.util.Position;
 import simulation.util.Triple;
 import agents.equiplet_agent.EquipletAgent;
 
-public class Equiplet extends EquipletAgent {
+public class Equiplet {
 
 	/**
 	 * 
@@ -58,9 +58,15 @@ public class Equiplet extends EquipletAgent {
 		this.timeBroken = -1;
 	}
 
-	//public String getName() {
-	//	return name;
-	//}
+	/**
+	 * TODO fix this so that the name can be called from jade.Agent so agent can communicate with each other.
+	 * note that this need to fix setup or constructor of equipletagent to set the name
+	 * @return
+	 */
+	@Deprecated
+	public String getEquipletName() {
+		return name;
+	}
 
 	public Position getPosition() {
 		return position;
@@ -281,6 +287,7 @@ public class Equiplet extends EquipletAgent {
 			executing.updateDueTime(time);
 			history.add(executing);
 
+			historyUpdate(time);
 			if (!schedule.isEmpty() && schedule.first().isReady()) {
 				executeJob(time);
 			} else {

@@ -231,7 +231,7 @@ public class Scheduling {
 					double load = equiplet.first.load(time, LOAD_WINDOW);
 
 					double cost = cost(delay, load);
-					Node node = new Node(equiplet.first.getName(), Math.max(available, stepComplete), equiplet.second);
+					Node node = new Node(equiplet.first.getEquipletName(), Math.max(available, stepComplete), equiplet.second);
 
 					System.out.println("Add to graph: " + lastNode + " --" + cost + "--> " + node + " : cost(delay=" + delay + ", load=" + load + ") available=" + available + ", stepComplete=" + stepComplete + ", travel=" + travel);
 					graph.add(lastNode, node, cost);

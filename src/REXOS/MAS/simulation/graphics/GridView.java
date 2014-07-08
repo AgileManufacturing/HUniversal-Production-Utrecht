@@ -44,8 +44,8 @@ public class GridView extends JPanel {
 	public void init(Collection<Equiplet> equiplets) {
 		for (Equiplet equiplet : equiplets) {
 
-			EquipletView component = new EquipletView(equiplet.getName(), equiplet.getServices(), equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.getScheduled(), equiplet.getExecuted());
-			components.put(equiplet.getName(), component);
+			EquipletView component = new EquipletView(equiplet.getEquipletName(), equiplet.getServices(), equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.getScheduled(), equiplet.getExecuted());
+			components.put(equiplet.getEquipletName(), component);
 			component.setBackground(Color.WHITE);
 			component.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
@@ -66,7 +66,7 @@ public class GridView extends JPanel {
 			init(equiplets);
 		} else {
 			for (Equiplet equiplet : equiplets) {
-				EquipletView view = components.get(equiplet.getName());
+				EquipletView view = components.get(equiplet.getEquipletName());
 				view.update(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.getScheduled(), equiplet.getExecuted());
 			}
 		}

@@ -55,7 +55,7 @@ public class Product {
 					double available = equiplet.available(time, step.getService());
 					double duration = equiplet.estimateService(step.getService());
 					double load = equiplet.load(time, deadline);
-					suitedEquiplets.put(equiplet.getName(), new Tuple<Double, Double, Double, Position>(available, duration, load, equiplet.getPosition()));
+					suitedEquiplets.put(equiplet.getEquipletName(), new Tuple<Double, Double, Double, Position>(available, duration, load, equiplet.getPosition()));
 				}
 			}
 
