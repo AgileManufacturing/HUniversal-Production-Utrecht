@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import configuration.ServerConfigurations;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -126,7 +127,9 @@ public class ProductAgent extends Agent{
 			if(productStep.getService().getName().equals("place") && !supplied){
 				String message = productStepList.get(currentPlannedProductStep).getAsJsonObject().toString();
 				AID supplierAgent = new AID();
-				supplierAgent.addAddresses("http://Tommy-PC.wired.hu.nl:7778/acc");
+				
+				supplierAgent.addAddresses(ServerConfigurations.GS_ADDRESS);
+				System.out.println("Supplier adress: "+supplierAgent.getAddressesArray()[0]);
 				supplierAgent.setName("'SupplyAgent@Platform2");
 				System.out.println("PA SEND=" +message);
 				sendMessage(MessageType.SUPPLIER_REQUEST, getAID(), supplierAgent, message, "meta");

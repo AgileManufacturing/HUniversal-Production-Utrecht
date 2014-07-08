@@ -425,7 +425,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		targetRotate.addProperty("z", 0);
 		target.add("move",targetMove);
 		target.add("rotate",targetRotate);
-		target.addProperty("identifier", "GC4x4MB_3");
+		target.addProperty("identifier", "GC4x4MB_1");
 		
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
@@ -442,7 +442,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		
 		subject.add("move",subjectMove);
 		subject.add("rotate",subjectRotate);
-		subject.addProperty("identifier", "GC4x4MB_1");
+		subject.addProperty("identifier", "GC4x4MB_6");
 		subjects.add(subject);
 		
 		criteria.add("target",target);

@@ -13447,3 +13447,76 @@
                         The status of hardwareStep identified by 0 (being processed by module HAL.modules.StewartGough@4ca7e00a) has changed to DONE
 [INFO ] [             ] 2014-07-04 13:12:51.030 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
                         The status of HAL.steps.HardwareStep@67fffe87 (being processed by module HAL.modules.StewartGough@4ca7e00a) has changed to DONE
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[INFO ] [halTransl    ] 2014-07-08 10:37:14.324 @ HAL.tasks.TranslationProcess.run(TranslationProcess.java:44)
+                        Translation process started with productStep: generic.ProductStep@59fe2228
+[DEBUG] [halCap       ] 2014-07-08 10:37:15.058 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:96)
+                        command: {"pick":"null","move":{"x":2.5,"y":2.5,"z":-16.0},"rotate":{"x":0,"y":0,"z":0}}, relativeTo: {"look_up":"GC4x4MB_1"}
+[DEBUG] [halCap       ] 2014-07-08 10:37:15.063 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:112)
+                        command: {"place":"null","move":{"x":1.0,"y":1.0,"z":-16.0,"maxAcceleration":2},"rotate":{"x":0,"y":0,"z":0}}, relativeTo: {"look_up":"GC4x4MB_3"}
+[DEBUG] [halModFactSql] 2014-07-08 10:37:15.068 @ HAL.factories.Factory.logSqlResult(Factory.java:23)
+                        The SQL result from query getModuleIdentifiersOfPhysicalModuleTreesForFunctionalModuleTreeOfACapabilityType:
+                        libraries.knowledgedb_client.Row{ serialNumber="1" typeNumber="gripper_type_A" manufacturer="HU" }
+
+[DEBUG] [halModFact   ] 2014-07-08 10:37:15.496 @ HAL.factories.ModuleFactory.getBottomModulesForFunctionalModuleTree(ModuleFactory.java:341)
+                        Found bottomModules for function module tree 1 of capability PickAndPlaceWithRotation:
+                        [HAL.modules.Gripper@6b76dfa5]
+
+[DEBUG] [halMod       ] 2014-07-08 10:37:15.599 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"pick":"null","move":{"x":2.5,"y":2.5,"z":-16.0},"rotate":{"x":0,"y":0,"z":0}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[DEBUG] [halMod       ] 2014-07-08 10:37:15.985 @ HAL.ModuleActor.adjustMoveWithDimensions(ModuleActor.java:174)
+                        Adjusting move with dimentions: {"place":"null","move":{"x":1.0,"y":1.0,"z":-16.0,"maxAcceleration":2},"rotate":{"x":0,"y":0,"z":0}}, offsetVector: (0.000, 0.000, 46.540) directionAngles: {pitch: 0.0roll: 0.0yaw: 0.0}
+[INFO ] [halCap       ] 2014-07-08 10:37:15.989 @ HAL.capabilities.PickAndPlaceWithRotation.translateProductStep(PickAndPlaceWithRotation.java:123)
+                        Translated hardware steps: [HAL.steps.HardwareStep@66a02c16, HAL.steps.HardwareStep@75e85e2f, HAL.steps.HardwareStep@d48db27, HAL.steps.HardwareStep@7ecaadbe]
+[INFO ] [             ] 2014-07-08 10:37:15.990 @ HAL.testerClasses.StewartGoughHALTesterClass.onTranslationFinished(StewartGoughHALTesterClass.java:463)
+                        Translation finished
+[INFO ] [halexec      ] 2014-07-08 10:37:16.018 @ HAL.tasks.ExecutionProcess.run(ExecutionProcess.java:43)
+                        Execution started with the following hardware steps:
+                        [HAL.steps.HardwareStep@66a02c16, HAL.steps.HardwareStep@75e85e2f, HAL.steps.HardwareStep@d48db27, HAL.steps.HardwareStep@7ecaadbe]
+
+[INFO ] [             ] 2014-07-08 10:37:16.147 @ HAL.testerClasses.StewartGoughHALTesterClass.onExecutionFinished(StewartGoughHALTesterClass.java:498)
+                        Execution finished
+[DEBUG] [halBb        ] 2014-07-08 10:37:16.342 @ HAL.BlackboardHandler.onMessage(BlackboardHandler.java:151)
+                        EQ step process status changed
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.342 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to IN_PROGRESS
+[INFO ] [             ] 2014-07-08 10:37:16.343 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to IN_PROGRESS
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.344 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to IN_PROGRESS
+[INFO ] [             ] 2014-07-08 10:37:16.344 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to IN_PROGRESS
+[DEBUG] [halBb        ] 2014-07-08 10:37:16.349 @ HAL.BlackboardHandler.onMessage(BlackboardHandler.java:151)
+                        EQ step process status changed
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.350 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to FAILED
+[INFO ] [             ] 2014-07-08 10:37:16.350 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to FAILED
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.350 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to FAILED
+[INFO ] [             ] 2014-07-08 10:37:16.351 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to FAILED
+[DEBUG] [halBb        ] 2014-07-08 10:37:16.354 @ HAL.BlackboardHandler.onMessage(BlackboardHandler.java:151)
+                        EQ step process status changed
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.355 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to IN_PROGRESS
+[INFO ] [             ] 2014-07-08 10:37:16.355 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to IN_PROGRESS
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.355 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to IN_PROGRESS
+[INFO ] [             ] 2014-07-08 10:37:16.356 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to IN_PROGRESS
+[DEBUG] [halBb        ] 2014-07-08 10:37:16.359 @ HAL.BlackboardHandler.onMessage(BlackboardHandler.java:151)
+                        EQ step process status changed
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.360 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to FAILED
+[INFO ] [             ] 2014-07-08 10:37:16.360 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.Gripper@6b76dfa5) has changed to FAILED
+[DEBUG] [halexec      ] 2014-07-08 10:37:16.360 @ HAL.tasks.ExecutionProcess.onProcessStateChanged(ExecutionProcess.java:76)
+                        The status of hardwareStep identified by 0 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to FAILED
+[INFO ] [             ] 2014-07-08 10:37:16.361 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:477)
+                        The status of HAL.steps.HardwareStep@66a02c16 (being processed by module HAL.modules.StewartGough@3d72a488) has changed to FAILED

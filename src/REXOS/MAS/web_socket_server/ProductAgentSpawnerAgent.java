@@ -21,9 +21,9 @@ public class ProductAgentSpawnerAgent extends Agent {
 		  ACLMessage acl = new ACLMessage(type);
 		  AID aid=new AID(ServerConfigurations.GS_NAME,AID.ISGUID);
 		  aid.addAddresses(ServerConfigurations.GS_ADDRESS);
-		  
 		  acl.addReceiver(aid);
 		  acl.setContent(message);
+		  System.out.println("Send : " + acl);
 		  send(acl);
 		  System.out.println("Send message: " + message);
 	}

@@ -39,11 +39,34 @@
 
 package configuration;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class ServerConfigurations {
-	public final static String WSS_URI = "ws://10.0.1.227:8887";
-	public final static String WSS_PORT = "8887";
-	public final static String GS_IP = "10.0.1.227";
-	public final static String GS_PORT = "1234";
-	public final static String GS_NAME = "Grid@Platform2";
-	public final static String GS_ADDRESS = "http://Tommy-PC.wired.hu.nl:7778/acc";	
+	public static final String WSS_URI = "ws://10.0.1.227:8887";
+	public static final String WSS_PORT = "8887";
+	public static final String GS_IP = getHostIP();
+	public static final String GS_PORT = "1099";
+	public static final String GS_NAME = "Grid@Platform2";
+	public static final String GS_ADDRESS = "http://"+getHostName()+".wired.hu.nl:7778/acc";
+	
+	private static String getHostName() {
+		try {
+			return InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "127.0.0.1";
+	}
+	
+	private static String getHostIP(){
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "127.0.0.1";
+	}
 }

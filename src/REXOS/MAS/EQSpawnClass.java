@@ -36,11 +36,11 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+import configuration.ServerConfigurations;
 import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
-
 import agents.equiplet_agent.EquipletAgent;
 
 public class EQSpawnClass extends Agent {
@@ -48,13 +48,13 @@ public class EQSpawnClass extends Agent {
 	  * @var MAIN_HOST
 	  * The string has the IP of the server that is hosting the Grid Agent Container.
 	  */
-	private static final String MAIN_HOST = "145.89.126.159";
+	private static final String MAIN_HOST = ServerConfigurations.GS_IP;
 	
 	/**
 	  * @var MAIN_PORT
 	  * The string has the PORT of the server that is hosting the Grid Agent Container.
 	  */
-	private static final String MAIN_PORT = "1099";
+	private static final String MAIN_PORT = ServerConfigurations.GS_PORT;
 	
 	/**
 	  * @var CONTAINER_NAME
@@ -72,9 +72,9 @@ public class EQSpawnClass extends Agent {
 		//Spanwing EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
 		Profile profile = new ProfileImpl();		
-		profile.setParameter(profile.MAIN_HOST,MAIN_HOST);
-		profile.setParameter(profile.MAIN_PORT,MAIN_PORT);
-		profile.setParameter(profile.CONTAINER_NAME,CONTAINER_NAME);
+		profile.setParameter(Profile.MAIN_HOST,MAIN_HOST);
+		profile.setParameter(Profile.MAIN_PORT,MAIN_PORT);
+		profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME);
 		
 		jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
 		Agent agent = new EquipletAgent();
