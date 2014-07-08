@@ -11,7 +11,7 @@ import simulation.util.Position;
 import simulation.util.Triple;
 import agents.equiplet_agent.EquipletAgent;
 
-public class Equiplet {
+public class Equiplet extends EquipletAgent {
 
 	/**
 	 * 
@@ -235,9 +235,15 @@ public class Equiplet {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
 		executing.updateStartTime(time);
+		
+		execute(executing);
 	}
 	
-	protected void execute() {
+	protected void execute(Job toExecuteJob) {
+		
+	}
+	
+	protected void executionFinished(){
 		
 	}
 

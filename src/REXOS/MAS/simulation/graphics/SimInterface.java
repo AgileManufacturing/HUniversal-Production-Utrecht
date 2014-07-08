@@ -59,7 +59,6 @@ public class SimInterface {
 			public void run() {
 				try {
 					SimInterface window = new SimInterface();
-					window.frmRexosSimulation.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -72,13 +71,13 @@ public class SimInterface {
 	 */
 	public SimInterface() {
 		init();
-		initialize();
+		initContent();
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initContent() {
 		frmRexosSimulation = new JFrame();
 		frmRexosSimulation.setTitle("REXOS Simulation");
 		frmRexosSimulation.setBounds(100, 100, 1000,700);
@@ -361,6 +360,7 @@ public class SimInterface {
 		frmRexosSimulation.getRootPane().setDefaultButton(btnStart);
 		btnStart.requestFocus();
 		btnStart.requestFocusInWindow();
+		frmRexosSimulation.setVisible(true);
 	}
 
 	private void init() {
