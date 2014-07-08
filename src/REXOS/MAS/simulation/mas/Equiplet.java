@@ -9,9 +9,14 @@ import java.util.TreeSet;
 import simulation.util.Capability;
 import simulation.util.Position;
 import simulation.util.Triple;
+import agents.equiplet_agent.EquipletAgent;
 
-public class Equiplet {
+public class Equiplet extends EquipletAgent {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final double SAFETY_FACTOR = 1;
 	private String name;
 	private Position position;
@@ -53,15 +58,15 @@ public class Equiplet {
 		this.timeBroken = -1;
 	}
 
-	public String getName() {
-		return name;
-	}
+	//public String getName() {
+	//	return name;
+	//}
 
 	public Position getPosition() {
 		return position;
 	}
 
-	public EquipletState getState() {
+	public EquipletState getEquipletState() {
 		return state;
 	}
 
@@ -224,6 +229,10 @@ public class Equiplet {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
 		executing.updateStartTime(time);
+	}
+	
+	protected void execute() {
+		
 	}
 
 	/**

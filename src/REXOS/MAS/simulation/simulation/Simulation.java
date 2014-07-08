@@ -211,9 +211,9 @@ public class Simulation extends Thread {
 	private void finishedEvent(String equiplet) {
 		Equiplet equipletAgent = grid.getEquiplet(equiplet);
 
-		if (equipletAgent.getState() == EquipletState.ERROR) {
+		if (equipletAgent.getEquipletState() == EquipletState.ERROR) {
 			equipletAgent.notifyJobFinished(time);
-		} else if (equipletAgent.getState() == EquipletState.BROKENDOWN) {
+		} else if (equipletAgent.getEquipletState() == EquipletState.BROKENDOWN) {
 			double remainingTime = equipletAgent.getTimeBroken();
 			equipletAgent.notifyJobFinished(time);
 			// schedule FINISHED time + productionTime, equiplet
@@ -344,7 +344,7 @@ public class Simulation extends Thread {
 			List<Triple<String, List<String>, Triple<String, Integer, Integer>>> equipletStates = new ArrayList<>();
 			for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
 				Equiplet equiplet = entry.getValue();
-				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getName(), equiplet.getServices(), new Triple<String, Integer, Integer>(equiplet.getState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
+				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getName(), equiplet.getServices(), new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
 			}
 
 			System.out.printf("Update: [time=%.2f, product=%d, equiplets=%s]\n\n", time, products.size(), equipletStates);
