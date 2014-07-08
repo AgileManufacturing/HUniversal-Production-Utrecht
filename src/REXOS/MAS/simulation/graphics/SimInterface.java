@@ -27,7 +27,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -82,7 +81,7 @@ public class SimInterface {
 	private void initialize() {
 		frmRexosSimulation = new JFrame();
 		frmRexosSimulation.setTitle("REXOS Simulation");
-		frmRexosSimulation.setBounds(100, 100, 800, 500);
+		frmRexosSimulation.setBounds(100, 100, 1000,700);
 		frmRexosSimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -93,24 +92,31 @@ public class SimInterface {
 		tabbedPane.addTab("Grid", null, gridView, null);
 		tabbedPane.setFocusable(false);
 
+		final JPanel equipletUtilizationView = new JPanel();
+		tabbedPane.addTab("Equiplet Utilization", null, equipletUtilizationView, null);
+		equipletUtilizationView.setLayout(new BoxLayout(equipletUtilizationView, BoxLayout.X_AXIS));
+		
 		final JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		tabbedPane.addTab("Schedule", null, scrollPane, null);
+		tabbedPane.addTab("Equiplet Schedule", null, scrollPane, null);
 
 		chartPanel = new JPanel();
 		scrollPane.setViewportView(chartPanel);
 		chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.X_AXIS));
 
-		final JPanel timeDivisionView = new JPanel();
-		tabbedPane.addTab("Equiplet Utilization", null, timeDivisionView, null);
-		timeDivisionView.setLayout(new BoxLayout(timeDivisionView, BoxLayout.X_AXIS));
 
 		final JPanel equipletSchedule = new JPanel();
 		equipletSchedule.setLayout(new BoxLayout(equipletSchedule, BoxLayout.Y_AXIS));
 		
 		final JScrollPane eScheduleScroll = new JScrollPane();
 		eScheduleScroll.setViewportView(equipletSchedule);
-		tabbedPane.addTab("Equiplet schedule", null, eScheduleScroll, null);
+		tabbedPane.addTab("Equiplet history", null, eScheduleScroll, null);
+		
+		final JPanel productSchedule = new JPanel();
+		productSchedule.setLayout(new BoxLayout(productSchedule, BoxLayout.Y_AXIS));
+		
+		final JScrollPane pScheduleScroll = new JScrollPane();
+		pScheduleScroll.setViewportView(productSchedule);
+		tabbedPane.addTab("Product schedules", null, pScheduleScroll, null);
 
 		final ProductView productView = new ProductView();
 		tabbedPane.addTab("Products", null, productView, null);
@@ -125,16 +131,20 @@ public class SimInterface {
 					chartPanel.removeAll();
 
 					List<Product> agents = new ArrayList<Product>(simulation.getProducts().values());
-					chartPanel.add(GanttChart.createChartPanelProducts(agents));
-				} else if (index == tabbedPane.indexOfComponent(timeDivisionView)) {
+					chartPanel.add(GanttChart.createChartProducts(agents));
+				} else if (index == tabbedPane.indexOfComponent(equipletUtilizationView)) {
 					Map<String, Triple<Double, Double, Double>> history = simulation.getEquipletHistory();
 					System.out.println("HISTORY: " + history);
-					timeDivisionView.removeAll();
-					timeDivisionView.add(StackedBarChart.createChartPanel(history));
+					equipletUtilizationView.removeAll();
+					equipletUtilizationView.add(StackedBarChart.createChartPanel(history));
 				} else if (index == tabbedPane.indexOfComponent(eScheduleScroll)) {
 					List<Equiplet> equiplets = simulation.getEquiplets();
 					equipletSchedule.removeAll();
-					equipletSchedule.add(GanttChart.createChartPanelEquiplets(equiplets));
+					equipletSchedule.add(GanttChart.createChartEquiplets(equiplets));
+				} else if (index == tabbedPane.indexOfComponent(pScheduleScroll)) {
+					List<Equiplet> equiplets = simulation.getEquiplets();
+					productSchedule.removeAll();
+					productSchedule.add(GanttChart.createChartEquiplets(equiplets, true));
 				} else if (index == tabbedPane.indexOfComponent(productView)) {
 					productView.update(simulation.getProducts());
 				}

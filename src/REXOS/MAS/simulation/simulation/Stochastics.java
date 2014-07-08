@@ -90,11 +90,11 @@ class Stochastics {
 	private double time(double time, DurationType type) {
 		switch (type) {
 		case EXP:
-			return exp(time);
+			//return exp(time);
 		case WEIBULL:
-			return weibull(1, time);
+			//return weibull(1, time);
 		case GAMMA:
-			return gamma(1, time);
+			//return gamma(1, time);
 		case NORMAL:
 		case DETERMINISTIC:
 		default:

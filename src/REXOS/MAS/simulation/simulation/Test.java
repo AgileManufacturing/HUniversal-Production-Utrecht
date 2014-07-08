@@ -17,7 +17,7 @@ import simulation.util.Position;
 import simulation.util.ProductStep;
 import simulation.util.ProductionStep;
 
-public class Test {
+class Test {
 	
 	public static void main(String[] args) {
 		productScheduling();	

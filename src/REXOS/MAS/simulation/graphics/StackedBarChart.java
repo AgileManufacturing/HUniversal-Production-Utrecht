@@ -15,6 +15,8 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
 
@@ -84,10 +86,18 @@ public class StackedBarChart extends ApplicationFrame {
 		// Optional customisation of chart
 		chart.setBackgroundPaint(Color.WHITE);
 
-		CategoryPlot plot = chart.getCategoryPlot();
+		final CategoryPlot plot = chart.getCategoryPlot();
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
+
 		
+		BarRenderer renderer = ((BarRenderer) plot.getRenderer()); 
+		renderer.setSeriesPaint(0, new Color(0x00, 0x00, 0x80)); // Color.DARK_BLUE
+		renderer.setSeriesPaint(1, new Color(0x00, 0x80, 0x00)); // Color.VERY_DARK_GREEN
+		// renderer.setSeriesPaint(1,  new Color(0x00, 0xC0, 0x00)); // Color.DARK_GREEN
+		renderer.setSeriesPaint(2, Color.RED);
+		renderer.setBarPainter(new StandardBarPainter());
+
 		return chart;
 	}
 

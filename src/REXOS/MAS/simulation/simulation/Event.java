@@ -6,7 +6,6 @@ class Event implements Comparable<Event> {
 	private EventType type;
 	private String product;
 	private String equiplet;
-	private String debug;
 
 	/**
 	 * Create event
@@ -16,10 +15,9 @@ class Event implements Comparable<Event> {
 	 * @param type
 	 * @param steps
 	 */
-	public Event(double time, EventType type, String debug) {
+	public Event(double time, EventType type) {
 		this.time = time;
 		this.type = type;
-		this.debug = debug;
 	}
 
 	/**
@@ -33,12 +31,11 @@ class Event implements Comparable<Event> {
 	 * @param equiplet
 	 *            name
 	 */
-	public Event(double time, EventType type, String product, String equiplet, String debug) {
+	public Event(double time, EventType type, String product, String equiplet) {
 		this.time = time;
 		this.type = type;
 		this.product = product;
 		this.equiplet = equiplet;
-		this.debug = debug;
 	}
 
 	/**
@@ -50,11 +47,10 @@ class Event implements Comparable<Event> {
 	 * @param equiplet
 	 *            name
 	 */
-	public Event(double time, EventType type, String equiplet, String debug) {
+	public Event(double time, EventType type, String equiplet) {
 		this.time = time;
 		this.type = type;
 		this.equiplet = equiplet;
-		this.debug = debug;
 	}
 
 	/**
@@ -88,15 +84,11 @@ class Event implements Comparable<Event> {
 	@Override
 	public String toString() {
 		if (type == EventType.PRODUCT || type == EventType.DONE) {
-			return String.format("Evt[time=%.2f, type=%s, debug=%s]", time, type, debug);
+			return String.format("Evt[time=%.2f, type=%s]", time, type);
 		} else if (type == EventType.ARRIVED) {
-			return String.format("Evt[time=%.2f, type=%s, product=%s, equipet=%s, debug=%s]", time, type, product, equiplet, debug);
+			return String.format("Evt[time=%.2f, type=%s, product=%s, equipet=%s]", time, type, product, equiplet);
 		} else {
-			if (type == EventType.FINISHED) {
-				// remove this if, not possible only for now
-				return String.format("Evt[time=%.2f, type=%s, should be product=%s, equipet=%s, debug=%s]", time, type, product, equiplet, debug);
-			}
-			return String.format("Evt:[time=%.2f, type=%s, equiplet=%s, debug=%s]", time, type, equiplet, debug);
+			return String.format("Evt:[time=%.2f, type=%s, equiplet=%s]", time, type, equiplet);
 		}
 	}
 }

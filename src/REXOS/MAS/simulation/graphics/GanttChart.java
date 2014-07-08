@@ -8,8 +8,10 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JPanel;
 
@@ -49,7 +51,7 @@ public class GanttChart extends ApplicationFrame {
 		chartPanel.setPreferredSize(new Dimension(800, 400));
 		setContentPane(chartPanel);
 	}
-
+	
 	/**
 	 * Creates a sample dataset for a Gantt chart.
 	 * 
@@ -111,35 +113,69 @@ public class GanttChart extends ApplicationFrame {
 				return toAppendTo.append(String.valueOf(date.getTime()));
 			}
 		});
+		axis.setMinimumDate(new Date(0));
 
 		return chart;
 	}
-	
-	public static JPanel createChartPanel(List<TaskSeries> tasks, String yLabel)  {
-		final IntervalCategoryDataset dataset = createDataset(tasks);
-		final JFreeChart chart = createChart("Schedule", yLabel, dataset);
-
-		final ChartPanel chartPanel = new ChartPanel(chart);
-		// chartPanel.setPreferredSize(new Dimension(800, 400));
-		return chartPanel;
-	}
 
 
-	public static JPanel createChartPanelProducts(List<Product> agents) {
+	public static JPanel createChartProducts(List<Product> agents) {
+		double maxTime = 300;
+		double minTime = Double.MAX_VALUE;
 		ArrayList<TaskSeries> tasks = new ArrayList<>();
 		for (Product agent : agents) {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
 			TaskSeries serie = new TaskSeries(agent.getName());
 			for (ProductionStep node : path) {
-				serie.add(new Task(node.getEquiplet(), new SimpleTimePeriod((long) (node.getTime() * 1000), (long) ((node.getTime() + node.getDuration()) * 1000))));
+				serie.add(new Task(node.getEquiplet(), new SimpleTimePeriod((long) node.getTime(), (long) (node.getTime() + node.getDuration()))));
+				maxTime = Math.max(maxTime, node.getTime() + node.getDuration());
+				minTime = Math.min(minTime, node.getTime());
 			}
 			tasks.add(serie);
 		}
 
-		return createChartPanel(tasks, "Equiplets");
+		final IntervalCategoryDataset dataset = createDataset(tasks);
+		final JFreeChart chart = createChart("Schedule", "Equiplets", dataset);
+
+		final ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setMaximumDrawWidth((int) (maxTime - minTime));
+		chartPanel.setPreferredSize(new Dimension((int) (maxTime - minTime), 600));
+		return chartPanel;
 	}
 	
-	public static JPanel createChartPanelEquiplets(List<Equiplet> equiplets) {
+	public static JPanel createChartEquiplets(List<Equiplet> equiplets) {
+		double maxTime = 0;
+		HashMap<String, ArrayList<Task>> products = new HashMap<String, ArrayList<Task>>();
+		for (Equiplet equiplet : equiplets) {	
+			List<Job> history = equiplet.getHistory();
+			for (Job job : history) {
+				if (!products.containsKey(job.getProductAgent())) {
+					products.put(job.getProductAgent(), new ArrayList<Task>());
+				}
+				products.get(job.getProductAgent()).add(new Task(equiplet.getName(), new SimpleTimePeriod((long) job.getStartTime(), (long) job.getDueTime())));
+				maxTime = Math.max(maxTime, job.getDueTime());
+			}
+		}
+
+		ArrayList<TaskSeries> tasks = new ArrayList<>();
+		for (Entry<String, ArrayList<Task>> product : products.entrySet()) {
+			TaskSeries serie = new TaskSeries(product.getKey());
+			for (Task task : product.getValue()) {
+				serie.add(task);
+			}
+			tasks.add(serie);
+		}
+		
+		final IntervalCategoryDataset dataset = createDataset(tasks);
+		final JFreeChart chart = createChart("Schedule", "Equiplets", dataset);
+
+		final ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setMaximumDrawWidth((int) maxTime); 
+		chartPanel.setPreferredSize(new Dimension((int) maxTime, 600));
+		return chartPanel;
+	}
+	
+	public static JPanel createChartEquiplets(List<Equiplet> equiplets, boolean productBased) {
 		int productCount = 0;
 		ArrayList<TaskSeries> tasks = new ArrayList<>();
 		for (Equiplet equiplet : equiplets) {
@@ -157,14 +193,8 @@ public class GanttChart extends ApplicationFrame {
 		final JFreeChart chart = createChart("Schedule", "Products", dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		// chartPanel.setMinimumSize(new Dimension(600, productCount * 100));
-		//chartPanel.setSize(600, productCount * 100);
-
-		//chartPanel.setPreferredSize(new Dimension(800, productCount * 10));
-		//chartPanel.revalidate();
-		//System.out.println("(" + 600 + ", " + productCount * 100 + ")");
+		chartPanel.setMaximumDrawHeight(productCount * 10);  
+		chartPanel.setPreferredSize(new Dimension(600, productCount * 10));
 		return chartPanel;
-
-		// return createChartPanel(tasks, "Products");
 	}
 }

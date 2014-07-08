@@ -74,6 +74,13 @@ public class Job implements Comparable<Job> {
 		this.ready = true;
 	}
 
+	public void updateStartTime(double time) {
+		this.start = time;
+	}
+	
+	public void updateDueTime(double time) {
+		this.due = time;
+	}
 	@Override
 	public String toString() {
 		return String.format("Job %s [product=%s, start=%.0f, due=%.0f, deadline=%.0f, ready=%s]", service, product, start, due, deadline, ready);

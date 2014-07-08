@@ -219,6 +219,12 @@ public class Equiplet {
 	public String getExecutingProduct() {
 		return executing.getProductAgent();
 	}
+	
+	public void executeJob(double time) {
+		state = EquipletState.BUSY;
+		executing = schedule.pollFirst();
+		executing.updateStartTime(time);
+	}
 
 	/**
 	 * Notify a product is arrived by the equiplet and is ready to be let the
@@ -247,12 +253,10 @@ public class Equiplet {
 		// execute the first job in the schedule if the job is ready
 		if (state == EquipletState.IDLE &&  schedule.first().isReady()) {
 			historyUpdate(time);
-			state = EquipletState.BUSY;
-			executing = schedule.pollFirst();
+			executeJob(time);
 		} else if (state == EquipletState.ERROR) {
 			executing = schedule.pollFirst();
 		}
-			
 	}
 
 	/**
@@ -265,29 +269,18 @@ public class Equiplet {
 		if (state == EquipletState.ERROR) {
 			timeShouldHaveFinished = time;
 		} else {
-			timeBroken = -1;
-			timeBreakdown = -1;
-			timeShouldHaveFinished = -1;
+			executing.updateDueTime(time);
+			history.add(executing);
 
-			historyUpdate(time);
-			if (isExecuting()) {
-				history.add(executing);
-
-				if (!schedule.isEmpty() && schedule.first().isReady()) {
-					state = EquipletState.BUSY;
-					executing = schedule.pollFirst();
-				} else {
-					state = EquipletState.IDLE;
-					executing = null;
-				}
+			if (!schedule.isEmpty() && schedule.first().isReady()) {
+				executeJob(time);
 			} else {
-				executing = null;
 				state = EquipletState.IDLE;
-				System.out.println("FAIL: job finished a non executing job");
+				executing = null;
 			}
 		}
 	}
-
+	
 	/**
 	 * Set the time of the breakdown of the equiplet
 	 * 
@@ -297,7 +290,9 @@ public class Equiplet {
 	public void notifyBreakdown(double time) {
 		historyUpdate(time);
 		state = EquipletState.ERROR;
-		this.timeBreakdown = time;
+		timeBroken = -1;
+		timeBreakdown = time;
+		timeShouldHaveFinished = -1;
 	}
 
 	/**
@@ -311,10 +306,8 @@ public class Equiplet {
 	public void notifyRepaired(double time) {
 		historyUpdate(time);
 		if (!hasFinishedDuringRepair()) {
-			state = EquipletState.BUSY;
 			this.timeBroken = time - timeBreakdown;
-			this.timeBreakdown = -1;
-			this.timeShouldHaveFinished = -1;
+			executeJob(time);
 		} else if (isExecuting()) {
 			state = EquipletState.BUSY;
 		} else {

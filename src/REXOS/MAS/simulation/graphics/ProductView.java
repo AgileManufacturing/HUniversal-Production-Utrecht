@@ -109,7 +109,7 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 			scheduleView.removeAll();
 			List<Product> list = new ArrayList<Product>();
 			list.add(product);
-			scheduleView.add(GanttChart.createChartPanelProducts(list));
+			scheduleView.add(GanttChart.createChartProducts(list));
 			scheduleView.revalidate();
 		}
 	}
