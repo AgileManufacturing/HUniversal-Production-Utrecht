@@ -8574,3 +8574,10 @@
                         The status of HAL.steps.HardwareStep@ffc5c61 (being processed by module HAL.modules.StewartGough@41f4c8d2) has changed to FAILED
 [INFO ] [             ] 2014-07-03 17:20:57.491 @ HAL.testerClasses.StewartGoughHALTesterClass.onProcessStatusChanged(StewartGoughHALTesterClass.java:476)
                         The status of HAL.steps.HardwareStep@12b2e647 (being processed by module HAL.modules.StewartGough@41f4c8d2) has changed to FAILED
+
+############################################################################################################################################################
+############################################################################################################################################################
+############################################################################################################################################################
+
+[DEBUG] [hal          ] 2014-07-07 17:18:07.416 @ HAL.testerClasses.HALTesterClass.main(HALTesterClass.java:301)
+                        Starting
