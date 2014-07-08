@@ -109,8 +109,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	/**
 	 * @var serverLists
-	 * The string serverLists Holds all the services that the equiplet can exectute.
-	 * This variable is used in the WIMP.
+	 * The string serverLists Holds all the services that the equiplet can execute.
+	 * This variable is used in the WI.
 	 */
 	public String serverLists = "";
 
@@ -140,16 +140,16 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	/**
 	 * @var productStepFailedCounter
 	 * The productStepFailedCounter keeps track off all the failed productSteps.
-	 * This information is displayed in the WIMP.
+	 * This information is displayed in the WI.
 	 */
-	private int productStepFailedCounter =0;
+	private int productStepFailedCounter = 0;
 
 	/**
 	 * @var productStepSuccesCounter
 	 * The productStepSuccesCounter keeps track off all the successfully executed productSteps.
 	 * This information is displayed in the WIMP.
 	 */
-	private int productStepSuccesCounter =0;
+	private int productStepSuccesCounter = 0;
 
 	/**
 	 * setup()
@@ -159,8 +159,12 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	protected void setup(){		
 
+		serverLists = "";
+		serviceList.clear();
+		
 		try {
 			hal = new HardwareAbstractionLayer(this);
+			serviceList = hal.getSupportedServices();
 		} catch (KnowledgeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -168,6 +172,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		register();
 		addBehaviour(new ReconfigureBehaviour(hal, this));
 		System.out.println("HAL created");
@@ -247,16 +252,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 	public void register(){
 
-		serverLists = "";
-		serviceList.clear();
-		try {
-			serviceList = hal.getSupportedServices();
-		} catch (KnowledgeException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		DFAgentDescription dfd = new DFAgentDescription();
 		for(int i =0; i < serviceList.size(); i++){
 			ServiceDescription sd  = new ServiceDescription();
@@ -279,6 +274,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * 
 	 * TODO fix hardcoded data ...
 	 * TODO Can you always execute only if the equiplet has valid capabilities ...? How about time?
+	 * TODO Add check for Criteria
 	 */
 	private String canExecute(String msg){
 		System.out.println("Can execute?");
@@ -313,6 +309,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				productSteps.get("duration").getAsString(),
 				productSteps.get("productStepId").getAsString(),
 				productSteps.get("productStep").getAsJsonObject());
+		
 		equipletSchedule.add(job);
 		productStepCounter++;
 		System.out.println(equipletSchedule.size()+" =Length");
@@ -360,8 +357,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			equipletActive=false;
 			scheduleCounter=0;
 			equipletSchedule.clear();
-			//Notify Product that failed and remove from schedule.
-			//Log that process execute failed.
+			//TODO Notify Product that failed and remove from schedule.
+			//TODO Log that process execute failed.
 			productStepFailedCounter++;
 		}
 	}

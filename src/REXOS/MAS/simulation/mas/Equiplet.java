@@ -9,8 +9,9 @@ import java.util.TreeSet;
 import simulation.util.Capability;
 import simulation.util.Position;
 import simulation.util.Triple;
+import agents.equiplet_agent.EquipletAgent;
 
-public class Equiplet {
+public class Equiplet extends EquipletAgent {
 
 	private static final double SAFETY_FACTOR = 1;
 	private String name;
@@ -53,15 +54,15 @@ public class Equiplet {
 		this.timeBroken = -1;
 	}
 
-	public String getName() {
-		return name;
-	}
+	//public String getName() {
+	//	return name;
+	//}
 
 	public Position getPosition() {
 		return position;
 	}
 
-	public EquipletState getState() {
+	public EquipletState getEquipletState() {
 		return state;
 	}
 
@@ -220,6 +221,15 @@ public class Equiplet {
 		return executing.getProductAgent();
 	}
 
+	private void executeJob(double time){
+		executing = schedule.pollFirst();
+		execute();
+	}
+	
+	protected void execute() {
+		
+	}
+
 	/**
 	 * Notify a product is arrived by the equiplet and is ready to be let the
 	 * equiplet execute his product step
@@ -283,7 +293,7 @@ public class Equiplet {
 			} else {
 				executing = null;
 				state = EquipletState.IDLE;
-				System.out.println("FAIL: job finished a non executing job");
+				System.err.println("FAIL: job finished a non executing job");
 			}
 		}
 	}

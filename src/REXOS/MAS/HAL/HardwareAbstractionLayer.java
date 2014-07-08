@@ -27,10 +27,10 @@ import com.google.gson.JsonObject;
  * @see http://wiki.agilemanufacturing.nl/index.php/HAL
  */
 public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquipletListener {
-	private CapabilityFactory capabilityFactory;
-	private ModuleFactory moduleFactory;
-	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
-	private BlackboardHandler blackboardHandler;
+	protected CapabilityFactory capabilityFactory;
+	protected ModuleFactory moduleFactory;
+	protected HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
+	protected BlackboardHandler blackboardHandler;
 	
 	private String equipletName;
 	public String getEquipletName() {
