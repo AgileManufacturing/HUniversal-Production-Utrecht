@@ -1,19 +1,21 @@
 package simulation.mas.scheduling;
 
+import java.util.Map;
+
 public class Job implements Comparable<Job> {
 	private double time;
 	private double duration;
 	private String productAgent;
+	private String service;
+	private Map<String, Object> criteria;
 
-	public Job(double time, double duration) {
-		this.time = time;
-		this.duration = duration;
-	}
-
-	public Job(double time, double duration, String productAgent) {
+	public Job(double time, double duration, String productAgent,
+			String service, Map<String, Object> criteria) {
 		this.time = time;
 		this.duration = duration;
 		this.productAgent = productAgent;
+		this.service = service;
+		this.criteria = criteria;
 	}
 
 	@Override
@@ -36,5 +38,13 @@ public class Job implements Comparable<Job> {
 
 	public String getProductAgent() {
 		return productAgent;
+	}
+	
+	public String getService(){
+		return service;
+	}
+	
+	public Map<String, Object> getCriteria(){
+		return criteria;
 	}
 }

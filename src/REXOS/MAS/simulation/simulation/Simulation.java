@@ -83,7 +83,7 @@ public class Simulation extends Thread {
 
 		for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
 			double breakdown = stochastics.generateBreakdownTime(entry.getKey());
-			// eventStack.add(new Event(time + breakdown, EventType.BREAKDOWN, entry.getKey()));
+			eventStack.add(new Event(time + breakdown, EventType.BREAKDOWN, entry.getKey()));
 		}
 
 		eventStack.add(new Event(time, EventType.PRODUCT));
@@ -124,7 +124,7 @@ public class Simulation extends Thread {
 
 					update();
 
-					//System.out.println("\nSimulation state: " + formatArray(grid.getEquiplets()));
+					System.out.println("\nSimulation state: " + formatArray(grid.getEquiplets()));
 					//System.out.println("\nSimulation products: " + formatArray(products) + "\n");
 					
 					//validate();

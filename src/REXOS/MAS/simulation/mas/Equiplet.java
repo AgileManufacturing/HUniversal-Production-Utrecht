@@ -234,6 +234,7 @@ public class Equiplet extends EquipletAgent {
 	public void executeJob(double time) {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
+		System.err.println("time: " + time + "\texecuting: " + executing);
 		executing.updateStartTime(time);
 		
 		execute(executing);
@@ -275,8 +276,8 @@ public class Equiplet extends EquipletAgent {
 		if (state == EquipletState.IDLE &&  schedule.first().isReady()) {
 			historyUpdate(time);
 			executeJob(time);
-		} else if (state == EquipletState.ERROR) {
-			executing = schedule.pollFirst();
+		} else if (!isExecuting() && state == EquipletState.ERROR) {	//NEW !isExecuting()
+			//executing = schedule.pollFirst();							//FOUT
 		}
 	}
 
@@ -289,6 +290,8 @@ public class Equiplet extends EquipletAgent {
 	public void notifyJobFinished(double time) {
 		if (state == EquipletState.ERROR) {
 			timeShouldHaveFinished = time;
+			//FOUT
+			//Opnieuw toevoegen aan de schedule?
 		} else {
 			executing.updateDueTime(time);
 			history.add(executing);
@@ -328,9 +331,11 @@ public class Equiplet extends EquipletAgent {
 	public void notifyRepaired(double time) {
 		historyUpdate(time);
 		if (!hasFinishedDuringRepair()) {
+			//executeJob(time);	//FOUT -> Gaat hij gewoon naar de volgende job als hij tijdens de breakdown klaar had moeten zijn..?
+		} 
+		
+		if (isExecuting()) {
 			this.timeBroken = time - timeBreakdown;
-			executeJob(time);
-		} else if (isExecuting()) {
 			state = EquipletState.BUSY;
 		} else {
 			state = EquipletState.IDLE;
@@ -364,7 +369,7 @@ public class Equiplet extends EquipletAgent {
 	 * @return if the equipet finished the job
 	 */
 	public boolean hasFinishedDuringRepair() {
-		return timeShouldHaveFinished > 0;
+		return timeShouldHaveFinished > 0;		//FOUT
 	}
 
 	private void historyUpdate(double time) {
