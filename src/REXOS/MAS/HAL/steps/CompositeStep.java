@@ -41,6 +41,7 @@ public class CompositeStep{
 	}
 	public JsonElement popCommandIdentifier(String identifier) throws ModuleTranslatingException{
 		JsonElement jsonIdentifier = command.remove(identifier);
+		
 		if (jsonIdentifier == null){
 			throw new ModuleTranslatingException ("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command, this);
 		}

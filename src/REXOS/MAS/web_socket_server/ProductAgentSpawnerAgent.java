@@ -23,12 +23,13 @@ public class ProductAgentSpawnerAgent extends Agent {
 		  aid.addAddresses(ServerConfigurations.GS_ADDRESS);
 		  acl.addReceiver(aid);
 		  acl.setContent(message);
-		  System.out.println("Send : " + acl);
+		  System.out.println("Send acl: " + acl);
 		  send(acl);
 		  System.out.println("Send message: " + message);
 	}
 	protected void setup(){
 		System.out.println(productSteps);
+		System.out.println("Agent name: "+ this.getName());
 		sendMessage(productSteps, 0);
 		try {
 			getContainerController().kill();

@@ -80,13 +80,15 @@ public class StewartGough extends ModuleActor {
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
 		} else {*/
 			//Approach
-			/*JsonObject commandApproach = new JsonParser().parse(commandMove.get(APPROACH).toString()).getAsJsonObject();
+			JsonObject commandApproach = new JsonParser().parse(commandMove.get(APPROACH).toString()).getAsJsonObject();
 			JsonObject approachInstructionData = new JsonObject();
-			approachInstructionData.add(MOVE, commandApproach);*/
+			approachInstructionData.add(MOVE, commandApproach);
+			approachInstructionData.getAsJsonObject(MOVE).addProperty(ModuleActor.MAX_ACCELERATION, maxAcceleration);
 			
 			//Entry point
-			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
-			
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			System.out.println("approachInstructionData: "+ approachInstructionData);
+			System.out.println("instructionData: "+ instructionData);
 			//Actual point
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));
 			
@@ -94,7 +96,7 @@ public class StewartGough extends ModuleActor {
 			translatedHardwareSteps.add(null);
 
 			//Exit point
-			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 		//}
 		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(), compositeStep.getCommand(), compositeStep.getRelativeTo()));

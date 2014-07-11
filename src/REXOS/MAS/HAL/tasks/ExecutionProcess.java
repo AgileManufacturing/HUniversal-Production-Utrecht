@@ -42,14 +42,13 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	public synchronized void run() {
 		Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Execution started with the following hardware steps:", hardwareSteps);
 		
-		System.out.println("hardwareSteps size: "+ hardwareSteps.size());
 		for(int i =0 ; i<hardwareSteps.size();i++){
 			try {
 				System.out.println("Executing: "+hardwareSteps.get(i));
 				moduleFactory.executeHardwareStep(this, hardwareSteps.get(i));
-				//this.wait();
+				this.wait();
 				System.out.println("After the wait");
-			} catch (FactoryException e) {
+			} catch (FactoryException | InterruptedException e) {
 				Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Module is unable to execute hardwareStep: " + e);
 			}
 		}
@@ -75,21 +74,20 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	public synchronized void onProcessStateChanged(String status, long hardwareStepSerialId, Module module) {
 		Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "The status of hardwareStep identified by " + 
 				hardwareStepSerialId + " (being processed by module " + module + ") has changed to " + status);
-		if(status.equals(HardwareStepStatus.DONE)){
+		if(status.matches(HardwareStepStatus.DONE.toString())){
 			if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = hardwareSteps.get(0);
 				hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
 				hardwareSteps.remove(0);
-				
 				//TODO MONGO FIX.. REMOVE ALL MONGO REFERENCES AND CLASSES! IT'S ASS FUCKING SLOWWWWW..!
-				try {
+				
+				/*try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-				
-				this.notify();
+				}*/ 
+				    this.notify();
 			}
 			else {
 				throw new RuntimeException("No more hardwareSteps while there should be at least one more");

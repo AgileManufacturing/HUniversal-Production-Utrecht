@@ -92,7 +92,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * @var serviceList
 	  * The ArrayList serviceList holds all the services that the equiplet can execute.
 	  */
-	private ArrayList<Service> serviceList=null;
+	private ArrayList<Service> serviceList;
 	
 	/**
 	  * @var scheduleCounter
@@ -243,9 +243,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void register(){
 		
 		serverLists = "";
-		serviceList.clear();
+		serviceList=new ArrayList<Service>();
 		try {
 		serviceList = hal.getSupportedServices();
+		System.out.println("Services: "+serviceList);
 	} catch (KnowledgeException e) {
 		e.printStackTrace();
 	} catch (Exception e) {

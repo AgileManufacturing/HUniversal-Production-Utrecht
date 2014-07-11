@@ -25,7 +25,7 @@
 		-container-name GridAgents 
 		-gui 
 		-agents 
-		&quot;MainAgent:agents.main_agent.MainAgent&quot;
+		&quot;Grid:grid_server.GridAgent;SupplyAgent:grid_server.SupplyAgent;MonitoringAgent:grid_server.MonitoringAgent&quot;
 		"/>
 	<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
 	

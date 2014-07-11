@@ -130,7 +130,7 @@ public class ProductAgent extends Agent{
 				
 				supplierAgent.addAddresses(ServerConfigurations.GS_ADDRESS);
 				System.out.println("Supplier adress: "+supplierAgent.getAddressesArray()[0]);
-				supplierAgent.setName("'SupplyAgent@Platform2");
+				supplierAgent.setName("SupplyAgent@"+ServerConfigurations.AGENT_ADDRESS);
 				System.out.println("PA SEND=" +message);
 				sendMessage(MessageType.SUPPLIER_REQUEST, getAID(), supplierAgent, message, "meta");
 			}

@@ -39,6 +39,7 @@ public abstract class ModuleActor extends Module {
 	protected static final String MOVE_X = "x";
 	protected static final String MOVE_Y = "y";
 	protected static final String MOVE_Z = "z";
+	protected static final String MOVE_MAX_ACCELERATION = "maxAcceleration";
 	
 	protected static final String ROTATION_X = "rotationX";
 	protected static final String ROTATION_Y = "rotationY";
@@ -189,6 +190,10 @@ public abstract class ModuleActor extends Module {
 			adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
 			adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
 			adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
+			adjustedMove.add(APPROACH,originalMove.get(APPROACH));
+			if(originalMove.get(MOVE_MAX_ACCELERATION)!= null){
+				adjustedMove.addProperty(MOVE_MAX_ACCELERATION, originalMove.get(MOVE_MAX_ACCELERATION).getAsInt());
+			}
 			
 			compositeCommand.add(MOVE, adjustedMove);
 		}

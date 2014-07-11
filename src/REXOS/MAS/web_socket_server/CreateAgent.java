@@ -87,7 +87,6 @@ public class CreateAgent {
 				
 				ac.start();	
 				
-				System.out.println("Starting AgentController: "+ ac.getState());
 				mws.setCreated(true);
 			}
 			catch(ControllerException e){
