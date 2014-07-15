@@ -70,9 +70,11 @@ public class CreateAgent {
 		java.util.Date date= new java.util.Date();
 		//Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
+		System.out.println("Creating agent");
 		
 		try {
-			Profile profile = new ProfileImpl();		
+			Profile profile = new ProfileImpl();
+			
 			profile.setParameter(Profile.MAIN_HOST,ServerConfigurations.GS_IP);
 			profile.setParameter(Profile.MAIN_PORT,ServerConfigurations.GS_PORT);
 			profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME+date.getTime());
@@ -82,7 +84,9 @@ public class CreateAgent {
 			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 			try{		
 				AgentController ac = container.acceptNewAgent( container.getContainerName()+identifier, agent);
-				ac.start();		
+				
+				ac.start();	
+				
 				mws.setCreated(true);
 			}
 			catch(ControllerException e){

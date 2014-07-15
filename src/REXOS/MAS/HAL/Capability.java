@@ -4,6 +4,8 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
+import com.google.gson.JsonParser;
+
 import libraries.log.LogLevel;
 import libraries.log.LogSection;
 import libraries.log.Logger;

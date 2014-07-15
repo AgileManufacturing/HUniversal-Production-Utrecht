@@ -54,7 +54,6 @@ import web_socket_server.java.org.java_websocket.server.WebSocketServer;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import configuration.ServerConfigurations;
 
 
@@ -113,7 +112,7 @@ public class Main extends WebSocketServer {
 		}
 		Main s = new Main( port );
 		s.start();
-		System.out.println( "WebSocketServer started on port: " + s.getPort() );
+		System.out.println( "WebSocketServer started on port: " + s.getPort());
 
 		BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
 		while ( true ) {

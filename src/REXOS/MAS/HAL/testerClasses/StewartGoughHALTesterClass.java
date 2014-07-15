@@ -29,6 +29,8 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
+	static JsonObject criteria;
+	static boolean insert = true;
 	
 	static final String baseDir = "/home/agileman/Desktop/";
 	static final String Aridir = "C:/users/Aristides/Desktop/Six Axis/";
@@ -305,8 +307,12 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
-
 		
+<<<<<<< HEAD
+=======
+
+if(insert){		
+>>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
 		FileInputStream fis;
 		byte[] content;
 
@@ -411,30 +417,39 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 	hal.insertModule(e, e);
 	System.out.println("Module E inserted");
+<<<<<<< HEAD
+=======
+	insert = false;
+}
+>>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
 		
-		JsonObject criteria = new JsonObject();
+		criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
 		JsonObject targetRotate = new JsonObject();
-		targetMove.addProperty("x", 1.0);
-		targetMove.addProperty("y", 1.0);
-		targetMove.addProperty("z", -16.0);
-		targetMove.addProperty("maxAcceleration", 2);
+		targetMove.addProperty("x", 5.0);
+		targetMove.addProperty("y", 5.0);
+		targetMove.addProperty("z", 20.0);
+		targetMove.addProperty("maxAcceleration", 5);
 		
 		targetRotate.addProperty("x", 0);
 		targetRotate.addProperty("y", 0);
 		targetRotate.addProperty("z", 0);
 		target.add("move",targetMove);
 		target.add("rotate",targetRotate);
-		target.addProperty("identifier", "GC4x4MB_3");
+		target.addProperty("identifier", "GC4x4MB_1");
 		
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
+		JsonObject subject1 = new JsonObject();
+		JsonObject subjectMove1 = new JsonObject();
+		JsonObject subjectRotate1 = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
 		JsonObject subjectRotate = new JsonObject();
-		subjectMove.addProperty("x", 2.5);
-		subjectMove.addProperty("y", 2.5);
-		subjectMove.addProperty("z", -16.0);
+		subjectMove.addProperty("x", 3.5);
+		subjectMove.addProperty("y", 3.5);
+		subjectMove.addProperty("z", 20.0);
+		subjectMove.addProperty("maxAcceleration", 5);
 		
 		subjectRotate.addProperty("x", 0);
 		subjectRotate.addProperty("y", 0);
@@ -443,14 +458,35 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		
 		subject.add("move",subjectMove);
 		subject.add("rotate",subjectRotate);
-		subject.addProperty("identifier", "GC4x4MB_1");
+		subject.addProperty("identifier", "GC4x4MB_6");
 		subjects.add(subject);
+		
+		//Test Alex
+		subjectMove1.addProperty("x", 5.0);
+		subjectMove1.addProperty("y", 5.0);
+		subjectMove1.addProperty("z", 20.0);
+		subjectMove1.addProperty("maxAcceleration", 5);
+		
+		subjectRotate1.addProperty("x", 0);
+		subjectRotate1.addProperty("y", 0);
+		subjectRotate1.addProperty("z", 0);
+		
+		
+		subject1.add("move",subjectMove1);
+		subject1.add("rotate",subjectRotate1);
+		subject1.addProperty("identifier", "GC4x4MB_3");
+		subjects.add(subject1);
 		
 		criteria.add("target",target);
 		criteria.add("subjects",subjects);
 		
 		
 		//hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
+<<<<<<< HEAD
+=======
+			
+		
+>>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
@@ -497,6 +533,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
+		hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
 	}
 
 	@Override
@@ -514,4 +551,5 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		// TODO Auto-generated method stub
 		
 	}
+	
 }

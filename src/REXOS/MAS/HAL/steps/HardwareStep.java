@@ -119,10 +119,9 @@ public class HardwareStep {
 			
 			instuctionDataNew.add("payload", payLoad);
 			
-			
 			returnValue.add(INSTRUCTION_DATA, instuctionDataNew);
 			
-			System.out.println("HardwareStep JSON: " + returnValue.toString());
+
 
 		} else if(this.instructionData.has("activate")){
 			instuctionDataNew.add("command", new JsonPrimitive("activate"));
@@ -135,7 +134,7 @@ public class HardwareStep {
 		} else {
 			System.out.println("NOTFOUND: "+this.instructionData.toString());
 		}
-		System.out.println("RETURNVALUE: "+returnValue.toString());
+		System.out.println("Return value: "+returnValue );
 		return returnValue;
 	}
 	
