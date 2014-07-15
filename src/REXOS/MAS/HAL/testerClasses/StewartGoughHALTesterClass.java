@@ -307,121 +307,113 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		
 		// TODO Auto-generated method stub
 		hal = new HardwareAbstractionLayer(htc);
-		
-<<<<<<< HEAD
-=======
 
-if(insert){		
->>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
+	if(insert){		
+	
 		FileInputStream fis;
 		byte[] content;
-
+		System.out.println("Start insertig module");
+		
+		File stewartGoughJar = new File(dir + "StewartGough.jar");
+		fis = new FileInputStream(stewartGoughJar);
+		content = new byte[(int) stewartGoughJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64DeltaRobot = new String(Base64.encodeBase64(content));
+		
+		File stewartGoughZip = new File(dir + "nodes.zip");
+		fis = new FileInputStream(stewartGoughZip);
+		content = new byte[(int) stewartGoughZip.length()];
+		fis.read(content);
+		fis.close();
+		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
+		
+		File gripperZip = new File(dir + "nodes.zip");
+		fis = new FileInputStream(gripperZip);
+		content = new byte[(int) gripperZip.length()];
+		fis.read(content);
+		fis.close();
+		String base64GripperRos = new String(Base64.encodeBase64(content));
+		
+		File cameraZip = new File(dir + "nodes.zip");
+		fis = new FileInputStream(cameraZip);
+		content = new byte[(int) cameraZip.length()];
+		fis.read(content);
+		fis.close();
+		String base64CameraRos = new String(Base64.encodeBase64(content));
+		
+		File workplaneZip = new File(dir + "nodes.zip");
+		fis = new FileInputStream(workplaneZip);
+		content = new byte[(int) workplaneZip.length()];
+		fis.read(content);
+		fis.close();
+		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
+		
+		File penJar = new File(dir + "Pen.jar");
+		fis = new FileInputStream(penJar);
+		content = new byte[(int) penJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Pen = new String(Base64.encodeBase64(content));
+		
+		File gripperJar = new File(dir + "Gripper.jar");
+		fis = new FileInputStream(gripperJar);
+		content = new byte[(int) gripperJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Gripper = new String(Base64.encodeBase64(content));
+		
+		File drawJar = new File(dir + "Draw.jar");
+		fis = new FileInputStream(drawJar);
+		content = new byte[(int) drawJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64Draw = new String(Base64.encodeBase64(content));
+		
+		File pickAndPlaceJar = new File(dir + "PickAndPlaceWithRotation.jar");
+		fis = new FileInputStream(pickAndPlaceJar);
+		content = new byte[(int) pickAndPlaceJar.length()];
+		fis.read(content);
+		fis.close();
+		String base64PickAndPlaceWithRotation = new String(Base64.encodeBase64(content));
+		
+		System.out.println("Finished reading moduleFiles, starting insertion of modules...");
+		
+		
+		// Six axis
+		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlaceWithRotation + moduleA_05; 
+		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
+		hal.insertModule(a, a);
+		System.out.println("Module A inserted");
+		
+	//	// pen
+	//	String moduleB = moduleB_01 + base64Pen + moduleB_02; 
+	//	JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+	//	hal.insertModule(b, b);
+		
+		// gripper
+		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
+		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+		hal.insertModule(b, b);
+		System.out.println("Module B inserted");
 	
-	System.out.println("Start insertig module");
-	
-	File stewartGoughJar = new File(dir + "StewartGough.jar");
-	fis = new FileInputStream(stewartGoughJar);
-	content = new byte[(int) stewartGoughJar.length()];
-	fis.read(content);
-	fis.close();
-	String base64DeltaRobot = new String(Base64.encodeBase64(content));
-	
-	File stewartGoughZip = new File(dir + "nodes.zip");
-	fis = new FileInputStream(stewartGoughZip);
-	content = new byte[(int) stewartGoughZip.length()];
-	fis.read(content);
-	fis.close();
-	String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
-	
-	File gripperZip = new File(dir + "nodes.zip");
-	fis = new FileInputStream(gripperZip);
-	content = new byte[(int) gripperZip.length()];
-	fis.read(content);
-	fis.close();
-	String base64GripperRos = new String(Base64.encodeBase64(content));
-	
-	File cameraZip = new File(dir + "nodes.zip");
-	fis = new FileInputStream(cameraZip);
-	content = new byte[(int) cameraZip.length()];
-	fis.read(content);
-	fis.close();
-	String base64CameraRos = new String(Base64.encodeBase64(content));
-	
-	File workplaneZip = new File(dir + "nodes.zip");
-	fis = new FileInputStream(workplaneZip);
-	content = new byte[(int) workplaneZip.length()];
-	fis.read(content);
-	fis.close();
-	String base64WorkplaneRos = new String(Base64.encodeBase64(content));
-	
-	File penJar = new File(dir + "Pen.jar");
-	fis = new FileInputStream(penJar);
-	content = new byte[(int) penJar.length()];
-	fis.read(content);
-	fis.close();
-	String base64Pen = new String(Base64.encodeBase64(content));
-	
-	File gripperJar = new File(dir + "Gripper.jar");
-	fis = new FileInputStream(gripperJar);
-	content = new byte[(int) gripperJar.length()];
-	fis.read(content);
-	fis.close();
-	String base64Gripper = new String(Base64.encodeBase64(content));
-	
-	File drawJar = new File(dir + "Draw.jar");
-	fis = new FileInputStream(drawJar);
-	content = new byte[(int) drawJar.length()];
-	fis.read(content);
-	fis.close();
-	String base64Draw = new String(Base64.encodeBase64(content));
-	
-	File pickAndPlaceJar = new File(dir + "PickAndPlaceWithRotation.jar");
-	fis = new FileInputStream(pickAndPlaceJar);
-	content = new byte[(int) pickAndPlaceJar.length()];
-	fis.read(content);
-	fis.close();
-	String base64PickAndPlaceWithRotation = new String(Base64.encodeBase64(content));
-	
-	System.out.println("Finished reading moduleFiles, starting insertion of modules...");
-	
-	
-	// gripper
-	String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlaceWithRotation + moduleA_05; 
-	JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
-	hal.insertModule(a, a);
-	System.out.println("Module A inserted");
-	
-//	// pen
-//	String moduleB = moduleB_01 + base64Pen + moduleB_02; 
-//	JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-//	hal.insertModule(b, b);
-	
-	// gripper
-	String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
-	JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-	hal.insertModule(b, b);
-	System.out.println("Module B inserted");
-
-	// camera
-	String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
-	JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
-	hal.insertModule(c, c);
-	System.out.println("Module C inserted");
-	// lens
-	String moduleD = moduleD_01 + base64Pen + moduleD_02; 
-	JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
-	hal.insertModule(d, d);
-	System.out.println("Module D inserted");
-	// workplane
-	String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
-	JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
-	hal.insertModule(e, e);
-	System.out.println("Module E inserted");
-<<<<<<< HEAD
-=======
-	insert = false;
-}
->>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
+		// camera
+		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
+		JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
+		hal.insertModule(c, c);
+		System.out.println("Module C inserted");
+		// lens
+		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
+		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
+		hal.insertModule(d, d);
+		System.out.println("Module D inserted");
+		// workplane
+		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
+		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
+		hal.insertModule(e, e);
+		System.out.println("Module E inserted");
+		insert = false;
+	}
 		
 /*criteria = new JsonObject();
 		JsonObject target = new JsonObject();
@@ -482,11 +474,6 @@ if(insert){
 		
 		
 		//hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
-<<<<<<< HEAD
-=======
-			
-		
->>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
 		
 		Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
