@@ -267,11 +267,11 @@ namespace rexos_stewart_gough{
 
 
     void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ){
-		maxAcceleration = 1;
+		//maxAcceleration = 1;
 		std::cout << "moveTo: point(x:" << point.x << ", y:" << point.y << ", z:" << point.z << ") rotation(x:" << rotationX << ", y:" << rotationY << ", z:" << rotationZ << ")" << std::endl;
 		
-		rexos_datatypes::Point3D<double> roundedPoint(roundf(point.x), roundf(point.y), roundf(point.z));
-		std::cout << "moveTo (rounded): point(x:" << roundedPoint.x << ", y:" << roundedPoint.y << ", z:" << roundedPoint.z << ")" << std::endl;
+		//rexos_datatypes::Point3D<double> roundedPoint(roundf(point.x), roundf(point.y), roundf(point.z));
+		//std::cout << "moveTo (rounded): point(x:" << roundedPoint.x << ", y:" << roundedPoint.y << ", z:" << roundedPoint.z << ")" << std::endl;
 		
 		
 		// check whether the motors are powered on.
@@ -281,7 +281,7 @@ namespace rexos_stewart_gough{
 
 		//check if the requested location is the effectors current location,
 		//if so the method can be cut short.
-        if(effectorLocation == roundedPoint
+        if(effectorLocation == point
 				&& currentEffectorRotationX == rotationX
 				&& currentEffectorRotationY == rotationY
 				&& currentEffectorRotationZ == rotationZ){
@@ -311,7 +311,7 @@ namespace rexos_stewart_gough{
 			
 			
 			
-			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(roundedPoint.x, roundedPoint.y, -roundedPoint.z), rotationX, rotationY, rotationZ);
+			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, -point.y, point.z), rotationX, rotationY, rotationZ);
 			
 			
 		//std::cout << "Rotation args from effectorMove: " << effectorMove.effectorRotationX << " " << effectorMove.effectorRotationY << " " << effectorMove.effectorRotationZ << std::endl;
@@ -323,9 +323,25 @@ namespace rexos_stewart_gough{
 			}
 			for(int i = 0; i < 6;i++){
 			
-				rotations[i]->angle = effectorMove.angles[i];
+				//Swap 2 and 3
+				if(i == 2){
+					rotations[i]->angle = effectorMove.angles[3];
+				} else if(i == 3){
+					rotations[i]->angle = effectorMove.angles[2];
+				} else
+				//Swap 0 and 1
+				if(i == 0){
+					rotations[i]->angle = effectorMove.angles[1];
+				} else if(i == 1){
+					rotations[i]->angle = effectorMove.angles[0];
+				} else {
+					rotations[i]->angle = effectorMove.angles[i];
+				}
+				
 				std::cout << "Angle for motor: " << i << " = " << effectorMove.angles[i] << std::endl;
 			}
+			
+		
 			
             //kinematics->destinationPointToMotorRotations(point, rotations);
         } catch(std::out_of_range& ex){
@@ -498,7 +514,6 @@ namespace rexos_stewart_gough{
      * @return The amount of motor steps the motor has moved.
      **/
     MotorGroup StewartGough::moveMotorUntilSensorIsOfValue(int motorIndex1, int motorIndex2, rexos_motor::MotorRotation motorRotation1 ,rexos_motor::MotorRotation motorRotation2, bool sensorValue){
-		ROS_INFO("move Motor Until Sensor Is Of Value...");
         motors[motorIndex1]->writeRotationData(motorRotation1, 1, false);
 		motors[motorIndex2]->writeRotationData(motorRotation2, 1, false);
 		bool done1 = false;
@@ -536,8 +551,6 @@ namespace rexos_stewart_gough{
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void StewartGough::calibrateMotor(int motorIndex1, int motorIndex2){
-       std::cout << "[DEBUG] Calibrating motor number " << motorIndex1 << std::endl;
-
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex1]->setIncrementalMode(1);
 		motors[motorIndex2]->setIncrementalMode(1);
@@ -569,14 +582,14 @@ namespace rexos_stewart_gough{
 		
 		
 		
-		std::cout << "actual steps: " << std::endl;
+		//std::cout << "actual steps: " << std::endl;
 		std::cout << actualAngleInSteps1 << std::endl;
 		//calculate and set the deviation.
 		//std::cout << stewartGoughMeasures->motorFromZeroToTopAngle << std::endl;
         double deviation1 = (actualAngleInSteps1 * motors.at(motorIndex1)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
         double deviation2 = (actualAngleInSteps2 * motors.at(motorIndex2)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
 		
-		std::cout << "passed 1" << std::endl;
+		//std::cout << "passed 1" << std::endl;
 		motors[motorIndex1]->setDeviationAndWriteMotorLimits(deviation1);
 		motors[motorIndex2]->setDeviationAndWriteMotorLimits(deviation2);
         // Move back to the new 0.
@@ -599,10 +612,10 @@ namespace rexos_stewart_gough{
     * 
     * @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
     **/
-    bool StewartGough::calibrateMotors(){       
-        std::cout << "calibrating" << std::endl;
-		// Check the availability of the sensors
+    bool StewartGough::calibrateMotors(){
+		ROS_INFO("Start motor calibration");
 		
+		// Check the availability of the sensors
 		for(int i = 0; i < 6; i++){
 			motorManager->powerOffSingleMotor(i);
 		}
@@ -610,7 +623,7 @@ namespace rexos_stewart_gough{
         bool sensorFailure = false;
 		for(int i =0; i < 6; i++){
 			if(checkSensor(i)){
-				std::cerr << "Sensor 0 failure (is the hardware connected?)" << std::endl;
+				ROS_ERROR_STREAM("Sensor " << i << "failure (is the hardware connected?)");
 				sensorFailure = true;
 			}
 		}
@@ -627,49 +640,21 @@ namespace rexos_stewart_gough{
 
 		for(int i = 0; i < 6; i++){
 			motorManager->powerOnSingleMotor(getMotorIndexByNumber(0 + i));
-			
 			getMotor(0 + i)->setDeviationAndWriteMotorLimits(0);
 			getMotor(0 + i)->writeRotationData(motorRotation, 1);
-			
-			
 			getMotor(0 + i)->startMovement(1);
-			//motorManager->startMovement(1);
-			//std::cout << "did start movement" << std::endl;
-			
 			getMotor(0 + i)->waitTillReady();
 			getMotor(0 + i)->disableAngleLimitations();
 		}
 
 		for(int i = 0; i < 6; i = i + 2){
-			/*
-			motorManager->powerOnSingleMotor(getMotorIndexByNumber(0 + i));
-			motorManager->powerOnSingleMotor(getMotorIndexByNumber(1 + i));
-			
-			//std::cout << "powered on 1 and 2" << std::endl;
-			getMotor(0 + i)->setDeviationAndWriteMotorLimits(0);
-			getMotor(0 + i)->writeRotationData(motorRotation, 1);
-			getMotor(1 + i)->setDeviationAndWriteMotorLimits(0);
-			getMotor(1 + i)->writeRotationData(motorRotation, 1);
-			//std::cout << "wrote diviation and rotation data" << std::endl;
-			
-			//getMotor(0 + i)->startMovement(1);
-			motorManager->startMovement(1);
-			//std::cout << "did start movement" << std::endl;
-			
-			getMotor(0 + i)->waitTillReady();
-			getMotor(1 + i)->waitTillReady();
-			
-			getMotor(0 + i)->disableAngleLimitations();
-			getMotor(1 + i)->disableAngleLimitations();
-			*/
-			
 			// Calibrate motors
 			calibrateMotor(getMotorIndexByNumber(0 + i), getMotorIndexByNumber(1 + i));
 			// Enable angle limitations
 			getMotor(0 + i)->enableAngleLimitations();
 			getMotor(1 + i)->enableAngleLimitations();
 			
-			std::cout << "Motors " << (0 + i) << " and " << (1 + i) << " done calibrating!" << std::endl;
+			ROS_INFO_STREAM("Motors " << (0 + i) << " and " << (1 + i) << " calibrated");
 		}
 	
 		
@@ -762,19 +747,66 @@ namespace rexos_stewart_gough{
 		
 		}
 		 */
-		moveTo(rexos_datatypes::Point3D<double>(0, 0, -350), 0.9, 0, 0, 0);
-		sleep(4);
-		moveTo(rexos_datatypes::Point3D<double>(-100, 0, -350), 0.9, 0, 0, 0);
-		//sleep(4);
-		//moveTo(rexos_datatypes::Point3D<double>(0, -100, -350), 0.9, 0, 0, 0);
-		//sleep(4);	
-		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -350), 0.9, 0, 0, 0);
-		//sleep(4);
-		//moveTo(rexos_datatypes::Point3D<double>(100, 0, -350), 0.9, 0, 0, 0);
-		//sleep(4);
-		//moveTo(rexos_datatypes::Point3D<double>(-100, 0, -350), 0.9, 0, 0, 0);
-		//sleep(4);
-		//moveTo(rexos_datatypes::Point3D<double>(0, 0, -350), 0.9, 0, 0, 0);
+		 
+		 /*
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280), 20, 0, 0, 0);
+		
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(-40, 40, -280),  0.9, 0, 0, 0);
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(40, 40, -280),  0.9, 0, 0, 0);
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(40, -40, -280),  0.9, 0, 0, 0);
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(-40, -40, -280),  0.9, 0, 0, 0);
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280),  0.9, 0, 0, 0);
+		
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, -40, -280),  0.9, 0.174532925, 0, 0);
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, -40, -280),  0.9, -0.174532925, 0, 0);
+		
+		
+
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280),  0.9, 0, 0, 0);
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280),  0.9, 0, 0.174532925, 0);
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280),  0.9, 0, -0.174532925, 0);
+		
+		
+		sleep(1);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -280),  0.9, 0, 0, 0);
+		*/
+		
+		/*
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(0, -100, -350),  20, 0, 0, 0);
+		sleep(2);	
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -350),  20, 0, 0, 0);
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(100, 0, -350),  20, 0, 0, 0);
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(-100, 0, -350),  20, 0, 0, 0);
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -350),  20, 0, 0, 0);
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(80, 80, -350),  20, 0, 0, 0);
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(-80, -80, -350),  20, 0, 0, 0);
+		sleep(2);
+		moveTo(rexos_datatypes::Point3D<double>(0, 0, -350),  20, 0, 0, 0);
+		*/
 		
 		
         std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
@@ -795,7 +827,7 @@ namespace rexos_stewart_gough{
      * Turns on the stewart gough's hardware.
      **/
     void StewartGough::powerOn(void){
-		ROS_INFO("powering motors on");
+		//ROS_INFO("powering motors on");
         if(!motorManager->isPoweredOn()){
             motorManager->powerOn();
         }

@@ -7,6 +7,7 @@
 
 #include "rexos_stewart_gough/SixAxisCalculations.h"
 using namespace std;
+
 void SixAxisCalculations::get4x4TransalationMatrix(double result[], Point3D point){
 	result[GET_INDEX(0, 0, 4)] = 1;
 	result[GET_INDEX(0, 1, 4)] = 0;
@@ -218,7 +219,13 @@ double SixAxisCalculations::calculateCircleDistanceD(SixAxisCalculations::Point3
 
 double SixAxisCalculations::calculateAB(Point3D enginePosition, Point3D jointPosition){
 	//double ac = sqrt(pow(enginePosition.x - jointPosition.x, 2) + pow(enginePosition.y - jointPosition.y, 2));
+
+
+
 	double ac = enginePosition.x - jointPosition.x; //TODO was x
+
+	//std::cout << "AC: " << ac << std::endl;
+
 	return sqrt(pow(lowerArmLength, 2) + pow(ac, 2));
 }
 
@@ -397,9 +404,16 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 
 	double radius = motorAxisToCenterDistance / cos(abs(groupPositionOnCircle - motorJointPositionOnCircle));
 
+	radius = motorAxisToCenterDistance;
+
 	xMotorPos = sin(DEGREES_TO_RADIANS(motorJointPositionOnCircle)) * radius;
 	yMotorPos = cos(DEGREES_TO_RADIANS(motorJointPositionOnCircle)) * radius;
 
+
+
+	//std::cout << "XJoint = (" << xJoint + moveTo.x << ", " << yJoint + moveTo.y << ", " << moveTo.z << ")" << std::endl;
+
+//std::cout << "motorX: " << xMotorPos << " motorY: " << yMotorPos << std::endl;
 
 
 	/**
@@ -437,7 +451,7 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	//std::cout << resultMatrix[GET_INDEX(1, 0, 1)] << std::endl;
 	//std::cout << resultMatrix[GET_INDEX(2, 0, 1)] << std::endl;
 
-
+	//std::cout << "Rotated point: "<< rotatedPoint << std::endl;
 
 
 	//Ugly cache method, so 6 matrix 3d rotations can be skipped in the calculation of the safety angles
@@ -497,7 +511,7 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 		//Create result point and do transformation
 		SixAxisCalculations::Point3D moveToTransalated( resultPoint[GET_INDEX(0, 0, 1)] + xTrans, resultPoint[GET_INDEX(1, 0, 1)] + yTrans, rotatedPoint.z);
 
-		std::cout << moveToTransalated << std::endl;
+		//std::cout << moveToTransalated << std::endl;
 
 
 
@@ -509,13 +523,157 @@ double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositio
 	 * Step 4: Inverse kinematics.
 	 */
 
+		//std::cout << "moveToTransalated: " << moveToTransalated << std::endl;
+
+
+	Point3D circlePlaneVector(1, 0, 0);
+
+	Point3D sphereCenterVector(engine.x - moveToTransalated.x, engine.y - moveToTransalated.y, engine.z  - moveToTransalated.z);
+
+	double sphereRadius = lowerArmLength;
+
+	double dotProduct = (circlePlaneVector.x * (0 - sphereCenterVector.x)) +
+						(circlePlaneVector.y * (0 - sphereCenterVector.y)) +
+						(circlePlaneVector.z * (0 - sphereCenterVector.z));
+
+
+	//std::cout << "dot product: " << dotProduct << std::endl;
+	if(abs(dotProduct) > sphereRadius){
+		//std::cout << "No Intersection!" << std::endl;
+	} else {
+		//std::cout << "Intersection!" << std::endl;
+	}
+
+
+
+
+
 	double ab = calculateAB(engine,  moveToTransalated);
+
+
+
+	double ab_new = sqrt((lowerArmLength*lowerArmLength) - abs(dotProduct*dotProduct));
+
+	//std::cout << "AB new: " << ab_new << std::endl;
+	//std::cout << "AB: " << ab << std::endl;
+
+
+	double dotAbs = abs(dotProduct);
+
+	Point3D dotproductTimesPlaneVector(dotAbs * sphereCenterVector.x, dotAbs * sphereCenterVector.y, dotAbs *sphereCenterVector.z);
+
+	Point3D planeCircleCenter(engine.x, moveToTransalated.y, moveToTransalated.z);
+
+
+
+
+	//c_s + d*n.
+	double d_new = calculateCircleDistanceD(engine, planeCircleCenter);
+
 	double d = calculateCircleDistanceD(engine, moveToTransalated);
-	double xd = calculateCircleIntersectionX(d, upperArmLength, ab);
+
+	//std::cout << "circlePlane center: " << planeCircleCenter << std::endl;
+
+	//std::cout << "d new: " << d_new << std::endl;
+	//std::cout << "d: " << d << std::endl;
+
+
+	double xd = calculateCircleIntersectionX(d_new,  ab_new, upperArmLength);
+
+
+
+	Point3D intersection = getIntersectionPoint(0, 0, upperArmLength, planeCircleCenter.y, planeCircleCenter.z, ab_new);
+
+	if(intersection.x == -1){
+		//std::cout << "no intersection with circles" << std::endl;
+		return NAN;
+	} else {
+		//std::cout << "Intersection with circles!!" << std::endl;
+		//std::cout << "AT: " << intersection << std::endl;
+
+
+		Point3D vectorBase(0, 0 + 100, 0);
+
+
+
+		double angle1  = atan2( vectorBase.z*intersection.y - vectorBase.y*intersection.z, vectorBase.z*intersection.z + vectorBase.y*intersection.y );
+
+
+		//double angle = getAngleBetween(vectorBase, intersection);
+
+		//std::cout << "Angle: " << RADIANS_TO_DEGREES(angle) << std::endl;
+		//std::cout << "Angle1: " << RADIANS_TO_DEGREES(angle1) << std::endl;
+		return angle1;
+	}
+
+
+
+
+	//std::cout << "x: " << xd << std::endl;
+
+
 	double d2 = d - xd;
 
-	return calculateAngle(d2);
+	//return angle; //calculateAngle(xd);
 }
+
+SixAxisCalculations::Point3D SixAxisCalculations::getIntersectionPoint(double x1, double y1, double r1, double x2, double y2, double r2){
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+
+	//Determine the straight-Line distance between the centers.
+	double d = sqrt((dy*dy) + (dx*dx));
+
+	//std::cout << "==distance: " << d << std::endl;
+
+	//std::cout << "==radiusAdded: " << (r1 + r2) << std::endl;
+
+	//No results
+	if(d > (r1 + r2)){
+		//std::cout << "==no Intersect: " << std::endl;
+		//No intersect
+		return Point3D(-1, 0, 0);
+		//Circle contained
+	} else if(d < abs(r1- r2)){
+		//std::cout << "==Contains: " << std::endl;
+		return Point3D(-1, 0, 0);
+	}
+
+
+
+
+
+	//Determine the distance from point 0 to the crossPoint
+	double crossPointDistance = ((r1*r1) - (r2*r2) + (d*d)) / (2.0 * d);
+
+
+	//Determine the coordinates of the crossPoint
+	double crossPointX = x1 + (dx * crossPointDistance/d);
+	double crossPointY = y1 + (dy * crossPointDistance/d);
+
+	//Determine the distance from crossPoint To either of the
+	//intersection points.
+	double h = sqrt((r1*r1) - (crossPointDistance*crossPointDistance));
+
+	//Now determine the offsets of the intersection points from
+	//crossPoint
+	double rx = (0-dy) * (h/d);
+	double ry = dx * (h/d);
+
+	//Determine the absolute intersection points.
+	   double xi1 = crossPointX + rx;
+	    double xi2 = crossPointX - rx;
+	    double yi1 = crossPointY + ry;
+	    double yi2 = crossPointY - ry;
+
+	   // std::cout << "Intersect! (" << yi1 << ", " << xi1 << ")" << std::endl;
+
+	   // std::cout << "Intersect! (" << yi2 << ", " << xi2 << ")" << std::endl;
+
+	   return Point3D(0, xi1, yi1);
+}
+
+
 
 double SixAxisCalculations::getAngleBetween(Point3D vectorOne, Point3D vectorTwo){
 	//Calculate the angle between the two vectors: http://en.wikipedia.org/wiki/Dot_product
@@ -526,6 +684,9 @@ double SixAxisCalculations::getAngleBetween(Point3D vectorOne, Point3D vectorTwo
 
 	return acos(dotProduct / (magnitudeVectorOne * magnitudeVectorTwo));
 }
+
+
+
 
 SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(Point3D moveTo, double xRotation, double yRotation, double zRotation){
 
@@ -583,6 +744,7 @@ SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(Point3D mo
 
 double * SixAxisCalculations::getAngles(double angles[6], Point3D moveTo, double xRotation, double yRotation, double zRotation){
 	EffectorMove move = getMotorAngles(moveTo, xRotation, yRotation, zRotation);
+	//std::cout << "isValid: " << move.validMove << std::endl;
 	if(move.validMove){
 		angles[0] = move.angles[0];
 		angles[1] = move.angles[1];
@@ -637,7 +799,7 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
     	double stepLengthRotationZ = rotationZ_length / largest_length;
 
 
-		std::cout << "path length: " << largest_length << std::endl;
+		//std::cout << "path length: " << largest_length << std::endl;
 
 		for(double step = 1; step <= largest_length; step++){
 
@@ -659,6 +821,3 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
         return true;
 
 }
-
-
-

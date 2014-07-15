@@ -32,7 +32,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	
 	static final String baseDir = "/home/agileman/Desktop/";
 	static final String Aridir = "C:/users/Aristides/Desktop/Six Axis/";
-	static final String dir = Aridir;
+	static final String dir = baseDir;
 	
 	// six_axis robot
 	static String moduleA_01 = "{"
@@ -307,7 +307,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		hal = new HardwareAbstractionLayer(htc);
 
 		
-		/*FileInputStream fis;
+		FileInputStream fis;
 		byte[] content;
 
 	
@@ -393,8 +393,9 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	// gripper
 	String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
 	JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
-	//hal.insertModule(b, b);
+	hal.insertModule(b, b);
 	System.out.println("Module B inserted");
+
 	// camera
 	String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
 	JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
@@ -409,7 +410,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
 	JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
 	hal.insertModule(e, e);
-	System.out.println("Module E inserted");*/
+	System.out.println("Module E inserted");
 		
 		JsonObject criteria = new JsonObject();
 		JsonObject target = new JsonObject();
@@ -449,7 +450,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		criteria.add("subjects",subjects);
 		
 		
-		hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
+		//hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);

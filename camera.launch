@@ -5,7 +5,9 @@
 	<arg name="serialNumber" />
 	<group>
 		<node pkg="vision_node" type="vision_node" name="vision_node" args="0 1"/>
+		
 		<node pkg="camera_calibration_node" type="camera_calibration_node" name="camera_calibration_node"/>
+
 		<node pkg="camera_control_node" type="camera_control_node" name="camera_control_node" args="$(arg equipletName) $(arg manufacturer) $(arg typeNumber) $(arg serialNumber)"/>
 	</group>
 

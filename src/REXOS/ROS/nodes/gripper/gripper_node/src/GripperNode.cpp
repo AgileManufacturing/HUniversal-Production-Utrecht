@@ -99,13 +99,17 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 			ROS_WARN_STREAM("value " << value);
 			if(strcmp(value.c_str(), "activate") == 0) {
 				std::cout << "Activating gripper" << std::endl;
-				gripper->grab();
+				//gripper->grab();
+				//std::cout << "Gripper activated" << std::endl;
 				setInstructionActionServer.setSucceeded(result_);
+				std::cout << "setSucceeded" << std::endl;
 				return;
 			} else if(strcmp(value.c_str(), "deactivate") == 0) {
 				std::cout << "Deactivating gripper" << std::endl;
-				gripper->release();
+				//gripper->release();
+				//std::cout << "Gripper deactivated" << std::endl;
 				setInstructionActionServer.setSucceeded(result_);
+				std::cout << "setSucceeded" << std::endl;
 				return;
 			}
 		}
@@ -151,7 +155,7 @@ bool GripperNode::transitionDeinitialize() {
 bool GripperNode::transitionSetup() {
 	ROS_INFO("Setup transition called");
 	// Set currentState to start
-	gripper->startWatchdog();
+	//gripper->startWatchdog();
 	
 	//The service servers should be set, to provide the normal methods for the equiplet
 	return true;
@@ -164,9 +168,9 @@ bool GripperNode::transitionSetup() {
 bool GripperNode::transitionShutdown() {
 	ROS_INFO("Shutdown transition called");
 	// Set currentState to stop
-	gripper->stopWatchdog();
-	gripper->release();
-	gripper->disable();
+	//gripper->stopWatchdog();
+	//gripper->release();
+	//gripper->disable();
 
 	return true;
 }

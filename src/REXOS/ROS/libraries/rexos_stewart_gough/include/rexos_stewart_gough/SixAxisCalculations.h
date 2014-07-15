@@ -77,33 +77,33 @@ class SixAxisCalculations {
 		bool checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ);
 
 
-		static const double EFFECTOR_MAGIC_NUMBER = 37.198;
+		static constexpr double EFFECTOR_MAGIC_NUMBER = 37.198;
 
 		/*
 		 * Can be calculated using:
 		 * double distanceBetweenMotors = (sin(degreesToRadians(EFFECTOR_MAGIC_NUMBER)) * effectorJointtoCenterDistance) * 2;
 		 * MOTOR_MAGIC_NUMBER = radiansToDegrees(asin((elbowGroupDistance/2) / motorAxisToCenterDistance));
 		 */
-		static const double MOTOR_MAGIC_NUMBER = 19.1624;
+		static constexpr double MOTOR_MAGIC_NUMBER = 19.1624;
 
 
-		static const double GROUP_A_POS 			= 0;
-		static const double EFFECTOR_JOINT_A1_POS 	= 0 - 37.198;
-		static const double EFFECTOR_JOINT_A2_POS 	= 0 + 37.198;
-		static const double MOTOR_A1_POS 			= 0 - 19.1624;
-		static const double MOTOR_A2_POS 			= 0 + 19.1624;
+		static constexpr double GROUP_A_POS 			= 0;
+		static constexpr double EFFECTOR_JOINT_A1_POS 	= 0 - 37.198;
+		static constexpr double EFFECTOR_JOINT_A2_POS 	= 0 + 37.198;
+		static constexpr double MOTOR_A1_POS 			= 0 - 19.1624;
+		static constexpr double MOTOR_A2_POS 			= 0 + 19.1624;
 
-		static const double GROUP_B_POS 			= 120;
-		static const double EFFECTOR_JOINT_B1_POS 	= 120 - 37.198;
-		static const double EFFECTOR_JOINT_B2_POS 	= 120 + 37.198;
-		static const double MOTOR_B1_POS 			= 120 - 19.1624;
-		static const double MOTOR_B2_POS 			= 120 + 19.1624;
+		static constexpr double GROUP_B_POS 			= 120;
+		static constexpr double EFFECTOR_JOINT_B1_POS 	= 120 - 37.198;
+		static constexpr double EFFECTOR_JOINT_B2_POS 	= 120 + 37.198;
+		static constexpr double MOTOR_B1_POS 			= 120 - 19.1624;
+		static constexpr double MOTOR_B2_POS 			= 120 + 19.1624;
 
-		static const double GROUP_C_POS 			= 240;
-		static const double EFFECTOR_JOINT_C1_POS 	= 240 - 37.198;
-		static const double EFFECTOR_JOINT_C2_POS 	= 240 + 37.198;
-		static const double MOTOR_C1_POS 			= 240 - 19.1624;
-		static const double MOTOR_C2_POS 			= 240 + 19.1624;
+		static constexpr double GROUP_C_POS 			= 240;
+		static constexpr double EFFECTOR_JOINT_C1_POS 	= 240 - 37.198;
+		static constexpr double EFFECTOR_JOINT_C2_POS 	= 240 + 37.198;
+		static constexpr double MOTOR_C1_POS 			= 240 - 19.1624;
+		static constexpr double MOTOR_C2_POS 			= 240 + 19.1624;
 
 	private:
         double upperArmLength;
@@ -115,16 +115,7 @@ class SixAxisCalculations {
         Point3D effectorJointPositionCache[6];
 
 
-		double matrixIdentity4x4[4][4] 		= {	{1, 0, 0, 0},
-												{0, 1, 0, 0},
-												{0, 0, 1, 0},
-												{0, 0, 0, 1}};
-
-		double matrixPoint4x4[4][1] 		= {	{0},
-												{0},
-												{0},
-												{1}};
-
+		
 		//Matrix operations
 		void getMultiplyMatrix(double result[], double matrixA[], int rowsA, int colsA, double matrixB[], int rowsB, int colsB);
 
@@ -159,6 +150,8 @@ class SixAxisCalculations {
 		void get1x3PointMatrix(double result[], Point3D point);
 
 
+
+		Point3D getIntersectionPoint(double x1, double y1, double r1, double x2, double y2, double r2);
 
 
         //Matrix operations

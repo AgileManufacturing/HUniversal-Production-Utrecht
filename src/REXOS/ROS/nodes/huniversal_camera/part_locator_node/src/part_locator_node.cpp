@@ -41,8 +41,6 @@
 #include <actionlib/client/simple_action_client.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
-
-
 using namespace std;
 
 const Vector2 PartLocatorNode::EXPECTED_DIRECTION = Vector2(-1, 0);
@@ -52,7 +50,6 @@ const int PartLocatorNode::minItemSamples = 11;
 /*const string PartLocatorNode::TOP_LEFT_VALUE = "WP_800_400_TL";
 const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
-
 
 PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, std::string equipletIdentifier):
 		equipletIdentifier(equipletIdentifier),
@@ -73,8 +70,9 @@ PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_datab
 	topLeftValue = std::string();
 	topRightValue = std::string();
 	bottomRightValue = std::string();
-	double workPlaneWidth = std::numeric_limits<double>::quiet_NaN();
-	double workPlaneHeight = std::numeric_limits<double>::quiet_NaN();
+	workPlaneWidth = std::numeric_limits<double>::quiet_NaN();
+	workPlaneHeight = std::numeric_limits<double>::quiet_NaN();
+	workSpaceHeight = std::numeric_limits<double>::quiet_NaN();
 	
 	for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
 		if(it->name() == "topLeftValue"){
@@ -410,17 +408,17 @@ bool PartLocatorNode::transitionDeinitialize() {
 bool PartLocatorNode::transitionSetup(){
 	ROS_INFO("Setup transition called");
 	
-	// Select either deltarobot or six_axisrobot
+	// @TODO Select either deltarobot or six_axisrobot (defaulted to sixaxis in constructor)
 	//	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
 	//  actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/six_axis_type_A/1/set_instruction");
-		actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/" +equipletIdentifier+"/1/set_instruction");
+	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/" +equipletIdentifier+"/1/set_instruction");
 	std::string hardwareStep;
 	rexos_statemachine::SetInstructionGoal* goal;
 	
 	
 	workPlaneWidth = 80;
 	workPlaneHeight = 80;
-	workSpaceHeight = 80;
+	workSpaceHeight = 50;
 	
 	/*rexos_statemachine::TransitionGoal goal2;
 	std::vector<rexos_statemachine::RequiredMutation> requiredMutations;
@@ -433,11 +431,18 @@ bool PartLocatorNode::transitionSetup(){
 	transitionActionClient.sendGoal(goal2);
 	transitionActionClient.waitForResult();
 */
+
+	ROS_INFO("Press enter when six-axis has finished calibration");
+	cin.get();
+	cin.ignore();
+
+
 	ROS_INFO("Continuing calibration");
 	
 	double x;
 	double y;
 	double z;
+	int acceleration = 20;
 	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
 	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "six_axis_type_A", "1"));
 	rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU",equipletIdentifier, "1"));
@@ -452,7 +457,7 @@ bool PartLocatorNode::transitionSetup(){
 	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
-	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\": "+boost::lexical_cast<std::string>(acceleration) +"} }";
 	ROS_WARN_STREAM(hardwareStep);
 	
 	goal = new rexos_statemachine::SetInstructionGoal();
@@ -473,7 +478,7 @@ bool PartLocatorNode::transitionSetup(){
 	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
-	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 	ROS_WARN_STREAM(hardwareStep);
 	
 	goal = new rexos_statemachine::SetInstructionGoal();
@@ -494,7 +499,7 @@ bool PartLocatorNode::transitionSetup(){
 	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
-	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 	ROS_WARN_STREAM(hardwareStep);
 	ROS_WARN_STREAM(*goal);
 		
@@ -558,7 +563,6 @@ bool PartLocatorNode::transitionSetup(){
 	postCorrectionRotationMatrix[3] = sin(rotationAngle);
 	postCorrectionRotationMatrix[4] = cos(rotationAngle);
 	
-	
 	Aproj = postCorrectionRotationMatrix * Aproj;
 	Bproj = postCorrectionRotationMatrix * Bproj;
 	Cproj = postCorrectionRotationMatrix * Cproj;
@@ -599,11 +603,9 @@ bool PartLocatorNode::transitionSetup(){
 	postCorrectionScaleMatrix[4] = scaleY;
 	ROS_INFO_STREAM("scaleX: " << scaleX << " scaleY " << scaleY);
 	
-	
 	Aproj = postCorrectionScaleMatrix * Aproj;
 	Bproj = postCorrectionScaleMatrix * Bproj;
 	Cproj = postCorrectionScaleMatrix * Cproj;
-	
 	
 	ROS_INFO_STREAM(postCorrectionScaleMatrix);
 	ROS_INFO_STREAM("scale: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
@@ -616,7 +618,6 @@ bool PartLocatorNode::transitionSetup(){
 	ROS_INFO_STREAM(translateFromA);
 	ROS_WARN_STREAM("--------------------------------------------------------------");
 	
-
 	/*postCorrectionTotalMatrix = postCorrectionTranslationMatrix * postCorrectionRotationMatrix * 
 			postCorrectionShearMatrix * postCorrectionScaleMatrix;*/
 	postCorrectionTotalMatrix = translateFromA * postCorrectionScaleMatrix * 
@@ -683,16 +684,18 @@ bool PartLocatorNode::transitionSetup(){
 	ROS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
 	ROS_INFO_STREAM(v);
-	v.z = -15;
+	v.z = workSpaceHeight;
 	v = convertToEquipletCoordinate(v);
 	ROS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
-	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 	
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 1;
 	setInstructionActionClient.sendGoal(*goal);
+	// @TODO this might be removed?
+	ROS_INFO("Press enter when ready");
 	cin.get();
 	cin.ignore();
 	
@@ -703,17 +706,19 @@ bool PartLocatorNode::transitionSetup(){
 	ROS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
 	ROS_INFO_STREAM(v);
-	v.z = -15;
+	v.z = workSpaceHeight;
 	ROS_INFO_STREAM(v);
 	v = convertToEquipletCoordinate(v);
 	ROS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
-	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 	
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 2;
 	setInstructionActionClient.sendGoal(*goal);
+	// @TODO this might be removed?
+	ROS_INFO("Press enter when ready");
 	cin.get();
 	cin.ignore();
 	
@@ -724,22 +729,47 @@ bool PartLocatorNode::transitionSetup(){
 	ROS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
 	ROS_INFO_STREAM(v);
-	v.z = 80; //Changed from -15 to -10
+	v.z = workSpaceHeight; //Changed from -15 to -10
 	ROS_INFO_STREAM(v);
 	v = convertToEquipletCoordinate(v);
 	ROS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
-	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":40 } }";
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 		
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 3;
 	setInstructionActionClient.sendGoal(*goal);
+	
+	
+	
+	ROS_INFO("Moving orign");
+	x = 0;
+	y = 0;
+	v = Vector3(x, y, 1);
+	ROS_INFO_STREAM(v);
+	v = postCorrectionTotalMatrix * v;
+	ROS_INFO_STREAM(v);
+	v.z = workSpaceHeight;
+	ROS_INFO_STREAM(v);
+	v = convertToEquipletCoordinate(v);
+	ROS_INFO_STREAM(v);
+	v = drModule.convertToModuleCoordinate(v);
+	
+	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
+	
+	goal = new rexos_statemachine::SetInstructionGoal();
+	goal->json = hardwareStep;
+	goal->OID = 4;
+	setInstructionActionClient.sendGoal(*goal);
+	
+	
+	
+	// @TODO this might be removed?
+	ROS_INFO("Press enter when ready");
 	cin.get();
 	cin.ignore();
 	
-
-
 	return true;
 }
 bool PartLocatorNode::transitionShutdown(){
@@ -764,6 +794,8 @@ int main(int argc, char* argv[]) {
 	}
 	for(int i=0; i<argc; i++)
 		std::cout << argv[i] << i << " " << std::endl;
+		
+	// @TODO check if valid identifier
 	std::string eqIdentifier;	
 	if(argc >= 5) {
 		std::cout << "Setting equipletIdentifier to " << argv[5] << std::endl;
