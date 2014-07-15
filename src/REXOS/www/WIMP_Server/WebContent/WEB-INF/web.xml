@@ -16,6 +16,16 @@ servlets.ProductServlet
         </servlet-class>
     </servlet>
 
+      <servlet>
+    <servlet-name>wsigServlet</servlet-name>
+    <servlet-class>servlets.WSIGServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+  <servlet-mapping>
+  	<servlet-name>wsigServlet</servlet-name>
+    <url-pattern>/ws/*</url-pattern>
+  </servlet-mapping>
     <servlet-mapping>
 
         <servlet-name>

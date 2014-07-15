@@ -1,0 +1,1 @@
+This is the directory where WSIG stores generated WSDL files

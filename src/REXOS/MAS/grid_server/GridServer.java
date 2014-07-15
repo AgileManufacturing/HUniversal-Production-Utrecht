@@ -50,9 +50,16 @@ public class GridServer extends Agent {
 
 	public static void main(String[] args) {
 		//-gui -port 1234 -platform-id Platform2 -agents "Grid:agents.GridAgent;PartsAgent:agents.PartsAgent; MonitoringAgent:agents.MonitoringAgent"
-		String [] argu = new String[2];
+		String [] argu = new String[3];
 		argu[0] = "-gui"; 
-		argu[1] = "Grid:grid_server.GridAgent;SupplyAgent:grid_server.SupplyAgent; MonitoringAgent:grid_server.MonitoringAgent"; 
+		argu[1] = "Grid:grid_server.GridAgent; "
+				+ "SupplyAgent:grid_server.SupplyAgent; "
+				+ "MonitoringAgent:grid_server.MonitoringAgent; "
+				+ "EquipletAgent:agents.equiplet_agent.EquipletAgent(ReconfigureFunctionsMapper true); "
+				+ "-name \"WSIGTestPlatform\";";
+		
+		
+		argu[2] = "-local-host 127.0.0.1 ";
 		jade.Boot.main(argu);
 	}
 

@@ -45,6 +45,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import web_socket_server.java.org.java_websocket.client.WebSocketClient;
+import web_socket_server.java.org.java_websocket.exceptions.WebsocketNotConnectedException;
 import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -79,7 +80,12 @@ public class MonitoringAgent extends Agent{
 			public void action() {
 				ACLMessage msg = receive();
                 if (msg!=null) {
+                	try {
                 	mws.send(msg.getContent());
+                	} catch (WebsocketNotConnectedException e) {
+                		System.err.println("Monitoring agent sucks: ");
+                		e.printStackTrace();
+                	}
                  }
                 block();				
 			}		

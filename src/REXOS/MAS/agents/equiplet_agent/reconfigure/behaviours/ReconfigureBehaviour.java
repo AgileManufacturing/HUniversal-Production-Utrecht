@@ -10,7 +10,7 @@
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	Responsible for setting up and shutting down the server to allow reconfiguration of the equiplet.
  *          dM@      dMMM3  .ga...g,    	@date Created:	2014-05-12
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tom Oosterwijk
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tom Oosterwijk, Martin Broers
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
@@ -38,13 +38,11 @@
  **/
 package agents.equiplet_agent.reconfigure.behaviours;
 
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
-
+import jade.content.AgentAction;
+import libraries.dynamicloader.JarFileLoaderException;
+import HAL.HardwareAbstractionLayer;
+import HAL.ModuleIdentifier;
+import HAL.exceptions.FactoryException;
 import agents.equiplet_agent.EquipletAgent;
 import agents.equiplet_agent.reconfigure.ModuleDataManager;
 import agents.equiplet_agent.reconfigure.datatypes.ModuleTree;
@@ -52,73 +50,29 @@ import agents.equiplet_agent.reconfigure.datatypes.ModuleTree;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import HAL.HardwareAbstractionLayer;
-import HAL.ModuleIdentifier;
-import HAL.exceptions.FactoryException;
-
-import jade.core.behaviours.Behaviour;
-import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KnowledgeException;
-
-public class ReconfigureBehaviour extends Behaviour{
+public class ReconfigureBehaviour implements AgentAction {
+	private static final long serialVersionUID = 1L;
 	public HardwareAbstractionLayer HAL;
 	public EquipletAgent equipletAgent;
 	public boolean serverHosted = false;
+	public ReconfigureBehaviour() {}
 	public ReconfigureBehaviour(HardwareAbstractionLayer hal, EquipletAgent ea) {
 		super();
 		this.HAL = hal;
 		equipletAgent = ea;
+		System.out.println("ReconfigureBehaviour");
+
 	}
 
-	@Override
 	public void action() {
-		QrReceiver qr = new QrReceiver();
 
-		// TODO Auto-generated method stub
-		if(serverHosted){
-			System.out.println("ServerHosted");
-			if(!((EquipletAgent.machineState.equals("OFFLINE") || EquipletAgent.machineState.equals("SAVE") ) 
-					&& EquipletAgent.machineMode.equals("SERVICE"))){				
-				try {
-					Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-							":9191/QrReceiver", qr).stop();
-					equipletAgent.register();
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				serverHosted=false;
-			}
-	        
-		}else{
-			if(((EquipletAgent.machineState.equals("OFFLINE") || EquipletAgent.machineState.equals("SAVE") ) 
-					&& EquipletAgent.machineMode.equals("SERVICE"))){
-				 try {
-						Endpoint.publish("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-									":9191/QrReceiver", qr);
-						System.out.println("http://" + Inet4Address.getLocalHost().getHostAddress() + 
-								":9191/QrReceiver published");
-						equipletAgent.deregister();
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (KnowledgeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				 serverHosted=true;
-			}
-		}
 	}
-	@Override
 	public boolean done() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	
-	@WebService
-	public class QrReceiver {
-		
+
 		 /**
 		  * @var moduleTree
 		  * The object is being used to create a moduleTree based on the bottomModules from the HAL.
@@ -131,13 +85,20 @@ public class ReconfigureBehaviour extends Behaviour{
 		  * Recieving all the bottomModules from HAL.
 		  * Send the bottomModules to the moduleTree to create a Tree.
 		  * @return String[][] array that contains the information about all the modules that the equiplet contains.
-		 * @throws JarFileLoaderException 
+		 * @throws JarFileLoaderException 2
 		 * @throws FactoryException 
 		  */
-		public String[][] getModules() throws FactoryException, JarFileLoaderException {
-			moduleTree = new ModuleTree(HAL.getBottomModules());
-			
-			return moduleTree.getModuleTree();
+		public java.util.ArrayList<String[]> getModules() throws FactoryException, JarFileLoaderException {
+			if(HAL != null) {
+				// TODO wsdl messages do not support String[] content 
+				moduleTree = new ModuleTree(HAL.getBottomModules());
+				java.util.ArrayList<String[]> a = new java.util.ArrayList<String[]>();
+				for(String[] s : moduleTree.getModuleTree()) {
+					a.add(s);
+				}
+				return a;
+			} else
+				throw new NullPointerException("HAL not initialized");
 		}
 
 		 /**
@@ -148,7 +109,7 @@ public class ReconfigureBehaviour extends Behaviour{
 		  * This is done by the ModuleDataManager.
 		  * The returning string data from the ModuleDataManager is casted to a JSON object and then send to the HAL.
 		  */
-		public void addModule(@WebParam(name="moduleDataJson") String moduleDataJson) {
+		public void addModule( String moduleDataJson) {
 			try {
 				if(moduleDataJson != null) {
 					JsonObject moduleSettings = new JsonParser().parse(moduleDataJson).getAsJsonObject();
@@ -173,9 +134,9 @@ public class ReconfigureBehaviour extends Behaviour{
 		  * @param The module name as a string type.
 		  * The module name is being used to let the HAL know what module needs to be updated.
 		  */
-		public void editModule(@WebParam(name="moduleDataJson") String moduleDataJson) {
+		public void editModule( String moduleDataJson) {
 			/*
-			 * @TODO
+			 * TODO
 			 * Change the Module information
 			 * Send the information to the HAL
 			 */
@@ -190,7 +151,7 @@ public class ReconfigureBehaviour extends Behaviour{
 		  * The returning data from the HAL is written away to the USB file.
 		  * This is done by the ModuleDataManager.
 		  */
-		public void removeModule(@WebParam(name="moduleDataJson") String moduleDataJson) {
+		public void removeModule( String moduleDataJson) {
 
 			try {
 				if(moduleDataJson != null) {
@@ -209,6 +170,4 @@ public class ReconfigureBehaviour extends Behaviour{
 				e.printStackTrace();
 			}
 		}
-	}
-
 }

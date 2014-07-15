@@ -1,0 +1,37 @@
+# WSIG configuration file
+
+# AGENT CONFIGURATION
+host=localhost
+port=1099
+container-name=WSIG-Container
+local-port=1200
+
+wsig.agent=com.tilab.wsig.agent.WSIGAgent
+wsig.uri=http://localhost:8080/wsig/ws
+wsig.console.uri=http://localhost:8080/wsig
+wsig.timeout=30000
+
+
+# DF to WSDL converter
+wsdl.localNamespacePrefix=impl
+wsdl.style=document
+wsdl.writeEnable=false
+wsdl.directory=wsdl
+
+
+# UDDI repository configuration
+uddi.enable=false
+uddi.queryManagerURL=http://localhost:8080/juddi/inquiry
+uddi.lifeCycleManagerURL=http://localhost:8080/juddi/publish
+uddi.businessKey=8C983E50-E09B-11D8-BE50-DA8FBF3BDC61
+uddi.userName=jdoe
+uddi.userPassword=
+
+
+# UDDI4j configuration
+org.uddi4j.logEnabled=true
+org.uddi4j.TransportClassName=org.uddi4j.transport.ApacheAxisTransport
+
+
+# Ontologies
+#MyOntologies#
