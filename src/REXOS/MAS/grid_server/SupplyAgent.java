@@ -66,6 +66,7 @@ public class SupplyAgent extends Agent{
 	private static final int PICK_PLACE__SERVICE_ID = 20;
 	private static final int DRAW_SERVICE_ID = 10;
 	private static final int APPROACH_OFFSET =75;
+	private boolean hasRotate = false;
 	
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
@@ -150,6 +151,7 @@ public class SupplyAgent extends Agent{
 						if(partRequest.get("serviceID").getAsInt()==PICK_PLACE_ROTATION_SERVICE_ID){
 							ACLMessage reply = msg.createReply();
 		                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
+		                    hasRotate =true;
 		                    reply.setContent(createPickPlaceRotationMessage(partRequest));
 		                    send(reply);
 						}
@@ -215,20 +217,21 @@ public class SupplyAgent extends Agent{
 		if(color.equals("red")){
 			for(int i =0; i < GC4x4MB_3.length; i++){
 				if(GC4x4MB_3[i].equals("red")){
-					//Vector3 subjectApproach = getRelativeApproachPointForBall(lookUpTable[(i*2)],lookUpTable[(i*2)+1]);
-					approach.addProperty("x", lookUpTable[(i*2)]+1);
-					approach.addProperty("y", lookUpTable[(i*2)+1]+7);
+					if(hasRotate){
+						subjectRotate.addProperty("x", Math.toRadians(15));
+						subjectRotate.addProperty("y", 0);
+						subjectRotate.addProperty("z", 0);
+						subject.add("rotate",subjectRotate);
+					}
+					approach.addProperty("x", lookUpTable[(i*2)]);
+					approach.addProperty("y", lookUpTable[(i*2)+1]);
 					approach.addProperty("z", APPROACH_OFFSET);
 					subjectMove.add("approach", approach);
-					subjectMove.addProperty("x", (lookUpTable[(i*2)])+1);
-					subjectMove.addProperty("y", (lookUpTable[(i*2)+1])+7);
+					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
 					//subjectMove.addProperty("z", "-26.5");		
 					subjectMove.addProperty("z", "3.0");
-					subjectRotate.addProperty("x", Math.toRadians(0));
-					subjectRotate.addProperty("y", 0);
-					subjectRotate.addProperty("z", 0);
 					subject.add("move",subjectMove);
-					subject.add("rotate",subjectRotate);
 					subject.addProperty("identifier", "GC4x4MB_3");
 					subjects.add(subject);
 					GC4x4MB_3[i]="";
