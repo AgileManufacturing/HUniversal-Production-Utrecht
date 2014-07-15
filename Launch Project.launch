@@ -21,9 +21,7 @@
 	<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
 	<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" 
 		value=
-		"-platform-id Grid 
-		-container-name GridAgents 
-		-gui 
+		"-gui 
 		-agents 
 		&quot;Grid:grid_server.GridAgent;SupplyAgent:grid_server.SupplyAgent;MonitoringAgent:grid_server.MonitoringAgent&quot;
 		"/>

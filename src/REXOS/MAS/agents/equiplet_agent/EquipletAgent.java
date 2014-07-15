@@ -333,9 +333,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			System.out.println("Execute PS");
 			hal.translateProductStep(equipletSchedule.get(scheduleCounter).getProductStep());	
 			scheduleCounter++;
-		}else{
-			equipletActive=false;
-			scheduleCounter=0;
+		} else {
+			equipletActive = false;
+			scheduleCounter = 0;
 			equipletSchedule.clear();
 		}
 	}

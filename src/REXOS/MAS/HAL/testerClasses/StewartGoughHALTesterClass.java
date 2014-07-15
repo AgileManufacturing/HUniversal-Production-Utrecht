@@ -423,7 +423,7 @@ if(insert){
 }
 >>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
 		
-		criteria = new JsonObject();
+/*criteria = new JsonObject();
 		JsonObject target = new JsonObject();
 		JsonObject targetMove = new JsonObject();
 		JsonObject targetRotate = new JsonObject();
@@ -488,7 +488,7 @@ if(insert){
 		
 >>>>>>> ab205d30f794a4aa8d2acda196d945bbd068c5ec
 		
-		/*Service service = new Service("PickAndPlace");
+		Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/
 		

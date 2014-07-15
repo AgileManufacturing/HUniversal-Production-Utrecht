@@ -110,6 +110,7 @@ public class HardwareStep {
 			payLoad.add("y", move.get("y"));
 			payLoad.add("z", move.get("z"));
 			payLoad.add("maxAcceleration", move.get("maxAcceleration"));
+			
 			if(this.instructionData.has("rotate")) {
 				JsonObject rotate = this.instructionData.getAsJsonObject("rotate");
 				payLoad.add("rotationX", rotate.get("x"));

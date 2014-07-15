@@ -17,6 +17,33 @@ public class ModuleIdentifier {
 		this.serialNumber = serialNumber;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ModuleIdentifier other = (ModuleIdentifier) obj;
+		if (manufacturer == null) {
+			if (other.manufacturer != null)
+				return false;
+		} else if (!manufacturer.equals(other.manufacturer))
+			return false;
+		if (serialNumber == null) {
+			if (other.serialNumber != null)
+				return false;
+		} else if (!serialNumber.equals(other.serialNumber))
+			return false;
+		if (typeNumber == null) {
+			if (other.typeNumber != null)
+				return false;
+		} else if (!typeNumber.equals(other.typeNumber))
+			return false;
+		return true;
+	}
+
 	public String getManufacturer(){
 		return this.manufacturer;
 	}
@@ -35,10 +62,19 @@ public class ModuleIdentifier {
 		return moduleIdentifier;
 	}
 	
+	/*
+	@Deprecated
 	public boolean equals(ModuleIdentifier rhs) {
 		if(this.manufacturer.equals(rhs.getManufacturer()) == false) return false;
 		if(this.typeNumber.equals(rhs.getTypeNumber()) == false) return false;
 		if(this.serialNumber.equals(rhs.getSerialNumber()) == false) return false;
 		return true;
 	}
+	*/
+	
+	@Override
+	public String toString() {
+		return manufacturer + " " + typeNumber + " " + serialNumber;
+	}
+	
 }

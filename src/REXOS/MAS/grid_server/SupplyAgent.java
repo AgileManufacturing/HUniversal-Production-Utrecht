@@ -38,6 +38,8 @@
  **/
 package grid_server;
 
+import libraries.math.Matrix;
+import libraries.math.Vector3;
 import agents.data_classes.MessageType;
 
 import com.google.gson.JsonArray;
@@ -63,6 +65,7 @@ public class SupplyAgent extends Agent{
 	private static final int PICK_PLACE_ROTATION_SERVICE_ID = 30;
 	private static final int PICK_PLACE__SERVICE_ID = 20;
 	private static final int DRAW_SERVICE_ID = 10;
+	private static final int APPROACH_OFFSET =75;
 	
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
@@ -173,17 +176,19 @@ public class SupplyAgent extends Agent{
 			private String createPickPlaceRotationMessage(JsonObject partRequest) {
 				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").remove("identifier");
 				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").addProperty("identifier", targetCrate);
-				// Hier moet approach berekeing komen
-				JsonObject targetRotate = new JsonObject();
 
+				double x = partRequest.getAsJsonObject("criteria").getAsJsonObject("target").getAsJsonObject("move").get("x").getAsDouble();
+				double y = partRequest.getAsJsonObject("criteria").getAsJsonObject("target").getAsJsonObject("move").get("y").getAsDouble();
+				
+				JsonObject targetRotate = new JsonObject();
 				targetRotate.addProperty("x", 0);
 				targetRotate.addProperty("y", 0);
 				targetRotate.addProperty("z", 0);
 				
 				JsonObject approach = new JsonObject();
-				approach.addProperty("x", 5.0);
-				approach.addProperty("y", 5.0);
-				approach.addProperty("z", 55.0);
+				approach.addProperty("x", x);
+				approach.addProperty("y", y);
+				approach.addProperty("z", APPROACH_OFFSET);
 
 				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").getAsJsonObject("move").add("approach", approach);
 				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").add("rotate",targetRotate);
@@ -206,18 +211,20 @@ public class SupplyAgent extends Agent{
 		JsonObject subjectRotate = new JsonObject();
 		JsonObject approach = new JsonObject();
 		
+		
 		if(color.equals("red")){
 			for(int i =0; i < GC4x4MB_3.length; i++){
 				if(GC4x4MB_3[i].equals("red")){
-					approach.addProperty("x", 5.0);
-					approach.addProperty("y", 5.0);
-					approach.addProperty("z", 50.0);
+					//Vector3 subjectApproach = getRelativeApproachPointForBall(lookUpTable[(i*2)],lookUpTable[(i*2)+1]);
+					approach.addProperty("x", lookUpTable[(i*2)]+1);
+					approach.addProperty("y", lookUpTable[(i*2)+1]+7);
+					approach.addProperty("z", APPROACH_OFFSET);
 					subjectMove.add("approach", approach);
-					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
-					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
+					subjectMove.addProperty("x", (lookUpTable[(i*2)])+1);
+					subjectMove.addProperty("y", (lookUpTable[(i*2)+1])+7);
 					//subjectMove.addProperty("z", "-26.5");		
-					subjectMove.addProperty("z", "20.0");
-					subjectRotate.addProperty("x", 0);
+					subjectMove.addProperty("z", "3.0");
+					subjectRotate.addProperty("x", Math.toRadians(0));
 					subjectRotate.addProperty("y", 0);
 					subjectRotate.addProperty("z", 0);
 					subject.add("move",subjectMove);
@@ -236,7 +243,7 @@ public class SupplyAgent extends Agent{
 					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
 					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
 					//subjectMove.addProperty("z", "-26.5");
-					subjectMove.addProperty("z", "20.0");
+					subjectMove.addProperty("z", "5.0");
 					subjectRotate.addProperty("x", 0);
 					subjectRotate.addProperty("y", 0);
 					subjectRotate.addProperty("z", 0);
@@ -272,4 +279,5 @@ public class SupplyAgent extends Agent{
 		}
 		return subjects;		
 	}
+
 }
