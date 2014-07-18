@@ -3,12 +3,10 @@ package simulation.util;
 import java.util.Map;
 
 public class Capability {
-	protected int id;
-	public String service;
+	private String service;
 	private Map<String, Object> limitations;
 
-	public Capability(int id, String service, Map<String, Object> limitations) {
-		this.id = id;
+	public Capability(String service, Map<String, Object> limitations) {
 		this.service = service;
 		this.limitations = limitations;
 	}

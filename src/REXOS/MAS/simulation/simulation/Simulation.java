@@ -9,17 +9,19 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import simulation.config.Config;
+import simulation.graphics.Control;
 import simulation.graphics.SimInterface;
 import simulation.mas.Equiplet;
 import simulation.mas.EquipletState;
 import simulation.mas.Product;
-import simulation.mas.Product.ProductState;
+import simulation.mas.ProductState;
 import simulation.util.Position;
 import simulation.util.ProductStep;
 import simulation.util.ProductionStep;
 import simulation.util.Triple;
+import simulation.util.Util;
 
-public class Simulation extends Thread {
+public class Simulation extends Thread implements Control {
 
 	// private final static Logger Log = Logger.getLogger("Simulation");
 
@@ -105,7 +107,7 @@ public class Simulation extends Thread {
 						productEvent();
 						break;
 					case ARRIVED:
-						startEvent(e.getProduct(), e.getEquiplet());
+						arrivedEvent(e.getProduct(), e.getEquiplet());
 						break;
 					case FINISHED:
 						finishedEvent(e.getEquiplet());
@@ -124,10 +126,11 @@ public class Simulation extends Thread {
 
 					update();
 
-					System.out.println("\nSimulation state: " + formatArray(grid.getEquiplets()));
-					//System.out.println("\nSimulation products: " + formatArray(products) + "\n");
-					
-					//validate();
+					System.out.println("\nSimulation state: " + Util.formatArray(grid.getEquiplets()));
+					// System.out.println("\nSimulation products: " +
+					// formatArray(products) + "\n");
+
+					// validate();
 
 					try {
 						sleep(delay);
@@ -138,18 +141,19 @@ public class Simulation extends Thread {
 				try {
 					synchronized (this) {
 						while (!running)
-							wait();//wait until notify gets called in startThread
+							wait();// wait until notify gets called in
+						// startThread
 					}
 				} catch (InterruptedException ie) {
 				}
 
-				//				if (!running) {
-				//					try {
-				//						sleep(2000);
-				//					} catch (InterruptedException e) {
-				//						e.printStackTrace();
-				//					}
-				//				}
+				// if (!running) {
+				// try {
+				// sleep(2000);
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// }
+				// }
 			}
 			saveStatistics();
 			run++;
@@ -170,13 +174,13 @@ public class Simulation extends Thread {
 
 		Equiplet equipletAgent = grid.getEquiplet(equiplet);
 
-		//schedule START time + travelTime, equiplet, product
+		// schedule ARRIVED time + travelTime, equiplet, product
 		double travelTime = grid.getTravelTime(startPosition, equipletAgent.getPosition());
 		eventStack.add(new Event(time + travelTime, EventType.ARRIVED, product, equiplet));
 		products.put(product, productAgent);
 		traveling++;
 
-		System.out.printf("Simulation: schedule event START %.0f + %.0f, %s, %s\n", time, travelTime, product, equiplet);
+		System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, product, equiplet);
 
 		// schedule next product arrival
 		double arrivalTime = stochastics.generateProductArrival();
@@ -184,11 +188,12 @@ public class Simulation extends Thread {
 		System.out.printf("Simulation: schedule event PRODUCT %.0f + %.0f\n", time, arrivalTime);
 	}
 
-	private void startEvent(String product, String equiplet) {
+	private void arrivedEvent(String product, String equiplet) {
 		traveling--;
 
 		// notitfy that the product arrived at the destination
-		// let the product agent in turn notify the equiplet agent that he is ready to produce
+		// let the product agent in turn notify the equiplet agent that he is
+		// ready to produce
 		Product productAgent = products.get(product);
 		productAgent.notifyProductArrived();
 		ProductionStep step = productAgent.getExecutingStep();
@@ -201,8 +206,6 @@ public class Simulation extends Thread {
 			productAgent.notifyProductProcessing();
 			double productionTime = stochastics.generateProductionTime(equiplet, step.getService());
 			// schedule FINISHED time + productionTime, equiplet
-
-			// TODO delete product, only for debug purpose
 			eventStack.add(new Event(time + productionTime, EventType.FINISHED, equiplet));
 			System.out.printf("Simulation: schedule event FINISHED %.0f + %.0f, %s, %s\n", time, productionTime, product, equiplet);
 		}
@@ -213,16 +216,22 @@ public class Simulation extends Thread {
 
 		if (equipletAgent.getEquipletState() == EquipletState.ERROR) {
 			equipletAgent.notifyJobFinished(time);
-		} else if (equipletAgent.getEquipletState() == EquipletState.BROKENDOWN) {
+			// } else if (equipletAgent.getEquipletState() ==
+			// EquipletState.BROKENDOWN) {
+		} else if (equipletAgent.hasFinishedDuringRepair()) { // FOUT
 			double remainingTime = equipletAgent.getTimeBroken();
 			equipletAgent.notifyJobFinished(time);
-			// schedule FINISHED time + productionTime, equiplet
-			// TODO delete product, only for debug purpose
+			// schedule FINISHED time + remainingTime, equiplet
 			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equiplet));
 			System.out.printf("Simulation: schedule event FINISHED when breakdown happend %.0f + %.0f, %s\n", time, remainingTime, equiplet);
+		} else if (equipletAgent.wasBroken()) {
+			double remainingTime = equipletAgent.getTimeBroken();
 
+			// schedule FINISHED time + remainingTime, equiplet
+			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equiplet));
+			System.out.printf("Simulation: schedule event FINISHED when breakdown happend %.0f + %.0f, %s\n", time, remainingTime, equiplet);
 		} else {
-			System.out.println("Equiplet Finished: " + equipletAgent);
+			System.out.println("Simulation: equiplet Finished: " + equipletAgent);
 			String product = equipletAgent.getExecutingProduct();
 			equipletAgent.notifyJobFinished(time);
 
@@ -238,9 +247,9 @@ public class Simulation extends Thread {
 				Equiplet nextEquipletAgent = grid.getEquiplet(nextEquiplet);
 
 				double travelTime = grid.getTravelTime(productAgent.getPosition(), nextEquipletAgent.getPosition());
-				// schedule START time + travelTime, equiplet, product
+				// schedule ARRIVED time + travelTime, equiplet, product
 				eventStack.add(new Event(time + travelTime, EventType.ARRIVED, product, nextEquiplet));
-				System.out.printf("Simulation: schedule event START for next product step %.0f + %.0f, %s, %s\n", time, travelTime, product, nextEquiplet);
+				System.out.printf("Simulation: schedule event ARRIVED for next product step %.0f + %.0f, %s, %s\n", time, travelTime, product, nextEquiplet);
 			}
 
 			// schedule next FINISHED event
@@ -258,12 +267,10 @@ public class Simulation extends Thread {
 				double productionTime = stochastics.generateProductionTime(equiplet, step.getService());
 
 				// schedule FINISHED time + productionTime, equiplet
-				// TODO remove product agent from event.
 				eventStack.add(new Event(time + productionTime, EventType.FINISHED, equiplet));
 				System.out.printf("Simulation: schedule event FINISHED for next equiplet job %.0f + %.0f, %s\n", time, productionTime, equiplet);
 			}
 		}
-		System.out.println("Equiplet state after finished: " + grid.getEquiplets());
 	}
 
 	private void breakdownEvent(String equiplet) {
@@ -280,21 +287,31 @@ public class Simulation extends Thread {
 		Equiplet equipletAgent = grid.getEquiplet(equiplet);
 
 		if (equipletAgent.hasFinishedDuringRepair()) {
-			double remainingTime = time - equipletAgent.getShouldHaveFinish();
+			double remainingTime = equipletAgent.getRemainingTime();
 			equipletAgent.notifyRepaired(time);
 
-			String pr = equipletAgent.getExecutingProduct();
 			// schedule FINISHED time + remainingTime, equiplet
-
-			// TODO delete product, only for debug purpose
 			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equiplet));
 			System.out.printf("Simulation: schedule event FINISHED after repaired %.0f + %.0f, %s\n", time, remainingTime, equiplet);
+		} else if (equipletAgent.isNewJobReady()) {
+			equipletAgent.notifyRepaired(time);
+
+			String nextProduct = equipletAgent.getExecutingProduct();
+			Product nextProductAgent = products.get(nextProduct);
+			ProductionStep step = nextProductAgent.getExecutingStep();
+			nextProductAgent.notifyProductProcessing();
+
+			double productionTime = stochastics.generateProductionTime(equiplet, step.getService());
+
+			// schedule FINISHED time + productionTime, equiplet
+			eventStack.add(new Event(time + productionTime, EventType.FINISHED, equiplet));
+			System.out.printf("Simulation: schedule event FINISHED for next equiplet job %.0f + %.0f, %s\n", time, productionTime, equiplet);
 		} else {
 			equipletAgent.notifyRepaired(time);
 		}
 
 		double breakdown = stochastics.generateBreakdownTime(equiplet);
-		//schedule BREAKDOWN time + breakdown, equiplet
+		// schedule BREAKDOWN time + breakdown, equiplet
 		eventStack.add(new Event(time + breakdown, EventType.BREAKDOWN, equiplet));
 		System.out.printf("Simulation: schedule event BREAKDOWN after repaired %.0f + %.0f, %s\n", time, breakdown, equiplet);
 	}
@@ -314,23 +331,18 @@ public class Simulation extends Thread {
 		for (Event e : eventStack) {
 			productNames.remove(e.getProduct());
 		}
-		
-		for(String pName : productNames) {
+
+		for (String pName : productNames) {
 			if (products.get(pName).getState() == ProductState.WAITING) {
 				productNames.remove(pName);
 			}
 		}
-		
+
 		System.out.println("VALIDATION of product events " + productNames.isEmpty() + " : " + productNames + "- " + products);
 		return;
 		/*
-		 * // An equiplet has not a job that is ready in the schedule when not
-		 * executing
-		 * for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet())
-		 * {
-		 * Equiplet equiplet = entry.getValue();
-		 * equiplet.validateSchedule(time);
-		 * }
+		 * // An equiplet has not a job that is ready in the schedule when not executing for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) { Equiplet equiplet =
+		 * entry.getValue(); equiplet.validateSchedule(time); }
 		 */
 	}
 
@@ -344,7 +356,8 @@ public class Simulation extends Thread {
 			List<Triple<String, List<String>, Triple<String, Integer, Integer>>> equipletStates = new ArrayList<>();
 			for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
 				Equiplet equiplet = entry.getValue();
-				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getEquipletName(), equiplet.getServices(), new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
+				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getEquipletName(), equiplet.getServices(),
+						new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
 			}
 
 			System.out.printf("Update: [time=%.2f, product=%d, equiplets=%s]\n\n", time, products.size(), equipletStates);
@@ -367,39 +380,30 @@ public class Simulation extends Thread {
 		System.out.println("Simulation: " + (running ? "start" : "pause"));
 
 		running = !running;
-		notify();//wake up the wait
+		notify();// wake up the wait
 	}
 
-	public int getDelay() {
+	public synchronized int getDelay() {
 		return delay;
 	}
 
-	public void setDelay(int delay) {
+	public synchronized void setDelay(int delay) {
 		this.delay = delay;
 	}
 
-	public Map<String, Product> getProducts() {
+	public synchronized Map<String, Product> getProducts() {
 		return products;
 	}
 
-	public List<Equiplet> getEquiplets() {
+	public synchronized List<Equiplet> getEquiplets() {
 		return new ArrayList<Equiplet>(grid.getEquiplets().values());
 	}
-	
-	public Map<String, Triple<Double, Double, Double>> getEquipletHistory() {
+
+	public synchronized Map<String, Triple<Double, Double, Double>> getEquipletHistory() {
 		Map<String, Triple<Double, Double, Double>> histories = new HashMap<String, Triple<Double, Double, Double>>();
 		for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
 			histories.put(entry.getValue().getEquipletName(), entry.getValue().getStatistics(time));
 		}
 		return histories;
-	}
-
-	private String formatArray(Map<String, ?> map) {
-		StringBuffer buffer = new StringBuffer();
-		for (Object item : map.entrySet()) {
-			buffer.append("\n\t");
-			buffer.append(item);
-		}
-		return buffer.toString();
 	}
 }

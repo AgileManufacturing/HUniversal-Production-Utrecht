@@ -127,7 +127,7 @@ public class GanttChart extends ApplicationFrame {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
 			TaskSeries serie = new TaskSeries(agent.getName());
 			for (ProductionStep node : path) {
-				serie.add(new Task(node.getEquiplet(), new SimpleTimePeriod((long) node.getTime(), (long) (node.getTime() + node.getDuration()))));
+				serie.add(new Task(node.getEquipletName(), new SimpleTimePeriod((long) node.getTime(), (long) (node.getTime() + node.getDuration()))));
 				maxTime = Math.max(maxTime, node.getTime() + node.getDuration());
 				minTime = Math.min(minTime, node.getTime());
 			}
@@ -149,10 +149,10 @@ public class GanttChart extends ApplicationFrame {
 		for (Equiplet equiplet : equiplets) {	
 			List<Job> history = equiplet.getHistory();
 			for (Job job : history) {
-				if (!products.containsKey(job.getProductAgent())) {
-					products.put(job.getProductAgent(), new ArrayList<Task>());
+				if (!products.containsKey(job.getProductAgentName())) {
+					products.put(job.getProductAgentName(), new ArrayList<Task>());
 				}
-				products.get(job.getProductAgent()).add(new Task(equiplet.getEquipletName(), new SimpleTimePeriod((long) job.getStartTime(), (long) job.getDueTime())));
+				products.get(job.getProductAgentName()).add(new Task(equiplet.getEquipletName(), new SimpleTimePeriod((long) job.getStartTime(), (long) job.getDueTime())));
 				maxTime = Math.max(maxTime, job.getDueTime());
 			}
 		}
@@ -183,7 +183,7 @@ public class GanttChart extends ApplicationFrame {
 			List<Job> history = equiplet.getHistory();
 			TaskSeries serie = new TaskSeries(equiplet.getEquipletName());
 			for (Job job : history) {
-				serie.add(new Task(job.getProductAgent(), new SimpleTimePeriod((long)job.getStartTime(), (long)job.getDueTime())));
+				serie.add(new Task(job.getProductAgentName(), new SimpleTimePeriod((long)job.getStartTime(), (long)job.getDueTime())));
 				productCount++;
 			}
 			tasks.add(serie);

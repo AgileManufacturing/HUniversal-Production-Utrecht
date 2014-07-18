@@ -1,27 +1,33 @@
 package simulation.util;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class ProductStep {
 
+	private int index;
 	private String service;
-	private HashMap<String, Object> criteria;
+	private Map<String, Object> criteria;
 
-	public ProductStep(String service, HashMap<String, Object> criteria, double duration) {
+	public ProductStep(int index, String service, Map<String, Object> criteria) {
+		this.index = index;
 		this.service = service;
 		this.criteria = criteria;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	public String getService() {
 		return service;
 	}
 
-	public HashMap<String, Object> getCriteria() {
+	public Map<String, Object> getCriteria() {
 		return criteria;
 	}
 
 	@Override
 	public String toString() {
-		return "(" + service + "," + criteria + ")";
+		return String.format("(%d=%s,%s)", index, service, criteria);
 	}
 }

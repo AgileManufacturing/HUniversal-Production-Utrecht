@@ -16,11 +16,6 @@ import simulation.util.ProductionStep;
 import simulation.util.Tuple;
 
 public class Product {
-
-	public enum ProductState {
-		SCHEDULING, TRAVELING, WAITING, PROCESSING, FINISHED, ERROR
-	}
-
 	private String name;
 	private double created;
 	private LinkedList<ProductStep> productSteps;
@@ -62,12 +57,12 @@ public class Product {
 			steps.add(new Pair<ProductStep, Map<String, Tuple<Double, Double, Double, Position>>>(step, suitedEquiplets));
 		}
 
-		System.out.printf("Product scheduling: [agent=%s, at=%.0f, steps=%s\n", name, time, steps);
+		System.out.printf("P:%s scheduling: [at=%.0f, steps=%s\n", name, time, steps);
 		Scheduling scheduling = new Scheduling();
 		LinkedList<Node> nodes = scheduling.calculateEDDPath(time, steps, deadline, grid.getTravelCost(), position);
 
 		if (nodes == null || nodes.size() != productSteps.size()) {
-			System.out.println("FAILED to find production path nodes=" + (nodes != null ? nodes : "null"));
+			System.out.println("P:" + name + "  FAILED to find production path nodes=" + (nodes != null ? nodes : "null"));
 			state = ProductState.ERROR;
 			return;
 		}
@@ -83,14 +78,15 @@ public class Product {
 			path.add(new ProductionStep(step, equiplet, node.getTime(), node.getDuration()));
 
 			grid.getEquiplet(equiplet).schedule(node.getTime(), node.getTime() + node.getDuration(), name, step.getService(), new HashMap<String, Object>());
-			// node.getEquiplet().schedule(node.getTime(), node.getDuration(), getName());
+			// node.getEquiplet().schedule(node.getTime(), node.getDuration(),
+			// getName());
 		}
 
 		// if all succeed:
 		// state = State.WAITING;
 		productionPath = path;
 
-		System.out.println("Product: productionpath=" + productionPath);
+		System.out.println("P:" + name + "  productionpath=" + productionPath);
 	}
 
 	public String getName() {
@@ -104,14 +100,15 @@ public class Product {
 	public ProductState getState() {
 		return state;
 	}
-	
+
 	public Position getPosition() {
 		return position;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", name, state, created, position, (productionPath.size() > 0 ? productionPath.peek() : "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
+		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", name, state, created, position,
+				(productionPath.size() > 0 ? productionPath.peek() : "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
 	}
 
 	public LinkedList<ProductionStep> getProductionPath() {
@@ -120,7 +117,7 @@ public class Product {
 
 	public String getNextEquipet() {
 		state = ProductState.TRAVELING;
-		return productionPath.peek().getEquiplet();
+		return productionPath.peek().getEquipletName();
 	}
 
 	public ProductionStep getExecutingStep() {

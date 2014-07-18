@@ -70,8 +70,8 @@ class Test {
 
 		System.out.println("TEst NODE + " + new Node(4));
 		LinkedList<ProductStep> productSteps = new LinkedList<ProductStep>();
-		productSteps.add(new ProductStep("screw", new HashMap<String, Object>(), 30));
-		productSteps.add(new ProductStep("glue", new HashMap<String, Object>(), 40));
+		productSteps.add(new ProductStep(1, "screw", new HashMap<String, Object>()));
+		productSteps.add(new ProductStep(2, "glue", new HashMap<String, Object>()));
 
 		Product p0 = new Product("P0", 0, productSteps, new Position(0,0));
 		System.out.println("P1: " + p0 + "\n");
@@ -108,7 +108,7 @@ class Test {
 		System.out.println("Start product scheduling test...");
 
 		LinkedList<ProductStep> productSteps = new LinkedList<ProductStep>();
-		productSteps.add(new ProductStep("Fails", new HashMap<String, Object>(), 30));
+		productSteps.add(new ProductStep(1, "Fails", new HashMap<String, Object>()));
 		Product p1 = new Product("PFAILED", 0, productSteps, new Position(0,0));
 
 		System.out.println("P1: " + p1);
@@ -129,7 +129,7 @@ class Test {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
 			TaskSeries serie = new TaskSeries(agent.getName());
 			for (ProductionStep step : path) {
-				serie.add(new Task(step.getEquiplet(), new SimpleTimePeriod((long) step.getTime(), (long)(step.getTime() + step.getDuration()))));
+				serie.add(new Task(step.getEquipletName(), new SimpleTimePeriod((long) step.getTime(), (long)(step.getTime() + step.getDuration()))));
 			}
 			tasks.add(serie);
 		}

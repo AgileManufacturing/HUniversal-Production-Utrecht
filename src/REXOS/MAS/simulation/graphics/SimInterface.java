@@ -32,9 +32,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import simulation.mas.Equiplet;
+import simulation.mas.EquipletAgent;
 import simulation.mas.Product;
+import simulation.mas.ProductAgent;
 import simulation.simulation.Simulation;
+import simulation.simulation.SimulationAgent;
+import simulation.util.Pair;
+import simulation.util.Position;
 import simulation.util.Triple;
+import simulation.util.Tuple;
 
 public class SimInterface {
 
@@ -43,7 +49,7 @@ public class SimInterface {
 	private GridView gridView;
 	private JPanel chartPanel;
 
-	private Simulation simulation;
+	private Control simulation;
 	private JLabel lblWaitingTime;
 	private JLabel lblBusy;
 	private JLabel lblTraveling;
@@ -58,7 +64,12 @@ public class SimInterface {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+
 					SimInterface window = new SimInterface();
+					Control simulation = new Simulation(window);
+					simulation.start();
+					window.setSimulation(simulation);
+					window.initContent();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -70,8 +81,18 @@ public class SimInterface {
 	 * Create the application.
 	 */
 	public SimInterface() {
-		init();
-		initContent();
+
+	}
+
+	public static SimInterface create(final Control control) {
+		SimInterface simInterface = new SimInterface();
+		simInterface.setSimulation(control);
+		simInterface.initContent();
+		return simInterface;
+	}
+
+	protected void setSimulation(Control simulation) {
+		this.simulation = simulation;
 	}
 
 	/**
@@ -80,7 +101,7 @@ public class SimInterface {
 	private void initContent() {
 		frmRexosSimulation = new JFrame();
 		frmRexosSimulation.setTitle("REXOS Simulation");
-		frmRexosSimulation.setBounds(100, 100, 1000,700);
+		frmRexosSimulation.setBounds(100, 100, 1000, 700);
 		frmRexosSimulation.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -94,7 +115,7 @@ public class SimInterface {
 		final JPanel equipletUtilizationView = new JPanel();
 		tabbedPane.addTab("Equiplet Utilization", null, equipletUtilizationView, null);
 		equipletUtilizationView.setLayout(new BoxLayout(equipletUtilizationView, BoxLayout.X_AXIS));
-		
+
 		final JScrollPane scrollPane = new JScrollPane();
 		tabbedPane.addTab("Equiplet Schedule", null, scrollPane, null);
 
@@ -102,17 +123,16 @@ public class SimInterface {
 		scrollPane.setViewportView(chartPanel);
 		chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.X_AXIS));
 
-
 		final JPanel equipletSchedule = new JPanel();
 		equipletSchedule.setLayout(new BoxLayout(equipletSchedule, BoxLayout.Y_AXIS));
-		
+
 		final JScrollPane eScheduleScroll = new JScrollPane();
 		eScheduleScroll.setViewportView(equipletSchedule);
 		tabbedPane.addTab("Equiplet history", null, eScheduleScroll, null);
-		
+
 		final JPanel productSchedule = new JPanel();
 		productSchedule.setLayout(new BoxLayout(productSchedule, BoxLayout.Y_AXIS));
-		
+
 		final JScrollPane pScheduleScroll = new JScrollPane();
 		pScheduleScroll.setViewportView(productSchedule);
 		tabbedPane.addTab("Product schedules", null, pScheduleScroll, null);
@@ -363,16 +383,12 @@ public class SimInterface {
 		frmRexosSimulation.setVisible(true);
 	}
 
-	private void init() {
-		simulation = new Simulation(this);
-		simulation.start();
-	}
-
 	public void reset() {
 		btnStart.setText("Start");
 	}
 
-	public void update(double time, int products, int productCount, int totalSteps, int traveling, List<Triple<String, List<String>, Triple<String, Integer, Integer>>> equipletStates, double waitingTime, List<Double> busy, double throughput) {
+	public void update(double time, int products, int productCount, int totalSteps, int traveling,
+			List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, double waitingTime, List<Double> busy, double throughput) {
 		String[] busyValues = new String[busy.size()];
 		for (int i = 0; i < busy.size(); i++) {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
@@ -387,7 +403,26 @@ public class SimInterface {
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));
 		lblBusy.setText(Arrays.toString(busyValues));
 		lblThroughput.setText(String.format("%.2f", throughput));
-		// gridView.update(equipletStates);
+		gridView.update(equipletStates);
+	}
+
+	public void update(double time, int products, int productCount, int totalSteps, Map<String, Pair<Position, Tuple<String, Integer, Integer, Integer>>> equiplets,
+			double waitingTime, List<Double> busy, double throughput) {
+		String[] busyValues = new String[busy.size()];
+		for (int i = 0; i < busy.size(); i++) {
+			busyValues[i] = String.format("%.0f%%", busy.get(i));
+		}
+
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		nf.setMaximumFractionDigits(1);
+
+		lblTime.setText(nf.format(time));
+		lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
+		lblTraveling.setText(String.format("%d", 0));
+		lblWaitingTime.setText(String.format("%.2f", waitingTime));
+		lblBusy.setText(Arrays.toString(busyValues));
+		lblThroughput.setText(String.format("%.2f", throughput));
+		gridView.update(equiplets);
 	}
 
 	public void update(double time, int products, int productCount, int totalSteps, Collection<Equiplet> equiplets, double waitingTime, List<Double> busy, double throughput) {
@@ -406,5 +441,6 @@ public class SimInterface {
 		lblBusy.setText(Arrays.toString(busyValues));
 		lblThroughput.setText(String.format("%.2f", throughput));
 		gridView.update(equiplets);
+
 	}
 }

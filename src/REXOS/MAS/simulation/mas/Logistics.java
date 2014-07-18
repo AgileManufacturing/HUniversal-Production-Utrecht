@@ -12,7 +12,7 @@ public class Logistics {
 		return 10;
 	}
 
-	public Object getTravelTimes(LinkedList<Pair<ProductStep, List<Pair<Equiplet, Double>>>> steps) {
+	public Object getTravelTimes(LinkedList<Pair<ProductStep, List<Pair<EquipletAgent, Double>>>> steps) {
 		return null;
 	}
 }

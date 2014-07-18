@@ -344,6 +344,6 @@ public class StaticSimInterface {
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));
 		lblBusy.setText(Arrays.toString(busyValues));
 		lblThroughput.setText(String.format("%.2f", throughput));
-		gridView.update(equipletStates);
+		//gridView.update(equipletStates);
 	}
 }

@@ -3,6 +3,7 @@ package simulation.graphics;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,14 +44,24 @@ public class EquipletView extends JPanel {
 		this.executed = executed;
 	}
 
+	public EquipletView(String name, String state, int waiting, int scheduled, int executed) {
+		this.name = name;
+		this.state = state;
+		// TODO remove this services or do something
+		this.services = new ArrayList<String>();
+		this.queue = waiting;
+		this.scheduled = scheduled;
+		this.executed = executed;
+	}
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
-		
+
 		setSize(Math.min(200, Math.max(40, getWidth())), Math.min(100, Math.max(40, getHeight())));
-		
-		//System.out.printf("DRAW EQUIPLET %s, %d : (%d, %d)", state, queue, getWidth(), getHeight());
+
+		// System.out.printf("DRAW EQUIPLET %s, %d : (%d, %d)", state, queue, getWidth(), getHeight());
 		g2.setPaint(COLORS.get(state.toLowerCase()));
 		g2.fillRect(0, 0, Math.max(40, getWidth()), Math.max(64, getHeight()));
 
@@ -65,7 +76,7 @@ public class EquipletView extends JPanel {
 	}
 
 	public void update(String state, int queue, int scheduled, int executed) {
-		//System.out.printf("UPDATE EQUIPLET %s, %d : (%d, %d)", state, queue, getWidth(), getHeight());
+		// System.out.printf("UPDATE EQUIPLET %s, %d : (%d, %d)", state, queue, getWidth(), getHeight());
 		this.state = state;
 		this.queue = queue;
 		this.scheduled = scheduled;

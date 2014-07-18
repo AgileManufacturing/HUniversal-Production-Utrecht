@@ -1,18 +1,28 @@
 package simulation.util;
 
-import java.util.HashMap;
+import jade.core.AID;
 
+import java.util.Map;
 
 public class ProductionStep {
 
 	private ProductStep productStep;
-	private String equiplet;
+	private AID equiplet;
+	private String equipletName;
 	private double time;
 	private double duration;
 
-	public ProductionStep(ProductStep productStep, String equilet, double time, double duration) {
+	public ProductionStep(ProductStep productStep, AID equilet, double time, double duration) {
 		this.productStep = productStep;
 		this.equiplet = equilet;
+		this.time = time;
+		this.duration = duration;
+	}
+
+	@Deprecated
+	public ProductionStep(ProductStep productStep, String equipletName, double time, double duration) {
+		this.productStep = productStep;
+		this.equipletName = equipletName;
 		this.time = time;
 		this.duration = duration;
 	}
@@ -21,8 +31,17 @@ public class ProductionStep {
 		return productStep;
 	}
 
-	public String getEquiplet() {
+	public AID getEquiplet() {
 		return equiplet;
+	}
+
+	public String getEquipletName() {
+		if (equiplet != null) {
+			return equiplet.getLocalName();
+		} else {
+			return equipletName;
+		}
+
 	}
 
 	public double getTime() {
@@ -36,8 +55,8 @@ public class ProductionStep {
 	public String getService() {
 		return productStep.getService();
 	}
-	
-	public HashMap<String, Object> getCriteria() {
+
+	public Map<String, Object> getCriteria() {
 		return productStep.getCriteria();
 	}
 

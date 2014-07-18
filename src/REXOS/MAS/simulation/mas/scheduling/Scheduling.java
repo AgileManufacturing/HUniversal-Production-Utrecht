@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import simulation.mas.Equiplet;
+import simulation.mas.EquipletAgent;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.ProductStep;
@@ -193,7 +193,7 @@ public class Scheduling {
 	}
 
 	@Deprecated
-	public LinkedList<Node> calculatePath_(double time, LinkedList<Pair<ProductStep, List<Pair<Equiplet, Double>>>> productSteps) {
+	public LinkedList<Node> calculatePath_(double time, LinkedList<Pair<ProductStep, List<Pair<EquipletAgent, Double>>>> productSteps) {
 		// Create the graph to calculate best production path
 		Graph<Node> graph = new Graph<Node>();
 
@@ -207,11 +207,11 @@ public class Scheduling {
 		Stack<Node> lastNodes = new Stack<Node>();
 		lastNodes.add(source);
 
-		for (Pair<ProductStep, List<Pair<Equiplet, Double>>> step : productSteps) {
+		for (Pair<ProductStep, List<Pair<EquipletAgent, Double>>> step : productSteps) {
 			// keep track of the equiplets to process in the next iteration
 			Stack<Node> equipletNodes = new Stack<Node>();
 
-			for (Pair<Equiplet, Double> equiplet : step.second) {
+			for (Pair<EquipletAgent, Double> equiplet : step.second) {
 
 				for (Node lastNode : lastNodes) {
 					// time the previous equiplet completes the production
@@ -223,20 +223,20 @@ public class Scheduling {
 
 					// Calculate the cost for producing by the equiplet
 					// TODO can this be answered before knowing the travel times?
-					double available = equiplet.first.available(stepComplete + travel, step.first.getService());
+					//double available = equiplet.first.available(stepComplete + travel, step.first.getService());
 
 					// TODO delay is relative to the previous step, this might be not undesirable 
 					// long delay = available > stepComplete + travel ? available - (stepComplete + travel) : 0;
-					double delay = 1 - 1.0 * Math.max(0, available + travel - stepComplete) / LOAD_WINDOW;
-					double load = equiplet.first.load(time, LOAD_WINDOW);
+					//double delay = 1 - 1.0 * Math.max(0, available + travel - stepComplete) / LOAD_WINDOW;
+					//double load = equiplet.first.load(time, LOAD_WINDOW);
 
-					double cost = cost(delay, load);
-					Node node = new Node(equiplet.first.getEquipletName(), Math.max(available, stepComplete), equiplet.second);
+					//double cost = cost(delay, load);
+					//Node node = new Node(equiplet.first.getEquipletName(), Math.max(available, stepComplete), equiplet.second);
 
-					System.out.println("Add to graph: " + lastNode + " --" + cost + "--> " + node + " : cost(delay=" + delay + ", load=" + load + ") available=" + available + ", stepComplete=" + stepComplete + ", travel=" + travel);
-					graph.add(lastNode, node, cost);
+					//System.out.println("Add to graph: " + lastNode + " --" + cost + "--> " + node + " : cost(delay=" + delay + ", load=" + load + ") available=" + available + ", stepComplete=" + stepComplete + ", travel=" + travel);
+					//graph.add(lastNode, node, cost);
 
-					equipletNodes.add(node);
+					//equipletNodes.add(node);
 				}
 			}
 

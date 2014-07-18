@@ -38,6 +38,7 @@ public class Equiplet extends EquipletAgent {
 
 	private Triple<Double, Double, Double> statistics;
 	private double lastHistoryUpdate;
+	private boolean jobBecameReady;
 
 	public Equiplet(String name, Position position, List<Capability> capabilities, Map<String, Double> productionTimes) {
 		this.name = name;
@@ -56,11 +57,13 @@ public class Equiplet extends EquipletAgent {
 		this.timeShouldHaveFinished = -1;
 		this.timeBreakdown = -1;
 		this.timeBroken = -1;
+		this.jobBecameReady = false;
 	}
 
 	/**
-	 * TODO fix this so that the name can be called from jade.Agent so agent can communicate with each other.
-	 * note that this need to fix setup or constructor of equipletagent to set the name
+	 * TODO fix this so that the name can be called from jade.Agent so agent can communicate with each other. note that this need to fix setup or constructor of equipletagent to
+	 * set the name
+	 * 
 	 * @return
 	 */
 	@Deprecated
@@ -84,10 +87,11 @@ public class Equiplet extends EquipletAgent {
 		return services;
 	}
 
-	public boolean isCapable(String service, HashMap<String, Object> criteria) {
+	public boolean isCapable(String service, Map<String, Object> criteria) {
 		for (Capability capability : capabilities) {
 			if (capability.getService().equalsIgnoreCase(service)) {
-				// Map<String, Object> limitations = capability.getLimitations();
+				// Map<String, Object> limitations =
+				// capability.getLimitations();
 				// TODO check limitations
 				return true;
 			}
@@ -155,18 +159,25 @@ public class Equiplet extends EquipletAgent {
 					busy += job.getDuration();
 				}
 			}
-			// System.out.println("load " + time + "= 1 - (" + busy + "/" + window + ") =" + (1.0 - (busy * 1.0 / window)) + ", schedule " + schedule);
+			// System.out.println("load " + time + "= 1 - (" + busy + "/" +
+			// window + ") =" + (1.0 - (busy * 1.0 / window)) + ", schedule " +
+			// schedule);
 
-			// the busy time can't be large than the window, altough there could be an overlap of max a job duration 
+			// the busy time can't be large than the window, altough there could
+			// be an overlap of max a job duration
 			return 1.0 - 1.0 * (Math.min(busy, window) / window);
 		} else if (schedule.size() > 0) {
 			Job job = schedule.first();
 
 			if (job.getDeadline() >= time && job.getStartTime() <= time + window) {
-				// System.out.println("load in window " + time + "= 1 - (" + job.getDuration() + "/" + window + ") =" + (1.0 - (job.getDuration() * 1.0 / window)) + ", schedule " + schedule);
+				// System.out.println("load in window " + time + "= 1 - (" +
+				// job.getDuration() + "/" + window + ") =" + (1.0 -
+				// (job.getDuration() * 1.0 / window)) + ", schedule " +
+				// schedule);
 				return 1.0 - (1.0 * job.getDuration() / window);
 			} else {
-				// System.out.println("load out window " + time + "= 1, schedule " + schedule);
+				// System.out.println("load out window " + time +
+				// "= 1, schedule " + schedule);
 				return 1.0;
 			}
 		} else {
@@ -175,8 +186,7 @@ public class Equiplet extends EquipletAgent {
 	}
 
 	/**
-	 * the first possible time there is enough room in the schedule to perform a
-	 * service
+	 * the first possible time there is enough room in the schedule to perform a service
 	 * 
 	 * @param time
 	 *            the first possible time from which to look
@@ -186,12 +196,12 @@ public class Equiplet extends EquipletAgent {
 	 */
 	public double available(double time, String service) {
 		/*
-		 * double productionTime = estimateJob(service);
-		 * for (Job job : schedule) {
+		 * double productionTime = estimateJob(service); for (Job job : schedule) {
 		 * 
 		 * }
 		 */
-		// TODO fix this so job can be scheduled in between jobs instead of alway behind the last
+		// TODO fix this so job can be scheduled in between jobs instead of
+		// alway behind the last
 		if (schedule.size() > 0) {
 			Job job = schedule.last();
 			return job.getDeadline();
@@ -203,15 +213,16 @@ public class Equiplet extends EquipletAgent {
 	@Override
 	public String toString() {
 		if (state == EquipletState.ERROR) {
-			return String.format("%s:[state=%s, capabilities=%s, time broken=%.2f, schedule=%s, history=%s]", name, state, capabilities, timeBroken, schedule, history);
+			return String.format("%s:[state=%s, capabilities=%s, time of breakdown=%.2f, executing=%s, schedule=%d, history=%d]", name, state, capabilities, timeBreakdown,
+					executing, schedule.size(), history.size());
 		} else {
-			return String.format("%s:[state=%s, capabilities=%s, executing=%s, schedule=%s, history=%s]", name, state, capabilities, (state == EquipletState.IDLE ? "null" : executing), schedule, history);
+			return String.format("%s:[state=%s, capabilities=%s, executing=%s, schedule=%d, history=%d]", name, state, capabilities, (state == EquipletState.IDLE ? "null"
+					: executing), schedule.size(), history.size());
 		}
 	}
 
 	/**
-	 * The simulation need to check if the just scheduled product step is going
-	 * to be executed
+	 * The simulation need to check if the just scheduled product step is going to be executed
 	 * 
 	 * @param product
 	 *            name
@@ -219,8 +230,9 @@ public class Equiplet extends EquipletAgent {
 	 * @param criteria
 	 * @return is the job
 	 */
-	public boolean isExecutingStep(String product, String service, HashMap<String, Object> criteria) {
-		return (executing != null && executing.getProductAgent().equalsIgnoreCase(product) && executing.getService().equalsIgnoreCase(service) && executing.getCriteria().equals(criteria));
+	public boolean isExecutingStep(String product, String service, Map<String, Object> criteria) {
+		return (executing != null && executing.getProductAgentName().equalsIgnoreCase(product) && executing.getService().equalsIgnoreCase(service) && executing.getCriteria().equals(
+				criteria));
 	}
 
 	public boolean isExecuting() {
@@ -228,56 +240,60 @@ public class Equiplet extends EquipletAgent {
 	}
 
 	public String getExecutingProduct() {
-		return executing.getProductAgent();
+		return executing.getProductAgentName();
 	}
-	
+
 	public void executeJob(double time) {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
-		System.err.println("time: " + time + "\texecuting: " + executing);
 		executing.updateStartTime(time);
-		
+		System.out.printf("EQ:%s starts at %.2f with executing job: %s\n", name, time, executing);
+
 		execute(executing);
 	}
-	
+
 	protected void execute(Job toExecuteJob) {
-		
+
 	}
-	
-	protected void executionFinished(){
-		
+
+	protected void executionFinished() {
+
 	}
 
 	/**
-	 * Notify a product is arrived by the equiplet and is ready to be let the
-	 * equiplet execute his product step
+	 * Notify a product is arrived by the equiplet and is ready to be let the equiplet execute his product step
 	 * 
 	 * @param time
 	 *            of the the product arrival
 	 * @param product
 	 *            name of the product agent
 	 * @param service
-	 *            name of the service that the equiplet is ask to perform for
-	 *            the product
+	 *            name of the service that the equiplet is ask to perform for the product
 	 */
 	public void notifyProductArrived(double time, String product, String service) {
 		// check if it is needed to also check the criteria
-		// TODO possible service not necessary, if making the constraint that a product can only have one job ready by an equiplet
+		// TODO possible service not necessary, if making the constraint that a
+		// product can only have one job ready by an equiplet
 		for (Job job : schedule) {
-			if (job.getProductAgent().equalsIgnoreCase(product) && job.getService().equalsIgnoreCase(service) && !job.isReady()) {
+			if (job.getProductAgentName().equalsIgnoreCase(product) && job.getService().equalsIgnoreCase(service) && !job.isReady()) {
 				job.setReady();
 				break;
 			}
 		}
 
-		// TODO combine the set ready loop above with the possibility to execute a job that is later in the schedule but can already be performed
+		// TODO combine the set ready loop above with the possibility to execute
+		// a job that is later in the schedule but can already be performed
 
 		// execute the first job in the schedule if the job is ready
-		if (state == EquipletState.IDLE &&  schedule.first().isReady()) {
+		if (state == EquipletState.IDLE && schedule.first().isReady()) {
 			historyUpdate(time);
 			executeJob(time);
-		} else if (!isExecuting() && state == EquipletState.ERROR) {	//NEW !isExecuting()
-			//executing = schedule.pollFirst();							//FOUT
+		} else if (!isExecuting() && schedule.first().isReady() && state == EquipletState.ERROR) {
+			// executing = schedule.pollFirst(); //FOUT
+			jobBecameReady = true;
+			System.out.printf("EQ:%s product %s going to be executed after repair\n", name, product);
+		} else {
+			System.out.printf("EQ:%s product %s is added to waiting products\n", name, product);
 		}
 	}
 
@@ -290,11 +306,17 @@ public class Equiplet extends EquipletAgent {
 	public void notifyJobFinished(double time) {
 		if (state == EquipletState.ERROR) {
 			timeShouldHaveFinished = time;
-			//FOUT
-			//Opnieuw toevoegen aan de schedule?
+			System.out.printf("EQ:%s job %s should have finished at %.2f, notifyJobFinished() : [breakdown=%.0f, finished=%.0f, broken=%.0f, executing=%s]\n", name, executing,
+					time, timeBreakdown, timeShouldHaveFinished, timeBroken, executing);
+		} else if (hasFinishedDuringRepair()) {
+			System.out.printf("EQ:%s job should finished but delayed by breakdown, should still %.2f be executed : [breakdown=%.0f, finished=%.0f, broken=%.0f, executing=%s]\n",
+					name, getRemainingTime(), timeBreakdown, timeShouldHaveFinished, timeBroken, executing);
+			state = EquipletState.BUSY;
 		} else {
 			executing.updateDueTime(time);
 			history.add(executing);
+
+			System.out.printf("EQ:%s finished with job %s\n", name, executing);
 
 			historyUpdate(time);
 			if (!schedule.isEmpty() && schedule.first().isReady()) {
@@ -305,7 +327,7 @@ public class Equiplet extends EquipletAgent {
 			}
 		}
 	}
-	
+
 	/**
 	 * Set the time of the breakdown of the equiplet
 	 * 
@@ -313,38 +335,50 @@ public class Equiplet extends EquipletAgent {
 	 *            of the breakdown
 	 */
 	public void notifyBreakdown(double time) {
+		System.out.printf("EQ:%s is broken down at %.2f\n", name, time);
 		historyUpdate(time);
 		state = EquipletState.ERROR;
 		timeBroken = -1;
 		timeBreakdown = time;
 		timeShouldHaveFinished = -1;
+		System.out.printf("EQ:%s error debug notifyBreakdown() [breakdown=%.0f, finished=%.0f, broken=%.0f, executing=%s]\n", name, timeBreakdown, timeShouldHaveFinished,
+				timeBroken, executing);
 	}
 
 	/**
-	 * The notify that the equiplet is repaired
-	 * if the equiplet has finished during the repair, remember the time the
-	 * equiplet has broken
+	 * The notify that the equiplet is repaired if the equiplet has finished during the repair, remember the time the equiplet has broken
 	 * 
 	 * @param time
 	 *            of repair
 	 */
 	public void notifyRepaired(double time) {
 		historyUpdate(time);
-		if (!hasFinishedDuringRepair()) {
-			//executeJob(time);	//FOUT -> Gaat hij gewoon naar de volgende job als hij tijdens de breakdown klaar had moeten zijn..?
-		} 
-		
-		if (isExecuting()) {
-			this.timeBroken = time - timeBreakdown;
+
+		if (jobBecameReady) {
+			jobBecameReady = false;
+			executeJob(time);
+
+			timeBroken = -1;
+			timeBreakdown = -1;
+			timeShouldHaveFinished = -1;
+		} else if (isExecuting()) {
+			System.out.printf("EQ:%s is repaired at %.2f and continue with job %s \n", name, time, executing);
+			timeBroken = time - timeBreakdown;
 			state = EquipletState.BUSY;
 		} else {
+			System.out.printf("EQ:%s is repaired at %.2f \n", name, time);
 			state = EquipletState.IDLE;
+
+			timeBroken = -1;
+			timeBreakdown = -1;
+			timeShouldHaveFinished = -1;
 		}
+		System.out.printf("EQ:%s error debug notifyRepaired() [breakdown=%.0f, finished=%.0f, broken=%.0f, executing=%s]\n", name, timeBreakdown, timeShouldHaveFinished,
+				timeBroken, executing);
 	}
 
 	/**
-	 * The simulation need the know the time the equiplet was broken to set the
-	 * finished event of the executing job over the remaining time of the job
+	 * The simulation need the know the time the equiplet was broken to set the finished event of the executing job over the remaining time of the job
 	 * 
 	 * @return time the equiplet was broken
 	 */
@@ -353,23 +387,31 @@ public class Equiplet extends EquipletAgent {
 	}
 
 	/**
-	 * The simulation has set the finished event over the remaining time of the
-	 * executing job
+	 * The simulation has set the finished event over the remaining time of the executing job
 	 * 
 	 * @return the time the equiplet should have finished
 	 */
+	@Deprecated
 	public double getShouldHaveFinish() {
 		return timeShouldHaveFinished;
 	}
 
 	/**
-	 * Ask if the Equiplet has finished the job during the time the equiplet was
-	 * broken. If this is the case, the time should have finished is set
+	 * The equiplet should have finished with the job while he was being repaided The function gives the simulation the remaining time of the job which still needs to be executed
+	 * 
+	 * @return the remaining process time of the job
+	 */
+	public double getRemainingTime() {
+		return timeShouldHaveFinished - timeBreakdown;
+	}
+
+	/**
+	 * Ask if the Equiplet has finished the job during the time the equiplet was broken. If this is the case, the time should have finished is set
 	 * 
 	 * @return if the equipet finished the job
 	 */
 	public boolean hasFinishedDuringRepair() {
-		return timeShouldHaveFinished > 0;		//FOUT
+		return timeShouldHaveFinished > 0; // FOUT
 	}
 
 	private void historyUpdate(double time) {
@@ -402,5 +444,21 @@ public class Equiplet extends EquipletAgent {
 			}
 		}
 		return true;
+	}
+
+	public boolean isNewJobReady() {
+		return jobBecameReady;
+	}
+
+	public boolean wasBroken() {
+		if (timeBroken > 0) {
+			double x = timeBroken;
+			timeBroken = -1;
+			timeBreakdown = -1;
+			timeShouldHaveFinished = -1;
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

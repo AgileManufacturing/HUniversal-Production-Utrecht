@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -19,6 +20,7 @@ import simulation.util.Capability;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.ProductStep;
+import simulation.util.Triple;
 
 // import simulation.mas.Equiplet;
 
@@ -84,7 +86,7 @@ public class Config {
 		ArrayList<ProductStep> productSteps = new ArrayList<>();
 
 		for (ProductStepConfig i : products.getSteps()) {
-			productSteps.add(new ProductStep(i.getService(), i.getCriteria(), i.getEstimate()));
+			productSteps.add(new ProductStep(productSteps.size(), i.getService(), i.getCriteria()));
 		}
 
 		return productSteps;
@@ -115,6 +117,22 @@ public class Config {
 	public List<EquipletConfig> getEquiplets() {
 		return equipletConfig;
 	}
+	
+	public Map<String, Triple<Position, List<Capability>, Map<String, Double>>> getEquipletsConfigurations() {
+		Map<String, Triple<Position, List<Capability>, Map<String, Double>>> equiplets = new HashMap<String, Triple<Position, List<Capability>, Map<String, Double>>>();
+		for (EquipletConfig e : equipletConfig) {
+			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
+			List<Capability> capabilities = new ArrayList<>();
+			HashMap<String, Double> productionTimes  = new HashMap<>();
+			for (CapabilityConfig c : e.getCapabilities()) {
+				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>()));
+				productionTimes.put(c.getName(), equipletProductionTime(e.getName(), c.getName()).first);
+			}
+			
+			equiplets.put(e.getName(), new Triple<Position, List<Capability>, Map<String, Double>>(position, capabilities, productionTimes));
+		}
+		return equiplets;
+	}
 
 	public List<Equiplet> getEquipletList() {
 		ArrayList<Equiplet> equiplets = new ArrayList<>();
@@ -123,7 +141,7 @@ public class Config {
 			List<Capability> capabilities = new ArrayList<>();
 			HashMap<String, Double> productionTimes  = new HashMap<>();
 			for (CapabilityConfig c : e.getCapabilities()) {
-				capabilities.add(new Capability(capabilities.size(), c.getName(), new HashMap<String, Object>()));
+				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>()));
 				productionTimes.put(c.getName(), equipletProductionTime(e.getName(), c.getName()).first);
 			}
 			
