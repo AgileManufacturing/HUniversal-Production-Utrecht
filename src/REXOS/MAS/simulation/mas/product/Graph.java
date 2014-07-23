@@ -1,4 +1,4 @@
-package simulation.mas.scheduling;
+package simulation.mas.product;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 import simulation.util.Pair;
+import simulation.util.Settings;
 
 public class Graph<V> {
 
@@ -91,7 +92,7 @@ public class Graph<V> {
 				HashMap<V, Double> neighbors = graph.get(node);
 				processed.add(node);
 
-				if (Scheduling.DEBUG_SCHEDULING) {
+				if (Settings.DEBUG_SCHEDULING) {
 					System.out.println("process node: " + node + " with neighbors " + neighbors);
 				}
 				
@@ -102,13 +103,13 @@ public class Graph<V> {
 					double cost = p.second + neighbor.getValue();
 					paths.add(new Pair<LinkedList<V>, Double>(newSubPath, cost));
 
-					if (Scheduling.DEBUG_SCHEDULING) {
+					if (Settings.DEBUG_SCHEDULING) {
 						System.out.println("newPath:  [neighbor=" + neighbor.getKey() + ", to=" + to + ", cost=" + cost + ", score " + score + ", path=" + newSubPath + "]");
 					}
 
 					// Check whether the path is the best and should be returned 
 					if (neighbor.getKey().equals(to) && cost > score) {
-						if (Scheduling.DEBUG_SCHEDULING) {
+						if (Settings.DEBUG_SCHEDULING) {
 							System.out.println("WIN path:  [to=" + to + ", cost=" + cost + ", path " + newSubPath + ", score " + score + "]");
 						}
 						score = cost;

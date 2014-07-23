@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import simulation.mas.Equiplet;
+import simulation.mas.equiplet.Equiplet;
+import simulation.mas.product.ProductStep;
 import simulation.util.Capability;
 import simulation.util.Pair;
 import simulation.util.Position;
-import simulation.util.ProductStep;
 import simulation.util.Triple;
 
 // import simulation.mas.Equiplet;
@@ -145,7 +145,7 @@ public class Config {
 				productionTimes.put(c.getName(), equipletProductionTime(e.getName(), c.getName()).first);
 			}
 			
-			equiplets.add(new simulation.mas.Equiplet(e.getName(), position, capabilities, productionTimes));
+			equiplets.add(new simulation.mas.equiplet.Equiplet(e.getName(), position, capabilities, productionTimes));
 		}
 		return equiplets;
 	}
@@ -184,7 +184,8 @@ public class Config {
 		return null;
 	}
 
+	@Override
 	public String toString() {
-		return String.format("Config [run length=%.0f, runs=%d, travel=%.0f (%s), \n products=%s, \n equiplets=%s]", runlength, runs, travel.mean(), travel.type(), products, equipletConfig);
+		return String.format("Config [run length=%.0f, runs=%d, travel=%.2f (%s), \n products=%s, \n equiplets=%s]", runlength, runs, travel.mean(), travel.type(), products, equipletConfig);
 	}
 }

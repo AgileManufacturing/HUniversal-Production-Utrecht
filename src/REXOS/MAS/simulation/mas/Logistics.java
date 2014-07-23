@@ -3,8 +3,9 @@ package simulation.mas;
 import java.util.LinkedList;
 import java.util.List;
 
+import simulation.mas.equiplet.EquipletAgent;
+import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
-import simulation.util.ProductStep;
 
 public class Logistics {
 	

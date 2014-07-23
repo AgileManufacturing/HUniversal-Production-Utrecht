@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import simulation.mas.product.ProductStep;
+
 public class ParserPrimitives {
 
 	protected static JSONObject parsePosition(Position position) throws JSONException {

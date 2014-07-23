@@ -1,4 +1,4 @@
-package simulation.mas.scheduling;
+package simulation.mas.product;
 
 import jade.core.AID;
 
@@ -10,11 +10,13 @@ public class Node {
 	private double duration;
 
 	public Node() {
-		time = -1;
+		this.equipletAID = null;
+		this.time = -1;
+		this.duration = 0;
 	}
 
 	public Node(double time) {
-		this.equiplet = null;
+		this.equipletAID = null;
 		this.time = time;
 		this.duration = 0;
 	}
@@ -25,7 +27,7 @@ public class Node {
 		this.time = time;
 		this.duration = duration;
 	}
-	
+
 	public Node(AID equiplet, double time, double duration) {
 		this.equipletAID = equiplet;
 		this.time = time;
@@ -46,6 +48,22 @@ public class Node {
 
 	public double getDuration() {
 		return duration;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Node)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		Node node = (Node) obj;
+		if (equipletAID == null || node.getEquipletAID() == null) {
+			return false;
+		}
+		
+		return equipletAID.equals(node.getEquipletAID()) && time == node.getTime() && duration == node.getDuration();
 	}
 
 	@Override

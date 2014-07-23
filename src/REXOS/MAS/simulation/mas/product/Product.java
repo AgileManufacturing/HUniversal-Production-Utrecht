@@ -1,4 +1,4 @@
-package simulation.mas;
+package simulation.mas.product;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -6,13 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import simulation.mas.scheduling.Node;
-import simulation.mas.scheduling.Scheduling;
+import simulation.mas.equiplet.Equiplet;
 import simulation.simulation.Grid;
 import simulation.util.Pair;
 import simulation.util.Position;
-import simulation.util.ProductStep;
-import simulation.util.ProductionStep;
 import simulation.util.Tuple;
 
 public class Product {
@@ -75,7 +72,7 @@ public class Product {
 			Node node = nodes.get(i);
 			ProductStep step = productSteps.get(i);
 			String equiplet = node.getEquiplet();
-			path.add(new ProductionStep(step, equiplet, node.getTime(), node.getDuration()));
+			path.add(new ProductionStep(step, equiplet, grid.getEquiplet(equiplet).getPosition(), node.getTime(), node.getDuration()));
 
 			grid.getEquiplet(equiplet).schedule(node.getTime(), node.getTime() + node.getDuration(), name, step.getService(), new HashMap<String, Object>());
 			// node.getEquiplet().schedule(node.getTime(), node.getDuration(),

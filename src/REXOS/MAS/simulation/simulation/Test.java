@@ -10,12 +10,12 @@ import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.RefineryUtilities;
 
 import simulation.graphics.GanttChart;
-import simulation.mas.Product;
-import simulation.mas.scheduling.Graph;
-import simulation.mas.scheduling.Node;
+import simulation.mas.product.Graph;
+import simulation.mas.product.Node;
+import simulation.mas.product.Product;
+import simulation.mas.product.ProductStep;
+import simulation.mas.product.ProductionStep;
 import simulation.util.Position;
-import simulation.util.ProductStep;
-import simulation.util.ProductionStep;
 
 class Test {
 	

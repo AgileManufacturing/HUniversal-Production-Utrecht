@@ -3,18 +3,12 @@ package simulation.graphics;
 import java.util.List;
 import java.util.Map;
 
-import simulation.mas.Equiplet;
-import simulation.mas.Product;
 import simulation.util.Triple;
 
 public interface Control {
 
-	Map<String, Product> getProducts();
-
-	List<Equiplet> getEquiplets();
-
-	Map<String, Triple<Double, Double, Double>> getEquipletHistory();
-
+	void step();
+	
 	void start();
 
 	void pause();
@@ -24,5 +18,17 @@ public interface Control {
 	void setDelay(int value);
 
 	void saveStatistics();
+
+	Map<String, List<Triple<String, Double, Double>>> getCompleteSchedule();
+	
+	Map<String, List<Triple<String, Double, Double>>> getEquipletSchedule();
+	
+	Map<String, List<Triple<String, Double, Double>>> getEquipletHistory();
+	
+	Map<String, Triple<Double, Double, Double>> getEquipletUtilization();
+
+	Map<String, Map<Double, Double>> getEquipletLatency();
+
+	Map<String, Map<Double, Double>> getProductStatistics();
 
 }

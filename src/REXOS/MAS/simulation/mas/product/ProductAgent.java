@@ -1,4 +1,4 @@
-package simulation.mas;
+package simulation.mas.product;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -20,15 +20,12 @@ import java.util.Map.Entry;
 
 import org.json.JSONException;
 
-import simulation.mas.scheduling.Graph;
-import simulation.mas.scheduling.Node;
 import simulation.simulation.ISimulation;
 import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
-import simulation.util.ProductStep;
-import simulation.util.ProductionStep;
+import simulation.util.Settings;
 import simulation.util.Triple;
 import simulation.util.Util;
 
@@ -37,7 +34,6 @@ public class ProductAgent extends Agent {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final boolean DEBUG_SCHEDULING = false;
 
 	private double created;
 	private List<ProductStep> productSteps;
@@ -80,7 +76,7 @@ public class ProductAgent extends Agent {
 		this.deadline = created + 10000;
 		this.state = ProductState.SCHEDULING;
 
-		System.out.printf("PA:%s initialize [pos=%s, product steps=%s]\n", getLocalName(), position, productSteps);
+		System.out.printf("PA:%s initialize [pos=%s, product steps=%s, deadline=%.0f]\n", getLocalName(), position, productSteps, deadline);
 
 		addBehaviour(new ScheduleBehaviour());
 		addBehaviour(new ProductListenerBehaviour());
@@ -98,7 +94,7 @@ public class ProductAgent extends Agent {
 			MessageTemplate template = MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM), MessageTemplate.MatchPerformative(ACLMessage.CONFIRM)));
 			ACLMessage msg = blockingReceive(template);
 			if (msg != null) {
-				System.out.printf("PA:%s received message [performative=%s, conversation=%s, content=%s, from=%s]\n", getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent(), msg.getSender().getLocalName());
+				System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 				switch (msg.getPerformative()) {
 				case ACLMessage.INFORM:
 					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_PROCESSING)) {
@@ -106,6 +102,9 @@ public class ProductAgent extends Agent {
 							boolean confirmation = Parser.parseConfirmation(msg.getContent());
 							if (confirmation) {
 								state = ProductState.PROCESSING;
+								
+								// notify the simulation that processing begins
+								simulation.notifyProductProcessing(getLocalName(), productionPath.peek().getEquipletName(), productionPath.peek().getService());
 							} else {
 								System.err.printf("PA:%s failed to receive confirmation.\n", getLocalName());
 							}
@@ -171,9 +170,18 @@ public class ProductAgent extends Agent {
 		private boolean scheduled;
 		private int retry = 3;
 
+		/**
+		 * @var equipletInfo
+		 * equiplet info :: Map < equiplet name, Pair < load of equiplet, position of equiplet> >
+		 */
+		private Map<AID, Pair<Double, Position>> equipletInfo;
+
 		public ScheduleBehaviour() {
 			searched = false;
 			scheduled = false;
+
+			equipletInfo = new HashMap<AID, Pair<Double,Position>>();
+			
 			state = ProductState.SCHEDULING;
 		}
 
@@ -206,9 +214,8 @@ public class ProductAgent extends Agent {
 					}
 				}
 
-				// equiplet info :: Map < Equiplet name, Pair < load of equiplet, position of equiplet> >
-				Map<AID, Pair<Double, Position>> equipletInfo = new HashMap<AID, Pair<Double, Position>>();
-
+				equipletInfo = new HashMap<AID, Pair<Double,Position>>();
+				
 				// option to execute product step :: Map < product step index, Map of options to execute product step <Equiplet, Pair < estimate duration of service, List of
 				// possibilities < from time, until time> > > >
 				Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options = new HashMap<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>();
@@ -221,7 +228,7 @@ public class ProductAgent extends Agent {
 					if (msg != null && msg.getPerformative() == ACLMessage.PROPOSE) {
 						counter++;
 
-						System.out.printf("PA:%s can execute reply received from %s : %s.\n", getLocalName(), msg.getSender(), msg.getContent());
+						System.out.printf("PA:%s can execute reply received from %s : %s.\n", getLocalName(), msg.getSender().getLocalName(), msg.getContent());
 						try {
 							// Triple < List of product steps, load, position >
 							Triple<List<Triple<Integer, Double, List<Pair<Double, Double>>>>, Double, Position> answer = Parser.parseCanExecuteAnswer(msg.getContent());
@@ -236,7 +243,7 @@ public class ProductAgent extends Agent {
 								options.get(service.first).put(msg.getSender(), new Pair<Double, List<Pair<Double, Double>>>(service.second, service.third));
 							}
 						} catch (JSONException e) {
-							System.err.printf("PA:%s failed to receive correct message from equiplet when asking can execute %s.\n", getLocalName(), msg.getContent());
+							System.err.printf("PA:%s failed to receive correct message from equiplet %s when asking can execute %s.\n", getLocalName(), msg.getSender().getLocalName(), msg.getContent());
 							System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
 						}
 					} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
@@ -255,7 +262,7 @@ public class ProductAgent extends Agent {
 				}
 
 				boolean succeeded = true;
-				LinkedList<Node> nodes = calculateEDDPath(created, deadline, position, productSteps, equipletInfo, options);
+				LinkedList<Node> nodes = calculateEDDPath(created, deadline, position, productSteps, options);
 				if (nodes == null || nodes.size() != productSteps.size()) {
 					System.out.println("P:" + getLocalName() + "  FAILED to find production path nodes=" + (nodes != null ? nodes : "null"));
 					state = ProductState.ERROR;
@@ -266,6 +273,8 @@ public class ProductAgent extends Agent {
 				} else {
 					succeeded = schedule(nodes);
 					scheduled = succeeded;
+
+					System.out.printf("PA:%s scheduled the following production path: %s.\n", getLocalName(), productionPath);
 
 					// if all succeed: product will travel to first equiplet
 					if (succeeded) {
@@ -317,55 +326,7 @@ public class ProductAgent extends Agent {
 			return suitedEquiplets;
 		}
 
-		@Override
-		public boolean done() {
-			return (searched && scheduled) || retry < 1;
-		}
-
-		private boolean schedule(LinkedList<Node> nodes) {
-			int sendCounter = 0;
-			LinkedList<ProductionStep> path = new LinkedList<>();
-			for (int i = 0; i < nodes.size(); i++) {
-				Node node = nodes.get(i);
-				ProductStep step = productSteps.get(i);
-				AID equiplet = node.getEquipletAID();
-				path.add(new ProductionStep(step, equiplet, node.getTime(), node.getDuration()));
-
-				String service = step.getService();
-				Map<String, Object> criteria = step.getCriteria();
-
-				try {
-					// Ask the equiplet to schedule the service
-					ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-					message.addReceiver(equiplet);
-					message.setOntology(Ontology.GRID_ONTOLOGY);
-					message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
-					message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
-					message.setContent(Parser.parseSchedule(service, criteria, node.getTime(), deadline));
-					send(message);
-					sendCounter++;
-				} catch (JSONException e) {
-					System.err.printf("PA:%s failed to construct message to equiplet %s for scheduling.\n", getLocalName(), equiplet);
-					System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
-				}
-			}
-			boolean succeeded = true;
-			while (sendCounter > 0) { // All agent have to answer
-				ACLMessage msg = blockingReceive(); // change to blockingReceive(millis) or blockingReceive(MessageTemplate, millis) to enable a timeout and or message for enable
-													// more message handler
-				if (msg != null && msg.getPerformative() == ACLMessage.CONFIRM) {
-					sendCounter--;
-				} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
-					succeeded = false;
-					sendCounter--;
-				}
-			}
-			productionPath = path;
-
-			return succeeded;
-		}
-
-		private LinkedList<Node> calculateEDDPath(double time, double deadline, Position position, List<ProductStep> productSteps, Map<AID, Pair<Double, Position>> equipletInfo, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions) {
+		private LinkedList<Node> calculateEDDPath(double time, double deadline, Position position, List<ProductStep> productSteps, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions) {
 			Graph<Node> graph = new Graph<>();
 
 			Node source = new Node(time);
@@ -374,7 +335,7 @@ public class ProductAgent extends Agent {
 			graph.add(source);
 			graph.add(sink);
 
-			if (DEBUG_SCHEDULING) {
+			if (Settings.DEBUG_SCHEDULING) {
 				System.out.printf("\nPA:%s calculate best path \ninfo: \t %s\noptions: \t%s\n", getLocalName(), Util.formatArray(equipletInfo), Util.formatArray(serviceOptions));
 			}
 
@@ -385,7 +346,7 @@ public class ProductAgent extends Agent {
 			for (ProductStep step : productSteps) {
 				Map<AID, Pair<Double, List<Pair<Double, Double>>>> options = serviceOptions.get(step.getIndex());
 
-				if (DEBUG_SCHEDULING) {
+				if (Settings.DEBUG_SCHEDULING) {
 					System.out.printf("\nPA:%s construct scheduling graph, step=%s, from nodes=%s, with options=%s.\n\n", getLocalName(), step, lastNodes, Util.formatArray(options));
 				}
 
@@ -421,18 +382,18 @@ public class ProductAgent extends Agent {
 						Node nextNode = new Node(option.getKey(), firstPossibilty, duration);
 
 						double window = deadline - arrival;
-						double cost = 1 - firstPossibilty / window;
+						double cost = 1 - (firstPossibilty - created) / window;
 
-						if (cost < 0 && DEBUG_SCHEDULING) {
-							System.out.println("failed maybe because the: " + deadline);
-							System.out.printf("Add to graph: %s -- %.6f --> %s [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+						if (cost < 0) { //) && Settings.DEBUG_SCHEDULING) {
+							System.out.println("FAILED maybe because the: deadline=" + deadline);
+							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
 						}
 
 						graph.add(node, nextNode, cost);
 						equipletNodes.add(nextNode);
 
-						if (DEBUG_SCHEDULING) {
-							System.out.printf("Add to graph: %s -- %.6f --> %s [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+						if (Settings.DEBUG_SCHEDULING) {
+							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
 						}
 					}
 				}
@@ -440,6 +401,7 @@ public class ProductAgent extends Agent {
 				lastNodes.clear();
 				lastNodes.addAll(equipletNodes);
 			}
+			
 			// add vertces from all the nodes in the last column to the sink node
 			for (Node node : lastNodes) {
 				graph.add(node, sink, 0);
@@ -453,12 +415,60 @@ public class ProductAgent extends Agent {
 				System.err.printf("PA:%s Failed to find path in %s\n", getLocalName(), graph);
 			}
 
-			if (DEBUG_SCHEDULING) {
+			if (Settings.DEBUG_SCHEDULING) {
 				System.out.println("the last equiplet nodes to be processed: " + lastNodes);
 				System.out.println("Graph: " + graph);
 			}
 
 			return path;
+		}
+
+		private boolean schedule(LinkedList<Node> nodes) {
+			int sendCounter = 0;
+			LinkedList<ProductionStep> path = new LinkedList<>();
+			for (int i = 0; i < nodes.size(); i++) {
+				Node node = nodes.get(i);
+				ProductStep step = productSteps.get(i);
+				AID equiplet = node.getEquipletAID();
+				path.add(new ProductionStep(step, equiplet, equipletInfo.get(equiplet).second, node.getTime(), node.getDuration()));
+
+				String service = step.getService();
+				Map<String, Object> criteria = step.getCriteria();
+
+				try {
+					// Ask the equiplet to schedule the service
+					ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+					message.addReceiver(equiplet);
+					message.setOntology(Ontology.GRID_ONTOLOGY);
+					message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
+					message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
+					message.setContent(Parser.parseSchedule(service, criteria, node.getTime(), deadline));
+					send(message);
+					sendCounter++;
+				} catch (JSONException e) {
+					System.err.printf("PA:%s failed to construct message to equiplet %s for scheduling.\n", getLocalName(), equiplet);
+					System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
+				}
+			}
+			boolean succeeded = true;
+			while (sendCounter > 0) { // All agent have to answer
+				ACLMessage msg = blockingReceive(); // change to blockingReceive(millis) or blockingReceive(MessageTemplate, millis) to enable a timeout and or message for enable
+													// more message handler
+				if (msg != null && msg.getPerformative() == ACLMessage.CONFIRM) {
+					sendCounter--;
+				} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
+					succeeded = false;
+					sendCounter--;
+				}
+			}
+			productionPath = path;
+
+			return succeeded;
+		}
+		
+		@Override
+		public boolean done() {
+			return (searched && scheduled) || retry < 1;
 		}
 	}
 
@@ -487,10 +497,13 @@ public class ProductAgent extends Agent {
 	public void notifyProductArrived(double time) {
 		// change state from travelling to ready
 		state = ProductState.WAITING;
+		
+		ProductionStep productionStep = productionPath.peek();
+		position = productionStep.getPosition();
 
 		try {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-			message.addReceiver(productionPath.peek().getEquiplet());
+			message.addReceiver(productionStep.getEquiplet());
 			message.setOntology(Ontology.GRID_ONTOLOGY);
 			message.setConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED);
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_ARRIVED + System.currentTimeMillis());

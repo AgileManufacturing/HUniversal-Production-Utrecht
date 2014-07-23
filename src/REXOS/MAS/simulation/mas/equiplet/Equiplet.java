@@ -1,4 +1,4 @@
-package simulation.mas;
+package simulation.mas.equiplet;
 
 import java.util.ArrayList;
 import java.util.HashMap;

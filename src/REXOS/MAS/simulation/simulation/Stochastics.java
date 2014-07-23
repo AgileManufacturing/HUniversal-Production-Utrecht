@@ -6,8 +6,8 @@ import java.util.Random;
 
 import simulation.config.Config;
 import simulation.config.DurationType;
+import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
-import simulation.util.ProductStep;
 
 class Stochastics {
 	private Random random;
@@ -35,7 +35,7 @@ class Stochastics {
 
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
-			return generateProductStepsTest();
+			 return generateProductStepsTest();
 		}
 		
 		LinkedList<ProductStep> steps = new LinkedList<>();

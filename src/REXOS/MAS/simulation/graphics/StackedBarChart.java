@@ -43,7 +43,7 @@ public class StackedBarChart extends ApplicationFrame {
 
 	public static JPanel createChartPanel(Map<String, Triple<Double, Double, Double>> data) {
 		final DefaultCategoryDataset dataset = createDataset(data);
-		final JFreeChart chart = createChart("Schedule", dataset);
+		final JFreeChart chart = createChart("Utilization", dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		// chartPanel.setPreferredSize(new Dimension(800, 400));
@@ -58,8 +58,8 @@ public class StackedBarChart extends ApplicationFrame {
 	private static DefaultCategoryDataset createDataset(Map<String, Triple<Double, Double, Double>> data) {
 		DefaultCategoryDataset collection = new DefaultCategoryDataset();
 		for (Entry<String, Triple<Double, Double, Double>> entry : data.entrySet()) {
-			collection.addValue(entry.getValue().first, "idle", entry.getKey());
-			collection.addValue(entry.getValue().second, "busy", entry.getKey());
+			collection.addValue(entry.getValue().first, "busy", entry.getKey());
+			collection.addValue(entry.getValue().second, "idle", entry.getKey());
 			collection.addValue(entry.getValue().third, "broken", entry.getKey());
 		}
 		return collection;
@@ -92,8 +92,8 @@ public class StackedBarChart extends ApplicationFrame {
 
 		
 		BarRenderer renderer = ((BarRenderer) plot.getRenderer()); 
-		renderer.setSeriesPaint(0, new Color(0x00, 0x00, 0x80)); // Color.DARK_BLUE
-		renderer.setSeriesPaint(1, new Color(0x00, 0x80, 0x00)); // Color.VERY_DARK_GREEN
+		renderer.setSeriesPaint(0, new Color(0x00, 0x80, 0x00)); // Color.VERY_DARK_GREEN
+		renderer.setSeriesPaint(1, new Color(0x00, 0x00, 0x80)); // Color.DARK_BLUE
 		// renderer.setSeriesPaint(1,  new Color(0x00, 0xC0, 0x00)); // Color.DARK_GREEN
 		renderer.setSeriesPaint(2, Color.RED);
 		renderer.setBarPainter(new StandardBarPainter());

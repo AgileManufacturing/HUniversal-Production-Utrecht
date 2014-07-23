@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import simulation.config.Config;
-import simulation.mas.Equiplet;
 import simulation.mas.Logistics;
+import simulation.mas.equiplet.Equiplet;
 import simulation.util.Position;
 
 public class Grid {

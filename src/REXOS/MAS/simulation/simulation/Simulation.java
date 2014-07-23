@@ -5,19 +5,20 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import simulation.config.Config;
 import simulation.graphics.Control;
 import simulation.graphics.SimInterface;
-import simulation.mas.Equiplet;
-import simulation.mas.EquipletState;
-import simulation.mas.Product;
-import simulation.mas.ProductState;
+import simulation.mas.equiplet.Equiplet;
+import simulation.mas.equiplet.EquipletState;
+import simulation.mas.product.Product;
+import simulation.mas.product.ProductState;
+import simulation.mas.product.ProductStep;
+import simulation.mas.product.ProductionStep;
 import simulation.util.Position;
-import simulation.util.ProductStep;
-import simulation.util.ProductionStep;
 import simulation.util.Triple;
 import simulation.util.Util;
 
@@ -35,6 +36,8 @@ public class Simulation extends Thread implements Control {
 	private int run;
 	private int runs;
 	private double run_length;
+
+	private int step;
 	private boolean finished;
 	private boolean running;
 	private int delay;
@@ -70,6 +73,7 @@ public class Simulation extends Thread implements Control {
 		run_length = config.getRunLength();
 		finished = false;
 		running = false;
+		step = 0;
 
 		time = 0;
 
@@ -356,8 +360,7 @@ public class Simulation extends Thread implements Control {
 			List<Triple<String, List<String>, Triple<String, Integer, Integer>>> equipletStates = new ArrayList<>();
 			for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
 				Equiplet equiplet = entry.getValue();
-				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getEquipletName(), equiplet.getServices(),
-						new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
+				equipletStates.add(new Triple<String, List<String>, Triple<String, Integer, Integer>>(equiplet.getEquipletName(), equiplet.getServices(), new Triple<String, Integer, Integer>(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.executedJobs())));
 			}
 
 			System.out.printf("Update: [time=%.2f, product=%d, equiplets=%s]\n\n", time, products.size(), equipletStates);
@@ -383,6 +386,10 @@ public class Simulation extends Thread implements Control {
 		notify();// wake up the wait
 	}
 
+	public synchronized void step() {
+		step++;
+	}
+
 	public synchronized int getDelay() {
 		return delay;
 	}
@@ -399,11 +406,40 @@ public class Simulation extends Thread implements Control {
 		return new ArrayList<Equiplet>(grid.getEquiplets().values());
 	}
 
-	public synchronized Map<String, Triple<Double, Double, Double>> getEquipletHistory() {
-		Map<String, Triple<Double, Double, Double>> histories = new HashMap<String, Triple<Double, Double, Double>>();
+	public synchronized Map<String, List<Triple<String, Double, Double>>> getEquipletHistory() {
+		return null;
+	}
+
+	@Override
+	public Map<String, List<Triple<String, Double, Double>>> getEquipletSchedule() {
+		// TODO Auto-generated method stub
+		return new HashMap<>();
+	}
+
+	@Override
+	public Map<String, Triple<Double, Double, Double>> getEquipletUtilization() {
+		Map<String, Triple<Double, Double, Double>> data = new HashMap<String, Triple<Double, Double, Double>>();
 		for (Entry<String, Equiplet> entry : grid.getEquiplets().entrySet()) {
-			histories.put(entry.getValue().getEquipletName(), entry.getValue().getStatistics(time));
+			data.put(entry.getValue().getEquipletName(), entry.getValue().getStatistics(time));
 		}
-		return histories;
+		return data;
+	}
+
+	@Override
+	public Map<String, List<Triple<String, Double, Double>>> getCompleteSchedule() {
+		// TODO Auto-generated method stub
+		return new HashMap<>();
+	}
+
+	@Override
+	public Map<String, Map<Double, Double>> getEquipletLatency() {
+		// TODO Auto-generated method stub
+		return new HashMap<>();
+	}
+
+	@Override
+	public Map<String, Map<Double, Double>>  getProductStatistics() {
+		// TODO Auto-generated method stub
+		return new HashMap<>();
 	}
 }

@@ -12,22 +12,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.json.JSONException;
 
 import simulation.config.Config;
 import simulation.graphics.Control;
 import simulation.graphics.SimInterface;
-import simulation.mas.Equiplet;
-import simulation.mas.EquipletAgent;
-import simulation.mas.Product;
-import simulation.mas.ProductAgent;
+import simulation.mas.equiplet.EquipletAgent;
+import simulation.mas.equiplet.EquipletState;
+import simulation.mas.product.ProductAgent;
+import simulation.mas.product.ProductStep;
 import simulation.util.Capability;
-import simulation.util.Parser;
 import simulation.util.Position;
-import simulation.util.ProductStep;
-import simulation.util.ProductionStep;
 import simulation.util.Triple;
 import simulation.util.Tuple;
 
@@ -38,6 +34,14 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	// product statistics
+	private static final String STATS_TRAVEL = "Traveling";
+	private static final String STATS_WAITING = "Waiting";
+	private static final String STATS_BUSY = "Processing";
+	private static final String STATS_FINISHED = "Finished";
+	private static final String STATS_FAILED = "Failed";
+	private static final String STATS_SYSTEM = "In System";
+
 	private SimInterface gui;
 	private Config config;
 	private Stochastics stochastics;
@@ -45,8 +49,10 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	private int run;
 	private int runs;
 	private double run_length;
+
 	private boolean finished;
 	private boolean running;
+	private int step;
 	private int delay;
 
 	protected final Object lock = new Object();
@@ -56,26 +62,27 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	private TreeSet<Event> eventStack;
 	private double time;
 
-	private Map<String, EquipletAgent> equiplets;
+	private TreeMap<String, EquipletAgent> equiplets;
 	private Map<String, ProductAgent> products;
 	private int productCount;
-
-	private Map<String, Triple<Double, Double, Double>> equipletHistories;
 
 	// Performance
 	private int totalSteps;
 
-	private int traveling;
+	// private int traveling;
 	private HashMap<String, Double> throughput;
+	private Map<String, TreeMap<Double, Double>> productStatistics;
 
 	// TODO
 
 	public void setup() {
-		System.out.println("Simulation: setup.");
-		gui = SimInterface.create(this);
+		delay = 1; // if delay = 0, waits forever
+
 		config = Config.read();
 		stochastics = new Stochastics(config);
-		delay = 1500; // if delay = 0, waits forever
+		gui = SimInterface.create(this);
+
+		System.out.printf("Simulation: setup %s.\n", config);
 
 		init();
 	}
@@ -88,15 +95,28 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		run_length = config.getRunLength();
 		finished = false;
 		running = false;
+		step = 0;
 
 		time = 0;
 
 		totalSteps = 0;
+		// traveling = 0;
 		productCount = 0;
 		throughput = new HashMap<String, Double>();
+		productStatistics = new HashMap<String, TreeMap<Double, Double>>();
+
+		TreeMap<Double, Double> initStats = new TreeMap<Double, Double>();
+		initStats.put(time, 0d);
+
+		productStatistics.put(STATS_TRAVEL, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_WAITING, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_BUSY, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_FINISHED, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_FAILED, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_SYSTEM, new TreeMap<Double, Double>(initStats));
 
 		products = new HashMap<>();
-		equiplets = new HashMap<>();
+		equiplets = new TreeMap<>();
 
 		// initialize the equiplets in the grid
 		for (Entry<String, Triple<Position, List<Capability>, Map<String, Double>>> entry : config.getEquipletsConfigurations().entrySet()) {
@@ -109,13 +129,9 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 			try {
 				// Create and start the agent
 				// Place the properties in an Object array to sent them to the new agent
-				String configurations = Parser.parseEquipletConfiguration(position, capabilities, productionTimes);
-
 				EquipletAgent equiplet = new EquipletAgent(position, capabilities, productionTimes);
 
-				// Object[] properties = { configurations };
 				ContainerController cc = getContainerController();
-				// AgentController ac = cc.createNewAgent(equipletName, EquipletAgent.class.getName(), properties);
 				AgentController ac = cc.acceptNewAgent(equipletName, equiplet);
 				ac.start();
 
@@ -127,9 +143,6 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 			} catch (NullPointerException e) {
 				System.err.println("Simulation: not yet ready.");
 				e.printStackTrace();
-			} catch (JSONException e) {
-				System.err.printf("Simulation: failed to construct equiplet agent %s construct configurations.\n", equipletName);
-				System.err.printf("Simulation: %s\n", e.getMessage());
 			}
 
 			double breakdown = stochastics.generateBreakdownTime(entry.getKey());
@@ -152,7 +165,11 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		@Override
 		public void action() {
 			while (!finished) {
-				while (running) {
+				while (running || step > 0) {
+
+					if (step > 0) {
+						step--;
+					}
 
 					synchronized (lock) {
 						System.out.println("WAIT ON LOCK. " + eventReady);
@@ -168,7 +185,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 					Event e = eventStack.pollFirst();
 					time = e.getTime();
 
-					System.out.println("\n-----\nSimulation iteration: " + e + " : " + eventStack);
+					System.out.println("\n-----\nSimulation: event=" + e + " : " + eventStack);
 
 					switch (e.getType()) {
 					case PRODUCT:
@@ -194,6 +211,16 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 
 					update();
 
+//					double busy = productStatistics.get(STATS_BUSY).lastEntry().getValue();
+//					double waiting = productStatistics.get(STATS_WAITING).lastEntry().getValue();
+//					double travel = productStatistics.get(STATS_TRAVEL).lastEntry().getValue();
+//					double failed = productStatistics.get(STATS_FAILED).lastEntry().getValue();
+//					double finished = productStatistics.get(STATS_FINISHED).lastEntry().getValue();
+//					double system = productStatistics.get(STATS_SYSTEM).lastEntry().getValue();
+//
+//					System.out.printf("\nSimulation: stats=[busy=%s, waiting=%.0f, travel=%.0f, failed=%.0f, finished=%.0f, in system=%.0f]\n\n", productStatistics.get(STATS_BUSY).lastEntry(), waiting, travel, failed, finished, system);
+//					System.out.printf("\nSTATS %s\n\n", productStatistics);
+
 					// System.out.println("\nSimulation state: " + formatArray(grid.getEquiplets()));
 					// System.out.println("\nSimulation products: " + formatArray(products) + "\n");
 
@@ -217,20 +244,8 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	}
 
 	@Override
-	public synchronized Map<String, Product> getProducts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Equiplet> getEquiplets() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public synchronized Map<String, Triple<Double, Double, Double>> getEquipletHistory() {
-		return equipletHistories;
+	public synchronized void step() {
+		step++;
 	}
 
 	@Override
@@ -254,13 +269,71 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 
 	@Override
 	public synchronized void setDelay(int delay) {
-		this.delay = delay;
+		this.delay = Math.max(1, delay);
 	}
 
 	@Override
 	public synchronized void saveStatistics() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Map<String, List<Triple<String, Double, Double>>> getCompleteSchedule() {
+		TreeMap<String, List<Triple<String, Double, Double>>> schedules = new TreeMap<String, List<Triple<String, Double, Double>>>();
+		for (Entry<String, EquipletAgent> entry : equiplets.entrySet()) {
+			schedules.put(entry.getKey(), entry.getValue().getCompleteSchedule());
+		}
+		return schedules;
+	}
+
+	@Override
+	public Map<String, List<Triple<String, Double, Double>>> getEquipletSchedule() {
+		TreeMap<String, List<Triple<String, Double, Double>>> schedules = new TreeMap<String, List<Triple<String, Double, Double>>>();
+		for (Entry<String, EquipletAgent> entry : equiplets.entrySet()) {
+			schedules.put(entry.getKey(), entry.getValue().getSchedule());
+		}
+		return schedules;
+	}
+
+	@Override
+	public Map<String, List<Triple<String, Double, Double>>> getEquipletHistory() {
+		TreeMap<String, List<Triple<String, Double, Double>>> histories = new TreeMap<String, List<Triple<String, Double, Double>>>();
+		for (Entry<String, EquipletAgent> entry : equiplets.entrySet()) {
+			histories.put(entry.getKey(), entry.getValue().getHistory());
+		}
+		return histories;
+	}
+
+	@Override
+	public Map<String, Triple<Double, Double, Double>> getEquipletUtilization() {
+		TreeMap<String, Triple<Double, Double, Double>> data = new TreeMap<String, Triple<Double, Double, Double>>();
+		for (Entry<String, EquipletAgent> entry : equiplets.entrySet()) {
+			data.put(entry.getKey(), entry.getValue().getStatistics(time));
+		}
+		return data;
+	}
+
+	@Override
+	public Map<String, Map<Double, Double>> getEquipletLatency() {
+		TreeMap<String, Map<Double, Double>> data = new TreeMap<String, Map<Double, Double>>();
+		for (Entry<String, EquipletAgent> entry : equiplets.entrySet()) {
+			data.put(entry.getKey(), entry.getValue().getLatency());
+		}
+		return data;
+	}
+
+	@Override
+	public Map<String, Map<Double, Double>> getProductStatistics() {
+		HashMap<String, Map<Double, Double>> stats = new HashMap<String, Map<Double, Double>>(productStatistics);
+		stats.remove(STATS_FINISHED);
+		return stats;
+	}
+
+	private void updateStats(String type, double add) {
+		double lastValue = productStatistics.get(type).lastEntry().getValue();
+		// System.out.println(" UPDATE " + type + " : " + lastValue + " + " + add + " = " + (lastValue + add));
+		productStatistics.get(type).put(time, lastValue + add);
 	}
 
 	private void changeReady(boolean ready) {
@@ -285,7 +358,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		double waitingTime = 0;
 		List<Double> busy = new ArrayList<Double>();
 		double throughput = 0;
-		gui.update(time, products.size(), productCount, totalSteps, traveling, equipletStates, waitingTime, busy, throughput);
+		gui.update(time, products.size(), productCount, totalSteps, productStatistics.get(STATS_TRAVEL).lastEntry().getValue().intValue(), equipletStates, waitingTime, busy, throughput);
 	}
 
 	private void productEvent() {
@@ -305,6 +378,8 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 
 			// update statistics
 			totalSteps += productSteps.size();
+			updateStats(STATS_SYSTEM, +1);
+
 		} catch (StaleProxyException e1) {
 			System.err.printf("Simulation: ERROR: product agent %s creation was not possible.\n", productName);
 			e1.printStackTrace();
@@ -315,22 +390,12 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	}
 
 	private void arrivedEvent(String productName, String equipletName) {
-		traveling--;
+		// traveling--;
+		updateStats(STATS_TRAVEL, -1);
+		updateStats(STATS_WAITING, +1);
+
 		ProductAgent productAgent = products.get(productName);
 		productAgent.notifyProductArrived(time);
-
-		ProductionStep step = productAgent.getCurrentStep();
-		EquipletAgent equipletAgent = equiplets.get(equipletName);
-
-		// check if the just scheduled product step is ready of execution
-		if (equipletAgent.isExecutingStep(productName, step.getService(), step.getCriteria())) {
-			double productionTime = stochastics.generateProductionTime(equipletName, step.getService());
-
-			// schedule FINISHED time + productionTime, equiplet
-			eventStack.add(new Event(time + productionTime, EventType.FINISHED, equipletName));
-			System.out.printf("Simulation: schedule event FINISHED %.0f + %.0f, %s, %s\n", time, productionTime, productName, equipletName);
-		}
-
 		// wait until an equiplet notify continue
 		// changeReady(false);
 		System.out.println("CHECKPOINT DELTA");
@@ -338,7 +403,24 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 
 	private void finishedEvent(String equipletName) {
 		EquipletAgent equipletAgent = equiplets.get(equipletName);
-		equipletAgent.notifyJobFinished(time);
+		System.out.printf("Simulation: equiplet finished: %s \n", equipletAgent);
+
+		if (equipletAgent.getEquipletState() == EquipletState.ERROR) {
+			// equiplet broken down, wait until equiplet is repaired to continue with the remaining time
+			equipletAgent.notifyJobFinished(time);
+		} else if (equipletAgent.getEquipletState() == EquipletState.ERROR_REPAIRED) {
+			double remainingTime = equipletAgent.getRemainingTime();
+			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equipletName));
+			System.out.printf("Simulation: reschedule event FINISHED after breakdown and equiplet is repaired %.0f + %.0f, %s\n", time, remainingTime, equipletName);
+
+			equipletAgent.notifyJobFinished(time);
+		} else {
+			updateStats(STATS_BUSY, -1);
+
+			// notify the equiplet his job is finished (without any more delay)
+			equipletAgent.notifyJobFinished(time);
+			// changeReady(false);
+		}
 
 		System.out.println("CHECKPOINT FOXTROT");
 	}
@@ -373,10 +455,13 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 			double travelTime = stochastics.generateTravelTime(travelSquares);
 
 			eventStack.add(new Event(time + travelTime, EventType.ARRIVED, productName, equipletName));
-			System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, productName, equipletName);
-			traveling++;
+			System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
+
+			// traveling++;
+			updateStats(STATS_TRAVEL, +1);
 		} else {
 			// TODO statistics update
+			updateStats(STATS_FAILED, +1);
 		}
 
 		// schedule next product arrival
@@ -384,15 +469,34 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		eventStack.add(new Event(time + arrivalTime, EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %.0f + %.0f\n", time, arrivalTime);
 
+		
 		// continue with simulation
 		changeReady(true);
 		System.out.println("CHECKPOINT ALPHA");
 	}
 
 	@Override
+	public void notifyProductProcessing(String productName, String equipletName, String service) {
+		updateStats(STATS_WAITING, -1);
+		updateStats(STATS_BUSY, +1);
+
+		System.out.printf("Simulation: product agent %s notifies processing.\n", productName);
+		double productionTime = stochastics.generateProductionTime(equipletName, service);
+
+		// schedule FINISHED time + productionTime, equiplet
+		eventStack.add(new Event(time + productionTime, EventType.FINISHED, equipletName));
+		System.out.printf("Simulation: schedule event FINISHED %.0f + %.0f, %s, %s\n", time, productionTime, productName, equipletName);
+
+		// unblock simulation when notifying job finished
+		// changeReady(true);
+	}
+
+	@Override
 	public void notifyProductTraveling(String productName, String equipletName) {
-		System.out.printf("Simulation: product agent %s product step finished and traveling to equiplet %s\n", productName, equipletName);
-		
+		updateStats(STATS_TRAVEL, +1);
+
+		System.out.printf("Simulation: product agent %s notifies product step is finished and traveling to equiplet %s\n", productName, equipletName);
+
 		ProductAgent productAgent = products.get(productName);
 		Position startPosition = productAgent.getPosition();
 
@@ -405,13 +509,18 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 
 		eventStack.add(new Event(time + travelTime, EventType.ARRIVED, productName, equipletName));
 		System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, productName, equipletName);
-		traveling++;
+
+		// unblock simulation when notifying job finished
+		// changeReady(true);
 	}
 
 	@Override
 	public void notifyProductFinished(String productName) {
-		System.out.printf("Simulation: product agent %s is finished.\n", productName);
-		
+		System.out.printf("Simulation: product agent %s notifies he is finished.\n", productName);
+
+		updateStats(STATS_FINISHED, +1);
+		updateStats(STATS_SYSTEM, -1);
+
 		// Product is finished
 		ProductAgent productAgent = products.get(productName);
 		products.remove(productName);

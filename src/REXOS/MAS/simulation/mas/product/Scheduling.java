@@ -1,4 +1,4 @@
-package simulation.mas.scheduling;
+package simulation.mas.product;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,15 +6,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import simulation.mas.EquipletAgent;
+import simulation.mas.equiplet.EquipletAgent;
 import simulation.util.Pair;
 import simulation.util.Position;
-import simulation.util.ProductStep;
+import simulation.util.Settings;
 import simulation.util.Tuple;
 
 public class Scheduling {
-
-	static boolean DEBUG_SCHEDULING = false;
 	public static final int LOAD_WINDOW = 100;
 
 	public LinkedList<Node> calculateEDDPath(double time, LinkedList<Pair<ProductStep, Map<String, Tuple<Double, Double, Double, Position>>>> productSteps, double deadline, double travelCost, Position start) {
@@ -63,14 +61,14 @@ public class Scheduling {
 
 					Node nextNode = new Node(entry.getKey(), firstPossibilty, duration);
 
-					if (cost < 0 && DEBUG_SCHEDULING) {
+					if (cost < 0){ // && Settings.DEBUG_SCHEDULING) {
 						System.out.println("FAAAAAAAAAAAAAAAAAAIIIIIIIIIIIIIIIIIIIIILLLLLLLLLLLLLLLLLLl: " + deadline);
 						System.out.printf("Add to graph: %s -- %.2f --> %s [cost=(1 - %.2f / %.2f)], available=%.2f, arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, available, arrival);
 					}
 
 					graph.add(node, nextNode, cost);
 
-					if (DEBUG_SCHEDULING) {
+					if (Settings.DEBUG_SCHEDULING) {
 						System.out.printf("Add to graph: %s -- %.2f --> %s [cost=(1 - %.2f / %.2f)], available=%.2f, arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, available, arrival);
 					}
 
@@ -78,7 +76,7 @@ public class Scheduling {
 				}
 			}
 
-			if (DEBUG_SCHEDULING) {
+			if (Settings.DEBUG_SCHEDULING) {
 				System.out.println("add nodes for " + step + " from : " + lastNodes + " to new equiplet nodes " + equipletNodes);
 			}
 
@@ -101,7 +99,7 @@ public class Scheduling {
 			System.out.println("Scheduling: Failed to find path in " + graph);
 		}
 
-		if (DEBUG_SCHEDULING) {
+		if (Settings.DEBUG_SCHEDULING) {
 			System.out.println("the last equiplet nodes to be processed: " + lastNodes);
 			System.out.println("Graph: " + graph);
 		}

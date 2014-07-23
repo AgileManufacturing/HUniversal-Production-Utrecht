@@ -14,8 +14,8 @@ import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import simulation.mas.Equiplet;
-import simulation.mas.EquipletAgent;
+import simulation.mas.equiplet.Equiplet;
+import simulation.mas.equiplet.EquipletAgent;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.Triple;
@@ -135,5 +135,6 @@ public class GridView extends JPanel {
 			gbc.weightx = 1.0;
 			add(component, gbc);
 		}
+		revalidate();
 	}
 }

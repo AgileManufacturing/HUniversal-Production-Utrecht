@@ -1,4 +1,4 @@
-package simulation.util;
+package simulation.mas.product;
 
 import java.util.Map;
 

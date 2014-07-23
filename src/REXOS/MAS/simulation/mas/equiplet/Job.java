@@ -1,4 +1,4 @@
-package simulation.mas;
+package simulation.mas.equiplet;
 
 import jade.core.AID;
 
@@ -107,6 +107,6 @@ public class Job implements Comparable<Job> {
 
 	@Override
 	public String toString() {
-		return String.format("Job %s [product=%s, start=%.0f, due=%.0f, deadline=%.0f, ready=%s]", service, product, start, due, deadline, ready);
+		return String.format("Job %s [product=%s, start=%.0f, due=%.0f, deadline=%.0f, ready=%s]", service, getProductAgentName(), start, due, deadline, ready);
 	}
 }

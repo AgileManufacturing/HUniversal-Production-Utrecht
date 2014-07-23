@@ -1,4 +1,4 @@
-package simulation.mas;
+package simulation.mas.equiplet;
 
 import jade.core.Agent;
 
