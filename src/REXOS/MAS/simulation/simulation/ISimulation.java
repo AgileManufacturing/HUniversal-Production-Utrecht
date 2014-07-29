@@ -2,7 +2,9 @@ package simulation.simulation;
 
 public interface ISimulation {
 
-	void notifyProductCreated(boolean succeeded, String productName, String equipletName);
+	void notifyProductCreationFailed(String localName);
+	
+	void notifyProductCreated(String productName, String equipletName);
 
 	void notifyProductTraveling(String productName, String equipletName);
 	

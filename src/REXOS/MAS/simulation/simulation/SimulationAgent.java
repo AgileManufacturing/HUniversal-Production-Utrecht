@@ -18,14 +18,16 @@ import java.util.TreeSet;
 import simulation.config.Config;
 import simulation.graphics.Control;
 import simulation.graphics.SimInterface;
+import simulation.mas.equiplet.Capability;
+import simulation.mas.equiplet.Equiplet;
 import simulation.mas.equiplet.EquipletAgent;
 import simulation.mas.equiplet.EquipletState;
 import simulation.mas.product.ProductAgent;
 import simulation.mas.product.ProductStep;
-import simulation.util.Capability;
 import simulation.util.Position;
 import simulation.util.Triple;
 import simulation.util.Tuple;
+import simulation.util.Util;
 
 public class SimulationAgent extends Agent implements Control, ISimulation {
 
@@ -41,6 +43,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	private static final String STATS_FINISHED = "Finished";
 	private static final String STATS_FAILED = "Failed";
 	private static final String STATS_SYSTEM = "In System";
+	private static final String STATS_BROKEN = "Broken";
 
 	private SimInterface gui;
 	private Config config;
@@ -114,6 +117,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		productStatistics.put(STATS_FINISHED, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_FAILED, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_SYSTEM, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_BROKEN, new TreeMap<Double, Double>(initStats));
 
 		products = new HashMap<>();
 		equiplets = new TreeMap<>();
@@ -211,17 +215,21 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 
 					update();
 
-//					double busy = productStatistics.get(STATS_BUSY).lastEntry().getValue();
-//					double waiting = productStatistics.get(STATS_WAITING).lastEntry().getValue();
-//					double travel = productStatistics.get(STATS_TRAVEL).lastEntry().getValue();
-//					double failed = productStatistics.get(STATS_FAILED).lastEntry().getValue();
-//					double finished = productStatistics.get(STATS_FINISHED).lastEntry().getValue();
-//					double system = productStatistics.get(STATS_SYSTEM).lastEntry().getValue();
-//
-//					System.out.printf("\nSimulation: stats=[busy=%s, waiting=%.0f, travel=%.0f, failed=%.0f, finished=%.0f, in system=%.0f]\n\n", productStatistics.get(STATS_BUSY).lastEntry(), waiting, travel, failed, finished, system);
-//					System.out.printf("\nSTATS %s\n\n", productStatistics);
+					//					double busy = productStatistics.get(STATS_BUSY).lastEntry().getValue();
+					//					double waiting = productStatistics.get(STATS_WAITING).lastEntry().getValue();
+					//					double travel = productStatistics.get(STATS_TRAVEL).lastEntry().getValue();
+					//					double failed = productStatistics.get(STATS_FAILED).lastEntry().getValue();
+					//					double finished = productStatistics.get(STATS_FINISHED).lastEntry().getValue();
+					//					double system = productStatistics.get(STATS_SYSTEM).lastEntry().getValue();
+					//
+					//					System.out.printf("\nSimulation: stats=[busy=%s, waiting=%.0f, travel=%.0f, failed=%.0f, finished=%.0f, in system=%.0f]\n\n", productStatistics.get(STATS_BUSY).lastEntry(), waiting, travel, failed, finished, system);
+					//					System.out.printf("\nSTATS %s\n\n", productStatistics);
 
-					// System.out.println("\nSimulation state: " + formatArray(grid.getEquiplets()));
+					System.out.println("\nSimulation state: " + Util.formatArray(equiplets));
+					for (Entry<String, EquipletAgent> eq : equiplets.entrySet()) {
+						System.out.println("\nSimulation schedule "+ eq.getKey() + " : " + eq.getValue().getSchedule());	
+					}
+					
 					// System.out.println("\nSimulation products: " + formatArray(products) + "\n");
 
 					// validate();
@@ -395,9 +403,8 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		updateStats(STATS_WAITING, +1);
 
 		ProductAgent productAgent = products.get(productName);
-		productAgent.notifyProductArrived(time);
-		// wait until an equiplet notify continue
-		// changeReady(false);
+		productAgent.onProductArrived(time);
+
 		System.out.println("CHECKPOINT DELTA");
 	}
 
@@ -409,28 +416,54 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 			// equiplet broken down, wait until equiplet is repaired to continue with the remaining time
 			equipletAgent.notifyJobFinished(time);
 		} else if (equipletAgent.getEquipletState() == EquipletState.ERROR_REPAIRED) {
+			equipletAgent.notifyJobFinished(time);
+			
 			double remainingTime = equipletAgent.getRemainingTime();
 			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equipletName));
 			System.out.printf("Simulation: reschedule event FINISHED after breakdown and equiplet is repaired %.0f + %.0f, %s\n", time, remainingTime, equipletName);
-
-			equipletAgent.notifyJobFinished(time);
 		} else {
 			updateStats(STATS_BUSY, -1);
 
 			// notify the equiplet his job is finished (without any more delay)
 			equipletAgent.notifyJobFinished(time);
-			// changeReady(false);
 		}
 
 		System.out.println("CHECKPOINT FOXTROT");
 	}
 
 	private void breakdownEvent(String equipletName) {
+		updateStats(STATS_BROKEN, +1);
+		EquipletAgent equipletAgent = equiplets.get(equipletName);
+		equipletAgent.notifyBreakdown(time);
 
+		// schedele REPAIRED time + repairTime, equiplet
+		double repairTime = stochastics.generateRepairTime(equipletName);
+		eventStack.add(new Event(time + repairTime, EventType.REPAIRED, equipletName));
+		System.out.printf("Simulation: schedule event REPAIRED %.0f + %.0f, %s\n", time, repairTime, equipletName);
 	}
 
 	private void repairedEvent(String equipletName) {
+		updateStats(STATS_BROKEN, -1);
 
+		EquipletAgent equipletAgent = equiplets.get(equipletName);
+		if (equipletAgent.getEquipletState() == EquipletState.ERROR_FINISHED) {
+			equipletAgent.notifyRepaired(time);
+			
+			double remainingTime = equipletAgent.getRemainingTime();
+			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equipletName));
+			System.out.printf("Simulation: reschedule event FINISHED after breakdown of equiplet %s over %.0f + %.0f\n", equipletName, time, remainingTime);
+		} else if (equipletAgent.getEquipletState() == EquipletState.ERROR_READY) {
+			// there become a job ready during the time the equiplet was broken
+			// this is handled by notify repaired, so the equiplet communicates with the product which let the simulation know
+			equipletAgent.notifyRepaired(time);
+		} else {
+			equipletAgent.notifyRepaired(time);
+		}
+
+		// schedule BREAKDOWN time + breakdown, equiplet
+		double breakdown = stochastics.generateBreakdownTime(equipletName);
+		eventStack.add(new Event(time + breakdown, EventType.BREAKDOWN, equipletName));
+		System.out.printf("Simulation: schedule event BREAKDOWN after repair %.0f + %.0f, %s\n", time, breakdown, equipletAgent);
 	}
 
 	private void doneEvent() {
@@ -440,36 +473,45 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	}
 
 	@Override
-	public void notifyProductCreated(boolean succeeded, String productName, String equipletName) {
-		System.out.printf("Simulation: product agent %s created success=%b traveling to equiplet %s\n", productName, succeeded, equipletName);
-
-		if (succeeded) {
-			ProductAgent productAgent = products.get(productName);
-			Position startPosition = productAgent.getPosition();
-
-			EquipletAgent equipletAgent = equiplets.get(equipletName);
-			Position nextPosition = equipletAgent.getPosition();
-
-			// schedule ARRIVED time + travelTime, equiplet, product
-			int travelSquares = Math.abs(startPosition.getX() - nextPosition.getX()) + Math.abs(startPosition.getY() - nextPosition.getY());
-			double travelTime = stochastics.generateTravelTime(travelSquares);
-
-			eventStack.add(new Event(time + travelTime, EventType.ARRIVED, productName, equipletName));
-			System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
-
-			// traveling++;
-			updateStats(STATS_TRAVEL, +1);
-		} else {
-			// TODO statistics update
-			updateStats(STATS_FAILED, +1);
-		}
+	public void notifyProductCreationFailed(String productName) {
+		System.out.printf("Simulation: product agent %s failed to create.\n", productName);
+		updateStats(STATS_FAILED, +1);
 
 		// schedule next product arrival
 		double arrivalTime = stochastics.generateProductArrival();
 		eventStack.add(new Event(time + arrivalTime, EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %.0f + %.0f\n", time, arrivalTime);
 
-		
+		// continue with simulation
+		changeReady(true);
+		System.out.println("CHECKPOINT GOLF");
+	}
+
+	@Override
+	public void notifyProductCreated(String productName, String equipletName) {
+		System.out.printf("Simulation: product agent %s created success and traveling to equiplet %s\n", productName, equipletName);
+
+		ProductAgent productAgent = products.get(productName);
+		Position startPosition = productAgent.getPosition();
+
+		EquipletAgent equipletAgent = equiplets.get(equipletName);
+		Position nextPosition = equipletAgent.getPosition();
+
+		// schedule ARRIVED time + travelTime, equiplet, product
+		int travelSquares = Math.abs(startPosition.getX() - nextPosition.getX()) + Math.abs(startPosition.getY() - nextPosition.getY());
+		double travelTime = stochastics.generateTravelTime(travelSquares);
+
+		eventStack.add(new Event(time + travelTime, EventType.ARRIVED, productName, equipletName));
+		System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
+
+		// traveling++;
+		updateStats(STATS_TRAVEL, +1);
+
+		// schedule next product arrival
+		double arrivalTime = stochastics.generateProductArrival();
+		eventStack.add(new Event(time + arrivalTime, EventType.PRODUCT));
+		System.out.printf("Simulation: schedule event PRODUCT %.0f + %.0f\n", time, arrivalTime);
+
 		// continue with simulation
 		changeReady(true);
 		System.out.println("CHECKPOINT ALPHA");

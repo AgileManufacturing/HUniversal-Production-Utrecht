@@ -127,11 +127,11 @@ public class SimInterface {
 
 		final JPanel equipletLatency = new JPanel();
 		equipletLatency.setLayout(new BoxLayout(equipletLatency, BoxLayout.Y_AXIS));
-		
+
 		final JScrollPane equipletLatencyScroll = new JScrollPane();
 		equipletLatencyScroll.setViewportView(equipletLatency);
 		tabbedPane.addTab("Equiplet Latency", null, equipletLatencyScroll, null);
-		
+
 		final JPanel productSchedule = new JPanel();
 		productSchedule.setLayout(new BoxLayout(productSchedule, BoxLayout.Y_AXIS));
 
@@ -144,7 +144,7 @@ public class SimInterface {
 
 		final JPanel productStatistics = new JPanel();
 		productStatistics.setLayout(new BoxLayout(productStatistics, BoxLayout.Y_AXIS));
-		
+
 		final JScrollPane productStatisticsScroll = new JScrollPane();
 		productStatisticsScroll.setViewportView(productStatistics);
 		tabbedPane.addTab("Product Statistics", null, productStatisticsScroll, null);
@@ -177,8 +177,10 @@ public class SimInterface {
 				} else if (index == tabbedPane.indexOfComponent(eScheduleScroll)) {
 					// Equiplet history
 					Map<String, List<Triple<String, Double, Double>>> history = simulation.getEquipletHistory();
-					equipletSchedule.removeAll();
-					equipletSchedule.add(GanttChart.createChartInvert("Equiplet History", "Equiplets", history));
+					if (history != null) {
+						equipletSchedule.removeAll();
+						equipletSchedule.add(GanttChart.createChartInvert("Equiplet History", "Equiplets", history));
+					}
 
 					// List<Equiplet> equiplets = simulation.getEquiplets();
 					// equipletSchedule.removeAll();
@@ -188,29 +190,29 @@ public class SimInterface {
 					Map<String, Map<Double, Double>> latency = simulation.getEquipletLatency();
 					equipletLatency.removeAll();
 					equipletLatency.add(Chart.createChart("Equiplet Latency", "Latency", latency));
-					
+
 				} else if (index == tabbedPane.indexOfComponent(pScheduleScroll)) {
 					// Product schedules
-//					List<Equiplet> equiplets = simulation.getEquiplets();
-//					productSchedule.removeAll();
-//					productSchedule.add(GanttChart.createChartEquiplets(equiplets, true));
+					//					List<Equiplet> equiplets = simulation.getEquiplets();
+					//					productSchedule.removeAll();
+					//					productSchedule.add(GanttChart.createChartEquiplets(equiplets, true));
 
 					Map<String, List<Triple<String, Double, Double>>> schedules = simulation.getCompleteSchedule();
 					productSchedule.removeAll();
 					productSchedule.add(GanttChart.createChart("Product Schedules", "Products", schedules));
-					
+
 				} else if (index == tabbedPane.indexOfComponent(productView)) {
 					// Products
 					//Map<String, Product> products = simulation.getProducts();
 					//if (products != null) {
 					//	productView.update(products);
 					//}
-				}else if (index == tabbedPane.indexOfComponent(productStatisticsScroll)) {
+				} else if (index == tabbedPane.indexOfComponent(productStatisticsScroll)) {
 					// Product Statistics
 					Map<String, Map<Double, Double>> stats = simulation.getProductStatistics();
 					productStatistics.removeAll();
 					productStatistics.add(Chart.createChart("Product Statistics", "Products", stats));
-					
+
 				}
 				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 			}
@@ -223,8 +225,7 @@ public class SimInterface {
 		gbl_optionsPanel.columnWidths = new int[] { 70, 0 };
 		gbl_optionsPanel.rowHeights = new int[] { 15, 25, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 462, 0, 0, 0, 0, 0, 0 };
 		gbl_optionsPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				Double.MIN_VALUE };
+		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		optionsPanel.setLayout(gbl_optionsPanel);
 
 		btnStart = new JButton("Start");

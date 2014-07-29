@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import simulation.util.Capability;
 import simulation.util.Position;
 import simulation.util.Triple;
 import agents.equiplet_agent.EquipletAgent;

@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import simulation.mas.equiplet.Capability;
 import simulation.mas.product.ProductStep;
 
 public class ParserPrimitives {

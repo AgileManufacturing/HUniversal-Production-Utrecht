@@ -232,6 +232,7 @@ public class GanttChart extends ApplicationFrame {
 	
 
 	public static JPanel createChartInvert(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
+		System.out.println("Gantt data" + data);
 		double maxTime = 300;
 		double minTime = Double.MAX_VALUE;
 		HashMap<String, TaskSeries> tasks = new HashMap<>();

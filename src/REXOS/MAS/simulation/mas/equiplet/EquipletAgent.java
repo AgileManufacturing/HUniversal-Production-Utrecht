@@ -19,11 +19,10 @@ import java.util.TreeSet;
 import org.json.JSONException;
 
 import simulation.mas.product.ProductStep;
-import simulation.util.Capability;
+import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
-import simulation.util.Ontology;
 import simulation.util.Triple;
 import simulation.util.Tuple;
 
@@ -50,18 +49,22 @@ public class EquipletAgent extends Agent {
 	private double timeRemaining;
 
 	/**
-	 * @var statistics Statistics contains the time the equiplet is in one of the states <BUSY, IDLE, ERROR> The states ERROR_READY and ERROR_FINISHED are counted as ERROR and
+	 * @var statistics Statistics contains the time the equiplet is in one of
+	 *      the states <BUSY, IDLE, ERROR> The states ERROR_READY and
+	 *      ERROR_FINISHED are counted as ERROR and
 	 *      ERROR_REPAIRED as BUSY
 	 */
 	private Triple<Double, Double, Double> statistics;
 
 	/**
-	 * @var lastHistoryUpdate The last time the statistics is update to calculate the elapsed time between state changes
+	 * @var lastHistoryUpdate The last time the statistics is update to
+	 *      calculate the elapsed time between state changes
 	 */
-	private double lastHistoryUpdate;
+	private double lastStatisticsUpdate;
 
 	/**
-	 * @var scheduleLatency A list of differences between the time and the time scheduled
+	 * @var scheduleLatency A list of differences between the time and the time
+	 *      scheduled
 	 */
 	private Map<Double, Double> scheduleLatency;
 
@@ -96,7 +99,7 @@ public class EquipletAgent extends Agent {
 				this.timeBreakdown = -1;
 				this.timeRemaining = -1;
 
-				this.lastHistoryUpdate = 0;
+				this.lastStatisticsUpdate = 0;
 				this.statistics = new Triple<Double, Double, Double>(0.0, 0.0, 0.0);
 				this.scheduleLatency = new HashMap<Double, Double>();
 
@@ -152,15 +155,6 @@ public class EquipletAgent extends Agent {
 		return new Pair<String, Double>(executing.getProductAgentName(), executing.getStartTime());
 	}
 
-	@Deprecated
-	protected List<String> getServices() {
-		ArrayList<String> services = new ArrayList<>();
-		for (Capability capability : capabilities) {
-			services.add(capability.getService());
-		}
-		return services;
-	}
-
 	public List<Triple<Integer, Double, List<Pair<Double, Double>>>> canExecute(double time, double deadline, List<ProductStep> productSteps) {
 		// answer :: List of services < index in production path, estimate production time, List of from and until time when possible>
 		List<Triple<Integer, Double, List<Pair<Double, Double>>>> answer = new ArrayList<>();
@@ -187,10 +181,82 @@ public class EquipletAgent extends Agent {
 		}
 		return false;
 	}
+	/**
+	 * calculate the load of the equiplet from a certain time with a window
+	 * 
+	 * @param time
+	 *            from which the load needs to be calculated
+	 * @param window
+	 *            of the load
+	 * @return load of the equiplet
+	 */
+	protected double load(double time, double window) {
+		if (schedule.size() > 1) {
+			double busy = 0.0;
 
-	@Deprecated
-	protected boolean providesService(String service) {
-		return productionTimes.containsKey(service);
+			for (Job job : schedule) {
+				if (job.getDeadline() >= time && job.getDeadline() <= time + window) {
+					busy += job.getDuration();
+				}
+			}
+			// System.out.println("load " + time + "= 1 - (" + busy + "/" +
+			// window + ") =" + (1.0 - (busy * 1.0 / window)) + ", schedule " +
+			// schedule);
+
+			// the busy time can't be large than the window, altough there could
+			// be an overlap of max a job duration
+			return 1.0 - 1.0 * (Math.min(busy, window) / window);
+		} else if (schedule.size() > 0) {
+			Job job = schedule.first();
+
+			if (job.getDeadline() >= time && job.getStartTime() <= time + window) {
+				// System.out.println("load in window " + time + "= 1 - (" +
+				// job.getDuration() + "/" + window + ") =" + (1.0 -
+				// (job.getDuration() * 1.0 / window)) + ", schedule " +
+				// schedule);
+				return 1.0 - (1.0 * job.getDuration() / window);
+			} else {
+				// System.out.println("load out window " + time +
+				// "= 1, schedule " + schedule);
+				return 1.0;
+			}
+		} else {
+			return 1.0;
+		}
+	}
+
+	/**
+	 * the first possible time there is enough room in the schedule to perform a
+	 * service
+	 * 
+	 * @param time
+	 *            the first possible time from which to look
+	 * @param service
+	 *            the name of the service to be performed
+	 * @return the available time
+	 */
+	/**
+	 * 
+	 * @param time
+	 *            the first possible time from which to look
+	 * @param duration
+	 *            an estimate of time the equiplet is checked for availability
+	 * @return a list of time it is possible to plan the duration TODO can only
+	 *         plan in end of schedule
+	 */
+	protected List<Pair<Double, Double>> available(double time, double duration, double deadline) {
+		// TODO fix this so job can be scheduled in between jobs instead of
+		// always behind the last
+		List<Pair<Double, Double>> available = new ArrayList<Pair<Double, Double>>();
+		if (schedule.size() > 0) {
+			Job job = schedule.last();
+			available.add(new Pair<Double, Double>(job.getDueTime(), deadline));
+		} else if (isExecuting()) {
+			available.add(new Pair<Double, Double>(executing.getDueTime(), deadline));
+		} else {
+			available.add(new Pair<Double, Double>(time, deadline));
+		}
+		return available;
 	}
 
 	public Position getPosition() {
@@ -198,7 +264,8 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Get the number of jobs waiting to be executed i.e. ready for execution A job is ready for executing when the product arrived by the equiplet
+	 * Get the number of jobs waiting to be executed i.e. ready for execution A
+	 * job is ready for executing when the product arrived by the equiplet
 	 * 
 	 * @return number of jobs ready to executed
 	 */
@@ -234,22 +301,23 @@ public class EquipletAgent extends Agent {
 	 * @return the remaining process time of the job
 	 */
 	public double getRemainingTime() {
-		return timeBreakdown;
+		return timeRemaining;
 	}
 
 	/**
-	 * update the statistics This method should be called after each state change
+	 * update the statistics This method should be called after each state
+	 * change
 	 * 
 	 * @param time
 	 */
 	protected void historyUpdate(double time) {
-		double elapsed = time - lastHistoryUpdate;
-		lastHistoryUpdate = time;
-		if (state == EquipletState.BUSY) {
+		double elapsed = time - lastStatisticsUpdate;
+		lastStatisticsUpdate = time;
+		if (state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED) {
 			statistics.first += elapsed;
 		} else if (state == EquipletState.IDLE) {
 			statistics.second += elapsed;
-		}  else if (state == EquipletState.ERROR) {
+		} else if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED) {
 			statistics.third += elapsed;
 		}
 	}
@@ -370,94 +438,19 @@ public class EquipletAgent extends Agent {
 		return productionTimes.get(service) * SAFETY_FACTOR;
 	}
 
-	/**
-	 * calculate the load of the equiplet from a certain time with a window
-	 * 
-	 * @param time
-	 *            from which the load needs to be calculated
-	 * @param window
-	 *            of the load
-	 * @return load of the equiplet
-	 */
-	protected double load(double time, double window) {
-		if (schedule.size() > 1) {
-			double busy = 0.0;
-
-			for (Job job : schedule) {
-				if (job.getDeadline() >= time && job.getDeadline() <= time + window) {
-					busy += job.getDuration();
-				}
-			}
-			// System.out.println("load " + time + "= 1 - (" + busy + "/" +
-			// window + ") =" + (1.0 - (busy * 1.0 / window)) + ", schedule " +
-			// schedule);
-
-			// the busy time can't be large than the window, altough there could
-			// be an overlap of max a job duration
-			return 1.0 - 1.0 * (Math.min(busy, window) / window);
-		} else if (schedule.size() > 0) {
-			Job job = schedule.first();
-
-			if (job.getDeadline() >= time && job.getStartTime() <= time + window) {
-				// System.out.println("load in window " + time + "= 1 - (" +
-				// job.getDuration() + "/" + window + ") =" + (1.0 -
-				// (job.getDuration() * 1.0 / window)) + ", schedule " +
-				// schedule);
-				return 1.0 - (1.0 * job.getDuration() / window);
-			} else {
-				// System.out.println("load out window " + time +
-				// "= 1, schedule " + schedule);
-				return 1.0;
-			}
-		} else {
-			return 1.0;
-		}
-	}
-
-	/**
-	 * the first possible time there is enough room in the schedule to perform a service
-	 * 
-	 * @param time
-	 *            the first possible time from which to look
-	 * @param service
-	 *            the name of the service to be performed
-	 * @return the available time
-	 */
-	/**
-	 * 
-	 * @param time
-	 *            the first possible time from which to look
-	 * @param duration
-	 *            an estimate of time the equiplet is checked for availability
-	 * @return a list of time it is possible to plan the duration TODO can only plan in end of schedule
-	 */
-	protected List<Pair<Double, Double>> available(double time, double duration, double deadline) {
-		// TODO fix this so job can be scheduled in between jobs instead of
-		// always behind the last
-		List<Pair<Double, Double>> available = new ArrayList<Pair<Double, Double>>();
-		if (schedule.size() > 0) {
-			Job job = schedule.last();
-			available.add(new Pair<Double, Double>(job.getDueTime(), deadline));
-		} else if (isExecuting()) {
-			available.add(new Pair<Double, Double>(executing.getDueTime(), deadline));
-		} else {
-			available.add(new Pair<Double, Double>(time, deadline));
-		}
-		return available;
-	}
-
 	@Override
 	public String toString() {
 		if (state == EquipletState.ERROR) {
 			return String.format("%s:[state=%s, capabilities=%s, time of breakdown=%.2f, executing=%s, schedule=%d, waiting=%d, history=%d]", getLocalName(), state, capabilities, timeBreakdown, executing, schedule.size(), getWaiting(), history.size());
 		} else {
-			return String.format("%s:[state=%s, capabilities=%s, executing=%s, schedule=%d, waiting=%d, history=%d]", getLocalName(), state, capabilities, (state == EquipletState.IDLE ? "null"
-					: executing), schedule.size(), getWaiting(), history.size());
+			return String.format("%s:[state=%s, capabilities=%s, executing=%s, schedule=%d, waiting=%d, history=%d]", getLocalName(), state, capabilities, (state == EquipletState.IDLE ? "null" : executing), schedule.size(), getWaiting(), history.size());
 		}
 	}
 
 	/**
-	 * TODO RENAME function name The simulation need to check if the just scheduled product step is going to be executed Simulation check whether there is need for scheduling a job
+	 * TODO RENAME function name The simulation need to check if the just
+	 * scheduled product step is going to be executed Simulation check whether
+	 * there is need for scheduling a job
 	 * finished event
 	 * 
 	 * @param product
@@ -489,17 +482,21 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Checks whether a job is ready for execution TODO check not only the first in the schedule but also after if job can be executed earlier than planned, which increases
+	 * Checks whether a job is ready for execution TODO check not only the first
+	 * in the schedule but also after if job can be executed earlier than
+	 * planned, which increases
 	 * complexity
 	 * 
 	 * @return if there is job ready for executing
 	 */
 	private boolean jobReady() {
-		return schedule.first().isReady();
+		return !schedule.isEmpty() && schedule.first().isReady();
 	}
 
 	/**
-	 * Start with executing the first job in the schedule Note: that the first job in the schedule need to be ready TODO fix that the job can be performed earlier that scheduled.
+	 * Start with executing the first job in the schedule Note: that the first
+	 * job in the schedule need to be ready TODO fix that the job can be
+	 * performed earlier that scheduled.
 	 * 
 	 * @param start
 	 *            time of the job
@@ -524,14 +521,16 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Notify a product is arrived by the equiplet and is ready to be let the equiplet execute his product step
+	 * Notify a product is arrived by the equiplet and is ready to be let the
+	 * equiplet execute his product step
 	 * 
 	 * @param time
 	 *            of the the product arrival
 	 * @param product
 	 *            name of the product agent
 	 * @param service
-	 *            name of the service that the equiplet is ask to perform for the product
+	 *            name of the service that the equiplet is ask to perform for
+	 *            the product
 	 */
 	@Deprecated
 	private void notifyProductArrived(double time, String product, String service) {
@@ -602,6 +601,7 @@ public class EquipletAgent extends Agent {
 			// the equiplet has still a remaining time to continue after the equiplet is repaired
 			state = EquipletState.ERROR_FINISHED;
 			timeRemaining = time - timeBreakdown;
+			executing.updateDueTime(executing.getDueTime() + timeRemaining);
 			System.out.printf("EA:%s job %s should finished but delayed by breakdown, should still %.2f be executed after being repaired.\n", getLocalName(), executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_REPAIRED) {
 			// the equiplet should have finished with the job, but was broken down in the meantime,
@@ -635,13 +635,14 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Notify the equiplet is broken down A constraint is that the equiplet can only be idle or busy when this can happen
+	 * Notify the equiplet is broken down A constraint is that the equiplet can
+	 * only be idle or busy when this can happen
 	 * 
 	 * @param time
 	 *            of the breakdown
 	 */
-	protected void notifyBreakdown(double time) {
-		if (state != EquipletState.IDLE || state != EquipletState.BUSY) {
+	public void notifyBreakdown(double time) {
+		if (state != EquipletState.IDLE && state != EquipletState.BUSY) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
@@ -652,12 +653,13 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * The notify that the equiplet is repaired if the equiplet has finished during the repair, remember the time the equiplet has broken
+	 * The notify that the equiplet is repaired if the equiplet has finished
+	 * during the repair, remember the time the equiplet has broken
 	 * 
 	 * @param time
 	 *            of repair
 	 */
-	protected void notifyRepaired(double time) {
+	public void notifyRepaired(double time) {
 		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
@@ -666,7 +668,7 @@ public class EquipletAgent extends Agent {
 		if (state == EquipletState.ERROR_FINISHED) {
 			// the equiplet has already a finished event received, but is now repaired and can continue with the job
 			state = EquipletState.BUSY;
-			System.out.printf("EA:%s is repaired at %.2f and continue with job %s \n", getLocalName(), time, executing);
+			System.out.printf("EA:%s is repaired at %.2f and continue with job %s, with %.0f time remaining.\n", getLocalName(), time, executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
 			executeJob(time);
@@ -674,16 +676,36 @@ public class EquipletAgent extends Agent {
 			// the equiplet is executing a job and is repaired, but waits until a job finished event is received
 			state = EquipletState.ERROR_REPAIRED;
 			timeRemaining = time - timeBreakdown;
-			System.out.printf("EA:%s is repaired at %.2f and continue with job %s. The equiplet was %.2f broken.\n", getLocalName(), time, executing, timeRemaining);
+			executing.updateDueTime(executing.getDueTime() + timeRemaining);
+			System.out.printf("EA:%s is repaired at %.2f and continue with job %s. The equiplet was %.2f broken, which is still remaining.\n", getLocalName(), time, executing, timeRemaining);
 		} else if (jobReady()) {
 			// when the equiplet was in the error state there became a job ready which arrived before the breakdown
-			System.out.println("EAUIPLET ERROR? " + schedule);
+			// not sure if this could happen
+			System.out.println("EQUIPLET ERROR? " + schedule);
 			executeJob(time);
 			System.out.printf("EA:%s is repaired at %.2f and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 		} else {
 			// the equiplet has nothing to do and goes into IDLE state
 			System.out.printf("EA:%s is repaired at %.2f \n", getLocalName(), time);
 			state = EquipletState.IDLE;
+		}
+
+		// After being broken down and repaired the jobs in the schedule can be delayed.
+		// The executing job is updated with the new due time
+		// The scheduled jobs should have, depending if the jobs are continuous scheduled, a new start time added with the delay
+		// Although the jobs doesn't have to be continuous scheduled, the start time depends on the due date of the previous job
+		// The new start time is the max of ( due time of previous job, or the original start time) 
+		if (isExecuting()) {
+			double dueTime = executing.getDueTime();
+			for (Job job : schedule) {
+				if (dueTime > job.getStartTime()) {
+					job.updateStartTime(dueTime);
+					dueTime = job.getDueTime();
+				} else {
+					// no change in start time, so continuing would not change the schedule
+					break;
+				}
+			}
 		}
 	}
 
@@ -734,8 +756,11 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Validate the schedule, this function should TODO check if there are no jobs that should be performed before a time, but has not. Note: this should be return true also if the
-	 * job first becomes ready but a job is being performed before he was scheduled for performence improvement.
+	 * Validate the schedule, this function should TODO check if there are no
+	 * jobs that should be performed before a time, but has not. Note: this
+	 * should be return true also if the
+	 * job first becomes ready but a job is being performed before he was
+	 * scheduled for performence improvement.
 	 * 
 	 * @param time
 	 * @return is the schedule validates
@@ -752,7 +777,8 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Information for updating the gui Tuple < name of equiplet, position, services, Tuple < state, waiting, scheduled, executed > >
+	 * Information for updating the gui Tuple < name of equiplet, position,
+	 * services, Tuple < state, waiting, scheduled, executed > >
 	 * 
 	 * @return information
 	 */

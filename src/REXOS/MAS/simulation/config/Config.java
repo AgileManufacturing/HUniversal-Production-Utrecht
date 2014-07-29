@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import simulation.mas.equiplet.Capability;
 import simulation.mas.equiplet.Equiplet;
 import simulation.mas.product.ProductStep;
-import simulation.util.Capability;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.Triple;

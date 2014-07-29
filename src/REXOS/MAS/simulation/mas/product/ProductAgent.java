@@ -101,10 +101,7 @@ public class ProductAgent extends Agent {
 						try {
 							boolean confirmation = Parser.parseConfirmation(msg.getContent());
 							if (confirmation) {
-								state = ProductState.PROCESSING;
-								
-								// notify the simulation that processing begins
-								simulation.notifyProductProcessing(getLocalName(), productionPath.peek().getEquipletName(), productionPath.peek().getService());
+								onProductProcessing();
 							} else {
 								System.err.printf("PA:%s failed to receive confirmation.\n", getLocalName());
 							}
@@ -122,19 +119,7 @@ public class ProductAgent extends Agent {
 						try {
 							boolean confirmation = Parser.parseConfirmation(msg.getContent());
 							if (confirmation) {
-								// remove the first production step as this is finished
-								productionPath.pop();
-								
-								if (productionPath.isEmpty()){
-									state = ProductState.FINISHED;
-									
-									// notify simulation product finished
-									simulation.notifyProductFinished(getLocalName());
-								} else {
-									state = ProductState.TRAVELING;
-									
-									simulation.notifyProductTraveling(getLocalName(), productionPath.peek().getEquipletName());
-								}
+								onProductStepFinished();
 							} else {
 								System.err.printf("PA:%s failed to receive confirmation.\n", getLocalName());
 							}
@@ -168,7 +153,7 @@ public class ProductAgent extends Agent {
 		private static final long serialVersionUID = 1L;
 		private boolean searched;
 		private boolean scheduled;
-		private int retry = 3;
+		private int retry = 1;
 
 		/**
 		 * @var equipletInfo
@@ -269,7 +254,7 @@ public class ProductAgent extends Agent {
 					succeeded = false;
 
 					// let the simulation know that the creation of product agent failed
-					simulation.notifyProductCreated(succeeded, getLocalName(), null);
+					simulation.notifyProductCreationFailed(getLocalName());
 				} else {
 					succeeded = schedule(nodes);
 					scheduled = succeeded;
@@ -278,12 +263,12 @@ public class ProductAgent extends Agent {
 
 					// if all succeed: product will travel to first equiplet
 					if (succeeded) {
+						simulation.notifyProductCreated(getLocalName(), productionPath.peek().getEquipletName());
 						state = ProductState.TRAVELING;
+					} else {
+						simulation.notifyProductCreationFailed(getLocalName());
 					}
 				}
-
-				// note that this can send multiple failed
-				simulation.notifyProductCreated(succeeded, getLocalName(), productionPath.peek().getEquipletName());
 
 			}
 
@@ -494,7 +479,7 @@ public class ProductAgent extends Agent {
 	/**
 	 * A for example a travel agent notifies the product agent that he is arrived by the equiplet
 	 */
-	public void notifyProductArrived(double time) {
+	public void onProductArrived(double time) {
 		// change state from travelling to ready
 		state = ProductState.WAITING;
 		
@@ -523,18 +508,30 @@ public class ProductAgent extends Agent {
 		}
 	}
 
-	public void notifyProductStepFinished() {
-		productionPath.poll();
-		if (productionPath.isEmpty()) {
+	protected void onProductStepFinished() {
+		// remove the first production step as this is finished
+		productionPath.pop();
+		
+		if (productionPath.isEmpty()){
 			state = ProductState.FINISHED;
+			
+			// notify simulation product finished
+			simulation.notifyProductFinished(getLocalName());
+		} else {
+			state = ProductState.TRAVELING;
+			
+			simulation.notifyProductTraveling(getLocalName(), productionPath.peek().getEquipletName());
 		}
 	}
 
-	public void notifyProductProcessing() {
+	protected void onProductProcessing() {
 		state = ProductState.PROCESSING;
+		
+		// notify the simulation that processing begins
+		simulation.notifyProductProcessing(getLocalName(), productionPath.peek().getEquipletName(), productionPath.peek().getService());
 	}
 
-	public ProductionStep getCurrentStep() {
+	private ProductionStep getCurrentStep() {
 		return productionPath.peek();
 	}
 

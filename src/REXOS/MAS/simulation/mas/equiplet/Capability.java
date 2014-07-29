@@ -1,4 +1,4 @@
-package simulation.util;
+package simulation.mas.equiplet;
 
 import java.util.Map;
 

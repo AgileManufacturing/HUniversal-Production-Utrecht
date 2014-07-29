@@ -76,7 +76,8 @@ class Stochastics {
 	}
 
 	public double generateBreakdownTime(String equiplet) {
-		return time(config.equipletBreakdownTime(equiplet));
+		return 100;
+		//return time(config.equipletBreakdownTime(equiplet));
 	}
 
 	public double generateRepairTime(String equiplet) {

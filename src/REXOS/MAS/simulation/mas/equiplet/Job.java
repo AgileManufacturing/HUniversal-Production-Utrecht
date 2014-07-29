@@ -98,6 +98,7 @@ public class Job implements Comparable<Job> {
 	}
 
 	public void updateStartTime(double time) {
+		this.due = time + (due - start);
 		this.start = time;
 	}
 
