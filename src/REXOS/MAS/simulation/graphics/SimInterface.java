@@ -51,6 +51,7 @@ public class SimInterface {
 	private JLabel lblProducts;
 	private JLabel lblThroughput;
 	private JButton btnStart;
+	private JLabel lblEvent;
 
 	/**
 	 * Launch the application.
@@ -223,9 +224,9 @@ public class SimInterface {
 		frmRexosSimulation.getContentPane().add(optionsPanel, BorderLayout.EAST);
 		GridBagLayout gbl_optionsPanel = new GridBagLayout();
 		gbl_optionsPanel.columnWidths = new int[] { 70, 0 };
-		gbl_optionsPanel.rowHeights = new int[] { 15, 25, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 462, 0, 0, 0, 0, 0, 0 };
+		gbl_optionsPanel.rowHeights = new int[] { 15, 25, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 462, 0, 0, 0, 0, 0, 0 };
 		gbl_optionsPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		optionsPanel.setLayout(gbl_optionsPanel);
 
 		btnStart = new JButton("Start");
@@ -291,82 +292,104 @@ public class SimInterface {
 		gbc_lblTime.gridx = 0;
 		gbc_lblTime.gridy = 5;
 		optionsPanel.add(lblTime, gbc_lblTime);
+		
+		JLabel lblEventText = new JLabel("Event");
+		GridBagConstraints gbc_lblEventText = new GridBagConstraints();
+		gbc_lblEventText.insets = new Insets(0, 0, 5, 0);
+		gbc_lblEventText.gridx = 0;
+		gbc_lblEventText.gridy = 6;
+		optionsPanel.add(lblEventText, gbc_lblEventText);
+		
+		lblEvent = new JLabel("");
+		GridBagConstraints gbc_lblEvent = new GridBagConstraints();
+		gbc_lblEvent.insets = new Insets(0, 0, 5, 0);
+		gbc_lblEvent.gridx = 0;
+		gbc_lblEvent.gridy = 7;
+		optionsPanel.add(lblEvent, gbc_lblEvent);
+		
+		JSeparator separator_3 = new JSeparator();
+		GridBagConstraints gbc_separator_3 = new GridBagConstraints();
+		gbc_separator_3.fill = GridBagConstraints.HORIZONTAL;
+		gbc_separator_3.insets = new Insets(0, 0, 5, 0);
+		gbc_separator_3.gridx = 0;
+		gbc_separator_3.gridy = 8;
+		optionsPanel.add(separator_3, gbc_separator_3);
 
 		JLabel lblProductsText = new JLabel("Products");
 		GridBagConstraints gbc_lblProductsText = new GridBagConstraints();
 		gbc_lblProductsText.insets = new Insets(0, 0, 5, 0);
 		gbc_lblProductsText.gridx = 0;
-		gbc_lblProductsText.gridy = 6;
+		gbc_lblProductsText.gridy = 9;
 		optionsPanel.add(lblProductsText, gbc_lblProductsText);
 
 		JLabel lblProductsSubText = new JLabel("in Grid (created) (steps)");
 		GridBagConstraints gbc_lblProductsSubText = new GridBagConstraints();
 		gbc_lblProductsSubText.insets = new Insets(0, 0, 5, 0);
 		gbc_lblProductsSubText.gridx = 0;
-		gbc_lblProductsSubText.gridy = 7;
+		gbc_lblProductsSubText.gridy = 10;
 		optionsPanel.add(lblProductsSubText, gbc_lblProductsSubText);
 
 		lblProducts = new JLabel("");
 		GridBagConstraints gbc_lblProducts = new GridBagConstraints();
 		gbc_lblProducts.insets = new Insets(0, 0, 5, 0);
 		gbc_lblProducts.gridx = 0;
-		gbc_lblProducts.gridy = 8;
+		gbc_lblProducts.gridy = 11;
 		optionsPanel.add(lblProducts, gbc_lblProducts);
 
 		JLabel lblTravelingText = new JLabel("Traveling");
 		GridBagConstraints gbc_lblTravelingText = new GridBagConstraints();
 		gbc_lblTravelingText.insets = new Insets(0, 0, 5, 0);
 		gbc_lblTravelingText.gridx = 0;
-		gbc_lblTravelingText.gridy = 9;
+		gbc_lblTravelingText.gridy = 12;
 		optionsPanel.add(lblTravelingText, gbc_lblTravelingText);
 
 		lblTraveling = new JLabel("");
 		GridBagConstraints gbc_lblTraveling = new GridBagConstraints();
 		gbc_lblTraveling.insets = new Insets(0, 0, 5, 0);
 		gbc_lblTraveling.gridx = 0;
-		gbc_lblTraveling.gridy = 10;
+		gbc_lblTraveling.gridy = 13;
 		optionsPanel.add(lblTraveling, gbc_lblTraveling);
 
 		JLabel lblWaitingTimeText = new JLabel("Avg waiting");
 		GridBagConstraints gbc_lblWaitingTimeText = new GridBagConstraints();
 		gbc_lblWaitingTimeText.insets = new Insets(0, 0, 5, 0);
 		gbc_lblWaitingTimeText.gridx = 0;
-		gbc_lblWaitingTimeText.gridy = 11;
+		gbc_lblWaitingTimeText.gridy = 14;
 		optionsPanel.add(lblWaitingTimeText, gbc_lblWaitingTimeText);
 
 		lblWaitingTime = new JLabel("");
 		GridBagConstraints gbc_lblWaitingTime = new GridBagConstraints();
 		gbc_lblWaitingTime.insets = new Insets(0, 0, 5, 0);
 		gbc_lblWaitingTime.gridx = 0;
-		gbc_lblWaitingTime.gridy = 12;
+		gbc_lblWaitingTime.gridy = 15;
 		optionsPanel.add(lblWaitingTime, gbc_lblWaitingTime);
 
 		JLabel lblBusyText = new JLabel("Busy");
 		GridBagConstraints gbc_lblBusyText = new GridBagConstraints();
 		gbc_lblBusyText.insets = new Insets(0, 0, 5, 0);
 		gbc_lblBusyText.gridx = 0;
-		gbc_lblBusyText.gridy = 13;
+		gbc_lblBusyText.gridy = 16;
 		optionsPanel.add(lblBusyText, gbc_lblBusyText);
 
 		lblBusy = new JLabel("");
 		GridBagConstraints gbc_lblBusy = new GridBagConstraints();
 		gbc_lblBusy.insets = new Insets(0, 0, 5, 0);
 		gbc_lblBusy.gridx = 0;
-		gbc_lblBusy.gridy = 14;
+		gbc_lblBusy.gridy = 17;
 		optionsPanel.add(lblBusy, gbc_lblBusy);
 
 		JLabel lblThroughputText = new JLabel("Avg throughput");
 		GridBagConstraints gbc_lblThroughputText = new GridBagConstraints();
 		gbc_lblThroughputText.insets = new Insets(0, 0, 5, 0);
 		gbc_lblThroughputText.gridx = 0;
-		gbc_lblThroughputText.gridy = 15;
+		gbc_lblThroughputText.gridy = 18;
 		optionsPanel.add(lblThroughputText, gbc_lblThroughputText);
 
 		lblThroughput = new JLabel("");
 		GridBagConstraints gbc_lblThroughput = new GridBagConstraints();
 		gbc_lblThroughput.insets = new Insets(0, 0, 5, 0);
 		gbc_lblThroughput.gridx = 0;
-		gbc_lblThroughput.gridy = 16;
+		gbc_lblThroughput.gridy = 19;
 		optionsPanel.add(lblThroughput, gbc_lblThroughput);
 
 		Component verticalStrut = Box.createVerticalStrut(20);
@@ -374,7 +397,7 @@ public class SimInterface {
 		gbc_verticalStrut.fill = GridBagConstraints.VERTICAL;
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 0);
 		gbc_verticalStrut.gridx = 0;
-		gbc_verticalStrut.gridy = 17;
+		gbc_verticalStrut.gridy = 20;
 		optionsPanel.add(verticalStrut, gbc_verticalStrut);
 
 		JSeparator separator = new JSeparator();
@@ -382,7 +405,7 @@ public class SimInterface {
 		gbc_separator.fill = GridBagConstraints.HORIZONTAL;
 		gbc_separator.insets = new Insets(0, 0, 5, 0);
 		gbc_separator.gridx = 0;
-		gbc_separator.gridy = 18;
+		gbc_separator.gridy = 21;
 		optionsPanel.add(separator, gbc_separator);
 
 		JPanel panel = new JPanel();
@@ -390,7 +413,7 @@ public class SimInterface {
 		gbc_panel.insets = new Insets(0, 0, 5, 0);
 		gbc_panel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panel.gridx = 0;
-		gbc_panel.gridy = 19;
+		gbc_panel.gridy = 22;
 		optionsPanel.add(panel, gbc_panel);
 
 		JLabel lblDelayText = new JLabel("Delay");
@@ -413,7 +436,7 @@ public class SimInterface {
 		gbc_slider.insets = new Insets(0, 0, 5, 0);
 		gbc_slider.fill = GridBagConstraints.HORIZONTAL;
 		gbc_slider.gridx = 0;
-		gbc_slider.gridy = 20;
+		gbc_slider.gridy = 23;
 		optionsPanel.add(slider, gbc_slider);
 
 		JSeparator separator_2 = new JSeparator();
@@ -421,7 +444,7 @@ public class SimInterface {
 		gbc_separator_2.fill = GridBagConstraints.HORIZONTAL;
 		gbc_separator_2.insets = new Insets(0, 0, 10, 0);
 		gbc_separator_2.gridx = 0;
-		gbc_separator_2.gridy = 21;
+		gbc_separator_2.gridy = 24;
 		optionsPanel.add(separator_2, gbc_separator_2);
 
 		JButton btnSave = new JButton("Save");
@@ -434,7 +457,7 @@ public class SimInterface {
 		gbc_btnSave.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSave.insets = new Insets(0, 15, 0, 15);
 		gbc_btnSave.gridx = 0;
-		gbc_btnSave.gridy = 22;
+		gbc_btnSave.gridy = 25;
 		optionsPanel.add(btnSave, gbc_btnSave);
 
 		frmRexosSimulation.getRootPane().setDefaultButton(btnStart);
@@ -447,7 +470,7 @@ public class SimInterface {
 		btnStart.setText("Start");
 	}
 
-	public void update(double time, int products, int productCount, int totalSteps, int traveling, List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, double waitingTime, List<Double> busy, double throughput) {
+	public void update(double time, String event, int products, int productCount, int totalSteps, int traveling, List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, double waitingTime, List<Double> busy, double throughput) {
 		String[] busyValues = new String[busy.size()];
 		for (int i = 0; i < busy.size(); i++) {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
@@ -457,6 +480,7 @@ public class SimInterface {
 		nf.setMaximumFractionDigits(1);
 
 		lblTime.setText(nf.format(time));
+		lblEvent.setText(event);
 		lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
 		lblTraveling.setText(String.format("%d", traveling));
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));

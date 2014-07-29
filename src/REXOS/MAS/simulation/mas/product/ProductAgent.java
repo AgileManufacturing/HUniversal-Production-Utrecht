@@ -114,7 +114,7 @@ public class ProductAgent extends Agent {
 							System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
 						}
 					}
-					
+
 					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_FINISHED)) {
 						try {
 							boolean confirmation = Parser.parseConfirmation(msg.getContent());
@@ -156,8 +156,7 @@ public class ProductAgent extends Agent {
 		private int retry = 1;
 
 		/**
-		 * @var equipletInfo
-		 * equiplet info :: Map < equiplet name, Pair < load of equiplet, position of equiplet> >
+		 * @var equipletInfo equiplet info :: Map < equiplet name, Pair < load of equiplet, position of equiplet> >
 		 */
 		private Map<AID, Pair<Double, Position>> equipletInfo;
 
@@ -165,8 +164,8 @@ public class ProductAgent extends Agent {
 			searched = false;
 			scheduled = false;
 
-			equipletInfo = new HashMap<AID, Pair<Double,Position>>();
-			
+			equipletInfo = new HashMap<AID, Pair<Double, Position>>();
+
 			state = ProductState.SCHEDULING;
 		}
 
@@ -199,8 +198,8 @@ public class ProductAgent extends Agent {
 					}
 				}
 
-				equipletInfo = new HashMap<AID, Pair<Double,Position>>();
-				
+				equipletInfo = new HashMap<AID, Pair<Double, Position>>();
+
 				// option to execute product step :: Map < product step index, Map of options to execute product step <Equiplet, Pair < estimate duration of service, List of
 				// possibilities < from time, until time> > > >
 				Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options = new HashMap<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>();
@@ -364,21 +363,26 @@ public class ProductAgent extends Agent {
 							}
 						}
 
-						Node nextNode = new Node(option.getKey(), firstPossibilty, duration);
+						// check if deadline can be reached
+						if (arrival < deadline) {
 
-						double window = deadline - arrival;
-						double cost = 1 - (firstPossibilty - created) / window;
+							Node nextNode = new Node(option.getKey(), firstPossibilty, duration);
 
-						if (cost < 0) { //) && Settings.DEBUG_SCHEDULING) {
-							System.out.println("FAILED maybe because the: deadline=" + deadline);
-							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
-						}
+							double window = deadline - arrival;
+							double cost = 1 - (firstPossibilty - created) / window;
 
-						graph.add(node, nextNode, cost);
-						equipletNodes.add(nextNode);
+							if (cost < 0) { // ) && Settings.DEBUG_SCHEDULING) {
+								// shouldn't occur as it would mean arrival > deadline 
+								System.out.println("FAILED maybe because the: deadline=" + deadline);
+								System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+							}
 
-						if (Settings.DEBUG_SCHEDULING) {
-							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+							graph.add(node, nextNode, cost);
+							equipletNodes.add(nextNode);
+
+							if (Settings.DEBUG_SCHEDULING) {
+								System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+							}
 						}
 					}
 				}
@@ -386,7 +390,7 @@ public class ProductAgent extends Agent {
 				lastNodes.clear();
 				lastNodes.addAll(equipletNodes);
 			}
-			
+
 			// add vertces from all the nodes in the last column to the sink node
 			for (Node node : lastNodes) {
 				graph.add(node, sink, 0);
@@ -450,7 +454,7 @@ public class ProductAgent extends Agent {
 
 			return succeeded;
 		}
-		
+
 		@Override
 		public boolean done() {
 			return (searched && scheduled) || retry < 1;
@@ -482,7 +486,7 @@ public class ProductAgent extends Agent {
 	public void onProductArrived(double time) {
 		// change state from travelling to ready
 		state = ProductState.WAITING;
-		
+
 		ProductionStep productionStep = productionPath.peek();
 		position = productionStep.getPosition();
 
@@ -511,22 +515,22 @@ public class ProductAgent extends Agent {
 	protected void onProductStepFinished() {
 		// remove the first production step as this is finished
 		productionPath.pop();
-		
-		if (productionPath.isEmpty()){
+
+		if (productionPath.isEmpty()) {
 			state = ProductState.FINISHED;
-			
+
 			// notify simulation product finished
 			simulation.notifyProductFinished(getLocalName());
 		} else {
 			state = ProductState.TRAVELING;
-			
+
 			simulation.notifyProductTraveling(getLocalName(), productionPath.peek().getEquipletName());
 		}
 	}
 
 	protected void onProductProcessing() {
 		state = ProductState.PROCESSING;
-		
+
 		// notify the simulation that processing begins
 		simulation.notifyProductProcessing(getLocalName(), productionPath.peek().getEquipletName(), productionPath.peek().getService());
 	}

@@ -19,8 +19,10 @@ public class EquipletView extends JPanel {
 		Map<String, Color> map = new HashMap<>();
 		map.put("idle", Color.LIGHT_GRAY);
 		map.put("busy", Color.GREEN);
-		map.put("broken", Color.RED);
-		map.put("was_broken", new Color(0x006400));
+		map.put("error", Color.RED);
+		map.put("error_ready", new Color(0x640000));
+		map.put("error_finished", new Color(0x640000));
+		map.put("error_repaired", new Color(0x006400));
 		COLORS = Collections.unmodifiableMap(map);
 	}
 

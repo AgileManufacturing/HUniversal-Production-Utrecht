@@ -580,7 +580,7 @@ public class EquipletAgent extends Agent {
 			// begin with executing job that arrived
 			historyUpdate(time);
 			executeJob(time);
-		} else if (state == EquipletState.ERROR && jobReady()) {
+		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady()) {
 			// Equiplet is still broken, but as soon as this is repaired it will execute the first job in the schedule
 			System.out.printf("EA:%s product %s going to be executed after repair\n", getLocalName(), product.getLocalName());
 			state = EquipletState.ERROR_READY;
@@ -630,7 +630,7 @@ public class EquipletAgent extends Agent {
 			// therefore there is no guarantee that informing the product is a blocking as the acknowledge is send before notifying the simulation
 			informProductStepFinished(finishedProduct);
 		} else {
-			throw new IllegalArgumentException("EQUIPLET: notify job not given in correct state: " + state);
+			throw new IllegalArgumentException("EQUIPLET: notify job finished not given in correct state: " + state);
 		}
 	}
 
@@ -642,14 +642,19 @@ public class EquipletAgent extends Agent {
 	 *            of the breakdown
 	 */
 	public void notifyBreakdown(double time) {
-		if (state != EquipletState.IDLE && state != EquipletState.BUSY) {
+		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED ) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
+		if (state==EquipletState.ERROR_REPAIRED) {
+			timeBreakdown = time - timeRemaining;
+			System.out.printf("EA:%s is broken down at %.2f, substracting the previous broken time %.2f\n", getLocalName(), time, timeRemaining);
+		} else {
+			timeBreakdown = time;
+			System.out.printf("EA:%s is broken down at %.2f\n", getLocalName(), time);
+		}
 		historyUpdate(time);
 		state = EquipletState.ERROR;
-		timeBreakdown = time;
-		System.out.printf("EA:%s is broken down at %.2f\n", getLocalName(), time);
 	}
 
 	/**
@@ -678,12 +683,12 @@ public class EquipletAgent extends Agent {
 			timeRemaining = time - timeBreakdown;
 			executing.updateDueTime(executing.getDueTime() + timeRemaining);
 			System.out.printf("EA:%s is repaired at %.2f and continue with job %s. The equiplet was %.2f broken, which is still remaining.\n", getLocalName(), time, executing, timeRemaining);
-		} else if (jobReady()) {
+		//} else if (jobReady()) {
 			// when the equiplet was in the error state there became a job ready which arrived before the breakdown
 			// not sure if this could happen
-			System.out.println("EQUIPLET ERROR? " + schedule);
-			executeJob(time);
-			System.out.printf("EA:%s is repaired at %.2f and detect that a job has became ready: %s \n", getLocalName(), time, executing);
+		//	System.out.println("EQUIPLET ERROR? " + schedule);
+		//	executeJob(time);
+		//	System.out.printf("EA:%s is repaired at %.2f and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 		} else {
 			// the equiplet has nothing to do and goes into IDLE state
 			System.out.printf("EA:%s is repaired at %.2f \n", getLocalName(), time);

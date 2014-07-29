@@ -89,12 +89,10 @@ public class GanttChart extends ApplicationFrame {
 		);
 
 		// Optional customisation of chart
-		chart.setBackgroundPaint(Color.white);
-
 		CategoryPlot plot = chart.getCategoryPlot();
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setRangeAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
-
+		
 		DateAxis axis = (DateAxis) plot.getRangeAxis();
 		axis.setDateFormatOverride(new DateFormat() {
 			private static final long serialVersionUID = 1L;
@@ -225,14 +223,13 @@ public class GanttChart extends ApplicationFrame {
 		final JFreeChart chart = createChart(title, yLabel, dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setMaximumDrawHeight(Math.max(counter * 10, 600));  
-		chartPanel.setPreferredSize(new Dimension(600, Math.max(counter * 10, 600)));
+		chartPanel.setMaximumDrawHeight(Math.max(counter * 20, 600));  
+		chartPanel.setPreferredSize(new Dimension(600, Math.max(counter * 20, 600)));
 		return chartPanel;
 	}
 	
 
 	public static JPanel createChartInvert(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
-		System.out.println("Gantt data" + data);
 		double maxTime = 300;
 		double minTime = Double.MAX_VALUE;
 		HashMap<String, TaskSeries> tasks = new HashMap<>();

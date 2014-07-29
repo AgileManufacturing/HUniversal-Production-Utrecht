@@ -35,7 +35,7 @@ class Stochastics {
 
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
-			 return generateProductStepsTest();
+			 //return generateProductStepsTest();
 		}
 		
 		LinkedList<ProductStep> steps = new LinkedList<>();
@@ -58,7 +58,9 @@ class Stochastics {
 	private LinkedList<ProductStep> generateProductStepsTest() {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
-		
+
+		steps.add(productSteps.get(0));
+		steps.add(productSteps.get(0));
 		steps.add(productSteps.get(0));
 		steps.add(productSteps.get(1));
 		steps.add(productSteps.get(2));
@@ -76,8 +78,7 @@ class Stochastics {
 	}
 
 	public double generateBreakdownTime(String equiplet) {
-		return 100;
-		//return time(config.equipletBreakdownTime(equiplet));
+		return time(config.equipletBreakdownTime(equiplet));
 	}
 
 	public double generateRepairTime(String equiplet) {
@@ -91,7 +92,7 @@ class Stochastics {
 	private double time(double time, DurationType type) {
 		switch (type) {
 		case EXP:
-			//return exp(time);
+			return exp(time);
 		case WEIBULL:
 			//return weibull(1, time);
 		case GAMMA:

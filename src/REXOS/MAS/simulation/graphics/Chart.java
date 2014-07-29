@@ -1,9 +1,13 @@
 package simulation.graphics;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +23,11 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -39,7 +46,7 @@ public class Chart {
 			}
 			dataset.addSeries(series);
 		}
-		
+
 		chart = createChart(title, yLabel, dataset);
 
 		ChartPanel chartPanel = new ChartPanel(chart);
@@ -91,6 +98,33 @@ public class Chart {
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setDomainGridlinePaint(Color.WHITE);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
+/*
+		final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setBaseLegendShape(new Rectangle(15, 15));
+		renderer.setSeriesStroke(
+	            0, new BasicStroke(
+	                2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+	                1.0f, new float[] {10.0f, 6.0f}, 0.0f
+	            )
+	        );
+		* /
+		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(){
+			private static final long serialVersionUID = 1L;
+			public Shape lookupLegendShape(int series) {
+				return new Rectangle(15, 15);
+			}
+		};
+		*/
+
+		LegendItemCollection legendItems = plot.getLegendItems();
+		for (int i = 0; i < legendItems.getItemCount(); i++) {
+			LegendItem item = legendItems.get(i);
+			item.setShape(new Rectangle(15, 15));
+		}
+		plot.setFixedLegendItems(legendItems);
+		
+		// renderer.setBaseLegendShape(new Rectangle(15, 15));
+		// plot.setRenderer(renderer);
 
 		return chart;
 	}
@@ -98,7 +132,7 @@ public class Chart {
 	public static void save(String path, String title, String yLabel, Map<String, Map<Double, Double>> data) {
 		try {
 			File file = new File(path);
-			
+
 			final XYSeriesCollection dataset = new XYSeriesCollection();
 			for (Entry<String, Map<Double, Double>> entry : data.entrySet()) {
 				final XYSeries series = new XYSeries(entry.getKey());
@@ -107,7 +141,7 @@ public class Chart {
 				}
 				dataset.addSeries(series);
 			}
-			
+
 			JFreeChart chart = createChart(title, yLabel, dataset);
 			ChartUtilities.saveChartAsPNG(file, chart, 1024, 720);
 		} catch (IOException e) {
@@ -122,7 +156,6 @@ public class Chart {
 	 * @return chart
 	 */
 	public static JPanel createChart(String title, String yLabel, Map<String, Map<Double, Double>> data) {
-		
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		for (Entry<String, Map<Double, Double>> entry : data.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
@@ -131,10 +164,19 @@ public class Chart {
 			}
 			dataset.addSeries(series);
 		}
-		
+
 		final JFreeChart chart = createChart(title, yLabel, dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		return chartPanel;
 	}
+	
+	/**
+	 *  Marker for current time
+	 * Long timestampToMark = new Date().getTime();
+	 * Marker m = new ValueMarker(timestampToMark);
+	 * m.setStroke(new BasicStroke(2));
+	 * m.setPaint(Color.RED);
+	 * plot.addDomainMarker(m);
+	 */
 }

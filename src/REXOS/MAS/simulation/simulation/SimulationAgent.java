@@ -4,6 +4,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	private static final String STATS_BUSY = "Processing";
 	private static final String STATS_FINISHED = "Finished";
 	private static final String STATS_FAILED = "Failed";
+	private static final String STATS_FAILED_CREATION = "Failed to create";
 	private static final String STATS_SYSTEM = "In System";
 	private static final String STATS_BROKEN = "Broken";
 
@@ -116,6 +118,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		productStatistics.put(STATS_BUSY, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_FINISHED, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_FAILED, new TreeMap<Double, Double>(initStats));
+		productStatistics.put(STATS_FAILED_CREATION, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_SYSTEM, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_BROKEN, new TreeMap<Double, Double>(initStats));
 
@@ -213,26 +216,27 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 						break;
 					}
 
-					update();
+					update(e);
 
-					//					double busy = productStatistics.get(STATS_BUSY).lastEntry().getValue();
-					//					double waiting = productStatistics.get(STATS_WAITING).lastEntry().getValue();
-					//					double travel = productStatistics.get(STATS_TRAVEL).lastEntry().getValue();
-					//					double failed = productStatistics.get(STATS_FAILED).lastEntry().getValue();
-					//					double finished = productStatistics.get(STATS_FINISHED).lastEntry().getValue();
-					//					double system = productStatistics.get(STATS_SYSTEM).lastEntry().getValue();
+					// double busy = productStatistics.get(STATS_BUSY).lastEntry().getValue();
+					// double waiting = productStatistics.get(STATS_WAITING).lastEntry().getValue();
+					// double travel = productStatistics.get(STATS_TRAVEL).lastEntry().getValue();
+					// double failed = productStatistics.get(STATS_FAILED).lastEntry().getValue();
+					// double finished = productStatistics.get(STATS_FINISHED).lastEntry().getValue();
+					// double system = productStatistics.get(STATS_SYSTEM).lastEntry().getValue();
 					//
-					//					System.out.printf("\nSimulation: stats=[busy=%s, waiting=%.0f, travel=%.0f, failed=%.0f, finished=%.0f, in system=%.0f]\n\n", productStatistics.get(STATS_BUSY).lastEntry(), waiting, travel, failed, finished, system);
-					//					System.out.printf("\nSTATS %s\n\n", productStatistics);
-
-					System.out.println("\nSimulation state: " + Util.formatArray(equiplets));
-					for (Entry<String, EquipletAgent> eq : equiplets.entrySet()) {
-						System.out.println("\nSimulation schedule "+ eq.getKey() + " : " + eq.getValue().getSchedule());	
-					}
+					// System.out.printf("\nSimulation: stats=[busy=%s, waiting=%.0f, travel=%.0f, failed=%.0f, finished=%.0f, in system=%.0f]\n\n",
+					// productStatistics.get(STATS_BUSY).lastEntry(), waiting, travel, failed, finished, system);
+					// System.out.printf("\nSTATS %s\n\n", productStatistics);
+					
+					/*
+					 * System.out.println("\nSimulation state: " + Util.formatArray(equiplets)); for (Entry<String, EquipletAgent> eq : equiplets.entrySet()) {
+					 * System.out.println("\nSimulation schedule " + eq.getKey() + " : " + eq.getValue().getSchedule()); }
+					 */
 					
 					// System.out.println("\nSimulation products: " + formatArray(products) + "\n");
 
-					// validate();
+					//validate();
 
 					doWait(delay);
 				}
@@ -248,6 +252,19 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		@Override
 		public boolean done() {
 			return finished;
+		}
+	}
+
+	private void validate() {
+		ArrayList<String> finishedEquiplets = new ArrayList<>();
+		for (Event event : eventStack) {
+			if (event.getType() == EventType.FINISHED) {
+				if (finishedEquiplets.contains(event.getEquiplet())) {
+					throw new IllegalArgumentException("Equiplet two times in event list: " + event);
+				} else {
+					finishedEquiplets.add(event.getEquiplet());
+				}
+			}
 		}
 	}
 
@@ -356,7 +373,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		}
 	}
 
-	private void update() {
+	private void update(Event e) {
 		// equiplet states = List of Tuple < name, position, services, Tuple < state, waiting, scheduled,executed > >
 		List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates = new ArrayList<>();
 		for (Entry<String, EquipletAgent> equiplet : equiplets.entrySet()) {
@@ -366,7 +383,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		double waitingTime = 0;
 		List<Double> busy = new ArrayList<Double>();
 		double throughput = 0;
-		gui.update(time, products.size(), productCount, totalSteps, productStatistics.get(STATS_TRAVEL).lastEntry().getValue().intValue(), equipletStates, waitingTime, busy, throughput);
+		gui.update(time, e.getEquiplet() + ":" + e.getType(), products.size(), productCount, totalSteps, productStatistics.get(STATS_TRAVEL).lastEntry().getValue().intValue(), equipletStates, waitingTime, busy, throughput);
 	}
 
 	private void productEvent() {
@@ -417,7 +434,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 			equipletAgent.notifyJobFinished(time);
 		} else if (equipletAgent.getEquipletState() == EquipletState.ERROR_REPAIRED) {
 			equipletAgent.notifyJobFinished(time);
-			
+
 			double remainingTime = equipletAgent.getRemainingTime();
 			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equipletName));
 			System.out.printf("Simulation: reschedule event FINISHED after breakdown and equiplet is repaired %.0f + %.0f, %s\n", time, remainingTime, equipletName);
@@ -448,7 +465,7 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 		EquipletAgent equipletAgent = equiplets.get(equipletName);
 		if (equipletAgent.getEquipletState() == EquipletState.ERROR_FINISHED) {
 			equipletAgent.notifyRepaired(time);
-			
+
 			double remainingTime = equipletAgent.getRemainingTime();
 			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equipletName));
 			System.out.printf("Simulation: reschedule event FINISHED after breakdown of equiplet %s over %.0f + %.0f\n", equipletName, time, remainingTime);
@@ -475,7 +492,19 @@ public class SimulationAgent extends Agent implements Control, ISimulation {
 	@Override
 	public void notifyProductCreationFailed(String productName) {
 		System.out.printf("Simulation: product agent %s failed to create.\n", productName);
-		updateStats(STATS_FAILED, +1);
+		updateStats(STATS_FAILED_CREATION, +1);
+		updateStats(STATS_SYSTEM, -1);
+
+		// remove agent from system
+		products.remove(productName);
+
+		ContainerController cc = getContainerController();
+		try {
+			AgentController agent = cc.getAgent(productName);
+			agent.kill();
+		} catch (ControllerException e) {
+			e.printStackTrace();
+		}
 
 		// schedule next product arrival
 		double arrivalTime = stochastics.generateProductArrival();
