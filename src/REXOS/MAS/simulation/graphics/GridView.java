@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +13,8 @@ import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import simulation.mas.equiplet.Equiplet;
-import simulation.mas.equiplet.EquipletAgent;
 import simulation.util.Pair;
 import simulation.util.Position;
-import simulation.util.Triple;
 import simulation.util.Tuple;
 
 public class GridView extends JPanel {
@@ -46,43 +42,13 @@ public class GridView extends JPanel {
 		}
 	}
 
-	public void init(Collection<Equiplet> equiplets) {
-		for (Equiplet equiplet : equiplets) {
-
-			EquipletView component = new EquipletView(equiplet.getEquipletName(), equiplet.getServices(), equiplet.getEquipletState().toString(), equiplet.getWaiting(),
-					equiplet.getScheduled(), equiplet.getExecuted());
-			components.put(equiplet.getEquipletName(), component);
-			component.setBackground(Color.WHITE);
-			component.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = equiplet.getPosition().getX();
-			gbc.gridy = equiplet.getPosition().getY();
-			gbc.fill = GridBagConstraints.BOTH;
-			gbc.anchor = GridBagConstraints.CENTER;
-			gbc.insets = new Insets(10, 10, 10, 10);
-			gbc.weighty = 1.0;
-			gbc.weightx = 1.0;
-			add(component, gbc);
-		}
-	}
-
-	public void update(Collection<Equiplet> equiplets) {
-		if (components.isEmpty()) {
-			init(equiplets);
-		} else {
-			for (Equiplet equiplet : equiplets) {
-				EquipletView view = components.get(equiplet.getEquipletName());
-				view.update(equiplet.getEquipletState().toString(), equiplet.getWaiting(), equiplet.getScheduled(), equiplet.getExecuted());
-			}
-		}
-	}
-
 	/**
 	 * Update grid view Containing a box of the equiplet view
 	 * 
 	 * @param equiplets
+	 *            :: Map < equiplet name, Pair < position in grid, state :: Tuple < state, # of (ready) products waiting, # of products scheduled, # of products executed > > >
 	 */
+	@Deprecated
 	public void update(Map<String, Pair<Position, Tuple<String, Integer, Integer, Integer>>> equiplets) {
 		for (Entry<String, Pair<Position, Tuple<String, Integer, Integer, Integer>>> entry : equiplets.entrySet()) {
 			String name = entry.getKey();
@@ -107,21 +73,27 @@ public class GridView extends JPanel {
 			gbc.weightx = 1.0;
 			add(component, gbc);
 		}
+		revalidate();
 	}
 
+	/**
+	 * 
+	 * @param equipletStates
+	 *            :: List < equiplet name, position in grid, services, state :: < state, # of (ready) products waiting, # of products scheduled, # of products executed > > 
+	 */
 	public void update(List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates) {
 		removeAll();
 		for (Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>> equiplet : equipletStates) {
 			String name = equiplet.first;
 			Position position = equiplet.second;
-
+			List<String> services = equiplet.third;
+			
 			String state = equiplet.fourth.first;
 			int waiting = equiplet.fourth.second;
 			int scheduled = equiplet.fourth.third;
 			int executed = equiplet.fourth.fourth;
 
-			EquipletView component = new EquipletView(name, state, waiting, scheduled, executed);
-			// components.put(name, component);
+			EquipletView component = new EquipletView(name, services, state, waiting, scheduled, executed);
 			component.setBackground(Color.WHITE);
 			component.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 

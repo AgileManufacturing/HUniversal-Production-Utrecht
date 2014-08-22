@@ -1,6 +1,5 @@
 package simulation.mas.equiplet;
 
-import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -35,9 +34,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
-		
 		// Listen only possible incoming conversation ids, note that otherwise the simulation would jam as the listener receives messages that else where is waited upon
-		// MessageTemplate template = MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM), MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
+		// MessageTemplate template = MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
+		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
 		MessageTemplate template = MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE)));
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
@@ -49,10 +48,6 @@ public class EquipletListenerBehaviour extends Behaviour {
 					handleProductArrived(msg);
 				}
 				break;
-			// inform of the simulation that something happened with the equiplet
-			case ACLMessage.INFORM_REF:
-				handleSimulationInform(msg.getContent(), msg.getSender());
-				break;
 			// Request of other agent to get information to schedule a job
 			// will send confirm or disconfirm message in return
 			case ACLMessage.REQUEST:
@@ -61,6 +56,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 			// query for information of the equiplet
 			case ACLMessage.QUERY_REF:
 				handleCanExecute(msg);
+				break;
+			case ACLMessage.QUERY_IF:
+				handleInformationRequest(msg);
 				break;
 			default:
 				break;
@@ -105,15 +103,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	private void handleScheduling(ACLMessage message) {
 		try {
-			// scheduling info = < Service, Criteria, time, deadline >
-			Tuple<String, Map<String, Object>, Double, Double> data = Parser.parseSchedule(message.getContent());
-
-			String service = data.first;
-			Map<String, Object> criteria = data.second;
-			double time = data.third;
-			double deadline = data.fourth;
-
-			boolean success = equiplet.schedule(message.getSender(), time, deadline, service, criteria);
+			// scheduling info = List of product steps :: [< time, deadline, Service, Criteria >]
+			List<Tuple<Double, Double, String, Map<String, Object>>> data = Parser.parseScheduleRequest(message.getContent());
+			boolean success = equiplet.schedule(message.getSender(), data);
 
 			// send can execute reply
 			ACLMessage reply = message.createReply();
@@ -122,7 +114,6 @@ public class EquipletListenerBehaviour extends Behaviour {
 			equiplet.send(reply);
 
 			System.out.printf("EA:%s send reply to %s  %s\n", equiplet.getLocalName(), message.getSender().getLocalName(), reply.getContent());
-
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to parse scheduling()\n", equiplet.getLocalName());
 			System.err.printf("EA:%s %s", equiplet.getLocalName(), e.getMessage());
@@ -145,7 +136,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}
 	}
 
-	private void handleInformationRequest(String content, AID sender, String conversationId, String reply) {
+	private void handleInformationRequest(ACLMessage message) {
 		try {
 			JSONObject json = new JSONObject();
 			json.append("state", equiplet.getEquipletState());
@@ -155,42 +146,12 @@ public class EquipletListenerBehaviour extends Behaviour {
 			json.append("executing", equiplet.getExecuting());
 
 			// send information reply
-			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-			message.addReceiver(sender);
-			message.setContent(json.toString());
-			message.setConversationId(conversationId);
-			message.setInReplyTo(reply);
+			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.INFORM);
+			reply.setContent(json.toString());
 			equiplet.send(message);
 		} catch (JSONException e) {
 			// TODO failed to construct reply
 		}
 	}
-
-	@Deprecated
-	private void handleSimulationInform(String content, AID sender) {
-		try {
-			JSONObject json = new JSONObject(content);
-
-			if (json.has("notify") && json.has("time")) {
-				double time = json.getDouble("time");
-
-				String notify = json.getString("notify");
-				if (notify.equals("finished")) {
-					equiplet.notifyJobFinished(time);
-				} else if (notify.equals("breakdown")) {
-					equiplet.notifyBreakdown(time);
-				} else if (notify.equals("repaired")) {
-					equiplet.notifyRepaired(time);
-				} else {
-					// TODO not understood
-				}
-			} else {
-				// TODO failed
-			}
-		} catch (JSONException e) {
-			// TODO: handle exception
-			// send failed inform request
-		}
-	}
-
 }

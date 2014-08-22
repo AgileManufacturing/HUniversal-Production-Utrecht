@@ -1,9 +1,12 @@
 package simulation.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,24 +14,23 @@ import org.json.JSONObject;
 
 import simulation.mas.equiplet.Capability;
 import simulation.mas.product.ProductStep;
+import simulation.mas.product.ProductionStep;
 
 public class Parser extends ParserPrimitives {
 
-	public static String parseEquipletConfiguration(Position position, List<Capability> capabilities, Map<String, Double> productionTimes) throws JSONException {
+	public static String parseEquipletConfiguration(Position position, List<Capability> capabilities) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("position", parsePosition(position));
 		json.put("capabilities", parseCapabilties(capabilities));
-		json.put("productionTimes", parseProductionTimes(productionTimes));
 		return json.toString();
 	}
 
-	public static Triple<Position, List<Capability>, Map<String, Double>> parseEquipletConfiguration(String source) throws JSONException {
+	public static Pair<Position, List<Capability>> parseEquipletConfiguration(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
-		if (json.has("position") && json.has("capabilities") && json.has("productionTimes")) {
+		if (json.has("position") && json.has("capabilities")) {
 			Position position = parsePosition(json.getJSONObject("position"));
 			List<Capability> capabilities = parseCapabilties(json.getJSONArray("capabilities"));
-			Map<String, Double> productionTimes = parseProductionTimes(json.getJSONArray("productionTimes"));
-			return new Triple<Position, List<Capability>, Map<String, Double>>(position, capabilities, productionTimes);
+			return new Pair<Position, List<Capability>>(position, capabilities);
 		} else {
 			throw new JSONException("Parser: parsing equiplet configuration failed to parse " + json);
 		}
@@ -170,27 +172,36 @@ public class Parser extends ParserPrimitives {
 		}
 	}
 
-	public static String parseSchedule(String service, Map<String, Object> criteria, double time, double deadline) throws JSONException {
-		JSONObject json = new JSONObject();
-		json.put("service", service);
-		json.put("criteria", parseMap(criteria));
-		json.put("time", time);
-		json.put("deadline", deadline);
-		return json.toString();
+	public static String parseScheduleRequest(ArrayList<ProductionStep> steps, double deadline) throws JSONException {
+		JSONArray list = new JSONArray();
+		for (ProductionStep productionStep : steps) {
+			JSONObject json = new JSONObject();
+			json.put("service", productionStep.getService());
+			json.put("criteria", parseMap(productionStep.getCriteria()));
+			json.put("time", productionStep.getTime());
+			json.put("deadline", deadline);
+			list.put(json);
+		}
+		return list.toString();
 	}
 
-	public static Tuple<String, Map<String, Object>, Double, Double> parseSchedule(String source) throws JSONException {
-		JSONObject json = new JSONObject(source);
-		if (json.has("service") && json.has("criteria") && json.has("time") && json.has("deadline")) {
-			String service = json.getString("service");
-			Map<String, Object> criteria = parseMap(json.getJSONArray("criteria"));
-			double time = json.getDouble("time");
-			double deadline = json.getDouble("deadline");
+	public static List<Tuple<Double, Double, String, Map<String, Object>>> parseScheduleRequest(String source) throws JSONException {
+		List<Tuple<Double, Double, String, Map<String, Object>>> result = new ArrayList<>();
+		JSONArray list = new JSONArray(source);
+		for (int i = 0; i < list.length(); i++) {
+			JSONObject json = list.getJSONObject(i);
+			if (json.has("service") && json.has("criteria") && json.has("time") && json.has("deadline")) {
+				double time = json.getDouble("time");
+				double deadline = json.getDouble("deadline");
+				String service = json.getString("service");
+				Map<String, Object> criteria = parseMap(json.getJSONArray("criteria"));
 
-			return new Tuple<String, Map<String, Object>, Double, Double>(service, criteria, time, deadline);
-		} else {
-			throw new JSONException("Parser: parsing scheduling failed to parse " + source);
+				result.add(new Tuple<Double, Double, String, Map<String, Object>>(time, deadline, service, criteria));
+			} else {
+				throw new JSONException("Parser: parsing scheduling failed to parse " + source);
+			}
 		}
+		return result;
 	}
 
 	public static String parseConfirmation(boolean confirmation) throws JSONException {
@@ -221,5 +232,125 @@ public class Parser extends ParserPrimitives {
 		} else {
 			throw new JSONException("Parser: parsing product arrived failed to parse " + source);
 		}
+	}
+
+	public static Pair<Position, List<Pair<String, String>>> parseTravelRouteRequest(String source) throws JSONException {
+		List<Pair<String, String>> routes = new ArrayList<Pair<String, String>>();
+		JSONObject json = new JSONObject(source);
+		if (json.has("position") && json.has("routes")) {
+			Position position = parsePosition(json.getJSONObject("position"));
+			JSONArray list = json.getJSONArray("routes");
+			for (int i = 0; i < list.length(); i++) {
+				JSONObject item = list.getJSONObject(i);
+				if (item.has("from") && item.has("to")) {
+					String from = item.getString("from");
+					String to = item.getString("to");
+					routes.add(new Pair<String, String>(from, to));
+				} else {
+					throw new JSONException("Parser: parsing travel time request failed to parse item " + source);
+				}
+			}
+			return new Pair<Position, List<Pair<String, String>>>(position, routes);
+		} else {
+			throw new JSONException("Parser: parsing travel time request failed to parse " + source);
+		}
+	}
+
+	public static String parseTravelRouteRequest(Position position, List<Pair<String, String>> routes) throws JSONException {
+		JSONObject json = new JSONObject();
+		JSONArray list = new JSONArray();
+		for (Pair<String, String> route : routes) {
+			JSONObject item = new JSONObject();
+			item.put("from", route.first);
+			item.put("to", route.second);
+			list.put(item);
+		}
+		json.put("position", parsePosition(position));
+		json.put("routes", list);
+		return json.toString();
+	}
+
+	public static List<Pair<Position, Position>> parseTravelTimeRequest(String source) throws JSONException {
+		List<Pair<Position, Position>> routes = new ArrayList<>();
+		JSONArray list = new JSONArray(source);
+		for (int i = 0; i < list.length(); i++) {
+			JSONObject item = list.getJSONObject(i);
+			if (item.has("from") && item.has("to")) {
+				Position from = parsePosition(item.getJSONObject("from"));
+				Position to = parsePosition(item.getJSONObject("to"));
+				routes.add(new Pair<Position, Position>(from, to));
+			} else {
+				throw new JSONException("Parser: parsing travel time request failed to parse item " + source);
+			}
+		}
+		return routes;
+
+	}
+
+	public static String parseTravelTimeRequest(Set<Pair<Position, Position>> routes) throws JSONException {
+		JSONArray list = new JSONArray();
+		for (Pair<Position, Position> route : routes) {
+			JSONObject item = new JSONObject();
+			item.put("from", parsePosition(route.first));
+			item.put("to", parsePosition(route.second));
+			list.put(item);
+		}
+		return list.toString();
+	}
+
+	public static Map<Pair<String, String>, Double> parseTravelRoutes(String source) throws JSONException {
+		Map<Pair<String, String>, Double> travelTimes = new HashMap<Pair<String, String>, Double>();
+		JSONArray list = new JSONArray(source);
+
+		for (int i = 0; i < list.length(); i++) {
+			JSONObject json = list.getJSONObject(i);
+			if (json.has("from") && json.has("to") && json.has("time")) {
+				String from = json.getString("from");
+				String to = json.getString("to");
+				double time = json.getDouble("time");
+				travelTimes.put(new Pair<String, String>(from, to), time);
+			}
+		}
+		return travelTimes;
+	}
+
+	public static String parseTravelRoutes(Map<Pair<String, String>, Double> travelTimes) throws JSONException {
+		JSONArray list = new JSONArray();
+		for (Entry<Pair<String, String>, Double> entry : travelTimes.entrySet()) {
+			JSONObject json = new JSONObject();
+			json.put("from", entry.getKey().first);
+			json.put("to", entry.getKey().second);
+			json.put("time", entry.getValue());
+			list.put(json);
+		}
+		return list.toString();
+	}
+
+	public static Map<Pair<Position, Position>, Double> parseTravelTimes(String source) throws JSONException {
+		Map<Pair<Position, Position>, Double> travelTimes = new HashMap<>();
+		JSONArray list = new JSONArray(source);
+
+		for (int i = 0; i < list.length(); i++) {
+			JSONObject json = list.getJSONObject(i);
+			if (json.has("from") && json.has("to") && json.has("time")) {
+				Position from = parsePosition(json.getJSONObject("from"));
+				Position to = parsePosition(json.getJSONObject("to"));
+				double time = json.getDouble("time");
+				travelTimes.put(new Pair<Position, Position>(from, to), time);
+			}
+		}
+		return travelTimes;
+	}
+
+	public static String parseTravelTimes(Map<Pair<Position, Position>, Double> travelTimes) throws JSONException {
+		JSONArray list = new JSONArray();
+		for (Entry<Pair<Position, Position>, Double> entry : travelTimes.entrySet()) {
+			JSONObject json = new JSONObject();
+			json.put("from", parsePosition(entry.getKey().first));
+			json.put("to", parsePosition(entry.getKey().second));
+			json.put("time", entry.getValue());
+			list.put(json);
+		}
+		return list.toString();
 	}
 }

@@ -1,5 +1,8 @@
 package simulation.util;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+
 public class Pair<U, V> {
 
 	/**
@@ -24,7 +27,30 @@ public class Pair<U, V> {
 		this.first = first;
 		this.second = second;
 	}
+	
+	@Override
+	public int hashCode() {
+		// two randomly chosen prime numbers
+		return new HashCodeBuilder(31, 71).append(first).append(second).toHashCode();
+	}
 
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		Pair<?, ?> pair = (Pair<?, ?>) obj;
+		return first.equals(pair.first) && second.equals(pair.second);
+
+	}
+	
 	@Override
 	public String toString() {
 		return "<" + first + "," + second + ">";

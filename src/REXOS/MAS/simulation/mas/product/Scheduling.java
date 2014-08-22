@@ -1,21 +1,44 @@
 package simulation.mas.product;
 
+import jade.core.AID;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Stack;
 
-import simulation.mas.equiplet.EquipletAgent;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.Settings;
 import simulation.util.Tuple;
+import simulation.util.Util;
 
 public class Scheduling {
-	public static final int LOAD_WINDOW = 100;
 
-	public LinkedList<Node> calculateEDDPath(double time, LinkedList<Pair<ProductStep, Map<String, Tuple<Double, Double, Double, Position>>>> productSteps, double deadline, double travelCost, Position start) {
+	private String agent;
+	private double time;
+	private double deadline;
+	private Position position;
+	private List<ProductStep> productSteps;
+	private Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions;
+	private Map<AID, Pair<Double, Position>> equipletInfo;
+	private Map<Pair<Position, Position>, Double> travelTimes;
+
+	public Scheduling(String agent, double time, double deadline, Position position, List<ProductStep> productSteps,
+			Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo,
+			Map<Pair<Position, Position>, Double> travelTimes) {
+		this.agent = agent;
+		this.time = time;
+		this.deadline = deadline;
+		this.position = position;
+		this.productSteps = productSteps;
+		this.serviceOptions = options;
+		this.equipletInfo = equipletInfo;
+		this.travelTimes = travelTimes;
+	}
+
+	public LinkedList<Node> calculateEDDPath() throws SchedulingException {
 		Graph<Node> graph = new Graph<>();
 
 		Node source = new Node(time);
@@ -24,65 +47,79 @@ public class Scheduling {
 		graph.add(source);
 		graph.add(sink);
 
+		if (Settings.DEBUG_SCHEDULING) {
+			System.out.printf("\nPA:%s calculate best path \ninfo: \t %s\noptions: \t%s\n", agent, Util.formatArray(equipletInfo), Util.formatArray(serviceOptions));
+		}
+
 		// list of node in the last column
-		Stack<Node> lastNodes = new Stack<Node>();
+		ArrayList<Node> lastNodes = new ArrayList<Node>();
 		lastNodes.add(source);
 
-		// remember one iteration the Map of possible equiplets for the previous product step
-		Map<String, Tuple<Double, Double, Double, Position>> previousSuitedEquiplets = null;
+		for (ProductStep step : productSteps) {
+			Map<AID, Pair<Double, List<Pair<Double, Double>>>> options = serviceOptions.get(step.getIndex());
 
-		// for each product step
-		for (Pair<ProductStep, Map<String, Tuple<Double, Double, Double, Position>>> step : productSteps) {
+			if (Settings.DEBUG_SCHEDULING) {
+				System.out.printf("\nPA:%s construct scheduling graph, step=%s, from nodes=%s, with options=%s.\n\n", agent, step, lastNodes, Util.formatArray(options));
+			}
+
 			// keep track of the equiplets to process in the next iteration
-			Stack<Node> equipletNodes = new Stack<Node>();
+			ArrayList<Node> equipletNodes = new ArrayList<Node>();
 
-			// for each equiplet that can perform the product step
-			// Entry < Equiplet name, Tuple < available, duration, load, equiplet position >  >
-			for (Entry<String, Tuple<Double, Double, Double, Position>> entry : step.second.entrySet()) {
+			// add a node with an arc to each node in the previous column
+			for (Node node : lastNodes) {
 
-				Tuple<Double, Double, Double, Position> equiplet = entry.getValue();
+				// Entry < Equiplet, Pair < duration, List of possible time options > >
+				for (Entry<AID, Pair<Double, List<Pair<Double, Double>>>> option : options.entrySet()) {
+					Position lastPosition = node != source ? equipletInfo.get(node.getEquipletAID()).second : position;
+					Position nextPosition = equipletInfo.get(option.getKey()).second;
+					Pair<Position, Position> route = new Pair<>(lastPosition, nextPosition);
+					if (!travelTimes.containsKey(route) && !lastPosition.equals(nextPosition)) {
+						throw new SchedulingException("route doesn't exists in travel time list: " + route);
+					}
 
-				double available = equiplet.first;
-				double duration = equiplet.second;
-				// double load = equiplet.third;
-
-				Position toPos = equiplet.fourth;
-
-				// add a node with an arc to each node in the previous column 
-				for (Node node : lastNodes) {
-					Position fromPos = node != source ? previousSuitedEquiplets.get(node.getEquiplet()).fourth : start;
-
-					double travel = calculateTravelTime(fromPos, toPos, travelCost);
+					double window = deadline - time;
+					double duration = option.getValue().first;
+					double travel = lastPosition.equals(nextPosition) ? 0.0 : travelTimes.get(new Pair<>(lastPosition, nextPosition));
 					double arrival = node.getTime() + node.getDuration() + travel;
-					double window = deadline - arrival;
+					double firstPossibilty = Double.MAX_VALUE;
 
-					double firstPossibilty = Math.max(available, arrival) + duration;
-					double cost = 1 - firstPossibilty / window;
+					// Time option is the time from (=option.first) until (=option.second) the equiplet is possible to perform the service
+					for (Pair<Double, Double> timeOption : option.getValue().second) {
+						
+						
+						
+						// choose the best time to perform the product step
+						if (timeOption.first < firstPossibilty && arrival < timeOption.second) {
 
-					Node nextNode = new Node(entry.getKey(), firstPossibilty, duration);
-
-					if (cost < 0){ // && Settings.DEBUG_SCHEDULING) {
-						System.out.println("FAAAAAAAAAAAAAAAAAAIIIIIIIIIIIIIIIIIIIIILLLLLLLLLLLLLLLLLLl: " + deadline);
-						System.out.printf("Add to graph: %s -- %.2f --> %s [cost=(1 - %.2f / %.2f)], available=%.2f, arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, available, arrival);
+							// TODO performance improvement
+							// set the first possibility, the first is the time the equiplet is able to perform or when the product can arrive by the equiplet
+							firstPossibilty = Math.max(timeOption.first, arrival);
+						}
 					}
 
-					graph.add(node, nextNode, cost);
+					// check if deadline can be reached
+					if (firstPossibilty + duration <= deadline) {
+						Node nextNode = new Node(option.getKey(), firstPossibilty, duration);
 
-					if (Settings.DEBUG_SCHEDULING) {
-						System.out.printf("Add to graph: %s -- %.2f --> %s [cost=(1 - %.2f / %.2f)], available=%.2f, arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, available, arrival);
+						double cost = 1 - (firstPossibilty - time) / window;
+
+						if (cost < 0) { // ) && Settings.DEBUG_SCHEDULING) {
+							// shouldn't occur as it would mean arrival of first possibility > deadline
+							System.err.println("FAILED maybe because the: deadline=" + deadline);
+							System.err.printf("Should happen: Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+						}
+
+						graph.add(node, nextNode, cost);
+						equipletNodes.add(nextNode);
+
+						if (Settings.DEBUG_SCHEDULING) {
+							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
+						}
 					}
-
-					equipletNodes.add(nextNode);
 				}
 			}
 
-			if (Settings.DEBUG_SCHEDULING) {
-				System.out.println("add nodes for " + step + " from : " + lastNodes + " to new equiplet nodes " + equipletNodes);
-			}
-
-			previousSuitedEquiplets = step.second;
-
-			lastNodes.removeAllElements();
+			lastNodes.clear();
 			lastNodes.addAll(equipletNodes);
 		}
 
@@ -95,8 +132,8 @@ public class Scheduling {
 		if (path.size() > 1) {
 			path.removeFirst();
 			path.removeLast();
-		} else if (path.isEmpty()) {
-			System.out.println("Scheduling: Failed to find path in " + graph);
+		} else if (path.isEmpty() || path.size() != productSteps.size()) {
+			throw new SchedulingException("failed to find path int nodes=" + graph + " - " + path);
 		}
 
 		if (Settings.DEBUG_SCHEDULING) {
@@ -107,161 +144,82 @@ public class Scheduling {
 		return path;
 	}
 
-	private double calculateTravelTime(Position a, Position b, double travelCost) {
-		return travelCost * Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
+	public LinkedList<Node> calculateMatrixPath() {
+		return null;
 	}
 
 	/**
-	 * List < of product steps =
-	 * - Pair< Product step to be executed for the product, List < of possible
-	 * equiplet consisting of
-	 * - - - Tuple<Equiplet name, available, duration, load> > > >
+	 * Generates the scheduleMatrix for all productsteps & equiplets. For more information see
 	 * 
-	 * @param time
+	 * @ref to paper 'Multiagent-based agile manufacturing: from user requirements to product' - Leo van Moergestel section 3.2
+	 * 
+	 * @param equiplets
+	 *            Map < Equiplet, < List<Service able to perform>, load of equiplet>
 	 * @param productSteps
-	 * @return
+	 *            list of product steps of the product
+	 * @return the generated scheduleMatrix
 	 */
-	public LinkedList<Node> calculatePath(double time, LinkedList<Pair<ProductStep, List<Tuple<String, Double, Double, Double>>>> productSteps) {
-		// Create the graph to calculate best production path
-		Graph<Node> graph = new Graph<Node>();
-
-		// Add start and end to the graph
-		Node source = new Node(time);
-		Node sink = new Node();
-		graph.add(source);
-		graph.add(sink);
-
-		// list of node in the last column
-		Stack<Node> lastNodes = new Stack<Node>();
-		lastNodes.add(source);
-
-		for (Pair<ProductStep, List<Tuple<String, Double, Double, Double>>> step : productSteps) {
-			// keep track of the equiplets to process in the next iteration
-			Stack<Node> equipletNodes = new Stack<Node>();
-
-			// add all the equiplet capable to execute the product step
-			for (Tuple<String, Double, Double, Double> equiplet : step.second) {
-
-				System.out.println("Process " + equiplet + " for product steps=" + step.first);
-
-				for (Node lastNode : lastNodes) {
-					// time the previous equiplet completes the production
-					double stepComplete = lastNode.getTime() + lastNode.getDuration();
-
-					// Calculate the cost for producing by the equiplet
-					// travel times should be added if the previous time are greater the the travel + availible time
-					double available = equiplet.second;
-
-					// TODO delay is relative to the previous step, this might be not undesirable 
-					// long delay = available > stepComplete + travel ? available - (stepComplete + travel) : 0;
-					double delay = 1 - 1.0 * Math.max(0, available - stepComplete) / LOAD_WINDOW;
-					double load = equiplet.fourth;
-
-					double cost = cost(delay, load);
-					Node node = new Node(equiplet.first, Math.max(available, stepComplete), equiplet.third);
-
-					System.out.println("Add to graph: " + lastNode + " --" + cost + "--> " + node + " : cost(delay=" + delay + ", load=" + load + ") available=" + available + ", stepComplete=" + stepComplete);
-					graph.add(lastNode, node, cost);
-
-					equipletNodes.add(node);
-				}
+	private double[][] generateMatrix(ArrayList<Tuple<AID, List<String>, Double, Double>> equiplets, ArrayList<ProductStep> productSteps) {
+		double[][] matrix = new double[equiplets.size()][productSteps.size()];
+		// initialize matrix
+		for (int r = 0; r < matrix.length; r++) {
+			for (int c = 0; c < matrix.length; c++) {
+				matrix[r][c] = 1.0;
 			}
-
-			System.out.println("step: " + lastNodes + " - " + equipletNodes);
-
-			lastNodes.removeAllElements();
-			lastNodes.addAll(equipletNodes);
 		}
 
-		System.out.println("last step: " + lastNodes);
+		// iterate over the equiplets, the rows of the matrix
+		for (int row = 0; row < equiplets.size(); row++) {
+			List<String> capableServices = equiplets.get(row).second;
+			double load = equiplets.get(row).third;
 
-		for (Node node : lastNodes) {
-			graph.add(node, sink, 0);
-		}
+			// always set sequenceLength to 0 and firstInsequence to -1 when doing a new row.
+			// the sequenceLength is the number of the product steps that can be consecutive performed by an equiplet
+			int sequenceLength = 0;
 
-		LinkedList<Node> path = graph.optimumPath(source, sink);
-		if (path.size() > 1) {
-			path.removeFirst();
-			path.removeLast();
-		} else if (path.isEmpty()) {
-			System.out.println("Scheduling: Failed to find path in " + graph);
-		}
+			// the first product step in the sequence that an equiplet can perform
+			int firstInSequence = -1;
 
-		return path;
-	}
+			// iterate over the product steps, the columns of the matrix
+			for (int column = 0; column < productSteps.size(); column++) {
+				ProductStep productStep = productSteps.get(column);
 
-	@Deprecated
-	public LinkedList<Node> calculatePath_(double time, LinkedList<Pair<ProductStep, List<Pair<EquipletAgent, Double>>>> productSteps) {
-		// Create the graph to calculate best production path
-		Graph<Node> graph = new Graph<Node>();
+				// if equiplet can perform product step
+				// TODO match criteria if needed
+				if (capableServices.contains(productStep.getService())) {
+					// set the first item in the sequence.
+					if (firstInSequence < 0) {
+						firstInSequence = column;
+					}
+					sequenceLength++;
 
-		// Add start and end to the graph
-		Node source = new Node(time);
-		Node sink = new Node();
-		graph.add(source);
-		graph.add(sink);
-
-		// list of node in the last column
-		Stack<Node> lastNodes = new Stack<Node>();
-		lastNodes.add(source);
-
-		for (Pair<ProductStep, List<Pair<EquipletAgent, Double>>> step : productSteps) {
-			// keep track of the equiplets to process in the next iteration
-			Stack<Node> equipletNodes = new Stack<Node>();
-
-			for (Pair<EquipletAgent, Double> equiplet : step.second) {
-
-				for (Node lastNode : lastNodes) {
-					// time the previous equiplet completes the production
-					double stepComplete = lastNode.getTime() + lastNode.getDuration();
-
-					// travel times should be added if the previous time are greater the the travel + availible time
-					// TODO travel times from equiplet to equiplets
-					double travel = 10; // .travelTime(lastNode.getEquiplet(), equiplet);
-
-					// Calculate the cost for producing by the equiplet
-					// TODO can this be answered before knowing the travel times?
-					//double available = equiplet.first.available(stepComplete + travel, step.first.getService());
-
-					// TODO delay is relative to the previous step, this might be not undesirable 
-					// long delay = available > stepComplete + travel ? available - (stepComplete + travel) : 0;
-					//double delay = 1 - 1.0 * Math.max(0, available + travel - stepComplete) / LOAD_WINDOW;
-					//double load = equiplet.first.load(time, LOAD_WINDOW);
-
-					//double cost = cost(delay, load);
-					//Node node = new Node(equiplet.first.getEquipletName(), Math.max(available, stepComplete), equiplet.second);
-
-					//System.out.println("Add to graph: " + lastNode + " --" + cost + "--> " + node + " : cost(delay=" + delay + ", load=" + load + ") available=" + available + ", stepComplete=" + stepComplete + ", travel=" + travel);
-					//graph.add(lastNode, node, cost);
-
-					//equipletNodes.add(node);
+					if (column == productSteps.size() - 1) { // end of row
+						// set value of sequence
+						for (int c = firstInSequence; c < matrix[row].length; c++) {
+							int value = sequenceLength - 1;
+							matrix[row][c] = value;
+						}
+					}
+				} else if (sequenceLength > 0) {
+					// end of sequence, set value of sequence
+					for (int c = firstInSequence; c < matrix[row].length; c++) {
+						int value = sequenceLength - 1;
+						matrix[row][c] = value;
+					}
+					sequenceLength = 0;
+					firstInSequence = -1;
 				}
+
+				// value might have changed since we added sequence multiplier
+				// TODO: perform supermagic calculation of currentValue * load here
+				for (int c = firstInSequence; c < matrix[row].length; c++) {
+					int value = sequenceLength - 1;
+					matrix[row][c] = value;
+				}
+				matrix[row][column] = matrix[row][column] * load;
 			}
-
-			System.out.println("step: " + lastNodes + " - " + equipletNodes);
-
-			lastNodes.removeAllElements();
-			lastNodes.addAll(equipletNodes);
 		}
 
-		System.out.println("last step: " + lastNodes);
-
-		for (Node node : lastNodes) {
-			graph.add(node, sink, 0);
-		}
-
-		LinkedList<Node> path = graph.optimumPath(source, sink);
-		if (path.size() > 1) {
-			path.removeFirst();
-			path.removeLast();
-		} else if (path.isEmpty()) {
-			System.out.println("Scheduling: Failed to find path in " + graph);
-		}
-
-		return path;
-	}
-
-	private double cost(double delay, double load) {
-		return delay * load;
+		return matrix;
 	}
 }

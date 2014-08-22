@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import simulation.config.Config;
 import simulation.mas.Logistics;
-import simulation.mas.equiplet.Equiplet;
+import simulation.mas.equiplet.IEquipletSim;
 import simulation.util.Position;
 
 public class Grid {
@@ -21,11 +21,8 @@ public class Grid {
 	 */
 
 	private static Grid mGrid;
-	private Map<String, Equiplet> equiplets;
-	private Logistics logistics;
-	private Stochastics stochastics;
-	private double travelCost;
-
+	private Map<String, IEquipletSim> equiplets;
+	
 	public static Grid getInstance() {
 		if (mGrid == null) {
 			mGrid = new Grid();
@@ -35,27 +32,13 @@ public class Grid {
 
 	private Grid() {
 		System.out.println("GRID: initiate");
-		logistics = new Logistics();
-		equiplets = new HashMap<String, Equiplet>();
-		Config config = Config.read();
-		stochastics = new Stochastics(config);
-		travelCost = config.getTravelTime().first;
+		equiplets = new HashMap<String, IEquipletSim>();
 
-		// fill equiplets
-		for (Equiplet equiplet : config.getEquipletList()) {
-			equiplets.put(equiplet.getEquipletName(), equiplet);
-		}
-
-		System.out.println("GRID: config " + config);
 		System.out.println("GRID: initialized");
 	}
 
-	/**
-	 * 
-	 * @return the logistics agent from the grid
-	 */
-	public Logistics getLogisticAgent() {
-		return logistics;
+	public void registerEquiplets(String name, IEquipletSim equiplet) {
+		equiplets.put(name, equiplet);
 	}
 
 	/**
@@ -66,13 +49,13 @@ public class Grid {
 	 *            name
 	 * @return list of equiplets that registed the service
 	 */
-	public List<Equiplet> serviceSearch(String service) {
-		List<Equiplet> suitedEquiplets = new ArrayList<>();
-		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
-			Equiplet equiplet = entry.getValue();
-			if (equiplet.providesService(service)) {
-				suitedEquiplets.add(equiplet);
-			}
+	public List<IEquipletSim> serviceSearch(String service) {
+		List<IEquipletSim> suitedEquiplets = new ArrayList<>();
+		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+			IEquipletSim equiplet = entry.getValue();
+			//if (equiplet.(service)) {
+				//suitedEquiplets.add(equiplet);
+			//}
 		}
 		return suitedEquiplets;
 	}
@@ -81,7 +64,7 @@ public class Grid {
 	public String toString() {
 		StringBuilder builder = new StringBuilder("Grid [equiplets=");
 		builder.append("\n[\n\t");
-		for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
+		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
 			builder.append(equiplet.toString());
 			builder.append(", \n\t");
 		}
@@ -90,20 +73,16 @@ public class Grid {
 		return builder.toString();
 	}
 
-	public Equiplet getEquiplet(String equiplet) {
+	public IEquipletSim getEquiplet(String equiplet) {
 		return equiplets.get(equiplet);
 	}
 
-	protected double getTravelTime(Position a, Position b) {
-		int travelSquares = Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
-		return stochastics.generateTravelTime(travelSquares);
-	}
-
-	protected Map<String, Equiplet> getEquiplets() {
+	protected Map<String, IEquipletSim> getEquiplets() {
 		return equiplets;
 	}
 
-	public double getTravelCost() {
-		return travelCost;
+	public void killAgent(String name) {
+		// TODO Auto-generated method stub
+		
 	}
 }

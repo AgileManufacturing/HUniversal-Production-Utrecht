@@ -16,11 +16,9 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import simulation.mas.equiplet.Capability;
-import simulation.mas.equiplet.Equiplet;
 import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
 import simulation.util.Position;
-import simulation.util.Triple;
 
 // import simulation.mas.Equiplet;
 
@@ -118,22 +116,20 @@ public class Config {
 		return equipletConfig;
 	}
 	
-	public Map<String, Triple<Position, List<Capability>, Map<String, Double>>> getEquipletsConfigurations() {
-		Map<String, Triple<Position, List<Capability>, Map<String, Double>>> equiplets = new HashMap<String, Triple<Position, List<Capability>, Map<String, Double>>>();
+	public Map<String, Pair<Position, List<Capability>>> getEquipletsConfigurations() {
+		Map<String, Pair<Position, List<Capability>>> equiplets = new HashMap<>();
 		for (EquipletConfig e : equipletConfig) {
 			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
 			List<Capability> capabilities = new ArrayList<>();
-			HashMap<String, Double> productionTimes  = new HashMap<>();
 			for (CapabilityConfig c : e.getCapabilities()) {
-				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>()));
-				productionTimes.put(c.getName(), equipletProductionTime(e.getName(), c.getName()).first);
+				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), equipletProductionTime(e.getName(), c.getName()).first));
 			}
 			
-			equiplets.put(e.getName(), new Triple<Position, List<Capability>, Map<String, Double>>(position, capabilities, productionTimes));
+			equiplets.put(e.getName(), new Pair<Position, List<Capability>>(position, capabilities));
 		}
 		return equiplets;
 	}
-
+/*
 	public List<Equiplet> getEquipletList() {
 		ArrayList<Equiplet> equiplets = new ArrayList<>();
 		for (EquipletConfig e : equipletConfig) {
@@ -149,6 +145,22 @@ public class Config {
 		}
 		return equiplets;
 	}
+*/
+	/*
+	public List<Triple<String, Position, List<Capability>>> getEquipletList() {
+		List<Triple<String, Position, List<Capability>>> equiplets = new ArrayList<>();
+		for (EquipletConfig e : equipletConfig) {
+			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
+			List<Capability> capabilities = new ArrayList<>();
+			for (CapabilityConfig c : e.getCapabilities()) {
+				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), equipletProductionTime(e.getName(), c.getName()).first));
+			}
+			
+			equiplets.add(new Triple<>(e.getName(), position, capabilities));
+		}
+		return equiplets;
+	}
+	*/
 
 	public Pair<Double, DurationType> equipletProductionTime(String equiplet, String service) {
 		for (EquipletConfig config : equipletConfig) {

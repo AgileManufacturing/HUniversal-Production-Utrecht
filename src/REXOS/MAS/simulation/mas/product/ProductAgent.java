@@ -20,14 +20,11 @@ import java.util.Map.Entry;
 
 import org.json.JSONException;
 
-import simulation.simulation.ISimulation;
 import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
-import simulation.util.Settings;
 import simulation.util.Triple;
-import simulation.util.Util;
 
 public class ProductAgent extends Agent {
 	/**
@@ -41,13 +38,6 @@ public class ProductAgent extends Agent {
 	private Position position;
 	private double deadline;
 	private ProductState state;
-	private ISimulation simulation;
-
-	public ProductAgent(ISimulation simulation, LinkedList<ProductStep> productSteps, Position startPosition, double time) {
-		this.simulation = simulation;
-		this.created = time;
-		setup(productSteps, startPosition);
-	}
 
 	public void setup() {
 		Object[] args = getArguments();
@@ -57,12 +47,16 @@ public class ProductAgent extends Agent {
 				setup(configuration.first, configuration.second);
 				this.created = Double.valueOf(System.currentTimeMillis());
 
+				addBehaviour(new ScheduleBehaviour(this, productSteps));
+				// /addBehaviour(new ScheduleBehaviours());
+				addBehaviour(new ProductListenerBehaviour());
+
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to parse the arguments\n", getLocalName());
 				System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
 				state = ProductState.ERROR;
 			}
-		} else if (simulation == null) {
+		} else {
 			System.err.printf("PA:%s Failed to receive correct arguments\n", getLocalName());
 			state = ProductState.ERROR;
 		}
@@ -73,13 +67,26 @@ public class ProductAgent extends Agent {
 		this.productSteps = productSteps;
 		this.productionPath = new LinkedList<>();
 
-		this.deadline = created + 10000;
+		this.deadline = getCreated() + 10000;
 		this.state = ProductState.SCHEDULING;
+		
+		System.out.printf("PA:%s initialize [created=%.2f, pos=%s, product steps=%s, deadline=%.0f]\n", getLocalName(), getCreated(), position, productSteps, deadline);
+	}
 
-		System.out.printf("PA:%s initialize [pos=%s, product steps=%s, deadline=%.0f]\n", getLocalName(), position, productSteps, deadline);
+	protected double getCreated() {
+		return created;
+	}
 
-		addBehaviour(new ScheduleBehaviour());
-		addBehaviour(new ProductListenerBehaviour());
+	protected double getDeadline() {
+		return deadline;
+	}
+
+	protected ProductState getProductState() {
+		return state;
+	}
+
+	protected Position getPosition() {
+		return position;
 	}
 
 	public class ProductListenerBehaviour extends Behaviour {
@@ -145,7 +152,8 @@ public class ProductAgent extends Agent {
 		}
 	}
 
-	public class ScheduleBehaviour extends Behaviour {
+	@Deprecated
+	public class ScheduleBehaviours extends Behaviour {
 
 		/**
 		 * 
@@ -160,7 +168,7 @@ public class ProductAgent extends Agent {
 		 */
 		private Map<AID, Pair<Double, Position>> equipletInfo;
 
-		public ScheduleBehaviour() {
+		public ScheduleBehaviours() {
 			searched = false;
 			scheduled = false;
 
@@ -190,7 +198,7 @@ public class ProductAgent extends Agent {
 						message.setOntology(Ontology.GRID_ONTOLOGY);
 						message.setConversationId(Ontology.CONVERSATION_CAN_EXECUTE);
 						message.setReplyWith(Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis());
-						message.setContent(Parser.parseCanExecute(created, deadline, entry.getValue()));
+						message.setContent(Parser.parseCanExecute(getCreated(), deadline, entry.getValue()));
 						send(message);
 					} catch (JSONException e) {
 						System.err.printf("PA:%s failed to construct message to equiplet for asking can execute %s.\n", getLocalName(), entry.getValue());
@@ -214,8 +222,10 @@ public class ProductAgent extends Agent {
 
 						System.out.printf("PA:%s can execute reply received from %s : %s.\n", getLocalName(), msg.getSender().getLocalName(), msg.getContent());
 						try {
-							// Triple < List of product steps, load, position >
+							// answes = list of product steps < product step index, duration of service, list of possibilities >, load of the equiplet, and position of equiplet
 							Triple<List<Triple<Integer, Double, List<Pair<Double, Double>>>>, Double, Position> answer = Parser.parseCanExecuteAnswer(msg.getContent());
+
+							// add load and position of equiplet to equiplet info
 							equipletInfo.put(msg.getSender(), new Pair<Double, Position>(answer.second, answer.third));
 
 							// Triple < product step index, estimate production, possible times >
@@ -245,29 +255,29 @@ public class ProductAgent extends Agent {
 					}
 				}
 
-				boolean succeeded = true;
-				LinkedList<Node> nodes = calculateEDDPath(created, deadline, position, productSteps, options);
-				if (nodes == null || nodes.size() != productSteps.size()) {
-					System.out.println("P:" + getLocalName() + "  FAILED to find production path nodes=" + (nodes != null ? nodes : "null"));
-					state = ProductState.ERROR;
-					succeeded = false;
-
-					// let the simulation know that the creation of product agent failed
-					simulation.notifyProductCreationFailed(getLocalName());
-				} else {
-					succeeded = schedule(nodes);
-					scheduled = succeeded;
-
-					System.out.printf("PA:%s scheduled the following production path: %s.\n", getLocalName(), productionPath);
-
-					// if all succeed: product will travel to first equiplet
-					if (succeeded) {
-						simulation.notifyProductCreated(getLocalName(), productionPath.peek().getEquipletName());
-						state = ProductState.TRAVELING;
-					} else {
-						simulation.notifyProductCreationFailed(getLocalName());
-					}
-				}
+				/*
+				 * Scheduling scheduling = new Scheduling(getLocalName(), getCreated(), deadline, position, productSteps, options, equipletInfo);
+				 * LinkedList<Node> nodes = scheduling.calculateEDDPath();
+				 * 
+				 * boolean succeeded = true;
+				 * if (nodes == null || nodes.size() != productSteps.size()) {
+				 * System.out.println("P:" + getLocalName() + "  FAILED to find production path nodes=" + (nodes != null ? nodes : "null"));
+				 * state = ProductState.ERROR;
+				 * succeeded = false;
+				 * } else {
+				 * succeeded = schedule(nodes, deadline);
+				 * scheduled = succeeded;
+				 * 
+				 * System.out.printf("PA:%s scheduled the following production path: %s.\n", getLocalName(), productionPath);
+				 * 
+				 * // if all succeed: product will travel to first equiplet
+				 * 
+				 * if (succeeded) {
+				 * state = ProductState.TRAVELING;
+				 * }
+				 * }
+				 * schedulingFinished(succeeded);
+				 */
 
 			}
 
@@ -310,132 +320,37 @@ public class ProductAgent extends Agent {
 			return suitedEquiplets;
 		}
 
-		private LinkedList<Node> calculateEDDPath(double time, double deadline, Position position, List<ProductStep> productSteps, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions) {
-			Graph<Node> graph = new Graph<>();
-
-			Node source = new Node(time);
-			Node sink = new Node();
-
-			graph.add(source);
-			graph.add(sink);
-
-			if (Settings.DEBUG_SCHEDULING) {
-				System.out.printf("\nPA:%s calculate best path \ninfo: \t %s\noptions: \t%s\n", getLocalName(), Util.formatArray(equipletInfo), Util.formatArray(serviceOptions));
-			}
-
-			// list of node in the last column
-			ArrayList<Node> lastNodes = new ArrayList<Node>();
-			lastNodes.add(source);
-
-			for (ProductStep step : productSteps) {
-				Map<AID, Pair<Double, List<Pair<Double, Double>>>> options = serviceOptions.get(step.getIndex());
-
-				if (Settings.DEBUG_SCHEDULING) {
-					System.out.printf("\nPA:%s construct scheduling graph, step=%s, from nodes=%s, with options=%s.\n\n", getLocalName(), step, lastNodes, Util.formatArray(options));
-				}
-
-				// keep track of the equiplets to process in the next iteration
-				ArrayList<Node> equipletNodes = new ArrayList<Node>();
-
-				// add a node with an arc to each node in the previous column
-				for (Node node : lastNodes) {
-
-					// Entry < Equiplet, Pair < duration, List of possible time options > >
-					for (Entry<AID, Pair<Double, List<Pair<Double, Double>>>> option : options.entrySet()) {
-
-						Position lastPosition = node != source ? equipletInfo.get(node.getEquipletAID()).second : position;
-						Position nextPosition = equipletInfo.get(option.getKey()).second;
-
-						double duration = option.getValue().first;
-						double travel = caclulateTravelTime(lastPosition, nextPosition);
-						double arrival = node.getTime() + node.getDuration() + travel;
-						double firstPossibilty = Double.MAX_VALUE;
-
-						// Time option is the time from : first until : second the equiplet is possible to perform the service
-						for (Pair<Double, Double> timeOption : option.getValue().second) {
-							// choose the best time to perform the product step
-							if (timeOption.first < firstPossibilty && arrival < timeOption.second) {
-
-								// TODO performance improvement
-								firstPossibilty = Math.max(timeOption.first, arrival); // set the first possibility, the first is the time the equiplet is able to perform or when
-																						// the
-																						// product can arrive by the equiplet
-							}
-						}
-
-						// check if deadline can be reached
-						if (arrival < deadline) {
-
-							Node nextNode = new Node(option.getKey(), firstPossibilty, duration);
-
-							double window = deadline - arrival;
-							double cost = 1 - (firstPossibilty - created) / window;
-
-							if (cost < 0) { // ) && Settings.DEBUG_SCHEDULING) {
-								// shouldn't occur as it would mean arrival > deadline 
-								System.out.println("FAILED maybe because the: deadline=" + deadline);
-								System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
-							}
-
-							graph.add(node, nextNode, cost);
-							equipletNodes.add(nextNode);
-
-							if (Settings.DEBUG_SCHEDULING) {
-								System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibilty, window, arrival);
-							}
-						}
-					}
-				}
-
-				lastNodes.clear();
-				lastNodes.addAll(equipletNodes);
-			}
-
-			// add vertces from all the nodes in the last column to the sink node
-			for (Node node : lastNodes) {
-				graph.add(node, sink, 0);
-			}
-
-			LinkedList<Node> path = graph.optimumPath(source, sink);
-			if (path.size() > 1) {
-				path.removeFirst();
-				path.removeLast();
-			} else if (path.isEmpty()) {
-				System.err.printf("PA:%s Failed to find path in %s\n", getLocalName(), graph);
-			}
-
-			if (Settings.DEBUG_SCHEDULING) {
-				System.out.println("the last equiplet nodes to be processed: " + lastNodes);
-				System.out.println("Graph: " + graph);
-			}
-
-			return path;
-		}
-
-		private boolean schedule(LinkedList<Node> nodes) {
-			int sendCounter = 0;
+		private boolean schedule(LinkedList<Node> nodes, double deadline) {
 			LinkedList<ProductionStep> path = new LinkedList<>();
+			HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
 			for (int i = 0; i < nodes.size(); i++) {
 				Node node = nodes.get(i);
-				ProductStep step = productSteps.get(i);
 				AID equiplet = node.getEquipletAID();
-				path.add(new ProductionStep(step, equiplet, equipletInfo.get(equiplet).second, node.getTime(), node.getDuration()));
+				ProductStep step = productSteps.get(i);
+				ProductionStep production = new ProductionStep(step, equiplet, equipletInfo.get(equiplet).second, node.getTime(), node.getDuration());
+				path.add(production);
 
-				String service = step.getService();
-				Map<String, Object> criteria = step.getCriteria();
+				if (!sendList.containsKey(equiplet)) {
+					sendList.put(equiplet, new ArrayList<ProductionStep>());
+				}
 
+				sendList.get(equiplet).add(production);
+			}
+
+			int sendCounter = 0;
+			for (Entry<AID, ArrayList<ProductionStep>> entry : sendList.entrySet()) {
 				try {
 					// Ask the equiplet to schedule the service
 					ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-					message.addReceiver(equiplet);
+					message.addReceiver(entry.getKey());
 					message.setOntology(Ontology.GRID_ONTOLOGY);
 					message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
 					message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
-					message.setContent(Parser.parseSchedule(service, criteria, node.getTime(), deadline));
+					message.setContent(Parser.parseScheduleRequest(entry.getValue(), deadline));
 					send(message);
 					sendCounter++;
 				} catch (JSONException e) {
-					System.err.printf("PA:%s failed to construct message to equiplet %s for scheduling.\n", getLocalName(), equiplet);
+					System.err.printf("PA:%s failed to construct message to equiplet %s for scheduling.\n", getLocalName(), entry.getKey());
 					System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
 				}
 			}
@@ -461,22 +376,20 @@ public class ProductAgent extends Agent {
 		}
 	}
 
-	private double caclulateTravelTime(Position a, Position b) {
-		int travelSquares = Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
-		return 0.5 * travelSquares;
+	public void schedulingFinished(boolean succeeded, LinkedList<ProductionStep> path) {
+		productionPath = path;
+		schedulingFinished(succeeded);
 	}
 
-	protected ProductState getProductState() {
-		return state;
-	}
-
-	public Position getPosition() {
-		return position;
+	protected void schedulingFinished(boolean succeeded) {
+		if (!succeeded) {
+			state = ProductState.ERROR;
+		}
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, created, position, (productionPath.size() > 0 ? productionPath.peek()
+		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, getCreated(), position, (productionPath.size() > 0 ? productionPath.peek()
 				: "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
 	}
 
@@ -518,28 +431,16 @@ public class ProductAgent extends Agent {
 
 		if (productionPath.isEmpty()) {
 			state = ProductState.FINISHED;
-
-			// notify simulation product finished
-			simulation.notifyProductFinished(getLocalName());
 		} else {
 			state = ProductState.TRAVELING;
-
-			simulation.notifyProductTraveling(getLocalName(), productionPath.peek().getEquipletName());
 		}
 	}
 
 	protected void onProductProcessing() {
 		state = ProductState.PROCESSING;
-
-		// notify the simulation that processing begins
-		simulation.notifyProductProcessing(getLocalName(), productionPath.peek().getEquipletName(), productionPath.peek().getService());
 	}
 
-	private ProductionStep getCurrentStep() {
+	protected ProductionStep getCurrentStep() {
 		return productionPath.peek();
-	}
-
-	public double getCreated() {
-		return created;
 	}
 }

@@ -35,19 +35,22 @@ class Stochastics {
 
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
-			 //return generateProductStepsTest();
+			return generateProductStepsTest();
 		}
 		
+		@SuppressWarnings("unused")
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
-		int n = 2 + (int) (random.nextDouble() * (productSteps.size() - 2));
+		int minProductSteps= 3;
+		int avgProductSteps = 6;
+		int n = minProductSteps + random.nextInt(avgProductSteps - minProductSteps);
 		for (int i = 0; i < n; i++) {
 			double u = random.nextDouble() * 100;
 			int sum = 0;
 			for (ProductStep productStep : productSteps) {
 				sum += config.getProductStepProbablity(productStep);
 				if (u <= sum) {
-					steps.add(productStep);
+					steps.add(new ProductStep(i, productStep.getService(), productStep.getCriteria()));
 					break;
 				}
 			}
@@ -59,13 +62,12 @@ class Stochastics {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 
-		steps.add(productSteps.get(0));
-		steps.add(productSteps.get(0));
-		steps.add(productSteps.get(0));
-		steps.add(productSteps.get(1));
-		steps.add(productSteps.get(2));
-		steps.add(productSteps.get(3));
-	
+		steps.add(new ProductStep(0, productSteps.get(0).getService(), productSteps.get(0).getCriteria()));
+		steps.add(new ProductStep(1, productSteps.get(0).getService(), productSteps.get(0).getCriteria()));
+		steps.add(new ProductStep(2, productSteps.get(0).getService(), productSteps.get(0).getCriteria()));
+		steps.add(new ProductStep(3, productSteps.get(1).getService(), productSteps.get(1).getCriteria()));
+		steps.add(new ProductStep(4, productSteps.get(2).getService(), productSteps.get(2).getCriteria()));
+		steps.add(new ProductStep(5, productSteps.get(3).getService(), productSteps.get(3).getCriteria()));
 		return steps;
 	}
 
@@ -92,7 +94,7 @@ class Stochastics {
 	private double time(double time, DurationType type) {
 		switch (type) {
 		case EXP:
-			return exp(time);
+			// return exp(time);
 		case WEIBULL:
 			//return weibull(1, time);
 		case GAMMA:

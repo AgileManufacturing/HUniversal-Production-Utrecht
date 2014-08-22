@@ -31,7 +31,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import simulation.mas.equiplet.Equiplet;
-import simulation.simulation.Simulation;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.Triple;
@@ -60,11 +59,9 @@ public class SimInterface {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-
 					SimInterface window = new SimInterface();
-					Control simulation = new Simulation(window);
-					simulation.start();
-					window.setSimulation(simulation);
+					//Control simulation = new Simulation(window);
+					//window.setSimulation(simulation);
 					window.initContent();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -489,6 +486,7 @@ public class SimInterface {
 		gridView.update(equipletStates);
 	}
 
+	@Deprecated
 	public void update(double time, int products, int productCount, int totalSteps, Map<String, Pair<Position, Tuple<String, Integer, Integer, Integer>>> equiplets, double waitingTime, List<Double> busy, double throughput) {
 		String[] busyValues = new String[busy.size()];
 		for (int i = 0; i < busy.size(); i++) {
@@ -507,6 +505,7 @@ public class SimInterface {
 		gridView.update(equiplets);
 	}
 
+	@Deprecated
 	public void update(double time, int products, int productCount, int totalSteps, Collection<Equiplet> equiplets, double waitingTime, List<Double> busy, double throughput) {
 		String[] busyValues = new String[busy.size()];
 		for (int i = 0; i < busy.size(); i++) {
@@ -522,7 +521,7 @@ public class SimInterface {
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));
 		lblBusy.setText(Arrays.toString(busyValues));
 		lblThroughput.setText(String.format("%.2f", throughput));
-		gridView.update(equiplets);
+		// gridView.update(equiplets);
 
 	}
 }

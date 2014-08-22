@@ -77,7 +77,7 @@ public class Job implements Comparable<Job> {
 		return start;
 	}
 
-	public double getDueTime() {
+	public double getDue() {
 		return due;
 	}
 

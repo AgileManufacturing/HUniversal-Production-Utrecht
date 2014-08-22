@@ -16,6 +16,7 @@ import simulation.config.Config;
 import simulation.config.DurationType;
 import simulation.graphics.StackedBarChart;
 import simulation.graphics.StaticSimInterface;
+import simulation.mas.equiplet.Capability;
 import simulation.util.Pair;
 import simulation.util.Triple;
 
@@ -81,9 +82,13 @@ public class Simulation extends Thread {
 
 		// fill equiplets
 		int equipletCounter = 0;
-		for (simulation.mas.equiplet.Equiplet equiplet : config.getEquipletList()) {
-			Position position = new Position(equiplet.getPosition().getX(), equiplet.getPosition().getY());
-			equiplets.put(equipletCounter, new Equiplet(equiplet.getEquipletName(), equiplet.getServices(), position));
+		for (Entry<String, Pair<simulation.util.Position, List<Capability>>> equiplet : config.getEquipletsConfigurations().entrySet()) {
+			Position position = new Position(equiplet.getValue().first.getX(), equiplet.getValue().first.getY());
+			List<String> services = new ArrayList<>();
+			for(Capability capability : equiplet.getValue().second) {
+				services.add(capability.getService());
+			}
+			equiplets.put(equipletCounter, new Equiplet(equiplet.getKey(), services, position));
 			B.put(equipletCounter, 0.0);
 
 			scheduleBreakdown(time, equipletCounter);

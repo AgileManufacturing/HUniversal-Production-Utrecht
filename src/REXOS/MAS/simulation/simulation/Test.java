@@ -1,8 +1,9 @@
 package simulation.simulation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
@@ -15,14 +16,34 @@ import simulation.mas.product.Node;
 import simulation.mas.product.Product;
 import simulation.mas.product.ProductStep;
 import simulation.mas.product.ProductionStep;
+import simulation.util.Pair;
 import simulation.util.Position;
 
 class Test {
 	
 	public static void main(String[] args) {
-		productScheduling();	
+
+		Set<Pair<Position, Position>> routes = new HashSet<>();
+		Position pos1 = new Position(0,0);
+		Position pos2 = new Position(2,0);
+		Position pos3 = new Position(2,0);
+		Position pos4 = new Position(0,0);
+		
+		Pair<Position, Position> route1 = new Pair<Position, Position>(pos1, pos2);
+		Pair<Position, Position> route2 = new Pair<Position, Position>(pos4, pos3);
+		
+		routes.add(route1);
+		routes.add(route2);
+
+		System.out.printf("pos1 %s == pos4 %s = %b\n\n", pos1, pos4, (pos1.equals(pos4)));
+		System.out.printf("route1 %s == route1 %s = %b\n\n", route1, route1, (route1.equals(route1)));
+		System.out.println("routes: " + routes);
+		//productScheduling();
 	}
 	
+	public Test() {
+		
+	}
 	
 	public void testGraph() {
 		Graph<TNode> graph = new Graph<TNode>();
@@ -70,9 +91,10 @@ class Test {
 
 		System.out.println("TEst NODE + " + new Node(4));
 		LinkedList<ProductStep> productSteps = new LinkedList<ProductStep>();
-		productSteps.add(new ProductStep(1, "screw", new HashMap<String, Object>()));
-		productSteps.add(new ProductStep(2, "glue", new HashMap<String, Object>()));
+		//productSteps.add(new ProductStep(1, "screw", new HashMap<String, Object>()));
+		//productSteps.add(new ProductStep(2, "glue", new HashMap<String, Object>()));
 
+		/*
 		Product p0 = new Product("P0", 0, productSteps, new Position(0,0));
 		System.out.println("P1: " + p0 + "\n");
 		
@@ -91,6 +113,7 @@ class Test {
 		Product p5 = new Product("P5", 40, productSteps, new Position(0,0));
 		System.out.println("P5: " + p5 + "\n");
 
+
 		ArrayList<Product> agents = new ArrayList<>();
 		agents.add(p1);
 		agents.add(p2);
@@ -98,6 +121,7 @@ class Test {
 		agents.add(p4);
 		agents.add(p5);
 		output(agents);
+		*/ 
 	}
 
 	/**
@@ -108,10 +132,10 @@ class Test {
 		System.out.println("Start product scheduling test...");
 
 		LinkedList<ProductStep> productSteps = new LinkedList<ProductStep>();
-		productSteps.add(new ProductStep(1, "Fails", new HashMap<String, Object>()));
-		Product p1 = new Product("PFAILED", 0, productSteps, new Position(0,0));
+		//productSteps.add(new ProductStep(1, "Fails", new HashMap<String, Object>()));
+		//Product p1 = new Product("PFAILED", 0, productSteps, new Position(0,0));
 
-		System.out.println("P1: " + p1);
+		//System.out.println("P1: " + p1);
 
 		Grid grid = Grid.getInstance();
 		System.out.println("grid: " + grid);
@@ -127,7 +151,7 @@ class Test {
 
 		for (Product agent : agents) {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
-			TaskSeries serie = new TaskSeries(agent.getName());
+			TaskSeries serie = new TaskSeries(agent.getProductName());
 			for (ProductionStep step : path) {
 				serie.add(new Task(step.getEquipletName(), new SimpleTimePeriod((long) step.getTime(), (long)(step.getTime() + step.getDuration()))));
 			}
@@ -141,8 +165,7 @@ class Test {
 	}
 
 	/**
-	 * @author laurens
-	 *         Test node for the graph
+	 * Test node for the graph
 	 */
 	static class TNode {
 		String name;

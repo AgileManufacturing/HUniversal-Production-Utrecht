@@ -54,14 +54,16 @@ public class ParserPrimitives {
 		JSONObject json = new JSONObject();
 		json.put("service", capability.getService());
 		json.put("limitations", parseMap(capability.getLimitations()));
+		json.put("duration", capability.getDuration());
 		return json;
 	}
 
 	protected static Capability parseCapabilty(JSONObject json) throws JSONException {
-		if (json.has("service") && json.has("limitations")) {
+		if (json.has("service") && json.has("limitations") && json.has("duration")) {
 			String service = json.getString("service");
 			Map<String, Object> limitations = parseMap(json.getJSONArray("limitations"));
-			return new Capability(service, limitations);
+			double duration = json.getDouble("duration");
+			return new Capability(service, limitations, duration);
 		} else {
 			throw new JSONException("Parser: parsing capability missing arguments service and/or limitations in " + json);
 		}

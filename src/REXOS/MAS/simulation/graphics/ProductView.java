@@ -117,11 +117,11 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 	private void createNodes(DefaultMutableTreeNode top) {
 		for (Entry<String, Product> entry: products.entrySet()) {
 			Product product = entry.getValue();
-			DefaultMutableTreeNode category = new DefaultMutableTreeNode(product.getName());
+			DefaultMutableTreeNode category = new DefaultMutableTreeNode(product.getProductName());
 			top.add(category);			
 
 			category.add(new DefaultMutableTreeNode(product.getCreated()));
-			category.add(new DefaultMutableTreeNode(product.getState()));
+			category.add(new DefaultMutableTreeNode(product.getProductState()));
 			category.add(new DefaultMutableTreeNode(product.getPosition()));
 			category.add(new DefaultMutableTreeNode(product.getExecutingStep()));
 			category.add(new DefaultMutableTreeNode(product.getNextEquipet()));
