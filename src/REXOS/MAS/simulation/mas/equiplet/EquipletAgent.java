@@ -135,19 +135,34 @@ public class EquipletAgent extends Equiplet {
 			String service = data.third;
 			Map<String, Object> criteria = data.fourth;
 
-			double duration = estimateService(service);
+			// check if the equiplet still capable
+			if (isCapable(service, criteria)) {
+				// if the request start is after the due time of the executing job
+				if (!isExecuting() || start >= executing.getDue()) {
+					double duration = estimateService(service);
 
-			System.out.printf("EA:%s schedule [product=%s, start=%.2f, duration=%.2f, deadline=%.2f, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
+					System.out.printf("EA:%s schedule [product=%s, start=%.2f, duration=%.2f, deadline=%.2f, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
 
-			if (schedule.subSet(new Job(start, 0), true, new Job(start, start + duration), true).isEmpty()) {
-				Job job = new Job(product, service, criteria, start, start + duration, deadline);
+					if (schedule.subSet(new Job(start, 0), true, new Job(start, start + duration), true).isEmpty()) {
+						Job job = new Job(product, service, criteria, start, start + duration, deadline);
 
-				possible.add(job);
+						possible.add(job);
+					} else {
+						// this shouldn't yet occur (not in the simulation), a equiplet should never give a product the available time which cannot be scheduled
+						System.err.println("\n----------\nstart=" + start + ", due=" + (start + duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
+						throw new IllegalArgumentException("Overlap schedule() ");
+						// return false;
+					}
+				} else {
+					// this shouldn't occur, TODO remove exception and log the error and return false, send fail message which must be handled!
+					System.err.printf("EA:%s failed to schedule: request to schedule job starting at %.2f when still executing %s other job.\n", getLocalName(), start, executing);
+					throw new IllegalArgumentException("request to schedule job starting at " + start + " when still executing " + executing + " other job");
+				}
 			} else {
-
-				System.out.println("\n----------\nstart=" + start + ", due=" + (start + duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
-				//throw new IllegalArgumentException("Overlap schedule() ");
-				// return false;
+				// this shouldn't occur, TODO remove exception nd log the error and return false, send fail message which must be handled!
+				// maybe possible when reconfigured??? probable not.
+				System.err.printf("EA:%s failed to schedule: not capable to execute service %s with criteria %s.\n", getLocalName(), service, criteria);
+				throw new IllegalArgumentException("not capable to execute service " + service + " with criteria " + criteria);
 			}
 		}
 
@@ -178,6 +193,26 @@ public class EquipletAgent extends Equiplet {
 
 		return true;
 
+	}
+	
+	protected void updateSchedule() {
+		// After being broken down and repaired the jobs in the schedule can be delayed.
+		// The executing job is updated with the new due time
+		// The scheduled jobs should have, depending if the jobs are continuous scheduled, a new start time added with the delay
+		// Although the jobs doesn't have to be continuous scheduled, the start time depends on the due date of the previous job
+		// The new start time is the max of ( due time of previous job, or the original start time)
+		if (isExecuting()) {
+			double dueTime = executing.getDue();
+			for (Job job : schedule) {
+				if (dueTime > job.getStartTime()) {
+					job.updateStartTime(dueTime);
+					dueTime = job.getDue();
+				} else {
+					// no change in start time, so continuing would not change the schedule
+					break;
+				}
+			}
+		}
 	}
 
 	@Override

@@ -121,7 +121,7 @@ public class ParserPrimitives {
 		return map;
 	}
 
-	protected static JSONArray parseProductSteps(List<ProductStep> productSteps) throws JSONException {
+	protected static JSONArray parseProductSteps(LinkedList<ProductStep> productSteps) throws JSONException {
 		JSONArray list = new JSONArray();
 		for (ProductStep productStep : productSteps) {
 			list.put(parseProductStep(productStep));
@@ -129,7 +129,7 @@ public class ParserPrimitives {
 		return list;
 	}
 
-	protected static List<ProductStep> parseProductSteps(JSONArray list) throws JSONException {
+	protected static LinkedList<ProductStep> parseProductSteps(JSONArray list) throws JSONException {
 		LinkedList<ProductStep> productSteps = new LinkedList<ProductStep>();
 		for (int i = 0; i < list.length(); i++) {
 			JSONObject item = list.getJSONObject(i);

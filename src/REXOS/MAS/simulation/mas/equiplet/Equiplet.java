@@ -211,32 +211,32 @@ public abstract class Equiplet extends Agent {
 		} else {
 			
 		}
-			
-			Iterator<Job> it = schedule.iterator();
-			while (it.hasNext()) {
-				Job job = it.next();
+		
+		Iterator<Job> it = schedule.iterator();
+		while (it.hasNext()) {
+			Job job = it.next();
 
-				if (job.getStartTime() > start) {
+			if (job.getStartTime() >= start) {
 
-					if (job.getStartTime() - start > duration) {
+				if (job.getStartTime() - start > duration) {
 
-						if (job.getStartTime() < deadline) {
-							available.add(new Pair<Double, Double>(start, job.getStartTime()));
-							start = job.getDue();
-						} else {
-							available.add(new Pair<Double, Double>(start, deadline));
-							break;
-						}
-					} else {
+					if (job.getStartTime() < deadline) {
+						available.add(new Pair<Double, Double>(start, job.getStartTime()));
 						start = job.getDue();
+					} else {
+						available.add(new Pair<Double, Double>(start, deadline));
+						break;
 					}
-				}
-				
-				if (!it.hasNext()) {
-					available.add(new Pair<Double, Double>(start, deadline));
+				} else {
+					start = job.getDue();
 				}
 			}
-		
+			
+			if (!it.hasNext()) {
+				available.add(new Pair<Double, Double>(start, deadline));
+			}
+		}
+	
 		return available;
 		
 		/*

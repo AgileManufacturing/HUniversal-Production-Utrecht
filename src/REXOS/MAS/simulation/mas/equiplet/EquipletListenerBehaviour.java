@@ -87,7 +87,6 @@ public class EquipletListenerBehaviour extends Behaviour {
 			String content = Parser.parseCanExecuteAnswer(answer, load, position);
 
 			// send can execute reply
-
 			ACLMessage reply = message.createReply();
 			reply.setContent(content);
 			reply.setPerformative(ACLMessage.PROPOSE);

@@ -87,7 +87,7 @@ public class Simulation implements ISimulation, Control {
 	public Simulation(ISimControl simulation) {
 		this.simulation = simulation;
 
-		delay = 400;
+		delay = 0;
 
 		finished = false;
 		running = false;
@@ -177,28 +177,6 @@ public class Simulation implements ISimulation, Control {
 				}
 
 				// wait if needed to continue with the next event
-				/*
-				 * synchronized (Object) {
-				 * System.out.println("WAIT ON LOCK. ready=" + eventReady);
-				 * while (!eventReady) {
-				 * simulation.delay(10);
-				 * }
-				 * }
-				 */
-
-				/*
-				 * synchronized (LOCK) {
-				 * System.out.println("WAIT ON LOCK. ready=" + eventReady);
-				 * while (!eventReady) {
-				 * try {
-				 * LOCK.wait();
-				 * } catch (InterruptedException ie) {
-				 * System.err.println("Simulation: waiting on lock InterruptedException " + ie.getMessage());
-				 * }
-				 * }
-				 * }
-				 */
-
 				System.out.println("Simulation: lock();");
 				lock.lock();
 				System.out.println("Simulation: continue");

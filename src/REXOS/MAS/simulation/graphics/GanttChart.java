@@ -136,9 +136,9 @@ public class GanttChart extends ApplicationFrame {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
 			TaskSeries serie = new TaskSeries(agent.getProductName());
 			for (ProductionStep node : path) {
-				serie.add(new Task(node.getEquipletName(), new SimpleTimePeriod((long) node.getTime(), (long) (node.getTime() + node.getDuration()))));
-				maxTime = Math.max(maxTime, node.getTime() + node.getDuration());
-				minTime = Math.min(minTime, node.getTime());
+				serie.add(new Task(node.getEquipletName(), new SimpleTimePeriod((long) node.getStart(), (long) (node.getStart() + node.getDuration()))));
+				maxTime = Math.max(maxTime, node.getStart() + node.getDuration());
+				minTime = Math.min(minTime, node.getStart());
 			}
 			tasks.add(serie);
 		}

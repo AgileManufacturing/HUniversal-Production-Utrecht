@@ -34,10 +34,10 @@ public class ScheduleBehaviour extends Behaviour {
 	 */
 	private static final long serialVersionUID = 1L;
 	private ProductAgent product;
-	private List<ProductStep> productSteps;
+	private LinkedList<ProductStep> productSteps;
 	private boolean done;
 
-	public ScheduleBehaviour(ProductAgent product, List<ProductStep> productSteps) {
+	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps) {
 		super(product);
 		this.product = product;
 		this.productSteps = productSteps;
@@ -58,14 +58,22 @@ public class ScheduleBehaviour extends Behaviour {
 
 			Map<Pair<Position, Position>, Double> travelTimes = retrieveTravelTimes(product.getPosition(), options, equipletInfo);
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), product.getCreated(), product.getDeadline(), product.getPosition(), productSteps, options, equipletInfo, travelTimes);
-			LinkedList<Node> nodes = scheduling.calculateEDDPath();
 
-			LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
+			boolean MATRIX_SCHEDULING = true;
+			if (MATRIX_SCHEDULING) {
+				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
+				schedule(productionPath, product.getDeadline());
+				product.schedulingFinished(true, productionPath);
+			} else {
+				LinkedList<Node> nodes = scheduling.calculateEDDPath();
 
-			product.schedulingFinished(true, productionPath);
+				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
+				product.schedulingFinished(true, productionPath);
+			}
+
 			done = true;
 		} catch (SchedulingException e) {
-			System.err.printf("PA:%s scheduling failed: %s", myAgent.getLocalName(), e.getMessage());
+			System.err.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
 			product.schedulingFinished(false);
 		}
 	}
@@ -122,7 +130,7 @@ public class ScheduleBehaviour extends Behaviour {
 				myAgent.send(message);
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to construct message to equiplet for asking can execute %s.\n", myAgent.getLocalName(), entry.getValue());
-				System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
+				System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
 			}
 		}
 
@@ -160,7 +168,7 @@ public class ScheduleBehaviour extends Behaviour {
 					}
 				} catch (JSONException e) {
 					System.err.printf("PA:%s failed to receive correct message from equiplet %s when asking can execute %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getContent());
-					System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
+					System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
 				}
 			} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
 				// equiplet is not able to execute the product step
@@ -223,7 +231,7 @@ public class ScheduleBehaviour extends Behaviour {
 			myAgent.send(message);
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), Settings.TRAFFIC_AGENT);
-			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
+			System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
 			throw new SchedulingException("failed retrieve travel times:" + e.getMessage());
 		}
 
@@ -241,14 +249,15 @@ public class ScheduleBehaviour extends Behaviour {
 			return travelTimes;
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), Settings.TRAFFIC_AGENT);
-			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
+			System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
 			throw new SchedulingException("failed retrieve travel times:" + e.getMessage());
 		}
 	}
 
-	private LinkedList<ProductionStep> schedule(LinkedList<Node> nodes, List<ProductStep> productSteps, Map<AID, Pair<Double, Position>> equipletInfo, double deadline)
+	private LinkedList<ProductionStep> schedule(LinkedList<Node> nodes, LinkedList<ProductStep> productSteps, Map<AID, Pair<Double, Position>> equipletInfo, double deadline)
 			throws SchedulingException {
 		LinkedList<ProductionStep> path = new LinkedList<>();
+		// construct send list grouped by equiplet
 		HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
 		for (int i = 0; i < nodes.size(); i++) {
 			Node node = nodes.get(i);
@@ -266,9 +275,26 @@ public class ScheduleBehaviour extends Behaviour {
 
 			sendList.get(equiplet).add(production);
 		}
-		
-		System.out.printf("PA:%s path to schedule: %s \n", myAgent.getLocalName(), nodes);
 
+		System.out.printf("PA:%s path to schedule: %s - send: %s\n", myAgent.getLocalName(), nodes, sendList);
+		schedule(sendList, deadline);
+		return path;
+	}
+
+	private void schedule(LinkedList<ProductionStep> path, double deadline) throws SchedulingException {
+		// construct send list grouped by equiplet
+		HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
+		for (ProductionStep production : path) {
+			if (!sendList.containsKey(production.getEquiplet())) {
+				sendList.put(production.getEquiplet(), new ArrayList<ProductionStep>());
+			}
+			sendList.get(production.getEquiplet()).add(production);
+		}
+		System.out.printf("PA:%s path to schedule: %s - send: %s\n", myAgent.getLocalName(), path, sendList);
+		schedule(sendList, deadline);
+	}
+
+	private void schedule(HashMap<AID, ArrayList<ProductionStep>> sendList, double deadline) throws SchedulingException {
 		int sendCounter = 0;
 		for (Entry<AID, ArrayList<ProductionStep>> entry : sendList.entrySet()) {
 			try {
@@ -284,18 +310,17 @@ public class ScheduleBehaviour extends Behaviour {
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to construct message to equiplet %s for scheduling.\n", myAgent.getLocalName(), entry.getKey());
 				System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
+				throw new SchedulingException("failed to construct message to equiplet for schedule product step");
 			}
 		}
 
 		while (sendCounter > 0) { // All agent have to answer
-			// change to blockingReceive(millis) or blockingReceive(MessageTemplate, millis) to enable a timeout and or message for enable more message handler
-			ACLMessage msg = myAgent.blockingReceive();
+			ACLMessage msg = myAgent.blockingReceive(Settings.COMMUNICATION_TIMEOUT);
 			if (msg != null && msg.getPerformative() == ACLMessage.CONFIRM) {
 				sendCounter--;
 			} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
-				throw new SchedulingException("Failed to get confirmation of all equiplets");
+				throw new SchedulingException("failed to get confirmation of all equiplets");
 			}
 		}
-		return path;
 	}
 }

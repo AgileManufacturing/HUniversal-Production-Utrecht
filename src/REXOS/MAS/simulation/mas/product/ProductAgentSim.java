@@ -48,6 +48,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	protected void onProductStepFinished() {
 		super.onProductStepFinished();
 
+		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
@@ -65,6 +66,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		simulation.notifyProductProcessing(getLocalName(), getCurrentStep().getEquipletName(), getCurrentStep().getService());
 	}
 
+	@Override
 	protected void schedulingFinished(boolean succeeded) {
 		System.out.println("scheduling finished");
 		// let the simulation know that the creation of product agent failed

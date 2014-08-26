@@ -15,6 +15,19 @@ public class ProductionStep {
 	private double time;
 	private double duration;
 
+	/**
+	 * 
+	 * @param productStep
+	 *            the product step
+	 * @param equilet
+	 *            the executing equiplet of the production step
+	 * @param position
+	 *            the position of the equiplet
+	 * @param time
+	 *            the start time of the product step
+	 * @param duration
+	 *            the estimate duration of the product step
+	 */
 	public ProductionStep(ProductStep productStep, AID equilet, Position position, double time, double duration) {
 		this.productStep = productStep;
 		this.equiplet = equilet;
@@ -31,14 +44,23 @@ public class ProductionStep {
 		this.duration = duration;
 	}
 
+	/**
+	 * @return the product step
+	 */
 	public ProductStep getProductStep() {
 		return productStep;
 	}
 
+	/**
+	 * @return the address of the equiplet
+	 */
 	public AID getEquiplet() {
 		return equiplet;
 	}
 
+	/**
+	 * @return the name of the equiplet
+	 */
 	public String getEquipletName() {
 		if (equiplet != null) {
 			return equiplet.getLocalName();
@@ -49,25 +71,52 @@ public class ProductionStep {
 	}
 
 	/**
+	 * {@link ProductionStep#position}
 	 * 
-	 * @return position of the equiplet
+	 * @return the position of the equiplet
 	 */
 	public Position getPosition() {
 		return position;
 	}
 
-	public double getTime() {
+	/**
+	 * {@link ProductionStep#time}
+	 * 
+	 * @return the scheduled start time of the product step
+	 */
+	public double getStart() {
 		return time;
 	}
 
+	/**
+	 * {@link ProductionStep#time}
+	 * 
+	 * @param time
+	 *            the new updated time of the product step
+	 */
+	public void updateStart(double time) {
+		this.time = time;
+	}
+
+	/**
+	 * {@link ProductionStep#duration}
+	 * 
+	 * @return the estimate duration of the product step
+	 */
 	public double getDuration() {
 		return duration;
 	}
 
+	/**
+	 * @return the service of the product step
+	 */
 	public String getService() {
 		return productStep.getService();
 	}
 
+	/**
+	 * @return the criteria of the product step
+	 */
 	public Map<String, Object> getCriteria() {
 		return productStep.getCriteria();
 	}

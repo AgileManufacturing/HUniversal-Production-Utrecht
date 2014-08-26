@@ -22,24 +22,30 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	private static final long serialVersionUID = 1L;
 
 	// Simulation variables
+	/**
+	 * time the equiplet breaks down
+	 */
 	private double timeBreakdown;
+	/**
+	 * the time remaining for the executing job after a breakdown
+	 */
 	private double timeRemaining;
 
+	// Simulation performances
 	/**
-	 * @var statistics Statistics contains the time the equiplet is in one of the states <BUSY, IDLE, ERROR>
-	 *      The states ERROR_READY and ERROR_FINISHED are counted as ERROR and ERROR_REPAIRED as BUSY
+	 * statistics Statistics contains the time the equiplet is in one of the states <BUSY, IDLE, ERROR>
+	 * The states ERROR_READY and ERROR_FINISHED are counted as ERROR and ERROR_REPAIRED as BUSY
 	 */
 	private Triple<Double, Double, Double> statistics;
 
 	/**
-	 * @var lastHistoryUpdate The last time the statistics is update to
-	 *      calculate the elapsed time between state changes
+	 * lastHistoryUpdate The last time the statistics is update to
+	 * calculate the elapsed time between state changes
 	 */
 	private double lastStatisticsUpdate;
 
 	/**
-	 * @var scheduleLatency A list of differences between the time and the time
-	 *      scheduled
+	 * scheduleLatency A list of differences between the time and the time scheduled
 	 */
 	private Map<Double, Double> scheduleLatency;
 
@@ -50,7 +56,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} catch (JSONException e) {
 			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
 		}
-		
+
 		lastStatisticsUpdate = 0;
 		statistics = new Triple<Double, Double, Double>(0.0, 0.0, 0.0);
 		scheduleLatency = new HashMap<Double, Double>();
@@ -210,6 +216,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		executing = schedule.pollFirst();
 
 		double latency = time - executing.getStartTime();
+//		if (latency > 0) {
+//			throw new IllegalArgumentException("latency can't be: " + latency + " > 0 for job=" + executing + ", schedule=" + schedule);
+//		}
 		scheduleLatency.put(time, latency);
 
 		executing.updateStartTime(time);
@@ -324,6 +333,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		if (state == EquipletState.ERROR_FINISHED) {
 			// the equiplet has already a finished event received, but is now repaired and can continue with the job
 			state = EquipletState.BUSY;
+			// executing.updateDueTime(executing.getDue() + (time - timeBreakdown));
 			System.out.printf("EA:%s is repaired at %.2f and continue with job %s, with %.0f time remaining.\n", getLocalName(), time, executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
@@ -346,22 +356,6 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			state = EquipletState.IDLE;
 		}
 
-		// After being broken down and repaired the jobs in the schedule can be delayed.
-		// The executing job is updated with the new due time
-		// The scheduled jobs should have, depending if the jobs are continuous scheduled, a new start time added with the delay
-		// Although the jobs doesn't have to be continuous scheduled, the start time depends on the due date of the previous job
-		// The new start time is the max of ( due time of previous job, or the original start time)
-		if (isExecuting()) {
-			double dueTime = executing.getDue();
-			for (Job job : schedule) {
-				if (dueTime > job.getStartTime()) {
-					job.updateStartTime(dueTime);
-					dueTime = job.getDue();
-				} else {
-					// no change in start time, so continuing would not change the schedule
-					break;
-				}
-			}
-		}
+		updateSchedule();
 	}
 }

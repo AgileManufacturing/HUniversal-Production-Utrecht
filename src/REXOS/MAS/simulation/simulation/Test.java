@@ -153,7 +153,7 @@ class Test {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
 			TaskSeries serie = new TaskSeries(agent.getProductName());
 			for (ProductionStep step : path) {
-				serie.add(new Task(step.getEquipletName(), new SimpleTimePeriod((long) step.getTime(), (long)(step.getTime() + step.getDuration()))));
+				serie.add(new Task(step.getEquipletName(), new SimpleTimePeriod((long) step.getStart(), (long)(step.getStart() + step.getDuration()))));
 			}
 			tasks.add(serie);
 		}

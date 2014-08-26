@@ -1,11 +1,8 @@
 package simulation.test;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import simulation.mas.equiplet.Equiplet;
 import simulation.mas.equiplet.EquipletAgent;
 import simulation.mas.equiplet.Job;
 import simulation.util.Pair;
@@ -24,7 +21,7 @@ public class EquipletAvailability extends EquipletAgent {
 
 		
 		//
-		System.out.println("\n2: Test with one job in schedule");
+		System.out.println("\n2: Test with 1 job inside the begin of the schedule");
 
 		EquipletAvailability equiplet2 = new EquipletAvailability();
 		equiplet2.schedule(new Job(5, 10));
@@ -35,7 +32,7 @@ public class EquipletAvailability extends EquipletAgent {
 		
 
 		//
-		System.out.println("\n3: Test with one job in schedule");
+		System.out.println("\n3: Test with 2 job inside the schedule");
 
 		EquipletAvailability equiplet3 = new EquipletAvailability();
 		equiplet3.schedule(new Job(5, 10));
@@ -47,7 +44,7 @@ public class EquipletAvailability extends EquipletAgent {
 		
 		
 		//
-		System.out.println("\n4: Test with one job in schedule");
+		System.out.println("\n4: Test with 1 job fully inside in schedule");
 
 		EquipletAvailability equiplet4 = new EquipletAvailability();
 		equiplet4.schedule(new Job(50, 55));
@@ -58,7 +55,7 @@ public class EquipletAvailability extends EquipletAgent {
 		
 		
 		//
-		System.out.println("\n5: Test with one job in schedule");
+		System.out.println("\n5: Test with 1 outside job in schedule");
 
 		EquipletAvailability equiplet5 = new EquipletAvailability();
 		equiplet5.schedule(new Job(80, 85));
@@ -69,7 +66,7 @@ public class EquipletAvailability extends EquipletAgent {
 		
 		
 		//
-		System.out.println("\n6: Test with one job in schedule");
+		System.out.println("\n6: Test with 1 executing and 1 job at begin schedule");
 
 		EquipletAvailability equiplet6 = new EquipletAvailability();
 		equiplet6.execute(new Job(205, 215));
@@ -145,10 +142,12 @@ public class EquipletAvailability extends EquipletAgent {
 
 				// System.out.println("(J.start = " + job.getStartTime() + " > start = " + start + " && " + (job.getStartTime() - start) + " > " + duration + " )");
 
-				if (job.getStartTime() > start) {
-
+				// search for the begin of the availability
+				if (job.getStartTime() >= start) {
+					// the available time is greater than the duration of the job  
 					if (job.getStartTime() - start > duration) {
 
+						// check the boundaries of the availability
 						if (job.getStartTime() < deadline) {
 							available.add(new Pair<Double, Double>(start, job.getStartTime()));
 							start = job.getDue();
@@ -167,8 +166,6 @@ public class EquipletAvailability extends EquipletAgent {
 			}
 		}
 		return available;
-
 	}
 	*/
-
 }

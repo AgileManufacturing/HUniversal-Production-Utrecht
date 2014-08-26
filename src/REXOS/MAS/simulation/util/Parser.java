@@ -43,12 +43,12 @@ public class Parser extends ParserPrimitives {
 		return json.toString();
 	}
 
-	public static Pair<List<ProductStep>, Position> parseProductConfiguration(String source) throws JSONException {
+	public static Pair<LinkedList<ProductStep>, Position> parseProductConfiguration(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("productSteps") && json.has("position")) {
-			List<ProductStep> productSteps = parseProductSteps(json.getJSONArray("productSteps"));
+			LinkedList<ProductStep> productSteps = parseProductSteps(json.getJSONArray("productSteps"));
 			Position position = parsePosition(json.getJSONObject("position"));
-			return new Pair<List<ProductStep>, Position>(productSteps, position);
+			return new Pair<LinkedList<ProductStep>, Position>(productSteps, position);
 		} else {
 			throw new JSONException("Parser: parsing product agent configuration failed to parse " + source);
 		}
@@ -74,7 +74,7 @@ public class Parser extends ParserPrimitives {
 		}
 	}
 
-	public static String parseCanExecute(double time, double deadline, List<ProductStep> productSteps) throws JSONException {
+	public static String parseCanExecute(double time, double deadline, LinkedList<ProductStep> productSteps) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("time", time);
 		json.put("deadline", deadline);
@@ -178,7 +178,7 @@ public class Parser extends ParserPrimitives {
 			JSONObject json = new JSONObject();
 			json.put("service", productionStep.getService());
 			json.put("criteria", parseMap(productionStep.getCriteria()));
-			json.put("time", productionStep.getTime());
+			json.put("time", productionStep.getStart());
 			json.put("deadline", deadline);
 			list.put(json);
 		}
@@ -309,6 +309,8 @@ public class Parser extends ParserPrimitives {
 				String to = json.getString("to");
 				double time = json.getDouble("time");
 				travelTimes.put(new Pair<String, String>(from, to), time);
+			} else {
+				throw new JSONException("Parser: parsing travel time routes failed to parse item " + source);
 			}
 		}
 		return travelTimes;
@@ -337,6 +339,8 @@ public class Parser extends ParserPrimitives {
 				Position to = parsePosition(json.getJSONObject("to"));
 				double time = json.getDouble("time");
 				travelTimes.put(new Pair<Position, Position>(from, to), time);
+			} else {
+				throw new JSONException("Parser: parsing product travel times failed to parse item " + source);
 			}
 		}
 		return travelTimes;
@@ -352,5 +356,20 @@ public class Parser extends ParserPrimitives {
 			list.put(json);
 		}
 		return list.toString();
+	}
+
+	public static double parseProductDelayed(String source) throws JSONException {
+		JSONObject json = new JSONObject(source);
+		if (json.has("start")) {
+			return json.getDouble("start");
+		} else {
+			throw new JSONException("Parser: parsing product delayed failed " + source);
+		}
+	}
+
+	public static String parseProductDelayed(double start) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("start", start);
+		return json.toString();
 	}
 }
