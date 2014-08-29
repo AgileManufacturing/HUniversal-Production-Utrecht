@@ -1,5 +1,6 @@
 package simulation.graphics;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.DateFormat;
@@ -7,12 +8,16 @@ import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.JPanel;
 
@@ -30,6 +35,7 @@ import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
+import org.jfree.data.time.TimePeriod;
 import org.jfree.ui.ApplicationFrame;
 
 import simulation.mas.product.Product;
@@ -63,6 +69,12 @@ public class GanttChart extends ApplicationFrame {
 	private static IntervalCategoryDataset createDataset(List<TaskSeries> tasks) {
 		final TaskSeriesCollection collection = new TaskSeriesCollection();
 		for (TaskSeries task : tasks) {
+			String s = " ";
+			List<Task> list = task.getTasks();
+			for (Task t : list) {
+				s += t.getDescription() + " ";
+			}
+			System.out.println("\tadd:" + s);
 			collection.add(task);
 		}
 
@@ -115,15 +127,18 @@ public class GanttChart extends ApplicationFrame {
 			}
 		});
 		axis.setMinimumDate(new Date(0));
-		
+
 		CategoryAxis domainAxis = plot.getDomainAxis();
 		domainAxis.setCategoryMargin(0.05);
 		domainAxis.setLowerMargin(0.05);
 		domainAxis.setUpperMargin(0.05);
-		
+
 		GanttRenderer renderer = (GanttRenderer) plot.getRenderer();
 		renderer.setItemMargin(0);
-		  
+		renderer.setDrawBarOutline(true);
+		renderer.setBaseOutlineStroke(new BasicStroke(0));
+		// renderer.set
+
 		return chart;
 	}
 
@@ -161,16 +176,30 @@ public class GanttChart extends ApplicationFrame {
 	public static JPanel createChart(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
 		int counter = 0;
 		ArrayList<TaskSeries> tasks = new ArrayList<>();
+		TreeSet<String> yLabels = new TreeSet<>();
 		for (Entry<String, List<Triple<String, Double, Double>>> entry : data.entrySet()) {
 			TaskSeries serie = new TaskSeries(entry.getKey());
 			for (Triple<String, Double, Double> value : entry.getValue()) {
+				yLabels.add(value.first);
 				serie.add(new Task(value.first, new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
 				counter++;
 			}
 			tasks.add(serie);
 		}
+		
 
-		final IntervalCategoryDataset dataset = createDataset(tasks);
+		TaskSeriesCollection dataset = new TaskSeriesCollection();
+		TaskSeries forceSortedLabels = new TaskSeries("");
+		for (String yItem : yLabels) {
+			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod(0, 0)));;
+		}
+		dataset.add(forceSortedLabels);
+
+		for (TaskSeries serie : tasks) {
+			dataset.add(serie);
+		}
+		
+
 		final JFreeChart chart = createChart(title, yLabel, dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
@@ -179,25 +208,61 @@ public class GanttChart extends ApplicationFrame {
 		return chartPanel;
 	}
 
+	/**
+	 * Create a gantt chart panel. The data is based on basis of y-axis labels with a list of x-axis data.
+	 * For example, a Map < equiplet as keys, and a list < of start and end time for product representing jobs > >
+	 * 
+	 * @param title
+	 *            of the chart
+	 * @param yLabel
+	 *            label of the y-axis
+	 * @param data
+	 *            <y-axis, [name, start, end] >
+	 * @return
+	 */
 	public static JPanel createChartInvert(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
 		double maxTime = 300;
 		double minTime = Double.MAX_VALUE;
+		
+		TaskSeriesCollection dataset = new TaskSeriesCollection();
 		TreeMap<String, TaskSeries> tasks = new TreeMap<>();
+		TreeSet<String> yLabels = new TreeSet<>();
+		
 		for (Entry<String, List<Triple<String, Double, Double>>> entry : data.entrySet()) {
+			yLabels.add(entry.getKey());
 			for (Triple<String, Double, Double> value : entry.getValue()) {
+				
 				if (!tasks.containsKey(value.first)) {
 					tasks.put(value.first, new TaskSeries(value.first));
 				}
+				
 				TaskSeries serie = tasks.get(value.first);
-				serie.add(new Task(entry.getKey(), new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
+				Task task = serie.get(entry.getKey());
+				if (task == null) {
+					task = new Task(entry.getKey(), new SimpleTimePeriod(value.second.longValue(), value.third.longValue()));
+					task.addSubtask(new Task(entry.getKey(), new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
+					serie.add(task);
+				} else {
+					task.addSubtask(new Task(entry.getKey(), new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
+				}
 				maxTime = Math.max(maxTime, value.third.longValue());
 				minTime = Math.min(minTime, value.second.longValue());
 			}
 		}
+		
+		System.out.println(" MIN:" + minTime + "  MAX:" + maxTime + " data:\n" + data);
 
-		System.out.println(" MIN:" + minTime + "  MAX:" + maxTime);
-
-		final IntervalCategoryDataset dataset = createDataset(new ArrayList<>(tasks.values()));
+		TaskSeries forceSortedLabels = new TaskSeries("");
+		for (String yItem : yLabels) {
+			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod((long)minTime, (long)minTime)));;
+		}
+		dataset.add(forceSortedLabels);
+		
+		for (TaskSeries serie : tasks.values()) {
+			dataset.add(serie);
+		}
+		
+		
 		final JFreeChart chart = createChart(title, yLabel, dataset);
 
 		CategoryPlot plot = chart.getCategoryPlot();

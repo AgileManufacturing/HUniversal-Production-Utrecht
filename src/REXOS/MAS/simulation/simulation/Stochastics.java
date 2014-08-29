@@ -19,7 +19,7 @@ class Stochastics {
 	}
 
 	public double generateProductArrival() {
-		return 35; // TODO too deterministic
+		return 10; // TODO too deterministic
 		// return time(config.getProductArrival());
 	}
 
@@ -35,7 +35,7 @@ class Stochastics {
 
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
-			return generateProductStepsTest();
+			//return generateProductStepsTest();
 		}
 		
 		@SuppressWarnings("unused")

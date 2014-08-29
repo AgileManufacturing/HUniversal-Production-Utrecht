@@ -121,5 +121,81 @@
 				</capability>
 			</capabilities>
 		</equiplet>
+		<equiplet>
+			<name>E5</name>
+			<position>
+				<x>0</x>
+				<y>4</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E6</name>
+			<position>
+				<x>4</x>
+				<y>0</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E7</name>
+			<position>
+				<x>4</x>
+				<y>2</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E8</name>
+			<position>
+				<x>4</x>
+				<y>4</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
 	</equiplets>
 </config>

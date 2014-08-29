@@ -47,31 +47,48 @@ public class ScheduleBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-			System.out.printf("PA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
+			
+			System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
 			HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = searchSuitedEquiplets(productSteps);
 
-			System.out.printf("PA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
+			System.out.printf(System.currentTimeMillis() + "\tPA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
 
 			Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> filteredEquiplets = filterEquiplets(suitedEquiplets);
 			Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options = filteredEquiplets.second;
 			Map<AID, Pair<Double, Position>> equipletInfo = filteredEquiplets.first;
 
+			System.out.printf(System.currentTimeMillis() + "\tPA:%s filter the capable equiplets %s\n", myAgent.getLocalName(), equipletInfo.keySet());
+
 			Map<Pair<Position, Position>, Double> travelTimes = retrieveTravelTimes(product.getPosition(), options, equipletInfo);
+
+			System.out.printf(System.currentTimeMillis() + "\tPA:%s retrieved travel times %s\n", myAgent.getLocalName(), travelTimes);
+			
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), product.getCreated(), product.getDeadline(), product.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
-			boolean MATRIX_SCHEDULING = true;
+			boolean MATRIX_SCHEDULING = false;
 			if (MATRIX_SCHEDULING) {
 				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
+
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), productionPath);
+				
 				schedule(productionPath, product.getDeadline());
+
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
+				
 				product.schedulingFinished(true, productionPath);
 			} else {
 				LinkedList<Node> nodes = scheduling.calculateEDDPath();
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
 
 				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 				product.schedulingFinished(true, productionPath);
 			}
+			
 
 			done = true;
+			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
+			
 		} catch (SchedulingException e) {
 			System.err.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
 			product.schedulingFinished(false);
