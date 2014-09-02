@@ -59,10 +59,11 @@ public class SimInterface {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SimInterface window = new SimInterface();
+					// SimInterface window = new SimInterface();
 					//Control simulation = new Simulation(window);
 					//window.setSimulation(simulation);
-					window.initContent();
+					// window.initContent();
+					System.out.println("not supported");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
