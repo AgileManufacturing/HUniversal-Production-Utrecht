@@ -53,9 +53,9 @@ public class ScheduleBehaviour extends Behaviour {
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
 
-			Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> filteredEquiplets = filterEquiplets(suitedEquiplets);
-			Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options = filteredEquiplets.second;
-			Map<AID, Pair<Double, Position>> equipletInfo = filteredEquiplets.first;
+			Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> capableEquiplets = capableEquiplets(suitedEquiplets);
+			Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options = capableEquiplets.second;
+			Map<AID, Pair<Double, Position>> equipletInfo = capableEquiplets.first;
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s filter the capable equiplets %s\n", myAgent.getLocalName(), equipletInfo.keySet());
 
@@ -135,7 +135,7 @@ public class ScheduleBehaviour extends Behaviour {
 		return suitedEquiplets;
 	}
 
-	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> filterEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) {
+	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) {
 		String replyConversation = Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis();
 
 		// send a questions to each of the equilplet if the product step can be executed

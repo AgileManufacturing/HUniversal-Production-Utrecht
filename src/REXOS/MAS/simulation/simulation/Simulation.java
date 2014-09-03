@@ -313,26 +313,6 @@ public class Simulation implements ISimulation, Control {
 	}
 
 	/**
-	 * Change if the simulation is ready to continue
-	 * Lock the simulation thread if the event is not handled completely i.e. waiting to be informed by an agent
-	 * 
-	 * @param ready
-	 *            if the simulation is ready to continue
-	 *            /
-	 *            private synchronized void changeReady(boolean ready) {
-	 *            System.out.println("change ready " + eventReady + " to " + ready);
-	 *            synchronized (Object) {
-	 *            if (ready) {
-	 *            eventReady = true;
-	 *            Object.notifyAll();
-	 *            } else {
-	 *            eventReady = false;
-	 *            }
-	 *            }
-	 *            }
-	 */
-
-	/**
 	 * Procedure for the updating the interface
 	 * 
 	 * @param e

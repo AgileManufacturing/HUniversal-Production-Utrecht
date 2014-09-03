@@ -90,6 +90,10 @@ public class ProductListenerBehaviour extends Behaviour {
 		try {
 			double start = Parser.parseProductDelayed(message.getContent());
 			product.onProductDelayed(start);
+			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.CONFIRM);
+			reply.setContent(Parser.parseConfirmation(true));
+			product.send(reply);
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse step delayed///////////////////////////\n", myAgent.getLocalName());
 			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
