@@ -17,12 +17,21 @@ class DurationConfig {
 
 	@XmlAttribute
 	private int scale;
-	
+
 	@XmlAttribute
 	private int shape;
 
 	@XmlValue
 	private double time;
+
+	public DurationConfig() {
+
+	}
+
+	public DurationConfig(String type, double time) {
+		this.type = type;
+		this.time = time;
+	}
 
 	public double mean() {
 		return time;
@@ -31,11 +40,11 @@ class DurationConfig {
 	public double location() {
 		return location;
 	}
-	
+
 	public double scale() {
 		return scale;
 	}
-	
+
 	public double shape() {
 		return shape;
 	}

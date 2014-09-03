@@ -16,7 +16,7 @@ import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
 
-public class TrafficAgent extends Agent {
+public class TrafficManager extends Agent {
 
 	/**
 	 * 
@@ -24,7 +24,7 @@ public class TrafficAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Map<String, Position> equiplets;
 
-	public TrafficAgent(Map<String, Position> equiplets) {
+	public TrafficManager(Map<String, Position> equiplets) {
 		this.equiplets = equiplets;
 	}
 
@@ -75,6 +75,7 @@ public class TrafficAgent extends Agent {
 
 				switch (msg.getPerformative()) {
 				// query for information of the travel agent
+				// TODO other way than match request route in position or equiplet names
 				case ACLMessage.QUERY_IF:
 					handleTravelRouteRequest(msg);
 					break;
@@ -94,6 +95,7 @@ public class TrafficAgent extends Agent {
 
 				// send travel time in reply
 				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.INFORM);
 				reply.setContent(Parser.parseTravelRoutes(travelTimes));
 				myAgent.send(reply);
 			} catch (JSONException e) {
@@ -108,6 +110,7 @@ public class TrafficAgent extends Agent {
 
 				// send travel time in reply
 				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.INFORM);
 				reply.setContent(Parser.parseTravelTimes(travelTimes));
 				myAgent.send(reply);
 			} catch (JSONException e) {

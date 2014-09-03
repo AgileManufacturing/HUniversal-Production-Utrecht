@@ -9,6 +9,6 @@ public class Ontology {
 	public static final String CONVERSATION_PRODUCT_ARRIVED = "product-arrived";
 	public static final String CONVERSATION_PRODUCT_PROCESSING = "product-processing";
 	public static final String CONVERSATION_PRODUCT_FINISHED = "product-finished";
-	public static final Object CONVERSATION_PRODUCT_DELAYED = "product-delayed";
+	public static final String CONVERSATION_PRODUCT_DELAYED = "product-delayed";
 	public static final String CONVERSATION_TRAVEL_TIME = "travel-time";
 }

@@ -8,14 +8,11 @@ import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -35,7 +32,6 @@ import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
-import org.jfree.data.time.TimePeriod;
 import org.jfree.ui.ApplicationFrame;
 
 import simulation.mas.product.Product;
@@ -69,12 +65,6 @@ public class GanttChart extends ApplicationFrame {
 	private static IntervalCategoryDataset createDataset(List<TaskSeries> tasks) {
 		final TaskSeriesCollection collection = new TaskSeriesCollection();
 		for (TaskSeries task : tasks) {
-			String s = " ";
-			List<Task> list = task.getTasks();
-			for (Task t : list) {
-				s += t.getDescription() + " ";
-			}
-			System.out.println("\tadd:" + s);
 			collection.add(task);
 		}
 
@@ -90,7 +80,6 @@ public class GanttChart extends ApplicationFrame {
 	 * @return The chart.
 	 */
 	private static JFreeChart createChart(final String title, final String yLabel, final IntervalCategoryDataset dataset) {
-
 		final JFreeChart chart = ChartFactory.createGanttChart(title, // chart title
 				yLabel, // x axis label
 				"Time", // y axis label
@@ -179,26 +168,34 @@ public class GanttChart extends ApplicationFrame {
 		TreeSet<String> yLabels = new TreeSet<>();
 		for (Entry<String, List<Triple<String, Double, Double>>> entry : data.entrySet()) {
 			TaskSeries serie = new TaskSeries(entry.getKey());
+
 			for (Triple<String, Double, Double> value : entry.getValue()) {
 				yLabels.add(value.first);
-				serie.add(new Task(value.first, new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
+
+				Task task = serie.get(value.first);
+				if (task == null) {
+					task = new Task(value.first, new SimpleTimePeriod(value.second.longValue(), value.third.longValue()));
+					task.addSubtask(new Task(value.first, new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
+					serie.add(task);
+				} else {
+					task.addSubtask(new Task(value.first, new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
+				}
 				counter++;
 			}
 			tasks.add(serie);
 		}
-		
 
 		TaskSeriesCollection dataset = new TaskSeriesCollection();
 		TaskSeries forceSortedLabels = new TaskSeries("");
 		for (String yItem : yLabels) {
-			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod(0, 0)));;
+			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod(0, 0)));
+			;
 		}
 		dataset.add(forceSortedLabels);
 
 		for (TaskSeries serie : tasks) {
 			dataset.add(serie);
 		}
-		
 
 		final JFreeChart chart = createChart(title, yLabel, dataset);
 
@@ -223,19 +220,19 @@ public class GanttChart extends ApplicationFrame {
 	public static JPanel createChartInvert(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
 		double maxTime = 300;
 		double minTime = Double.MAX_VALUE;
-		
+
 		TaskSeriesCollection dataset = new TaskSeriesCollection();
 		TreeMap<String, TaskSeries> tasks = new TreeMap<>();
 		TreeSet<String> yLabels = new TreeSet<>();
-		
+
 		for (Entry<String, List<Triple<String, Double, Double>>> entry : data.entrySet()) {
 			yLabels.add(entry.getKey());
 			for (Triple<String, Double, Double> value : entry.getValue()) {
-				
+
 				if (!tasks.containsKey(value.first)) {
 					tasks.put(value.first, new TaskSeries(value.first));
 				}
-				
+
 				TaskSeries serie = tasks.get(value.first);
 				Task task = serie.get(entry.getKey());
 				if (task == null) {
@@ -249,20 +246,20 @@ public class GanttChart extends ApplicationFrame {
 				minTime = Math.min(minTime, value.second.longValue());
 			}
 		}
-		
+
 		System.out.println(" MIN:" + minTime + "  MAX:" + maxTime + " data:\n" + data);
 
 		TaskSeries forceSortedLabels = new TaskSeries("");
 		for (String yItem : yLabels) {
-			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod((long)minTime, (long)minTime)));;
+			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod((long) minTime, (long) minTime)));
+			;
 		}
 		dataset.add(forceSortedLabels);
-		
+
 		for (TaskSeries serie : tasks.values()) {
 			dataset.add(serie);
 		}
-		
-		
+
 		final JFreeChart chart = createChart(title, yLabel, dataset);
 
 		CategoryPlot plot = chart.getCategoryPlot();

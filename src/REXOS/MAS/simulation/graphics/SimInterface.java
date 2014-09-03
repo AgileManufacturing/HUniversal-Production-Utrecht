@@ -146,6 +146,13 @@ public class SimInterface {
 		final JScrollPane productStatisticsScroll = new JScrollPane();
 		productStatisticsScroll.setViewportView(productStatistics);
 		tabbedPane.addTab("Product Statistics", null, productStatisticsScroll, null);
+		
+		final JPanel equipletStatistics = new JPanel();
+		equipletStatistics.setLayout(new BoxLayout(equipletStatistics, BoxLayout.Y_AXIS));
+
+		final JScrollPane equipletStatisticsScroll = new JScrollPane();
+		equipletStatisticsScroll.setViewportView(equipletStatistics);
+		tabbedPane.addTab("Equiplet Statistics", null, equipletStatisticsScroll, null);
 
 		ChangeListener changeListener = new ChangeListener() {
 			public void stateChanged(ChangeEvent changeEvent) {
@@ -210,6 +217,12 @@ public class SimInterface {
 					Map<String, Map<Double, Double>> stats = simulation.getProductStatistics();
 					productStatistics.removeAll();
 					productStatistics.add(Chart.createChart("Product Statistics", "Products", stats));
+
+				}else if (index == tabbedPane.indexOfComponent(equipletStatisticsScroll)) {
+					// Equiplet Statistics
+					Map<String, Map<Double, Double>> stats = simulation.getEquipletStatistics();
+					equipletStatistics.removeAll();
+					equipletStatistics.add(Chart.createChart("Equiplet Statistics", "Equiplets", stats));
 
 				}
 				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));

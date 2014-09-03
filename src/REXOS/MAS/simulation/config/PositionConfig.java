@@ -19,6 +19,15 @@ class PositionConfig {
 	@XmlElement(name = "y")
 	private int y;
 
+	public PositionConfig() {
+
+	}
+
+	public PositionConfig(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
 	public int getX() {
 		return x;
 	}

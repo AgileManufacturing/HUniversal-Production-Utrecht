@@ -72,6 +72,11 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		return state;
 	}
 
+	@Override
+	public double load(double time, double window) {
+		return super.load(time, window);
+	}
+
 	/**
 	 * Retrieve the statistics of the equiplet
 	 * 
@@ -216,9 +221,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		executing = schedule.pollFirst();
 
 		double latency = time - executing.getStartTime();
-//		if (latency > 0) {
-//			throw new IllegalArgumentException("latency can't be: " + latency + " > 0 for job=" + executing + ", schedule=" + schedule);
-//		}
+		// if (latency > 0) {
+		// throw new IllegalArgumentException("latency can't be: " + latency + " > 0 for job=" + executing + ", schedule=" + schedule);
+		// }
 		scheduleLatency.put(time, latency);
 
 		executing.updateStartTime(time);

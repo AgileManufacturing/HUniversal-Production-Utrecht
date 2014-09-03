@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import simulation.config.Config;
+import simulation.config.IConfig;
 import simulation.mas.Logistics;
 import simulation.mas.equiplet.IEquipletSim;
 import simulation.util.Position;

@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import simulation.mas.TrafficAgent;
+import simulation.mas.TrafficManager;
 import simulation.mas.equiplet.Capability;
 import simulation.mas.equiplet.EquipletSimAgent;
 import simulation.mas.equiplet.IEquipletSim;
@@ -128,7 +128,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 			System.out.println("Simulation: create traffic agent");
 
 			// Create and start the agent
-			TrafficAgent trafficAgent = new TrafficAgent(equiplets);
+			TrafficManager trafficAgent = new TrafficManager(equiplets);
 			
 			ContainerController cc = getContainerController();
 			AgentController ac = cc.acceptNewAgent(Settings.TRAFFIC_AGENT, trafficAgent);

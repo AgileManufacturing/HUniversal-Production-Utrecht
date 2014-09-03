@@ -166,7 +166,7 @@ public abstract class Equiplet extends Agent {
 				answer.add(new Triple<Integer, Double, List<Pair<Double, Double>>>(index, duration, available));
 			}
 		}
-	
+
 		return answer;
 	}
 
@@ -205,13 +205,12 @@ public abstract class Equiplet extends Agent {
 			start = Math.max(start, executing.getDue());
 		}
 
-		
 		if (schedule.isEmpty()) {
 			available.add(new Pair<Double, Double>(start, deadline));
 		} else {
-			
+
 		}
-		
+
 		Iterator<Job> it = schedule.iterator();
 		while (it.hasNext()) {
 			Job job = it.next();
@@ -231,25 +230,25 @@ public abstract class Equiplet extends Agent {
 					start = job.getDue();
 				}
 			}
-			
+
 			if (!it.hasNext()) {
 				available.add(new Pair<Double, Double>(start, deadline));
 			}
 		}
-	
+
 		return available;
-		
+
 		/*
 		 * 
-		if (schedule.size() > 0) {
-			Job job = schedule.last();
-			available.add(new Pair<Double, Double>(job.getDue(), deadline));
-		} else if (isExecuting()) {
-			available.add(new Pair<Double, Double>(executing.getDue(), deadline));
-		} else {
-			available.add(new Pair<Double, Double>(time, deadline));
-		}
-		return available;
+		 * if (schedule.size() > 0) {
+		 * Job job = schedule.last();
+		 * available.add(new Pair<Double, Double>(job.getDue(), deadline));
+		 * } else if (isExecuting()) {
+		 * available.add(new Pair<Double, Double>(executing.getDue(), deadline));
+		 * } else {
+		 * available.add(new Pair<Double, Double>(time, deadline));
+		 * }
+		 * return available;
 		 */
 	}
 
@@ -263,6 +262,20 @@ public abstract class Equiplet extends Agent {
 	 * @return load of the equiplet
 	 */
 	protected double load(double time, double window) {
+
+		double sum = 0.0;
+		for (Job job : schedule) {
+			if (job.getStartTime() >= time && job.getStartTime() < time + window || job.getDue() > time && job.getDue() <= time + window) {
+				sum += Math.min(job.getDue(), time + window) - Math.max(job.getStartTime(), time);
+			}
+		}
+
+		return 1 - sum / window;
+
+	}
+
+	private double load__(double time, double window) {
+
 		// TODO validate correctness
 		if (schedule.size() > 1) {
 			double busy = 0.0;
@@ -299,6 +312,6 @@ public abstract class Equiplet extends Agent {
 	 * @param job
 	 */
 	protected void execute(Job job) {
-		
+
 	}
 }

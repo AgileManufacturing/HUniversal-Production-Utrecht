@@ -13,6 +13,8 @@ public interface IEquipletSim {
 
 	EquipletState getEquipletState();
 
+	double load(double time, double window);
+
 	void notifyJobFinished(double time);
 
 	void notifyBreakdown(double time);

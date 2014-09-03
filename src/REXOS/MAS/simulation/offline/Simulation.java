@@ -12,8 +12,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simulation.config.Config;
+import simulation.config.IConfig;
 import simulation.config.DurationType;
+import simulation.config.Config;
 import simulation.graphics.StackedBarChart;
 import simulation.graphics.StaticSimInterface;
 import simulation.mas.equiplet.Capability;
@@ -23,7 +24,7 @@ import simulation.util.Triple;
 public class Simulation extends Thread {
 
 	private Random random;
-	private Config config;
+	private IConfig config;
 	private StaticSimInterface gui;
 
 	private TreeSet<Event> eventStack;

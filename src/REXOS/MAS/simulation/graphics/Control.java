@@ -31,4 +31,6 @@ public interface Control {
 
 	Map<String, Map<Double, Double>> getProductStatistics();
 
+	Map<String, Map<Double, Double>> getEquipletStatistics();
+
 }

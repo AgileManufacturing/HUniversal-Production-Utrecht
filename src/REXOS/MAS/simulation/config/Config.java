@@ -20,18 +20,15 @@ import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
 import simulation.util.Position;
 
-// import simulation.mas.Equiplet;
-
 /**
  * Configuration data to read from configuration file simulation.xml
  * 
  * @author Laurens van den Brink
  * 
  */
-
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Config {
+public class Config implements IConfig {
 
 	// run length of the simulation
 	@XmlElement(name = "runlength")
@@ -42,10 +39,10 @@ public class Config {
 	private int runs;
 
 	@XmlElement(name = "travel")
-	private DurationConfig travel;
+	protected DurationConfig travel;
 
 	@XmlElement(name = "products")
-	private ProductsConfig products;
+	protected ProductsConfig products;
 
 	private List<EquipletConfig> equipletConfig = new ArrayList<EquipletConfig>();
 
@@ -59,7 +56,7 @@ public class Config {
 
 		} catch (JAXBException e) {
 			e.printStackTrace();
-			System.out.println("Failed to load config settings");
+			System.err.println("Failed to load config settings");
 			return null;
 		}
 	}
@@ -96,7 +93,7 @@ public class Config {
 				return step.getProbability();
 			}
 		}
-		System.out.println("Config error: product step probablity of " + productStep + " in " + toString());
+		System.err.println("Config error: product step probablity of " + productStep + " in " + toString());
 		return 0;
 	}
 
@@ -115,7 +112,7 @@ public class Config {
 	public List<EquipletConfig> getEquiplets() {
 		return equipletConfig;
 	}
-	
+
 	public Map<String, Pair<Position, List<Capability>>> getEquipletsConfigurations() {
 		Map<String, Pair<Position, List<Capability>>> equiplets = new HashMap<>();
 		for (EquipletConfig e : equipletConfig) {
@@ -124,43 +121,11 @@ public class Config {
 			for (CapabilityConfig c : e.getCapabilities()) {
 				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), equipletProductionTime(e.getName(), c.getName()).first));
 			}
-			
+
 			equiplets.put(e.getName(), new Pair<Position, List<Capability>>(position, capabilities));
 		}
 		return equiplets;
 	}
-/*
-	public List<Equiplet> getEquipletList() {
-		ArrayList<Equiplet> equiplets = new ArrayList<>();
-		for (EquipletConfig e : equipletConfig) {
-			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
-			List<Capability> capabilities = new ArrayList<>();
-			HashMap<String, Double> productionTimes  = new HashMap<>();
-			for (CapabilityConfig c : e.getCapabilities()) {
-				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>()));
-				productionTimes.put(c.getName(), equipletProductionTime(e.getName(), c.getName()).first);
-			}
-			
-			equiplets.add(new simulation.mas.equiplet.Equiplet(e.getName(), position, capabilities, productionTimes));
-		}
-		return equiplets;
-	}
-*/
-	/*
-	public List<Triple<String, Position, List<Capability>>> getEquipletList() {
-		List<Triple<String, Position, List<Capability>>> equiplets = new ArrayList<>();
-		for (EquipletConfig e : equipletConfig) {
-			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
-			List<Capability> capabilities = new ArrayList<>();
-			for (CapabilityConfig c : e.getCapabilities()) {
-				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), equipletProductionTime(e.getName(), c.getName()).first));
-			}
-			
-			equiplets.add(new Triple<>(e.getName(), position, capabilities));
-		}
-		return equiplets;
-	}
-	*/
 
 	public Pair<Double, DurationType> equipletProductionTime(String equiplet, String service) {
 		for (EquipletConfig config : equipletConfig) {
@@ -172,7 +137,7 @@ public class Config {
 				}
 			}
 		}
-		System.out.println("Config error: production time of " + equiplet + " " + service  + " in " + toString());
+		System.err.println("Config error: production time of " + equiplet + " " + service + " in " + toString());
 		return null;
 	}
 
@@ -182,7 +147,7 @@ public class Config {
 				return new Pair<Double, DurationType>(config.getBreakdown().mean(), config.getBreakdown().type());
 			}
 		}
-		System.out.println("Config error: breakdown time of " + equiplet + " in " + toString());
+		System.err.println("Config error: breakdown time of " + equiplet + " in " + toString());
 		return null;
 	}
 
@@ -192,7 +157,7 @@ public class Config {
 				return new Pair<Double, DurationType>(config.getRepaired().mean(), config.getRepaired().type());
 			}
 		}
-		System.out.println("Config error: repair time of " + equiplet + " in " + toString());
+		System.err.println("Config error: repair time of " + equiplet + " in " + toString());
 		return null;
 	}
 

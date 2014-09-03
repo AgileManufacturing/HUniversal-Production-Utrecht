@@ -19,7 +19,7 @@ public class EquipletSim extends Equiplet implements IEquipletSim {
 		this.name = equipletName;
 		init(position, capabilities);
 	}
-	
+
 	public String getEquipletName() {
 		return name;
 	}
@@ -28,28 +28,33 @@ public class EquipletSim extends Equiplet implements IEquipletSim {
 	public Position getPosition() {
 		return position;
 	}
-	
+
 	@Override
 	public EquipletState getEquipletState() {
 		return state;
 	}
 
 	@Override
+	public double load(double time, double window) {
+		return super.load(time, window);
+	}
+
+	@Override
 	public void notifyJobFinished(double time) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void notifyBreakdown(double time) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void notifyRepaired(double time) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

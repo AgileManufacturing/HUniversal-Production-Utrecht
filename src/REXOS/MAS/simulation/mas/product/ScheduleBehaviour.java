@@ -47,7 +47,7 @@ public class ScheduleBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-			
+
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
 			HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = searchSuitedEquiplets(productSteps);
 
@@ -62,7 +62,7 @@ public class ScheduleBehaviour extends Behaviour {
 			Map<Pair<Position, Position>, Double> travelTimes = retrieveTravelTimes(product.getPosition(), options, equipletInfo);
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s retrieved travel times %s\n", myAgent.getLocalName(), travelTimes);
-			
+
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), product.getCreated(), product.getDeadline(), product.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
 			boolean MATRIX_SCHEDULING = false;
@@ -70,11 +70,11 @@ public class ScheduleBehaviour extends Behaviour {
 				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), productionPath);
-				
+
 				schedule(productionPath, product.getDeadline());
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
-				
+
 				product.schedulingFinished(true, productionPath);
 			} else {
 				LinkedList<Node> nodes = scheduling.calculateEDDPath();
@@ -84,11 +84,10 @@ public class ScheduleBehaviour extends Behaviour {
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 				product.schedulingFinished(true, productionPath);
 			}
-			
 
 			done = true;
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
-			
+
 		} catch (SchedulingException e) {
 			System.err.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
 			product.schedulingFinished(false);
@@ -101,6 +100,8 @@ public class ScheduleBehaviour extends Behaviour {
 	}
 
 	private HashMap<AID, LinkedList<ProductStep>> searchSuitedEquiplets(List<ProductStep> productSteps) throws SchedulingException {
+		// TODO communication improvement, instead of map equiplets to executable product step, change product step to service,
+		// so it has to ask only once for a service instead of product step
 		HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = new HashMap<>();
 		for (ProductStep productStep : productSteps) {
 			try {
@@ -135,6 +136,8 @@ public class ScheduleBehaviour extends Behaviour {
 	}
 
 	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> filterEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) {
+		String replyConversation = Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis();
+
 		// send a questions to each of the equilplet if the product step can be executed
 		for (Entry<AID, LinkedList<ProductStep>> entry : suitedEquiplets.entrySet()) {
 			try {
@@ -142,7 +145,7 @@ public class ScheduleBehaviour extends Behaviour {
 				message.addReceiver(entry.getKey());
 				message.setOntology(Ontology.GRID_ONTOLOGY);
 				message.setConversationId(Ontology.CONVERSATION_CAN_EXECUTE);
-				message.setReplyWith(Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis());
+				message.setReplyWith(replyConversation);
 				message.setContent(Parser.parseCanExecute(product.getCreated(), product.getDeadline(), entry.getValue()));
 				myAgent.send(message);
 			} catch (JSONException e) {
@@ -160,10 +163,12 @@ public class ScheduleBehaviour extends Behaviour {
 
 		System.out.printf("PA:%s waiting on answers of equiplets whether they can execute the product steps...\n", myAgent.getLocalName());
 
+		MessageTemplate template = MessageTemplate.MatchInReplyTo(replyConversation);
+
 		// receives the answers of the equiplets, whether they can execute the product steps
 		int counter = 0;
 		while (counter < suitedEquiplets.size()) {
-			ACLMessage msg = myAgent.receive();
+			ACLMessage msg = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 
 			// the equiplet is able to perform the product step and propose possibilities for executing the product step
 			if (msg != null && msg.getPerformative() == ACLMessage.PROPOSE) {
@@ -189,6 +194,9 @@ public class ScheduleBehaviour extends Behaviour {
 				}
 			} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
 				// equiplet is not able to execute the product step
+			} else if (msg == null) {
+				// TODO remove!
+				throw new RuntimeException("message not received while waiting on equiplet reply if equiplet can execute product step");
 			}
 		}
 
@@ -238,12 +246,13 @@ public class ScheduleBehaviour extends Behaviour {
 		}
 
 		AID trafficAgent = new AID(Settings.TRAFFIC_AGENT, AID.ISLOCALNAME);
+		String replyConversation = Ontology.CONVERSATION_TRAVEL_TIME + System.currentTimeMillis();
 		try {
 			ACLMessage message = new ACLMessage(ACLMessage.QUERY_REF);
 			message.addReceiver(trafficAgent);
 			message.setOntology(Ontology.GRID_ONTOLOGY);
 			message.setConversationId(Ontology.CONVERSATION_TRAVEL_TIME);
-			message.setReplyWith(Ontology.CONVERSATION_TRAVEL_TIME + System.currentTimeMillis());
+			message.setReplyWith(replyConversation);
 			message.setContent(Parser.parseTravelTimeRequest(routes));
 			myAgent.send(message);
 		} catch (JSONException e) {
@@ -256,14 +265,18 @@ public class ScheduleBehaviour extends Behaviour {
 
 		// wait for reply
 		try {
-			MessageTemplate template = MessageTemplate.MatchSender(trafficAgent);
+			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchSender(trafficAgent), MessageTemplate.MatchInReplyTo(replyConversation));
 
 			ACLMessage reply = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
-			Map<Pair<Position, Position>, Double> travelTimes = Parser.parseTravelTimes(reply.getContent());
+			if (reply != null) {
+				Map<Pair<Position, Position>, Double> travelTimes = Parser.parseTravelTimes(reply.getContent());
 
-			System.out.printf("PA:%s received travel times %s\n", myAgent.getLocalName(), travelTimes);
+				System.out.printf("PA:%s received travel times %s\n", myAgent.getLocalName(), travelTimes);
 
-			return travelTimes;
+				return travelTimes;
+			} else {
+				throw new SchedulingException("failed to receive travel times, message == null");
+			}
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), Settings.TRAFFIC_AGENT);
 			System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
@@ -312,6 +325,7 @@ public class ScheduleBehaviour extends Behaviour {
 	}
 
 	private void schedule(HashMap<AID, ArrayList<ProductionStep>> sendList, double deadline) throws SchedulingException {
+		String replyConversation = Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis();
 		int sendCounter = 0;
 		for (Entry<AID, ArrayList<ProductionStep>> entry : sendList.entrySet()) {
 			try {
@@ -320,7 +334,7 @@ public class ScheduleBehaviour extends Behaviour {
 				message.addReceiver(entry.getKey());
 				message.setOntology(Ontology.GRID_ONTOLOGY);
 				message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
-				message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
+				message.setReplyWith(replyConversation);
 				message.setContent(Parser.parseScheduleRequest(entry.getValue(), deadline));
 				myAgent.send(message);
 				sendCounter++;
@@ -330,13 +344,15 @@ public class ScheduleBehaviour extends Behaviour {
 				throw new SchedulingException("failed to construct message to equiplet for schedule product step");
 			}
 		}
-
+		MessageTemplate template = MessageTemplate.MatchInReplyTo(replyConversation);
 		while (sendCounter > 0) { // All agent have to answer
-			ACLMessage msg = myAgent.blockingReceive(Settings.COMMUNICATION_TIMEOUT);
+			ACLMessage msg = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 			if (msg != null && msg.getPerformative() == ACLMessage.CONFIRM) {
 				sendCounter--;
 			} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {
 				throw new SchedulingException("failed to get confirmation of all equiplets");
+			} else if (msg == null) {
+				throw new SchedulingException("failed schedule, message == null");
 			}
 		}
 	}

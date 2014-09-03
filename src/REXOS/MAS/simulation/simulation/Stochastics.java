@@ -4,22 +4,32 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import simulation.config.Config;
+import simulation.config.IConfig;
 import simulation.config.DurationType;
 import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
 
 class Stochastics {
 	private Random random;
-	private Config config;
+	private IConfig config;
 
-	Stochastics(Config config) {
+	Stochastics(IConfig config) {
 		random = new Random();
 		this.config = config;
 	}
 
+	int x = 0;
+
 	public double generateProductArrival() {
-		return 10; // TODO too deterministic
+		 return time(config.getProductArrival());
+		/*if (x < 15) {
+			x++;
+			return 100;
+		} else {
+			return 10000000;
+		}
+		*/
+		// return 10; // TODO too deterministic
 		// return time(config.getProductArrival());
 	}
 
@@ -35,13 +45,26 @@ class Stochastics {
 
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
-			//return generateProductStepsTest();
+			// return generateProductStepsTest();
+
+			LinkedList<ProductStep> steps = new LinkedList<>();
+			List<ProductStep> productSteps = config.getProductSteps();
+
+			int minProductSteps = 3;
+			int avgProductSteps = productSteps.size();
+			int n = minProductSteps + random.nextInt(avgProductSteps - minProductSteps);
+			for (int i = 0; i < n; i++) {
+				ProductStep step = productSteps.get(random.nextInt(productSteps.size()));
+				steps.add(new ProductStep(i, step.getService(), step.getCriteria()));
+			}
+
+			return steps;
 		}
-		
+
 		@SuppressWarnings("unused")
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
-		int minProductSteps= 3;
+		int minProductSteps = 3;
 		int avgProductSteps = 6;
 		int n = minProductSteps + random.nextInt(avgProductSteps - minProductSteps);
 		for (int i = 0; i < n; i++) {
@@ -96,9 +119,9 @@ class Stochastics {
 		case EXP:
 			// return exp(time);
 		case WEIBULL:
-			//return weibull(1, time);
+			// return weibull(1, time);
 		case GAMMA:
-			//return gamma(1, time);
+			// return gamma(1, time);
 		case NORMAL:
 		case DETERMINISTIC:
 		default:
@@ -158,7 +181,7 @@ class Stochastics {
 	}
 
 	protected double weibull(double A, double B) {
-		// F−1(u) = [−αln(1−u)]1/β      0 < u < 1.
+		// F−1(u) = [−αln(1−u)]1/β 0 < u < 1.
 		double u = random.nextDouble();
 		return Math.pow(-A * Math.log(1 - u), 1 / B);
 	}

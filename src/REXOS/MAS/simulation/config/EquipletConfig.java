@@ -32,6 +32,18 @@ class EquipletConfig {
 	// @XmlElement(name = "capabilities")
 	private List<CapabilityConfig> capabilities;
 
+	public EquipletConfig() {
+
+	}
+
+	public EquipletConfig(String name, PositionConfig position, DurationConfig breakdown, DurationConfig repaired, List<CapabilityConfig> capabilities) {
+		this.name = name;
+		this.position = position;
+		this.breakdown = breakdown;
+		this.repaired = repaired;
+		this.capabilities = capabilities;
+	}
+
 	public String getName() {
 		return name;
 	}

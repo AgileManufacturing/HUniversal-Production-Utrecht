@@ -26,6 +26,16 @@ class CapabilityConfig {
 	@XmlElement(name = "limitation")
 	private HashMap<String, Object> limitations = null;
 
+	public CapabilityConfig() {
+
+	}
+
+	public CapabilityConfig(String service, DurationConfig duration, HashMap<String, Object> limitations) {
+		this.name = service;
+		this.duration = duration;
+		this.limitations = limitations;
+	}
+
 	public String getName() {
 		return name;
 	}

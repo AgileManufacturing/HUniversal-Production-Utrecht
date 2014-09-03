@@ -23,7 +23,7 @@ public class ProductListenerBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
-		MessageTemplate template = MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM), MessageTemplate.MatchPerformative(ACLMessage.CONFIRM)));
+		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED)), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED));
 		ACLMessage msg = myAgent.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
@@ -58,6 +58,7 @@ public class ProductListenerBehaviour extends Behaviour {
 			}
 
 			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(confirmation));
 			myAgent.send(reply);
 		} catch (JSONException e) {
@@ -76,6 +77,7 @@ public class ProductListenerBehaviour extends Behaviour {
 			}
 
 			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(confirmation));
 			myAgent.send(reply);
 		} catch (JSONException e) {

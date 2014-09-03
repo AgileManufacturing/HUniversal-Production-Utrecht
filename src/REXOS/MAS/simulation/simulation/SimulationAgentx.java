@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import simulation.config.IConfig;
 import simulation.config.Config;
 import simulation.graphics.Control;
 import simulation.graphics.SimInterface;
@@ -50,7 +51,7 @@ public class SimulationAgentx extends Agent implements Control, ISimulation {
 	private static final String STATS_BROKEN = "Broken";
 
 	private SimInterface gui;
-	private Config config;
+	private IConfig config;
 	private Stochastics stochastics;
 
 	private int run;
@@ -372,6 +373,12 @@ public class SimulationAgentx extends Agent implements Control, ISimulation {
 		HashMap<String, Map<Double, Double>> stats = new HashMap<String, Map<Double, Double>>(productStatistics);
 		stats.remove(STATS_FINISHED);
 		return stats;
+	}
+
+	@Override
+	public Map<String, Map<Double, Double>> getEquipletStatistics() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

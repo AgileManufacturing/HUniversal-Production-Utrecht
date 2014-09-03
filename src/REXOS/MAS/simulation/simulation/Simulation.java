@@ -10,6 +10,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import simulation.config.Config;
+import simulation.config.Configuration;
+import simulation.config.Configuration.ConfigException;
+import simulation.config.IConfig;
 import simulation.graphics.Control;
 import simulation.graphics.SimInterface;
 import simulation.mas.equiplet.Capability;
@@ -51,14 +54,21 @@ public class Simulation implements ISimulation, Control {
 	private static final String STATS_SYSTEM = "In System";
 	private static final String STATS_BROKEN = "Broken";
 
+	// equiplet statistics
+	// private static final String STATS_SCHEDULED = "Scheduled";
+	// private static final String STATS_QUEUED = "Queued";
+	// private static final String STATS_EXECUTED = "Executed";
+	// private static final String STATS_STATE = "State";
+	private static final String STATS_LOAD = "Load";
+	private static final String STATS_LOAD_HISTORY = "Load history";
+	private static final double LOAD_WINDOW = 1000;
+
 	private ISimControl simulation;
 	private SimInterface gui;
-	private Config config;
+	private IConfig config;
 	private Stochastics stochastics;
 
-	private final static Object Object = new Object();
 	private Lock lock = new Lock();
-	private boolean eventReady;
 
 	private int run;
 	private int runs;
@@ -83,6 +93,7 @@ public class Simulation implements ISimulation, Control {
 	// private int traveling;
 	private HashMap<String, Double> throughput;
 	private Map<String, TreeMap<Double, Double>> productStatistics;
+	private Map<String, TreeMap<Double, Double>> equipletStatistics;
 
 	public Simulation(ISimControl simulation) {
 		this.simulation = simulation;
@@ -93,12 +104,20 @@ public class Simulation implements ISimulation, Control {
 		running = false;
 		step = 0;
 
-		config = Config.read();
-		stochastics = new Stochastics(config);
-		gui = SimInterface.create(this);
+		try {
+			Config con = Config.read();
+			config = Configuration.read(con);
 
-		init();
+			System.out.println("Simulation: configuration: " + config);
 
+			stochastics = new Stochastics(config);
+			gui = SimInterface.create(this);
+
+			init();
+
+		} catch (ConfigException e) {
+			System.err.println("Configuration failed " + e.getMessage());
+		}
 	}
 
 	/**
@@ -118,6 +137,7 @@ public class Simulation implements ISimulation, Control {
 		productCount = 0;
 		throughput = new HashMap<String, Double>();
 		productStatistics = new HashMap<String, TreeMap<Double, Double>>();
+		equipletStatistics = new HashMap<String, TreeMap<Double, Double>>();
 
 		TreeMap<Double, Double> initStats = new TreeMap<Double, Double>();
 		initStats.put(time, 0d);
@@ -130,6 +150,12 @@ public class Simulation implements ISimulation, Control {
 		productStatistics.put(STATS_FAILED_CREATION, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_SYSTEM, new TreeMap<Double, Double>(initStats));
 		productStatistics.put(STATS_BROKEN, new TreeMap<Double, Double>(initStats));
+
+		// equipletStatistics.put(STATS_SCHEDULED, new TreeMap<Double, Double>(initStats));
+		// equipletStatistics.put(STATS_QUEUED, new TreeMap<Double, Double>(initStats));
+		// equipletStatistics.put(STATS_EXECUTED, new TreeMap<Double, Double>(initStats));
+		// equipletStatistics.put(STATS_STATE, new TreeMap<Double, Double>(initStats));
+		equipletStatistics.put(STATS_LOAD, new TreeMap<Double, Double>(initStats));
 
 		products = new HashMap<>();
 		equiplets = new TreeMap<>();
@@ -161,15 +187,12 @@ public class Simulation implements ISimulation, Control {
 			e.printStackTrace();
 		}
 
-		eventReady = true;
 		eventStack.add(new Event(time, EventType.PRODUCT));
 		eventStack.add(new Event(run_length, EventType.DONE));
 
 	}
 
 	public void handleEvent() {
-
-		// System.out.println("handle");
 		try {
 			while (running || step > 0) {
 				if (step > 0) {
@@ -210,6 +233,7 @@ public class Simulation implements ISimulation, Control {
 					break;
 				}
 
+				calculateEquipletLoad();
 				update(e);
 
 				// print the product statistics
@@ -270,9 +294,22 @@ public class Simulation implements ISimulation, Control {
 	 * @param add
 	 *            the addition of the statistic
 	 */
-	private void updateStats(String type, double add) {
+	private void updateProductStats(String type, double add) {
 		double lastValue = productStatistics.get(type).lastEntry().getValue();
 		productStatistics.get(type).put(time, lastValue + add);
+	}
+
+	private void calculateEquipletLoad() {
+		double sumLoad = 0.0;
+		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+			double load = entry.getValue().load(time, LOAD_WINDOW);
+			System.out.println("Simulation: " + entry.getKey() + " load=" + load);
+			sumLoad += (1 - load);
+		}
+
+		double l = sumLoad / equiplets.size();
+		System.out.println("sum load " + sumLoad + " / " + equiplets.size() + " = " + l);
+		equipletStatistics.get(STATS_LOAD).put(time, l);
 	}
 
 	/**
@@ -331,7 +368,7 @@ public class Simulation implements ISimulation, Control {
 
 			// update statistics
 			totalSteps += productSteps.size();
-			updateStats(STATS_SYSTEM, +1);
+			updateProductStats(STATS_SYSTEM, +1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -350,8 +387,8 @@ public class Simulation implements ISimulation, Control {
 	 *            name of the equiplet agent
 	 */
 	private void arrivedEvent(String productName, String equipletName) {
-		updateStats(STATS_TRAVEL, -1);
-		updateStats(STATS_WAITING, +1);
+		updateProductStats(STATS_TRAVEL, -1);
+		updateProductStats(STATS_WAITING, +1);
 
 		IProductSim productAgent = products.get(productName);
 		productAgent.onProductArrived(time);
@@ -382,7 +419,7 @@ public class Simulation implements ISimulation, Control {
 			eventStack.add(new Event(time + remainingTime, EventType.FINISHED, equipletName));
 			System.out.printf("Simulation: reschedule event FINISHED after breakdown and equiplet is repaired %.0f + %.0f, %s\n", time, remainingTime, equipletName);
 		} else {
-			updateStats(STATS_BUSY, -1);
+			updateProductStats(STATS_BUSY, -1);
 
 			// notify the equiplet his job is finished (without any more delay)
 			equipletAgent.notifyJobFinished(time);
@@ -402,7 +439,7 @@ public class Simulation implements ISimulation, Control {
 	 *            name of the equiplet
 	 */
 	private void breakdownEvent(String equipletName) {
-		updateStats(STATS_BROKEN, +1);
+		updateProductStats(STATS_BROKEN, +1);
 		IEquipletSim equipletAgent = equiplets.get(equipletName);
 		equipletAgent.notifyBreakdown(time);
 
@@ -426,7 +463,7 @@ public class Simulation implements ISimulation, Control {
 	 *            name of the equiplet
 	 */
 	private void repairedEvent(String equipletName) {
-		updateStats(STATS_BROKEN, -1);
+		updateProductStats(STATS_BROKEN, -1);
 
 		IEquipletSim equipletAgent = equiplets.get(equipletName);
 		if (equipletAgent.getEquipletState() == EquipletState.ERROR_FINISHED) {
@@ -477,8 +514,8 @@ public class Simulation implements ISimulation, Control {
 	@Override
 	public void notifyProductCreationFailed(String productName) {
 		System.out.printf("Simulation: product agent %s failed to create.\n", productName);
-		updateStats(STATS_FAILED_CREATION, +1);
-		updateStats(STATS_SYSTEM, -1);
+		updateProductStats(STATS_FAILED_CREATION, +1);
+		updateProductStats(STATS_SYSTEM, -1);
 
 		// remove agent from system
 		products.remove(productName);
@@ -496,7 +533,7 @@ public class Simulation implements ISimulation, Control {
 			lock.unlock();
 		}
 		System.out.println("CHECKPOINT GOLF");
-		
+
 		simulation.delay(10000);
 	}
 
@@ -528,7 +565,7 @@ public class Simulation implements ISimulation, Control {
 		System.out.printf("Simulation: schedule event ARRIVED %.0f + %.0f, %s, %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
 
 		// traveling++;
-		updateStats(STATS_TRAVEL, +1);
+		updateProductStats(STATS_TRAVEL, +1);
 
 		// schedule next product arrival
 		double arrivalTime = stochastics.generateProductArrival();
@@ -556,8 +593,8 @@ public class Simulation implements ISimulation, Control {
 	 */
 	@Override
 	public void notifyProductProcessing(String productName, String equipletName, String service) {
-		updateStats(STATS_WAITING, -1);
-		updateStats(STATS_BUSY, +1);
+		updateProductStats(STATS_WAITING, -1);
+		updateProductStats(STATS_BUSY, +1);
 
 		System.out.printf("Simulation: product agent %s notifies processing.\n", productName);
 		double productionTime = stochastics.generateProductionTime(equipletName, service);
@@ -582,7 +619,7 @@ public class Simulation implements ISimulation, Control {
 	 */
 	@Override
 	public void notifyProductTraveling(String productName, String equipletName) {
-		updateStats(STATS_TRAVEL, +1);
+		updateProductStats(STATS_TRAVEL, +1);
 
 		System.out.printf("Simulation: product agent %s notifies product step is finished and traveling to equiplet %s\n", productName, equipletName);
 
@@ -614,8 +651,8 @@ public class Simulation implements ISimulation, Control {
 	public void notifyProductFinished(String productName) {
 		System.out.printf("Simulation: product agent %s notifies he is finished.\n", productName);
 
-		updateStats(STATS_FINISHED, +1);
-		updateStats(STATS_SYSTEM, -1);
+		updateProductStats(STATS_FINISHED, +1);
+		updateProductStats(STATS_SYSTEM, -1);
 
 		// Product is finished
 		IProductSim productAgent = products.get(productName);
@@ -711,7 +748,12 @@ public class Simulation implements ISimulation, Control {
 	@Override
 	public Map<String, Map<Double, Double>> getProductStatistics() {
 		HashMap<String, Map<Double, Double>> stats = new HashMap<String, Map<Double, Double>>(productStatistics);
-		stats.remove(STATS_FINISHED);
+		// / stats.remove(STATS_FINISHED);
 		return stats;
+	}
+
+	@Override
+	public Map<String, Map<Double, Double>> getEquipletStatistics() {
+		return new HashMap<String, Map<Double, Double>>(equipletStatistics);
 	}
 }
