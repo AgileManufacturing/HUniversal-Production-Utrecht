@@ -28,4 +28,5 @@ add_executable(equiplet_node ${sources})
 
 
 target_link_libraries(equiplet_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES})
+add_dependencies(equiplet_node equiplet_node_gencpp)
 
