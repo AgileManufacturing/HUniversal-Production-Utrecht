@@ -52,9 +52,13 @@ public class ProductStep {
 	
 	public String toJSON(){
 		  return  "{" +
-		    " " + ID + ":" + id + ",\n" +
-		    " " + SERVICE + ":" + service.toJSON() + ",\n" +
-		    " " + CRITERIA + ": {" + criteria + "}\n" +
+		    " \"" + ID + "\":" + id + ",\n" +
+		    " \"" + SERVICE + "\":" + service.toJSON() + ",\n" +
+		    " \"" + CRITERIA + "\": {" + criteria + "}\n" +
 		    "}";
+	}
+	
+	public String toString() {
+		return toJSON();
 	}
 }
