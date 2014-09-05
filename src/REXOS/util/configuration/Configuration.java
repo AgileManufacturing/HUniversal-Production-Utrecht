@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  **/
-package configuration;
+package util.configuration;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Configuration {
-	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
-	//private static String propertiesFilePath = "src/REXOS/MAS/configuration/";
+	//private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
+	private static String propertiesFilePath = "src/REXOS/util/configuration/";
 	
 	public static String getProperty(ConfigurationFiles file, String key)
 	{

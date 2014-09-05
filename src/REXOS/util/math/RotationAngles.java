@@ -1,4 +1,4 @@
-package libraries.math;
+package util.math;
 /**
  * Struct describing the rotation angles in the 3D space
  * @author Tommas Bakker

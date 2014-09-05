@@ -29,7 +29,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package libraries.log;
+package util.log;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -86,7 +86,7 @@ public class Logger {
 	
 	
 	protected static LogSection[] includedLogSections = new LogSection[] {LogSection.NONE, LogSection.HAL};
-	protected static LogSection[] excludedLogSections = new LogSection[] {};
+	protected static LogSection[] excludedLogSections = new LogSection[] {LogSection.HAL_MODULE_FACTORY_SQL, LogSection.HAL_CAPABILITY_FACTORY_SQL};
 	protected static LogLevel loglevelThreshold = LogLevel.DEBUG;
 	
 	

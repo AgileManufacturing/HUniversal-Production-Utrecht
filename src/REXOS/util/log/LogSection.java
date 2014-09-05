@@ -1,4 +1,4 @@
-package libraries.log;
+package util.log;
 
 public enum LogSection {
 	NONE(null, ""),

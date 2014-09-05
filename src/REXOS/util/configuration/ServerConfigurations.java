@@ -37,7 +37,7 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package configuration;
+package util.configuration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

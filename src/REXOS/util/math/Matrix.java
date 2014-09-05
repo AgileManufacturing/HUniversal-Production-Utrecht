@@ -1,4 +1,4 @@
-package libraries.math;
+package util.math;
 
 // source: http://pastebin.com/Gq4mHL82
 

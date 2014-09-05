@@ -1,4 +1,4 @@
-package libraries.math;
+package util.math;
 
 public class Vector3 {
     public final static Vector3 X_AXIS=new Vector3(1,0,0);
