@@ -1,3 +1,5 @@
+package MAS;
+
 /**                                     ______  _______   __ _____  _____
  *                  ...++,              | ___ \|  ___\ \ / /|  _  |/  ___|
  *                .+MM9WMMN.M,          | |_/ /| |__  \ V / | | | |\ `--.
@@ -36,12 +38,12 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
-import agents.equiplet_agent.EquipletAgent;
+import MAS.equiplet.equiplet_agent.EquipletAgent;
 
 public class EQSpawnClass extends Agent {
 	/**

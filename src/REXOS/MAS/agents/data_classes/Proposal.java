@@ -1,4 +1,4 @@
-package agents.data_classes;
+package MAS.agents.data_classes;
 
 import jade.core.AID;
 

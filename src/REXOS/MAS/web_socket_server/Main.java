@@ -36,7 +36,7 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package web_socket_server;
+package MAS.web_socket_server;
 
 
 import java.io.BufferedReader;
@@ -54,7 +54,7 @@ import web_socket_server.java.org.java_websocket.server.WebSocketServer;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 
 
 /**

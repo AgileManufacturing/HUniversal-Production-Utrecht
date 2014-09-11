@@ -36,13 +36,13 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package web_socket_server;
+package MAS.web_socket_server;
 
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 
 import web_socket_server.java.org.java_websocket.client.WebSocketClient;
 import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;

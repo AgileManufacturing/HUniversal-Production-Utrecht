@@ -1,6 +1,6 @@
-package web_socket_server;
+package MAS.web_socket_server;
 
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 
 import jade.core.AID;
 import jade.core.Agent;

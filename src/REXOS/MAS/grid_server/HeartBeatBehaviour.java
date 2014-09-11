@@ -36,10 +36,10 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package grid_server;
+package MAS.grid_server;
 
 
-import agents.data_classes.MessageType;
+import MAS.agents.data_classes.MessageType;
 
 import jade.core.AID;
 import jade.core.Agent;

@@ -36,11 +36,11 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package grid_server;
+package MAS.grid_server;
 
-import libraries.math.Matrix;
-import libraries.math.Vector3;
-import agents.data_classes.MessageType;
+import util.math.Matrix;
+import util.math.Vector3;
+import MAS.agents.data_classes.MessageType;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

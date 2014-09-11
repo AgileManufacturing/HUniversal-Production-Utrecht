@@ -37,9 +37,9 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package grid_server;
+package MAS.grid_server;
 
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,9 +49,6 @@ import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentController;
-import jade.wrapper.ContainerController;
-import jade.wrapper.StaleProxyException;
 
 public class MonitoringAgent extends Agent{
 	/**

@@ -1,10 +1,10 @@
-package grid_server;
+package MAS.grid_server;
 
 import generic.ProductStep;
 
 import java.util.ArrayList;
 
-import agents.data_classes.MessageType;
+import MAS.agents.data_classes.MessageType;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
