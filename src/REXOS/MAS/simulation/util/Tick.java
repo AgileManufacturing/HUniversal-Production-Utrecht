@@ -1,5 +1,7 @@
 package simulation.util;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 public class Tick extends Number implements Comparable<Tick> {
 
 	/**
@@ -37,7 +39,8 @@ public class Tick extends Number implements Comparable<Tick> {
 	@Override
 	public String toString() {
 		if (type.equals(Double.class)) {
-			return String.format("%.2f", dTime);
+			return dTime.toString();
+			// return String.format("%.2f", dTime);
 		} else if (type.equals(Long.class)) {
 			return lTime.toString();
 		}
@@ -45,6 +48,21 @@ public class Tick extends Number implements Comparable<Tick> {
 		return dTime.toString();
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		Tick tick = (Tick) obj;
+		return dTime.equals(tick.doubleValue());
+	}
+	
 	@Override
 	public double doubleValue() {
 		return dTime;
