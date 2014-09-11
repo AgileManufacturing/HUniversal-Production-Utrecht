@@ -1,8 +1,6 @@
 package HAL.steps;
 
 import generic.ProductStep;
-
-
 import HAL.Capability;
 import HAL.Module;
 import HAL.exceptions.ModuleTranslatingException;

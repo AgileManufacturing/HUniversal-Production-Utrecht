@@ -331,8 +331,7 @@ public class ModuleFactory extends Factory {
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
 			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			ModuleActor module = (ModuleActor) this.getModuleByIdentifier(identifier);
-			modules.add(module);
+			modules.add((ModuleActor) this.getModuleByIdentifier(identifier));
 		}
 		Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.DEBUG, "Found bottomModules for function module tree " + treeNumber + " of capability " + capability.getName() + ":", 
 				modules);
@@ -358,6 +357,17 @@ public class ModuleFactory extends Factory {
 		}
 		
 		return modules;
+	}
+	/**
+	 * This method executes the {@link HardwareStep} by instantiating the module and forwarding the HardwareStep to it.
+	 * @param processListener
+	 * @param hardwareStep
+	 * @throws FactoryException
+	 * @throws ModuleExecutingException
+	 */
+	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException{
+		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
+		module.executeHardwareStep(processListener, hardwareStep);
 	}
 	
 	/**
@@ -387,7 +397,7 @@ public class ModuleFactory extends Factory {
 			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "well, we are fucked", ex);
 			return null;
 		} catch (JarFileLoaderException ex) {
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "Unable to load the jarFile of the module " + moduleIdentifier);
+			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "Unable to load the jarFile of the module");
 			return null;
 		}
 	}

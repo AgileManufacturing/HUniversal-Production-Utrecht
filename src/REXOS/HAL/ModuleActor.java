@@ -181,7 +181,6 @@ public abstract class ModuleActor extends Module {
 			double originalY = originalMove.get(MOVE_Y).getAsDouble();
 			double originalZ = originalMove.get(MOVE_Z).getAsDouble();
 			
-			
 			Matrix rotationMatrix = directionAngles.generateRotationMatrix();
 			
 			Vector3 originalVector = offsetVector;
@@ -191,15 +190,6 @@ public abstract class ModuleActor extends Module {
 			adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
 			adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
 			adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
-			
-			if(originalMove.has(APPROACH)){
-
-				adjustedMove.add(APPROACH,originalMove.getAsJsonObject(APPROACH));
-			}
-			
-			if(originalMove.get(MOVE_MAX_ACCELERATION)!= null){
-				adjustedMove.addProperty(MOVE_MAX_ACCELERATION, originalMove.get(MOVE_MAX_ACCELERATION).getAsInt());
-			}
 			
 			compositeCommand.add(MOVE, adjustedMove);
 		}

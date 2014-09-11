@@ -67,7 +67,6 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will attempt to translate the product step provided. This is a asynchronous call.
 	 * Once the translation has finished, the onTranslationFinished of the HardwareAbstractionLayerListener will be called.
 	 */
-	
 	public void translateProductStep(ProductStep productStep){
 		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
 		translationProcess.start();

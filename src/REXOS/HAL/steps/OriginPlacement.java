@@ -1,6 +1,5 @@
 package HAL.steps;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class OriginPlacement {
