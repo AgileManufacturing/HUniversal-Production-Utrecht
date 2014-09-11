@@ -65,3 +65,6 @@ src/REXOS/databases/equipletRecord.sql
 src/REXOS/databases/equipletRecord.sql
 log.txt
 *.txt
+/bin
+
+output/

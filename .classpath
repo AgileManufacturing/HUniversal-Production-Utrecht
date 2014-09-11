@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="agents/service_agent/|agents/hardware_agent/" kind="src" path="src/REXOS/MAS"/>
+	<classpathentry excluding="ROS/|www/|databases/" kind="src" path="src/REXOS"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/commons-lang-2.3.jar"/>
@@ -24,5 +24,10 @@
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/mongo-2.9.3.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/mysql-connector-java-5.1.24-bin.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/sqlite-jdbc-3.7.2.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/jcommon-1.0.21.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/jfreechart-1.0.17.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/java-json.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="src" path="/AgentTest"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

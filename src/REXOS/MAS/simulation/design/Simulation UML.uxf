@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.2">
+  <help_text>/ Uncomment the following line to change the fontsize and font:
+// fontsize=14
+// fontfamily=SansSerif //possible: SansSerif,Serif,Monospaced
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Welcome to UMLet!
+//
+// Double-click on elements to add them to the diagram, or to copy them
+// Edit elements by modifying the text in this panel
+// Hold Ctrl to select multiple elements
+// Use Ctrl+mouse to select via lasso
+//
+// Use +/- or Ctrl+mouse wheel to zoom
+// Drag a whole relation at its central square icon
+//
+// Press Ctrl+C to copy the whole diagram to the system clipboard (then just paste it to, eg, Word)
+// Edit the files in the "palettes" directory to create your own element palettes
+//
+// Select "Custom Elements &gt; New..." to create new element types
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// This text will be stored with each diagram;  use it for notes.</help_text>
+  <zoom_level>7</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>21</x>
+      <y>112</y>
+      <w>574</w>
+      <h>336</h>
+    </coordinates>
+    <panel_attributes>mas.equiplet::Job
+--
+-product: AID
+-productName: String
+-service: String
+-criteria: Map&lt;String, Object&gt;
+-start: double
+-due: double
+-deadline: double
+-ready: boolean
+--
++Job(double start, double deadline): ctor
++Job(String service, String product, Map&lt;String, Object&gt; criteria, double start, double due, double deadline): ctor
++Job(AID product, String service, Map&lt;String, Object&gt; criteria, double start, double due, double deadline): ctor
++compareTo(Job job): int
++getService(): String
++getProductAgentName(): String
++getProductAgent(): AID
++getCriteria(): Map&lt;String, Object&gt;
++getStartTime(): double
++getDueTime(): double
++getDeadline(): double
++getDuration(): double
++isReady(): boolean
++setReady(): void
++updateStartTime(double time): void
++updateDueTime(double time): void
++toString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1246</x>
+      <y>112</y>
+      <w>595</w>
+      <h>245</h>
+    </coordinates>
+    <panel_attributes>simulation.mas.product::ProductionStep
+--
+-productStep: ProductStep
+-equiplet: AID
+-equipletName: String
+-position: Position
+-time: double
+-duration: double
+--
++ProductionStep(ProductStep productStep, AID equilet, Position position, double time, double duration): ctor
++ProductionStep(ProductStep productStep, String equipletName, Position position, double time, double duration): ctor
++getProductStep(): ProductStep
++getEquiplet(): AID
++getEquipletName(): String
++getPosition(): Position
++getTime(): double
++getDuration(): double
++getService(): String
++getCriteria(): Map&lt;String, Object&gt;
++toString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1351</x>
+      <y>371</y>
+      <w>301</w>
+      <h>203</h>
+    </coordinates>
+    <panel_attributes>simulation.mas.product::Node
+--
+-equipletAID: AID
+-equiplet: String
+-time: double
+-duration: double
+--
++Node(): ctor
++Node(double time): ctor
++Node(String equiplet, double time, double duration): ctor
++Node(AID equiplet, double time, double duration): ctor
++getEquiplet(): String
++getEquipletAID(): AID
++getTime(): double
++getDuration(): double
++equals(Object obj): boolean
++toString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1295</x>
+      <y>602</y>
+      <w>378</w>
+      <h>133</h>
+    </coordinates>
+    <panel_attributes>simulation.mas.product::ProductStep
+--
+-index: int
+-service: String
+-criteria: Map&lt;String, Object&gt;
+--
++ProductStep(int index, String service, Map&lt;String, Object&gt; criteria): ctor
++getIndex(): int
++getService(): String
++getCriteria(): Map&lt;String, Object&gt;
++toString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1561</x>
+      <y>784</y>
+      <w>455</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+simulation.simulation::ISimulation
+--
+--
+~notifyProductCreationFailed(String localName): void
+~notifyProductCreated(String productName, String equipletName): void
+~notifyProductTraveling(String productName, String equipletName): void
+~notifyProductProcessing(String productName, String equipletName, String service): void
+~notifyProductFinished(String productName): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>49</x>
+      <y>672</y>
+      <w>336</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>mas.equiplet::Capability
+--
+-service: String
+-limitations: Map&lt;String, Object&gt;
+--
++Capability(String service, Map&lt;String, Object&gt; limitations): ctor
++getService(): String
++getLimitations(): Map&lt;String, Object&gt;
++toString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1120</x>
+      <y>840</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>simulation.util::Position
+--
+-x: int
+-y: int
+--
++Position(int x, int y): ctor
++getX(): int
++getY(): int
++toString(): String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>434</x>
+      <y>770</y>
+      <w>357</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>mas.equiplet::EquipletAgent
+--
+- 
+--
+-register()
+#takeDown()
+#notifyProductArrived(AID product, double time) : void
+-informProductProcessing(AID product)
+-informProductStepFinished(AID product)
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>623</x>
+      <y>147</y>
+      <w>581</w>
+      <h>371</h>
+    </coordinates>
+    <panel_attributes>mas.equiplet.Equiplet
+--
+-name : String
+-position : Position
+-capabilities : List&lt;Capability&gt;
+-productionTimes : Map&lt;String, Double&gt;
+-state : EquipletState
+-executing : Job
+-schedule : TreeSet&lt;Job&gt;
+-history : List&lt;Job&gt;
+-statistics : Triple&lt;Double, Double, Double&gt;
+-lastStatisticsUpdate : double
+-scheduleLatency : Map&lt;Double, Double&gt;
+--
+#init(Position position, List&lt;Capability&gt; capabilities, Map&lt;String, Double&gt; productionTimes)
+#canExecute(double time, double deadline, List&lt;ProductStep&gt; productSteps : List&lt;Triple&lt;Integer, Double, List&lt;Pair&lt;Double, Double&gt;&gt;&gt;&gt;
+#isCapable(String service, Map&lt;String, Object&gt; criteria)
+#available(double time, double duration, double deadline) : List&lt;Pair&lt;Double, Double&gt;&gt;
+#load(double time, double window) : double
+
+#schedule(AID product, double start, double deadline, String service, Map&lt;String, Object&gt; criteria) : boolean
+-estimateService(String service) : double
+#isExecuting() : boolean
+#jobReady() : boolean
+
+#historyUpdate(double time) : void
+executeJob(double time) : 
+/#execute(Job job)/
+/#informProductProcessing()/
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>14</x>
+      <y>483</y>
+      <w>483</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>mas.equiplet::EquipletListenerBehaviour
+--
+-serialVersionUID = 1L: long
+-equiplet: EquipletAgent
+-done: boolean
+--
++EquipletListenerBehaviour(EquipletAgent equiplet): ctor
++action(): void
++done(): boolean
+-handleCanExecute(ACLMessage message): void
+-handleScheduling(ACLMessage message): void
+-handleProductArrived(ACLMessage message): void
+-handleInformationRequest(String content, AID sender, String conversationId, String reply): void
+-handleSimulationInform(String content, AID sender): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>609</x>
+      <y>532</y>
+      <w>413</w>
+      <h>217</h>
+    </coordinates>
+    <panel_attributes>mas.equiplet.SimEquipet
+--
+-timeBreakdown : double
+-timeReamining : double
+--
++getEquipletState() : EquipletState
++getTimeRemaining() : double
++getExecutingProduct() : String
+
++getPosition() : Position
++getScheduled() : int
++getWaiting() : int
++getScheduled() : int 
+
++getStatistics() : Triple&lt;Double, Double, Double&gt;
++getSchedule(): List&lt;Triple&lt;String, Double, Double&gt;&gt;
++getHistory() : List&lt;Triple&lt;String, Double, Double&gt;&gt;
++getCompleteSchedule() : List&lt;Triple&lt;String, Double, Double&gt;&gt;
++getLatency() : Map&lt;Double, Double&gt;
+
++notifyJobFinished(double time) : void
++notifyBreakdown(double time) : void
++notifyRepaired(double time) : void
+
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1841</x>
+      <y>434</y>
+      <w>602</w>
+      <h>203</h>
+    </coordinates>
+    <panel_attributes>mas.product.ProductSimulation
+--
+-simulation : ISimulation
+--
++ProductAgent(ISimulation simulation, LinkedList&lt;ProductStep&gt; productSteps, Position startPosition, double time) : ctor
++getCreated() : double
++getPosition() : Position
++getProductState() : ProductState
++onProductArrived(double time) : void
++onProductStepFinished() : void
++onProductProcessing() : void
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>1988</x>
+      <y>238</y>
+      <w>420</w>
+      <h>133</h>
+    </coordinates>
+    <panel_attributes>mas.product.Product
+--
+-created : double
+-deadline : double
+-position : Position
+-productSteps : List&lt;ProductStep&gt;
+-productionPath : LinkedList&lt;ProductionStep&gt; 
+-state : ProductState
+
+
+--
++setup() : void
+-setup(List&lt;ProductStep&gt; productSteps, Position startPosition position) : void
+
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

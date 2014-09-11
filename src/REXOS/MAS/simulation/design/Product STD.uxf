@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>96</x>
+      <y>392</y>
+      <w>144</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>Scheduling
+--
+entry/schedule()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.InitialState</type>
+    <coordinates>
+      <x>8</x>
+      <y>432</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>0</x>
+      <y>400</y>
+      <w>112</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+Product()</panel_attributes>
+    <additional_attributes>96;40;24;40</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>656</x>
+      <y>392</y>
+      <w>144</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>Processing
+--
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>392</x>
+      <y>392</y>
+      <w>144</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>Traveling
+--
+entry/updatePosition();
+informEquiplet();
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>552</x>
+      <y>504</y>
+      <w>72</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>Finished</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>288</x>
+      <y>504</y>
+      <w>72</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>Error</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>72</x>
+      <y>456</y>
+      <w>232</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+[productionPath == null]</panel_attributes>
+    <additional_attributes>216;64;96;64;96;24</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>296</x>
+      <y>512</y>
+      <w>168</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>152;56;24;56;24;24</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.FinalState</type>
+    <coordinates>
+      <x>448</x>
+      <y>560</y>
+      <w>16</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>608</x>
+      <y>312</y>
+      <w>210</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyProductProcessing()</panel_attributes>
+    <additional_attributes>120;80;120;40;24;40</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>440</x>
+      <y>512</y>
+      <w>160</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>24;56;144;56;144;24</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>600</x>
+      <y>456</y>
+      <w>226</w>
+      <h>98</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyProductStepFinished()/
+[productionPath.isEmpty()]</panel_attributes>
+    <additional_attributes>24;64;128;64;128;24</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>512</x>
+      <y>400</y>
+      <w>160</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+getNextEquipet()</panel_attributes>
+    <additional_attributes>24;40;144;40</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>216</x>
+      <y>400</y>
+      <w>192</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyProductProcessing()</panel_attributes>
+    <additional_attributes>176;40;24;40</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>560</x>
+      <y>336</y>
+      <w>72</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>Waiting</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>376</x>
+      <y>312</y>
+      <w>200</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyProductArrived()</panel_attributes>
+    <additional_attributes>184;40;88;40;88;80</additional_attributes>
+  </element>
+</diagram>
