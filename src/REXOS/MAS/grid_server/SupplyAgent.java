@@ -145,63 +145,24 @@ public class SupplyAgent extends Agent{
 				ACLMessage msg = receive();
 				if (msg!=null) {
 					System.out.println("PARTS AGENTS!!");
-					System.out.println("Supply: "+ msg);
 					if (msg.getPerformative() == MessageType.SUPPLIER_REQUEST){
 						JsonObject partRequest = new JsonParser().parse(msg.getContent()).getAsJsonObject();
-						if(partRequest.get("serviceID").getAsInt()==PICK_PLACE_ROTATION_SERVICE_ID){
-							ACLMessage reply = msg.createReply();
-		                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
-		                    hasRotate =true;
-		                    reply.setContent(createPickPlaceRotationMessage(partRequest));
-		                    send(reply);
-						}
-						else{
-							partRequest.getAsJsonObject("criteria").getAsJsonObject("target").remove("identifier");
-							partRequest.getAsJsonObject("criteria").getAsJsonObject("target").addProperty("identifier", targetCrate);
-							JsonArray parts =findPart(partRequest.getAsJsonObject("criteria").getAsJsonObject("subjects").get("color").getAsString());
-							
-							partRequest.getAsJsonObject("criteria").remove("subjects");
-							partRequest.getAsJsonObject("criteria").add("subjects", parts);
-							ACLMessage reply = msg.createReply();
-		                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
-		                    reply.setContent(partRequest.toString());
-		                    send(reply);  
-						}
+						partRequest.getAsJsonObject("criteria").getAsJsonObject("target").remove("identifier");
+						partRequest.getAsJsonObject("criteria").getAsJsonObject("target").addProperty("identifier", targetCrate);
+						JsonArray parts =findPart(partRequest.getAsJsonObject("criteria").getAsJsonObject("subjects").get("color").getAsString());
+						
+						partRequest.getAsJsonObject("criteria").remove("subjects");
+						partRequest.getAsJsonObject("criteria").add("subjects", parts);
+						ACLMessage reply = msg.createReply();
+	                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
+	                    reply.setContent(partRequest.toString());
+	                    send(reply);   
 					}
 					else {
 						System.out.println(	"FAILED PARTSAGENTS");
 					}
 				}
 				block();    
-			}
-
-			private String createPickPlaceRotationMessage(JsonObject partRequest) {
-				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").remove("identifier");
-				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").addProperty("identifier", targetCrate);
-
-				double x = partRequest.getAsJsonObject("criteria").getAsJsonObject("target").getAsJsonObject("move").get("x").getAsDouble();
-				double y = partRequest.getAsJsonObject("criteria").getAsJsonObject("target").getAsJsonObject("move").get("y").getAsDouble();
-				
-				JsonObject targetRotate = new JsonObject();
-				targetRotate.addProperty("x", 0);
-				targetRotate.addProperty("y", 0);
-				targetRotate.addProperty("z", 0);
-				
-				JsonObject approach = new JsonObject();
-				approach.addProperty("x", x);
-				approach.addProperty("y", y);
-				approach.addProperty("z", APPROACH_OFFSET);
-
-				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").getAsJsonObject("move").add("approach", approach);
-				partRequest.getAsJsonObject("criteria").getAsJsonObject("target").add("rotate",targetRotate);
-				JsonArray parts =findPart(partRequest.getAsJsonObject("criteria").getAsJsonObject("subjects").get("color").getAsString());
-				
-				partRequest.getAsJsonObject("criteria").remove("subjects");
-				partRequest.getAsJsonObject("criteria").add("subjects", parts);
-
-				return partRequest.toString();
-				// TODO Auto-generated method stub
-				
 			}  
 		});  
 	}
@@ -210,27 +171,13 @@ public class SupplyAgent extends Agent{
 		JsonArray subjects = new JsonArray();
 		JsonObject subject = new JsonObject();
 		JsonObject subjectMove = new JsonObject();
-		JsonObject subjectRotate = new JsonObject();
-		JsonObject approach = new JsonObject();
-		
 		
 		if(color.equals("red")){
 			for(int i =0; i < GC4x4MB_3.length; i++){
 				if(GC4x4MB_3[i].equals("red")){
-					if(hasRotate){
-						subjectRotate.addProperty("x", Math.toRadians(15));
-						subjectRotate.addProperty("y", 0);
-						subjectRotate.addProperty("z", 0);
-						subject.add("rotate",subjectRotate);
-					}
-					approach.addProperty("x", lookUpTable[(i*2)]);
-					approach.addProperty("y", lookUpTable[(i*2)+1]);
-					approach.addProperty("z", APPROACH_OFFSET);
-					subjectMove.add("approach", approach);
 					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
 					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
-					//subjectMove.addProperty("z", "-26.5");		
-					subjectMove.addProperty("z", "3.0");
+					subjectMove.addProperty("z", "-26.5");					
 					subject.add("move",subjectMove);
 					subject.addProperty("identifier", "GC4x4MB_3");
 					subjects.add(subject);
@@ -245,13 +192,8 @@ public class SupplyAgent extends Agent{
 					subjectMove.addProperty("identifier", "GC4x4MB_1");
 					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
 					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
-					//subjectMove.addProperty("z", "-26.5");
-					subjectMove.addProperty("z", "5.0");
-					subjectRotate.addProperty("x", 0);
-					subjectRotate.addProperty("y", 0);
-					subjectRotate.addProperty("z", 0);
+					subjectMove.addProperty("z", "-26.5");
 					subject.add("move",subjectMove);
-					subject.add("rotate",subjectRotate);
 					subject.addProperty("identifier", "GC4x4MB_1");
 					subjects.add(subject);
 					GC4x4MB_1[i]="";
@@ -265,13 +207,8 @@ public class SupplyAgent extends Agent{
 					subjectMove.addProperty("identifier", "GC4x4MB_4");
 					subjectMove.addProperty("x", (lookUpTable[(i*2)]));
 					subjectMove.addProperty("y", (lookUpTable[(i*2)+1]));
-					//subjectMove.addProperty("z", "-26.5");
-					subjectMove.addProperty("z", "20.0");
-					subjectRotate.addProperty("x", 0);
-					subjectRotate.addProperty("y", 0);
-					subjectRotate.addProperty("z", 0);
+					subjectMove.addProperty("z", "-26.5");
 					subject.add("move",subjectMove);
-					subject.add("rotate",subjectRotate);
 					subject.addProperty("identifier", "GC4x4MB_4");
 					subjects.add(subject);
 					GC4x4MB_4[i]="";
@@ -282,5 +219,4 @@ public class SupplyAgent extends Agent{
 		}
 		return subjects;		
 	}
-
 }

@@ -39,6 +39,7 @@
 package MAS.grid_server;
 
 import jade.core.AID;
+
 import java.io.Serializable;
 
 import com.google.gson.JsonObject;
