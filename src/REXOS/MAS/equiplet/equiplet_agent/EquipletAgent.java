@@ -36,15 +36,15 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package agents.equiplet_agent;
+package MAS.equiplet.equiplet_agent;
 
 import generic.ProductStep;
 import generic.Service;
 
 import java.util.ArrayList;
 
-import agents.data_classes.MessageType;
-import agents.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
+import MAS.agents.data_classes.MessageType;
+import MAS.equiplet.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -61,7 +61,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import libraries.knowledgedb_client.KnowledgeException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener{
 		

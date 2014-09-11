@@ -36,7 +36,7 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package agents.product_agent;
+package MAS.product.product_agent;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import generic.ProductStep;
-import agents.data_classes.Proposal;
+import MAS.agents.data_classes.Proposal;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -57,7 +57,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import agents.data_classes.MessageType;
+import MAS.agents.data_classes.MessageType;
 
 /**
  * ProductAgent that communicates with equipletagents to plan its product steps.

@@ -37,12 +37,10 @@
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-package agents.equiplet_agent.reconfigure.datatypes;
+package MAS.equiplet.equiplet_agent.reconfigure.datatypes;
 
 import java.util.ArrayList;
 
-import libraries.knowledgedb_client.KeyNotFoundException;
-import libraries.knowledgedb_client.KnowledgeException;
 import HAL.Module;
 import HAL.ModuleIdentifier;
 

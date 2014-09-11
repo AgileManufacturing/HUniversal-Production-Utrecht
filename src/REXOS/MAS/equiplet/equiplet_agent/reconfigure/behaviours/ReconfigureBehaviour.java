@@ -36,7 +36,7 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package agents.equiplet_agent.reconfigure.behaviours;
+package MAS.equiplet.equiplet_agent.reconfigure.behaviours;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
@@ -45,9 +45,9 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
-import agents.equiplet_agent.EquipletAgent;
-import agents.equiplet_agent.reconfigure.ModuleDataManager;
-import agents.equiplet_agent.reconfigure.datatypes.ModuleTree;
+import MAS.equiplet.equiplet_agent.EquipletAgent;
+import MAS.equiplet.equiplet_agent.reconfigure.ModuleDataManager;
+import MAS.equiplet.equiplet_agent.reconfigure.datatypes.ModuleTree;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -57,8 +57,8 @@ import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 
 import jade.core.behaviours.Behaviour;
-import libraries.dynamicloader.JarFileLoaderException;
-import libraries.knowledgedb_client.KnowledgeException;
+import HAL.libraries.dynamicloader.JarFileLoaderException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 
 public class ReconfigureBehaviour extends Behaviour{
 	public HardwareAbstractionLayer HAL;
