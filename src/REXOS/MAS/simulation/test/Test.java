@@ -1,4 +1,4 @@
-package simulation.simulation;
+package simulation.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,8 +16,10 @@ import simulation.mas.product.Node;
 import simulation.mas.product.Product;
 import simulation.mas.product.ProductStep;
 import simulation.mas.product.ProductionStep;
+import simulation.simulation.Grid;
 import simulation.util.Pair;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 class Test {
 	
@@ -89,7 +91,7 @@ class Test {
 	public static void productScheduling() {
 		System.out.println("Start product scheduling test...");
 
-		System.out.println("TEst NODE + " + new Node(4));
+		System.out.println("TEst NODE + " + new Node(new Tick(4)));
 		LinkedList<ProductStep> productSteps = new LinkedList<ProductStep>();
 		//productSteps.add(new ProductStep(1, "screw", new HashMap<String, Object>()));
 		//productSteps.add(new ProductStep(2, "glue", new HashMap<String, Object>()));
@@ -153,7 +155,7 @@ class Test {
 			LinkedList<ProductionStep> path = agent.getProductionPath();
 			TaskSeries serie = new TaskSeries(agent.getProductName());
 			for (ProductionStep step : path) {
-				serie.add(new Task(step.getEquipletName(), new SimpleTimePeriod((long) step.getStart(), (long)(step.getStart() + step.getDuration()))));
+				serie.add(new Task(step.getEquipletName(), new SimpleTimePeriod((long) step.getStart().doubleValue(), (long)(step.getStart().doubleValue() + step.getDuration().doubleValue()))));
 			}
 			tasks.add(serie);
 		}

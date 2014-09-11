@@ -19,6 +19,7 @@ import simulation.mas.equiplet.Capability;
 import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 /**
  * Configuration data to read from configuration file simulation.xml
@@ -32,7 +33,7 @@ public class Config implements IConfig {
 
 	// run length of the simulation
 	@XmlElement(name = "runlength")
-	private double runlength;
+	private Tick runlength;
 
 	// number of times the simulation needs to run
 	@XmlElement(name = "runs")
@@ -61,7 +62,7 @@ public class Config implements IConfig {
 		}
 	}
 
-	public double getRunLength() {
+	public Tick getRunLength() {
 		return runlength;
 	}
 
@@ -69,12 +70,12 @@ public class Config implements IConfig {
 		return runs;
 	}
 
-	public Pair<Double, DurationType> getTravelTime() {
-		return new Pair<Double, DurationType>(travel.mean(), travel.type());
+	public Pair<Tick, DurationType> getTravelTime() {
+		return new Pair<Tick, DurationType>(new Tick(travel.mean()), travel.type());
 	}
 
-	public Pair<Double, DurationType> getProductArrival() {
-		return new Pair<Double, DurationType>(products.getArrival(), products.getArrivalType());
+	public Pair<Tick, DurationType> getProductArrival() {
+		return new Pair<Tick, DurationType>(new Tick(products.getArrival()), products.getArrivalType());
 	}
 
 	public List<ProductStep> getProductSteps() {
@@ -127,12 +128,12 @@ public class Config implements IConfig {
 		return equiplets;
 	}
 
-	public Pair<Double, DurationType> equipletProductionTime(String equiplet, String service) {
+	public Pair<Tick, DurationType> equipletProductionTime(String equiplet, String service) {
 		for (EquipletConfig config : equipletConfig) {
 			if (config.getName().equalsIgnoreCase(equiplet)) {
 				for (CapabilityConfig capability : config.getCapabilities()) {
 					if (capability.getName().equalsIgnoreCase(service)) {
-						return new Pair<Double, DurationType>(capability.getDuration(), capability.getDurationType());
+						return new Pair<Tick, DurationType>(new Tick(capability.getDuration()), capability.getDurationType());
 					}
 				}
 			}
@@ -141,20 +142,20 @@ public class Config implements IConfig {
 		return null;
 	}
 
-	public Pair<Double, DurationType> equipletBreakdownTime(String equiplet) {
+	public Pair<Tick, DurationType> equipletBreakdownTime(String equiplet) {
 		for (EquipletConfig config : equipletConfig) {
 			if (config.getName().equalsIgnoreCase(equiplet)) {
-				return new Pair<Double, DurationType>(config.getBreakdown().mean(), config.getBreakdown().type());
+				return new Pair<Tick, DurationType>(new Tick(config.getBreakdown().mean()), config.getBreakdown().type());
 			}
 		}
 		System.err.println("Config error: breakdown time of " + equiplet + " in " + toString());
 		return null;
 	}
 
-	public Pair<Double, DurationType> equipletRepaireTime(String equiplet) {
+	public Pair<Tick, DurationType> equipletRepaireTime(String equiplet) {
 		for (EquipletConfig config : equipletConfig) {
 			if (config.getName().equalsIgnoreCase(equiplet)) {
-				return new Pair<Double, DurationType>(config.getRepaired().mean(), config.getRepaired().type());
+				return new Pair<Tick, DurationType>(new Tick(config.getRepaired().mean()), config.getRepaired().type());
 			}
 		}
 		System.err.println("Config error: repair time of " + equiplet + " in " + toString());
@@ -163,6 +164,6 @@ public class Config implements IConfig {
 
 	@Override
 	public String toString() {
-		return String.format("Config [run length=%.0f, runs=%d, travel=%.2f (%s), \n products=%s, \n equiplets=%s]", runlength, runs, travel.mean(), travel.type(), products, equipletConfig);
+		return String.format("Config [run length=%s, runs=%d, travel=%.2f (%s), \n products=%s, \n equiplets=%s]", runlength, runs, travel.mean(), travel.type(), products, equipletConfig);
 	}
 }

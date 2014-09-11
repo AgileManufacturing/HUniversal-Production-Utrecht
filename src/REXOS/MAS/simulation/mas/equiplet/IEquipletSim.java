@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import simulation.util.Position;
+import simulation.util.Tick;
 import simulation.util.Triple;
 import simulation.util.Tuple;
 
@@ -13,26 +14,27 @@ public interface IEquipletSim {
 
 	EquipletState getEquipletState();
 
-	double load(double time, double window);
+	double load(Tick time, Tick window);
 
-	void notifyJobFinished(double time);
+	double loadHistory(Tick time, Tick window);
 
-	void notifyBreakdown(double time);
+	void notifyJobFinished(Tick time);
 
-	void notifyRepaired(double time);
+	void notifyBreakdown(Tick time);
 
-	double getRemainingTime();
+	void notifyRepaired(Tick time);
 
-	Triple<Double, Double, Double> getStatistics(double time);
+	Tick getRemainingTime();
 
-	List<Triple<String, Double, Double>> getCompleteSchedule();
+	Triple<Tick, Tick, Tick> getStatistics(Tick time);
 
-	List<Triple<String, Double, Double>> getSchedule();
+	List<Triple<String, Tick, Tick>> getCompleteSchedule();
 
-	List<Triple<String, Double, Double>> getHistory();
+	List<Triple<String, Tick, Tick>> getSchedule();
+
+	List<Triple<String, Tick, Tick>> getHistory();
 
 	Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>> getUpdateState();
 
-	Map<Double, Double> getLatency();
-
+	Map<Tick, Tick> getLatency();
 }

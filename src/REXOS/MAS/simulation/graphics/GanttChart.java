@@ -9,7 +9,6 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,8 +33,7 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.ApplicationFrame;
 
-import simulation.mas.product.Product;
-import simulation.mas.product.ProductionStep;
+import simulation.util.Tick;
 import simulation.util.Triple;
 
 public class GanttChart extends ApplicationFrame {
@@ -131,45 +129,20 @@ public class GanttChart extends ApplicationFrame {
 		return chart;
 	}
 
-	@Deprecated
-	public static JPanel createChartProducts(List<Product> agents) {
-		double maxTime = 300;
-		double minTime = Double.MAX_VALUE;
-		ArrayList<TaskSeries> tasks = new ArrayList<>();
-		for (Product agent : agents) {
-			LinkedList<ProductionStep> path = agent.getProductionPath();
-			TaskSeries serie = new TaskSeries(agent.getProductName());
-			for (ProductionStep node : path) {
-				serie.add(new Task(node.getEquipletName(), new SimpleTimePeriod((long) node.getStart(), (long) (node.getStart() + node.getDuration()))));
-				maxTime = Math.max(maxTime, node.getStart() + node.getDuration());
-				minTime = Math.min(minTime, node.getStart());
-			}
-			tasks.add(serie);
-		}
-
-		final IntervalCategoryDataset dataset = createDataset(tasks);
-		final JFreeChart chart = createChart("Schedule", "Equiplets", dataset);
-
-		final ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setMaximumDrawWidth((int) (maxTime - minTime));
-		chartPanel.setPreferredSize(new Dimension((int) (maxTime - minTime), 600));
-		return chartPanel;
-	}
-
 	/**
 	 * 
 	 * @param data
 	 *            <name [<name, start, end>]
 	 * @return chart
 	 */
-	public static JPanel createChart(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
+	public static JPanel createChart(String title, String yLabel, Map<String, List<Triple<String, Tick, Tick>>> data) {
 		int counter = 0;
 		ArrayList<TaskSeries> tasks = new ArrayList<>();
 		TreeSet<String> yLabels = new TreeSet<>();
-		for (Entry<String, List<Triple<String, Double, Double>>> entry : data.entrySet()) {
+		for (Entry<String, List<Triple<String, Tick, Tick>>> entry : data.entrySet()) {
 			TaskSeries serie = new TaskSeries(entry.getKey());
 
-			for (Triple<String, Double, Double> value : entry.getValue()) {
+			for (Triple<String, Tick, Tick> value : entry.getValue()) {
 				yLabels.add(value.first);
 
 				Task task = serie.get(value.first);
@@ -217,17 +190,17 @@ public class GanttChart extends ApplicationFrame {
 	 *            <y-axis, [name, start, end] >
 	 * @return
 	 */
-	public static JPanel createChartInvert(String title, String yLabel, Map<String, List<Triple<String, Double, Double>>> data) {
-		double maxTime = 300;
-		double minTime = Double.MAX_VALUE;
+	public static JPanel createChartInvert(String title, String yLabel, Map<String, List<Triple<String, Tick, Tick>>> data) {
+		Tick maxTime = new Tick(300);
+		Tick minTime = new Tick(Double.MAX_VALUE);
 
 		TaskSeriesCollection dataset = new TaskSeriesCollection();
 		TreeMap<String, TaskSeries> tasks = new TreeMap<>();
 		TreeSet<String> yLabels = new TreeSet<>();
 
-		for (Entry<String, List<Triple<String, Double, Double>>> entry : data.entrySet()) {
+		for (Entry<String, List<Triple<String, Tick, Tick>>> entry : data.entrySet()) {
 			yLabels.add(entry.getKey());
-			for (Triple<String, Double, Double> value : entry.getValue()) {
+			for (Triple<String, Tick, Tick> value : entry.getValue()) {
 
 				if (!tasks.containsKey(value.first)) {
 					tasks.put(value.first, new TaskSeries(value.first));
@@ -242,8 +215,8 @@ public class GanttChart extends ApplicationFrame {
 				} else {
 					task.addSubtask(new Task(entry.getKey(), new SimpleTimePeriod(value.second.longValue(), value.third.longValue())));
 				}
-				maxTime = Math.max(maxTime, value.third.longValue());
-				minTime = Math.min(minTime, value.second.longValue());
+				maxTime = maxTime.max(value.third);
+				minTime = minTime.min(value.second);
 			}
 		}
 
@@ -251,8 +224,7 @@ public class GanttChart extends ApplicationFrame {
 
 		TaskSeries forceSortedLabels = new TaskSeries("");
 		for (String yItem : yLabels) {
-			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod((long) minTime, (long) minTime)));
-			;
+			forceSortedLabels.add(new Task(yItem, new SimpleTimePeriod(minTime.longValue(), minTime.longValue())));
 		}
 		dataset.add(forceSortedLabels);
 
@@ -265,12 +237,12 @@ public class GanttChart extends ApplicationFrame {
 		CategoryPlot plot = chart.getCategoryPlot();
 		ValueAxis axis = plot.getRangeAxis();
 		axis.setLowerBound(0);
-		axis.setRange((minTime > 100 && minTime != Double.MAX_VALUE ? minTime - 100 : 0), maxTime + 100);
+		axis.setRange((minTime.greaterThan(100) && minTime.lessThan(Double.MAX_VALUE) ? minTime.longValue() - 100 : 0), maxTime.longValue() + 100);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
 
-		chartPanel.setMaximumDrawWidth(Math.max((int) (maxTime - minTime), 800));
-		chartPanel.setPreferredSize(new Dimension(Math.max((int) (maxTime - minTime), 800), 800));
+		chartPanel.setMaximumDrawWidth(Math.max(maxTime.intValue() - minTime.intValue(), 800));
+		chartPanel.setPreferredSize(new Dimension(Math.max(maxTime.intValue() - minTime.intValue(), 800), 800));
 		return chartPanel;
 	}
 }

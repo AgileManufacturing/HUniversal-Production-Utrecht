@@ -11,23 +11,23 @@ import java.util.Map.Entry;
 import simulation.util.Pair;
 import simulation.util.Position;
 import simulation.util.Settings;
+import simulation.util.Tick;
 import simulation.util.Tuple;
 import simulation.util.Util;
 
 public class Scheduling {
 
 	private String agent;
-	private double time;
-	private double deadline;
+	private Tick time;
+	private Tick deadline;
 	private Position position;
 	private List<ProductStep> productSteps;
-	private Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions;
+	private Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> serviceOptions;
 	private Map<AID, Pair<Double, Position>> equipletInfo;
-	private Map<Pair<Position, Position>, Double> travelTimes;
+	private Map<Pair<Position, Position>, Tick> travelTimes;
 
-	public Scheduling(String agent, double time, double deadline, Position position, List<ProductStep> productSteps,
-			Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo,
-			Map<Pair<Position, Position>, Double> travelTimes) {
+	public Scheduling(String agent, Tick time, Tick deadline, Position position, List<ProductStep> productSteps,
+			Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo, Map<Pair<Position, Position>, Tick> travelTimes) {
 		this.agent = agent;
 		this.time = time;
 		this.deadline = deadline;
@@ -56,7 +56,7 @@ public class Scheduling {
 		lastNodes.add(source);
 
 		for (ProductStep step : productSteps) {
-			Map<AID, Pair<Double, List<Pair<Double, Double>>>> options = serviceOptions.get(step.getIndex());
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(step.getIndex());
 
 			if (Settings.DEBUG_SCHEDULING) {
 				System.out.printf("\nPA:%s construct scheduling graph, step=%s, from nodes=%s, with options=%s.\n\n", agent, step, lastNodes, Util.formatArray(options));
@@ -69,7 +69,7 @@ public class Scheduling {
 			for (Node node : lastNodes) {
 
 				// Entry < Equiplet, Pair < duration, List of possible time options > >
-				for (Entry<AID, Pair<Double, List<Pair<Double, Double>>>> option : options.entrySet()) {
+				for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : options.entrySet()) {
 					Position lastPosition = node != source ? equipletInfo.get(node.getEquipletAID()).second : position;
 					Position nextPosition = equipletInfo.get(option.getKey()).second;
 					Pair<Position, Position> route = new Pair<>(lastPosition, nextPosition);
@@ -77,42 +77,42 @@ public class Scheduling {
 						throw new SchedulingException("route doesn't exists in travel time list: " + route);
 					}
 
-					double window = deadline - time;
-					double duration = option.getValue().first;
-					double travel = lastPosition.equals(nextPosition) ? 0.0 : travelTimes.get(new Pair<>(lastPosition, nextPosition));
-					double arrival = node.getTime() + node.getDuration() + travel;
-					double firstPossibility = Double.MAX_VALUE;
+					Tick window = deadline.minus(time);
+					Tick duration = option.getValue().first;
+					Tick travel = lastPosition.equals(nextPosition) ? new Tick(0) : travelTimes.get(new Pair<>(lastPosition, nextPosition));
+					Tick arrival = node.getTime().add(node.getDuration()).add(travel);
+					Tick firstPossibility = deadline;
 
 					// Time option is the time from (=option.first) until (=option.second) the equiplet is possible to perform the service
-					for (Pair<Double, Double> timeOption : option.getValue().second) {
+					for (Pair<Tick, Tick> timeOption : option.getValue().second) {
 
 						// choose the best time to perform the product step
 						// is the first available time earlier than first possibility and the product can arrive + duration is within the time window
-						if (timeOption.first < firstPossibility && arrival + duration < timeOption.second) {
+						if (timeOption.first.lessThan(firstPossibility) && arrival.add(duration).lessThan(timeOption.second)) {
 
 							// TODO performance improvement
 							// set the first possibility, the first is the time the equiplet is able to perform or when the product can arrive by the equiplet
-							firstPossibility = Math.max(timeOption.first, arrival);
+							firstPossibility = timeOption.first.max(arrival);
 						}
 					}
 
 					// check if deadline can be reached
-					if (firstPossibility + duration <= deadline) {
+					if (firstPossibility.add(duration).lessOrEqualThan(deadline)) {
 						Node nextNode = new Node(option.getKey(), firstPossibility, duration, step.getIndex());
 
-						double cost = 1 - (firstPossibility - time) / window;
+						double cost = 1 - firstPossibility.minus(time).doubleValue() / window.doubleValue();
 
 						if (cost < 0) { // ) && Settings.DEBUG_SCHEDULING) {
 							// shouldn't occur as it would mean arrival of first possibility > deadline
 							System.err.println("FAILED maybe because the: deadline=" + deadline);
-							System.err.printf("Should happen: Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibility, window, arrival);
+							System.err.printf("Should happen: Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
 						}
 
 						graph.add(node, nextNode, cost);
 						equipletNodes.add(nextNode);
 
 						if (Settings.DEBUG_SCHEDULING) {
-							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %.2f / %.2f)], arrival=%.2f]\n", node, cost, nextNode, firstPossibility, window, arrival);
+							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
 						}
 					}
 				}
@@ -193,7 +193,7 @@ public class Scheduling {
 			System.out.println("Scheduling Matrix: step " + productSteps + " \n" + Util.formatMatrix(matrix));
 		}
 
-		Pair<Position, Double> previousStep = new Pair<Position, Double>(position, time);
+		Pair<Position, Tick> previousStep = new Pair<Position, Tick>(position, time);
 
 		LinkedList<ProductionStep> path = new LinkedList<>();
 		for (int column = 0; column < productSteps.size(); column++) {
@@ -210,18 +210,18 @@ public class Scheduling {
 			// private Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions;
 			if (highestRow >= 0) {
 				AID equiplet = equiplets.get(highestRow);
-				Pair<Double, List<Pair<Double, Double>>> option = serviceOptions.get(column).get(equiplet);
-				List<Pair<Double, Double>> availableTimeSlots = option.second;
+				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(column).get(equiplet);
+				List<Pair<Tick, Tick>> availableTimeSlots = option.second;
 
-				double travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? 0.0
+				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0)
 						: travelTimes.get(new Pair<Position, Object>(previousStep.first, equipletInfo.get(equiplet).second));
-				double arrival = previousStep.second + travelTime;
-				double duration = option.first;
-				double firstPossibility = Double.MAX_VALUE;
+				Tick arrival = previousStep.second.add(travelTime);
+				Tick duration = option.first;
+				Tick firstPossibility = deadline;
 
-				for (Pair<Double, Double> timeSlot : availableTimeSlots) {
-					if (timeSlot.first < firstPossibility && arrival + duration <= timeSlot.second) {
-						firstPossibility = Math.max(timeSlot.first, arrival);
+				for (Pair<Tick, Tick> timeSlot : availableTimeSlots) {
+					if (timeSlot.first.lessThan(firstPossibility) && arrival.add(duration).lessOrEqualThan(timeSlot.second)) {
+						firstPossibility = timeSlot.first.max(arrival);
 					}
 				}
 
@@ -231,9 +231,9 @@ public class Scheduling {
 							+ availableTimeSlots + ", so first possibility=" + firstPossibility);
 				}
 
-				if (firstPossibility < Double.MAX_VALUE) {
+				if (firstPossibility.lessThan(deadline)) {
 					path.add(new ProductionStep(productSteps.get(column), equiplet, equipletInfo.get(equiplet).second, firstPossibility, deadline));
-					previousStep = new Pair<Position, Double>(equipletInfo.get(equiplet).second, firstPossibility + duration);
+					previousStep = new Pair<Position, Tick>(equipletInfo.get(equiplet).second, firstPossibility.add(duration));
 				} else {
 					throw new SchedulingException("You selected the wrong equiplet, TODO shit because no available time is found ");
 				}

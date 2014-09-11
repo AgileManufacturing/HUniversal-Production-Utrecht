@@ -13,6 +13,8 @@ import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
+import simulation.util.Tick;
+import simulation.util.Triple;
 
 public class ProductAgent extends Agent {
 	/**
@@ -20,20 +22,20 @@ public class ProductAgent extends Agent {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private double created;
+	private Tick created;
 	private LinkedList<ProductStep> productSteps;
 	private LinkedList<ProductionStep> productionPath;
 	private Position position;
-	private double deadline;
+	private Tick deadline;
 	private ProductState state;
 
 	public void setup() {
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			try {
-				Pair<LinkedList<ProductStep>, Position> configuration = Parser.parseProductConfiguration(args[0].toString());
-				setup(configuration.first, configuration.second);
-				this.created = Double.valueOf(System.currentTimeMillis());
+				Triple<LinkedList<ProductStep>, Position, Tick> configuration = Parser.parseProductConfiguration(args[0].toString());
+				setup(configuration.first, configuration.second, configuration.third);
+				this.created = new Tick();
 
 				addBehaviour(new ScheduleBehaviour(this, productSteps));
 				addBehaviour(new ProductListenerBehaviour(this));
@@ -49,22 +51,22 @@ public class ProductAgent extends Agent {
 		}
 	}
 
-	protected void setup(LinkedList<ProductStep> productSteps, Position startPosition) {
+	protected void setup(LinkedList<ProductStep> productSteps, Position startPosition, Tick deadline) {
 		this.position = startPosition;
 		this.productSteps = productSteps;
 		this.productionPath = new LinkedList<>();
 
-		this.deadline = getCreated() + 10000;
+		this.deadline = deadline;
 		this.state = ProductState.SCHEDULING;
-		
-		System.out.printf("PA:%s initialize [created=%.2f, pos=%s, product steps=%s, deadline=%.0f]\n", getLocalName(), getCreated(), position, productSteps, deadline);
+
+		System.out.printf("PA:%s initialize [created=%s, pos=%s, product steps=%s, deadline=%s]\n", getLocalName(), getCreated(), position, productSteps, deadline);
 	}
 
-	protected double getCreated() {
+	protected Tick getCreated() {
 		return created;
 	}
 
-	protected double getDeadline() {
+	protected Tick getDeadline() {
 		return deadline;
 	}
 
@@ -93,14 +95,14 @@ public class ProductAgent extends Agent {
 
 	@Override
 	public String toString() {
-		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, getCreated(), position, (productionPath.size() > 0 ? productionPath.peek()
+		return String.format("Product: %s [state=%s, created=%s, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, getCreated(), position, (productionPath.size() > 0 ? productionPath.peek()
 				: "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
 	}
 
 	/**
 	 * A for example a travel agent notifies the product agent that he is arrived by the equiplet
 	 */
-	protected void onProductArrived(double time) {
+	protected void onProductArrived(Tick time) {
 		// change state from travelling to ready
 		state = ProductState.WAITING;
 
@@ -143,9 +145,9 @@ public class ProductAgent extends Agent {
 	protected void onProductProcessing() {
 		state = ProductState.PROCESSING;
 	}
-	
-	protected void onProductDelayed(double start) {
-		double delay;
+
+	protected void onProductDelayed(Tick start) {
+		Tick delay;
 		for (ProductionStep productionStep : productionPath) {
 
 		}

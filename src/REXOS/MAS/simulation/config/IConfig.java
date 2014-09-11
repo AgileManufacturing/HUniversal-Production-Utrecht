@@ -7,27 +7,28 @@ import simulation.mas.equiplet.Capability;
 import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public interface IConfig {
 
-	public double getRunLength();
-	
+	public Tick getRunLength();
+
 	public int getRuns();
 
-	public Pair<Double, DurationType> getTravelTime();
+	public Pair<Tick, DurationType> getTravelTime();
 
-	public Pair<Double, DurationType> getProductArrival();
+	public Pair<Tick, DurationType> getProductArrival();
 
 	public List<ProductStep> getProductSteps();
 
 	public int getProductStepProbablity(ProductStep productStep);
-	
+
 	public Map<String, Pair<Position, List<Capability>>> getEquipletsConfigurations();
-	
-	public Pair<Double, DurationType> equipletProductionTime(String equiplet, String service);
 
-	public Pair<Double, DurationType> equipletBreakdownTime(String equiplet);
+	public Pair<Tick, DurationType> equipletProductionTime(String equiplet, String service);
 
-	public Pair<Double, DurationType> equipletRepaireTime(String equiplet);
+	public Pair<Tick, DurationType> equipletBreakdownTime(String equiplet);
+
+	public Pair<Tick, DurationType> equipletRepaireTime(String equiplet);
 
 }

@@ -2,9 +2,9 @@
 <config>
 	<runlength>100000</runlength>
 	<runs>1</runs>
-	<travel type="normal">5</travel>
+	<travel type="normal">1</travel>
 	<products>
-		<arrival type="none">5</arrival>
+		<arrival type="none">15</arrival>
 		<path>3</path>
 		<steps>
 			<step probability="50">

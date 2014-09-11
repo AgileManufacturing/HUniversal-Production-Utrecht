@@ -2,6 +2,7 @@ package simulation.mas.product;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import simulation.util.Tick;
 import jade.core.AID;
 
 public class Node {
@@ -9,32 +10,32 @@ public class Node {
 	private AID equipletAID;
 	private String equiplet;
 	private int index;
-	private double time;
-	private double duration;
+	private Tick time;
+	private Tick duration;
 
 	public Node() {
 		this.equipletAID = null;
 		this.index = -1;
-		this.time = -1;
-		this.duration = 0;
+		this.time = new Tick(-1);
+		this.duration = new Tick(0);
 	}
 
-	public Node(double time) {
+	public Node(Tick time) {
 		this.equipletAID = null;
 		this.index = -1;
 		this.time = time;
-		this.duration = 0;
+		this.duration = new Tick(0);
 	}
 
 	@Deprecated
-	public Node(String equiplet, double time, double duration, int index) {
+	public Node(String equiplet, Tick time, Tick duration, int index) {
 		this.equiplet = equiplet;
 		this.index = index;
 		this.time = time;
 		this.duration = duration;
 	}
 
-	public Node(AID equiplet, double time, double duration, int index) {
+	public Node(AID equiplet, Tick time, Tick duration, int index) {
 		this.equipletAID = equiplet;
 		this.index = index;
 		this.time = time;
@@ -49,14 +50,14 @@ public class Node {
 		return equipletAID;
 	}
 
-	public double getTime() {
+	public Tick getTime() {
 		return time;
 	}
 
-	public double getDuration() {
+	public Tick getDuration() {
 		return duration;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(43, 67).append(equipletAID).append(time).append(duration).append(index).toHashCode();
@@ -74,18 +75,18 @@ public class Node {
 		if (equipletAID == null || node.getEquipletAID() == null) {
 			return false;
 		}
-		
+
 		return equipletAID.equals(node.getEquipletAID()) && time == node.getTime() && duration == node.getDuration() && index == node.index;
 	}
 
 	@Override
 	public String toString() {
 		if (equipletAID != null) {
-			return String.format("N(%s), %d, %.2f, %.2f", equipletAID.getLocalName(), index, time, duration);
+			return String.format("N(%s), %d, %s, %s", equipletAID.getLocalName(), index, time, duration);
 		} else if (equiplet != null) {
-			return String.format("N(%s), %d, %.2f, %.2f", equiplet, index, time, duration);
-		} else if (time > -1) {
-			return String.format("N(source), %.2f", time);
+			return String.format("N(%s), %d, %s, %s", equiplet, index, time, duration);
+		} else if (time.greaterThan(-1)) {
+			return String.format("N(source), %s", time);
 		} else {
 			return "N(sink)";
 		}

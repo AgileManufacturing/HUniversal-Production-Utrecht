@@ -1,6 +1,7 @@
 package simulation.graphics;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class StackedBarChart extends ApplicationFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public StackedBarChart(String title, Map<String, Triple<Double, Double, Double>> data) {
+	public StackedBarChart(String title, Map<String, Triple<? extends Number, ? extends Number, ? extends Number>> data) {
 		super(title);
 
 		final DefaultCategoryDataset dataset = createDataset(data);
@@ -41,8 +42,8 @@ public class StackedBarChart extends ApplicationFrame {
 		setContentPane(chartPanel);
 	}
 
-	public static JPanel createChartPanel(Map<String, Triple<Double, Double, Double>> data) {
-		final DefaultCategoryDataset dataset = createDataset(data);
+	public static JPanel createChartPanel(Map<String, Triple<? extends Number, ? extends Number, ? extends Number>> history) {
+		final DefaultCategoryDataset dataset = createDataset(history);
 		final JFreeChart chart = createChart("Utilization", dataset);
 
 		final ChartPanel chartPanel = new ChartPanel(chart);
@@ -55,9 +56,9 @@ public class StackedBarChart extends ApplicationFrame {
 	 * 
 	 * @return The dataset.
 	 */
-	private static DefaultCategoryDataset createDataset(Map<String, Triple<Double, Double, Double>> data) {
+	private static DefaultCategoryDataset createDataset(Map<String, Triple<? extends Number, ? extends Number, ? extends Number>> data) {
 		DefaultCategoryDataset collection = new DefaultCategoryDataset();
-		for (Entry<String, Triple<Double, Double, Double>> entry : data.entrySet()) {
+		for (Entry<String, Triple<? extends Number, ? extends Number, ? extends Number>> entry : data.entrySet()) {
 			collection.addValue(entry.getValue().first, "busy", entry.getKey());
 			collection.addValue(entry.getValue().second, "idle", entry.getKey());
 			collection.addValue(entry.getValue().third, "broken", entry.getKey());
@@ -90,18 +91,17 @@ public class StackedBarChart extends ApplicationFrame {
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
 
-		
-		BarRenderer renderer = ((BarRenderer) plot.getRenderer()); 
+		BarRenderer renderer = ((BarRenderer) plot.getRenderer());
 		renderer.setSeriesPaint(0, new Color(0x00, 0x80, 0x00)); // Color.VERY_DARK_GREEN
 		renderer.setSeriesPaint(1, new Color(0x00, 0x00, 0x80)); // Color.DARK_BLUE
-		// renderer.setSeriesPaint(1,  new Color(0x00, 0xC0, 0x00)); // Color.DARK_GREEN
+		// renderer.setSeriesPaint(1, new Color(0x00, 0xC0, 0x00)); // Color.DARK_GREEN
 		renderer.setSeriesPaint(2, Color.RED);
 		renderer.setBarPainter(new StandardBarPainter());
 
 		return chart;
 	}
 
-	public static void save(String filename, String title, Map<String, Triple<Double, Double, Double>> data) {
+	public static void save(String filename, String title, Map<String, Triple<? extends Number, ? extends Number, ? extends Number>> data) {
 		try {
 			File file = new File(filename);
 			final DefaultCategoryDataset dataset = createDataset(data);

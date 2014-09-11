@@ -145,9 +145,9 @@ class Equiplet {
 	@Override
 	public String toString() {
 		if (state == EquipletState.BROKEN) {
-			return String.format("%s:[state=%s, services=%s, queue=%s, time broken=%.2f]", name, state, Arrays.toString(services.toArray()), Arrays.toString(queue.toArray()), timeBroken);
+			return String.format("%s:[state=%s, services=%s, queue=%s, time broken=%s]", name, state, Arrays.toString(services.toArray()), Arrays.toString(queue.toArray()), timeBroken);
 		} else if (state == EquipletState.WAS_BROKEN) {
-			return String.format("%s:[state=%s, services=%s, queue=%s, time broken=%.2f, should finished=%.2f]", name, state, Arrays.toString(services.toArray()), Arrays.toString(queue.toArray()), timeBroken, shouldFinish);
+			return String.format("%s:[state=%s, services=%s, queue=%s, time broken=%s, should finished=%s]", name, state, Arrays.toString(services.toArray()), Arrays.toString(queue.toArray()), timeBroken, shouldFinish);
 		} else {
 			return String.format("%s:[state=%s, services=%s, executing=%s, queue=%s]", name, state, Arrays.toString(services.toArray()), (state == EquipletState.IDLE ? "null" : executingStep), Arrays.toString(queue.toArray()));
 		}

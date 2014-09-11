@@ -4,19 +4,20 @@ import java.util.LinkedList;
 
 import simulation.simulation.Simulation;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public class ProductSim implements IProductSim {
 
 	private Product product;
-	
-	public ProductSim(Simulation simulation, String name, LinkedList<ProductStep> steps, Position position, double time) {
+
+	public ProductSim(Simulation simulation, String name, LinkedList<ProductStep> steps, Position position, Tick time, Tick deadline) {
 		product = new Product();
-		product.init(time, steps, position);
+		product.init(time, deadline, steps, position);
 	}
 
-	public void onProductArrived(double time) {
+	public void onProductArrived(Tick time) {
 		product.notifyProductArrived();
-		
+
 	}
 
 	@Override
@@ -25,7 +26,7 @@ public class ProductSim implements IProductSim {
 	}
 
 	@Override
-	public double getCreated() {
+	public Tick getCreated() {
 		return product.getCreated();
 	}
 

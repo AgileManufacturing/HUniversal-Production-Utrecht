@@ -1,13 +1,10 @@
 package simulation.graphics;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +24,11 @@ import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import simulation.util.Tick;
 
 public class Chart {
 
@@ -129,15 +127,15 @@ public class Chart {
 		return chart;
 	}
 
-	public static void save(String path, String title, String yLabel, Map<String, Map<Double, Double>> data) {
+	public static void save(String path, String title, String yLabel, Map<String, Map<Tick, Double>> data) {
 		try {
 			File file = new File(path);
 
 			final XYSeriesCollection dataset = new XYSeriesCollection();
-			for (Entry<String, Map<Double, Double>> entry : data.entrySet()) {
+			for (Entry<String, Map<Tick, Double>> entry : data.entrySet()) {
 				final XYSeries series = new XYSeries(entry.getKey());
-				for (Entry<Double, Double> point : entry.getValue().entrySet()) {
-					series.add(point.getKey(), point.getValue());
+				for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
+					series.add(point.getKey().doubleValue(), point.getValue());
 				}
 				dataset.addSeries(series);
 			}
@@ -155,12 +153,12 @@ public class Chart {
 	 *            <name [<name, start, end>]
 	 * @return chart
 	 */
-	public static JPanel createChart(String title, String yLabel, Map<String, Map<Double, Double>> data) {
+	public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-		for (Entry<String, Map<Double, Double>> entry : data.entrySet()) {
+		for (Entry<String, Map<Tick, Double>> entry : data.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
-			for (Entry<Double, Double> point : entry.getValue().entrySet()) {
-				series.add(point.getKey(), point.getValue());
+			for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
+				series.add(point.getKey().doubleValue(), point.getValue());
 			}
 			dataset.addSeries(series);
 		}
@@ -170,6 +168,23 @@ public class Chart {
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		return chartPanel;
 	}
+
+	public static JPanel createChartTicks(String title, String yLabel, Map<String, Map<Tick, Tick>> data) {
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		for (Entry<String, Map<Tick, Tick>> entry : data.entrySet()) {
+			final XYSeries series = new XYSeries(entry.getKey());
+			for (Entry<Tick, Tick> point : entry.getValue().entrySet()) {
+				series.add(point.getKey().doubleValue(), point.getValue().doubleValue());
+			}
+			dataset.addSeries(series);
+		}
+
+		final JFreeChart chart = createChart(title, yLabel, dataset);
+
+		final ChartPanel chartPanel = new ChartPanel(chart);
+		return chartPanel;
+	}
+
 	
 	/**
 	 *  Marker for current time

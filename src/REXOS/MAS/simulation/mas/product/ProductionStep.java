@@ -5,6 +5,7 @@ import jade.core.AID;
 import java.util.Map;
 
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public class ProductionStep {
 
@@ -12,8 +13,8 @@ public class ProductionStep {
 	private AID equiplet;
 	private String equipletName;
 	private Position position;
-	private double time;
-	private double duration;
+	private Tick time;
+	private Tick duration;
 
 	/**
 	 * 
@@ -28,7 +29,7 @@ public class ProductionStep {
 	 * @param duration
 	 *            the estimate duration of the product step
 	 */
-	public ProductionStep(ProductStep productStep, AID equilet, Position position, double time, double duration) {
+	public ProductionStep(ProductStep productStep, AID equilet, Position position, Tick time, Tick duration) {
 		this.productStep = productStep;
 		this.equiplet = equilet;
 		this.position = position;
@@ -37,7 +38,7 @@ public class ProductionStep {
 	}
 
 	@Deprecated
-	public ProductionStep(ProductStep productStep, String equipletName, Position position, double time, double duration) {
+	public ProductionStep(ProductStep productStep, String equipletName, Position position, Tick time, Tick duration) {
 		this.productStep = productStep;
 		this.equipletName = equipletName;
 		this.time = time;
@@ -84,7 +85,7 @@ public class ProductionStep {
 	 * 
 	 * @return the scheduled start time of the product step
 	 */
-	public double getStart() {
+	public Tick getStart() {
 		return time;
 	}
 
@@ -94,7 +95,7 @@ public class ProductionStep {
 	 * @param time
 	 *            the new updated time of the product step
 	 */
-	public void updateStart(double time) {
+	public void updateStart(Tick time) {
 		this.time = time;
 	}
 
@@ -103,7 +104,7 @@ public class ProductionStep {
 	 * 
 	 * @return the estimate duration of the product step
 	 */
-	public double getDuration() {
+	public Tick getDuration() {
 		return duration;
 	}
 
@@ -123,6 +124,6 @@ public class ProductionStep {
 
 	@Override
 	public String toString() {
-		return "Production Step(" + productStep.getService() + "," + getEquipletName() + ", from=" + time + ", until=" + (time + duration) + ")";
+		return "Production Step(" + productStep.getService() + "," + getEquipletName() + ", from=" + time + ", until=" + time.add(duration) + ")";
 	}
 }

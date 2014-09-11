@@ -11,10 +11,12 @@ import java.util.Map;
 
 import org.json.JSONException;
 
+import simulation.config.Config;
 import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public class TrafficManager extends Agent {
 
@@ -23,9 +25,11 @@ public class TrafficManager extends Agent {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Map<String, Position> equiplets;
+	private Tick travelTime;
 
 	public TrafficManager(Map<String, Position> equiplets) {
 		this.equiplets = equiplets;
+		travelTime = Config.read().getTravelTime().first;
 	}
 
 	@Override
@@ -33,30 +37,30 @@ public class TrafficManager extends Agent {
 		addBehaviour(new TraficListenerBehaviour());
 	}
 
-	protected Map<Pair<String, String>, Double> caculateTravelTimesEquiplets(List<Pair<String, String>> requests) {
-		Map<Pair<String, String>, Double> travelTimes = new HashMap<Pair<String, String>, Double>();
+	protected Map<Pair<String, String>, Tick> caculateTravelTimesEquiplets(List<Pair<String, String>> requests) {
+		Map<Pair<String, String>, Tick> travelTimes = new HashMap<Pair<String, String>, Tick>();
 		for (Pair<String, String> request : requests) {
 
 			if (equiplets.containsKey(request.first) && equiplets.containsKey(request.second)) {
-				double time = caclulateTravelTime(equiplets.get(request.first), equiplets.get(request.second));
+				Tick time = caclulateTravelTime(equiplets.get(request.first), equiplets.get(request.second));
 				travelTimes.put(request, time);
 			}
 		}
 		return travelTimes;
 	}
 
-	protected Map<Pair<Position, Position>, Double> caculateTravelTimesPosition(List<Pair<Position, Position>> requests) {
-		Map<Pair<Position, Position>, Double> travelTimes = new HashMap<>();
+	protected Map<Pair<Position, Position>, Tick> caculateTravelTimesPosition(List<Pair<Position, Position>> requests) {
+		Map<Pair<Position, Position>, Tick> travelTimes = new HashMap<>();
 		for (Pair<Position, Position> request : requests) {
-			double time = caclulateTravelTime(request.first, request.second);
+			Tick time = caclulateTravelTime(request.first, request.second);
 			travelTimes.put(request, time);
 		}
 		return travelTimes;
 	}
 
-	private double caclulateTravelTime(Position a, Position b) {
+	private Tick caclulateTravelTime(Position a, Position b) {
 		int travelSquares = Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
-		return 0.5 * travelSquares;
+		return travelTime.times(travelSquares);
 	}
 
 	class TraficListenerBehaviour extends CyclicBehaviour {
@@ -91,7 +95,7 @@ public class TrafficManager extends Agent {
 		private void handleTravelRouteRequest(ACLMessage message) {
 			try {
 				Pair<Position, List<Pair<String, String>>> request = Parser.parseTravelRouteRequest(message.getContent());
-				Map<Pair<String, String>, Double> travelTimes = caculateTravelTimesEquiplets(request.second);
+				Map<Pair<String, String>, Tick> travelTimes = caculateTravelTimesEquiplets(request.second);
 
 				// send travel time in reply
 				ACLMessage reply = message.createReply();
@@ -106,7 +110,7 @@ public class TrafficManager extends Agent {
 		private void handleTravelTimePositionRequest(ACLMessage message) {
 			try {
 				List<Pair<Position, Position>> request = Parser.parseTravelTimeRequest(message.getContent());
-				Map<Pair<Position, Position>, Double> travelTimes = caculateTravelTimesPosition(request);
+				Map<Pair<Position, Position>, Tick> travelTimes = caculateTravelTimesPosition(request);
 
 				// send travel time in reply
 				ACLMessage reply = message.createReply();

@@ -7,6 +7,7 @@ import org.json.JSONException;
 import simulation.simulation.ISimulation;
 import simulation.util.Parser;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
 
@@ -15,22 +16,22 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	 */
 	private static final long serialVersionUID = 1L;
 	private ISimulation simulation;
-	private double created;
+	private Tick created;
 
-	public ProductAgentSim(ISimulation simulation, LinkedList<ProductStep> productSteps, Position position, double time) {
+	public ProductAgentSim(ISimulation simulation, LinkedList<ProductStep> productSteps, Position position, Tick time, Tick deadline) {
 		try {
-			Object[] args = new Object[] { Parser.parseProductConfiguration(productSteps, position) };
+			Object[] args = new Object[] { Parser.parseProductConfiguration(productSteps, position, deadline) };
 			setArguments(args);
 		} catch (JSONException e) {
 			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
 		}
-		
+
 		this.simulation = simulation;
 		this.created = time;
 	}
 
 	@Override
-	public void onProductArrived(double time) {
+	public void onProductArrived(Tick time) {
 		super.onProductArrived(time);
 	}
 
@@ -40,7 +41,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	}
 
 	@Override
-	public double getCreated() {
+	public Tick getCreated() {
 		return created;
 	}
 

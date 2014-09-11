@@ -19,6 +19,7 @@ import simulation.graphics.StackedBarChart;
 import simulation.graphics.StaticSimInterface;
 import simulation.mas.equiplet.Capability;
 import simulation.util.Pair;
+import simulation.util.Tick;
 import simulation.util.Triple;
 
 public class Simulation extends Thread {
@@ -64,7 +65,7 @@ public class Simulation extends Thread {
 
 		run = 0;
 		runs = config.getRuns();
-		run_length = config.getRunLength();
+		run_length = config.getRunLength().doubleValue();
 		finished = false;
 		running = false;
 
@@ -86,7 +87,7 @@ public class Simulation extends Thread {
 		for (Entry<String, Pair<simulation.util.Position, List<Capability>>> equiplet : config.getEquipletsConfigurations().entrySet()) {
 			Position position = new Position(equiplet.getValue().first.getX(), equiplet.getValue().first.getY());
 			List<String> services = new ArrayList<>();
-			for(Capability capability : equiplet.getValue().second) {
+			for (Capability capability : equiplet.getValue().second) {
 				services.add(capability.getService());
 			}
 			equiplets.put(equipletCounter, new Equiplet(equiplet.getKey(), services, position));
@@ -160,10 +161,10 @@ public class Simulation extends Thread {
 					case EQUIPLET_FINISHED:
 						equiplet = equiplets.get(e.getEquiplet());
 						if (equiplet.getState() == EquipletState.BROKEN) {
-							// equiplet is broken while finishing the product step, remember the time is finished so it can continue when the equiplet is repaired 
+							// equiplet is broken while finishing the product step, remember the time is finished so it can continue when the equiplet is repaired
 							equiplet.setShouldFinish(time);
 						} else if (equiplet.getState() == EquipletState.WAS_BROKEN) {
-							// equiplet was broken and repaired while producing the product step, continue the product step 
+							// equiplet was broken and repaired while producing the product step, continue the product step
 							double timeBroken = equiplet.continueAfterBreakdown(time);
 							eventStack.add(new Event(time + timeBroken, EventType.EQUIPLET_FINISHED, e.getEquiplet()));
 						} else {
@@ -173,7 +174,7 @@ public class Simulation extends Thread {
 							int productID = finishResult.first;
 							boolean canContinue = finishResult.second;
 
-							// if product steps waiting in the queue, continue producing  
+							// if product steps waiting in the queue, continue producing
 							if (canContinue) {
 								Q_n--;
 								scheduleFinish(time, e.getEquiplet());
@@ -188,7 +189,7 @@ public class Simulation extends Thread {
 								scheduleStart(time, equiplet.getPosition(), nextPos, nextEquiplet, productID, nextStep);
 								traveling++;
 							} else {
-								// product finished 
+								// product finished
 								products.remove(productID);
 								// keep track of the throughput time of a product
 								throughput.put(productID, time - product.getCreated());
@@ -267,7 +268,8 @@ public class Simulation extends Thread {
 			dir.mkdir();
 		}
 
-		StackedBarChart.save(path + "equiplets.png", "Equiplets production", getEquipletHistory());
+		// TODO
+		// StackedBarChart.save(path + "equiplets.png", "Equiplets production", getEquipletHistory());
 	}
 
 	private int findEquiplet(String service) {
@@ -383,16 +385,16 @@ public class Simulation extends Thread {
 		this.delay = delay;
 	}
 
-	private double time(Pair<Double, DurationType> time) {
+	private double time(Pair<Tick, DurationType> time) {
 		switch (time.second) {
 		case EXP:
-			return exp(time.first);
+			return exp(time.first.doubleValue());
 		case WEIBULL:
 		case GAMMA:
 		case NORMAL:
 		case DETERMINISTIC:
 		default:
-			return time.first;
+			return time.first.doubleValue();
 		}
 	}
 

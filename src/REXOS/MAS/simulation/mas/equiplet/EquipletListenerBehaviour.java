@@ -15,6 +15,7 @@ import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
+import simulation.util.Tick;
 import simulation.util.Triple;
 import simulation.util.Tuple;
 
@@ -74,13 +75,13 @@ public class EquipletListenerBehaviour extends Behaviour {
 	private void handleCanExecute(ACLMessage message) {
 		try {
 			// can the equiplet execute the Triple < from time, within deadline, the following product steps >
-			Triple<Double, Double, List<ProductStep>> question = Parser.parseCanExecute(message.getContent());
+			Triple<Tick, Tick, List<ProductStep>> question = Parser.parseCanExecute(message.getContent());
 
-			double time = question.first;
-			double deadline = question.second;
-			double window = deadline - time;
+			Tick time = question.first;
+			Tick deadline = question.second;
+			Tick window = deadline.minus(time);
 
-			List<Triple<Integer, Double, List<Pair<Double, Double>>>> answer = equiplet.canExecute(time, deadline, question.third);
+			List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> answer = equiplet.canExecute(time, deadline, question.third);
 
 			double load = equiplet.load(time, window);
 			Position position = equiplet.getPosition();
@@ -103,7 +104,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	private void handleScheduling(ACLMessage message) {
 		try {
 			// scheduling info = List of product steps :: [< time, deadline, Service, Criteria >]
-			List<Tuple<Double, Double, String, Map<String, Object>>> data = Parser.parseScheduleRequest(message.getContent());
+			List<Tuple<Tick, Tick, String, Map<String, Object>>> data = Parser.parseScheduleRequest(message.getContent());
 			boolean success = equiplet.schedule(message.getSender(), data);
 
 			// send can execute reply
@@ -121,7 +122,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	private void handleProductArrived(ACLMessage message) {
 		try {
-			double time = Parser.parseProductArrived(message.getContent());
+			Tick time = Parser.parseProductArrived(message.getContent());
 			equiplet.notifyProductArrived(message.getSender(), time);
 
 			// send can reply

@@ -4,10 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import simulation.config.IConfig;
 import simulation.config.DurationType;
+import simulation.config.IConfig;
 import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
+import simulation.util.Tick;
 
 class Stochastics {
 	private Random random;
@@ -20,27 +21,28 @@ class Stochastics {
 
 	int x = 0;
 
-	public double generateProductArrival() {
-		 return time(config.getProductArrival());
-		/*if (x < 15) {
-			x++;
-			return 100;
-		} else {
-			return 10000000;
-		}
-		*/
+	public Tick generateProductArrival() {
+		return time(config.getProductArrival());
+		/*
+		 * if (x < 15) {
+		 * x++;
+		 * return 100;
+		 * } else {
+		 * return 10000000;
+		 * }
+		 */
 		// return 10; // TODO too deterministic
 		// return time(config.getProductArrival());
 	}
 
-	public double generateDeadline() {
+	public Tick generateDeadline() {
 		// TODO Auto-generated method stub
-		return 0;
+		return new Tick(0);
 	}
 
-	public double generateDuetime() {
+	public Tick generateDuetime() {
 		// TODO Auto-generated method stub
-		return 0;
+		return new Tick(0);
 	}
 
 	public LinkedList<ProductStep> generateProductSteps() {
@@ -65,8 +67,8 @@ class Stochastics {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 		int minProductSteps = 3;
-		int avgProductSteps = 6;
-		int n = minProductSteps + random.nextInt(avgProductSteps - minProductSteps);
+		int maxProductSteps = 6;
+		int n = minProductSteps + random.nextInt(maxProductSteps - minProductSteps);
 		for (int i = 0; i < n; i++) {
 			double u = random.nextDouble() * 100;
 			int sum = 0;
@@ -94,27 +96,27 @@ class Stochastics {
 		return steps;
 	}
 
-	public double generateTravelTime(int travelSquares) {
-		return travelSquares * time(config.getTravelTime());
+	public Tick generateTravelTime(int travelSquares) {
+		return time(config.getTravelTime()).times(travelSquares);
 	}
 
-	public double generateProductionTime(String equiplet, String service) {
+	public Tick generateProductionTime(String equiplet, String service) {
 		return time(config.equipletProductionTime(equiplet, service));
 	}
 
-	public double generateBreakdownTime(String equiplet) {
+	public Tick generateBreakdownTime(String equiplet) {
 		return time(config.equipletBreakdownTime(equiplet));
 	}
 
-	public double generateRepairTime(String equiplet) {
+	public Tick generateRepairTime(String equiplet) {
 		return time(config.equipletRepaireTime(equiplet));
 	}
 
-	private double time(Pair<Double, DurationType> data) {
+	private Tick time(Pair<Tick, DurationType> data) {
 		return time(data.first, data.second);
 	}
 
-	private double time(double time, DurationType type) {
+	private Tick time(Tick time, DurationType type) {
 		switch (type) {
 		case EXP:
 			// return exp(time);

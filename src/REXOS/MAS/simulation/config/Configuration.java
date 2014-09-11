@@ -18,6 +18,7 @@ import simulation.mas.equiplet.Capability;
 import simulation.mas.product.ProductStep;
 import simulation.util.Pair;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public class Configuration implements IConfig {
 
@@ -84,7 +85,7 @@ public class Configuration implements IConfig {
 				}
 			}
 		}
-		
+
 		int counter = 1;
 		List<ProductStep> steps = new ArrayList<ProductStep>();
 		for (EquipletConfig equiplet : equipletConfig) {
@@ -149,7 +150,7 @@ public class Configuration implements IConfig {
 		return capabilities;
 	}
 
-	public double getRunLength() {
+	public Tick getRunLength() {
 		return legacy.getRunLength();
 	}
 
@@ -157,11 +158,11 @@ public class Configuration implements IConfig {
 		return legacy.getRuns();
 	}
 
-	public Pair<Double, DurationType> getTravelTime() {
+	public Pair<Tick, DurationType> getTravelTime() {
 		return legacy.getTravelTime();
 	}
 
-	public Pair<Double, DurationType> getProductArrival() {
+	public Pair<Tick, DurationType> getProductArrival() {
 		return legacy.getProductArrival();
 	}
 
@@ -179,19 +180,19 @@ public class Configuration implements IConfig {
 			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
 			List<Capability> capabilities = new ArrayList<>();
 			for (CapabilityConfig c : e.getCapabilities()) {
-				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), c.getDuration()));
+				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), new Tick(c.getDuration())));
 			}
 			equiplets.put(e.getName(), new Pair<Position, List<Capability>>(position, capabilities));
 		}
 		return equiplets;
 	}
 
-	public Pair<Double, DurationType> equipletProductionTime(String equiplet, String service) {
+	public Pair<Tick, DurationType> equipletProductionTime(String equiplet, String service) {
 		for (EquipletConfig config : equipletConfig) {
 			if (config.getName().equalsIgnoreCase(equiplet)) {
 				for (CapabilityConfig capability : config.getCapabilities()) {
 					if (capability.getName().equalsIgnoreCase(service)) {
-						return new Pair<Double, DurationType>(capability.getDuration(), capability.getDurationType());
+						return new Pair<Tick, DurationType>(new Tick(capability.getDuration()), capability.getDurationType());
 					}
 				}
 			}
@@ -200,20 +201,20 @@ public class Configuration implements IConfig {
 		return null;
 	}
 
-	public Pair<Double, DurationType> equipletBreakdownTime(String equiplet) {
+	public Pair<Tick, DurationType> equipletBreakdownTime(String equiplet) {
 		for (EquipletConfig config : equipletConfig) {
 			if (config.getName().equalsIgnoreCase(equiplet)) {
-				return new Pair<Double, DurationType>(config.getBreakdown().mean(), config.getBreakdown().type());
+				return new Pair<Tick, DurationType>(new Tick(config.getBreakdown().mean()), config.getBreakdown().type());
 			}
 		}
 		System.out.println("Config error: breakdown time of " + equiplet + " in " + toString());
 		return null;
 	}
 
-	public Pair<Double, DurationType> equipletRepaireTime(String equiplet) {
+	public Pair<Tick, DurationType> equipletRepaireTime(String equiplet) {
 		for (EquipletConfig config : equipletConfig) {
 			if (config.getName().equalsIgnoreCase(equiplet)) {
-				return new Pair<Double, DurationType>(config.getRepaired().mean(), config.getRepaired().type());
+				return new Pair<Tick, DurationType>(new Tick(config.getRepaired().mean()), config.getRepaired().type());
 			}
 		}
 		System.out.println("Config error: repair time of " + equiplet + " in " + toString());
@@ -222,6 +223,6 @@ public class Configuration implements IConfig {
 
 	@Override
 	public String toString() {
-		return String.format("Config [run length=%.0f, runs=%d, travel=%.2f (%s), \n products=%s, \n equiplets=%s]", legacy.getRunLength(), legacy.getRuns(), legacy.getTravelTime().first, legacy.getTravelTime().second, legacy.getProductSteps(), equipletConfig);
+		return String.format("Config [run length=%s, runs=%d, travel=%s (%s), \n products=%s, \n equiplets=%s]", legacy.getRunLength(), legacy.getRuns(), legacy.getTravelTime().first, legacy.getTravelTime().second, legacy.getProductSteps(), equipletConfig);
 	}
 }

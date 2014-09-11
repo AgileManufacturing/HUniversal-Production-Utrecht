@@ -1,13 +1,14 @@
 package simulation.mas.product;
 
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public interface IProductSim {
 
-	void onProductArrived(double time);
+	void onProductArrived(Tick time);
 
 	Position getPosition();
 
-	double getCreated();
+	Tick getCreated();
 
 }

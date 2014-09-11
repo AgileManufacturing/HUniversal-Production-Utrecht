@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.management.RuntimeErrorException;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,8 +33,8 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 	private JPanel scheduleView;
 	private JTree tree;
 
-	//Optionally play with line styles.  Possible values are
-	//"Angled" (the default), "Horizontal", and "None".
+	// Optionally play with line styles. Possible values are
+	// "Angled" (the default), "Horizontal", and "None".
 	private static boolean playWithLineStyle = false;
 	private static String lineStyle = "Horizontal";
 
@@ -41,21 +42,21 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 		super(new GridLayout(1, 0));
 		this.products = new HashMap<String, Product>();
 	}
-	
+
 	public void update(Map<String, Product> products) {
 		this.products = products;
-		
+
 		removeAll();
-		
-		//Create the nodes.
+
+		// Create the nodes.
 		DefaultMutableTreeNode top = new DefaultMutableTreeNode("Products");
 		createNodes(top);
 
-		//Create a tree that allows one selection at a time.
+		// Create a tree that allows one selection at a time.
 		tree = new JTree(top);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-		//Listen for when the selection changes.
+		// Listen for when the selection changes.
 		tree.addTreeSelectionListener(this);
 
 		if (playWithLineStyle) {
@@ -63,16 +64,16 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 			tree.putClientProperty("JTree.lineStyle", lineStyle);
 		}
 
-		//Create the scroll pane and add the tree to it. 
+		// Create the scroll pane and add the tree to it.
 		JScrollPane treeView = new JScrollPane(tree);
 
-		//Create the schedule panel.
+		// Create the schedule panel.
 		scheduleView = new JPanel();
 		scheduleView.setLayout(new BoxLayout(scheduleView, BoxLayout.X_AXIS));
-		
+
 		JScrollPane htmlView = new JScrollPane(scheduleView);
 
-		//Add the scroll panes to a split pane.
+		// Add the scroll panes to a split pane.
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setTopComponent(treeView);
 		splitPane.setBottomComponent(htmlView);
@@ -80,14 +81,14 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 		Dimension minimumSize = new Dimension(100, 250);
 		htmlView.setMinimumSize(minimumSize);
 		treeView.setMinimumSize(minimumSize);
-		splitPane.setDividerLocation(100); //XXX: ignored in some releases
-											//of Swing. bug 4101306
-		//workaround for bug 4101306:
-		//treeView.setPreferredSize(new Dimension(100, 100)); 
+		splitPane.setDividerLocation(100); // XXX: ignored in some releases
+											// of Swing. bug 4101306
+		// workaround for bug 4101306:
+		// treeView.setPreferredSize(new Dimension(100, 100));
 
 		splitPane.setPreferredSize(new Dimension(500, 300));
 
-		//Add the split pane to this panel.
+		// Add the split pane to this panel.
 		add(splitPane);
 	}
 
@@ -103,22 +104,23 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 		if (node.isLeaf()) {
 			nodeInfo = node.getParent();
 		}
-		
+
 		if (!node.isLeaf()) {
 			Product product = products.get(nodeInfo.toString());
 			scheduleView.removeAll();
 			List<Product> list = new ArrayList<Product>();
 			list.add(product);
-			scheduleView.add(GanttChart.createChartProducts(list));
+			// scheduleView.add(GanttChart.createChartProducts(list));
 			scheduleView.revalidate();
+			throw new RuntimeException("not supported");
 		}
 	}
 
 	private void createNodes(DefaultMutableTreeNode top) {
-		for (Entry<String, Product> entry: products.entrySet()) {
+		for (Entry<String, Product> entry : products.entrySet()) {
 			Product product = entry.getValue();
 			DefaultMutableTreeNode category = new DefaultMutableTreeNode(product.getProductName());
-			top.add(category);			
+			top.add(category);
 
 			category.add(new DefaultMutableTreeNode(product.getCreated()));
 			category.add(new DefaultMutableTreeNode(product.getProductState()));

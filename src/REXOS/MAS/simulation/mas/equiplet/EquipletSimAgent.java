@@ -11,6 +11,7 @@ import org.json.JSONException;
 
 import simulation.util.Parser;
 import simulation.util.Position;
+import simulation.util.Tick;
 import simulation.util.Triple;
 import simulation.util.Tuple;
 
@@ -25,29 +26,29 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	/**
 	 * time the equiplet breaks down
 	 */
-	private double timeBreakdown;
+	private Tick timeBreakdown;
 	/**
 	 * the time remaining for the executing job after a breakdown
 	 */
-	private double timeRemaining;
+	private Tick timeRemaining;
 
 	// Simulation performances
 	/**
 	 * statistics Statistics contains the time the equiplet is in one of the states <BUSY, IDLE, ERROR>
 	 * The states ERROR_READY and ERROR_FINISHED are counted as ERROR and ERROR_REPAIRED as BUSY
 	 */
-	private Triple<Double, Double, Double> statistics;
+	private Triple<Tick, Tick, Tick> statistics;
 
 	/**
 	 * lastHistoryUpdate The last time the statistics is update to
 	 * calculate the elapsed time between state changes
 	 */
-	private double lastStatisticsUpdate;
+	private Tick lastStatisticsUpdate;
 
 	/**
 	 * scheduleLatency A list of differences between the time and the time scheduled
 	 */
-	private Map<Double, Double> scheduleLatency;
+	private Map<Tick, Tick> scheduleLatency;
 
 	public EquipletSimAgent(Position position, List<Capability> capabilities) {
 		try {
@@ -57,9 +58,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
 		}
 
-		lastStatisticsUpdate = 0;
-		statistics = new Triple<Double, Double, Double>(0.0, 0.0, 0.0);
-		scheduleLatency = new HashMap<Double, Double>();
+		lastStatisticsUpdate = new Tick(0);
+		statistics = new Triple<Tick, Tick, Tick>(new Tick(0), new Tick(0), new Tick(0));
+		scheduleLatency = new HashMap<Tick, Tick>();
 	}
 
 	@Override
@@ -73,8 +74,13 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	@Override
-	public double load(double time, double window) {
+	public double load(Tick time, Tick window) {
 		return super.load(time, window);
+	}
+
+	@Override
+	public double loadHistory(Tick time, Tick window) {
+		return super.loadHistory(time, window);
 	}
 
 	/**
@@ -85,7 +91,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @return time the equiplet is <BUSY, IDLES, ERROR>
 	 */
 	@Override
-	public Triple<Double, Double, Double> getStatistics(double time) {
+	public Triple<Tick, Tick, Tick> getStatistics(Tick time) {
 		historyUpdate(time);
 		return statistics;
 	}
@@ -97,16 +103,16 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @return a list of jobs
 	 */
 	@Override
-	public List<Triple<String, Double, Double>> getCompleteSchedule() {
-		List<Triple<String, Double, Double>> data = new ArrayList<Triple<String, Double, Double>>();
+	public List<Triple<String, Tick, Tick>> getCompleteSchedule() {
+		List<Triple<String, Tick, Tick>> data = new ArrayList<Triple<String, Tick, Tick>>();
 		for (Job job : history) {
-			data.add(new Triple<String, Double, Double>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
+			data.add(new Triple<String, Tick, Tick>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
 		}
 		if (isExecuting()) {
-			data.add(new Triple<String, Double, Double>(executing.getProductAgentName(), executing.getStartTime(), executing.getDue()));
+			data.add(new Triple<String, Tick, Tick>(executing.getProductAgentName(), executing.getStartTime(), executing.getDue()));
 		}
 		for (Job job : schedule) {
-			data.add(new Triple<String, Double, Double>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
+			data.add(new Triple<String, Tick, Tick>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
 		}
 		return data;
 	}
@@ -117,13 +123,13 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @return a list of jobs
 	 */
 	@Override
-	public List<Triple<String, Double, Double>> getSchedule() {
-		List<Triple<String, Double, Double>> data = new ArrayList<Triple<String, Double, Double>>();
+	public List<Triple<String, Tick, Tick>> getSchedule() {
+		List<Triple<String, Tick, Tick>> data = new ArrayList<Triple<String, Tick, Tick>>();
 		if (isExecuting()) {
-			data.add(new Triple<String, Double, Double>(executing.getProductAgentName(), executing.getStartTime(), executing.getDue()));
+			data.add(new Triple<String, Tick, Tick>(executing.getProductAgentName(), executing.getStartTime(), executing.getDue()));
 		}
 		for (Job job : schedule) {
-			data.add(new Triple<String, Double, Double>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
+			data.add(new Triple<String, Tick, Tick>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
 		}
 		return data;
 	}
@@ -134,10 +140,10 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @return a list of jobs
 	 */
 	@Override
-	public List<Triple<String, Double, Double>> getHistory() {
-		List<Triple<String, Double, Double>> data = new ArrayList<Triple<String, Double, Double>>();
+	public List<Triple<String, Tick, Tick>> getHistory() {
+		List<Triple<String, Tick, Tick>> data = new ArrayList<Triple<String, Tick, Tick>>();
 		for (Job job : history) {
-			data.add(new Triple<String, Double, Double>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
+			data.add(new Triple<String, Tick, Tick>(job.getProductAgentName(), job.getStartTime(), job.getDue()));
 		}
 		return data;
 	}
@@ -146,7 +152,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @return the difference between the start time and the planned start time
 	 */
 	@Override
-	public Map<Double, Double> getLatency() {
+	public Map<Tick, Tick> getLatency() {
 		return scheduleLatency;
 	}
 
@@ -157,7 +163,6 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	public Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>> getUpdateState() {
-		System.out.println("EQ " + this);
 		List<String> services = new ArrayList<String>();
 		for (Capability capability : capabilities) {
 			services.add(capability.getService());
@@ -170,7 +175,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @return the remaining process time of the job
 	 */
 	@Override
-	public double getRemainingTime() {
+	public Tick getRemainingTime() {
 		return timeRemaining;
 	}
 
@@ -179,15 +184,15 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * 
 	 * @param time
 	 */
-	private void historyUpdate(double time) {
-		double elapsed = time - lastStatisticsUpdate;
+	private void historyUpdate(Tick time) {
+		Tick elapsed = time.minus(lastStatisticsUpdate);
 		lastStatisticsUpdate = time;
 		if (state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED) {
-			statistics.first += elapsed;
+			statistics.first = statistics.first.add(elapsed);
 		} else if (state == EquipletState.IDLE) {
-			statistics.second += elapsed;
+			statistics.second = statistics.second.add(elapsed);
 		} else if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED) {
-			statistics.third += elapsed;
+			statistics.third = statistics.third.add(elapsed);
 		}
 	}
 
@@ -203,7 +208,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Deprecated
 	@SuppressWarnings("unused")
-	private boolean validateSchedule(double time) {
+	private boolean validateSchedule(Tick time) {
 		return true;
 	}
 
@@ -216,18 +221,15 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            time of the job
 	 */
 	@Override
-	protected void executeJob(double time) {
+	protected void executeJob(Tick time) {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
 
-		double latency = time - executing.getStartTime();
-		// if (latency > 0) {
-		// throw new IllegalArgumentException("latency can't be: " + latency + " > 0 for job=" + executing + ", schedule=" + schedule);
-		// }
+		Tick latency = time.minus(executing.getStartTime());
 		scheduleLatency.put(time, latency);
 
 		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %.2f (%.2f from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
+		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
 
 		informProductProcessing(executing.getProductAgent());
 
@@ -249,7 +251,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            of the the product arrival
 	 */
 	@Override
-	protected void notifyProductArrived(AID product, double time) {
+	protected void notifyProductArrived(AID product, Tick time) {
 		historyUpdate(time);
 		super.notifyProductArrived(product, time);
 	}
@@ -260,18 +262,18 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @param time
 	 *            the job finished
 	 */
-	public void notifyJobFinished(double time) {
+	public void notifyJobFinished(Tick time) {
 		if (state == EquipletState.ERROR) {
 			// the equiplet should have finished the job, but was broken down in the meantime
 			// the equiplet has still a remaining time to continue after the equiplet is repaired
 			state = EquipletState.ERROR_FINISHED;
-			timeRemaining = time - timeBreakdown;
-			executing.updateDueTime(executing.getDue() + timeRemaining);
-			System.out.printf("EA:%s job %s should finished but delayed by breakdown, should still %.2f be executed after being repaired.\n", getLocalName(), executing, timeRemaining);
+			timeRemaining = time.minus(timeBreakdown);
+			executing.updateDueTime(executing.getDue().add(timeRemaining));
+			System.out.printf("EA:%s job %s should finished but delayed by breakdown, should still %s be executed after being repaired.\n", getLocalName(), executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_REPAIRED) {
 			// the equiplet should have finished with the job, but was broken down in the meantime,
 			// the equiplet continues with executing the job
-			System.out.printf("EA:%s job %s should finished but delayed by breakdown, should still %.2f be executed.\n", getLocalName(), executing, timeRemaining);
+			System.out.printf("EA:%s job %s should finished but delayed by breakdown, should still %s be executed.\n", getLocalName(), executing, timeRemaining);
 			state = EquipletState.BUSY;
 		} else if (state == EquipletState.BUSY) {
 			// executing of the job is really finished and will continue with the next job if possible
@@ -306,17 +308,17 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @param time
 	 *            of the breakdown
 	 */
-	public void notifyBreakdown(double time) {
+	public void notifyBreakdown(Tick time) {
 		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
 		if (state == EquipletState.ERROR_REPAIRED) {
-			timeBreakdown = time - timeRemaining;
-			System.out.printf("EA:%s is broken down at %.2f, substracting the previous broken time %.2f\n", getLocalName(), time, timeRemaining);
+			timeBreakdown = time.minus(timeRemaining);
+			System.out.printf("EA:%s is broken down at %s, substracting the previous broken time %s\n", getLocalName(), time, timeRemaining);
 		} else {
 			timeBreakdown = time;
-			System.out.printf("EA:%s is broken down at %.2f\n", getLocalName(), time);
+			System.out.printf("EA:%s is broken down at %s\n", getLocalName(), time);
 		}
 		historyUpdate(time);
 		state = EquipletState.ERROR;
@@ -329,7 +331,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @param time
 	 *            of repair
 	 */
-	public void notifyRepaired(double time) {
+	public void notifyRepaired(Tick time) {
 		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
@@ -339,25 +341,25 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			// the equiplet has already a finished event received, but is now repaired and can continue with the job
 			state = EquipletState.BUSY;
 			// executing.updateDueTime(executing.getDue() + (time - timeBreakdown));
-			System.out.printf("EA:%s is repaired at %.2f and continue with job %s, with %.0f time remaining.\n", getLocalName(), time, executing, timeRemaining);
+			System.out.printf("EA:%s is repaired at %s and continue with job %s, with %s time remaining.\n", getLocalName(), time, executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
 			executeJob(time);
 		} else if (isExecuting()) {
 			// the equiplet is executing a job and is repaired, but waits until a job finished event is received
 			state = EquipletState.ERROR_REPAIRED;
-			timeRemaining = time - timeBreakdown;
-			executing.updateDueTime(executing.getDue() + timeRemaining);
-			System.out.printf("EA:%s is repaired at %.2f and continue with job %s. The equiplet was %.2f broken, which is still remaining.\n", getLocalName(), time, executing, timeRemaining);
+			timeRemaining = time.minus(timeBreakdown);
+			executing.updateDueTime(executing.getDue().add(timeRemaining));
+			System.out.printf("EA:%s is repaired at %s and continue with job %s. The equiplet was %s broken, which is still remaining.\n", getLocalName(), time, executing, timeRemaining);
 			// } else if (jobReady()) {
 			// when the equiplet was in the error state there became a job ready which arrived before the breakdown
 			// not sure if this could happen
 			// System.out.println("EQUIPLET ERROR? " + schedule);
 			// executeJob(time);
-			// System.out.printf("EA:%s is repaired at %.2f and detect that a job has became ready: %s \n", getLocalName(), time, executing);
+			// System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 		} else {
 			// the equiplet has nothing to do and goes into IDLE state
-			System.out.printf("EA:%s is repaired at %.2f \n", getLocalName(), time);
+			System.out.printf("EA:%s is repaired at %s \n", getLocalName(), time);
 			state = EquipletState.IDLE;
 		}
 

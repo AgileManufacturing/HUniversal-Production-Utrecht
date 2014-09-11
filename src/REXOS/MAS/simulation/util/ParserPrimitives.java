@@ -54,7 +54,7 @@ public class ParserPrimitives {
 		JSONObject json = new JSONObject();
 		json.put("service", capability.getService());
 		json.put("limitations", parseMap(capability.getLimitations()));
-		json.put("duration", capability.getDuration());
+		json.put("duration", parseTick(capability.getDuration()));
 		return json;
 	}
 
@@ -62,7 +62,8 @@ public class ParserPrimitives {
 		if (json.has("service") && json.has("limitations") && json.has("duration")) {
 			String service = json.getString("service");
 			Map<String, Object> limitations = parseMap(json.getJSONArray("limitations"));
-			double duration = json.getDouble("duration");
+			
+			Tick duration = parseTick(json.getJSONObject("duration"));
 			return new Capability(service, limitations, duration);
 		} else {
 			throw new JSONException("Parser: parsing capability missing arguments service and/or limitations in " + json);
@@ -93,6 +94,22 @@ public class ParserPrimitives {
 			}
 		}
 		return map;
+	}
+
+	protected static JSONObject parseTick(Tick time) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("double", time.doubleValue());
+		return json;
+	}
+
+	protected static Tick parseTick(JSONObject json) throws JSONException {
+		if (json.has("double")) {
+			return new Tick(json.getDouble("double"));
+		} else if (json.has("long")) {
+			return new Tick(json.getDouble("long"));
+		} else {
+			throw new JSONException("Parser: parsing failed to parse tick " + json);
+		}
 	}
 
 	protected static JSONArray parseProductionTimes(Map<String, Double> productionTimes) throws JSONException {

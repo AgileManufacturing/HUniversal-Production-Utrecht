@@ -20,6 +20,7 @@ import simulation.mas.product.ProductAgentSim;
 import simulation.mas.product.ProductStep;
 import simulation.util.Position;
 import simulation.util.Settings;
+import simulation.util.Tick;
 
 public class SimulationAgent extends Agent implements ISimControl {
 
@@ -90,11 +91,12 @@ public class SimulationAgent extends Agent implements ISimControl {
 	}
 
 	@Override
-	public IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, double time) throws Exception {
+	public IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time) throws Exception {
 		try {
 			System.out.println("Simulation: create product");
 			// Create and start the agent
-			ProductAgentSim productAgent = new ProductAgentSim(simulation, productSteps, position, time);
+			Tick deadline = time.add(1000);
+			ProductAgentSim productAgent = new ProductAgentSim(simulation, productSteps, position, time, deadline);
 
 			ContainerController cc = getContainerController();
 			AgentController ac = cc.acceptNewAgent(name, productAgent);
@@ -129,7 +131,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 
 			// Create and start the agent
 			TrafficManager trafficAgent = new TrafficManager(equiplets);
-			
+
 			ContainerController cc = getContainerController();
 			AgentController ac = cc.acceptNewAgent(Settings.TRAFFIC_AGENT, trafficAgent);
 			ac.start();

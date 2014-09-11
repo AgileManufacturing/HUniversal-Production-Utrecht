@@ -8,6 +8,7 @@ import org.json.JSONException;
 
 import simulation.util.Ontology;
 import simulation.util.Parser;
+import simulation.util.Tick;
 
 public class ProductListenerBehaviour extends Behaviour {
 
@@ -88,7 +89,7 @@ public class ProductListenerBehaviour extends Behaviour {
 
 	private void handleProductStepDelayed(ACLMessage message) {
 		try {
-			double start = Parser.parseProductDelayed(message.getContent());
+			Tick start = Parser.parseProductDelayed(message.getContent());
 			product.onProductDelayed(start);
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);

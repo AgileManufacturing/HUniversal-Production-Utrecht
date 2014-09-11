@@ -5,18 +5,20 @@ import jade.core.AID;
 import java.util.HashMap;
 import java.util.Map;
 
+import simulation.util.Tick;
+
 public class Job implements Comparable<Job> {
 
 	private AID product;
 	private String productName;
 	private String service;
 	private Map<String, Object> criteria;
-	private double start;
-	private double due;
-	private double deadline;
+	private Tick start;
+	private Tick due;
+	private Tick deadline;
 	private boolean ready;
 
-	public Job(double start, double deadline) {
+	public Job(Tick start, Tick deadline) {
 		this.product = null;
 		this.productName = "";
 		this.service = "";
@@ -28,7 +30,7 @@ public class Job implements Comparable<Job> {
 	}
 
 	@Deprecated
-	public Job(String service, String product, Map<String, Object> criteria, double start, double due, double deadline) {
+	public Job(String service, String product, Map<String, Object> criteria, Tick start, Tick due, Tick deadline) {
 		this.service = service;
 		this.productName = product;
 		this.criteria = criteria;
@@ -38,7 +40,7 @@ public class Job implements Comparable<Job> {
 		this.ready = false;
 	}
 
-	public Job(AID product, String service, Map<String, Object> criteria, double start, double due, double deadline) {
+	public Job(AID product, String service, Map<String, Object> criteria, Tick start, Tick due, Tick deadline) {
 		this.service = service;
 		this.product = product;
 		this.criteria = criteria;
@@ -50,7 +52,7 @@ public class Job implements Comparable<Job> {
 
 	@Override
 	public int compareTo(Job job) {
-		return start < job.start ? -1 : (start > job.start ? 1 : 0);
+		return start.lessThan(job.start) ? -1 : (start.greaterThan(job.start) ? 1 : 0);
 	}
 
 	public String getService() {
@@ -73,20 +75,20 @@ public class Job implements Comparable<Job> {
 		return criteria;
 	}
 
-	public double getStartTime() {
+	public Tick getStartTime() {
 		return start;
 	}
 
-	public double getDue() {
+	public Tick getDue() {
 		return due;
 	}
 
-	public double getDeadline() {
+	public Tick getDeadline() {
 		return deadline;
 	}
 
-	public double getDuration() {
-		return due - start;
+	public Tick getDuration() {
+		return due.minus(start);
 	}
 
 	public boolean isReady() {
@@ -97,17 +99,17 @@ public class Job implements Comparable<Job> {
 		this.ready = true;
 	}
 
-	public void updateStartTime(double time) {
-		this.due = time + (due - start);
+	public void updateStartTime(Tick time) {
+		this.due = time.add(due.minus(start));
 		this.start = time;
 	}
 
-	public void updateDueTime(double time) {
+	public void updateDueTime(Tick time) {
 		this.due = time;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Job %s [product=%s, start=%.0f, due=%.0f, deadline=%.0f, ready=%s]", service, getProductAgentName(), start, due, deadline, ready);
+		return String.format("Job %s [product=%s, start=%s, due=%s, deadline=%s, ready=%s]", service, getProductAgentName(), start, due, deadline, ready);
 	}
 }

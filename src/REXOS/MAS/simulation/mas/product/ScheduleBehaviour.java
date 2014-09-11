@@ -25,6 +25,7 @@ import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
 import simulation.util.Settings;
+import simulation.util.Tick;
 import simulation.util.Triple;
 
 public class ScheduleBehaviour extends Behaviour {
@@ -53,13 +54,13 @@ public class ScheduleBehaviour extends Behaviour {
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
 
-			Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> capableEquiplets = capableEquiplets(suitedEquiplets);
-			Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options = capableEquiplets.second;
+			Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets = capableEquiplets(suitedEquiplets);
+			Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options = capableEquiplets.second;
 			Map<AID, Pair<Double, Position>> equipletInfo = capableEquiplets.first;
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s filter the capable equiplets %s\n", myAgent.getLocalName(), equipletInfo.keySet());
 
-			Map<Pair<Position, Position>, Double> travelTimes = retrieveTravelTimes(product.getPosition(), options, equipletInfo);
+			Map<Pair<Position, Position>, Tick> travelTimes = retrieveTravelTimes(product.getPosition(), options, equipletInfo);
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s retrieved travel times %s\n", myAgent.getLocalName(), travelTimes);
 
@@ -99,6 +100,15 @@ public class ScheduleBehaviour extends Behaviour {
 		return done;
 	}
 
+	/**
+	 * search for suited equiplet
+	 * ask the DF if there are equiplets that have registered service needed for production of the product
+	 * 
+	 * @param productSteps
+	 *            with the needed services
+	 * @return a map equiplet that are suited for a set of product steps
+	 * @throws SchedulingException
+	 */
 	private HashMap<AID, LinkedList<ProductStep>> searchSuitedEquiplets(List<ProductStep> productSteps) throws SchedulingException {
 		// TODO communication improvement, instead of map equiplets to executable product step, change product step to service,
 		// so it has to ask only once for a service instead of product step
@@ -135,7 +145,19 @@ public class ScheduleBehaviour extends Behaviour {
 		return suitedEquiplets;
 	}
 
-	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) {
+	/**
+	 * filter incapable equiplets out of the suited equiplet list
+	 * the equiplets will be contacted to retreive the availability, load and position of these equiplets
+	 * 
+	 * the answers will be sorted in a map of equiplet info and a map of options
+	 * the equiplet info consists of the load and position for each equiplet
+	 * the options consists a list of equiplets, with load, estimate for service and possibilities, for each product step index
+	 * 
+	 * @param suitedEquiplets
+	 *            a map of equiplet with the suited product steps
+	 * @return equiplet info and product step options
+	 */
+	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) {
 		String replyConversation = Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis();
 
 		// send a questions to each of the equilplet if the product step can be executed
@@ -154,12 +176,12 @@ public class ScheduleBehaviour extends Behaviour {
 			}
 		}
 
-		// equiplet info :: list of equiplet with the position of the equiplet
+		// equiplet info :: list of equiplet with the load and position of the equiplet
 		Map<AID, Pair<Double, Position>> equipletInfo = new HashMap<>();
 
 		// option to execute product step ::
-		// Map < product step index, Options to execute product step <Equiplet, Triple < load, estimate duration of service, List of possibilities < from time, until time> > > >
-		Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions = new HashMap<>();
+		// Map < product step index, Options to execute product step <Equiplet, Triple < estimate duration of service, List of possibilities < from time, until time> > > >
+		Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> serviceOptions = new HashMap<>();
 
 		System.out.printf("PA:%s waiting on answers of equiplets whether they can execute the product steps...\n", myAgent.getLocalName());
 
@@ -177,16 +199,16 @@ public class ScheduleBehaviour extends Behaviour {
 				System.out.printf("PA:%s can execute reply received from %s : %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getContent());
 				try {
 					// Triple < List of product steps, load, position >
-					Triple<List<Triple<Integer, Double, List<Pair<Double, Double>>>>, Double, Position> answer = Parser.parseCanExecuteAnswer(msg.getContent());
+					Triple<List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position> answer = Parser.parseCanExecuteAnswer(msg.getContent());
 					equipletInfo.put(msg.getSender(), new Pair<Double, Position>(answer.second, answer.third));
 
 					// Triple < product step index, estimate production, possible times >
-					for (Triple<Integer, Double, List<Pair<Double, Double>>> service : answer.first) {
+					for (Triple<Integer, Tick, List<Pair<Tick, Tick>>> service : answer.first) {
 						if (!serviceOptions.containsKey(service.first)) {
-							serviceOptions.put(service.first, new HashMap<AID, Pair<Double, List<Pair<Double, Double>>>>());
+							serviceOptions.put(service.first, new HashMap<AID, Pair<Tick, List<Pair<Tick, Tick>>>>());
 						}
 
-						serviceOptions.get(service.first).put(msg.getSender(), new Pair<Double, List<Pair<Double, Double>>>(service.second, service.third));
+						serviceOptions.get(service.first).put(msg.getSender(), new Pair<Tick, List<Pair<Tick, Tick>>>(service.second, service.third));
 					}
 				} catch (JSONException e) {
 					System.err.printf("PA:%s failed to receive correct message from equiplet %s when asking can execute %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getContent());
@@ -200,10 +222,10 @@ public class ScheduleBehaviour extends Behaviour {
 			}
 		}
 
-		return new Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>>>(equipletInfo, serviceOptions);
+		return new Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>>(equipletInfo, serviceOptions);
 	}
 
-	private Map<Pair<Position, Position>, Double> retrieveTravelTimes(Position position, Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo)
+	private Map<Pair<Position, Position>, Tick> retrieveTravelTimes(Position position, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo)
 			throws SchedulingException {
 		// the routes of equiplet to equiplet for which the time is needed for scheduling
 		Set<Pair<Position, Position>> routes = new HashSet<>();
@@ -220,11 +242,11 @@ public class ScheduleBehaviour extends Behaviour {
 			}
 
 			// map the possibilities for a product step to the next possibilities for the product step;
-			Map<AID, Pair<Double, List<Pair<Double, Double>>>> previousPossibilities = options.get(i - 1);
-			Map<AID, Pair<Double, List<Pair<Double, Double>>>> nextPossibilities = options.get(i);
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> previousPossibilities = options.get(i - 1);
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> nextPossibilities = options.get(i);
 
-			for (Entry<AID, Pair<Double, List<Pair<Double, Double>>>> previousEquiplet : previousPossibilities.entrySet()) {
-				for (Entry<AID, Pair<Double, List<Pair<Double, Double>>>> nextEquiplet : nextPossibilities.entrySet()) {
+			for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> previousEquiplet : previousPossibilities.entrySet()) {
+				for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> nextEquiplet : nextPossibilities.entrySet()) {
 					Position previousPos = equipletInfo.get(previousEquiplet.getKey()).second;
 					Position nextPos = equipletInfo.get(nextEquiplet.getKey()).second;
 					Pair<Position, Position> route = new Pair<>(previousPos, nextPos);
@@ -237,8 +259,8 @@ public class ScheduleBehaviour extends Behaviour {
 
 		// add routes from the current product position to the position of the possible equiplet for the first product step
 		if (options.containsKey(0)) {
-			Map<AID, Pair<Double, List<Pair<Double, Double>>>> possibilities = options.get(0);
-			for (Entry<AID, Pair<Double, List<Pair<Double, Double>>>> equiplet : possibilities.entrySet()) {
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> possibilities = options.get(0);
+			for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> equiplet : possibilities.entrySet()) {
 				routes.add(new Pair<>(position, equipletInfo.get(equiplet.getKey()).second));
 			}
 		} else {
@@ -269,7 +291,7 @@ public class ScheduleBehaviour extends Behaviour {
 
 			ACLMessage reply = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 			if (reply != null) {
-				Map<Pair<Position, Position>, Double> travelTimes = Parser.parseTravelTimes(reply.getContent());
+				Map<Pair<Position, Position>, Tick> travelTimes = Parser.parseTravelTimes(reply.getContent());
 
 				System.out.printf("PA:%s received travel times %s\n", myAgent.getLocalName(), travelTimes);
 
@@ -284,9 +306,10 @@ public class ScheduleBehaviour extends Behaviour {
 		}
 	}
 
-	private LinkedList<ProductionStep> schedule(LinkedList<Node> nodes, LinkedList<ProductStep> productSteps, Map<AID, Pair<Double, Position>> equipletInfo, double deadline)
+	private LinkedList<ProductionStep> schedule(LinkedList<Node> nodes, LinkedList<ProductStep> productSteps, Map<AID, Pair<Double, Position>> equipletInfo, Tick deadline)
 			throws SchedulingException {
 		LinkedList<ProductionStep> path = new LinkedList<>();
+
 		// construct send list grouped by equiplet
 		HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
 		for (int i = 0; i < nodes.size(); i++) {
@@ -311,7 +334,7 @@ public class ScheduleBehaviour extends Behaviour {
 		return path;
 	}
 
-	private void schedule(LinkedList<ProductionStep> path, double deadline) throws SchedulingException {
+	private void schedule(LinkedList<ProductionStep> path, Tick deadline) throws SchedulingException {
 		// construct send list grouped by equiplet
 		HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
 		for (ProductionStep production : path) {
@@ -324,7 +347,7 @@ public class ScheduleBehaviour extends Behaviour {
 		schedule(sendList, deadline);
 	}
 
-	private void schedule(HashMap<AID, ArrayList<ProductionStep>> sendList, double deadline) throws SchedulingException {
+	private void schedule(HashMap<AID, ArrayList<ProductionStep>> sendList, Tick deadline) throws SchedulingException {
 		String replyConversation = Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis();
 		int sendCounter = 0;
 		for (Entry<AID, ArrayList<ProductionStep>> entry : sendList.entrySet()) {

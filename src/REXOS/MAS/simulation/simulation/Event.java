@@ -1,8 +1,10 @@
 package simulation.simulation;
 
+import simulation.util.Tick;
+
 class Event implements Comparable<Event> {
 
-	private double time;
+	private Tick time;
 	private EventType type;
 	private String product;
 	private String equiplet;
@@ -15,7 +17,7 @@ class Event implements Comparable<Event> {
 	 * @param type
 	 * @param steps
 	 */
-	public Event(double time, EventType type) {
+	public Event(Tick time, EventType type) {
 		this.time = time;
 		this.type = type;
 	}
@@ -31,7 +33,7 @@ class Event implements Comparable<Event> {
 	 * @param equiplet
 	 *            name
 	 */
-	public Event(double time, EventType type, String product, String equiplet) {
+	public Event(Tick time, EventType type, String product, String equiplet) {
 		this.time = time;
 		this.type = type;
 		this.product = product;
@@ -47,7 +49,7 @@ class Event implements Comparable<Event> {
 	 * @param equiplet
 	 *            name
 	 */
-	public Event(double time, EventType type, String equiplet) {
+	public Event(Tick time, EventType type, String equiplet) {
 		this.time = time;
 		this.type = type;
 		this.equiplet = equiplet;
@@ -62,10 +64,10 @@ class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int compareTo(Event event) {
-		return time < event.getTime() ? -1 : (time > event.getTime() ? 1 : type == event.getType() ? -1 : type.compareTo(event.getType()));
+		return time.lessThan(event.getTime())  ? -1 : (time.greaterThan(event.getTime()) ? 1 : type == event.getType() ? -1 : type.compareTo(event.getType()));
 	}
 
-	public double getTime() {
+	public Tick getTime() {
 		return time;
 	}
 
@@ -84,11 +86,11 @@ class Event implements Comparable<Event> {
 	@Override
 	public String toString() {
 		if (type == EventType.PRODUCT || type == EventType.DONE) {
-			return String.format("Evt:[time=%.2f, type=%s]", time, type);
+			return String.format("Evt:[time=%s, type=%s]", time, type);
 		} else if (type == EventType.ARRIVED) {
-			return String.format("Evt:[time=%.2f, type=%s, product=%s, equipet=%s]", time, type, product, equiplet);
+			return String.format("Evt:[time=%s, type=%s, product=%s, equipet=%s]", time, type, product, equiplet);
 		} else {
-			return String.format("Evt:[time=%.2f, type=%s, equiplet=%s]", time, type, equiplet);
+			return String.format("Evt:[time=%s, type=%s, equiplet=%s]", time, type, equiplet);
 		}
 	}
 }

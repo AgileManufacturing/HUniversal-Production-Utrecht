@@ -2,12 +2,14 @@ package simulation.mas.equiplet;
 
 import java.util.Map;
 
+import simulation.util.Tick;
+
 public class Capability {
 	private String service;
 	private Map<String, Object> limitations;
-	private double duration;
+	private Tick duration;
 
-	public Capability(String service, Map<String, Object> limitations, double duration) {
+	public Capability(String service, Map<String, Object> limitations, Tick duration) {
 		this.service = service;
 		this.limitations = limitations;
 		this.duration = duration;
@@ -21,7 +23,7 @@ public class Capability {
 		return limitations;
 	}
 
-	public double getDuration() {
+	public Tick getDuration() {
 		return duration;
 	}
 	

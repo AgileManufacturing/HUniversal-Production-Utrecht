@@ -96,7 +96,7 @@ public class StaticSimInterface {
 		chartPanel = new JPanel();
 		scrollPane.setViewportView(chartPanel);
 		chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.X_AXIS));
-		
+
 		final JPanel timeDivisionView = new JPanel();
 		tabbedPane.addTab("Equiplet time division", null, timeDivisionView, null);
 		timeDivisionView.setLayout(new BoxLayout(timeDivisionView, BoxLayout.X_AXIS));
@@ -109,7 +109,7 @@ public class StaticSimInterface {
 					Map<String, Triple<Double, Double, Double>> history = offlineSim.getEquipletHistory();
 					System.out.println("HISTORY: " + history);
 					timeDivisionView.removeAll();
-					timeDivisionView.add(StackedBarChart.createChartPanel(history));
+					// timeDivisionView.add(StackedBarChart.createChartPanel(history));
 				}
 				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 			}
@@ -334,9 +334,8 @@ public class StaticSimInterface {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
 		}
 
-
-        NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-        nf.setMaximumFractionDigits(1);
+		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+		nf.setMaximumFractionDigits(1);
 
 		lblTime.setText(nf.format(time));
 		lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
@@ -344,6 +343,6 @@ public class StaticSimInterface {
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));
 		lblBusy.setText(Arrays.toString(busyValues));
 		lblThroughput.setText(String.format("%.2f", throughput));
-		//gridView.update(equipletStates);
+		// gridView.update(equipletStates);
 	}
 }

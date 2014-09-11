@@ -9,12 +9,13 @@ import simulation.mas.equiplet.IEquipletSim;
 import simulation.mas.product.IProductSim;
 import simulation.mas.product.ProductStep;
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public interface ISimControl {
 
 	void delay(long delay);
 	
-	IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, double time) throws Exception;
+	IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time) throws Exception;
 	
 	IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception;
 

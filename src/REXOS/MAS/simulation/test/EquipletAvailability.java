@@ -1,171 +1,198 @@
 package simulation.test;
 
-import java.util.List;
-import java.util.TreeSet;
+import static org.junit.Assert.assertArrayEquals;
 
-import simulation.mas.equiplet.EquipletAgent;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
 import simulation.mas.equiplet.Job;
 import simulation.util.Pair;
+import simulation.util.Tick;
 
-public class EquipletAvailability extends EquipletAgent {
+public class EquipletAvailability {
 
-	public static void main(String[] args) {
+	@Test
+	public void test1() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
 
-		System.out.println("\n1: Test without jobs in schedule");
+		System.out.println("\n1: Test without jobs in schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
 
-		EquipletAvailability equiplet1 = new EquipletAvailability();
-		System.out.println("Equiplet: " + equiplet1);
+		EquipletTest equiplet = new EquipletTest();
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
 
-		List<Pair<Double, Double>> available1 = equiplet1.available(2, 5, 75);
-		System.out.println("Available: " + available1);
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(start, deadline));
 
-		
-		//
-		System.out.println("\n2: Test with 1 job inside the begin of the schedule");
-
-		EquipletAvailability equiplet2 = new EquipletAvailability();
-		equiplet2.schedule(new Job(5, 10));
-		System.out.println("Equiplet: " + equiplet2);
-
-		List<Pair<Double, Double>> available2 = equiplet2.available(2, 5, 75);
-		System.out.println("Available: " + available2);
-		
-
-		//
-		System.out.println("\n3: Test with 2 job inside the schedule");
-
-		EquipletAvailability equiplet3 = new EquipletAvailability();
-		equiplet3.schedule(new Job(5, 10));
-		equiplet3.schedule(new Job(28, 32));
-		System.out.println("Equiplet: " + equiplet3);
-
-		List<Pair<Double, Double>> available3 = equiplet3.available(2, 5, 75);
-		System.out.println("Available: " + available3);
-		
-		
-		//
-		System.out.println("\n4: Test with 1 job fully inside in schedule");
-
-		EquipletAvailability equiplet4 = new EquipletAvailability();
-		equiplet4.schedule(new Job(50, 55));
-		System.out.println("Equiplet: " + equiplet4);
-
-		List<Pair<Double, Double>> available4 = equiplet4.available(2, 5, 75);
-		System.out.println("Available: " + available4);		
-		
-		
-		//
-		System.out.println("\n5: Test with 1 outside job in schedule");
-
-		EquipletAvailability equiplet5 = new EquipletAvailability();
-		equiplet5.schedule(new Job(80, 85));
-		System.out.println("Equiplet: " + equiplet5);
-
-		List<Pair<Double, Double>> available5 = equiplet5.available(2, 5, 75);
-		System.out.println("Available: " + available5);
-		
-		
-		//
-		System.out.println("\n6: Test with 1 executing and 1 job at begin schedule");
-
-		EquipletAvailability equiplet6 = new EquipletAvailability();
-		equiplet6.execute(new Job(205, 215));
-		equiplet6.schedule(new Job(215, 225));
-		System.out.println("Equiplet: " + equiplet6);
-		
-		List<Pair<Double, Double>> available6 = equiplet6.available(210, 10, 10210);
-		System.out.println("Available: " + available6);
-
-		
-		//
-		System.out.println("\n7: Test with multiple job in schedule");
-		EquipletAvailability equiplet = new EquipletAvailability();
-		equiplet.schedule(new Job(5, 10));
-		equiplet.schedule(new Job(20, 25));
-		equiplet.schedule(new Job(28, 32));
-		equiplet.schedule(new Job(40, 45));
-		equiplet.schedule(new Job(48, 53));
-		equiplet.schedule(new Job(80, 85));
-
-		System.out.println("Equiplet: " + equiplet);
-
-		List<Pair<Double, Double>> available = equiplet.available(2, 5, 75);
-		System.out.println("Available: " + available);
-
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
 	}
 
-	public EquipletAvailability() {
-		schedule = new TreeSet<>();
+	@Test
+	public void test2() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
+
+		System.out.println("\n2: Test with 1 job inside the begin of the schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.schedule(new Job(new Tick(5), new Tick(35)));
+
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(new Tick(35d), deadline));
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("Availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
 	}
 
-	protected void execute(Job job) {
-		executing = job;
+	@Test
+	public void test3() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
+
+		System.out.println("\n3: Test with 2 job inside the schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.schedule(new Job(new Tick(5), new Tick(50)));
+		equiplet.schedule(new Job(new Tick(60), new Tick(100)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(new Tick(100d), deadline));
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
 	}
-	
-	private void schedule(Job job) {
-		schedule.add(job);
+
+	@Test
+	public void test4() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
+
+		System.out.println("\n4: Test with 1 job fully inside in schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.schedule(new Job(new Tick(90), new Tick(140)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(start, new Tick(90d)));
+		result.add(new Pair<>(new Tick(140d), deadline));
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
 	}
 
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("EQ schedule:");
-		if (isExecuting()) {
-			builder.append("\nExe\t" + executing);
-		}
-		for (Job j : schedule) {
-			builder.append("\n\t" + j);
-		}
-		return builder.toString();
+	@Test
+	public void test5() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
+
+		System.out.println("\n5: Test with 1 outside job in schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.schedule(new Job(new Tick(1050), new Tick(1100)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(start, deadline));
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	@Test
+	public void test6() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
 
-	/*
-	protected List<Pair<Double, Double>> available(double time, double duration, double deadline) {
-		List<Pair<Double, Double>> available = new ArrayList<Pair<Double, Double>>();
+		System.out.println("\n6: Test with 1 executing and 1 job at begin schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.execute(new Job(new Tick(0), new Tick(45)));
+		equiplet.schedule(new Job(new Tick(45), new Tick(90)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
 
-		double start = time;
-		if (isExecuting()) {
-			start = Math.max(start, executing.getDue());
-		}
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(new Tick(90d), deadline));
 
-		
-		if (schedule.isEmpty()) {
-			available.add(new Pair<Double, Double>(start, deadline));
-		} else {
-			Iterator<Job> it = schedule.iterator();
-			while (it.hasNext()) {
-				Job job = it.next();
-
-				// System.out.println("(J.start = " + job.getStartTime() + " > start = " + start + " && " + (job.getStartTime() - start) + " > " + duration + " )");
-
-				// search for the begin of the availability
-				if (job.getStartTime() >= start) {
-					// the available time is greater than the duration of the job  
-					if (job.getStartTime() - start > duration) {
-
-						// check the boundaries of the availability
-						if (job.getStartTime() < deadline) {
-							available.add(new Pair<Double, Double>(start, job.getStartTime()));
-							start = job.getDue();
-						} else {
-							available.add(new Pair<Double, Double>(start, deadline));
-							break;
-						}
-					} else {
-						start = job.getDue();
-					}
-				}
-				
-				if (!it.hasNext()) {
-					available.add(new Pair<Double, Double>(start, deadline));
-				}
-			}
-		}
-		return available;
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
 	}
-	*/
+
+	@Test
+	public void test7() {
+		Tick start = new Tick(15);
+		Tick duration = new Tick(50);
+		Tick deadline = new Tick(1000);
+
+		System.out.println("\n7: Test with 1 executing [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.execute(new Job(new Tick(10), new Tick(69)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(new Tick(69d), deadline));
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
+	}
+
+	@Test
+	public void test8() {
+		Tick start = new Tick(0);
+		Tick duration = new Tick(5);
+		Tick deadline = new Tick(75);
+
+		System.out.println("\n8: Test with multiple job in schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.schedule(new Job(new Tick(5), new Tick(10)));
+		equiplet.schedule(new Job(new Tick(20), new Tick(25)));
+		equiplet.schedule(new Job(new Tick(28), new Tick(32)));
+		equiplet.schedule(new Job(new Tick(40), new Tick(45)));
+		equiplet.schedule(new Job(new Tick(48), new Tick(53)));
+		equiplet.schedule(new Job(new Tick(80), new Tick(85)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+		result.add(new Pair<>(new Tick(10d), new Tick(20d)));
+		result.add(new Pair<>(new Tick(32d), new Tick(40d)));
+		result.add(new Pair<>(new Tick(53d), deadline));
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
+	}
+
+	@Test
+	public void test9() {
+		Tick start = new Tick(10);
+		Tick duration = new Tick(5);
+		Tick deadline = new Tick(500);
+
+		System.out.println("\n9: Test with a full schedule [start=" + start + ", duration=" + duration + ", deadline=" + deadline + "]");
+		EquipletTest equiplet = new EquipletTest();
+		equiplet.schedule(new Job(new Tick(0), new Tick(50)));
+		equiplet.schedule(new Job(new Tick(50), new Tick(100)));
+		equiplet.schedule(new Job(new Tick(100), new Tick(150)));
+		equiplet.schedule(new Job(new Tick(150), new Tick(200)));
+		equiplet.schedule(new Job(new Tick(200), new Tick(250)));
+		equiplet.schedule(new Job(new Tick(250), new Tick(300)));
+		equiplet.schedule(new Job(new Tick(300), new Tick(350)));
+		equiplet.schedule(new Job(new Tick(350), new Tick(400)));
+		equiplet.schedule(new Job(new Tick(400), new Tick(450)));
+		equiplet.schedule(new Job(new Tick(450), new Tick(500)));
+		equiplet.schedule(new Job(new Tick(500), new Tick(550)));
+		List<Pair<Tick, Tick>> available = equiplet.available(start, duration, deadline);
+
+		List<Pair<Tick, Tick>> result = new ArrayList<>();
+
+		System.out.println("Available: " + result + " == " + available);
+		assertArrayEquals("availability must be " + result + "  with one job in schedule", result.toArray(), available.toArray());
+	}
 }

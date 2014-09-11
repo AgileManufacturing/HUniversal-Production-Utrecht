@@ -6,30 +6,35 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import simulation.util.Position;
+import simulation.util.Tick;
 
 public class Product extends Agent {
 	
-	private double created;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Tick created;
 	private LinkedList<ProductStep> productSteps;
 	private LinkedList<ProductionStep> productionPath;
 	private Position position;
-	private double deadline;
+	private Tick deadline;
 	private ProductState state;
 
-	public void init(double time, LinkedList<ProductStep> steps, Position position) {
+	public void init(Tick time, Tick deadline, LinkedList<ProductStep> steps, Position position) {
 		this.created = time;
 		this.productSteps = steps;
 		this.position = position;
 		this.productionPath = new LinkedList<>();
 
-		this.deadline = Double.MAX_VALUE;
+		this.deadline = deadline;
 		this.state = ProductState.SCHEDULING;
 	}
 	public String getProductName() {
 		return getLocalName();
 	}
 
-	public double getCreated() {
+	public Tick getCreated() {
 		return created;
 	}
 
@@ -43,7 +48,7 @@ public class Product extends Agent {
 
 	@Override
 	public String toString() {
-		return String.format("Product: %s [state=%s, created=%.2f, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, created, position, (productionPath.size() > 0 ? productionPath.peek()
+		return String.format("Product: %s [state=%s, created=%s, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, created, position, (productionPath.size() > 0 ? productionPath.peek()
 				: "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
 	}
 

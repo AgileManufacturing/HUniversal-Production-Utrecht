@@ -14,6 +14,7 @@ import simulation.mas.product.ProductionStep;
 import simulation.util.Ontology;
 import simulation.util.Parser;
 import simulation.util.Position;
+import simulation.util.Tick;
 import simulation.util.Tuple;
 
 public class Scheduling {
@@ -137,7 +138,7 @@ public class Scheduling {
 		}
 	}
 	
-	private void sendScheduleMessages(ArrayList<ProductionStep> productionPath, double deadline) {
+	private void sendScheduleMessages(ArrayList<ProductionStep> productionPath, Tick deadline) {
 		// group the production path by equiplets, so to send multiple product steps schedule requests at once to one equiplet. 
 		HashMap<AID, ArrayList<ProductionStep>> sendMap = new HashMap<>();
 		

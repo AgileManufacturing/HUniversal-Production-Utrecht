@@ -18,6 +18,19 @@ import simulation.mas.product.ProductionStep;
 
 public class Parser extends ParserPrimitives {
 
+	/**
+	 * encode the equiplet configuration for starting an equiplet
+	 * the configuration of an equiplet consists of the needed parameters to start the equiplet agent
+	 * 
+	 * counterpart {@link #parseEquipletConfiguration(String) parseEquipletConfiguration}
+	 * 
+	 * @param position
+	 *            of the equiplet in the grid
+	 * @param capabilities
+	 *            of the equiplet
+	 * @return the configuration in json format
+	 * @throws JSONException
+	 */
 	public static String parseEquipletConfiguration(Position position, List<Capability> capabilities) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("position", parsePosition(position));
@@ -25,6 +38,17 @@ public class Parser extends ParserPrimitives {
 		return json.toString();
 	}
 
+	/**
+	 * decode the equiplet configuration for starting an equiplet
+	 * the configuration of an equiplet consists of the needed parameters to start the equiplet agent
+	 * 
+	 * counterpart {@link #parseEquipletConfiguration(Position, List<Capability>) parseEquipletConfiguration}
+	 * 
+	 * @param source
+	 *            encoded data in json format
+	 * @return a tuple of the configuration of the equiplet
+	 * @throws JSONException
+	 */
 	public static Pair<Position, List<Capability>> parseEquipletConfiguration(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("position") && json.has("capabilities")) {
@@ -36,60 +60,90 @@ public class Parser extends ParserPrimitives {
 		}
 	}
 
-	public static String parseProductConfiguration(LinkedList<ProductStep> productSteps, Position startPosition) throws JSONException {
+	/**
+	 * encode the product configuration for starting a product agent
+	 * the product configurations are the needed parameters to start a product agent
+	 * 
+	 * counterpart {@link #parseProductConfiguration(String) parseProductConfiguration}
+	 * 
+	 * @param productSteps
+	 *            of the product
+	 * @param startPosition
+	 *            of the product agent
+	 * @return the configuration in json format
+	 * @throws JSONException
+	 */
+	public static String parseProductConfiguration(LinkedList<ProductStep> productSteps, Position startPosition, Tick deadline) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("productSteps", parseProductSteps(productSteps));
 		json.put("position", parsePosition(startPosition));
+		json.put("deadline", parseTick(deadline));
 		return json.toString();
 	}
 
-	public static Pair<LinkedList<ProductStep>, Position> parseProductConfiguration(String source) throws JSONException {
+	/**
+	 * decode the product configuration for starting a product agent
+	 * the product configurations are the needed parameters to start a product agent
+	 * 
+	 * counterpart {@link #parseProductConfiguration(LinkedList<ProductStep>, Position) parseProductConfiguration}
+	 * 
+	 * @param source
+	 *            encoded data in json format
+	 * @return a tuple of the configuration of the product
+	 * @throws JSONException
+	 */
+	public static Triple<LinkedList<ProductStep>, Position, Tick> parseProductConfiguration(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
-		if (json.has("productSteps") && json.has("position")) {
+		if (json.has("productSteps") && json.has("position") && json.has("deadline")) {
 			LinkedList<ProductStep> productSteps = parseProductSteps(json.getJSONArray("productSteps"));
 			Position position = parsePosition(json.getJSONObject("position"));
-			return new Pair<LinkedList<ProductStep>, Position>(productSteps, position);
+			Tick deadline = parseTick(json.getJSONObject("deadline"));
+			return new Triple<LinkedList<ProductStep>, Position, Tick>(productSteps, position, deadline);
 		} else {
 			throw new JSONException("Parser: parsing product agent configuration failed to parse " + source);
 		}
 	}
 
-	@Deprecated
-	public static String paresProductCreationAnswer(String equiplet, Position position) throws JSONException {
+	/**
+	 * encode the communication data to ask the equiplet agent if he can execute a list of product steps
+	 * 
+	 * counterpart {@link #parseCanExecute(String) parseCanExecute}
+	 * 
+	 * @param time
+	 *            of the question/first product step
+	 * @param deadline
+	 *            till which is being search for available time
+	 * @param productSteps
+	 *            that are queried if the equiplet can execute
+	 * @return json encoded data
+	 * @throws JSONException
+	 */
+	public static String parseCanExecute(Tick time, Tick deadline, LinkedList<ProductStep> productSteps) throws JSONException {
 		JSONObject json = new JSONObject();
-		json.put("equiplet", equiplet);
-		json.put("position", parsePosition(position));
-		return json.toString();
-	}
-
-	@Deprecated
-	public static Pair<String, Position> paresProductCreationAnswer(String source) throws JSONException {
-		JSONObject json = new JSONObject(source);
-		if (json.has("position") && json.has("equiplet")) {
-			String equiplet = json.getString("equiplet");
-			Position position = parsePosition(json.getJSONObject("position"));
-			return new Pair<String, Position>(equiplet, position);
-		} else {
-			throw new JSONException("Parser: parsing product answer after creation failed to parse " + source);
-		}
-	}
-
-	public static String parseCanExecute(double time, double deadline, LinkedList<ProductStep> productSteps) throws JSONException {
-		JSONObject json = new JSONObject();
-		json.put("time", time);
-		json.put("deadline", deadline);
+		json.put("time", parseTick(time));
+		json.put("deadline", parseTick(deadline));
 		json.put("productSteps", parseProductSteps(productSteps));
 		return json.toString();
 	}
 
-	public static Triple<Double, Double, List<ProductStep>> parseCanExecute(String source) throws JSONException {
+	/**
+	 * the communication data to ask the equiplet agent if he can execute a list of product steps
+	 * 
+	 * counterpart {@link #parseCanExecute(Tick, Tick, LinkedList<ProductStep>) parseCanExecute}
+	 * 
+	 * @param source
+	 *            encoded data in json format
+	 * @return a tuple of the decoded data
+	 * @throws JSONException
+	 */
+	public static Triple<Tick, Tick, List<ProductStep>> parseCanExecute(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("time") && json.has("deadline") && json.has("productSteps")) {
-			double time = json.getDouble("time");
-			double deadline = json.getDouble("deadline");
+			Tick time = parseTick(json.getJSONObject("time"));
+			Tick deadline = parseTick(json.getJSONObject("deadline"));
 			List<ProductStep> productSteps = parseProductSteps(json.getJSONArray("productSteps"));
 
-			return new Triple<Double, Double, List<ProductStep>>(time, deadline, productSteps);
+			return new Triple<Tick, Tick, List<ProductStep>>(time, deadline, productSteps);
 		}
 		throw new JSONException("Parser: parsing can execute failed to parse " + source);
 	}
@@ -98,6 +152,8 @@ public class Parser extends ParserPrimitives {
 	 * The answer whether an equiplet can execute a list of product steps i.e. a service with criteria is constructed of three variables: The load of the equiplet, the position of
 	 * the equiplet and the possibilities when a product step can be executed. The possibilities are a list for each service that can be executed, consisting of an index
 	 * corresponding to the index of the product step, an estimate of executing the service, a list of times from and until it is possible to schedule the service
+	 * 
+	 * counterpart {@link #parseCanExecuteAnswer(String) parseCanExecuteAnswer}
 	 * 
 	 * @param answer
 	 *            List of services < index in production path, estimate production time, List of from and until time when possible>
@@ -109,21 +165,21 @@ public class Parser extends ParserPrimitives {
 	 * @throws JSONException
 	 *             when parsing failed
 	 */
-	public static String parseCanExecuteAnswer(List<Triple<Integer, Double, List<Pair<Double, Double>>>> answer, Double load, Position position) throws JSONException {
+	public static String parseCanExecuteAnswer(List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> answer, Double load, Position position) throws JSONException {
 		JSONObject json = new JSONObject();
 
 		JSONArray list = new JSONArray();
-		for (Triple<Integer, Double, List<Pair<Double, Double>>> triple : answer) {
+		for (Triple<Integer, Tick, List<Pair<Tick, Tick>>> triple : answer) {
 			JSONObject service = new JSONObject();
 			JSONArray possibilities = new JSONArray();
-			for (Pair<Double, Double> option : triple.third) {
+			for (Pair<Tick, Tick> option : triple.third) {
 				JSONObject item = new JSONObject();
-				item.put("from", option.first);
-				item.put("until", option.second);
+				item.put("from", parseTick(option.first));
+				item.put("until", parseTick(option.second));
 				possibilities.put(item);
 			}
 			service.put("index", triple.first);
-			service.put("duration", triple.second);
+			service.put("duration", parseTick(triple.second));
 			service.put("possibilities", possibilities);
 			list.put(service);
 		}
@@ -134,31 +190,44 @@ public class Parser extends ParserPrimitives {
 		return json.toString();
 	}
 
-	public static Triple<List<Triple<Integer, Double, List<Pair<Double, Double>>>>, Double, Position> parseCanExecuteAnswer(String source) throws JSONException {
+	/**
+	 * decode the answer whether an equiplet can execute a list of product steps i.e. a service with criteria is constructed of three variables: The load of the equiplet, the
+	 * position of the equiplet and the possibilities when a product step can be executed. The possibilities are a list for each service that can be executed, consisting of an
+	 * index corresponding to the index of the product step, an estimate of executing the service, a list of times from and until it is possible to schedule the service
+	 * 
+	 * counterpart {@link #parseCanExecuteAnswer(List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position) parseCanExecuteAnswer}
+	 * 
+	 * @param source
+	 *            encoded data in json format
+	 * @return a tuple of the decoded data
+	 * @throws JSONException
+	 */
+	public static Triple<List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position> parseCanExecuteAnswer(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 
 		if (json.has("answer") && json.has("load") && json.has("position")) {
-			List<Triple<Integer, Double, List<Pair<Double, Double>>>> answer = new ArrayList<Triple<Integer, Double, List<Pair<Double, Double>>>>();
+			List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> answer = new ArrayList<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>();
 
 			JSONArray list = json.getJSONArray("answer");
 			for (int i = 0; i < list.length(); i++) {
 				JSONObject service = list.getJSONObject(i);
 				if (service.has("index") && service.has("duration") && service.has("possibilities")) {
-					List<Pair<Double, Double>> possibilities = new ArrayList<Pair<Double, Double>>();
+					List<Pair<Tick, Tick>> possibilities = new ArrayList<Pair<Tick, Tick>>();
 
 					JSONArray options = service.getJSONArray("possibilities");
 					for (int j = 0; j < options.length(); j++) {
 						JSONObject option = options.getJSONObject(j);
 						if (option.has("from") && option.has("until")) {
-							double from = option.getDouble("from");
-							double until = option.getDouble("until");
-							possibilities.add(new Pair<Double, Double>(from, until));
+							Tick from = parseTick(option.getJSONObject("from"));
+							Tick until = parseTick(option.getJSONObject("until"));
+							possibilities.add(new Pair<Tick, Tick>(from, until));
 						} else {
 							throw new JSONException("Parser: parsing can execute answer failed when parsing service " + option);
 						}
 					}
 
-					answer.add(new Triple<Integer, Double, List<Pair<Double, Double>>>(service.getInt("index"), service.getDouble("duration"), possibilities));
+					Tick duration = parseTick(service.getJSONObject("duration"));
+					answer.add(new Triple<Integer, Tick, List<Pair<Tick, Tick>>>(service.getInt("index"), duration, possibilities));
 				} else {
 					throw new JSONException("Parser: parsing can execute answer failed when parsing service " + service);
 				}
@@ -172,31 +241,54 @@ public class Parser extends ParserPrimitives {
 		}
 	}
 
-	public static String parseScheduleRequest(ArrayList<ProductionStep> steps, double deadline) throws JSONException {
+	/**
+	 * encode a request to schedule a list of product steps by an equiplet
+	 * the data is list of [ product steps :: a tuple of < time, deadline, service, criteria > ]
+	 * 
+	 * counterpart {@link #parseScheduleRequest(String) parseScheduleRequest}
+	 * 
+	 * @param steps
+	 *            is a list of production steps containing a service, criteria and start time
+	 * @param deadline
+	 *            of the product
+	 * @return
+	 * @throws JSONException
+	 */
+	public static String parseScheduleRequest(ArrayList<ProductionStep> steps, Tick deadline) throws JSONException {
 		JSONArray list = new JSONArray();
 		for (ProductionStep productionStep : steps) {
 			JSONObject json = new JSONObject();
 			json.put("service", productionStep.getService());
 			json.put("criteria", parseMap(productionStep.getCriteria()));
-			json.put("time", productionStep.getStart());
-			json.put("deadline", deadline);
+			json.put("time", parseTick(productionStep.getStart()));
+			json.put("deadline", parseTick(deadline));
 			list.put(json);
 		}
 		return list.toString();
 	}
 
-	public static List<Tuple<Double, Double, String, Map<String, Object>>> parseScheduleRequest(String source) throws JSONException {
-		List<Tuple<Double, Double, String, Map<String, Object>>> result = new ArrayList<>();
+	/**
+	 * decode a request to schedule a list of product steps by an equiplet
+	 * the data is list of [ product steps :: a tuple of < time, deadline, service, criteria > ]
+	 * 
+	 * counterpart {@link #parseScheduleRequest(ArrayList<ProductionStep>, Tick) parseScheduleRequest}
+	 * 
+	 * @param source
+	 * @return a tuple of decoded schedule data
+	 * @throws JSONException
+	 */
+	public static List<Tuple<Tick, Tick, String, Map<String, Object>>> parseScheduleRequest(String source) throws JSONException {
+		List<Tuple<Tick, Tick, String, Map<String, Object>>> result = new ArrayList<>();
 		JSONArray list = new JSONArray(source);
 		for (int i = 0; i < list.length(); i++) {
 			JSONObject json = list.getJSONObject(i);
 			if (json.has("service") && json.has("criteria") && json.has("time") && json.has("deadline")) {
-				double time = json.getDouble("time");
-				double deadline = json.getDouble("deadline");
+				Tick time = parseTick(json.getJSONObject("time"));
+				Tick deadline = parseTick(json.getJSONObject("deadline"));
 				String service = json.getString("service");
 				Map<String, Object> criteria = parseMap(json.getJSONArray("criteria"));
 
-				result.add(new Tuple<Double, Double, String, Map<String, Object>>(time, deadline, service, criteria));
+				result.add(new Tuple<Tick, Tick, String, Map<String, Object>>(time, deadline, service, criteria));
 			} else {
 				throw new JSONException("Parser: parsing scheduling failed to parse " + source);
 			}
@@ -204,12 +296,32 @@ public class Parser extends ParserPrimitives {
 		return result;
 	}
 
+	/**
+	 * parse confirmation
+	 * this can be used for acknowledgement for receiving a message
+	 * 
+	 * counterpart {@link #parseConfirmation(String) parseConfirmation}
+	 * 
+	 * @param confirmation
+	 * @return
+	 * @throws JSONException
+	 */
 	public static String parseConfirmation(boolean confirmation) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("confirmation", confirmation);
 		return json.toString();
 	}
 
+	/**
+	 * parse confirmation
+	 * this can be used for acknowledgement for receiving a message
+	 * 
+	 * counterpart {@link #parseConfirmation(boolean) parseConfirmation}
+	 * 
+	 * @param source
+	 * @return
+	 * @throws JSONException
+	 */
 	public static boolean parseConfirmation(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("confirmation")) {
@@ -219,16 +331,35 @@ public class Parser extends ParserPrimitives {
 		}
 	}
 
-	public static String parseProductArrived(double time) throws JSONException {
+	/**
+	 * encode the notification that a product is arrived by an equiplet
+	 * 
+	 * counterpart {@link #parseProductArrived(String) parseProductArrived}
+	 * 
+	 * @param time
+	 *            of arrival
+	 * @return
+	 * @throws JSONException
+	 */
+	public static String parseProductArrived(Tick time) throws JSONException {
 		JSONObject json = new JSONObject();
-		json.put("time", time);
+		json.put("time", parseTick(time));
 		return json.toString();
 	}
 
-	public static double parseProductArrived(String source) throws JSONException {
+	/**
+	 * decode the notification that a product is arrived by an equiplet
+	 * 
+	 * counterpart {@link #parseProductArrived(Tick) parseProductArrived}
+	 * 
+	 * @param source
+	 * @return
+	 * @throws JSONException
+	 */
+	public static Tick parseProductArrived(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("time")) {
-			return json.getDouble("time");
+			return parseTick(json.getJSONObject("time"));
 		} else {
 			throw new JSONException("Parser: parsing product arrived failed to parse " + source);
 		}
@@ -298,8 +429,8 @@ public class Parser extends ParserPrimitives {
 		return list.toString();
 	}
 
-	public static Map<Pair<String, String>, Double> parseTravelRoutes(String source) throws JSONException {
-		Map<Pair<String, String>, Double> travelTimes = new HashMap<Pair<String, String>, Double>();
+	public static Map<Pair<String, String>, Tick> parseTravelRoutes(String source) throws JSONException {
+		Map<Pair<String, String>, Tick> travelTimes = new HashMap<Pair<String, String>, Tick>();
 		JSONArray list = new JSONArray(source);
 
 		for (int i = 0; i < list.length(); i++) {
@@ -307,7 +438,7 @@ public class Parser extends ParserPrimitives {
 			if (json.has("from") && json.has("to") && json.has("time")) {
 				String from = json.getString("from");
 				String to = json.getString("to");
-				double time = json.getDouble("time");
+				Tick time = parseTick(json.getJSONObject("time"));
 				travelTimes.put(new Pair<String, String>(from, to), time);
 			} else {
 				throw new JSONException("Parser: parsing travel time routes failed to parse item " + source);
@@ -316,20 +447,20 @@ public class Parser extends ParserPrimitives {
 		return travelTimes;
 	}
 
-	public static String parseTravelRoutes(Map<Pair<String, String>, Double> travelTimes) throws JSONException {
+	public static String parseTravelRoutes(Map<Pair<String, String>, Tick> travelTimes) throws JSONException {
 		JSONArray list = new JSONArray();
-		for (Entry<Pair<String, String>, Double> entry : travelTimes.entrySet()) {
+		for (Entry<Pair<String, String>, Tick> entry : travelTimes.entrySet()) {
 			JSONObject json = new JSONObject();
 			json.put("from", entry.getKey().first);
 			json.put("to", entry.getKey().second);
-			json.put("time", entry.getValue());
+			json.put("time", parseTick(entry.getValue()));
 			list.put(json);
 		}
 		return list.toString();
 	}
 
-	public static Map<Pair<Position, Position>, Double> parseTravelTimes(String source) throws JSONException {
-		Map<Pair<Position, Position>, Double> travelTimes = new HashMap<>();
+	public static Map<Pair<Position, Position>, Tick> parseTravelTimes(String source) throws JSONException {
+		Map<Pair<Position, Position>, Tick> travelTimes = new HashMap<>();
 		JSONArray list = new JSONArray(source);
 
 		for (int i = 0; i < list.length(); i++) {
@@ -337,7 +468,7 @@ public class Parser extends ParserPrimitives {
 			if (json.has("from") && json.has("to") && json.has("time")) {
 				Position from = parsePosition(json.getJSONObject("from"));
 				Position to = parsePosition(json.getJSONObject("to"));
-				double time = json.getDouble("time");
+				Tick time = parseTick(json.getJSONObject("time"));
 				travelTimes.put(new Pair<Position, Position>(from, to), time);
 			} else {
 				throw new JSONException("Parser: parsing product travel times failed to parse item " + source);
@@ -346,30 +477,30 @@ public class Parser extends ParserPrimitives {
 		return travelTimes;
 	}
 
-	public static String parseTravelTimes(Map<Pair<Position, Position>, Double> travelTimes) throws JSONException {
+	public static String parseTravelTimes(Map<Pair<Position, Position>, Tick> travelTimes) throws JSONException {
 		JSONArray list = new JSONArray();
-		for (Entry<Pair<Position, Position>, Double> entry : travelTimes.entrySet()) {
+		for (Entry<Pair<Position, Position>, Tick> entry : travelTimes.entrySet()) {
 			JSONObject json = new JSONObject();
 			json.put("from", parsePosition(entry.getKey().first));
 			json.put("to", parsePosition(entry.getKey().second));
-			json.put("time", entry.getValue());
+			json.put("time", parseTick(entry.getValue()));
 			list.put(json);
 		}
 		return list.toString();
 	}
 
-	public static double parseProductDelayed(String source) throws JSONException {
+	public static Tick parseProductDelayed(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("start")) {
-			return json.getDouble("start");
+			return parseTick(json.getJSONObject("start"));
 		} else {
 			throw new JSONException("Parser: parsing product delayed failed " + source);
 		}
 	}
 
-	public static String parseProductDelayed(double start) throws JSONException {
+	public static String parseProductDelayed(Tick start) throws JSONException {
 		JSONObject json = new JSONObject();
-		json.put("start", start);
+		json.put("start", parseTick(start));
 		return json.toString();
 	}
 }

@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/jcommon-1.0.21.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/MAS/external_libraries/java-json.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

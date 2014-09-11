@@ -1,6 +1,7 @@
 package simulation.mas.equiplet;
 
 import jade.core.AID;
+import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -10,24 +11,313 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.json.JSONException;
 
+import simulation.mas.product.ProductStep;
 import simulation.util.Ontology;
 import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
 import simulation.util.Settings;
+import simulation.util.Tick;
+import simulation.util.Triple;
 import simulation.util.Tuple;
 
-public class EquipletAgent extends Equiplet {
+public class EquipletAgent extends Agent {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	// private static final double SAFETY_FACTOR = 1;
+
+	protected Position position;
+	protected List<Capability> capabilities;
+
+	// Equiplet state
+	protected TreeSet<Job> schedule;
+	protected EquipletState state;
+	protected Job executing;
+	protected TreeSet<Job> history;
+	private Map<String, Tick> productionTimes;
+
+	/**
+	 * initialize the equiplet
+	 * 
+	 * @param position
+	 *            of the equiplet in the grid
+	 * @param capabilities
+	 *            of the equiplet
+	 * @param productionTimes
+	 *            estimate of duration of the providing services
+	 */
+	protected void init(Position position, List<Capability> capabilities) {
+		this.position = position;
+		this.capabilities = capabilities;
+
+		this.state = EquipletState.IDLE;
+		this.executing = null;
+		this.schedule = new TreeSet<>();
+		this.history = new TreeSet<>();
+
+		this.productionTimes = new HashMap<>();
+		for (Capability capability : capabilities) {
+			productionTimes.put(capability.getService(), capability.getDuration());
+		}
+	}
+
+	/**
+	 * @return the position of the equiplet
+	 */
+	protected Position getPosition() {
+		return position;
+	}
+
+	/**
+	 * @return the state of the equiplet
+	 */
+	protected EquipletState getEquipletState() {
+		return state;
+	}
+
+	/**
+	 * @return whether the equiplet is executing a job
+	 */
+	protected boolean isExecuting() {
+		return executing != null;
+	}
+
+	/**
+	 * information of the executing job, i.e. the service with the duration
+	 * 
+	 * @return the executing job
+	 */
+	protected Pair<String, Tick> getExecuting() {
+		return new Pair<String, Tick>(executing.getProductAgentName(), executing.getStartTime());
+	}
+
+	/**
+	 * Get the number of job that are scheduled for the equiplet
+	 * 
+	 * @return number of jobs
+	 */
+	protected synchronized int getScheduled() {
+		return schedule.size();
+	}
+
+	/**
+	 * Get the number of jobs waiting to be executed i.e. ready for execution A
+	 * job is ready for executing when the product arrived by the equiplet
+	 * 
+	 * @return number of jobs ready to executed
+	 */
+	protected synchronized int getWaiting() {
+		int waiting = 0;
+		for (Job job : schedule) {
+			if (job.isReady()) {
+				waiting++;
+			}
+		}
+		return waiting;
+	}
+
+	/**
+	 * Get the number of jobs executed by the equiplet
+	 * 
+	 * @return number of jobs
+	 */
+	protected int getExecuted() {
+		return history.size();
+	}
+
+	/**
+	 * give an estimate of the duration of the service
+	 * 
+	 * @param service
+	 *            name
+	 * @return the duration
+	 */
+	protected Tick estimateService(String service) {
+		return productionTimes.get(service);
+	}
+
+	/**
+	 * Checks whether a job is ready for execution
+	 * TODO check not only the first in the schedule but also after if job can be executed earlier than
+	 * planned, which increases complexity
+	 * 
+	 * @return if there is job ready for executing
+	 */
+	protected synchronized boolean jobReady() {
+		return !schedule.isEmpty() && schedule.first().isReady();
+	}
+
+	/**
+	 * check whether the equiplet can execute a list of product steps within a time frame
+	 * this returns the list of services that can be performed @see {@code isCapable}, with the estimate duration of the service and a list of possible time frames
+	 * the time frame is a list of times from which the equiplet is free until the equiplet busy again where the deadline is the time till when is looked
+	 * 
+	 * @param time
+	 *            of the first possibility to perform the product steps
+	 * @param deadline
+	 *            of the product steps
+	 * @param productSteps
+	 *            the list of product steps to be performed
+	 * @return
+	 */
+	public synchronized List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> canExecute(Tick time, Tick deadline, List<ProductStep> productSteps) {
+		// answer :: List of services < index in production path, estimate production time, List of from and until time when possible>
+		List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> answer = new ArrayList<>();
+
+		for (ProductStep productStep : productSteps) {
+			if (isCapable(productStep.getService(), productStep.getCriteria())) {
+				int index = productStep.getIndex();
+				Tick duration = estimateService(productStep.getService());
+				List<Pair<Tick, Tick>> available = available(time, duration, deadline);
+				answer.add(new Triple<Integer, Tick, List<Pair<Tick, Tick>>>(index, duration, available));
+			}
+		}
+
+		return answer;
+	}
+
+	/**
+	 * check whether the equiplet is capable to perform a service with certain criteria
+	 * 
+	 * @param service
+	 * @param criteria
+	 * @return whether the equiplet is capable to perform the service
+	 */
+	protected synchronized boolean isCapable(String service, Map<String, Object> criteria) {
+		for (Capability capability : capabilities) {
+			if (capability.getService().equalsIgnoreCase(service)) {
+				// Map<String, Object> limitations = capability.getLimitations();
+				// TODO check limitations
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * the first possible time there is enough room in the schedule to perform a service
+	 * load = 1 - Sr / Sw
+	 * 
+	 * @param time
+	 *            the first possible time from which to look
+	 * @param duration
+	 *            an estimate of time the equiplet is checked for availability
+	 * @return a list of time it is possible to plan the duration TODO can only
+	 *         plan in end of schedule
+	 */
+	protected synchronized List<Pair<Tick, Tick>> available(Tick time, Tick duration, Tick deadline) {
+		List<Pair<Tick, Tick>> available = new ArrayList<Pair<Tick, Tick>>();
+		Tick start = time;
+		if (isExecuting()) {
+			start = start.max(executing.getDue());
+		}
+
+		if (schedule.isEmpty()) {
+			available.add(new Pair<Tick, Tick>(start, deadline));
+		} else {
+			Iterator<Job> it = schedule.iterator();
+			while (it.hasNext()) {
+				Job job = it.next();
+
+				if (job.getStartTime().greaterOrEqualThan(start)) {
+
+					if (job.getStartTime().minus(start).greaterThan(duration)) {
+
+						if (job.getStartTime().lessThan(deadline)) {
+							available.add(new Pair<Tick, Tick>(start, job.getStartTime()));
+							start = job.getDue();
+						} else {
+							available.add(new Pair<Tick, Tick>(start, deadline));
+							break;
+						}
+					} else {
+						start = job.getDue();
+					}
+				} else {
+					start = job.getDue().max(start);
+				}
+
+				if (!it.hasNext() && start.lessThan(deadline)) {
+					available.add(new Pair<Tick, Tick>(start, deadline));
+				}
+			}
+		}
+
+		return available;
+	}
+
+	/**
+	 * calculate the load of the equiplet from a certain time with a window
+	 * load = 1 - Sr / Sw
+	 * 
+	 * @param time
+	 *            from which the load needs to be calculated
+	 * @param window
+	 *            of the load
+	 * @return load of the equiplet
+	 */
+	protected synchronized double load(Tick time, Tick window) {
+		Tick sum = new Tick(0);
+
+		for (Job job : schedule) {
+			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
+					&& job.getDue().lessOrEqualThan(time.add(window))) {
+				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
+			}
+
+			if (job.getStartTime().greaterThan(time.add(window))) {
+				break;
+			}
+		}
+
+		// System.out.println("EA:" + getLocalName() + " load= 1 - " + sum + " / " + window + " = " + (1 - sum / window) + " in " + schedule);
+
+		// double precision error, dirty fix
+		// sum = (double) Math.round(sum * 100000000) / 100000000;
+
+		return 1 - sum.div(window).doubleValue();
+	}
+
+	/**
+	 * calculate the load of the history of the equiplet from a certain time with a window
+	 * 
+	 * @param time
+	 *            from which the load needs to be calculated
+	 * @param window
+	 *            of the load
+	 * @return load of the equiplet
+	 */
+	protected synchronized double loadHistory(Tick time, Tick window) {
+		Tick sum = new Tick(0);
+
+		Iterator<Job> iterator = history.descendingIterator();
+		while (iterator.hasNext()) {
+			Job job = iterator.next();
+			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
+					&& job.getDue().lessOrEqualThan(time.add(window))) {
+				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
+			} else if (job.getDue().lessThan(time)) {
+				// the jobs are outside the scope of the load window
+				// break;
+			}
+		}
+
+		// double precision error, dirty fix
+		// sum = (double) Math.round(sum * 100000000) / 100000000;
+
+		return 1 - sum.div(window).doubleValue();
+	}
 
 	/**
 	 * Equiplet agent startup
@@ -100,12 +390,12 @@ public class EquipletAgent extends Equiplet {
 	 *            of the job
 	 * @return if it succeeded to schedule the job
 	 */
-	protected boolean schedule(AID product, double start, double deadline, String service, Map<String, Object> criteria) {
-		double duration = estimateService(service);
-		System.out.printf("EA:%s schedule [product=%s, start=%.2f, duration=%.2f, deadline=%.2f, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
+	protected synchronized boolean schedule(AID product, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
+		Tick duration = estimateService(service);
+		System.out.printf("EA:%s schedule [product=%s, start=%s, duration=%s, deadline=%s, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
 
-		if (schedule.subSet(new Job(start, 0), true, new Job(start, duration), true).isEmpty()) {
-			Job job = new Job(product, service, criteria, start, start + duration, deadline);
+		if (schedule.subSet(new Job(start, new Tick(0)), true, new Job(start, duration), true).isEmpty()) {
+			Job job = new Job(product, service, criteria, start, start.add(duration), deadline);
 			return schedule.add(job);
 		} else {
 			return false;
@@ -127,35 +417,36 @@ public class EquipletAgent extends Equiplet {
 	 *            of the job
 	 * @return if it succeeded to schedule the job
 	 */
-	protected boolean schedule(AID product, List<Tuple<Double, Double, String, Map<String, Object>>> requests) {
+	protected synchronized boolean schedule(AID product, List<Tuple<Tick, Tick, String, Map<String, Object>>> requests) {
 		List<Job> possible = new ArrayList<Job>();
-		for (Tuple<Double, Double, String, Map<String, Object>> data : requests) {
-			double start = data.first;
-			double deadline = data.second;
+		for (Tuple<Tick, Tick, String, Map<String, Object>> data : requests) {
+			Tick start = data.first;
+			Tick deadline = data.second;
 			String service = data.third;
 			Map<String, Object> criteria = data.fourth;
 
 			// check if the equiplet still capable
 			if (isCapable(service, criteria)) {
 				// if the request start is after the due time of the executing job
-				if (!isExecuting() || start >= executing.getDue()) {
-					double duration = estimateService(service);
+				if (!isExecuting() || start.greaterOrEqualThan(executing.getDue())) {
+					Tick duration = estimateService(service);
 
-					System.out.printf("EA:%s schedule [product=%s, start=%.2f, duration=%.2f, deadline=%.2f, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
+					System.out.printf("EA:%s schedule [product=%s, start=%s, duration=%s, deadline=%s, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
 
-					if (schedule.subSet(new Job(start, 0), true, new Job(start, start + duration), true).isEmpty()) {
-						Job job = new Job(product, service, criteria, start, start + duration, deadline);
+					// TODO FIX! if in the time between can execute en schedule an other agent has schedule, it should return false
+					if (schedule.subSet(new Job(start, new Tick(0)), true, new Job(start.add(duration), new Tick(0)), true).isEmpty()) {
+						Job job = new Job(product, service, criteria, start, start.add(duration), deadline);
 
 						possible.add(job);
 					} else {
 						// this shouldn't yet occur (not in the simulation), a equiplet should never give a product the available time which cannot be scheduled
-						System.err.println("\n----------\nstart=" + start + ", due=" + (start + duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
-						throw new IllegalArgumentException("Overlap schedule() ");
+						System.err.println("\n----------\nstart=" + start + ", due=" + start.add(duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
+						throw new IllegalArgumentException("Overlap schedule ");
 						// return false;
 					}
 				} else {
 					// this shouldn't occur, TODO remove exception and log the error and return false, send fail message which must be handled!
-					System.err.printf("EA:%s failed to schedule: request to schedule job starting at %.2f when still executing %s other job.\n", getLocalName(), start, executing);
+					System.err.printf("EA:%s failed to schedule: request to schedule job starting at %s when still executing %s other job.\n", getLocalName(), start, executing);
 					throw new IllegalArgumentException("request to schedule job starting at " + start + " when still executing " + executing + " other job");
 				}
 			} else {
@@ -194,17 +485,17 @@ public class EquipletAgent extends Equiplet {
 		return true;
 
 	}
-	
-	protected void updateSchedule() {
+
+	protected synchronized void updateSchedule() {
 		// After being broken down and repaired the jobs in the schedule can be delayed.
 		// The executing job is updated with the new due time
 		// The scheduled jobs should have, depending if the jobs are continuous scheduled, a new start time added with the delay
 		// Although the jobs doesn't have to be continuous scheduled, the start time depends on the due date of the previous job
 		// The new start time is the max of ( due time of previous job, or the original start time)
 		if (isExecuting()) {
-			double dueTime = executing.getDue();
+			Tick dueTime = executing.getDue();
 			for (Job job : schedule) {
-				if (dueTime > job.getStartTime()) {
+				if (dueTime.greaterThan(job.getStartTime())) {
 					job.updateStartTime(dueTime);
 					dueTime = job.getDue();
 				} else {
@@ -228,16 +519,25 @@ public class EquipletAgent extends Equiplet {
 	 * @param start
 	 *            time of the job
 	 */
-	protected void executeJob(double time) {
+	protected synchronized void executeJob(Tick time) {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
 
 		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %.2f with executing job: %s\n", getLocalName(), time, executing);
+		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
 
 		informProductProcessing(executing.getProductAgent());
 
 		execute(executing);
+	}
+
+	/**
+	 * The actual start of executing a job
+	 * 
+	 * @param job
+	 */
+	protected void execute(Job job) {
+
 	}
 
 	/**
@@ -249,7 +549,7 @@ public class EquipletAgent extends Equiplet {
 	 * @param time
 	 *            of the the product arrival
 	 */
-	protected void notifyProductArrived(AID product, double time) {
+	protected synchronized void notifyProductArrived(AID product, Tick time) {
 		// check if it is needed to also check the criteria
 		// TODO possible service not necessary, if making the constraint that a
 		// product can only have one job ready by an equiplet
@@ -297,7 +597,7 @@ public class EquipletAgent extends Equiplet {
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 
-			if (!Parser.parseConfirmation(reply.getContent())) {
+			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product processing.\n", getLocalName());
 			}
 		} catch (JSONException e) {
