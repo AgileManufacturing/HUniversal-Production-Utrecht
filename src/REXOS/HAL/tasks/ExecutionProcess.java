@@ -7,6 +7,7 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.Module;
+import HAL.ModuleActor;
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
@@ -40,10 +41,6 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		
 		this.toExecuteSteps.clear();
 		this.toExecuteSteps.addAll(hardwareSteps);
-		/*
-		this.hardwareSteps = new ArrayList<HardwareStep>();
-		this.hardwareSteps.addAll(hardwareSteps);
-		*/
 		this.moduleFactory = moduleFactory;
 	}
 
@@ -53,37 +50,21 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	 */
 	@Override
 	public synchronized void run() {
-		//Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Execution started with the following hardware steps:", hardwareSteps);
 		Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Execution started with the following hardware steps:", toExecuteSteps);
-		
 		
 		try {
 			while(!toExecuteSteps.isEmpty()){
 				currentStep = toExecuteSteps.poll();
-				System.out.println("Executing: " + currentStep);
-				moduleFactory.executeHardwareStep(this, currentStep);
-				System.out.println("Wait for hardware step to finish: " + currentStep);
-				this.wait();
-				//currentStep.STATUS
-				Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Hardware step finished with state: " + lastStatus + " " + currentStep);
+				ModuleActor module = (ModuleActor) moduleFactory.getModuleByIdentifier(currentStep.getModuleIdentifier());
+				module.executeHardwareStep(this, currentStep);
+				Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "Wait for hardware step to finish: " + currentStep);
 				
+				this.wait();
+				
+				Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Hardware step finished with state: " + lastStatus + " " + currentStep);
 			}
 			currentStep = null;
-			/*
-			while (hardwareSteps.size() > 0){
-				System.out.println("Executing: "+hardwareSteps.get(0));
-				moduleFactory.executeHardwareStep(this, hardwareSteps.get(0));
-				this.wait();
-				System.out.println("After the wait");
-			}
-			*/
-		} catch (FactoryException e) {
-			Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Module is unable to execute hardwareStep: " + e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch(Exception e){
-			Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Unexpected error: " + e);
 			e.printStackTrace();
 		} finally {
 			hardwareAbstractionLayerListener.onExecutionFinished();

@@ -331,12 +331,8 @@ public class ModuleFactory extends Factory {
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
 			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			try{
-				modules.add((ModuleActor) this.getModuleByIdentifier(identifier));
-			} catch (FactoryException ex) {
-				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.ERROR, "Unable to get module with identifier: " + identifier, ex);
-			}
-				
+			ModuleActor module = (ModuleActor) this.getModuleByIdentifier(identifier);
+			modules.add(module);
 		}
 		Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.DEBUG, "Found bottomModules for function module tree " + treeNumber + " of capability " + capability.getName() + ":", 
 				modules);
@@ -363,17 +359,6 @@ public class ModuleFactory extends Factory {
 		
 		return modules;
 	}
-	/**
-	 * This method executes the {@link HardwareStep} by instantiating the module and forwarding the HardwareStep to it.
-	 * @param processListener
-	 * @param hardwareStep
-	 * @throws FactoryException
-	 * @throws ModuleExecutingException
-	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException{
-		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
-		module.executeHardwareStep(processListener, hardwareStep);
-	}
 	
 	/**
 	 * This method will return the instantiated module for the {@link ModuleIdentifier}.
@@ -382,7 +367,7 @@ public class ModuleFactory extends Factory {
 	 * @return
 	 * @throws FactoryException
 	 */
-	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) throws FactoryException{
+	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) {
 		for (ModuleIdentifier loadedModuleIdentifier : loadedModules.keySet()) {
 			if(moduleIdentifier.equals(loadedModuleIdentifier) == true) {
 				return loadedModules.get(loadedModuleIdentifier);
@@ -399,9 +384,11 @@ public class ModuleFactory extends Factory {
 		} catch (InstantiateClassException | InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException ex) {
-			throw new FactoryException("well, we are fucked", ex);
+			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "well, we are fucked", ex);
+			return null;
 		} catch (JarFileLoaderException ex) {
-			throw new FactoryException("Unable to load the jarFile of the module");
+			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "Unable to load the jarFile of the module " + moduleIdentifier);
+			return null;
 		}
 	}
 	/**
