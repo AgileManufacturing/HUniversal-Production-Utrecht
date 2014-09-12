@@ -1,6 +1,6 @@
 package generic;
 
-import com.google.gson.JsonObject;
+import org.json.JSONObject;
 
 /**
  * A ProductStep is a step that is has not been translated and is supplied by the {@link ProductAgent}. 
@@ -19,22 +19,22 @@ public class ProductStep {
 	
 	
 	private Service service;
-	private JsonObject criteria;
+	private JSONObject criteria;
 	private String id;
 	
-	public ProductStep(JsonObject json){
+	public ProductStep(JSONObject json){
 		if (json.has(ID)){
-			this.id = json.get(ID).getAsString();
+			this.id = json.optString(ID);
 		}
 		if (json.has(SERVICE)){
-			this.service = new Service(json.get(SERVICE).getAsString());
+			this.service = new Service(json.optString(SERVICE));
 		}
 		if (json.has("CRITERIA")){
-			this.criteria = json.get("CRITERIA").getAsJsonObject();
+			this.criteria = json.optJSONObject("CRITERIA");
 		}
 	}
 	
-	public ProductStep(String productStepId, JsonObject criteria, Service service){
+	public ProductStep(String productStepId, JSONObject criteria, Service service){
 		this.id = productStepId;
 		this.criteria = criteria;
 		this.service = service;
@@ -43,7 +43,7 @@ public class ProductStep {
 	public Service getService(){
 		return this.service;
 	}
-	public JsonObject getCriteria(){
+	public JSONObject getCriteria(){
 		return this.criteria;
 	}
 	public String getId(){
