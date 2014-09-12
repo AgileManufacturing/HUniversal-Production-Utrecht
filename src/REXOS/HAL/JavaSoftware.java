@@ -2,16 +2,18 @@ package HAL;
 
 import java.util.HashMap;
 
+import org.apache.commons.codec.binary.Base64;
+
 import HAL.libraries.dynamicloader.DynamicClassDescription;
 import HAL.libraries.dynamicloader.JarFileLoader;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
+import HAL.libraries.knowledgedb_client.KeyNotFoundException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 
-import org.apache.commons.codec.binary.Base64;
-
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 /**
  * This class provides methods for serializing and deserializing of JavaSoftware and the loading of jarFiles. 
  * @author Tommas Bakker
@@ -58,22 +60,24 @@ public class JavaSoftware implements JarFileLoader {
 	 */
 	private static HashMap<Integer, JavaSoftware> javaSoftwareInstances = new HashMap<Integer, JavaSoftware>(); 
 	/**
-	 * Deserializes java software from a JsonObject and stores in in the knowledge database.
+	 * Deserializes java software from a JSONObject and stores in in the knowledge database.
 	 * This method uses a new KnowledgeDBClient which may cause locking issues. It is recommended to provide your own KnowledgeDBClient.
-	 * @param javaSoftware the JsonObject to be used
+	 * @param javaSoftware the JSONObject to be used
 	 * @return the now stored java software
+	 * @throws JSONException 
 	 */
-	public static JavaSoftware insertJavaSoftware(JsonObject javaSoftware) {
+	public static JavaSoftware insertJavaSoftware(JSONObject javaSoftware) throws JSONException {
 		return insertJavaSoftware(javaSoftware, new KnowledgeDBClient());
 	}
 	/**
-	 * Deserializes java software from a JsonObject and stores in in the knowledge database using the provided KnowledgeDBClient.
+	 * Deserializes java software from a JSONObject and stores in in the knowledge database using the provided KnowledgeDBClient.
 	 * @param javaSoftware
 	 * @param knowledgeDBClient
 	 * @return the now stored java software
+	 * @throws JSONException 
 	 */
-	public static JavaSoftware insertJavaSoftware(JsonObject javaSoftware, KnowledgeDBClient knowledgeDBClient) {
-		byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
+	public static JavaSoftware insertJavaSoftware(JSONObject javaSoftware, KnowledgeDBClient knowledgeDBClient) throws JSONException {
+		byte[] jarFile = Base64.decodeBase64(javaSoftware.getString("jarFile").getBytes());
 		int buildNumber = getBuildNumber(javaSoftware);
 		String className = getClassName(javaSoftware);
 		
@@ -82,20 +86,22 @@ public class JavaSoftware implements JarFileLoader {
 		return new JavaSoftware(id, buildNumber, className, knowledgeDBClient);
 	}
 	/**
-	 * This method allows the extraction of the build number of the javaSoftware from the JsonObject. Used for updating.
+	 * This method allows the extraction of the build number of the javaSoftware from the JSONObject. Used for updating.
 	 * @param javaSoftware
 	 * @return
+	 * @throws JSONException 
 	 */
-	public static int getBuildNumber(JsonObject javaSoftware) {
-		return javaSoftware.get("buildNumber").getAsInt();
+	public static int getBuildNumber(JSONObject javaSoftware) throws JSONException {
+		return javaSoftware.getInt("buildNumber");
 	}
 	/**
-	 * This method allows the extraction of the class name of the javaSoftware from the JsonObject.
+	 * This method allows the extraction of the class name of the javaSoftware from the JSONObject.
 	 * @param javaSoftware
 	 * @return
+	 * @throws JSONException 
 	 */
-	public static String getClassName(JsonObject javaSoftware) {
-		return javaSoftware.get("className").getAsString();
+	public static String getClassName(JSONObject javaSoftware) throws JSONException {
+		return javaSoftware.getString("className");
 	}
 	
 	private int id;
@@ -193,15 +199,16 @@ public class JavaSoftware implements JarFileLoader {
 	 * This method serializes java software from the knowledge database. This method does NOT remove the java software from the knowledge database.
 	 * @param knowledgeDBClient
 	 * @param moduleIdentifier
-	 * @return The JsonObject for the JavaSoftware
+	 * @return The JSONObject for the JavaSoftware
+	 * @throws JSONException 
 	 */
-	public JsonObject serialize() {
-		JsonObject javaSoftware = new JsonObject();
+	public JSONObject serialize() throws JSONException {
+		JSONObject javaSoftware = new JSONObject();
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForId, this.id);
-		javaSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
-		javaSoftware.addProperty("className", (String) rows[0].get("className"));
+		javaSoftware.put("buildNumber", (Integer) rows[0].get("buildNumber"));
+		javaSoftware.put("className", (String) rows[0].get("className"));
 		byte[] jarFile = (byte[]) rows[0].get("jarFile");
-		javaSoftware.addProperty("jarFile", new String(Base64.encodeBase64(jarFile)));
+		javaSoftware.put("jarFile", new String(Base64.encodeBase64(jarFile)));
 		return javaSoftware;
 	}
 	
@@ -223,9 +230,10 @@ public class JavaSoftware implements JarFileLoader {
 	/**
 	 * This method will update the java software in the knowledge database. 
 	 * @param javaSoftware
+	 * @throws JSONException 
 	 */
-	public void updateJavaSoftware(JsonObject javaSoftware) {
-		byte[] jarFile = Base64.decodeBase64(javaSoftware.get("jarFile").getAsString().getBytes());
+	public void updateJavaSoftware(JSONObject javaSoftware) throws JSONException {
+		byte[] jarFile = Base64.decodeBase64(javaSoftware.getString("jarFile").getBytes());
 		int buildNumber = getBuildNumber(javaSoftware);
 		String className = getClassName(javaSoftware);
 		

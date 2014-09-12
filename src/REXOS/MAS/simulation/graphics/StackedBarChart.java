@@ -1,7 +1,6 @@
 package MAS.simulation.graphics;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;

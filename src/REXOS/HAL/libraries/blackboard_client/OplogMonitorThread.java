@@ -31,10 +31,10 @@ package HAL.libraries.blackboard_client;
 
 import java.util.ArrayList;
 
-import HAL.libraries.blackboard_client.data_classes.BlackboardSubscription;
-import HAL.libraries.blackboard_client.data_classes.OplogEntry;
 import util.log.LogLevel;
 import util.log.Logger;
+import HAL.libraries.blackboard_client.data_classes.BlackboardSubscription;
+import HAL.libraries.blackboard_client.data_classes.OplogEntry;
 
 import com.mongodb.Bytes;
 import com.mongodb.DB;

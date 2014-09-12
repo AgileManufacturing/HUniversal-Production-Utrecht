@@ -41,7 +41,8 @@ package MAS.equiplet.equiplet_agent;
 import generic.ProductStep;
 import generic.Service;
 
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class Job {
@@ -73,13 +74,14 @@ public class Job {
 	/**
 	  * Job()
 	  * The constructor initializes the variables.
+	 * @throws JSONException 
 	  */
-	public Job(String startTime, String duration, String productStepId, JsonObject jsonProductStep){
+	public Job(String startTime, String duration, String productStepId, JSONObject jsonProductStep) throws JSONException{
 		this.startTime = startTime;
 		this.duration = duration;
 		this.productStepId = productStepId;
-    	Service service = new Service(jsonProductStep.get("service").getAsString());
-		productStep = new ProductStep(productStepId, jsonProductStep.get("criteria").getAsJsonObject(), service);
+    	Service service = new Service(jsonProductStep.getString("service"));
+		productStep = new ProductStep(productStepId, jsonProductStep.getJSONObject("criteria"), service);
 	}
 	
 	/**

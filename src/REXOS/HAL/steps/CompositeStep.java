@@ -5,8 +5,12 @@ import HAL.Capability;
 import HAL.Module;
 import HAL.exceptions.ModuleTranslatingException;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 
 /**
  * A CompositeStep is a step composed of multiple abstract {@link HardwareStep}s.
@@ -16,13 +20,13 @@ import com.google.gson.JsonObject;
  */
 public class CompositeStep{
 	private ProductStep productStep;
-	private JsonObject command;
+	private JSONObject command;
 	private OriginPlacement originPlacement;
 	
 	public static final String IDENTIFIER = "identifier";
 	public static final String RELATIVE_TO = "relativeTo";
 	
-	public CompositeStep(ProductStep productStep, JsonObject command, OriginPlacement originPlacement){
+	public CompositeStep(ProductStep productStep, JSONObject command, OriginPlacement originPlacement){
 		this.command = command;
 		this.originPlacement = originPlacement;
 		this.productStep = productStep;
@@ -31,14 +35,14 @@ public class CompositeStep{
 	public ProductStep getProductStep(){
 		return this.productStep;
 	}
-	public JsonObject getCommand(){
+	public JSONObject getCommand(){
 		return this.command;
 	}
 	public OriginPlacement getOriginPlacement(){
 		return this.originPlacement;
 	}
-	public JsonElement popCommandIdentifier(String identifier) throws ModuleTranslatingException{
-		JsonElement jsonIdentifier = command.remove(identifier);
+	public JSONObject popCommandIdentifier(String identifier) throws ModuleTranslatingException{
+		JSONObject jsonIdentifier = (JSONObject) command.remove(identifier);
 		
 		if (jsonIdentifier == null){
 			throw new ModuleTranslatingException ("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command, this);
@@ -46,10 +50,14 @@ public class CompositeStep{
 		return jsonIdentifier;
 	}
 	
-	public JsonObject toJSON() {
-		JsonObject returnValue = new JsonObject();
-		returnValue.add("command", command);
-		returnValue.add("originPlacement", originPlacement.toJSON());
+	public JSONObject toJSON() {
+		JSONObject returnValue = new JSONObject();
+		try {
+			returnValue.put("command", command);
+			returnValue.put("originPlacement", originPlacement.toJSON());
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+		}
 		return returnValue;
 	}
 }

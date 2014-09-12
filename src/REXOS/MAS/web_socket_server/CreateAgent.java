@@ -39,18 +39,17 @@
 package MAS.web_socket_server;
 
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import util.configuration.ServerConfigurations;
-
-import web_socket_server.java.org.java_websocket.client.WebSocketClient;
-import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;
-
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import util.configuration.ServerConfigurations;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 
 
 public class CreateAgent {	

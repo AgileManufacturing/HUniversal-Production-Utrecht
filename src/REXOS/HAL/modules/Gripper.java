@@ -3,20 +3,21 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.knowledgedb_client.KnowledgeException;
 import util.math.Vector3;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
+import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.ModuleListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Gripper extends ModuleActor {
 	// Gonna be loaded from KDB:
@@ -32,7 +33,7 @@ public class Gripper extends ModuleActor {
 	}
 
 	@Override
-	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
+	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		compositeStep = adjustMoveWithDimensions(compositeStep, new Vector3(0, 0, GRIPPER_SIZE));
 		
@@ -52,12 +53,12 @@ public class Gripper extends ModuleActor {
 		// Set hardwareSteps
 		if (isPick || isPlace) {
 			HardwareStep harwareStep;
-			JsonObject instructionData = new JsonObject();
+			JSONObject instructionData = new JSONObject();
 			if (isPick) {
-				instructionData.add(ACTIVATE, null);
+				instructionData.put(ACTIVATE, JSONObject.NULL);
 				harwareStep = new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData);
 			} else {
-				instructionData.add(DEACTIVATE, null);
+				instructionData.put(DEACTIVATE, JSONObject.NULL);
 				harwareStep = new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData);
 			}
 			

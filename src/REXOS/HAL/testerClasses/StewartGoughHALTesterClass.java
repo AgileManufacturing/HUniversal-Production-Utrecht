@@ -7,28 +7,26 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
+import org.apache.commons.codec.binary.Base64;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
-
-import org.apache.commons.codec.binary.Base64;
-
 import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListener {
 	static StewartGoughHALTesterClass htc = new StewartGoughHALTesterClass();
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
-	static JsonObject criteria;
+	static JSONObject criteria;
 	static boolean insert = true;
 	
 	static final String baseDir = "/home/agileman/Desktop/";
@@ -381,43 +379,43 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		
 		// Six axis
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlaceWithRotation + moduleA_05; 
-		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
+		JSONObject a = new JSONObject(new JSONTokener(moduleA));
 		hal.insertModule(a, a);
 		System.out.println("Module A inserted");
 		
 	//	// pen
 	//	String moduleB = moduleB_01 + base64Pen + moduleB_02; 
-	//	JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+	//	JSONObject b = new JsonParser().parse(moduleB).getAsJSONObject();
 	//	hal.insertModule(b, b);
 		
 		// gripper
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
-		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+		JSONObject b = new JSONObject(new JSONTokener(moduleB));
 		hal.insertModule(b, b);
 		System.out.println("Module B inserted");
 	
 		// camera
 		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
-		JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
+		JSONObject c = new JSONObject(new JSONTokener(moduleC));
 		hal.insertModule(c, c);
 		System.out.println("Module C inserted");
 		// lens
 		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
-		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
+		JSONObject d = new JSONObject(new JSONTokener(moduleD));
 		hal.insertModule(d, d);
 		System.out.println("Module D inserted");
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
-		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
+		JSONObject e = new JSONObject(new JSONTokener(moduleE));
 		hal.insertModule(e, e);
 		System.out.println("Module E inserted");
 		insert = false;
 	}
 		
-/*criteria = new JsonObject();
-		JsonObject target = new JsonObject();
-		JsonObject targetMove = new JsonObject();
-		JsonObject targetRotate = new JsonObject();
+/*criteria = new JSONObject();
+		JSONObject target = new JSONObject();
+		JSONObject targetMove = new JSONObject();
+		JSONObject targetRotate = new JSONObject();
 		targetMove.addProperty("x", 5.0);
 		targetMove.addProperty("y", 5.0);
 		targetMove.addProperty("z", 20.0);
@@ -430,13 +428,13 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		target.add("rotate",targetRotate);
 		target.addProperty("identifier", "GC4x4MB_1");
 		
-		JsonArray subjects = new JsonArray();
-		JsonObject subject = new JsonObject();
-		JsonObject subject1 = new JsonObject();
-		JsonObject subjectMove1 = new JsonObject();
-		JsonObject subjectRotate1 = new JsonObject();
-		JsonObject subjectMove = new JsonObject();
-		JsonObject subjectRotate = new JsonObject();
+		JSONArray subjects = new JSONArray();
+		JSONObject subject = new JSONObject();
+		JSONObject subject1 = new JSONObject();
+		JSONObject subjectMove1 = new JSONObject();
+		JSONObject subjectRotate1 = new JSONObject();
+		JSONObject subjectMove = new JSONObject();
+		JSONObject subjectRotate = new JSONObject();
 		subjectMove.addProperty("x", 3.5);
 		subjectMove.addProperty("y", 3.5);
 		subjectMove.addProperty("z", 20.0);

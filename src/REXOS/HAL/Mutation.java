@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.Row;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
+import org.json.JSONArray;
+import org.json.JSONException;
 /**
  * This method provides methods for serializing and deserializing of Mutations
  * @author Tommas Bakker
@@ -57,7 +56,7 @@ public class Mutation {
 	 * @param moduleIdentifier
 	 * @return
 	 */
-	public static JsonArray serializeAllSupportedMutations(ModuleIdentifier moduleIdentifier) {
+	public static JSONArray serializeAllSupportedMutations(ModuleIdentifier moduleIdentifier) {
 		return serializeAllSupportedMutations(moduleIdentifier, new KnowledgeDBClient());
 	}
 	/**
@@ -66,12 +65,12 @@ public class Mutation {
 	 * @param knowledgeDBClient
 	 * @return
 	 */
-	public static JsonArray serializeAllSupportedMutations(ModuleIdentifier moduleIdentifier, 
+	public static JSONArray serializeAllSupportedMutations(ModuleIdentifier moduleIdentifier, 
 			KnowledgeDBClient knowledgeDBClient) {
-		JsonArray supportedMutationEntries = new JsonArray();
+		JSONArray supportedMutationEntries = new JSONArray();
 		ArrayList<Mutation> mutations = getSupportedMutations(moduleIdentifier, knowledgeDBClient);
 		for (Mutation mutation : mutations) {
-			supportedMutationEntries.add(new JsonPrimitive(mutation.getMutationType()));
+			supportedMutationEntries.put(mutation.getMutationType());
 		}
 		return supportedMutationEntries;
 	}
@@ -81,8 +80,9 @@ public class Mutation {
 	 * @param moduleIdentifier
 	 * @param supportedMutationEntries
 	 * @return
+	 * @throws JSONException 
 	 */
-	public static ArrayList<Mutation> insertSupportedMutations(ModuleIdentifier moduleIdentifier, JsonArray supportedMutationEntries) {
+	public static ArrayList<Mutation> insertSupportedMutations(ModuleIdentifier moduleIdentifier, JSONArray supportedMutationEntries) throws JSONException {
 		return insertSupportedMutations(moduleIdentifier, supportedMutationEntries, new KnowledgeDBClient());
 	}
 	/**
@@ -91,13 +91,14 @@ public class Mutation {
 	 * @param supportedMutationEntries
 	 * @param knowledgeDBClient
 	 * @return
+	 * @throws JSONException 
 	 */
 	public static ArrayList<Mutation> insertSupportedMutations(ModuleIdentifier moduleIdentifier, 
-			JsonArray supportedMutationEntries, KnowledgeDBClient knowledgeDBClient) {
+			JSONArray supportedMutationEntries, KnowledgeDBClient knowledgeDBClient) throws JSONException {
 		ArrayList<Mutation> mutations = new ArrayList<Mutation>();
 		
-		for (JsonElement supportedMutationEntryElement : supportedMutationEntries) {
-			String mutationType = supportedMutationEntryElement.getAsString();
+		for (int i = 0; i < supportedMutationEntries.length(); i++) {
+			String mutationType = supportedMutationEntries.getString(i);
 			knowledgeDBClient.executeUpdateQuery(addSupportedMutationTypeForModuleType, 
 					moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), mutationType);
 			mutations.add(new Mutation(mutationType));

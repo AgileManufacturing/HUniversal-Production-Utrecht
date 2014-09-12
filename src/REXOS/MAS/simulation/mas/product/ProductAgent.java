@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import org.json.JSONException;
 
 import MAS.simulation.util.Ontology;
-import MAS.simulation.util.Pair;
 import MAS.simulation.util.Parser;
 import MAS.simulation.util.Position;
 import MAS.simulation.util.Tick;

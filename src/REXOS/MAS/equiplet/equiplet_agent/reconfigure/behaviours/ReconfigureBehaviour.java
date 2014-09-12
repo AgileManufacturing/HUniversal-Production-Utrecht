@@ -38,6 +38,8 @@
  **/
 package MAS.equiplet.equiplet_agent.reconfigure.behaviours;
 
+import jade.core.behaviours.Behaviour;
+
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
@@ -45,20 +47,17 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import HAL.HardwareAbstractionLayer;
+import HAL.ModuleIdentifier;
+import HAL.exceptions.FactoryException;
+import HAL.libraries.dynamicloader.JarFileLoaderException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 import MAS.equiplet.equiplet_agent.EquipletAgent;
 import MAS.equiplet.equiplet_agent.reconfigure.ModuleDataManager;
 import MAS.equiplet.equiplet_agent.reconfigure.datatypes.ModuleTree;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import HAL.HardwareAbstractionLayer;
-import HAL.ModuleIdentifier;
-import HAL.exceptions.FactoryException;
-
-import jade.core.behaviours.Behaviour;
-import HAL.libraries.dynamicloader.JarFileLoaderException;
-import HAL.libraries.knowledgedb_client.KnowledgeException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class ReconfigureBehaviour extends Behaviour{
 	public HardwareAbstractionLayer HAL;
@@ -151,13 +150,13 @@ public class ReconfigureBehaviour extends Behaviour{
 		public void addModule(@WebParam(name="moduleDataJson") String moduleDataJson) {
 			try {
 				if(moduleDataJson != null) {
-					JsonObject moduleSettings = new JsonParser().parse(moduleDataJson).getAsJsonObject();
-					ModuleDataManager moduleDataManager = new ModuleDataManager(moduleSettings.get("qrCode").getAsString());				
-					JsonObject staticSettings = new JsonParser().parse(moduleDataManager.getJsonFileAsString()).getAsJsonObject();
-					JsonObject dynamicSettings = new JsonObject();
-					dynamicSettings.add("attachedTo", moduleSettings.get("attachedTo"));
-					dynamicSettings.add("mountPointX", moduleSettings.get("mountPointX"));
-					dynamicSettings.add("mountPointY", moduleSettings.get("mountPointY"));
+					JSONObject moduleSettings = new JSONObject(new JSONTokener(moduleDataJson));
+					ModuleDataManager moduleDataManager = new ModuleDataManager(moduleSettings.getString("qrCode"));				
+					JSONObject staticSettings = new JSONObject(new JSONTokener(moduleDataManager.getJsonFileAsString()));
+					JSONObject dynamicSettings = new JSONObject();
+					dynamicSettings.put("attachedTo", moduleSettings.get("attachedTo"));
+					dynamicSettings.put("mountPointX", moduleSettings.get("mountPointX"));
+					dynamicSettings.put("mountPointY", moduleSettings.get("mountPointY"));
 					System.out.println("Static: "+staticSettings.toString());
 					System.out.println("Static: "+dynamicSettings.toString());
 					HAL.insertModule(staticSettings, dynamicSettings);
@@ -194,13 +193,13 @@ public class ReconfigureBehaviour extends Behaviour{
 
 			try {
 				if(moduleDataJson != null) {
-					JsonObject moduleSettings = new JsonParser().parse(moduleDataJson).getAsJsonObject();
-					String[] splittedQrString = moduleSettings.get("qrCode").getAsString().split("\\|");				
+					JSONObject moduleSettings = new JSONObject(new JSONTokener(moduleDataJson));
+					String[] splittedQrString = moduleSettings.getString("qrCode").split("\\|");				
 
 					ModuleIdentifier moduleIdentifier = new ModuleIdentifier(splittedQrString[1], splittedQrString[2], splittedQrString[3]);
-					JsonObject moduleData = HAL.deleteModule(moduleIdentifier);
+					JSONObject moduleData = HAL.deleteModule(moduleIdentifier);
 					if(moduleData != null){
-						ModuleDataManager moduleDataManager = new ModuleDataManager(moduleSettings.get("qrCode").getAsString());
+						ModuleDataManager moduleDataManager = new ModuleDataManager(moduleSettings.getString("qrCode"));
 						moduleDataManager.writeStringToJsonFile(moduleData.toString());			
 					}
 				}

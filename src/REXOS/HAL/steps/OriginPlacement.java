@@ -1,12 +1,17 @@
 package HAL.steps;
 
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 
 public class OriginPlacement {
 	private OriginPlacementType originPlacementType;
-	private JsonObject parameters;
+	private JSONObject parameters;
 	
-	public OriginPlacement(OriginPlacementType originPlacementType, JsonObject parameters) {
+	public OriginPlacement(OriginPlacementType originPlacementType, JSONObject parameters) {
 		this.originPlacementType = originPlacementType;
 		this.parameters = parameters;
 	}
@@ -14,14 +19,18 @@ public class OriginPlacement {
 	public OriginPlacementType getIdentifier() {
 		return originPlacementType;
 	}
-	public JsonObject getParameters() {
+	public JSONObject getParameters() {
 		return parameters;
 	}
 
-	public JsonObject toJSON() {
-		JsonObject output = new JsonObject();
-		output.addProperty("originPlacementType", originPlacementType.getName());
-		output.add("parameters", parameters);
+	public JSONObject toJSON() {
+		JSONObject output = new JSONObject();
+		try {
+		output.put("originPlacementType", originPlacementType.getName());
+		output.put("parameters", parameters);
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+		}
 		return output;
 	}
 }

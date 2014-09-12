@@ -4,7 +4,7 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
-import com.google.gson.JsonParser;
+import org.json.JSONException;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -51,12 +51,12 @@ public abstract class Capability {
 	 */
 	abstract public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException;
 	
-	protected ArrayList<HardwareStep> translateCompositeStep(ArrayList<ModuleActor> modules, CompositeStep compositeStep) throws CapabilityException {
+	protected ArrayList<HardwareStep> translateCompositeStep(ArrayList<ModuleActor> modules, CompositeStep compositeStep) throws CapabilityException, JSONException {
 		ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
 		compositeSteps.add(compositeStep);
 		return translateCompositeStep(modules, compositeSteps);
 	}
-	protected ArrayList<HardwareStep> translateCompositeStep(ArrayList<ModuleActor> modules, ArrayList<CompositeStep> compositeSteps) throws CapabilityException {
+	protected ArrayList<HardwareStep> translateCompositeStep(ArrayList<ModuleActor> modules, ArrayList<CompositeStep> compositeSteps) throws CapabilityException, JSONException {
 		for (ModuleActor moduleActor : modules) {
 			ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 			try {

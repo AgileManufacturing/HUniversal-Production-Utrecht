@@ -5,22 +5,22 @@ import generic.Service;
 
 import java.util.ArrayList;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import HAL.libraries.dynamicloader.JarFileLoaderException;
-import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
+import HAL.libraries.dynamicloader.JarFileLoaderException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 /**
  * The main interface of the HAL for the equiplet agent. This class manages the factories and the blackboard handler.
  * @author Bas Voskuijlen
@@ -72,21 +72,21 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		translationProcess.start();
 	}
 	/**
-	 * This method will insert a module by copying data from the staticSettings and dynamicSettings JsonObjects to the database and invoking the Equiplet Node to load the new modules.
+	 * This method will insert a module by copying data from the staticSettings and dynamicSettings JSONObjects to the database and invoking the Equiplet Node to load the new modules.
 	 * Make sure the equiplet is in Service Mode before calling this method. 
 	 * @param staticSettings
 	 * @param dynamicSettings
 	 * @return true if insertion is successful.
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
-	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings) throws InvalidMastModeException {
+	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
 		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
-		JsonArray capabilities = staticSettings.get("type").getAsJsonObject().get("capabilities").getAsJsonArray();
+		JSONArray capabilities = staticSettings.optJSONObject("type").optJSONArray("capabilities");
 		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilityTypes(capabilities);
 		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
 	}
 	/**
-	 * This method will update a module by copying data from the staticSettings and dynamicSettings JsonObjects to the database and invoking the Equiplet Node to reload the modules.
+	 * This method will update a module by copying data from the staticSettings and dynamicSettings JSONObjects to the database and invoking the Equiplet Node to reload the modules.
 	 * The software of the module or the associated capabilities will be updated if the buildnumber is higher than the buildnumber of the already installed software.
 	 * Make sure the equiplet is in Service Mode before calling this method. 
 	 * @param staticSettings
@@ -94,11 +94,11 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @return
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
-	public boolean updateModule(JsonObject staticSettings, JsonObject dynamicSettings) throws InvalidMastModeException {
+	public boolean updateModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
 		return moduleFactory.updateModule(staticSettings, dynamicSettings);
 	}
 	/**
-	 * This method will remove a module by moving data from the database to the JsonObject and invoking the Equiplet Node to remove the module.
+	 * This method will remove a module by moving data from the database to the JSONObject and invoking the Equiplet Node to remove the module.
 	 * Make sure the equiplet is in Service Mode before calling this method. 
 	 * @param moduleIdentifier
 	 * @return The static settings of the module from the database.
@@ -106,10 +106,10 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws JarFileLoaderException if the loading of the jarFile by the factories failed
 	 * @throws FactoryException if the instantiation of the class in the jarFile failed 
 	 */
-	public JsonObject deleteModule(ModuleIdentifier moduleIdentifier) throws FactoryException, InvalidMastModeException {
-		JsonArray capabilities = capabilityFactory.removeCapabilities(moduleIdentifier);
-		JsonObject module = moduleFactory.removeModule(moduleIdentifier);			
-		module.get("type").getAsJsonObject().add("capabilities", capabilities);
+	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
+		JSONArray capabilities = capabilityFactory.removeCapabilities(moduleIdentifier);
+		JSONObject module = moduleFactory.removeModule(moduleIdentifier);			
+		module.optJSONObject("type").put("capabilities", capabilities);
 		return module;
 	}
 	/**
