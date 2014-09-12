@@ -1,10 +1,9 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,25 +14,25 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simulation.config.Config;
-import simulation.config.Configuration;
-import simulation.config.Configuration.ConfigException;
-import simulation.config.IConfig;
-import simulation.graphics.Chart;
-import simulation.graphics.IControl;
-import simulation.graphics.SimInterface;
-import simulation.mas.equiplet.Capability;
-import simulation.mas.equiplet.EquipletState;
-import simulation.mas.equiplet.IEquipletSim;
-import simulation.mas.product.IProductSim;
-import simulation.mas.product.ProductStep;
-import simulation.util.Lock;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Settings;
-import simulation.util.Tick;
-import simulation.util.Triple;
-import simulation.util.Tuple;
+import MAS.simulation.config.Config;
+import MAS.simulation.config.Configuration;
+import MAS.simulation.config.Configuration.ConfigException;
+import MAS.simulation.config.IConfig;
+import MAS.simulation.graphics.Chart;
+import MAS.simulation.graphics.IControl;
+import MAS.simulation.graphics.SimInterface;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.equiplet.EquipletState;
+import MAS.simulation.mas.equiplet.IEquipletSim;
+import MAS.simulation.mas.product.IProductSim;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Lock;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
+import MAS.simulation.util.Tuple;
 
 public class Simulation implements ISimulation, IControl {
 
@@ -108,7 +107,7 @@ public class Simulation implements ISimulation, IControl {
 			Config con = Config.read();
 			config = Configuration.read(con);
 
-			System.out.println("Simulation: configuration: " + con);
+			System.out.println("Simulation: configuration: " + config);
 
 			stochastics = new Stochastics(config);
 			if (startGUI) {
@@ -117,8 +116,9 @@ public class Simulation implements ISimulation, IControl {
 
 			init();
 
-		} catch (ConfigException e) {
+		} catch (NullPointerException | ConfigException e) {
 			System.err.println("Configuration failed " + e.getMessage());
+			simulation.takeDown();
 		}
 	}
 
@@ -542,7 +542,6 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT LIMA");
 
 		saveStatistics();
-		
 	}
 
 	/**
@@ -736,7 +735,7 @@ public class Simulation implements ISimulation, IControl {
 	public synchronized void saveStatistics() {
 		System.out.println("Simulation: save statistics");
 
-		String path = "output";
+		String path = Settings.SIMULATION_OUTPUT;
 
 		File file = new File(path);
 		if (!file.exists()) {

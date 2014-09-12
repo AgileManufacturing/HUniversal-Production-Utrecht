@@ -1,4 +1,4 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
 public interface ISimulation {
 

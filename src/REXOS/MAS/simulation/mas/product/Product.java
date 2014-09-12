@@ -1,12 +1,12 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import jade.core.Agent;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public class Product extends Agent {
 	

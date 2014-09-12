@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,8 +30,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import simulation.offline.Simulation;
-import simulation.util.Triple;
+import MAS.simulation.offline.Simulation;
+import MAS.simulation.util.Triple;
 
 public class StaticSimInterface {
 

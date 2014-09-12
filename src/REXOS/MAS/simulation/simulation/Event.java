@@ -1,6 +1,6 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
-import simulation.util.Tick;
+import MAS.simulation.util.Tick;
 
 class Event implements Comparable<Event> {
 

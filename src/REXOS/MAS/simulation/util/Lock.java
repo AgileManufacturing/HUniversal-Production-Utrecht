@@ -1,4 +1,4 @@
-package simulation.util;
+package MAS.simulation.util;
 
 public class Lock {
 	private boolean isLocked = false;

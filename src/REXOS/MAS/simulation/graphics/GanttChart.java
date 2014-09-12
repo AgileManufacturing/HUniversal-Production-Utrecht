@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -33,8 +33,8 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.ApplicationFrame;
 
-import simulation.util.Tick;
-import simulation.util.Triple;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
 
 public class GanttChart extends ApplicationFrame {
 

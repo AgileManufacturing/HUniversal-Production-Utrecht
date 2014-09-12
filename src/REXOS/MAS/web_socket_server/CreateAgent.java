@@ -36,7 +36,7 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package web_socket_server;
+package MAS.web_socket_server;
 
 
 import jade.core.Profile;
@@ -47,9 +47,9 @@ import jade.wrapper.ControllerException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import web_socket_server.java.org.java_websocket.client.WebSocketClient;
-import web_socket_server.java.org.java_websocket.handshake.ServerHandshake;
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 
 
 public class CreateAgent {	
@@ -69,9 +69,11 @@ public class CreateAgent {
 		java.util.Date date= new java.util.Date();
 		//Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
+		System.out.println("Creating agent");
 		
 		try {
-			Profile profile = new ProfileImpl();		
+			Profile profile = new ProfileImpl();
+			
 			profile.setParameter(Profile.MAIN_HOST,ServerConfigurations.GS_IP);
 			profile.setParameter(Profile.MAIN_PORT,ServerConfigurations.GS_PORT);
 			profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME+date.getTime());
@@ -81,7 +83,9 @@ public class CreateAgent {
 			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 			try{		
 				AgentController ac = container.acceptNewAgent( container.getContainerName()+identifier, agent);
-				ac.start();		
+				
+				ac.start();	
+				
 				mws.setCreated(true);
 			}
 			catch(ControllerException e){

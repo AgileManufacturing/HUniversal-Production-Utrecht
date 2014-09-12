@@ -1,5 +1,4 @@
-package simulation.util;
-
+package MAS.simulation.util;
 
 public class Tick extends Number implements Comparable<Tick> {
 
@@ -38,8 +37,7 @@ public class Tick extends Number implements Comparable<Tick> {
 	@Override
 	public String toString() {
 		if (type.equals(Double.class)) {
-			return dTime.toString();
-			// return String.format("%.2f", dTime);
+			return String.format("%.2f", dTime);
 		} else if (type.equals(Long.class)) {
 			return lTime.toString();
 		}

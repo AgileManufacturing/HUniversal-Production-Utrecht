@@ -1,13 +1,13 @@
-package simulation.offline;
+package MAS.simulation.offline;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Triple;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Triple;
 
 class Equiplet {
 	private String name;

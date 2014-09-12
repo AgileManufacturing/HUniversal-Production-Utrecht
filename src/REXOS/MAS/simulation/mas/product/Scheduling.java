@@ -1,4 +1,4 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import jade.core.AID;
 
@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Settings;
-import simulation.util.Tick;
-import simulation.util.Tuple;
-import simulation.util.Util;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Tuple;
+import MAS.simulation.util.Util;
 
 public class Scheduling {
 

@@ -1,4 +1,4 @@
-package simulation.util;
+package MAS.simulation.util;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 

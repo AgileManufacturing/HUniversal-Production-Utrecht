@@ -1,11 +1,11 @@
-package simulation.test;
+package MAS.simulation.test;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import simulation.mas.equiplet.Job;
-import simulation.util.Tick;
+import MAS.simulation.mas.equiplet.Job;
+import MAS.simulation.util.Tick;
 
 public class EquipletLoad {
 

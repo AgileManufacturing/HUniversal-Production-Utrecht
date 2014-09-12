@@ -1,10 +1,10 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import java.util.LinkedList;
 
-import simulation.simulation.Simulation;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.simulation.Simulation;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public class ProductSim implements IProductSim {
 

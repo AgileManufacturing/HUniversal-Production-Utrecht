@@ -1,4 +1,4 @@
-package simulation.mas;
+package MAS.simulation.mas;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -11,8 +11,8 @@ import java.util.TreeSet;
 
 import org.json.JSONException;
 
-import simulation.mas.equiplet.Job;
-import simulation.util.Parser;
+import MAS.simulation.mas.equiplet.Job;
+import MAS.simulation.util.Parser;
 
 public class ScheduleDispatcher extends Agent {
 

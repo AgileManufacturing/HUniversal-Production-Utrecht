@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;

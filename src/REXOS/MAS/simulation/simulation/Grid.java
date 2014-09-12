@@ -1,4 +1,4 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import simulation.mas.equiplet.IEquipletSim;
+import MAS.simulation.mas.equiplet.IEquipletSim;
 
 public class Grid {
 

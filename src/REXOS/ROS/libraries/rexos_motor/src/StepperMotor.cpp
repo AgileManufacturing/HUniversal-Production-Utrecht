@@ -70,23 +70,23 @@ namespace rexos_motor {
 		if(!poweredOn){
 			
 			//Reset alarm
-			std::cout << "motor index: ";
+			//std::cout << "motor index: ";
 			std::cout << motorIndex << std::endl;
 			
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
-			std::cout << "i did reset alarm" << std::endl;
+			//std::cout << "i did reset alarm" << std::endl;
 			// Set operating modes
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, 0);
-			std::cout << "I did set operating modes" << std::endl;
+			//std::cout << "I did set operating modes" << std::endl;
 			// set modes for all used motion slots
 			for(int i = 0; i < CRD514KD::MOTION_SLOTS_USED; i++){
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_POSMODE + i, 1);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_OPMODE + i, 0);
 				modbus->writeU16(motorIndex, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
 			}
-			std::cout << "i did set modes for all used slots" << std::endl;
+			//std::cout << "i did set modes for all used slots" << std::endl;
 			// Excite motor
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 			

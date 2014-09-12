@@ -36,8 +36,9 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package grid_server;
+package MAS.grid_server;
 
+import MAS.product.product_agent.ProductAgent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -46,6 +47,8 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
 public class GridAgent extends Agent{
+	private static final long serialVersionUID = -720095833750151495L;
+	
 	private long productAgentCounter =0;
 	protected void setup(){	
 		addBehaviour(new CyclicBehaviour()

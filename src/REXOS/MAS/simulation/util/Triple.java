@@ -1,4 +1,4 @@
-package simulation.util;
+package MAS.simulation.util;
 
 public class Triple<U, V, W> {
 

@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.management.RuntimeErrorException;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,7 +19,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import simulation.mas.product.Product;
+import MAS.simulation.mas.product.Product;
 
 public class ProductView extends JPanel implements TreeSelectionListener {
 

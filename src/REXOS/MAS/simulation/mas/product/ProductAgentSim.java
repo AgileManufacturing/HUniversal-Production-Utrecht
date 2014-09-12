@@ -1,13 +1,13 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import java.util.LinkedList;
 
 import org.json.JSONException;
 
-import simulation.simulation.ISimulation;
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.simulation.ISimulation;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
 

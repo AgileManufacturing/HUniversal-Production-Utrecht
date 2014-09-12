@@ -1,4 +1,4 @@
-package simulation.mas.equiplet;
+package MAS.simulation.mas.equiplet;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -19,15 +19,15 @@ import java.util.TreeSet;
 
 import org.json.JSONException;
 
-import simulation.mas.product.ProductStep;
-import simulation.util.Ontology;
-import simulation.util.Pair;
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Settings;
-import simulation.util.Tick;
-import simulation.util.Triple;
-import simulation.util.Tuple;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Ontology;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
+import MAS.simulation.util.Tuple;
 
 public class EquipletAgent extends Agent {
 

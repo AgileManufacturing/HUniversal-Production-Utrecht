@@ -1,4 +1,4 @@
-package simulation.util;
+package MAS.simulation.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import simulation.mas.equiplet.Capability;
-import simulation.mas.product.ProductStep;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.product.ProductStep;
 
 public class ParserPrimitives {
 

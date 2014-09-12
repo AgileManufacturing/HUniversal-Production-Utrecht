@@ -1,15 +1,15 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import simulation.mas.equiplet.Capability;
-import simulation.mas.equiplet.IEquipletSim;
-import simulation.mas.product.IProductSim;
-import simulation.mas.product.ProductStep;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.equiplet.IEquipletSim;
+import MAS.simulation.mas.product.IProductSim;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public interface ISimControl {
 
@@ -22,4 +22,6 @@ public interface ISimControl {
 	void killAgent(String name);
 
 	void createTrafficAgent(Map<String, Position> equipletPositions) throws Exception;
+
+	void takeDown();
 }

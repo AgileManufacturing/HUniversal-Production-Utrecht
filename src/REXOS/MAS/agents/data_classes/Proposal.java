@@ -1,10 +1,11 @@
-package agents.data_classes;
+package MAS.agents.data_classes;
 
 import jade.core.AID;
 
 import java.io.Serializable;
 
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Proposal implements Serializable {
 	private static final long serialVersionUID = 1067152669716744380L;
@@ -13,15 +14,15 @@ public class Proposal implements Serializable {
 	private int productStepId;
 	private AID equipletAgent;
 	
-	public Proposal(JsonObject json, AID equipletAgent){
+	public Proposal(JSONObject json, AID equipletAgent) throws JSONException{
 		if (json.has("startTime")){
-			this.startTime = json.get("startTime").getAsInt();
+			this.startTime = json.getInt("startTime");
 		}
 		if (json.has("duration")){
-			this.duration = json.get("duration").getAsInt();
+			this.duration = json.getInt("duration");
 		}
 		if (json.has("productStepId")){
-			this.productStepId = json.get("productStepId").getAsInt();
+			this.productStepId = json.getInt("productStepId");
 		}
 		this.equipletAgent = equipletAgent;
 	}

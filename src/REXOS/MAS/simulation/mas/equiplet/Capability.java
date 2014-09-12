@@ -1,8 +1,8 @@
-package simulation.mas.equiplet;
+package MAS.simulation.mas.equiplet;
 
 import java.util.Map;
 
-import simulation.util.Tick;
+import MAS.simulation.util.Tick;
 
 public class Capability {
 	private String service;

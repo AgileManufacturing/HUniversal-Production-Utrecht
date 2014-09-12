@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,7 +29,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import simulation.util.Tick;
+import MAS.simulation.util.Tick;
 
 public class Chart {
 
@@ -97,23 +97,23 @@ public class Chart {
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setDomainGridlinePaint(Color.WHITE);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
-		/*
-		 * final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-		 * renderer.setBaseLegendShape(new Rectangle(15, 15));
-		 * renderer.setSeriesStroke(
-		 * 0, new BasicStroke(
-		 * 2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-		 * 1.0f, new float[] {10.0f, 6.0f}, 0.0f
-		 * )
-		 * );
-		 * /
-		 * XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(){
-		 * private static final long serialVersionUID = 1L;
-		 * public Shape lookupLegendShape(int series) {
-		 * return new Rectangle(15, 15);
-		 * }
-		 * };
-		 */
+/*
+		final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		renderer.setBaseLegendShape(new Rectangle(15, 15));
+		renderer.setSeriesStroke(
+	            0, new BasicStroke(
+	                2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+	                1.0f, new float[] {10.0f, 6.0f}, 0.0f
+	            )
+	        );
+		* /
+		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(){
+			private static final long serialVersionUID = 1L;
+			public Shape lookupLegendShape(int series) {
+				return new Rectangle(15, 15);
+			}
+		};
+		*/
 
 		LegendItemCollection legendItems = plot.getLegendItems();
 		for (int i = 0; i < legendItems.getItemCount(); i++) {
@@ -121,7 +121,7 @@ public class Chart {
 			item.setShape(new Rectangle(15, 15));
 		}
 		plot.setFixedLegendItems(legendItems);
-
+		
 		// renderer.setBaseLegendShape(new Rectangle(15, 15));
 		// plot.setRenderer(renderer);
 
@@ -130,7 +130,7 @@ public class Chart {
 
 	public static void save(String path, String title, String yLabel, Map<String, TreeMap<Tick, Double>> data) {
 		try {
-			File file = new File(path + title.replace(" ", "_"));
+			File file = new File(path + title.replace(" ", "_") + ".png");
 
 			final XYSeriesCollection dataset = new XYSeriesCollection();
 			for (Entry<String, TreeMap<Tick, Double>> entry : data.entrySet()) {
@@ -185,7 +185,7 @@ public class Chart {
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		return chartPanel;
 	}
-
+	
 	/**
 	 * Marker for current time
 	 * Long timestampToMark = new Date().getTime();

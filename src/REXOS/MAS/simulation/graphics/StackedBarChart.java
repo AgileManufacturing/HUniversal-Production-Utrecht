@@ -1,7 +1,6 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,7 @@ import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
 
-import simulation.util.Triple;
+import MAS.simulation.util.Triple;
 
 public class StackedBarChart extends ApplicationFrame {
 

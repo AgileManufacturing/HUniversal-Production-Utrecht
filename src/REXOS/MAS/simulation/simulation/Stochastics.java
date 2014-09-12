@@ -1,14 +1,14 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import simulation.config.DurationType;
-import simulation.config.IConfig;
-import simulation.mas.product.ProductStep;
-import simulation.util.Pair;
-import simulation.util.Tick;
+import MAS.simulation.config.DurationType;
+import MAS.simulation.config.IConfig;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Tick;
 
 class Stochastics {
 	private Random random;

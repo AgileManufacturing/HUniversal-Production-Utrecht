@@ -1,11 +1,11 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import jade.core.AID;
 
 import java.util.Map;
 
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public class ProductionStep {
 

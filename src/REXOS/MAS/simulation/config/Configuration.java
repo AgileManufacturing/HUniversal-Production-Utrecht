@@ -1,4 +1,4 @@
-package simulation.config;
+package MAS.simulation.config;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,11 +14,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simulation.mas.equiplet.Capability;
-import simulation.mas.product.ProductStep;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
 
 public class Configuration implements IConfig {
 
@@ -47,8 +48,8 @@ public class Configuration implements IConfig {
 	public static Configuration read(IConfig legacy) throws ConfigException {
 		List<EquipletConfig> equipletConfig = new ArrayList<EquipletConfig>();
 
-		File file = new File("equiplets.csv");
-		System.out.println("Configuration " + file);
+		File file = new File(Settings.SIMULATION_EQUIPLET_CONFIG);
+		System.out.println("Configuration " + file.getAbsolutePath());
 
 		BufferedReader reader = null;
 

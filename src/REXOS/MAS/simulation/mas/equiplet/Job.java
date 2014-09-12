@@ -1,11 +1,11 @@
-package simulation.mas.equiplet;
+package MAS.simulation.mas.equiplet;
 
 import jade.core.AID;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import simulation.util.Tick;
+import MAS.simulation.util.Tick;
 
 public class Job implements Comparable<Job> {
 

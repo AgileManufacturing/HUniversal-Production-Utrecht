@@ -1,4 +1,4 @@
-package simulation.config;
+package MAS.simulation.config;
 
 import java.util.List;
 

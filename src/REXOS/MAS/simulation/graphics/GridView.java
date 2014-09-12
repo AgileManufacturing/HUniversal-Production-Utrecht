@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,9 +13,9 @@ import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tuple;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tuple;
 
 public class GridView extends JPanel {
 

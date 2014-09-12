@@ -1,10 +1,10 @@
-package web_socket_server;
+package MAS.web_socket_server;
 
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.StaleProxyException;
-import configuration.ServerConfigurations;
+import util.configuration.ServerConfigurations;
 
 
 public class ProductAgentSpawnerAgent extends Agent {
@@ -23,11 +23,13 @@ public class ProductAgentSpawnerAgent extends Agent {
 		  
 		  acl.addReceiver(aid);
 		  acl.setContent(message);
+		  System.out.println("Send acl: " + acl);
 		  send(acl);
 		  System.out.println("Send message: " + message);
 	}
 	protected void setup(){
 		System.out.println(productSteps);
+		System.out.println("Agent name: "+ this.getName());
 		sendMessage(productSteps, 0);
 		try {
 			getContainerController().kill();

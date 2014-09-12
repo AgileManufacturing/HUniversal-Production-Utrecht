@@ -1,4 +1,4 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import simulation.util.Pair;
-import simulation.util.Settings;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Settings;
 
 public class Graph<V> {
 

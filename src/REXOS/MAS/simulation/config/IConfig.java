@@ -1,13 +1,13 @@
-package simulation.config;
+package MAS.simulation.config;
 
 import java.util.List;
 import java.util.Map;
 
-import simulation.mas.equiplet.Capability;
-import simulation.mas.product.ProductStep;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public interface IConfig {
 
@@ -32,6 +32,5 @@ public interface IConfig {
 	public Pair<Tick, DurationType> equipletBreakdownTime(String equiplet);
 
 	public Pair<Tick, DurationType> equipletRepaireTime(String equiplet);
-
 
 }

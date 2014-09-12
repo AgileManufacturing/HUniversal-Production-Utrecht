@@ -1,4 +1,4 @@
-package simulation.offline;
+package MAS.simulation.offline;
 
 import java.util.Arrays;
 import java.util.LinkedList;

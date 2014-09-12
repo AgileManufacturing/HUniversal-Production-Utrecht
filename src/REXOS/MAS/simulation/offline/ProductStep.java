@@ -1,4 +1,4 @@
-package simulation.offline;
+package MAS.simulation.offline;
 
 class ProductStep {
 	private String service;

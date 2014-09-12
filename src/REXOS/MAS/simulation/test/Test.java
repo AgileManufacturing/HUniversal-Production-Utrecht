@@ -1,4 +1,4 @@
-package simulation.test;
+package MAS.simulation.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,16 +10,16 @@ import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.RefineryUtilities;
 
-import simulation.graphics.GanttChart;
-import simulation.mas.product.Graph;
-import simulation.mas.product.Node;
-import simulation.mas.product.Product;
-import simulation.mas.product.ProductStep;
-import simulation.mas.product.ProductionStep;
-import simulation.simulation.Grid;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.graphics.GanttChart;
+import MAS.simulation.mas.product.Graph;
+import MAS.simulation.mas.product.Node;
+import MAS.simulation.mas.product.Product;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.mas.product.ProductionStep;
+import MAS.simulation.simulation.Grid;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 class Test {
 	

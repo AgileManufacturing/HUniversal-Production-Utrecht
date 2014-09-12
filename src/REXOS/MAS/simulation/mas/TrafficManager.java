@@ -1,4 +1,4 @@
-package simulation.mas;
+package MAS.simulation.mas;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -11,12 +11,12 @@ import java.util.Map;
 
 import org.json.JSONException;
 
-import simulation.config.Config;
-import simulation.util.Ontology;
-import simulation.util.Pair;
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.config.Config;
+import MAS.simulation.util.Ontology;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 public class TrafficManager extends Agent {
 

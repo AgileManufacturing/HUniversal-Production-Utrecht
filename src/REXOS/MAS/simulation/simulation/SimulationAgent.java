@@ -1,4 +1,4 @@
-package simulation.simulation;
+package MAS.simulation.simulation;
 
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
@@ -18,16 +18,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import simulation.mas.TrafficManager;
-import simulation.mas.equiplet.Capability;
-import simulation.mas.equiplet.EquipletSimAgent;
-import simulation.mas.equiplet.IEquipletSim;
-import simulation.mas.product.IProductSim;
-import simulation.mas.product.ProductAgentSim;
-import simulation.mas.product.ProductStep;
-import simulation.util.Position;
-import simulation.util.Settings;
-import simulation.util.Tick;
+import MAS.simulation.mas.TrafficManager;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.equiplet.EquipletSimAgent;
+import MAS.simulation.mas.equiplet.IEquipletSim;
+import MAS.simulation.mas.product.IProductSim;
+import MAS.simulation.mas.product.ProductAgentSim;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
 
 public class SimulationAgent extends Agent implements ISimControl {
 
@@ -44,6 +44,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 	public void setup() {
 		try {
 			verbosity = Integer.parseInt(getProperty("verbosity", "1"));
+			System.out.println("Simulation: verbosity is set on " + verbosity);
 		} catch (NumberFormatException e) {
 			System.err.println("Simulation: parsing error verbosity");
 		}
@@ -83,7 +84,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 	}
 
 	@Override
-	protected void takeDown() {
+	public void takeDown() {
 		// TODO check if warning is because of bad coding and need to be fixed "WARNING: Cannot kill container Main-Container: Unreachable. "
 		Codec codec = new SLCodec();
 		Ontology jmo = JADEManagementOntology.getInstance();

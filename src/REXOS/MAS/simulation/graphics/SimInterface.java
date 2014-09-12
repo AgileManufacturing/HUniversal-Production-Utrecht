@@ -1,4 +1,4 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,11 +29,11 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
-import simulation.util.Triple;
-import simulation.util.Tuple;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
+import MAS.simulation.util.Tuple;
 
 public class SimInterface {
 

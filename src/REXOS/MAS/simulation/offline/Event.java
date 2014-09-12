@@ -1,8 +1,8 @@
-package simulation.offline;
+package MAS.simulation.offline;
 
 import java.util.LinkedList;
 
-import simulation.util.Triple;
+import MAS.simulation.util.Triple;
 
 class Event implements Comparable<Event> {
 	private double time;

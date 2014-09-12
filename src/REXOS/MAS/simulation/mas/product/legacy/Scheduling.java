@@ -1,4 +1,4 @@
-package simulation.mas.product.legacy;
+package MAS.simulation.mas.product.legacy;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.json.JSONException;
 
-import simulation.mas.product.ProductStep;
-import simulation.mas.product.ProductionStep;
-import simulation.util.Ontology;
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Tick;
-import simulation.util.Tuple;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.mas.product.ProductionStep;
+import MAS.simulation.util.Ontology;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Tuple;
 
 public class Scheduling {
 

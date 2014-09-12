@@ -1,4 +1,4 @@
-package simulation.config;
+package MAS.simulation.config;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,11 +15,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import simulation.mas.equiplet.Capability;
-import simulation.mas.product.ProductStep;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.product.ProductStep;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
 
 /**
  * Configuration data to read from configuration file simulation.xml
@@ -49,12 +50,16 @@ public class Config implements IConfig {
 
 	public static Config read() {
 		try {
-			File file = new File("Simulation.xml");
+			File file = new File(Settings.SIMULATION_CONFIG);
+			if (file.exists()) {
 			JAXBContext jaxbContext = JAXBContext.newInstance(Config.class);
 
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 			return (Config) jaxbUnmarshaller.unmarshal(file);
-
+			} else {
+				System.err.println("Failed to load config settings: file not found: " + file.getAbsolutePath());
+				return null;
+			}
 		} catch (JAXBException e) {
 			e.printStackTrace();
 			System.err.println("Failed to load config settings");

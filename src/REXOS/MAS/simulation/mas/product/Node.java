@@ -1,9 +1,10 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
+
+import jade.core.AID;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import simulation.util.Tick;
-import jade.core.AID;
+import MAS.simulation.util.Tick;
 
 public class Node {
 

@@ -1,4 +1,4 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -9,11 +9,11 @@ import java.util.LinkedList;
 
 import org.json.JSONException;
 
-import simulation.util.Ontology;
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Tick;
-import simulation.util.Triple;
+import MAS.simulation.util.Ontology;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
 
 public class ProductAgent extends Agent {
 	/**
@@ -58,7 +58,7 @@ public class ProductAgent extends Agent {
 		this.deadline = deadline;
 		this.state = ProductState.SCHEDULING;
 
-		System.out.printf("PA:%s initialize [created=%s, pos=%s, deadline=%s, product steps=%s]\n", getLocalName(), getCreated(), position, deadline, productSteps);
+		System.out.printf("PA:%s initialize [created=%s, pos=%s, product steps=%s, deadline=%s]\n", getLocalName(), getCreated(), position, productSteps, deadline);
 	}
 
 	protected Tick getCreated() {

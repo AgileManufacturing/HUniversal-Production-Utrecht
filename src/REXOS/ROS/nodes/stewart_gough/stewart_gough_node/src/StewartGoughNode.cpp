@@ -287,6 +287,10 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y
  **/
 bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration){
 
+	if(maxAcceleration > 20){
+		maxAcceleration = 20;
+	}
+	
 	std::cout << "moveTo rotation: " << rotationX << " " << rotationY << " " << rotationZ << std::endl;
 		
 	

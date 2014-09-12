@@ -1,4 +1,4 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -6,9 +6,9 @@ import jade.lang.acl.MessageTemplate;
 
 import org.json.JSONException;
 
-import simulation.util.Ontology;
-import simulation.util.Parser;
-import simulation.util.Tick;
+import MAS.simulation.util.Ontology;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Tick;
 
 public class ProductListenerBehaviour extends Behaviour {
 

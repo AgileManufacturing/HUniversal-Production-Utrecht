@@ -1,4 +1,4 @@
-package simulation.offline;
+package MAS.simulation.offline;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,15 +12,15 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simulation.config.Config;
-import simulation.config.DurationType;
-import simulation.config.IConfig;
-import simulation.graphics.StaticSimInterface;
-import simulation.mas.equiplet.Capability;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
-import simulation.util.Triple;
+import MAS.simulation.config.Config;
+import MAS.simulation.config.DurationType;
+import MAS.simulation.config.IConfig;
+import MAS.simulation.graphics.StaticSimInterface;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
 
 public class Simulation extends Thread {
 
@@ -84,7 +84,7 @@ public class Simulation extends Thread {
 
 		// fill equiplets
 		int equipletCounter = 0;
-		for (Entry<String, Pair<simulation.util.Position, List<Capability>>> equiplet : config.getEquipletsConfigurations().entrySet()) {
+		for (Entry<String, Pair<Position, List<Capability>>> equiplet : config.getEquipletsConfigurations().entrySet()) {
 			Position position = new Position(equiplet.getValue().first.getX(), equiplet.getValue().first.getY());
 			List<String> services = new ArrayList<>();
 			for (Capability capability : equiplet.getValue().second) {
@@ -292,14 +292,14 @@ public class Simulation extends Thread {
 	}
 
 	private void scheduleProduct(double time) {
-		List<simulation.mas.product.ProductStep> productSteps = config.getProductSteps();
+		List<MAS.simulation.mas.product.ProductStep> productSteps = config.getProductSteps();
 		LinkedList<ProductStep> steps = new LinkedList<ProductStep>();
 
 		int n = 1 + (int) (random.nextDouble() * (productSteps.size() - 1));
 		for (int i = 0; i < n; i++) {
 			double u = random.nextDouble() * 100;
 			int sum = 0;
-			for (simulation.mas.product.ProductStep productStep : productSteps) {
+			for (MAS.simulation.mas.product.ProductStep productStep : productSteps) {
 				sum += config.getProductStepProbablity(productStep);
 				if (u <= sum) {
 					steps.add(new ProductStep(productStep.getService()));

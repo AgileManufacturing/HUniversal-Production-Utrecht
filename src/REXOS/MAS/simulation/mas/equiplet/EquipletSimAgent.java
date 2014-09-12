@@ -1,4 +1,4 @@
-package simulation.mas.equiplet;
+package MAS.simulation.mas.equiplet;
 
 import jade.core.AID;
 
@@ -9,11 +9,11 @@ import java.util.Map;
 
 import org.json.JSONException;
 
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Tick;
-import simulation.util.Triple;
-import simulation.util.Tuple;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
+import MAS.simulation.util.Tuple;
 
 public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 

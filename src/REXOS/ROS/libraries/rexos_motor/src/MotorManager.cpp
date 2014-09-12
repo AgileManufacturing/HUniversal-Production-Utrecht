@@ -48,7 +48,6 @@ namespace rexos_motor{
 	void MotorManager::powerOn(void){
 		if(!poweredOn){
 			for(int i = 0; i < motors.size(); ++i){
-				cout << "motor power on" << endl;
 				motors[i]->powerOn();
 			}
 		}
@@ -99,7 +98,7 @@ namespace rexos_motor{
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		
-		std::cout << "modbus writeU16 time: " << (rexos_utilities::timeNow()-timer2) << std::endl;
+		//ROS_INFO_STREAM("modbus writeU16 time: " << (rexos_utilities::timeNow()-timer2));
 		
 		for(int i = 0; i < motors.size(); ++i){
 			if(motors[i]->isPoweredOn())

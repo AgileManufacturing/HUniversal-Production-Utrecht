@@ -1,10 +1,10 @@
-package simulation.graphics;
+package MAS.simulation.graphics;
 
 import java.util.List;
 import java.util.Map;
 
-import simulation.util.Tick;
-import simulation.util.Triple;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
 
 public interface IControl {
 

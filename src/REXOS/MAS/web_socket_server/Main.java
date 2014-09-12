@@ -36,7 +36,7 @@
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-package web_socket_server;
+package MAS.web_socket_server;
 
 
 import java.io.BufferedReader;
@@ -46,16 +46,16 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 
-import web_socket_server.java.org.java_websocket.WebSocket;
-import web_socket_server.java.org.java_websocket.WebSocketImpl;
-import web_socket_server.java.org.java_websocket.framing.Framedata;
-import web_socket_server.java.org.java_websocket.handshake.ClientHandshake;
-import web_socket_server.java.org.java_websocket.server.WebSocketServer;
+import util.configuration.ServerConfigurations;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import configuration.ServerConfigurations;
+import org.java_websocket.WebSocket;
+import org.java_websocket.WebSocketImpl;
+import org.java_websocket.framing.Framedata;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 
 /**
@@ -87,15 +87,18 @@ public class Main extends WebSocketServer {
 	@Override
 	public void onMessage( WebSocket conn, String receivedMessage ) {
 		System.out.println( conn + ": " + receivedMessage );
-		
-		JsonObject message = new JsonParser().parse(receivedMessage).getAsJsonObject();
-		if (message.get("receiver").getAsString().equals("webSocketServer")){
-			CreateAgent ca = new CreateAgent();
-			ca.createAgent(receivedMessage, numProductAgents);
-			numProductAgents++;
-		}
-		else {
-			this.sendToAll( receivedMessage );
+		try {
+			JSONObject message = new JSONObject(new JSONTokener(receivedMessage));
+			if (message.getString("receiver").equals("webSocketServer")){
+				CreateAgent ca = new CreateAgent();
+				ca.createAgent(receivedMessage, numProductAgents);
+				numProductAgents++;
+			}
+			else {
+				this.sendToAll( receivedMessage );
+			}
+		} catch (JSONException ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -113,7 +116,7 @@ public class Main extends WebSocketServer {
 		}
 		Main s = new Main( port );
 		s.start();
-		System.out.println( "WebSocketServer started on port: " + s.getPort() );
+		System.out.println( "WebSocketServer started on port: " + s.getPort());
 
 		BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
 		while ( true ) {

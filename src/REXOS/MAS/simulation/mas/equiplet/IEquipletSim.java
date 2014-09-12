@@ -1,12 +1,12 @@
-package simulation.mas.equiplet;
+package MAS.simulation.mas.equiplet;
 
 import java.util.List;
 import java.util.Map;
 
-import simulation.util.Position;
-import simulation.util.Tick;
-import simulation.util.Triple;
-import simulation.util.Tuple;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
+import MAS.simulation.util.Tuple;
 
 public interface IEquipletSim {
 

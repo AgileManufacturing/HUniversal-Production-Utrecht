@@ -1,14 +1,14 @@
-package simulation.test;
+package MAS.simulation.test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import simulation.mas.equiplet.Capability;
-import simulation.mas.equiplet.EquipletAgent;
-import simulation.mas.equiplet.Job;
-import simulation.util.Pair;
-import simulation.util.Position;
-import simulation.util.Tick;
+import MAS.simulation.mas.equiplet.Capability;
+import MAS.simulation.mas.equiplet.EquipletAgent;
+import MAS.simulation.mas.equiplet.Job;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Tick;
 
 class EquipletTest extends EquipletAgent {
 	private static final long serialVersionUID = 1L;

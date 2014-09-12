@@ -1,4 +1,4 @@
-package simulation.mas.product;
+package MAS.simulation.mas.product;
 
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
@@ -20,13 +20,13 @@ import java.util.Set;
 
 import org.json.JSONException;
 
-import simulation.util.Ontology;
-import simulation.util.Pair;
-import simulation.util.Parser;
-import simulation.util.Position;
-import simulation.util.Settings;
-import simulation.util.Tick;
-import simulation.util.Triple;
+import MAS.simulation.util.Ontology;
+import MAS.simulation.util.Pair;
+import MAS.simulation.util.Parser;
+import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
+import MAS.simulation.util.Tick;
+import MAS.simulation.util.Triple;
 
 public class ScheduleBehaviour extends Behaviour {
 

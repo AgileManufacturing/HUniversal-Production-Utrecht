@@ -58,7 +58,7 @@ class SixAxisCalculations {
 			double angles[6];
 		};
 
-		SixAxisCalculations(double upperArmLength = 100.00, double lowerArmLength = 300.00, double motorAxisToCenterDistance = 101.30, double effectorJointtoCenterDistance = 55.00, double maxJointAngle = 0.17):
+		SixAxisCalculations(double upperArmLength = 100.00, double lowerArmLength = 300.00, double motorAxisToCenterDistance = 101.30, double effectorJointtoCenterDistance = 55.00, double maxJointAngle = 0.46):
 			upperArmLength(upperArmLength),
 			lowerArmLength(lowerArmLength),
 			motorAxisToCenterDistance(motorAxisToCenterDistance),
@@ -69,42 +69,41 @@ class SixAxisCalculations {
 		EffectorMove getMotorAngles(Point3D moveTo, double xRotation, double yRotation, double zRotation);
 		double * getAngles(double angles[6], Point3D moveTo, double xRotation, double yRotation, double zRotation);
 
-		bool checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ);
-
-
 		//
 		bool isValidMove(double angles[6]);
 
-		void matrixTest();
+		//void matrixTest();
+
+		bool checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ);
 
 
-		constexpr static double EFFECTOR_MAGIC_NUMBER = 37.198;
+		static constexpr double EFFECTOR_MAGIC_NUMBER = 37.198;
 
 		/*
 		 * Can be calculated using:
 		 * double distanceBetweenMotors = (sin(degreesToRadians(EFFECTOR_MAGIC_NUMBER)) * effectorJointtoCenterDistance) * 2;
 		 * MOTOR_MAGIC_NUMBER = radiansToDegrees(asin((elbowGroupDistance/2) / motorAxisToCenterDistance));
 		 */
-		constexpr static double MOTOR_MAGIC_NUMBER = 19.1624;
+		static constexpr double MOTOR_MAGIC_NUMBER = 19.1624;
 
 
-		constexpr static double GROUP_A_POS 			= 0;
-		constexpr static double EFFECTOR_JOINT_A1_POS 	= 0 - 37.198;
-		constexpr static double EFFECTOR_JOINT_A2_POS 	= 0 + 37.198;
-		constexpr static double MOTOR_A1_POS 			= 0 - 19.1624;
-		constexpr static double MOTOR_A2_POS 			= 0 + 19.1624;
+		static constexpr double GROUP_A_POS 			= 0;
+		static constexpr double EFFECTOR_JOINT_A1_POS 	= 0 - 37.198;
+		static constexpr double EFFECTOR_JOINT_A2_POS 	= 0 + 37.198;
+		static constexpr double MOTOR_A1_POS 			= 0 - 19.1624;
+		static constexpr double MOTOR_A2_POS 			= 0 + 19.1624;
 
-		constexpr static double GROUP_B_POS 			= 120;
-		constexpr static double EFFECTOR_JOINT_B1_POS 	= 120 - 37.198;
-		constexpr static double EFFECTOR_JOINT_B2_POS 	= 120 + 37.198;
-		constexpr static double MOTOR_B1_POS 			= 120 - 19.1624;
-		constexpr static double MOTOR_B2_POS 			= 120 + 19.1624;
+		static constexpr double GROUP_B_POS 			= 120;
+		static constexpr double EFFECTOR_JOINT_B1_POS 	= 120 - 37.198;
+		static constexpr double EFFECTOR_JOINT_B2_POS 	= 120 + 37.198;
+		static constexpr double MOTOR_B1_POS 			= 120 - 19.1624;
+		static constexpr double MOTOR_B2_POS 			= 120 + 19.1624;
 
-		constexpr static double GROUP_C_POS 			= 240;
-		constexpr static double EFFECTOR_JOINT_C1_POS 	= 240 - 37.198;
-		constexpr static double EFFECTOR_JOINT_C2_POS 	= 240 + 37.198;
-		constexpr static double MOTOR_C1_POS 			= 240 - 19.1624;
-		constexpr static double MOTOR_C2_POS 			= 240 + 19.1624;
+		static constexpr double GROUP_C_POS 			= 240;
+		static constexpr double EFFECTOR_JOINT_C1_POS 	= 240 - 37.198;
+		static constexpr double EFFECTOR_JOINT_C2_POS 	= 240 + 37.198;
+		static constexpr double MOTOR_C1_POS 			= 240 - 19.1624;
+		static constexpr double MOTOR_C2_POS 			= 240 + 19.1624;
 
 	private:
         double upperArmLength;
@@ -115,6 +114,8 @@ class SixAxisCalculations {
 
         Point3D effectorJointPositionCache[6];
 
+
+		
 		//Matrix operations
 		void getMultiplyMatrix(double result[], double matrixA[], int rowsA, int colsA, double matrixB[], int rowsB, int colsB);
 
@@ -150,6 +151,8 @@ class SixAxisCalculations {
 
 
 
+		Point3D getIntersectionPoint(double x1, double y1, double r1, double x2, double y2, double r2);
+
 
         //Matrix operations
         std::vector< std::vector<double> > multiplyMatrix(std::vector< std::vector<double> > matrixA, int rowsA, int colsA, std::vector< std::vector<double> > matrixB, int rowsB, int colsB);
@@ -158,7 +161,7 @@ class SixAxisCalculations {
         double getAngleBetween(Point3D vectorOne, Point3D vectorTwo);
 
         //Motor angle calculation and validation
-        double getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ);
+        double getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double motorJointPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ);
         bool isValidPosition(Point3D relativeJointPosition, Point3D relativeNeighbourJointPosition, double motorAngle, double motorGroupPositionOnCircle, double motorPositionOnCircle);
         double getEffectorJointAngle(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double groupPositionOnCircle, double motorPositionOnCircle, double motorAngle);
 
