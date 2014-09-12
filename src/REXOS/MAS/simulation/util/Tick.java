@@ -1,6 +1,5 @@
 package simulation.util;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Tick extends Number implements Comparable<Tick> {
 

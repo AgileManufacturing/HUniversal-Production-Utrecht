@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Queue;
 
 import simulation.util.Pair;
+import simulation.util.Position;
 import simulation.util.Triple;
 
 class Equiplet {

@@ -1,7 +1,14 @@
 package simulation.simulation;
 
+import jade.content.lang.Codec;
+import jade.content.lang.sl.SLCodec;
+import jade.content.onto.Ontology;
+import jade.content.onto.basic.Action;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.domain.JADEAgentManagement.JADEManagementOntology;
+import jade.domain.JADEAgentManagement.ShutdownPlatform;
+import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
@@ -29,14 +36,26 @@ public class SimulationAgent extends Agent implements ISimControl {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Simulation simulation;
+	private int verbosity;
 
 	/**
 	 * Setup the simulation agent
 	 */
 	public void setup() {
-		simulation = new Simulation(this);
+		try {
+			verbosity = Integer.parseInt(getProperty("verbosity", "1"));
+		} catch (NumberFormatException e) {
+			System.err.println("Simulation: parsing error verbosity");
+		}
 
+		simulation = new Simulation(this, verbosity > 1);
 		addBehaviour(new SimulationBehaviour());
+
+		// no use of gui, so start direct the simulation
+		if (verbosity < 2) {
+			simulation.start();
+		}
+
 	}
 
 	/**
@@ -54,6 +73,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 			while (!simulation.isFinished()) {
 				simulation.handleEvent();
 			}
+			takeDown();
 		}
 
 		@Override
@@ -61,6 +81,24 @@ public class SimulationAgent extends Agent implements ISimControl {
 			return simulation.isFinished();
 		}
 	}
+
+	@Override
+	protected void takeDown() {
+		// TODO check if warning is because of bad coding and need to be fixed "WARNING: Cannot kill container Main-Container: Unreachable. "
+		Codec codec = new SLCodec();
+		Ontology jmo = JADEManagementOntology.getInstance();
+		getContentManager().registerLanguage(codec);
+		getContentManager().registerOntology(jmo);
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		msg.addReceiver(getAMS());
+		msg.setLanguage(codec.getName());
+		msg.setOntology(jmo.getName());
+		try {
+			getContentManager().fillContent(msg, new Action(getAID(), new ShutdownPlatform()));
+			send(msg);
+		} catch (Exception e) {
+		}
+	};
 
 	@Override
 	public void delay(long delay) {
@@ -91,11 +129,10 @@ public class SimulationAgent extends Agent implements ISimControl {
 	}
 
 	@Override
-	public IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time) throws Exception {
+	public IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) throws Exception {
 		try {
 			System.out.println("Simulation: create product");
 			// Create and start the agent
-			Tick deadline = time.add(1000);
 			ProductAgentSim productAgent = new ProductAgentSim(simulation, productSteps, position, time, deadline);
 
 			ContainerController cc = getContainerController();

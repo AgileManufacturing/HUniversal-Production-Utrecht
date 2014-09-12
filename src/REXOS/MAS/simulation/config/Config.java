@@ -33,7 +33,7 @@ public class Config implements IConfig {
 
 	// run length of the simulation
 	@XmlElement(name = "runlength")
-	private Tick runlength;
+	private double runlength;
 
 	// number of times the simulation needs to run
 	@XmlElement(name = "runs")
@@ -63,7 +63,7 @@ public class Config implements IConfig {
 	}
 
 	public Tick getRunLength() {
-		return runlength;
+		return new Tick(runlength);
 	}
 
 	public int getRuns() {
@@ -76,6 +76,11 @@ public class Config implements IConfig {
 
 	public Pair<Tick, DurationType> getProductArrival() {
 		return new Pair<Tick, DurationType>(new Tick(products.getArrival()), products.getArrivalType());
+	}
+
+	@Override
+	public Pair<Tick, DurationType> getProductDeadline() {
+		return new Pair<Tick, DurationType>(new Tick(products.getDeadline()), products.getDeadlineType());
 	}
 
 	public List<ProductStep> getProductSteps() {

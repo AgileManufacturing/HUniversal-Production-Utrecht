@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import org.json.JSONException;
 
 import simulation.util.Ontology;
-import simulation.util.Pair;
 import simulation.util.Parser;
 import simulation.util.Position;
 import simulation.util.Tick;
@@ -59,7 +58,7 @@ public class ProductAgent extends Agent {
 		this.deadline = deadline;
 		this.state = ProductState.SCHEDULING;
 
-		System.out.printf("PA:%s initialize [created=%s, pos=%s, product steps=%s, deadline=%s]\n", getLocalName(), getCreated(), position, productSteps, deadline);
+		System.out.printf("PA:%s initialize [created=%s, pos=%s, deadline=%s, product steps=%s]\n", getLocalName(), getCreated(), position, deadline, productSteps);
 	}
 
 	protected Tick getCreated() {

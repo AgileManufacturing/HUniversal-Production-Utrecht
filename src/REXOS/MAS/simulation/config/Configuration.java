@@ -166,6 +166,10 @@ public class Configuration implements IConfig {
 		return legacy.getProductArrival();
 	}
 
+	public Pair<Tick, DurationType> getProductDeadline() {
+		return legacy.getProductDeadline();
+	}
+
 	public List<ProductStep> getProductSteps() {
 		return productSteps;
 	}

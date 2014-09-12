@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -96,23 +97,23 @@ public class Chart {
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setDomainGridlinePaint(Color.WHITE);
 		plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
-/*
-		final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-		renderer.setBaseLegendShape(new Rectangle(15, 15));
-		renderer.setSeriesStroke(
-	            0, new BasicStroke(
-	                2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-	                1.0f, new float[] {10.0f, 6.0f}, 0.0f
-	            )
-	        );
-		* /
-		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(){
-			private static final long serialVersionUID = 1L;
-			public Shape lookupLegendShape(int series) {
-				return new Rectangle(15, 15);
-			}
-		};
-		*/
+		/*
+		 * final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		 * renderer.setBaseLegendShape(new Rectangle(15, 15));
+		 * renderer.setSeriesStroke(
+		 * 0, new BasicStroke(
+		 * 2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+		 * 1.0f, new float[] {10.0f, 6.0f}, 0.0f
+		 * )
+		 * );
+		 * /
+		 * XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(){
+		 * private static final long serialVersionUID = 1L;
+		 * public Shape lookupLegendShape(int series) {
+		 * return new Rectangle(15, 15);
+		 * }
+		 * };
+		 */
 
 		LegendItemCollection legendItems = plot.getLegendItems();
 		for (int i = 0; i < legendItems.getItemCount(); i++) {
@@ -120,19 +121,19 @@ public class Chart {
 			item.setShape(new Rectangle(15, 15));
 		}
 		plot.setFixedLegendItems(legendItems);
-		
+
 		// renderer.setBaseLegendShape(new Rectangle(15, 15));
 		// plot.setRenderer(renderer);
 
 		return chart;
 	}
 
-	public static void save(String path, String title, String yLabel, Map<String, Map<Tick, Double>> data) {
+	public static void save(String path, String title, String yLabel, Map<String, TreeMap<Tick, Double>> data) {
 		try {
-			File file = new File(path);
+			File file = new File(path + title.replace(" ", "_"));
 
 			final XYSeriesCollection dataset = new XYSeriesCollection();
-			for (Entry<String, Map<Tick, Double>> entry : data.entrySet()) {
+			for (Entry<String, TreeMap<Tick, Double>> entry : data.entrySet()) {
 				final XYSeries series = new XYSeries(entry.getKey());
 				for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
 					series.add(point.getKey().doubleValue(), point.getValue());
@@ -140,7 +141,7 @@ public class Chart {
 				dataset.addSeries(series);
 			}
 
-			JFreeChart chart = createChart(title, yLabel, dataset);
+			final JFreeChart chart = createChart(title, yLabel, dataset);
 			ChartUtilities.saveChartAsPNG(file, chart, 1024, 720);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -185,9 +186,8 @@ public class Chart {
 		return chartPanel;
 	}
 
-	
 	/**
-	 *  Marker for current time
+	 * Marker for current time
 	 * Long timestampToMark = new Date().getTime();
 	 * Marker m = new ValueMarker(timestampToMark);
 	 * m.setStroke(new BasicStroke(2));

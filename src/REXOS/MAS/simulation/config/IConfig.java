@@ -18,6 +18,8 @@ public interface IConfig {
 	public Pair<Tick, DurationType> getTravelTime();
 
 	public Pair<Tick, DurationType> getProductArrival();
+	
+	public Pair<Tick, DurationType> getProductDeadline();
 
 	public List<ProductStep> getProductSteps();
 
@@ -30,5 +32,6 @@ public interface IConfig {
 	public Pair<Tick, DurationType> equipletBreakdownTime(String equiplet);
 
 	public Pair<Tick, DurationType> equipletRepaireTime(String equiplet);
+
 
 }

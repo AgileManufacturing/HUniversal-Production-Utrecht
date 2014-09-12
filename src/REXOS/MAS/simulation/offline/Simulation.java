@@ -12,13 +12,13 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simulation.config.IConfig;
-import simulation.config.DurationType;
 import simulation.config.Config;
-import simulation.graphics.StackedBarChart;
+import simulation.config.DurationType;
+import simulation.config.IConfig;
 import simulation.graphics.StaticSimInterface;
 import simulation.mas.equiplet.Capability;
 import simulation.util.Pair;
+import simulation.util.Position;
 import simulation.util.Tick;
 import simulation.util.Triple;
 
