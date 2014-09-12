@@ -1,6 +1,11 @@
 package HAL;
 
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 /**
  * This class provides a method of identifying modules
  * @author Tommas Bakker
@@ -54,11 +59,15 @@ public class ModuleIdentifier {
 		return this.serialNumber;
 	}
 	
-	public JsonObject toJSON(){
-		JsonObject moduleIdentifier = new JsonObject();
-		moduleIdentifier.addProperty("manufacturer", manufacturer);
-		moduleIdentifier.addProperty("typeNumber", typeNumber);
-		moduleIdentifier.addProperty("serialNumber", serialNumber);
+	public JSONObject toJSON(){
+		JSONObject moduleIdentifier = new JSONObject();
+		try {
+			moduleIdentifier.putOpt("manufacturer", manufacturer);
+			moduleIdentifier.putOpt("typeNumber", typeNumber);
+			moduleIdentifier.putOpt("serialNumber", serialNumber);
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+		}
 		return moduleIdentifier;
 	}
 	

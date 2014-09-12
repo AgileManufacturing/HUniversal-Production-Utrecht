@@ -38,11 +38,11 @@ package MAS;
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-import util.configuration.ServerConfigurations;
 import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
+import util.configuration.ServerConfigurations;
 import MAS.equiplet.equiplet_agent.EquipletAgent;
 
 public class EQSpawnClass extends Agent {

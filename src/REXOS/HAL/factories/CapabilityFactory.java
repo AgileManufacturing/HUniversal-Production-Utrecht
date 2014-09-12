@@ -23,10 +23,9 @@ import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The CapabilityFactory is the factory for the {@link Capability}. 
@@ -305,28 +304,28 @@ public class CapabilityFactory extends Factory{
 	}
 
 	/**
-	 * This method will insert a array of capabilityTypes into the knowledge database, using the data provided in the JsonArray.
+	 * This method will insert a array of capabilityTypes into the knowledge database, using the data provided in the JSONArray.
 	 * @param capabilityTypes
 	 * @return true if successful, false otherwise
 	 */
-	public boolean insertCapabilityTypes(JsonArray capabilityTypes) {
+	public boolean insertCapabilityTypes(JSONArray capabilityTypes) {
 		try{
 			try{
-				for (JsonElement capabilityTypeElement : capabilityTypes) {
-					JsonObject capabilityTypeEntry = capabilityTypeElement.getAsJsonObject();
-					String name = capabilityTypeEntry.get("name").getAsString();
+				for (int i = 0; i < capabilityTypes.length(); i++) {
+					JSONObject capabilityTypeEntry = capabilityTypes.getJSONObject(i);
+					String name = capabilityTypeEntry.getString("name");
 					
-					JsonObject capabilitySoftware = capabilityTypeEntry.get("halSoftware").getAsJsonObject();
+					JSONObject capabilitySoftware = capabilityTypeEntry.getJSONObject("halSoftware");
 					JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(capabilitySoftware, knowledgeDBClient);
 					int halSoftwareId = halSoftware.getId();
 					
 					knowledgeDBClient.executeUpdateQuery(addCapabilityType, name, halSoftwareId);
 					//TODO update behavior for the required mutations
-					JsonArray requiredMutationsTrees = capabilityTypeEntry.get("requiredMutationsTrees").getAsJsonArray();
+					JSONArray requiredMutationsTrees = capabilityTypeEntry.getJSONArray("requiredMutationsTrees");
 					deserializeRequiredMutations(name, requiredMutationsTrees);
 					
-					for (JsonElement serviceTypeElement : capabilityTypeEntry.get("services").getAsJsonArray()) {
-						String serviceName = serviceTypeElement.getAsString();
+					for (int j = 0; j < capabilityTypeEntry.length(); j++) {
+						String serviceName = capabilityTypeEntry.getJSONArray("services").getString(j);
 						knowledgeDBClient.executeUpdateQuery(addServiceType, serviceName);
 						knowledgeDBClient.executeUpdateQuery(addServiceType_CapabilityType, serviceName,name);
 					}
@@ -349,7 +348,7 @@ public class CapabilityFactory extends Factory{
 	 * @param moduleIdentifier
 	 * @return The serialized associated capabilities.
 	 */
-	public JsonArray removeCapabilities(ModuleIdentifier moduleIdentifier) {
+	public JSONArray removeCapabilities(ModuleIdentifier moduleIdentifier) {
 		ArrayList<String> capabilityNames = new ArrayList<String>();
 		try{
 			try{
@@ -359,25 +358,25 @@ public class CapabilityFactory extends Factory{
 					capabilityNames.add((String) row.get("capabilityType"));
 				}
 				
-				JsonArray capabilities = new JsonArray();
+				JSONArray capabilities = new JSONArray();
 				for (String capabilityName : capabilityNames) {
-					JsonObject capability = new JsonObject();
-					capability.addProperty("name", capabilityName);
+					JSONObject capability = new JSONObject();
+					capability.put("name", capabilityName);
 					
 					JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForCapabilityName(capabilityName);
-					capability.add("halSoftware", javaSoftware.serialize());
+					capability.put("halSoftware", javaSoftware.serialize());
 					
-					capability.add("requiredMutationsTrees", serializeRequiredMutations(capabilityName));
+					capability.put("requiredMutationsTrees", serializeRequiredMutations(capabilityName));
 					
 					//TODO actually remove the capability
-					JsonArray services = new JsonArray();
+					JSONArray services = new JSONArray();
 					Row[] serviceRows = knowledgeDBClient.executeSelectQuery(getServiceTypesForCapabilityType, capabilityName);
 					for (Row serviceRow : serviceRows) {
-						services.add(new JsonPrimitive((String) serviceRow.get("serviceType")));
+						services.put(serviceRow.get("serviceType"));
 					}
-					capability.add("services", services);
+					capability.put("services", services);
 					
-					capabilities.add(capability);
+					capabilities.put(capability);
 				}
 				return capabilities;
 			} catch(Exception ex) {
@@ -395,9 +394,10 @@ public class CapabilityFactory extends Factory{
 	 * This method will serialize all the required mutations of a capabilityType from the knowledge database, but does NOT remove them.
 	 * @param capabilityTypeName
 	 * @return
+	 * @throws JSONException 
 	 */
-	private JsonArray serializeRequiredMutations(String capabilityTypeName) {
-		HashMap<Integer, JsonObject> requiredTreesMap = new HashMap<Integer, JsonObject>();
+	private JSONArray serializeRequiredMutations(String capabilityTypeName) throws JSONException {
+		HashMap<Integer, JSONObject> requiredTreesMap = new HashMap<Integer, JSONObject>();
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getRequiredMutationsForCapabilityType, 
 				capabilityTypeName);
 		for (Row row : rows) {
@@ -405,17 +405,17 @@ public class CapabilityFactory extends Factory{
 			String mutation = (String) row.get("mutation");
 			
 			if(requiredTreesMap.containsKey(treeNumber) == false) {
-				JsonObject tree = new JsonObject();
-				tree.addProperty("treeNumber", treeNumber);
-				tree.add("mutations", new JsonArray());
+				JSONObject tree = new JSONObject();
+				tree.put("treeNumber", treeNumber);
+				tree.put("mutations", new JSONArray());
 				requiredTreesMap.put(treeNumber, tree);
 			}
 			
-			requiredTreesMap.get(treeNumber).get("mutations").getAsJsonArray().add(new JsonPrimitive(mutation));
+			requiredTreesMap.get(treeNumber).getJSONArray("mutations").put(mutation);
 		}
-		JsonArray requiredMutationTrees = new JsonArray();
-		for (JsonObject entry : requiredTreesMap.values()) {
-			requiredMutationTrees.add(entry);
+		JSONArray requiredMutationTrees = new JSONArray();
+		for (JSONObject entry : requiredTreesMap.values()) {
+			requiredMutationTrees.put(entry);
 		}
 		return requiredMutationTrees;
 	}
@@ -423,14 +423,15 @@ public class CapabilityFactory extends Factory{
 	 * This method deserializes the required mutations and stores them in the knowledge database.
 	 * @param capabilityTypeName
 	 * @param requiredMutationTrees
+	 * @throws JSONException 
 	 */
-	private void deserializeRequiredMutations(String capabilityTypeName, JsonArray requiredMutationTrees) {
-		for (JsonElement requiredMutationTreeElement : requiredMutationTrees) {
-			JsonObject requiredMutationTree = requiredMutationTreeElement.getAsJsonObject();
-			Integer requiredMutationTreeNumber = requiredMutationTree.get("treeNumber").getAsInt();
-			JsonArray requiredMutations = requiredMutationTree.get("mutations").getAsJsonArray();
-			for (JsonElement requiredMutationElement : requiredMutations) {
-				String requiredMutation = requiredMutationElement.getAsString();
+	private void deserializeRequiredMutations(String capabilityTypeName, JSONArray requiredMutationTrees) throws JSONException {
+		for (int i = 0; i < requiredMutationTrees.length(); i++) {
+			JSONObject requiredMutationTree = requiredMutationTrees.getJSONObject(i);
+			Integer requiredMutationTreeNumber = requiredMutationTree.getInt("treeNumber");
+			JSONArray requiredMutations = requiredMutationTree.getJSONArray("mutations");
+			for (int j = 0; j < requiredMutations.length(); j++) {
+				String requiredMutation = requiredMutations.getString(j);
 				knowledgeDBClient.executeUpdateQuery(addRequiredMutationForCapabilityType, 
 						requiredMutationTreeNumber, capabilityTypeName, requiredMutation);
 			}

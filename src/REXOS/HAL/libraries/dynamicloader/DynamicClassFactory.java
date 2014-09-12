@@ -75,6 +75,7 @@ public class DynamicClassFactory<T> {
 	 * @throws InstantiateClassException The object of the specified class could not be instantiated.
 	 *
 	 **/
+	@SuppressWarnings("unchecked")
 	private Class<T> getClassWithLoader(DynamicClassLoader loader, String className) throws InstantiateClassException {
 		try {
 			return (Class<T>) loader.loadClass(className);

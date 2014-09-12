@@ -3,6 +3,12 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import util.configuration.Configuration;
+import util.configuration.ConfigurationFiles;
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
+import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.blackboard_client.BlackboardClient;
 import HAL.libraries.blackboard_client.data_classes.BlackboardSubscriber;
 import HAL.libraries.blackboard_client.data_classes.FieldUpdateSubscription;
@@ -12,18 +18,11 @@ import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.blackboard_client.data_classes.MongoOperation;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
-import util.log.LogLevel;
-import util.log.LogSection;
-import util.log.Logger;
-import HAL.exceptions.BlackboardUpdateException;
 import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.BlackboardModuleListener;
 
-import com.google.gson.JsonObject;
+import org.json.JSONObject;
 import com.mongodb.DBObject;
-
-import util.configuration.Configuration;
-import util.configuration.ConfigurationFiles;
 
 
 /**
@@ -163,7 +162,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		}
 	}
 	
-	public void postHardwareStep(JsonObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+	public void postHardwareStep(JSONObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		equipletStepBBClient.insertDocument(hardwareStep.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
 

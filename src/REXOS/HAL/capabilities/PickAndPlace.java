@@ -51,8 +51,9 @@ import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Pick and place capability class that translate
@@ -76,64 +77,63 @@ public class PickAndPlace extends Capability {
 	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
-		JsonObject target = productStep.getCriteria().get(ProductStep.TARGET).getAsJsonObject();
-		JsonArray subjects = productStep.getCriteria().get(ProductStep.SUBJECTS).getAsJsonArray();
-		
-		if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) == false) {
-			String message = "Recieved a service (" + productStep.getService() + "which is not supported by this capability.";
-			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
-			throw new IllegalArgumentException(message);	
-		}
-		if(target == null) {
-			String message = "Recieved a illegaly formatted product step: " + productStep;
-			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
-			throw new IllegalArgumentException(message);
-		}
-		if(subjects.size() == 0) {
-			String message = "Recieved a product step which has no subjects: " + productStep;
-			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
-			throw new IllegalArgumentException(message);
-		}
-		
-		
-		// pick
-		// We assume that the first subject is the subject to pick
-		JsonObject subject = subjects.getAsJsonArray().get(0).getAsJsonObject();
-		JsonObject subjectMoveCommand = subject.get("move").getAsJsonObject();
-		
-		JsonObject pickCommand = new JsonObject();
-		pickCommand.add("pick", null);
-		pickCommand.add("move", subjectMoveCommand);
-		
-		JsonObject pickOriginPlacementParameters = new JsonObject();
-		pickOriginPlacementParameters.addProperty("identifier", subject.get(CompositeStep.IDENTIFIER).getAsString());
-		OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, pickOriginPlacementParameters);
-		
-		CompositeStep pick = new CompositeStep(productStep, pickCommand, pickOriginPlacement);
-		Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
-		
-		// place
-		JsonObject targetMoveCommand = target.get("move").getAsJsonObject();
-		
-		JsonObject placeCommand = new JsonObject();
-		placeCommand.add("place", null);
-		placeCommand.add("move", targetMoveCommand);
-		
-		JsonObject placeOriginPlacementParameters = new JsonObject();
-		placeOriginPlacementParameters.addProperty("identifier", target.get(CompositeStep.IDENTIFIER).getAsString());
-		OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, placeOriginPlacementParameters);
-		
-		CompositeStep place = new CompositeStep(productStep, placeCommand, placeOriginPlacement);
-		Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + place);
-		
-		// Translate to hardwareSteps
-		ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
-		ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
-		compositeSteps.add(pick);
-		compositeSteps.add(place);
+		try {
+			JSONObject target = productStep.getCriteria().getJSONObject(ProductStep.TARGET);
+			JSONArray subjects = productStep.getCriteria().getJSONArray(ProductStep.SUBJECTS);
 			
-		ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
-		Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
-		return hardwareSteps;
+			if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) == false) {
+				String message = "Recieved a service (" + productStep.getService() + "which is not supported by this capability.";
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
+				throw new IllegalArgumentException(message);	
+			}
+			if(subjects.length() == 0) {
+				String message = "Recieved a product step which has no subjects: " + productStep;
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
+				throw new IllegalArgumentException(message);
+			}
+			
+			
+			// pick
+			// We assume that the first subject is the subject to pick
+			JSONObject subject = subjects.getJSONObject(0);
+			JSONObject subjectMoveCommand = subject.getJSONObject("move");
+			
+			JSONObject pickCommand = new JSONObject();
+			pickCommand.put("pick", JSONObject.NULL);
+			pickCommand.put("move", subjectMoveCommand);
+			
+			JSONObject pickOriginPlacementParameters = new JSONObject();
+			pickOriginPlacementParameters.put("identifier", subject.getString(CompositeStep.IDENTIFIER));
+			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, pickOriginPlacementParameters);
+			
+			CompositeStep pick = new CompositeStep(productStep, pickCommand, pickOriginPlacement);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
+			
+			// place
+			JSONObject targetMoveCommand = target.getJSONObject("move");
+			
+			JSONObject placeCommand = new JSONObject();
+			placeCommand.put("place", JSONObject.NULL);
+			placeCommand.put("move", targetMoveCommand);
+			
+			JSONObject placeOriginPlacementParameters = new JSONObject();
+			placeOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
+			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, placeOriginPlacementParameters);
+			
+			CompositeStep place = new CompositeStep(productStep, placeCommand, placeOriginPlacement);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + place);
+			
+			// Translate to hardwareSteps
+			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
+			ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
+			compositeSteps.add(pick);
+			compositeSteps.add(place);
+				
+			ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
+			return hardwareSteps;
+		} catch(JSONException ex) {
+			throw new CapabilityException("Unable to translate due to illegally formatted JSON", ex);
+		}
 	}
 }

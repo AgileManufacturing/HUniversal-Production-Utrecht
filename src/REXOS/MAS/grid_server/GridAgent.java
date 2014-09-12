@@ -38,6 +38,7 @@
  **/
 package MAS.grid_server;
 
+import MAS.product.product_agent.ProductAgent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -46,6 +47,8 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
 public class GridAgent extends Agent{
+	private static final long serialVersionUID = -720095833750151495L;
+	
 	private long productAgentCounter =0;
 	protected void setup(){	
 		addBehaviour(new CyclicBehaviour()

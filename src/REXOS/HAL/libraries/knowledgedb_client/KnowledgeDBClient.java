@@ -34,11 +34,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.JDBC4PreparedStatement;
-
 import util.configuration.Configuration;
 import util.configuration.ConfigurationFiles;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.JDBC4PreparedStatement;
 
 /**
  * A client to communicate with knowledge database.

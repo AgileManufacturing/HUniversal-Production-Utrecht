@@ -12,10 +12,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import MAS.simulation.config.IConfig;
-import MAS.simulation.config.DurationType;
 import MAS.simulation.config.Config;
-import MAS.simulation.graphics.StackedBarChart;
+import MAS.simulation.config.DurationType;
+import MAS.simulation.config.IConfig;
 import MAS.simulation.graphics.StaticSimInterface;
 import MAS.simulation.mas.equiplet.Capability;
 import MAS.simulation.util.Pair;

@@ -3,27 +3,28 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import com.google.gson.JsonObject;
-
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
+import util.math.Matrix;
+import util.math.RotationAngles;
+import util.math.Vector3;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
+import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
+import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
+import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
-import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
-import HAL.libraries.knowledgedb_client.KnowledgeException;
-import util.math.Matrix;
-import util.math.RotationAngles;
-import util.math.Vector3;
-import util.log.LogLevel;
-import util.log.LogSection;
-import util.log.Logger;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
@@ -72,7 +73,7 @@ public abstract class ModuleActor extends Module {
 	 * @param command
 	 * @throws ModuleExecutingException
 	 */
-	protected void executeMongoCommand(JsonObject command){
+	protected void executeMongoCommand(JSONObject command){
 		try {
 			moduleFactory.getHAL().getBlackBoardHandler().postHardwareStep(command);
 		} catch (InvalidJSONException ex) {
@@ -91,8 +92,9 @@ public abstract class ModuleActor extends Module {
 	 * @return The hardware steps resulted from the translation of the CompositeStep done by the parent modules.
 	 * @throws ModuleTranslatingException if the CompositeStep could not completely be translated (which is the case if there is no parent module and the CompositeStep is not empty)  
 	 * @throws FactoryException
+	 * @throws JSONException 
 	 */
-	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException {
+	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
 		ModuleActor moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null) {
 			// forward to parent
@@ -122,7 +124,7 @@ public abstract class ModuleActor extends Module {
 	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
 		this.processListener = processListener;
-		JsonObject command = hardwareStep.toJSON();
+		JSONObject command = hardwareStep.toJSON();
 		executeMongoCommand(command);
 	}
 	/**
@@ -131,8 +133,9 @@ public abstract class ModuleActor extends Module {
 	 * @return The hardware steps resulted from the translation of the CompositeStep. 
 	 * @throws ModuleTranslatingException
 	 * @throws FactoryException
+	 * @throws JSONException 
 	 */
-	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException;
+	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException;
 	/**
 	 * This method will forward the changed MAST module state to the {@link ModuleListener}
 	 * Do not call this method!
@@ -163,35 +166,32 @@ public abstract class ModuleActor extends Module {
 		return -1;
 	}
 	
-	protected CompositeStep adjustMoveWithDimensions(CompositeStep compositeStep, Vector3 offsetVector){
-		JsonObject command = compositeStep.getCommand();
+	protected CompositeStep adjustMoveWithDimensions(CompositeStep compositeStep, Vector3 offsetVector) throws JSONException{
+		JSONObject command = compositeStep.getCommand();
 		command = adjustMoveWithDimensions(command, offsetVector);
 		return new CompositeStep(compositeStep.getProductStep(), command, compositeStep.getOriginPlacement());
 	}
-	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector){
+	protected JSONObject adjustMoveWithDimensions(JSONObject compositeCommand, Vector3 offsetVector) throws JSONException{
 		return adjustMoveWithDimensions(compositeCommand, offsetVector, new RotationAngles(0, 0, 0));
 	}
-	protected JsonObject adjustMoveWithDimensions(JsonObject compositeCommand, Vector3 offsetVector, RotationAngles directionAngles){
+	protected JSONObject adjustMoveWithDimensions(JSONObject compositeCommand, Vector3 offsetVector, RotationAngles directionAngles) throws JSONException{
 		Logger.log(LogSection.HAL_MODULES, LogLevel.DEBUG, "Adjusting move with dimentions: " + compositeCommand.toString() + 
 				", offsetVector: " + offsetVector + " directionAngles: " + directionAngles);
 		
-		JsonObject originalMove = compositeCommand.remove(MOVE).getAsJsonObject();
-		if (originalMove != null){
-			double originalX = originalMove.get(MOVE_X).getAsDouble();
-			double originalY = originalMove.get(MOVE_Y).getAsDouble();
-			double originalZ = originalMove.get(MOVE_Z).getAsDouble();
+		JSONObject move = compositeCommand.getJSONObject(MOVE);
+		if (move != null){
+			double originalX = (double) move.remove(MOVE_X);
+			double originalY = (double) move.remove(MOVE_Y);
+			double originalZ = (double) move.remove(MOVE_Z);
 			
 			Matrix rotationMatrix = directionAngles.generateRotationMatrix();
 			
 			Vector3 originalVector = offsetVector;
 			Vector3 rotatedVector = originalVector.rotate(rotationMatrix);
 			
-			JsonObject adjustedMove = new JsonObject();
-			adjustedMove.addProperty(MOVE_X, originalX + rotatedVector.x);
-			adjustedMove.addProperty(MOVE_Y, originalY + rotatedVector.y);
-			adjustedMove.addProperty(MOVE_Z, originalZ + rotatedVector.z);
-			
-			compositeCommand.add(MOVE, adjustedMove);
+			move.put(MOVE_X, originalX + rotatedVector.x);
+			move.put(MOVE_Y, originalY + rotatedVector.y);
+			move.put(MOVE_Z, originalZ + rotatedVector.z);
 		}
 		else {
 			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, 

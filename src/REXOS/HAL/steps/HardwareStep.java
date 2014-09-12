@@ -3,9 +3,12 @@ package HAL.steps;
 import HAL.Module;
 import HAL.ModuleIdentifier;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 
 /**
  * A HardwareStep is a step that is completely translated and can be processed by the ROS node corresponding to this HardwareStep.
@@ -37,18 +40,18 @@ public class HardwareStep {
 	private CompositeStep compositeStep;
 	private HardwareStepStatus hardwareStepStatus;
 
-	private JsonObject instructionData;
+	private JSONObject instructionData;
 	private OriginPlacement originPlacement;
 
 	
-	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JsonObject instructionData) {
+	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JSONObject instructionData) {
 		javaIsGayConstructor(moduleIdentifier, compositeStep, hardwareStepStatus, instructionData, null);
 	}
-	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JsonObject instructionData, OriginPlacement originPlacement) {
+	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JSONObject instructionData, OriginPlacement originPlacement) {
 		javaIsGayConstructor(moduleIdentifier, compositeStep, hardwareStepStatus, instructionData, originPlacement);
 	}
 	
-	private void javaIsGayConstructor(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JsonObject instructionData, OriginPlacement originPlacement) {
+	private void javaIsGayConstructor(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JSONObject instructionData, OriginPlacement originPlacement) {
 		this.moduleIdentifier = moduleIdentifier;
 		this.compositeStep = compositeStep;
 		this.instructionData = instructionData;
@@ -56,7 +59,7 @@ public class HardwareStep {
 		this.originPlacement = originPlacement;
 	}
 	
-	/*public HardwareStep(CompositeStep compositeStep, JsonObject rosCommand, ModuleIdentifier moduleIdentifier) {
+	/*public HardwareStep(CompositeStep compositeStep, JSONObject rosCommand, ModuleIdentifier moduleIdentifier) {
 		this.moduleIdentifier = moduleIdentifier;
 		//this.rosCommand = rosCommand;
 		this.compositeStep = compositeStep;
@@ -73,7 +76,7 @@ public class HardwareStep {
 	public HardwareStepStatus getHardwareStepStatus() {
 		return this.hardwareStepStatus;
 	}
-	public JsonObject getInstructionData() {
+	public JSONObject getInstructionData() {
 		return this.instructionData;
 	}
 	public OriginPlacement getOriginPlacement() {
@@ -81,12 +84,16 @@ public class HardwareStep {
 	}
 	
 	
-	public JsonObject toJSON() {
-		JsonObject returnValue = new JsonObject();
-		returnValue.add(MODULE_IDENTIFIER, moduleIdentifier.toJSON());
-		returnValue.addProperty(STATUS, hardwareStepStatus.toString());
-		returnValue.add(INSTRUCTION_DATA, instructionData);
-		returnValue.add(ORIGIN_PLACEMENT, originPlacement.toJSON());
+	public JSONObject toJSON() {
+		JSONObject returnValue = new JSONObject();
+		try {
+			returnValue.put(MODULE_IDENTIFIER, moduleIdentifier.toJSON());
+			returnValue.put(STATUS, hardwareStepStatus.toString());
+			returnValue.put(INSTRUCTION_DATA, instructionData);
+			returnValue.put(ORIGIN_PLACEMENT, originPlacement.toJSON());
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+		}
 		return returnValue;
 	}
 }

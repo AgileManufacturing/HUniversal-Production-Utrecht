@@ -1,10 +1,10 @@
 package HAL.factories;
 
-import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
-import HAL.libraries.knowledgedb_client.Row;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
+import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
+import HAL.libraries.knowledgedb_client.Row;
 /**
  * Generic abstract class for factories. 
  * @author Tommas Bakker

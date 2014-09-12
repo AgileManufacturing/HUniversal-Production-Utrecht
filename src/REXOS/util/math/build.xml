@@ -1,8 +1,7 @@
-<project name="math" default="build" basedir=".">
-
+<project name="math" default="build">
 	<import file="../build.xml"/>
 
-	<target name="build"> 
+	<target name="all"> 
 		<buildjava dir="${basedir}"/>  
 	</target>
 

@@ -32,17 +32,14 @@ package HAL.libraries.blackboard_client.data_classes;
 
 import java.util.Hashtable;
 
-import util.log.LogLevel;
-import util.log.Logger;
+import util.configuration.Configuration;
+import util.configuration.ConfigurationFiles;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
-
-import util.configuration.Configuration;
-import util.configuration.ConfigurationFiles;
 
 /**
  * Helper class for managing Mongo connections.

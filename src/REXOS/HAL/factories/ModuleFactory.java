@@ -6,17 +6,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import HAL.libraries.dynamicloader.DynamicClassDescription;
-import HAL.libraries.dynamicloader.DynamicClassFactory;
-import HAL.libraries.dynamicloader.InstantiateClassException;
-import HAL.libraries.dynamicloader.JarFileLoaderException;
-import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
-import HAL.libraries.knowledgedb_client.KnowledgeException;
-import HAL.libraries.knowledgedb_client.Row;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -30,9 +19,20 @@ import HAL.Mutation;
 import HAL.RosSoftware;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
+import HAL.libraries.dynamicloader.DynamicClassDescription;
+import HAL.libraries.dynamicloader.DynamicClassFactory;
+import HAL.libraries.dynamicloader.InstantiateClassException;
+import HAL.libraries.dynamicloader.JarFileLoaderException;
+import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The ModuleFactory is the factory for the {@link Module}s. 
@@ -417,38 +417,38 @@ public class ModuleFactory extends Factory {
 	}
 	
 	/**
-	 * This methods attempts to insert a module in the database using the data provided in the JsonObjects.
+	 * This methods attempts to insert a module in the database using the data provided in the JSONObjects.
 	 * @param staticSettings contains all the static information of the module (software, properties, calibrationData, etc).
 	 * @param dynamicSettings contains all the dynamic information of the module (mount position, attached to other modules, orientation, etc).
 	 * @return true if insertion of the module is successful, false otherwise. 
 	 */
-	public boolean insertModule(JsonObject staticSettings, JsonObject dynamicSettings) {
+	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) {
 		try{
 			try{
 				knowledgeDBClient.getConnection().setAutoCommit(false);
-				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(staticSettings.get("manufacturer").getAsString(), 
-						staticSettings.get("typeNumber").getAsString(), staticSettings.get("serialNumber").getAsString());
+				ModuleIdentifier moduleIdentifier = new ModuleIdentifier(staticSettings.getString("manufacturer"), 
+						staticSettings.getString("typeNumber"), staticSettings.getString("serialNumber"));
 				
 				if(isModuleTypeKnown(moduleIdentifier)) {
-					updateModuleType(moduleIdentifier, staticSettings.get("type").getAsJsonObject());
+					updateModuleType(moduleIdentifier, staticSettings.getJSONObject("type"));
 				} else {
-					insertModuleType(moduleIdentifier, staticSettings.get("type").getAsJsonObject());
+					insertModuleType(moduleIdentifier, staticSettings.getJSONObject("type"));
 				}
 				
-				String properties = staticSettings.get("properties").getAsString();
+				String properties = staticSettings.getString("properties");
 				
-				if(dynamicSettings.get("attachedTo").isJsonNull()) {
+				if(dynamicSettings.isNull("attachedTo")) {
 					// we are not attached to another module
-					Integer mountPointX = dynamicSettings.get("mountPointX").getAsInt();
-					Integer mountPointY = dynamicSettings.get("mountPointY").getAsInt();
+					Integer mountPointX = dynamicSettings.getInt("mountPointX");
+					Integer mountPointY = dynamicSettings.getInt("mountPointY");
 					knowledgeDBClient.executeUpdateQuery(addTopModule, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), 
 							moduleIdentifier.getSerialNumber(), properties, hal.getEquipletName(), mountPointX, mountPointY);
 				}
-				else if(dynamicSettings.get("mountPointX").isJsonNull() || dynamicSettings.get("mountPointY").isJsonNull()) {
+				else if(dynamicSettings.isNull("mountPointX") || dynamicSettings.isNull("mountPointY")) {
 					// this module is attached to another module
-					JsonObject parentModuleJson = dynamicSettings.get("attachedTo").getAsJsonObject();
-					ModuleIdentifier parentModuleIdentifier = new ModuleIdentifier(parentModuleJson.get("manufacturer").getAsString(), 
-							parentModuleJson.get("typeNumber").getAsString(), parentModuleJson.get("serialNumber").getAsString());
+					JSONObject parentModuleJson = dynamicSettings.getJSONObject("attachedTo");
+					ModuleIdentifier parentModuleIdentifier = new ModuleIdentifier(parentModuleJson.getString("manufacturer"), 
+							parentModuleJson.getString("typeNumber"), parentModuleJson.getString("serialNumber"));
 					
 					insertSpace(parentModuleIdentifier);
 					knowledgeDBClient.executeUpdateQuery(addModuleAttachedToModule, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), 
@@ -461,7 +461,7 @@ public class ModuleFactory extends Factory {
 				}
 				
 				// calibration
-				JsonArray calibrationEntries = staticSettings.get("calibrationData").getAsJsonArray();
+				JSONArray calibrationEntries = staticSettings.getJSONArray("calibrationData");
 				deserializeModuleCalibrationData(calibrationEntries);
 				
 			} catch(Exception ex) {
@@ -478,12 +478,12 @@ public class ModuleFactory extends Factory {
 		}
 	}
 	/**
-	 * This methods attempts to update a module in the database using the data provided in the JsonObjects.
+	 * This methods attempts to update a module in the database using the data provided in the JSONObjects.
 	 * @param staticSettings contains all the static information of the module (software, properties, calibrationData, etc).
 	 * @return true if insertion of the module is successful, false otherwise. 
 	 */
-	public boolean updateModule(JsonObject staticSettings,
-			JsonObject dynamicSettings) {
+	public boolean updateModule(JSONObject staticSettings,
+			JSONObject dynamicSettings) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -491,49 +491,49 @@ public class ModuleFactory extends Factory {
 	 * This method removes a module from the knowledge database.
 	 * @param moduleIdentifier
 	 * @return the static information of the module.
-	 * @throws FactoryException
+	 * @throws JSONException 
 	 */
-	public JsonObject removeModule(ModuleIdentifier moduleIdentifier) throws FactoryException {
-		JsonObject output = new JsonObject();
-		output.addProperty("manufacturer", moduleIdentifier.getManufacturer());
-		output.addProperty("typeNumber", moduleIdentifier.getTypeNumber());
-		output.addProperty("serialNumber", moduleIdentifier.getSerialNumber());
+	public JSONObject removeModule(ModuleIdentifier moduleIdentifier) throws JSONException {
+		JSONObject output = new JSONObject();
+		output.put("manufacturer", moduleIdentifier.getManufacturer());
+		output.put("typeNumber", moduleIdentifier.getTypeNumber());
+		output.put("serialNumber", moduleIdentifier.getSerialNumber());
 		
-		JsonObject type = new JsonObject();
+		JSONObject type = new JSONObject();
 		Module module = this.getModuleByIdentifier(moduleIdentifier);
 		String moduleProperties = module.getProperties();
-		type.addProperty("properties", moduleProperties);
+		type.put("properties", moduleProperties);
 		
 		// fetch halSoftware
 		JavaSoftware halSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier);
-		type.add("halSoftware", halSoftware.serialize());
+		type.put("halSoftware", halSoftware.serialize());
 		// fetch rosSoftware
 		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier);
-		type.add("rosSoftware", rosSoftware.serialize());
+		type.put("rosSoftware", rosSoftware.serialize());
 		
-		type.add("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
+		type.put("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
 		Mutation.removeSupportedMutations(moduleIdentifier, knowledgeDBClient);
 		
-		output.add("calibrationData", serializeModuleCalibrationData(moduleIdentifier));
+		output.put("calibrationData", serializeModuleCalibrationData(moduleIdentifier));
 		knowledgeDBClient.executeUpdateQuery(removeAllCalibrationDataForModule, 
 				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 		
 		Row[] moduleTypeRows = knowledgeDBClient.executeSelectQuery(getModuleType, 
 				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
 		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleType", moduleTypeRows);
-		type.addProperty("properties", (String) moduleTypeRows[0].get("moduleTypeProperties"));
+		type.put("properties", (String) moduleTypeRows[0].get("moduleTypeProperties"));
 		
 		Row[] moduleRows = knowledgeDBClient.executeSelectQuery(getModule, 
 				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModule", moduleRows);
-		output.addProperty("properties", (String) moduleRows[0].get("moduleProperties"));
+		output.put("properties", (String) moduleRows[0].get("moduleProperties"));
 		
 		removeSpace(moduleIdentifier);
 		knowledgeDBClient.executeUpdateQuery(removeModule, 
 				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 		knowledgeDBClient.executeUpdateQuery(removeModuleTypesWithNoModules);
 		
-		output.add("type", type);
+		output.put("type", type);
 		return output;
 	}
 	
@@ -566,25 +566,29 @@ public class ModuleFactory extends Factory {
 	 * @return
 	 * @throws KnowledgeException
 	 */
-	private boolean insertModuleType(ModuleIdentifier moduleIdentifier, JsonObject type) throws KnowledgeException {
-		JsonObject halSoftwareObject = type.get("halSoftware").getAsJsonObject();
-		JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(halSoftwareObject, knowledgeDBClient);
-		int halSoftwareId = halSoftware.getId();
-		
-		Integer rosSoftwareId = null;
-		if(type.get("rosSoftware").isJsonNull() == false) {
-			JsonObject rosSoftwareObject = type.get("rosSoftware").getAsJsonObject();
-			RosSoftware rosSoftware = RosSoftware.insertRosSoftware(rosSoftwareObject, knowledgeDBClient);
-			rosSoftwareId = rosSoftware.getId();
+	private boolean insertModuleType(ModuleIdentifier moduleIdentifier, JSONObject type) throws KnowledgeException {
+		try {
+			JSONObject halSoftwareObject = type.getJSONObject("halSoftware");
+			JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(halSoftwareObject, knowledgeDBClient);
+			int halSoftwareId = halSoftware.getId();
+			
+			// not every module has rosSoftware
+			Integer rosSoftwareId = null;
+			if(type.isNull("rosSoftware") == false) {
+				JSONObject rosSoftwareObject = type.getJSONObject("rosSoftware");
+				RosSoftware rosSoftware = RosSoftware.insertRosSoftware(rosSoftwareObject, knowledgeDBClient);
+				rosSoftwareId = rosSoftware.getId();
+			}
+			
+			String properties = type.getString("properties");
+			knowledgeDBClient.executeUpdateQuery(addModuleType, moduleIdentifier.getManufacturer(), 
+					moduleIdentifier.getTypeNumber(), properties, halSoftwareId, rosSoftwareId);
+			
+			JSONArray supportedMutationEntries = type.getJSONArray("supportedMutations");
+			Mutation.insertSupportedMutations(moduleIdentifier, supportedMutationEntries, knowledgeDBClient);
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.ERROR, "Unable to insert module due to illegally formatted JSON", ex);
 		}
-		
-		String properties = type.get("properties").getAsString();
-		knowledgeDBClient.executeUpdateQuery(addModuleType, moduleIdentifier.getManufacturer(), 
-				moduleIdentifier.getTypeNumber(), properties, halSoftwareId, rosSoftwareId);
-		
-		JsonArray supportedMutationEntries = type.get("supportedMutations").getAsJsonArray();
-		Mutation.insertSupportedMutations(moduleIdentifier, supportedMutationEntries, knowledgeDBClient);
-		
 		return true;
 	}
 	/**
@@ -592,9 +596,10 @@ public class ModuleFactory extends Factory {
 	 * It will update the software of the moduleType if the buildNumber of the provided software is higher than the buildNumber of the currently stored software.
 	 * @param moduleIdentifier
 	 * @param type
+	 * @throws JSONException 
 	 */
-	private void updateModuleType(ModuleIdentifier moduleIdentifier, JsonObject type) {
-		JsonObject halSoftwareObject = type.get("halSoftware").getAsJsonObject();
+	private void updateModuleType(ModuleIdentifier moduleIdentifier, JSONObject type) throws JSONException {
+		JSONObject halSoftwareObject = type.getJSONObject("halSoftware");
 		
 		JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 		int currentJavaSoftwareBuildNumber = javaSoftware.getBuildNumber();
@@ -605,7 +610,7 @@ public class ModuleFactory extends Factory {
 			javaSoftware.updateJavaSoftware(halSoftwareObject);
 		}
 		
-		JsonObject rosSoftwareObject = type.get("rosSoftware").getAsJsonObject();
+		JSONObject rosSoftwareObject = type.getJSONObject("rosSoftware");
 		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 		int currentRosSoftwareBuildNumber = rosSoftware.getBuildNumber();
 		int newRosSoftwareBuildNumber = RosSoftware.getBuildNumber(rosSoftwareObject);
@@ -621,9 +626,10 @@ public class ModuleFactory extends Factory {
 	 * This metohd will NOT remove the serialized moduleCalibrationData. 
 	 * @param moduleIdentifier
 	 * @return
+	 * @throws JSONException 
 	 */
-	private JsonArray serializeModuleCalibrationData(ModuleIdentifier moduleIdentifier) {
-		JsonArray calibrationEntries = new JsonArray();
+	private JSONArray serializeModuleCalibrationData(ModuleIdentifier moduleIdentifier) throws JSONException {
+		JSONArray calibrationEntries = new JSONArray();
 		Row[] calibrationDataRows = knowledgeDBClient.executeSelectQuery(getAllModuleCalibrationDataForModule, 
 				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
 		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getAllModuleCalibrationDataForModule", calibrationDataRows);
@@ -632,12 +638,12 @@ public class ModuleFactory extends Factory {
 			String dateTime = ((Timestamp) calibrationDataRow.get("date")).toString();
 			String properties = (String) calibrationDataRow.get("properties");
 			
-			JsonObject calibrationDataEntry = new JsonObject();
-			calibrationDataEntry.addProperty("date", dateTime);
-			calibrationDataEntry.addProperty("data", properties);
+			JSONObject calibrationDataEntry = new JSONObject();
+			calibrationDataEntry.put("date", dateTime);
+			calibrationDataEntry.put("data", properties);
 			
 			// fetch the moduleSet for the calibration data
-			JsonArray moduleEntries = new JsonArray();
+			JSONArray moduleEntries = new JSONArray();
 			Row[] moduleSetrows = knowledgeDBClient.executeSelectQuery(getModuleSetForModuleCalibrationData, moduleCalibrationId);
 			logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleSetForModuleCalibrationData", calibrationDataRows);
 			for (Row moduleSetrow : moduleSetrows) {
@@ -645,37 +651,38 @@ public class ModuleFactory extends Factory {
 				String typeNumber = (String) moduleSetrow.get("typeNumber");
 				String serialNumber = (String) moduleSetrow.get("serialNumber");
 				
-				JsonObject moduleEntry = new JsonObject();
-				moduleEntry.addProperty("manufacturer", manufacturer);
-				moduleEntry.addProperty("typeNumber", typeNumber);
-				moduleEntry.addProperty("serialNumber", serialNumber);
+				JSONObject moduleEntry = new JSONObject();
+				moduleEntry.put("manufacturer", manufacturer);
+				moduleEntry.put("typeNumber", typeNumber);
+				moduleEntry.put("serialNumber", serialNumber);
 				
-				moduleEntries.add(moduleEntry);
+				moduleEntries.put(moduleEntry);
 			}
-			calibrationDataEntry.add("moduleSet", moduleEntries);
+			calibrationDataEntry.put("moduleSet", moduleEntries);
 			
-			calibrationEntries.add(calibrationDataEntry);
+			calibrationEntries.put(calibrationDataEntry);
 		}
 		return calibrationEntries;
 	}
 	/**
 	 * This method will deserialize all the moduleCalibration data provided and store it in the knowledge database.
 	 * @param moduleCalibrationEntries
+	 * @throws JSONException 
 	 */
-	private void deserializeModuleCalibrationData(JsonArray moduleCalibrationEntries) {
-		for (JsonElement moduleCalibrationEntryElement : moduleCalibrationEntries) {
-			JsonObject moduleCalibrationEntry = moduleCalibrationEntryElement.getAsJsonObject();
-			String dateTime = moduleCalibrationEntry.get("date").getAsString();
-			String properties = moduleCalibrationEntry.get("data").getAsString();
+	private void deserializeModuleCalibrationData(JSONArray moduleCalibrationEntries) throws JSONException {
+		for (int i = 0; i < moduleCalibrationEntries.length(); i++) {
+			JSONObject moduleCalibrationEntry = moduleCalibrationEntries.getJSONObject(i);
+			String dateTime = moduleCalibrationEntry.getString("date");
+			String properties = moduleCalibrationEntry.getString("data");
 			int calibrationDataId = knowledgeDBClient.executeUpdateQuery(addModuleCalibrationData, dateTime, properties);
 			
-			JsonArray moduleSetEntries = moduleCalibrationEntry.get("moduleSet").getAsJsonArray();
-			for (JsonElement moduleSetEntryElement : moduleSetEntries) {
-				JsonObject moduleSetEntry = moduleSetEntryElement.getAsJsonObject();
+			JSONArray moduleSetEntries = moduleCalibrationEntry.getJSONArray("moduleSet");
+			for (int j = 0; j < moduleSetEntries.length(); j++) {
+				JSONObject moduleSetEntry = moduleSetEntries.getJSONObject(j);
 				
-				String manufacturer = moduleSetEntry.get("manufacturer").getAsString();
-				String typeNumber = moduleSetEntry.get("typeNumber").getAsString();
-				String serialNumber = moduleSetEntry.get("serialNumber").getAsString();
+				String manufacturer = moduleSetEntry.getString("manufacturer");
+				String typeNumber = moduleSetEntry.getString("typeNumber");
+				String serialNumber = moduleSetEntry.getString("serialNumber");
 				knowledgeDBClient.executeUpdateQuery(addModuleToCalibrationData, 
 						calibrationDataId, manufacturer, typeNumber, serialNumber);
 			}

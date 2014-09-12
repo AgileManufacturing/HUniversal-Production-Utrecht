@@ -40,20 +40,6 @@ package MAS.equiplet.equiplet_agent;
 
 import generic.ProductStep;
 import generic.Service;
-
-import java.util.ArrayList;
-
-import MAS.agents.data_classes.MessageType;
-import MAS.equiplet.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import HAL.HardwareAbstractionLayer;
-import HAL.steps.HardwareStep;
-import HAL.Module;
-import HAL.exceptions.BlackboardUpdateException;
-import HAL.listeners.HardwareAbstractionLayerListener;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -61,7 +47,21 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+
+import java.util.ArrayList;
+
+import HAL.HardwareAbstractionLayer;
+import HAL.Module;
+import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.steps.HardwareStep;
+import MAS.agents.data_classes.MessageType;
+import MAS.equiplet.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener{
 		
@@ -197,35 +197,38 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
     	                    send(reply);                    		
                     	}
                     	if(msg.getPerformative()==MessageType.PULSE_UPDATE){
-                    		
                     		//This is the update information for the WIMP!
-                    		JsonObject equipletUpdate = new JsonObject();
-                    		equipletUpdate.addProperty("receiver", "interface");
-                    		equipletUpdate.addProperty("subject", "update_equiplet");
-                    		equipletUpdate.addProperty("id", EQName);
-                    		equipletUpdate.addProperty("services", serverLists);
-                    		JsonObject status = new JsonObject();
-                    		status.addProperty("type", "success");
-                    		status.addProperty("content", "NORMAL");
-                    		equipletUpdate.add("status", status);
-                    		
-                    		JsonObject mode = new JsonObject();
-                    		mode.addProperty("type", "success");
-                    		mode.addProperty("content", "NORMAL");
-                    		equipletUpdate.add("mode", mode);
-
-                    		JsonObject equipletDetails = new JsonObject();
-                    		equipletDetails.addProperty("status", equipletActive);
-                    		equipletDetails.addProperty("plannedSteps", productStepCounter);
-                    		equipletDetails.addProperty("successfulSteps", productStepSuccesCounter);
-                    		equipletDetails.addProperty("failedSteps", productStepFailedCounter);
-                    		
-                    		equipletUpdate.add("details", equipletDetails);
-                    		
-                    		ACLMessage reply = msg.createReply();
-    	                    reply.setPerformative( MessageType.PULSE_UPDATE );
-    	                    reply.setContent(equipletUpdate.toString());
-    	                    send(reply);
+                    		try {
+	                    		JSONObject equipletUpdate = new JSONObject();
+	                    		equipletUpdate.put("receiver", "interface");
+	                    		equipletUpdate.put("subject", "update_equiplet");
+	                    		equipletUpdate.put("id", EQName);
+	                    		equipletUpdate.put("services", serverLists);
+	                    		JSONObject status = new JSONObject();
+	                    		status.put("type", "success");
+	                    		status.put("content", "NORMAL");
+	                    		equipletUpdate.put("status", status);
+	                    		
+	                    		JSONObject mode = new JSONObject();
+	                    		mode.put("type", "success");
+	                    		mode.put("content", "NORMAL");
+	                    		equipletUpdate.put("mode", mode);
+	
+	                    		JSONObject equipletDetails = new JSONObject();
+	                    		equipletDetails.put("status", equipletActive);
+	                    		equipletDetails.put("plannedSteps", productStepCounter);
+	                    		equipletDetails.put("successfulSteps", productStepSuccesCounter);
+	                    		equipletDetails.put("failedSteps", productStepFailedCounter);
+	                    		
+	                    		equipletUpdate.put("details", equipletDetails);
+	                    		
+	                    		ACLMessage reply = msg.createReply();
+	    	                    reply.setPerformative( MessageType.PULSE_UPDATE );
+	    	                    reply.setContent(equipletUpdate.toString());
+	    	                    send(reply);
+                    		} catch (JSONException ex) {
+                    			ex.printStackTrace();
+                    		}
                     	}
 					}
 				}
@@ -275,17 +278,21 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  */
 	private String canExecute(String msg){
 		System.out.println("Can execute?");
-		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
-		for(int i =0; i < serviceList.size(); i++){
-	        if(serviceList.get(i).getName().equals(productSteps.get("service").getAsString())){
-	        	
-	        	JsonObject message = new JsonObject();
-	        	message.addProperty("startTime", "0");
-	        	message.addProperty("duration", "100");
-	        	message.addProperty("productStepId", productSteps.get("id").getAsString());	       	
-	        	
-	        	return message.toString();
-	        }	        
+		try {
+			JSONObject productSteps = new JSONObject(new JSONTokener(msg));
+			for(int i =0; i < serviceList.size(); i++){
+		        if(serviceList.get(i).getName().equals(productSteps.getString("service"))){
+		        	
+		        	JSONObject message = new JSONObject();
+		        	message.put("startTime", "0");
+		        	message.put("duration", "100");
+		        	message.put("productStepId", productSteps.getString("id"));	       	
+		        	
+		        	return message.toString();
+		        }	        
+			}
+		} catch (JSONException ex) {
+			ex.printStackTrace();
 		}
 		return "false";
 	}
@@ -296,16 +303,21 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  */
 	private String schedule(String msg){
 		System.out.println("Can Schedule?");
-
-		JsonObject productSteps = new JsonParser().parse(msg).getAsJsonObject();
-		Job job = new Job(productSteps.get("startTime").getAsString(),productSteps.get("duration").getAsString(),productSteps.get("productStepId").getAsString(),productSteps.get("productStep").getAsJsonObject());
-    	equipletSchedule.add(job);
-    	productStepCounter++;
-		System.out.println(equipletSchedule.size()+" =Length");
-		if(scheduleCounter == 0){
-			executeProductStep();
+		try {
+			JSONObject productSteps = new JSONObject(new JSONTokener(msg));
+			Job job = new Job(productSteps.getString("startTime"), productSteps.getString("duration"), 
+					productSteps.getString("productStepId"), productSteps.getJSONObject("productStep"));
+	    	equipletSchedule.add(job);
+	    	productStepCounter++;
+			System.out.println(equipletSchedule.size()+" =Length");
+			if(scheduleCounter == 0){
+				executeProductStep();
+			}
+			return "true";
+		} catch (JSONException ex) {
+			ex.printStackTrace();
+			return "false";
 		}
-		return "true";		
 	}
 	
 	/**

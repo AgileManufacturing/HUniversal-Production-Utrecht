@@ -1,49 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="HAL" default="all">
+<project name="HAL" default="all" basedir=".">
 
 	<import file="../build.xml"/>
 
-	<target name="all" depends="">
+	<target name="all" depends="libraries, jars">
 		<buildjava dir="${basedir}"/>
-		<buildjava dir="${basedir}/capabilities"/>
-		<buildjava dir="${basedir}/exceptions"/>
-		<buildjava dir="${basedir}/factories"/>
-		<buildjava dir="${basedir}/listeners"/>
-		<buildjava dir="${basedir}/modules"/>
-		<buildjava dir="${basedir}/steps"/>
-		<buildjava dir="${basedir}/tasks"/>
 	</target>
 	
-	<!--<target name="generic" depends="capabilities, exceptions, factories, listeners, modules, tasks">
+	<target name="libraries" depends="">
+   		<ant antfile="build.xml" target="all" dir="libraries" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
-	
-	<target name="capabilities" depends="exceptions, factories, steps">
+
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="commons-codec-1.3.jar"/></antcall>
+
 	</target>
-	
-	<target name="entities" depends="exceptions">
-	</target>
-	
-	<target name="exceptions" depends="">
-	</target>
-	
-	<target name="factories" depends="">
-	</target>
-	
-	<target name="listeners" depends="">
-	</target>
-	
-	<target name="modules" depends="generic">
-	</target>
-	
-	<target name="steps" depends="entities">
-	</target>
-	
-	<target name="tasks" depends="factories">
-	</target>-->
 	
 	<target name="clean">
 		 <cleanjava dir="${basedir}"/>
-		 <cleanjava dir="${basedir}/behaviours"/>
 	</target>
 
 </project>

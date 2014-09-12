@@ -8,12 +8,10 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.Module;
 import HAL.ModuleActor;
-import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
 /**
  * The thread that manages the execution of hardware steps
  * @author Bas Voskuijlen

@@ -7,21 +7,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
+import org.apache.commons.codec.binary.Base64;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
-
-import org.apache.commons.codec.binary.Base64;
-
 import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HALTesterClass htc = new HALTesterClass();
@@ -372,56 +371,56 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		// deltarobot
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobot + moduleA_03 + base64Draw + moduleA_04 + base64PickAndPlace + moduleA_05; 
-		JsonObject a = new JsonParser().parse(moduleA).getAsJsonObject();
+		JSONObject a = new JSONObject(new JSONTokener(moduleA));
 		hal.insertModule(a, a);
 		
 		// pen
 		//String moduleB = moduleB_01 + base64Pen + moduleB_02; 
-		//JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+		//JSONObject b = new JsonParser().parse(moduleB).getAsJSONObject();
 		//hal.insertModule(b, b);
 		
 		// gripper
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64Gripper + moduleB_03; 
-		JsonObject b = new JsonParser().parse(moduleB).getAsJsonObject();
+		JSONObject b = new JSONObject(new JSONTokener(moduleB));
 		hal.insertModule(b, b);
 		
 		// camera
 		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64Pen + moduleC_03;
-		JsonObject c = new JsonParser().parse(moduleC).getAsJsonObject();
+		JSONObject c = new JSONObject(new JSONTokener(moduleC));
 		hal.insertModule(c, c);
 		
 		// lens
 		String moduleD = moduleD_01 + base64Pen + moduleD_02; 
-		JsonObject d = new JsonParser().parse(moduleD).getAsJsonObject();
+		JSONObject d = new JSONObject(new JSONTokener(moduleD));
 		hal.insertModule(d, d);
 		
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64Pen + moduleE_03;
-		JsonObject e = new JsonParser().parse(moduleE).getAsJsonObject();
+		JSONObject e = new JSONObject(new JSONTokener(moduleE));
 		hal.insertModule(e, e);
 		
 		
-		JsonObject criteria = new JsonObject();
-		JsonObject target = new JsonObject();
-		JsonObject targetMove = new JsonObject();
-		targetMove.addProperty("x", -2.0);
-		targetMove.addProperty("y", 1.0);
-		targetMove.addProperty("z", 15.0);
-		target.add("move",targetMove);
-		target.addProperty("identifier", "GC4x4MB_1");
+		JSONObject criteria = new JSONObject();
+		JSONObject target = new JSONObject();
+		JSONObject targetMove = new JSONObject();
+		targetMove.put("x", -2.0);
+		targetMove.put("y", 1.0);
+		targetMove.put("z", 15.0);
+		target.put("move",targetMove);
+		target.put("identifier", "GC4x4MB_1");
 		
-		JsonArray subjects = new JsonArray();
-		JsonObject subject = new JsonObject();
-		JsonObject subjectMove = new JsonObject();
-		subjectMove.addProperty("x", -3.0);
-		subjectMove.addProperty("y", 3.0);
-		subjectMove.addProperty("z", 35.0);
-		subject.add("move",subjectMove);
-		subject.addProperty("identifier", "GC4x4MB_6");
-		subjects.add(subject);
+		JSONArray subjects = new JSONArray();
+		JSONObject subject = new JSONObject();
+		JSONObject subjectMove = new JSONObject();
+		subjectMove.put("x", -3.0);
+		subjectMove.put("y", 3.0);
+		subjectMove.put("z", 35.0);
+		subject.put("move",subjectMove);
+		subject.put("identifier", "GC4x4MB_6");
+		subjects.put(subject);
 		
-		criteria.add("target",target);
-		criteria.add("subjects", subjects);
+		criteria.put("target",target);
+		criteria.put("subjects", subjects);
 		
 		
 		hal.translateProductStep(

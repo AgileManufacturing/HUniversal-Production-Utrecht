@@ -55,13 +55,13 @@ echo ""
 if [ "$ROS_ONLY" == false ] || [ "$MAS_ONLY" == true ];
 then
 	echo -e "\033[36m===== Building JAVA =====\033[0m"
-	ant -buildfile src/REXOS/MAS/build.xml $REXOS_BUILD_TARGET
+	ant -buildfile src/REXOS/build.xml $REXOS_BUILD_TARGET
 	echo -e "\033[35m===== DONE JAVA =====\033[0m"
 
 
 	if [ "$REXOS_BUILD_TARGET" != "clean" ];
 	then
-		. ./build/REXOS/MAS/.export-classpath
+		. ./build/REXOS/.export-classpath
 	fi
 fi
 

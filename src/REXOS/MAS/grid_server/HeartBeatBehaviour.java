@@ -39,8 +39,6 @@
 package MAS.grid_server;
 
 
-import MAS.agents.data_classes.MessageType;
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -48,6 +46,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
+import MAS.agents.data_classes.MessageType;
 
 public class HeartBeatBehaviour extends TickerBehaviour {
 	/**

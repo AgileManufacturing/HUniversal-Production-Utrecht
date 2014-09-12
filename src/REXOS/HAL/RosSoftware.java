@@ -2,13 +2,15 @@ package HAL;
 
 import java.util.HashMap;
 
+import org.apache.commons.codec.binary.Base64;
+
+import HAL.libraries.knowledgedb_client.KeyNotFoundException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 
-import org.apache.commons.codec.binary.Base64;
-
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This class provides methods for serializing and deserializing of RosSoftware. 
@@ -44,22 +46,24 @@ public class RosSoftware {
 	 */
 	private static HashMap<Integer, RosSoftware> rosSoftwareInstances = new HashMap<Integer, RosSoftware>(); 
 	/**
-	 * Deserializes ros software from a JsonObject and stores in in the knowledge database 
+	 * Deserializes ros software from a JSONObject and stores in in the knowledge database 
 	 * This method uses a new KnowledgeDBClient which may cause locking issues. It is recommended to provide your own KnowledgeDBClient.
-	 * @param rosSoftware the JsonObject to be used
+	 * @param rosSoftware the JSONObject to be used
 	 * @return the now stored ros software
+	 * @throws JSONException 
 	 */
-	public static RosSoftware insertRosSoftware(JsonObject rosSoftware) {
+	public static RosSoftware insertRosSoftware(JSONObject rosSoftware) throws JSONException {
 		return insertRosSoftware(rosSoftware, new KnowledgeDBClient());
 	}
 	/**
-	 * Deserializes ros software from a JsonObject and stores in in the knowledge database using the provided KnowledgeDBClient.
+	 * Deserializes ros software from a JSONObject and stores in in the knowledge database using the provided KnowledgeDBClient.
 	 * @param rosSoftware
 	 * @param knowledgeDBClient
 	 * @return the now stored ros software
+	 * @throws JSONException 
 	 */
-	public static RosSoftware insertRosSoftware(JsonObject rosSoftware, KnowledgeDBClient knowledgeDBClient) {
-		byte[] zipFile = Base64.decodeBase64(rosSoftware.get("rosFile").getAsString().getBytes());
+	public static RosSoftware insertRosSoftware(JSONObject rosSoftware, KnowledgeDBClient knowledgeDBClient) throws JSONException {
+		byte[] zipFile = Base64.decodeBase64(rosSoftware.getString("rosFile").getBytes());
 		int buildNumber = getBuildNumber(rosSoftware);
 		String command = getCommand(rosSoftware);
 		
@@ -69,20 +73,22 @@ public class RosSoftware {
 	}
 	
 	/**
-	 * This method allows the extraction of the build number of the rosSoftware from the JsonObject. Used for updating.
+	 * This method allows the extraction of the build number of the rosSoftware from the JSONObject. Used for updating.
 	 * @param rosSoftware
 	 * @return
+	 * @throws JSONException 
 	 */
-	public static int getBuildNumber(JsonObject rosSoftware) {
-		return rosSoftware.get("buildNumber").getAsInt();
+	public static int getBuildNumber(JSONObject rosSoftware) throws JSONException {
+		return rosSoftware.getInt("buildNumber");
 	}
 	/**
-	 * This method allows the extraction of the command of the rosSoftware from the JsonObject.
+	 * This method allows the extraction of the command of the rosSoftware from the JSONObject.
 	 * @param rosSoftware
 	 * @return
+	 * @throws JSONException 
 	 */
-	public static String getCommand(JsonObject rosSoftware) {
-		return rosSoftware.get("command").getAsString();
+	public static String getCommand(JSONObject rosSoftware) throws JSONException {
+		return rosSoftware.getString("command");
 	}
 	
 	private int id;
@@ -149,24 +155,27 @@ public class RosSoftware {
 	 * This method serializes ros software from the knowledge database 
 	 * @param knowledgeDBClient
 	 * @param moduleIdentifier
-	 * @return The JsonObject for the RosSoftware
+	 * @return The JSONObject for the RosSoftware
+	 * @throws JSONException 
+	 * @throws KeyNotFoundException 
 	 */
-	public JsonObject serialize() {
-		JsonObject rosSoftware = new JsonObject();
+	public JSONObject serialize() throws KeyNotFoundException, JSONException {
+		JSONObject rosSoftware = new JSONObject();
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForId, this.id);
-		rosSoftware.addProperty("buildNumber", (Integer) rows[0].get("buildNumber"));
-		rosSoftware.addProperty("command", (String) rows[0].get("command"));
+		rosSoftware.put("buildNumber", (Integer) rows[0].get("buildNumber"));
+		rosSoftware.put("command", (String) rows[0].get("command"));
 		byte[] zipFile = (byte[]) rows[0].get("zipFile");
-		rosSoftware.addProperty("rosFile", new String(Base64.encodeBase64(zipFile)));
+		rosSoftware.put("rosFile", new String(Base64.encodeBase64(zipFile)));
 		return rosSoftware;
 	}
 	
 	/**
 	 * This method will update the ros software in the knowledge database. 
 	 * @param rosSoftware
+	 * @throws JSONException 
 	 */
-	public void updateRosSoftware(JsonObject rosSoftware) {
-		byte[] zipFile = Base64.decodeBase64(rosSoftware.get("zipFile").getAsString().getBytes());
+	public void updateRosSoftware(JSONObject rosSoftware) throws JSONException {
+		byte[] zipFile = Base64.decodeBase64(rosSoftware.getString("zipFile").getBytes());
 		int buildNumber = getBuildNumber(rosSoftware);
 		String command = getCommand(rosSoftware);
 		
