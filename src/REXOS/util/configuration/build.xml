@@ -1,10 +1,7 @@
 <project name="configuration" default="all">
-<import file="../build.xml"/>	
+	<import file="../build.xml"/>	
 
-	<target name="all" depends="build"> 
-	</target>
-	
-	<target name="build">
+	<target name="all">
 		<buildjava dir="${basedir}"/>  
 	</target>
 
