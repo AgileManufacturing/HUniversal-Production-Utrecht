@@ -19,6 +19,7 @@ import MAS.simulation.mas.equiplet.Capability;
 import MAS.simulation.mas.product.ProductStep;
 import MAS.simulation.util.Pair;
 import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 
 /**
@@ -33,7 +34,7 @@ public class Config implements IConfig {
 
 	// run length of the simulation
 	@XmlElement(name = "runlength")
-	private Tick runlength;
+	private double runlength;
 
 	// number of times the simulation needs to run
 	@XmlElement(name = "runs")
@@ -49,12 +50,16 @@ public class Config implements IConfig {
 
 	public static Config read() {
 		try {
-			File file = new File("Simulation.xml");
+			File file = new File(Settings.SIMULATION_CONFIG);
+			if (file.exists()) {
 			JAXBContext jaxbContext = JAXBContext.newInstance(Config.class);
 
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 			return (Config) jaxbUnmarshaller.unmarshal(file);
-
+			} else {
+				System.err.println("Failed to load config settings: file not found: " + file.getAbsolutePath());
+				return null;
+			}
 		} catch (JAXBException e) {
 			e.printStackTrace();
 			System.err.println("Failed to load config settings");
@@ -63,7 +68,7 @@ public class Config implements IConfig {
 	}
 
 	public Tick getRunLength() {
-		return runlength;
+		return new Tick(runlength);
 	}
 
 	public int getRuns() {
@@ -76,6 +81,11 @@ public class Config implements IConfig {
 
 	public Pair<Tick, DurationType> getProductArrival() {
 		return new Pair<Tick, DurationType>(new Tick(products.getArrival()), products.getArrivalType());
+	}
+
+	@Override
+	public Pair<Tick, DurationType> getProductDeadline() {
+		return new Pair<Tick, DurationType>(new Tick(products.getDeadline()), products.getDeadlineType());
 	}
 
 	public List<ProductStep> getProductSteps() {

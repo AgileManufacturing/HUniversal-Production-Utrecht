@@ -1,5 +1,8 @@
 package MAS.simulation.simulation;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,11 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import MAS.simulation.config.Config;
 import MAS.simulation.config.Configuration;
 import MAS.simulation.config.Configuration.ConfigException;
 import MAS.simulation.config.IConfig;
+import MAS.simulation.graphics.Chart;
 import MAS.simulation.graphics.IControl;
 import MAS.simulation.graphics.SimInterface;
 import MAS.simulation.mas.equiplet.Capability;
@@ -23,6 +29,7 @@ import MAS.simulation.mas.product.ProductStep;
 import MAS.simulation.util.Lock;
 import MAS.simulation.util.Pair;
 import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 import MAS.simulation.util.Tuple;
@@ -47,13 +54,17 @@ public class Simulation implements ISimulation, IControl {
 	private static final String STATS_LOAD = "Load";
 	private static final String STATS_LOAD_2 = "Load small window";
 	private static final String STATS_LOAD_HISTORY = "Load history";
-	private static final String STATS_LOAD_HISTORY_2 = "Load histor 2y";
+	private static final String STATS_LOAD_HISTORY_E4 = "Load histor E4";
+	private static final String STATS_LOAD_HISTORY_E1 = "Load histor E1";
+	private static final String STATS_LOAD_E4 = "Load E4";
+	private static final String STATS_LOAD_E1 = "Load E1";
 	private static final Tick LOAD_WINDOW = new Tick(1000);
 
 	private ISimControl simulation;
 	private SimInterface gui;
 	private IConfig config;
 	private Stochastics stochastics;
+	private boolean useGUI;
 
 	private Lock lock = new Lock();
 
@@ -82,8 +93,9 @@ public class Simulation implements ISimulation, IControl {
 	private Map<String, TreeMap<Tick, Double>> productStatistics;
 	private Map<String, TreeMap<Tick, Double>> equipletStatistics;
 
-	public Simulation(ISimControl simulation) {
+	public Simulation(ISimControl simulation, boolean startGUI) {
 		this.simulation = simulation;
+		this.useGUI = startGUI;
 
 		delay = 0;
 
@@ -98,12 +110,15 @@ public class Simulation implements ISimulation, IControl {
 			System.out.println("Simulation: configuration: " + config);
 
 			stochastics = new Stochastics(config);
-			gui = SimInterface.create(this);
+			if (startGUI) {
+				gui = SimInterface.create(this);
+			}
 
 			init();
 
-		} catch (ConfigException e) {
+		} catch (NullPointerException | ConfigException e) {
 			System.err.println("Configuration failed " + e.getMessage());
+			simulation.takeDown();
 		}
 	}
 
@@ -145,7 +160,10 @@ public class Simulation implements ISimulation, IControl {
 		equipletStatistics.put(STATS_LOAD, new TreeMap<Tick, Double>(initStats));
 		equipletStatistics.put(STATS_LOAD_2, new TreeMap<Tick, Double>(initStats));
 		equipletStatistics.put(STATS_LOAD_HISTORY, new TreeMap<Tick, Double>(initStats));
-		equipletStatistics.put(STATS_LOAD_HISTORY_2, new TreeMap<Tick, Double>(initStats));
+		equipletStatistics.put(STATS_LOAD_E1, new TreeMap<Tick, Double>(initStats));
+		equipletStatistics.put(STATS_LOAD_E4, new TreeMap<Tick, Double>(initStats));
+		equipletStatistics.put(STATS_LOAD_HISTORY_E1, new TreeMap<Tick, Double>(initStats));
+		equipletStatistics.put(STATS_LOAD_HISTORY_E4, new TreeMap<Tick, Double>(initStats));
 
 		products = new HashMap<>();
 		equiplets = new TreeMap<>();
@@ -222,10 +240,12 @@ public class Simulation implements ISimulation, IControl {
 					break;
 				}
 
-				lock.await();
+				if (useGUI) {
+					lock.await();
 
-				calculateEquipletLoad();
-				update(e);
+					calculateEquipletLoad();
+					update(e);
+				}
 
 				for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
 					// System.out.println("EQ: " + equiplet.getValue());
@@ -261,7 +281,6 @@ public class Simulation implements ISimulation, IControl {
 		} catch (InterruptedException ie) {
 			ie.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -300,9 +319,7 @@ public class Simulation implements ISimulation, IControl {
 	 */
 	private void calculateEquipletLoad() {
 		double sumLoad = 0.0;
-		double sumLoad2 = 0.0;
 		double sumLoadH = 0.0;
-		double sumLoadH2 = 0.0;
 
 		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
 			double load = entry.getValue().load(time, LOAD_WINDOW);
@@ -313,45 +330,39 @@ public class Simulation implements ISimulation, IControl {
 			}
 			sumLoad += (1 - load);
 
-			// second load with smaller window
-			double load2 = entry.getValue().load(time, new Tick(100));
-			if (load2 > 1 || load2 < 0) {
-				System.out.println(" ERROR: time=" + time + " - " + 100 + ", load=" + load2 + " : " + entry.getValue());
-				throw new IllegalArgumentException(" ERROR: time=" + time + ", window=" + 100 + ", load=" + load2 + " : " + entry.getValue());
-			}
-			sumLoad2 += (1 - load2);
-
 			// load history
-			double loadH = entry.getValue().loadHistory(time.minus(100), new Tick(100));
+			double loadH = entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
 			if (loadH > 1 || loadH < 0) {
-				System.out.println(" ERROR: time=" + time + " - " + 100 + ", load=" + loadH + " : " + entry.getValue());
-				throw new IllegalArgumentException(" ERROR: time=" + time + ", window=" + 100 + ", load=" + loadH + " : " + entry.getValue());
+				System.out.println(" ERROR: time=" + time + " - " + LOAD_WINDOW + ", load=" + loadH + " : " + entry.getValue());
+				throw new IllegalArgumentException(" ERROR: time=" + time + ", window=" + LOAD_WINDOW + ", load=" + loadH + " : " + entry.getValue());
 			}
 			sumLoadH += (1 - loadH);
-
-			// load history a second time
-			double loadH2 = entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
-			if (loadH2 > 1 || loadH2 < 0) {
-				System.out.println(" ERROR: time=" + time + " - " + LOAD_WINDOW + ", load=" + loadH2 + " : " + entry.getValue());
-				throw new IllegalArgumentException(" ERROR: time=" + time + ", window=" + LOAD_WINDOW + ", load=" + loadH2 + " : " + entry.getValue());
-			}
-			sumLoadH2 += (1 - loadH2);
 		}
 
+		IEquipletSim e1 = equiplets.get("E1");
+		IEquipletSim e4 = equiplets.get("E4");
+
+		double h1 = 1 - e1.loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
+		equipletStatistics.get(STATS_LOAD_HISTORY_E1).put(time, h1);
+
+		double h4 = 1 - e4.loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
+		equipletStatistics.get(STATS_LOAD_HISTORY_E4).put(time, h4);
+
+		double l1 = 1 - e1.load(time, LOAD_WINDOW);
+		equipletStatistics.get(STATS_LOAD_E1).put(time, l1);
+
+		double l4 = 1 - e4.load(time, LOAD_WINDOW);
+		equipletStatistics.get(STATS_LOAD_E4).put(time, l4);
+
+		//
 		double l = sumLoad / equiplets.size();
 		System.out.println("sum load " + sumLoad + " / " + equiplets.size() + " = " + l);
 		equipletStatistics.get(STATS_LOAD).put(time, l);
-
-		double l2 = sumLoad2 / equiplets.size();
-		equipletStatistics.get(STATS_LOAD_2).put(time, l2);
 
 		double lH = sumLoadH / equiplets.size();
 		System.out.println("sum load history " + sumLoadH + " / " + equiplets.size() + " = " + lH);
 		equipletStatistics.get(STATS_LOAD_HISTORY).put(time, lH);
 
-		double lH2 = sumLoadH2 / equiplets.size();
-		System.out.println("sum load history 2" + sumLoadH2 + " / " + equiplets.size() + " = " + lH2);
-		equipletStatistics.get(STATS_LOAD_HISTORY_2).put(time, lH2);
 	}
 
 	/**
@@ -388,7 +399,8 @@ public class Simulation implements ISimulation, IControl {
 			String productName = "P" + productCount++;
 			Position startPosition = new Position(-1, -1);
 
-			IProductSim product = simulation.createProduct(productName, startPosition, productSteps, time);
+			Tick deadline = time.add(stochastics.generateDeadline());
+			IProductSim product = simulation.createProduct(productName, startPosition, productSteps, time, deadline);
 			products.put(productName, product);
 
 			// update statistics
@@ -528,6 +540,8 @@ public class Simulation implements ISimulation, IControl {
 			lock.unlock();
 		}
 		System.out.println("CHECKPOINT LIMA");
+
+		saveStatistics();
 	}
 
 	/**
@@ -705,8 +719,6 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("Simulation: " + (running ? "start" : "pause"));
 
 		running = !running;
-		// notify();// wake up the wait
-
 	}
 
 	@Override
@@ -721,8 +733,49 @@ public class Simulation implements ISimulation, IControl {
 
 	@Override
 	public synchronized void saveStatistics() {
-		// TODO Auto-generated method stub
+		System.out.println("Simulation: save statistics");
 
+		String path = Settings.SIMULATION_OUTPUT;
+
+		File file = new File(path);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+
+		int number = 1;
+		Pattern pattern = Pattern.compile("run([0-9]+)");
+		File[] fileList = file.listFiles();
+		for (File f : fileList) {
+			Matcher matcher = pattern.matcher(f.getName());
+			if (f.isDirectory() && matcher.find()) {
+				number = Integer.valueOf(matcher.group(1)) + 1;
+			}
+		}
+
+		path += String.format("/run%d/", number);
+		file = new File(path);
+		file.mkdir();
+
+		File statFile = new File(path + "stats.txt");
+		try {
+			PrintWriter writer = new PrintWriter(statFile);
+			writer.println("Grid Simulation run");
+			writer.printf("run rime: \t%s\n", run_length);
+			writer.printf("Settings: \t%s\n", config);
+			writer.printf("Product Statistics: \t%s\n", productStatistics);
+			writer.printf("Equiplet Statistics: \t%s\n", equipletStatistics);
+			writer.println();
+
+			writer.println("more statistics");
+
+			writer.println();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		Chart.save(path, "Product Statistics", "Products", productStatistics);
+		Chart.save(path, "Equiplet Statistics", "Equiplets", equipletStatistics);
 	}
 
 	@Override

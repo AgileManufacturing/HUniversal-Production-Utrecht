@@ -18,6 +18,7 @@ import MAS.simulation.config.IConfig;
 import MAS.simulation.graphics.StaticSimInterface;
 import MAS.simulation.mas.equiplet.Capability;
 import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 
@@ -83,7 +84,7 @@ public class Simulation extends Thread {
 
 		// fill equiplets
 		int equipletCounter = 0;
-		for (Entry<String, Pair<MAS.simulation.util.Position, List<Capability>>> equiplet : config.getEquipletsConfigurations().entrySet()) {
+		for (Entry<String, Pair<Position, List<Capability>>> equiplet : config.getEquipletsConfigurations().entrySet()) {
 			Position position = new Position(equiplet.getValue().first.getX(), equiplet.getValue().first.getY());
 			List<String> services = new ArrayList<>();
 			for (Capability capability : equiplet.getValue().second) {

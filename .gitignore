@@ -67,4 +67,5 @@ log.txt
 *.txt
 /bin
 
-output/
+# Ignore simulation output 
+simulation/output/

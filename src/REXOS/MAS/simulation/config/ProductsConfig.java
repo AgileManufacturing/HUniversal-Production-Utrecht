@@ -15,10 +15,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlRootElement
-@XmlType(propOrder = { "arrival", "path", "steps" })
+@XmlType(propOrder = { "arrival", "deadline", "path", "steps" })
 class ProductsConfig {
 	@XmlElement(name = "arrival")
 	private DurationConfig arrival;
+
+	@XmlElement(name = "deadline")
+	private DurationConfig deadline;
 
 	@XmlElement(name = "path")
 	private int path;
@@ -31,6 +34,14 @@ class ProductsConfig {
 
 	public DurationType getArrivalType() {
 		return arrival.type();
+	}
+
+	public double getDeadline() {
+		return deadline.mean();
+	}
+
+	public DurationType getDeadlineType() {
+		return deadline.type();
 	}
 
 	public int getPathLength() {
@@ -48,6 +59,6 @@ class ProductsConfig {
 	}
 
 	public String toString() {
-		return String.format("[arrival=%.0f (%s), path length=steps=%d, product steps=%s]", arrival.mean(), arrival.type(), path, steps);
+		return String.format("[arrival=%.0f (%s), deadline=%.0f (%s), path length=steps=%d, product steps=%s]", arrival.mean(), arrival.type(), deadline.mean(), deadline.type(), path, steps);
 	}
 }

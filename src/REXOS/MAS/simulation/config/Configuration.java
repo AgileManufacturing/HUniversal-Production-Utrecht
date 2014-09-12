@@ -18,6 +18,7 @@ import MAS.simulation.mas.equiplet.Capability;
 import MAS.simulation.mas.product.ProductStep;
 import MAS.simulation.util.Pair;
 import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 
 public class Configuration implements IConfig {
@@ -47,8 +48,8 @@ public class Configuration implements IConfig {
 	public static Configuration read(IConfig legacy) throws ConfigException {
 		List<EquipletConfig> equipletConfig = new ArrayList<EquipletConfig>();
 
-		File file = new File("equiplets.csv");
-		System.out.println("Configuration " + file);
+		File file = new File(Settings.SIMULATION_EQUIPLET_CONFIG);
+		System.out.println("Configuration " + file.getAbsolutePath());
 
 		BufferedReader reader = null;
 
@@ -164,6 +165,10 @@ public class Configuration implements IConfig {
 
 	public Pair<Tick, DurationType> getProductArrival() {
 		return legacy.getProductArrival();
+	}
+
+	public Pair<Tick, DurationType> getProductDeadline() {
+		return legacy.getProductDeadline();
 	}
 
 	public List<ProductStep> getProductSteps() {

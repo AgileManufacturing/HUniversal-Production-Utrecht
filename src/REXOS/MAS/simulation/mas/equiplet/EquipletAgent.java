@@ -284,7 +284,7 @@ public class EquipletAgent extends Agent {
 		// System.out.println("EA:" + getLocalName() + " load= 1 - " + sum + " / " + window + " = " + (1 - sum / window) + " in " + schedule);
 
 		// double precision error, dirty fix
-		// sum = (double) Math.round(sum * 100000000) / 100000000;
+		sum = new Tick(Math.round(sum.doubleValue() * 100000000) / 100000000);
 
 		return 1 - sum.div(window).doubleValue();
 	}
@@ -313,8 +313,8 @@ public class EquipletAgent extends Agent {
 			}
 		}
 
-		// double precision error, dirty fix
-		// sum = (double) Math.round(sum * 100000000) / 100000000;
+		// double precision error, dirty fix, can use BigDecimal although performance 
+		sum = new Tick(Math.round(sum.doubleValue() * 100000000) / 100000000);
 
 		return 1 - sum.div(window).doubleValue();
 	}
