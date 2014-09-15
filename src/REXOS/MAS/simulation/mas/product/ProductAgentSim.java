@@ -23,11 +23,18 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			Object[] args = new Object[] { Parser.parseProductConfiguration(productSteps, position, deadline) };
 			setArguments(args);
 		} catch (JSONException e) {
-			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
+			System.err.printf("PA: failed to create product: %s.\n", e.getMessage());
 		}
 
 		this.simulation = simulation;
 		this.created = time;
+	}
+
+	@Override
+	public void kill() {
+		// TODO handle properly, let the equiplet know that I been killed
+		System.out.printf("PA:%s terminating\n", getLocalName());
+		doDelete();
 	}
 
 	@Override

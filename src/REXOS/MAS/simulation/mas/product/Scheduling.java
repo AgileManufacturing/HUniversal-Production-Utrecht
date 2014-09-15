@@ -73,6 +73,8 @@ public class Scheduling {
 					Position lastPosition = node != source ? equipletInfo.get(node.getEquipletAID()).second : position;
 					Position nextPosition = equipletInfo.get(option.getKey()).second;
 					Pair<Position, Position> route = new Pair<>(lastPosition, nextPosition);
+					
+					// check if the travel time from the route is know, and is not the the same as the previous
 					if (!travelTimes.containsKey(route) && !lastPosition.equals(nextPosition)) {
 						throw new SchedulingException("route doesn't exists in travel time list: " + route);
 					}

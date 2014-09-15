@@ -112,34 +112,45 @@ public class ScheduleBehaviour extends Behaviour {
 	private HashMap<AID, LinkedList<ProductStep>> searchSuitedEquiplets(List<ProductStep> productSteps) throws SchedulingException {
 		// TODO communication improvement, instead of map equiplets to executable product step, change product step to service,
 		// so it has to ask only once for a service instead of product step
+
+		Map<String, List<AID>> searchedServices = new HashMap<>();
 		HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = new HashMap<>();
 		for (ProductStep productStep : productSteps) {
-			try {
-				// Build the description used as template for the search
-				DFAgentDescription template = new DFAgentDescription();
-				ServiceDescription sd = new ServiceDescription();
-				sd.setType(Ontology.SERVICE_SEARCH_TYPE);
-				sd.setName(productStep.getService());
+			if (!searchedServices.containsKey(productStep.getService())) {
+				try {
+					// Build the description used as template for the search
+					DFAgentDescription template = new DFAgentDescription();
+					ServiceDescription sd = new ServiceDescription();
+					sd.setType(Ontology.SERVICE_SEARCH_TYPE);
+					sd.setName(productStep.getService());
 
-				template.addServices(sd);
+					template.addServices(sd);
 
-				DFAgentDescription[] results = DFService.search(myAgent, template);
-				if (results.length > 0) {
-					for (int i = 0; i < results.length; i++) {
-						AID equiplet = results[i].getName();
+					DFAgentDescription[] results = DFService.search(myAgent, template);
+					if (results.length > 0) {
+						List<AID> equiplets = new ArrayList<>();
+						for (int i = 0; i < results.length; i++) {
+							AID equiplet = results[i].getName();
 
-						if (!suitedEquiplets.containsKey(equiplet)) {
-							suitedEquiplets.put(equiplet, new LinkedList<ProductStep>());
+							if (!suitedEquiplets.containsKey(equiplet)) {
+								suitedEquiplets.put(equiplet, new LinkedList<ProductStep>());
+							}
+							suitedEquiplets.get(equiplet).add(productStep);
+							equiplets.add(equiplet);
 						}
-						suitedEquiplets.get(equiplet).add(productStep);
+						searchedServices.put(productStep.getService(), equiplets);
+					} else {
+						System.err.printf("PA:%s failed to find the service %s\n", myAgent.getLocalName(), productStep.getService());
+						return new HashMap<>();
 					}
-				} else {
-					System.err.printf("PA:%s failed to find the service %s\n", myAgent.getLocalName(), productStep.getService());
-					return new HashMap<>();
+				} catch (FIPAException fe) {
+					fe.printStackTrace();
+					throw new SchedulingException(" failed to find services: " + fe.getMessage());
 				}
-			} catch (FIPAException fe) {
-				fe.printStackTrace();
-				throw new SchedulingException(" failed to find services: " + fe.getMessage());
+			} else {
+				for (AID equiplet : searchedServices.get(productStep.getService())) {
+					suitedEquiplets.get(equiplet).add(productStep);
+				}
 			}
 		}
 		return suitedEquiplets;

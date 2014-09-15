@@ -1,6 +1,8 @@
 package MAS.simulation.mas.equiplet;
 
 import jade.core.AID;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +63,19 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		lastStatisticsUpdate = new Tick(0);
 		statistics = new Triple<Tick, Tick, Tick>(new Tick(0), new Tick(0), new Tick(0));
 		scheduleLatency = new HashMap<Tick, Tick>();
+	}
+
+	@Override
+	public void kill() {
+		try {
+			// deregister equiplet by the df
+			DFService.deregister(this);
+		} catch (FIPAException e) {
+			System.err.println("failed to deregister equiplet");
+			e.printStackTrace();
+		} finally {
+			super.doDelete();
+		}
 	}
 
 	@Override

@@ -64,7 +64,6 @@ public class Simulation implements ISimulation, IControl {
 	private SimInterface gui;
 	private IConfig config;
 	private Stochastics stochastics;
-	private boolean useGUI;
 
 	private Lock lock = new Lock();
 
@@ -93,15 +92,15 @@ public class Simulation implements ISimulation, IControl {
 	private Map<String, TreeMap<Tick, Double>> productStatistics;
 	private Map<String, TreeMap<Tick, Double>> equipletStatistics;
 
-	public Simulation(ISimControl simulation, boolean startGUI) {
+	public Simulation(ISimControl simulation) {
 		this.simulation = simulation;
-		this.useGUI = startGUI;
 
 		delay = 0;
 
 		finished = false;
 		running = false;
 		step = 0;
+		run = 1;
 
 		try {
 			Config con = Config.read();
@@ -110,10 +109,11 @@ public class Simulation implements ISimulation, IControl {
 			System.out.println("Simulation: configuration: " + config);
 
 			stochastics = new Stochastics(config);
-			if (startGUI) {
+			if (Settings.VERBOSITY > 1) {
 				gui = SimInterface.create(this);
 			}
 
+			runs = config.getRuns();
 			init();
 
 		} catch (NullPointerException | ConfigException e) {
@@ -128,14 +128,11 @@ public class Simulation implements ISimulation, IControl {
 	private void init() {
 		eventStack = new TreeSet<>();
 
-		run = 0;
-		runs = config.getRuns();
 		run_length = config.getRunLength();
 
 		time = new Tick(0);
 
 		totalSteps = 0;
-		// traveling = 0;
 		productCount = 0;
 		throughput = new HashMap<String, Tick>();
 		productStatistics = new HashMap<String, TreeMap<Tick, Double>>();
@@ -186,7 +183,7 @@ public class Simulation implements ISimulation, IControl {
 			}
 
 			Tick breakdown = stochastics.generateBreakdownTime(entry.getKey());
-			// eventStack.add(new Event(time + breakdown, EventType.BREAKDOWN, equipletName));
+			eventStack.add(new Event(time.add(breakdown), EventType.BREAKDOWN, equipletName));
 		}
 
 		try {
@@ -240,7 +237,7 @@ public class Simulation implements ISimulation, IControl {
 					break;
 				}
 
-				if (useGUI) {
+				if (Settings.VERBOSITY > 1) {
 					lock.await();
 
 					calculateEquipletLoad();
@@ -480,7 +477,7 @@ public class Simulation implements ISimulation, IControl {
 		IEquipletSim equipletAgent = equiplets.get(equipletName);
 		equipletAgent.notifyBreakdown(time);
 
-		// schedele REPAIRED time + repairTime, equiplet
+		// schedule REPAIRED time + repairTime, equiplet
 		Tick repairTime = stochastics.generateRepairTime(equipletName);
 		eventStack.add(new Event(time.add(repairTime), EventType.REPAIRED, equipletName));
 		System.out.printf("Simulation: schedule event REPAIRED %s + %s, %s\n", time, repairTime, equipletName);
@@ -534,7 +531,6 @@ public class Simulation implements ISimulation, IControl {
 	private void doneEvent() {
 		System.out.println("Simulation: simulation finished");
 		running = false;
-		finished = true;
 
 		synchronized (this) {
 			lock.unlock();
@@ -542,6 +538,31 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT LIMA");
 
 		saveStatistics();
+
+		// take down all agents
+		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+			equiplet.getValue().kill();
+		}
+
+		for (Entry<String, IProductSim> product : products.entrySet()) {
+			product.getValue().kill();
+		}
+
+		simulation.killAgent(Settings.TRAFFIC_AGENT);
+
+		// TODO check if needed to wait until messages are received and all is taken down / killed
+		simulation.delay(1000);
+
+		if (run == runs) {
+			finished = true;
+		} else {
+			run++;
+			init();
+
+			System.out.println("Simulation: run " + run);
+
+			running = true;
+		}
 	}
 
 	/**
@@ -557,6 +578,8 @@ public class Simulation implements ISimulation, IControl {
 		updateProductStats(STATS_SYSTEM, -1);
 
 		// remove agent from system
+		IProductSim productAgent = products.get(productName);
+		productAgent.kill();
 		products.remove(productName);
 
 		simulation.killAgent(productName);
@@ -695,6 +718,7 @@ public class Simulation implements ISimulation, IControl {
 
 		// Product is finished
 		IProductSim productAgent = products.get(productName);
+		productAgent.kill();
 		products.remove(productName);
 		throughput.put(productName, time.minus(productAgent.getCreated()));
 		System.out.println("CHECKPOINT INDIA");
@@ -748,7 +772,7 @@ public class Simulation implements ISimulation, IControl {
 		for (File f : fileList) {
 			Matcher matcher = pattern.matcher(f.getName());
 			if (f.isDirectory() && matcher.find()) {
-				number = Integer.valueOf(matcher.group(1)) + 1;
+				number = Math.max(Integer.valueOf(matcher.group(1)) + 1, number);
 			}
 		}
 
@@ -760,11 +784,11 @@ public class Simulation implements ISimulation, IControl {
 		try {
 			PrintWriter writer = new PrintWriter(statFile);
 			writer.println("Grid Simulation run");
-			writer.printf("run rime: \t%s\n", run_length);
-			writer.printf("Settings: \t%s\n", config);
-			writer.printf("Product Statistics: \t%s\n", productStatistics);
-			writer.printf("Equiplet Statistics: \t%s\n", equipletStatistics);
-			writer.println();
+			writer.printf("run rime: \t%s\r\n", run_length);
+			writer.printf("Settings: \t%s\t\r\n", config);
+			writer.printf("Product Statistics: \t%s\r\n", productStatistics);
+			writer.printf("Equiplet Statistics: \t%s\r\n", equipletStatistics);
+			writer.println("\r\t");
 
 			writer.println("more statistics");
 

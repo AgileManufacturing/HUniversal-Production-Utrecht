@@ -9,10 +9,12 @@ import MAS.simulation.util.Tick;
 public class ProductSim implements IProductSim {
 
 	private Product product;
+	String name;
 
 	public ProductSim(Simulation simulation, String name, LinkedList<ProductStep> steps, Position position, Tick time, Tick deadline) {
 		product = new Product();
 		product.init(time, deadline, steps, position);
+		this.name = name;
 	}
 
 	public void onProductArrived(Tick time) {
@@ -28,6 +30,11 @@ public class ProductSim implements IProductSim {
 	@Override
 	public Tick getCreated() {
 		return product.getCreated();
+	}
+
+	@Override
+	public void kill() {
+		System.out.println("PA:" + name + " terminating");
 	}
 
 }

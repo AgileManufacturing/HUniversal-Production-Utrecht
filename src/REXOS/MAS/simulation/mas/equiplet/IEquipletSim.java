@@ -37,4 +37,6 @@ public interface IEquipletSim {
 	Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>> getUpdateState();
 
 	Map<Tick, Tick> getLatency();
+
+	void kill();
 }
