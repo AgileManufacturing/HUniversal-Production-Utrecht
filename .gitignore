@@ -69,3 +69,4 @@ log.txt
 
 # Ignore simulation output 
 simulation/output/
+simulation/simulation/output/
