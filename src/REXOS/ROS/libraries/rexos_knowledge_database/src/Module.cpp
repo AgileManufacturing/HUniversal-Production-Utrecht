@@ -30,7 +30,7 @@ namespace rexos_knowledge_database{
 			std::string message = "This module (" + moduleIdentifier.toString() + ") does not exist";
 			throw KnowledgeDatabaseException(message.c_str());
 		}
-		ROS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
+		REXOS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
 				" typeNumber=" << moduleIdentifier.getTypeNumber() << " serialNumber=" << moduleIdentifier.getSerialNumber());
 		
 		delete result;
@@ -265,21 +265,21 @@ namespace rexos_knowledge_database{
 		return properties;
 	}
 	std::string Module::getCalibrationDataForModuleAndChilds(){
-		ROS_INFO("getCalibrationDataForModuleAndChilds a1");
+		REXOS_INFO("getCalibrationDataForModuleAndChilds a1");
 		std::vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
-		ROS_INFO("getCalibrationDataForModuleAndChilds a2, vector size = %lu", childs.size());
+		REXOS_INFO("getCalibrationDataForModuleAndChilds a2, vector size = %lu", childs.size());
 		std::string returnValue = getCalibrationDataForModuleAndOtherModules(childs);
-		ROS_INFO("%s", returnValue.c_str());
+		REXOS_INFO("%s", returnValue.c_str());
 		return returnValue;
 	}
 	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
-		ROS_INFO("getCalibrationDataForModuleAndOtherModules b1" );
+		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b1" );
 		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 		std::string query = "SELECT properties FROM ModuleCalibration WHERE id = ?;";
-		ROS_INFO("getCalibrationDataForModuleAndOtherModules b2, SQL query = %s", query.c_str());
+		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b2, SQL query = %s", query.c_str());
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement(query);
 		preparedStmt->setInt(1, calibrationId);
-		ROS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
+		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find calibration entry");
@@ -378,7 +378,7 @@ namespace rexos_knowledge_database{
 	
 	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
 		// create a temp table for storing the modules
-		ROS_INFO("getCalibrationGroupForModuleAndOtherModules c1");
+		REXOS_INFO("getCalibrationGroupForModuleAndOtherModules c1");
 		sql::PreparedStatement* preparedStmt;
 		std::string query = "\
 		CREATE TEMPORARY TABLE otherModules( \
@@ -386,7 +386,7 @@ namespace rexos_knowledge_database{
 			typeNumber char(200) NOT NULL, \
 			serialNumber char(200) NOT NULL \
 		);";
-		ROS_INFO("%s", query.c_str());
+		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		preparedStmt->executeQuery();
 		delete preparedStmt;
@@ -398,7 +398,7 @@ namespace rexos_knowledge_database{
 		) VALUES ( \
 			?, ?, ? \
 		);";
-		ROS_INFO("%s", query.c_str());
+		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		for(int i = 0; i < moduleIdentifiers.size(); i++){
 				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
@@ -434,7 +434,7 @@ namespace rexos_knowledge_database{
 				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \
 			) \
 		) = ?;";
-		ROS_INFO("%s", query.c_str());
+		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
@@ -444,7 +444,7 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			ROS_INFO("result...");
+			REXOS_INFO("result...");
 			// delete the temp table for storing the modules
 			preparedStmt = connection->prepareStatement("\
 			DROP TEMPORARY TABLE otherModules;");

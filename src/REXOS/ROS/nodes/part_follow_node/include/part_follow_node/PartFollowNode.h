@@ -32,6 +32,7 @@
 #pragma once
 
 #include <ros/ros.h>
+#include "rexos_logger/rexos_logger.h"
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_datatypes/InstructionData.h>
 

@@ -59,9 +59,9 @@ void on_mouse(int event, int x, int y, int flags, void* param){
 	if(event == CV_EVENT_LBUTTONDOWN){
 		rexos_vision::PixelAndRealCoordinateTransformer* cordTransformer = (rexos_vision::PixelAndRealCoordinateTransformer*) param;
 		rexos_datatypes::Point2D result = cordTransformer->pixelToRealCoordinate(rexos_datatypes::Point2D(x, y));
-		ROS_INFO("RX: %f, RY:%f", result.x, result.y);
-		ROS_INFO("PX: %d, PY:%d", x, y);
-		std::cout.flush();
+		REXOS_INFO("RX: %f, RY:%f", result.x, result.y);
+		REXOS_INFO("PX: %d, PY:%d", x, y);
+		//std::cout.flush();
 	}
 }
 
@@ -212,7 +212,7 @@ inline float averageY(std::vector<cv::Point2f> points){
  * Starts the calibration procedure
  **/
 bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErrors){
-	ROS_INFO("Updating calibration markers...");
+	REXOS_INFO("Updating calibration markers...");
 
 	// Clear all buffers and settings for the new calibration
 	fid1_buffer.clear();
@@ -226,18 +226,18 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 	// ROS says: Once a subscriber is removed (aka out of context) the subscription is removed.
 	// This allows us to use a temporary callback handler.
 	{
-		std::cout << "[DEBUG] Starting calibration" << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] Starting calibration" << std::endl);
 		image_transport::Subscriber subscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::calibrateCallback, this, image_transport::TransportHints("compressed"));
 
 		while(ros::ok() && (measurementCount < measurements && failCount < maxErrors)){
 			ros::spinOnce();
 		}
-		std::cout << "[DEBUG] Done calibrating, removing subscription." << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] Done calibrating, removing subscription." << std::endl);
 	}
 
 	// If it was a successful capture of all fiducials process the results
 	if(measurementCount >= measurements){
-		std::cout << "[DEBUG] Computing average X and Y coordinate for each marker." << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] Computing average X and Y coordinate for each marker." << std::endl);
 		rexos_datatypes::Point2D fid1(averageX(fid1_buffer), averageY(fid1_buffer));
 		rexos_datatypes::Point2D fid2(averageX(fid2_buffer), averageY(fid2_buffer));
 		rexos_datatypes::Point2D fid3(averageX(fid3_buffer), averageY(fid3_buffer));
@@ -248,11 +248,11 @@ bool CrateLocatorNode::calibrate(unsigned int measurements, unsigned int maxErro
 		markers.push_back(rexos_datatypes::Point2D(fid3.x, fid3.y));
 		cordTransformer->setFiducialPixelCoordinates(markers);
 
-		ROS_INFO( "Calibration markers updated.\nMeasured: %d Failed: %d", measurements, failCount);
+		REXOS_INFO( "Calibration markers updated.\nMeasured: %d Failed: %d", measurements, failCount);
 		return true;
 	}
 
-	ROS_INFO( "Calibration timed out, too many failed attempts. Measurements needed: %d Measured: %d", measurements, measurementCount);
+	REXOS_INFO( "Calibration timed out, too many failed attempts. Measurements needed: %d Measured: %d", measurements, measurementCount);
 	return false;
 }
 
@@ -266,7 +266,7 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg){
 	try{
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 	} catch(cv_bridge::Exception& e){
-		ROS_ERROR("cv_bridge exception: %s", e.what());
+		REXOS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
 
@@ -290,17 +290,17 @@ void CrateLocatorNode::calibrateCallback(const sensor_msgs::ImageConstPtr& msg){
 		failCount++;
 //size() on a vector returns a size_type, which has a different size on a 64-bit platform
 #if defined(__LP64__) || defined(_LP64)
-		ROS_WARN("Incorrect number of markers. Needed: 3 Saw: %lu", fiducialPoints.size());
+		REXOS_WARN("Incorrect number of markers. Needed: 3 Saw: %lu", fiducialPoints.size());
 #else
-		ROS_WARN("Incorrect number of markers. Needed: 3 Saw: %u", fiducialPoints.size());
+		REXOS_WARN("Incorrect number of markers. Needed: 3 Saw: %u", fiducialPoints.size());
 #endif
 	}
 
 	// Show the debug image and progress status.
 	cv::imshow(WINDOW_NAME, cv_ptr->image);
 	cv::waitKey(3);
-	std::cout << "Measures " << measurementCount << "/" << measurements << std::endl;
-	std::cout.flush();
+	REXOS_DEBUG_STREAM("Measures " << measurementCount << "/" << measurements << std::endl);
+	//std::cout.flush();
 }
 
 /**
@@ -314,7 +314,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 	try{
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 	} catch(cv_bridge::Exception& e){
-		ROS_ERROR("cv_bridge exception: %s", e.what());
+		REXOS_ERROR("cv_bridge exception: %s", e.what());
 		return;
 	}
 
@@ -359,7 +359,7 @@ void CrateLocatorNode::crateLocateCallback(const sensor_msgs::ImageConstPtr& msg
 		msg.crate.y = it->y;
 		msg.crate.angle = it->angle;
 
-		ROS_INFO("%s", it->toString().c_str());
+		REXOS_INFO("%s", it->toString().c_str());
 		crateEventPublisher.publish(msg);
 	}
 
@@ -380,12 +380,12 @@ void CrateLocatorNode::run(){
 	} else{
 		// Shutdown is not immediately exiting the program. This caused to run the these statements if they were not in the else...
 
-		std::cout << "[DEBUG] Waiting for subscription" << std::endl;
+		REXOS_INFO_STREAM("[DEBUG] Waiting for subscription" << std::endl);
 		// Subscribe example: (poorly documented on ros wiki)
 		// Images are transported in JPEG format to decrease tranfer time per image.
 		// imageTransport.subscribe(<base image topic>, <queue_size>, <callback>, <tracked object>, <TransportHints(<transport type>)>)
 		cameraSubscriber = imageTransport.subscribe("camera/image", 1, &CrateLocatorNode::crateLocateCallback, this, image_transport::TransportHints("compressed"));
-		std::cout << "[DEBUG] Starting crateLocateCallback loop" << std::endl;
+		REXOS_INFO_STREAM("[DEBUG] Starting crateLocateCallback loop" << std::endl);
 
 		while(ros::ok()){
 			ros::spinOnce();

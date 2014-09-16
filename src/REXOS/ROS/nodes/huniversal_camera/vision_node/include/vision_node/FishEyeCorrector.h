@@ -31,6 +31,7 @@
 #pragma once
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <camera/RectifyImage.h>
 

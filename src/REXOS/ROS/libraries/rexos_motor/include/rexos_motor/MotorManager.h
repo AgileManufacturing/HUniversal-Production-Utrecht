@@ -33,6 +33,7 @@
 
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_motor/StepperMotor.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 

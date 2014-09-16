@@ -31,6 +31,7 @@
 #define MODULEDETECTORNODE_H_
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <string>
 #include <iostream>

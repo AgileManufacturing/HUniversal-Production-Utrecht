@@ -62,10 +62,10 @@ ModuleProxy* ModuleRegistry::getModule(rexos_knowledge_database::ModuleIdentifie
 }
 
 bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res) {
-	ROS_INFO("ModuleRegistry: Module %s %s %s registering", req.manufacturer.c_str(), req.typeNumber.c_str(), req.serialNumber.c_str());
+	REXOS_INFO("ModuleRegistry: Module %s %s %s registering", req.manufacturer.c_str(), req.typeNumber.c_str(), req.serialNumber.c_str());
 	
 	if(!newRegistrationsAllowed) {
-		ROS_INFO("registration of new module not allowed");
+		REXOS_INFO("registration of new module not allowed");
 		return false;
 	}
 	
@@ -73,11 +73,11 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &re
 	for (int i = 0; i < registeredModules.size(); i++) {
 		if(registeredModules[i]->getModuleIdentifier() == newModuleIdentifier) {
 			registeredModules[i]->bind();
-			ROS_INFO("registration successful");
+			REXOS_INFO("registration successful");
 			return true;
 		}
 	}
-	ROS_WARN("registration failed because no module with this identifier exists in registry (did someone manually start a module with the wrong equipletName?)");
+	REXOS_WARN("registration failed because no module with this identifier exists in registry (did someone manually start a module with the wrong equipletName?)");
 	return false;
 }
 
@@ -86,7 +86,7 @@ void ModuleRegistry::onModuleStateChanged(
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
-	//ROS_INFO("ModuleRegistry received from %s a state change from %s to %s",moduleProxy->getModuleNodeName(),previousState,newState);
+	//REXOS_INFO("ModuleRegistry received from %s a state change from %s to %s",moduleProxy->getModuleNodeName(),previousState,newState);
 	if(moduleRegistryListener != NULL){
 		moduleRegistryListener->onModuleStateChanged(moduleProxy, newState, previousState);
 	}
@@ -97,7 +97,7 @@ void ModuleRegistry::onModuleModeChanged(
 	rexos_statemachine::Mode newMode, 
 	rexos_statemachine::Mode previousMode)
 {
-	//ROS_INFO("ModuleRegistry received from %s a mode change from %s to %s",moduleProxy->getModuleNodeName(),previousMode,newMode);
+	//REXOS_INFO("ModuleRegistry received from %s a mode change from %s to %s",moduleProxy->getModuleNodeName(),previousMode,newMode);
 	if(moduleRegistryListener != NULL){
 		moduleRegistryListener->onModuleModeChanged(moduleProxy, newMode, previousMode);
 	}
@@ -114,10 +114,10 @@ void ModuleRegistry::onInstructionStepCompleted(
 }
 
 void ModuleRegistry::onModuleDied(ModuleProxy* moduleProxy){
-	ROS_WARN("Module has died! :(");
+	REXOS_WARN("Module has died! :(");
 	for(std::vector<ModuleProxy*>::iterator it = registeredModules.begin(); it != registeredModules.end(); it++){
 		if(*it == moduleProxy){
-			ROS_INFO("found me");
+			REXOS_INFO("found me");
 			registeredModules.erase(it);
 			delete *it;
 			break;

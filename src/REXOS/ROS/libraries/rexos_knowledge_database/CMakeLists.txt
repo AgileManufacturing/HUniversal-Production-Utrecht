@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_knowledge_database)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS libjson)
+find_package(catkin REQUIRED COMPONENTS libjson rexos_logger)
 find_package(MYSQLCONNECTORCPP)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES rexos_knowledge_database
-CATKIN_DEPENDS libjson
+LIBRARIES rexos_knowledge_database rexos_logger
+CATKIN_DEPENDS libjson rexos_logger
 DEPENDS MYSQLCONNECTORCPP)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_delta_robot)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_datatypes rexos_modbus rexos_motor rexos_utilities)
+find_package(catkin REQUIRED COMPONENTS rexos_datatypes rexos_modbus rexos_motor rexos_utilities rexos_logger)
 find_package(Boost)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES rexos_delta_robot 
-CATKIN_DEPENDS rexos_datatypes rexos_modbus rexos_motor rexos_utilities
+LIBRARIES rexos_delta_robot rexos_logger
+CATKIN_DEPENDS rexos_datatypes rexos_modbus rexos_motor rexos_utilities rexos_logger
 DEPENDS Boost)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

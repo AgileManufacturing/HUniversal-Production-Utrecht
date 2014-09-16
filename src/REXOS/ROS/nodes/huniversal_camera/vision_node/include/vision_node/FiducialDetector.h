@@ -32,6 +32,8 @@
 #define FIDUCIALREADERNODE_H_
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
+
 
 #include <image_transport/image_transport.h>
 #include <rexos_vision/FiducialDetector.h> 

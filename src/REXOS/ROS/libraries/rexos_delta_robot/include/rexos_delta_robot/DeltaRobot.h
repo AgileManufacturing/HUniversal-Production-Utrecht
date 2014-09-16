@@ -41,6 +41,8 @@
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
+#include "rexos_logger/rexos_logger.h"
+
 
 #include <vector>
 

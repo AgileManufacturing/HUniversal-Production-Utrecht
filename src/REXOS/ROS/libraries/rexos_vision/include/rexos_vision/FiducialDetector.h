@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <opencv2/core/core.hpp>
 #include <vector>
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_vision{
 

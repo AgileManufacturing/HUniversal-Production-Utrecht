@@ -40,7 +40,7 @@ namespace rexos_gripper {
 	InputOutputController::InputOutputController(JSONNode node) {
 		readJSONNode(node);
 
-		ROS_INFO("[DEBUG] Opening modbus connection");
+		REXOS_INFO("[DEBUG] Opening modbus connection");
 		
 		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
 		if(modbusIO == NULL){
@@ -57,10 +57,10 @@ namespace rexos_gripper {
 		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
 			if(it->name() == "modbusIp"){
 				modbusIp = it->as_string();
-				ROS_INFO_STREAM("found modbusIp " << modbusIp);
+				REXOS_INFO_STREAM("found modbusIp " << modbusIp);
 			} else if(it->name() == "modbusPort"){
 				modbusPort = it->as_int();
-				ROS_INFO_STREAM("found modbusPort " << modbusPort);
+				REXOS_INFO_STREAM("found modbusPort " << modbusPort);
 				
 			} else {
 				// some other property, ignore it

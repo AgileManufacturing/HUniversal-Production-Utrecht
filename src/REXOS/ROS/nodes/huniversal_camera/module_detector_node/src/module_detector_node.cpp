@@ -36,7 +36,7 @@
 #define MODULE_QR_CODE_TIME_TO_LIVE 3
 
 ModuleDetectorNode::ModuleDetectorNode() {
-	ROS_INFO("Constructing");
+	REXOS_INFO("Constructing");
 }
 
 void ModuleDetectorNode::qrCodeCallback(const vision_node::QrCodes & message) {
@@ -63,7 +63,7 @@ void ModuleDetectorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 			
 			// have we previously scanned this QR code?
 			if(pendingQrCodes.count(data) == 0){
-				ROS_INFO("Detected new module QR-code");
+				REXOS_INFO("Detected new module QR-code");
 				std_msgs::String moduleMsg;
 				moduleMsg.data = data;
 				modulesPublisher.publish(moduleMsg);
@@ -76,14 +76,14 @@ void ModuleDetectorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 void ModuleDetectorNode::run() {
 	modulesPublisher = nodeHandle.advertise<std_msgs::String>("camera/modules", 100);
 	
-	ROS_INFO("waiting for camera/qr_codes");
+	REXOS_INFO("waiting for camera/qr_codes");
 	ros::Subscriber sub = nodeHandle.subscribe("camera/qr_codes", 10, &ModuleDetectorNode::qrCodeCallback, this);
 	ros::spin();
 }
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "module_detector_node");
-	ROS_DEBUG("Constructing node");
+	REXOS_DEBUG("Constructing node");
 
 	ModuleDetectorNode node;
 	

@@ -3,13 +3,13 @@ project(libjson)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED rexos_logger)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES libjson 
-CATKIN_DEPENDS 
+LIBRARIES libjson rexos_logger
+CATKIN_DEPENDS rexos_logger
 DEPENDS)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

@@ -63,10 +63,10 @@ namespace rexos_delta_robot{
 			effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
 			boundariesGenerated(false),
 			currentMotionSlot(1){
-		ROS_INFO("DeltaRobot constructor entering...");
+		REXOS_INFO("DeltaRobot constructor entering...");
 		readJSONNode(node);
 		
-		ROS_INFO("Configuring Modbus...");
+		REXOS_INFO("Configuring Modbus...");
 		// Initialize modbus for IO controller
 		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
 		if(modbusIO == NULL){
@@ -108,24 +108,24 @@ namespace rexos_delta_robot{
 		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
 			if(it->name() == "modbusIp"){
 				modbusIp = it->as_string();
-				ROS_INFO_STREAM("found modbusIp " << modbusIp);
+				REXOS_INFO_STREAM("found modbusIp " << modbusIp);
 			} else if(it->name() == "modbusPort"){
 				modbusPort = it->as_int();
-				ROS_INFO_STREAM("found modbusPort " << modbusPort);
+				REXOS_INFO_STREAM("found modbusPort " << modbusPort);
 			
 			} else if(it->name() == "calibrationBigStepFactor"){
 				calibrationBigStepFactor = it->as_int();
-				ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
+				REXOS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
 			
 			
 			} else if(it->name() == "stepperMotorProperties"){
 				JSONNode node = it->as_node();
 				stepperMotorProperties = new rexos_motor::StepperMotorProperties(node);
-				ROS_INFO_STREAM("found stepperMotorProperties");
+				REXOS_INFO_STREAM("found stepperMotorProperties");
 			} else if(it->name() == "deltaRobotMeasures"){
 				JSONNode node = it->as_node();
 				deltaRobotMeasures = new rexos_delta_robot::DeltaRobotMeasures(node);
-				ROS_INFO_STREAM("found deltraRobotMeasures");
+				REXOS_INFO_STREAM("found deltraRobotMeasures");
 			} else {
 				// some other property, ignore it
 			}
@@ -393,7 +393,7 @@ namespace rexos_delta_robot{
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void DeltaRobot::calibrateMotor(int motorIndex){
-        std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
+        REXOS_DEBUG_STREAM("[DEBUG] Calibrating motor number " << motorIndex << std::endl);
 
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex]->setIncrementalMode(1);
@@ -435,17 +435,17 @@ namespace rexos_delta_robot{
         // Check the availability of the sensors
         bool sensorFailure = false;
         if(checkSensor(0)){
-            std::cerr << "Sensor 0 failure (is the hardware connected?)" << std::endl;
+            REXOS_ERROR_STREAM("Sensor 0 failure (is the hardware connected?)" << std::endl);
             sensorFailure = true;
         }
 
         if(checkSensor(1)){
-            std::cerr << "Sensor 1 failure (is the hardware connected?)" << std::endl;
+            REXOS_ERROR_STREAM("Sensor 1 failure (is the hardware connected?)" << std::endl);
             sensorFailure = true;
         }
 
         if(checkSensor(2)){
-            std::cerr << "Sensor 2 failure (is the hardware connected?)" << std::endl;
+           REXOS_ERROR_STREAM("Sensor 2 failure (is the hardware connected?)" << std::endl);
             sensorFailure = true;
         }
 
@@ -492,7 +492,7 @@ namespace rexos_delta_robot{
                 deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector) * (
                 deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector))
         );
-        std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
+        REXOS_DEBUG_STREAM("[DEBUG] effector location z: " << effectorLocation.z << std::endl); 
 
         return true;
     }

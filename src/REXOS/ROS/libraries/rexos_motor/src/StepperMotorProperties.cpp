@@ -50,28 +50,28 @@ namespace rexos_motor {
 		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
 			if(it->name() == "motorMinAngleDegrees"){
 				motorMinAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
+				REXOS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
 			} else if(it->name() == "motorMaxAngleDegrees"){
 				motorMaxAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
+				REXOS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
 			
 			} else if(it->name() == "microStepAngleDegrees"){
 				microStepAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found microStepAngle " << microStepAngle);
+				REXOS_INFO_STREAM("found microStepAngle " << microStepAngle);
 			
 			} else if(it->name() == "minAccelerationDegrees"){
 				minAcceleration = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found minAcceleration " << minAcceleration);
+				REXOS_INFO_STREAM("found minAcceleration " << minAcceleration);
 			} else if(it->name() == "maxAccelerationDegrees"){
 				maxAcceleration = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
+				REXOS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
 			
 			} else if(it->name() == "minSpeedDegrees"){
 				minSpeed = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found minSpeed " << minSpeed);
+				REXOS_INFO_STREAM("found minSpeed " << minSpeed);
 			} else if(it->name() == "maxSpeedDegrees"){
 				maxSpeed = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found maxSpeed " << maxSpeed);
+				REXOS_INFO_STREAM("found maxSpeed " << maxSpeed);
 			} else {
 				// some other property, ignore it
 			}

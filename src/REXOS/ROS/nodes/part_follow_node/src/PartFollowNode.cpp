@@ -51,26 +51,26 @@ using namespace part_follow_node;
 PartFollowNode::PartFollowNode(std::string blackboardIp) :
 	maxAcceleration("5.0") {
 
-	ROS_INFO("Constructing");
+	REXOS_INFO("Constructing");
 
 	//DirectMoveStepsBlackBoard
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "EquipletStepsBlackBoard");
 
 
 	equipletStepBlackboardClient->removeDocuments("");
-	ROS_INFO("A");
+	REXOS_INFO("A");
 }
 
 PartFollowNode::~PartFollowNode(){
-	ROS_INFO("Destructing");
+	REXOS_INFO("Destructing");
 }
 
 void PartFollowNode::run(){
-	ROS_INFO("B");
+	REXOS_INFO("B");
 	ros::Rate rate(1);
 
 	while (ros::ok()) {
-	ROS_INFO("C");
+	REXOS_INFO("C");
 		writeToBlackBoard(maxAcceleration);
 		rate.sleep();
 		ros::spinOnce();
@@ -78,7 +78,7 @@ void PartFollowNode::run(){
 }
 
 void PartFollowNode::writeToBlackBoard(std::string acceleration){
-	ROS_INFO("D");
+	REXOS_INFO("D");
 
 	//Need to include InstructionData for the instructiondata
 	//Dont forget to set in package & makelist!
@@ -90,7 +90,7 @@ void PartFollowNode::writeToBlackBoard(std::string acceleration){
 	payload.insert(pair<string, string>("y", "0.0"));
 	payload.insert(pair<string, string>("z", "-335"));
 
-	ROS_INFO("E");
+	REXOS_INFO("E");
 	if(!acceleration.empty()) {
 		payload.insert(pair<string, string>("maxAcceleration", acceleration));
 	}
@@ -98,7 +98,7 @@ void PartFollowNode::writeToBlackBoard(std::string acceleration){
 	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "FIND_ID", 
             look_up_parameters, payload);
 
-	ROS_INFO("F");
+	REXOS_INFO("F");
     std::stringstream ss;
         ss << "{ ";
         ss << "\"serviceStepID\" : \"" << "1" << "\", ";
@@ -107,15 +107,15 @@ void PartFollowNode::writeToBlackBoard(std::string acceleration){
         ss << "\"instructionData\" : " << instructionData->toJSONString() << ", ";
         ss << "\"status\" : \"WAITING\" ";
         ss << " } ";
-	ROS_INFO(ss.str().c_str());
+	REXOS_INFO(ss.str().c_str());
     rexos_datatypes::EquipletStep step = rexos_datatypes::EquipletStep(libjson::parse(ss.str()));    
 
 
-	ROS_INFO("G");
+	REXOS_INFO("G");
 	step.setInstructionData(*instructionData);
 
 	if(equipletStepBlackboardClient->insertDocument(step.toJSONString())) {
-		std::cout << "printed: " << step.toJSONString() << "to blackboard." << std::endl;
+		REXOS_INFO_STREAM("printed: " << step.toJSONString() << "to blackboard." << std::endl);
 	}
 
 }

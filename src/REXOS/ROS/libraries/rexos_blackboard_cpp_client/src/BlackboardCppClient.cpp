@@ -119,7 +119,7 @@ bool BlackboardCppClient::insertDocument(std::string json, mongo::BSONObj * resu
 	delete connection;
 	return result.getIntField("ok") == 1;
 	}catch(const std::exception &e){
-		std::cout << "Exception inserting document: " << e.what() <<  std::endl;
+		REXOS_ERROR_STREAM("Exception inserting document: " << e.what() <<  std::endl);
 	}
 }
 
@@ -142,7 +142,7 @@ int BlackboardCppClient::removeDocuments(std::string queryAsJSON, mongo::BSONObj
 	return result.getIntField("n");
 
 	}catch(const std::exception &e){
-		std::cout << "Exception removing document: "<< e.what() <<  std::endl;
+		REXOS_ERROR_STREAM("Exception removing document: "<< e.what() <<  std::endl);
 	}
 }
 
@@ -159,7 +159,7 @@ mongo::BSONObj BlackboardCppClient::findDocumentById(mongo::OID objectId) {
 	return document;
 
 	}catch(const std::exception &e){
-		std::cout << "Exception finding document: " << e.what() <<  std::endl;
+		REXOS_ERROR_STREAM("Exception finding document: " << e.what() <<  std::endl);
 	}
 }
 
@@ -186,7 +186,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 		}
 	} catch (mongo::AssertionException &ex) {
 		// Error occurred at remote server, there will be no more objects.
-		std::cout << "Assertion exception at 188 blackboardclient cpp " << ex.what() << std::endl;
+		REXOS_ERROR_STREAM("Assertion exception at 188 blackboardclient cpp " << ex.what() << std::endl);
 	}
 
 	connection->done();
@@ -194,7 +194,7 @@ int BlackboardCppClient::findDocuments(std::string queryAsJSON, std::vector<mong
 	return resultCount;
 
 	}catch(const std::exception &e){
-		std::cout << "Exception finding document by json: " << e.what() <<  std::endl;
+		REXOS_ERROR_STREAM("Exception finding document by json: " << e.what() <<  std::endl);
 	}
 }
 
@@ -222,7 +222,7 @@ int BlackboardCppClient::updateDocuments(
 	delete connection;
 	return result.getIntField("n");
 		}catch(const std::exception &e){
-		std::cout << "Exception updating documents: "  << e.what() << std::endl;
+		REXOS_ERROR_STREAM("Exception updating documents: "  << e.what() << std::endl);
 	}
 }
 

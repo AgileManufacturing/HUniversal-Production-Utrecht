@@ -2,6 +2,7 @@
 #define TestSuite_JSONStats_h
 
 #include "JSONOptions.h"
+#include "rexos_logger/rexos_logger.h"
 
 #if defined(JSON_UNIT_TEST) || defined(JSON_DEBUG)
 	#define LIBJSON_OBJECT(name)\
@@ -40,13 +41,13 @@
 			std::map<getCounter_m, objectStructure*> & mymap = getMapper();
 			std::map<getCounter_m, objectStructure*>::iterator b = mymap.begin();
 			std::map<getCounter_m, objectStructure*>::iterator e = mymap.end();
-			std::cout << "Counters for libjson:" << std::endl;
+			REXOS_INFO_STREAM("Counters for libjson:" << std::endl);
 			for(; b != e; ++b){
-				std::cout << "  " << b -> second -> _name << std::endl;
-				std::cout << "     Constructor:      " << b -> second -> _cTor() << std::endl;
-				std::cout << "     Copy Constructor: " << b -> second -> _ccTor() << std::endl;
-				std::cout << "     Assignment:       " << b -> second -> _assign() << std::endl;
-				std::cout << "     Destructor:       " << b -> second -> _dTor() << std::endl;
+				REXOS_INFO_STREAM("  " << b -> second -> _name << std::endl);
+				REXOS_INFO_STREAM("     Constructor:      " << b -> second -> _cTor() << std::endl);
+				REXOS_INFO_STREAM("     Copy Constructor: " << b -> second -> _ccTor() << std::endl);
+				REXOS_INFO_STREAM("     Assignment:       " << b -> second -> _assign() << std::endl);
+				REXOS_INFO_STREAM("     Destructor:       " << b -> second -> _dTor() << std::endl);
 				delete b -> second;
 			}
 		}

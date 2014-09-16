@@ -21,7 +21,7 @@ namespace rexos_coordinates{
 			module(module)
 	{
 		updateTranslationVectors();
-		ROS_INFO_STREAM("rexos_coordinates: Constructed module");
+		REXOS_INFO_STREAM("rexos_coordinates: Constructed module");
 	}
 	void Module::updateTranslationVectors() {
 		int mountPointX = module->getMountPointX();
@@ -33,18 +33,18 @@ namespace rexos_coordinates{
 		double midPointX = std::numeric_limits<double>::quiet_NaN();
 		double midPointY = std::numeric_limits<double>::quiet_NaN();
 		double midPointZ = std::numeric_limits<double>::quiet_NaN();
-		ROS_INFO_STREAM(properties);
-		//ROS_INFO_STREAM(jsonNode.write_formatted());
+		REXOS_INFO_STREAM(properties);
+		//REXOS_INFO_STREAM(jsonNode.write_formatted());
 		for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
 			if(it->name() == "midPointX"){
 				midPointX = it->as_float();
-				ROS_INFO("found midPointX");
+				REXOS_INFO("found midPointX");
 			} else if(it->name() == "midPointY"){
 				midPointY = it->as_float();
-				ROS_INFO("found midPointY");
+				REXOS_INFO("found midPointY");
 			} else if(it->name() == "midPointZ"){
 				midPointZ = it->as_float();
-				ROS_INFO("found midPointZ");
+				REXOS_INFO("found midPointZ");
 			} else {
 				// some other property, ignore it
 			}
@@ -62,7 +62,7 @@ namespace rexos_coordinates{
 		
 		this->equipletToModule = Vector3(offsetX, offsetY, offsetZ);
 		this->moduleToEquiplet = Vector3(-offsetX, -offsetY, -offsetZ);
-		ROS_INFO_STREAM("equipletToModule: " << equipletToModule);
-		ROS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
+		REXOS_INFO_STREAM("equipletToModule: " << equipletToModule);
+		REXOS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
 	}
 }

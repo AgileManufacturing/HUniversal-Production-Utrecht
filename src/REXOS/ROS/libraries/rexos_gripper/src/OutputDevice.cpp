@@ -47,10 +47,10 @@ namespace rexos_gripper {
 		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
 			if(it->name() == "modbusAddress"){
 				address = it->as_int();
-				ROS_INFO_STREAM("found modbusAddress " << address);
+				REXOS_INFO_STREAM("found modbusAddress " << address);
 			} else if(it->name() == "modbusDevicePin"){
 				pin = it->as_int();
-				ROS_INFO_STREAM("found modbusDevicePin " << pin);
+				REXOS_INFO_STREAM("found modbusDevicePin " << pin);
 			} else {
 				// some other property, ignore it
 			}

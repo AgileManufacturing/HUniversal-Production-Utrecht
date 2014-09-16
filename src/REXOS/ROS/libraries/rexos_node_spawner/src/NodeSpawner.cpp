@@ -48,7 +48,7 @@ namespace rexos_node_spawner {
 		
 	}
 	void NodeSpawner::spawnNode(rexos_knowledge_database::ModuleIdentifier moduleIdentifier) {
-		ROS_INFO("Spawning new node");
+		REXOS_INFO("Spawning new node");
 		int pid = fork();
 		if(pid == 0) {
 			// we are the new child
@@ -62,17 +62,17 @@ namespace rexos_node_spawner {
 			boost::algorithm::replace_all(command, "{typeNumber}", moduleIdentifier.getTypeNumber());
 			boost::algorithm::replace_all(command, "{serialNumber}", moduleIdentifier.getSerialNumber());
 		
-			ROS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
+			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
 			execl("/bin/bash", "/bin/bash", "-c", command.c_str(), NULL);
-			ROS_ERROR("Unable to execl");
+			REXOS_ERROR("Unable to execl");
 			throw std::runtime_error("Unable to execl");
 		} else {
 			// we are the old parent
-			ROS_INFO("node has been spawned");
+			REXOS_INFO("node has been spawned");
 		}
 	}
 	void NodeSpawner::spawnEquipletNode() {
-		ROS_INFO("Spawning new node");
+		REXOS_INFO("Spawning new node");
 		int pid = fork();
 		if(pid == 0) {
 			// we are the new child
@@ -83,13 +83,13 @@ namespace rexos_node_spawner {
 			std::string command = rosSoftware.getCommand();
 			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
 			
-			ROS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
+			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
 			execl("/bin/bash", "/bin/bash", "-c", command.c_str(), NULL);
-			ROS_ERROR("Unable to execl");
+			REXOS_ERROR("Unable to execl");
 			throw std::runtime_error("Unable to execl");
 		} else {
 			// we are the old parent
-			ROS_INFO("node has been spawned");
+			REXOS_INFO("node has been spawned");
 		}
 	}
 	void NodeSpawner::extractZipArchive(rexos_knowledge_database::RosSoftware& rosSoftware) {
@@ -107,11 +107,11 @@ namespace rexos_node_spawner {
 			zipFileOutputStream.write(buf, rosFile->gcount());
 		}
 		zipFileOutputStream.close();
-		ROS_INFO_STREAM("zip archive has been written at " << zipArchiveFileName);
+		REXOS_INFO_STREAM("zip archive has been written at " << zipArchiveFileName);
 		
 		int err = 0;
 		zip* zipArchive = zip_open((zipArchivePath + zipArchiveFileName).c_str(), 0, &err);
-		ROS_INFO_STREAM("zip archive opened with " << err);
+		REXOS_INFO_STREAM("zip archive opened with " << err);
 		
 		struct zip_stat zipStat;
 		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
@@ -148,6 +148,6 @@ namespace rexos_node_spawner {
 				}
 			}
 		}
-		ROS_INFO("zipArchive has been extracted");
+		REXOS_INFO("zipArchive has been extracted");
 	}
 }

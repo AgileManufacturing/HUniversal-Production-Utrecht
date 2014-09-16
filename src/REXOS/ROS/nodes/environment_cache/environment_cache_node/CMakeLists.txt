@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(environment_cache)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation environment_communication_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation environment_communication_msgs rexos_logger)
 find_package(Log4cxx)
 
 file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
@@ -22,8 +22,8 @@ generate_messages (
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES  
-CATKIN_DEPENDS roscpp std_msgs environment_communication_msgs
+LIBRARIES rexos_logger 
+CATKIN_DEPENDS roscpp std_msgs environment_communication_msgs rexos_logger
 DEPENDS)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

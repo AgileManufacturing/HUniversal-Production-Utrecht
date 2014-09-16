@@ -3,7 +3,7 @@ project(rexos_vision)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_datatypes)
+find_package(catkin REQUIRED rexos_logger COMPONENTS rexos_datatypes)
 find_package(Boost)
 find_package(ZBAR)
 find_package(OpenCV)
@@ -11,8 +11,8 @@ find_package(OpenCV)
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES rexos_vision 
-CATKIN_DEPENDS rexos_datatypes
+LIBRARIES rexos_vision rexos_logger
+CATKIN_DEPENDS rexos_datatypes rexos_logger
 DEPENDS Boost ZBAR OpenCV)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

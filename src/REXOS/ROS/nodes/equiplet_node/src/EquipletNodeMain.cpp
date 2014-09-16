@@ -33,10 +33,10 @@
 const char* DEFAULT_BLACKBOARD_IP = "145.89.191.131"; //10.0.1.227
 
 static void show_usage(std::string name) {
-	std::cerr << "Usage: " << name << " <options(s)>\n" << "Options:\n"
+	REXOS_ERROR_STREAM("Usage: " << name << " <options(s)>\n" << "Options:\n"
 			<< "\t--help\t\tShow this help message\n"
 			<< "\t--blackboard\tIP address of the blackboard (default: 145.89.191.131)\n"
-			<< "\t--id\t\tID of this equiplet (default: 1)\n";
+			<< "\t--id\t\tID of this equiplet (default: 1)\n");
 }
 
 int main(int argc, char **argv) {
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 			if (i + 1 < argc) {
 				blackboardIP = argv[++i];
 			} else {
-				std::cerr << "--blackboard requires one argument";
+				REXOS_ERROR("--blackboard requires one argument");
 				return -1;
 			}
 		} else if (arg == "--spawnNodes") {
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	if(argc < 2) {
-		ROS_ERROR("Usage: equiplet_node (--blackboard <ip-address>) (--spawnNodes) equipletName");
+		REXOS_ERROR("Usage: equiplet_node (--blackboard <ip-address>) (--spawnNodes) equipletName");
 		return -2;
 	}
 	

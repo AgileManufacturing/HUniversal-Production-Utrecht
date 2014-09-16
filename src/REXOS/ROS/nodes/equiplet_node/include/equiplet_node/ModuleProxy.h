@@ -27,7 +27,8 @@
 #include <equiplet_node/SetInstruction.h>
 
 #include "equiplet_node/ModuleProxyListener.h"
- 
+#include "rexos_logger/rexos_logger.h"
+
 // GCC system header to suppress libjson warnings
 #pragma GCC system_header
 #include <libjson/libjson.h>

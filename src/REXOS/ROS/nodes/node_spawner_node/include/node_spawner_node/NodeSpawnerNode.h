@@ -32,6 +32,7 @@
 #pragma once
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 #include "lookup_handler/LookupServer.h"
 
 #include <string>

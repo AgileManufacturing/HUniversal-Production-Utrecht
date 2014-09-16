@@ -45,6 +45,9 @@
   <build_depend>equiplet_node</build_depend>
   <run_depend>equiplet_node</run_depend>
 
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+
   <export>
     <cpp cflags="-I${prefix}/include"/>
   </export>

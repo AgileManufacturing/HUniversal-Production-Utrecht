@@ -33,6 +33,8 @@
 #include "ros/ros.h"
 #include "rexos_std_srvs/Module.h"
 #include "delta_robot_node/Point.h"
+#include "rexos_logger/rexos_logger.h"
+
 
 #include <rexos_datatypes/Point3D.h>
 #include <rexos_delta_robot/DeltaRobot.h>

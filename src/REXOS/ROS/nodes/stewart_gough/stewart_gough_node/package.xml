@@ -42,6 +42,9 @@
   <build_depend>rexos_coordinates</build_depend>
   <run_depend>rexos_coordinates</run_depend>
 
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+
   <export>
     <cpp cflags="-I${prefix}/include"/>
   </export>

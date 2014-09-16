@@ -223,7 +223,6 @@ return formats;
 		}
 
 		if (format.bpp != 24) {
-			std::cout << "bits per pixel: " << format.bpp << std::endl;
 			throw UnicapCvException("Invalid bits per pixel");
 		}
 

@@ -40,6 +40,7 @@
 #include <rexos_delta_robot/Measures.h>
 #include <rexos_delta_robot/InverseKinematicsModel.h>
 #include <vector>
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_delta_robot{
 	/**

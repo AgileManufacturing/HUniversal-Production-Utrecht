@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_statemachine)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg actionlib_msgs actionlib message_generation rexos_bond rexos_knowledge_database)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs genmsg actionlib_msgs actionlib message_generation rexos_bond rexos_knowledge_database rexos_logger)
 find_package(Mongo)
 
 file(GLOB_RECURSE actions RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/action" "*.action")
@@ -22,8 +22,8 @@ generate_messages (
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES rexos_statemachine 
-CATKIN_DEPENDS rexos_bond rexos_knowledge_database
+LIBRARIES rexos_statemachine rexos_logger
+CATKIN_DEPENDS rexos_bond rexos_knowledge_database rexos_logger
 DEPENDS Boost)
 
 file(GLOB_RECURSE sources "src/**.c" "src/**.cpp")

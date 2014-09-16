@@ -123,9 +123,9 @@ void EnvironmentCache::printEnvironmentCache(){
 	std::map< std::string, std::map<std::string, std::string> >::iterator cacheIterator;
 	std::map<std::string, std::string>::iterator propertiesIterator;
 	for(cacheIterator = cache.begin(); cacheIterator != cache.end(); cacheIterator++){
-		std::cout << (*cacheIterator).first << " :" << std::endl;
+		REXOS_INFO_STREAM((*cacheIterator).first << " :" << std::endl);
 		for(propertiesIterator = (*cacheIterator).second.begin(); propertiesIterator != (*cacheIterator).second.end(); propertiesIterator++){
-			std::cout << "\t" << (*propertiesIterator).first << " : " << (*propertiesIterator).second << std::endl;
+			REXOS_INFO_STREAM("\t" << (*propertiesIterator).first << " : " << (*propertiesIterator).second << std::endl);
 		}
 	}
 }
@@ -144,7 +144,7 @@ bool EnvironmentCache::addItemToCache(std::string id, const std::vector<environm
 		// Convert the vector with properties to a map
 		createMapFromVector(properties, options);
 		cache.insert(std::pair<std::string, std::map<std::string, std::string> >(id, options));
-		std::cout << "New item added to environment cache" << std::endl;
+		REXOS_INFO_STREAM("New item added to environment cache" << std::endl);
 		return true;
 	}
 	return false;
@@ -178,10 +178,10 @@ bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<envir
 			if((*cacheIterator).second.count((*optionsIterator).first) == 1){
 				propertyIterator = (*cacheIterator).second.find((*optionsIterator).first); // Create iterator to the property found
 				(*propertyIterator).second = (*optionsIterator).second; // update its value
-				std::cout << "Property with key " << (*propertyIterator).first << " in item with id " << (*cacheIterator).first << " updated" << std::endl;
+				REXOS_INFO_STREAM("Property with key " << (*propertyIterator).first << " in item with id " << (*cacheIterator).first << " updated" << std::endl);
 			} else{
 				(*cacheIterator).second.insert(std::pair<std::string, std::string>((*optionsIterator).first, (*optionsIterator).second ));
-				std::cout << "Property with key " << (*optionsIterator).first << " added to item with id " << id << std::endl;
+				REXOS_INFO_STREAM("Property with key " << (*optionsIterator).first << " added to item with id " << id << std::endl);
 			}
 		}
 		return true;
@@ -199,7 +199,7 @@ bool EnvironmentCache::updateItemInCache(std::string id, const std::vector<envir
 bool EnvironmentCache::removeItemFromCache(std::string id){
 	if(cache.count(id) == 1){
 		cache.erase(id);
-		std::cout << "Item with id " << id << " deleted from cache" << std::endl;
+		REXOS_INFO_STREAM("Item with id " << id << " deleted from cache" << std::endl);
 		return true;
 	}
 	return false;

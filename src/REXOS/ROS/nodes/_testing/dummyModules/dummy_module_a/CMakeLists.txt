@@ -3,13 +3,13 @@ project(dummy_module_a)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_knowledge_database rexos_statemachine)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_knowledge_database rexos_statemachine rexos_logger)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES  
-CATKIN_DEPENDS message_runtime roscpp std_msgs rexos_knowledge_database rexos_statemachine
+LIBRARIES rexos_logger
+CATKIN_DEPENDS message_runtime roscpp std_msgs rexos_knowledge_database rexos_statemachine rexos_logger
 DEPENDS )
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

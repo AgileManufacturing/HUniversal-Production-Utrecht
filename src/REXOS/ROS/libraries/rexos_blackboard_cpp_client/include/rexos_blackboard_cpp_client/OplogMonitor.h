@@ -35,6 +35,7 @@
 #include <vector>
 #include "mongo/client/dbclientinterface.h"
 #include "boost/thread.hpp"
+#include "rexos_logger/rexos_logger.h"
 
 namespace Blackboard {
 

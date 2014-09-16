@@ -36,7 +36,7 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
 	ros::NodeHandle nodeHandle;
 	lookupEnvironmentClient = nodeHandle.serviceClient<environment_cache::LookupEnvironmentObject>("LookupEnvironmentObject");
 	lookupServer = nodeHandle.advertiseService("LookupHandler/lookup", &LookupHandler::lookupServiceCallback, this);
-	ROS_INFO("LookupHandler constructor called");
+	REXOS_INFO("LookupHandler constructor called");
 }
 /**
  * Call back for lookupHandler/lookup service
@@ -48,7 +48,7 @@ EnvironmentCommunication::LookupHandler::LookupHandler(){
 bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handler::LookupServer::Request &request, lookup_handler::LookupServer::Response &response){
 	// Construct a message for LookupEnvironmentObject service
 	environment_cache::LookupEnvironmentObject msg;
-	std::cout << "lookupservice callback. LookupType: " << request.lookupMsg.lookupType << std::endl;
+	REXOS_INFO_STREAM("lookupservice callback. LookupType: " << request.lookupMsg.lookupType << std::endl);
 	std::map<std::string, std::string> payloadMap = createMapFromVector(request.lookupMsg.payLoad.map);
 	std::map<std::string, std::string> lookupParametersMap = createMapFromVector(request.lookupMsg.lookupParameters.map);
 
@@ -59,11 +59,11 @@ bool EnvironmentCommunication::LookupHandler::lookupServiceCallback(lookup_handl
 		std::map<std::string, std::string>::iterator iterator = lookupParametersMap.find("ID");
 
 		if (iterator == lookupParametersMap.end()) {
-			std::cout << "nothing found " << std::endl;
+			REXOS_INFO_STREAM("nothing found " << std::endl);
 			return false;
 		} else { 
 			msg.request.lookupID = iterator->second; //lookup id from request.
-			std::cout << "found ID. " << msg.request.lookupID  << std::endl;
+			REXOS_INFO_STREAM("found ID. " << msg.request.lookupID  << std::endl);
 		}
 
 		if(lookupEnvironmentClient.call(msg)) {

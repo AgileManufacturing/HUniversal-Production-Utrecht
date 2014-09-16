@@ -3,15 +3,15 @@ project(camera_control_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp vision_node camera_calibration_node camera rexos_statemachine rexos_knowledge_database libjson)
+find_package(catkin REQUIRED COMPONENTS roscpp vision_node camera_calibration_node camera rexos_statemachine rexos_knowledge_database libjson rexos_logger)
 find_package(MYSQLCONNECTORCPP)
 
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES  
-CATKIN_DEPENDS roscpp vision_node camera camera_calibration_node rexos_statemachine rexos_knowledge_database libjson
+LIBRARIES rexos_logger 
+CATKIN_DEPENDS roscpp vision_node camera camera_calibration_node rexos_statemachine rexos_knowledge_database libjson rexos_logger
 DEPENDS MYSQLCONNECTORCPP)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

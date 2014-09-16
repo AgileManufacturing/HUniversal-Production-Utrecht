@@ -31,6 +31,8 @@
 #define LOOKUPHANDLER_H
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
+
 #include <environment_communication_msgs/KeyValuePair.h>
 #include <environment_communication_msgs/Map.h>
 #include <environment_cache/LookupEnvironmentObject.h>

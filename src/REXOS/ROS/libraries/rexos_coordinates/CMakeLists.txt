@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_coordinates)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS vectors rexos_knowledge_database libjson)
+find_package(catkin REQUIRED COMPONENTS vectors rexos_knowledge_database libjson rexos_logger)
 find_package(MYSQLCONNECTORCPP)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES rexos_coordinates
-CATKIN_DEPENDS vectors rexos_knowledge_database libjson
+LIBRARIES rexos_coordinates rexos_logger
+CATKIN_DEPENDS vectors rexos_knowledge_database libjson rexos_logger
 DEPENDS MYSQLCONNECTORCPP)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

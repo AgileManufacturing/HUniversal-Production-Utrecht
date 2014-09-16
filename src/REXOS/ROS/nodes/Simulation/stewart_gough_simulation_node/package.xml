@@ -26,6 +26,9 @@
 
   <run_depend>rexos_gazebo</run_depend>
 
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
 

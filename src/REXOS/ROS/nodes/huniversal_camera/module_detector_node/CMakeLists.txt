@@ -3,15 +3,15 @@ project(module_detector_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node rexos_logger)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(Mongo)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES  
-CATKIN_DEPENDS message_runtime roscpp std_msgs vision_node
+LIBRARIES rexos_logger 
+CATKIN_DEPENDS message_runtime roscpp std_msgs vision_node rexos_logger
 DEPENDS OpenCV)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

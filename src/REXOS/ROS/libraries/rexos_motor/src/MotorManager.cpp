@@ -98,7 +98,7 @@ namespace rexos_motor{
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
 		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		
-		//ROS_INFO_STREAM("modbus writeU16 time: " << (rexos_utilities::timeNow()-timer2));
+		//REXOS_INFO_STREAM("modbus writeU16 time: " << (rexos_utilities::timeNow()-timer2));
 		
 		for(int i = 0; i < motors.size(); ++i){
 			if(motors[i]->isPoweredOn())

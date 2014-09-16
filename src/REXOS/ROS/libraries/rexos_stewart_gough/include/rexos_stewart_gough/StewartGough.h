@@ -39,6 +39,7 @@
 #include <rexos_stewart_gough/SixAxisCalculations.h>
 //#include <rexos_stewart_gough/EffectorBoundaries.h>
 //#include <rexos_stewart_gough/InverseKinematics.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 

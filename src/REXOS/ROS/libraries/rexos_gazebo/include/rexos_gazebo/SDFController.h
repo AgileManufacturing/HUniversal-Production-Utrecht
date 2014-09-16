@@ -41,6 +41,7 @@
 #include "gazebo_msgs/ODEJointProperties.h"
 #include "gazebo_msgs/JointRequest.h"
 #include "gazebo_msgs/GetLinkState.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 

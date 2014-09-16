@@ -198,7 +198,7 @@ void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_in
 		JSONNode jsonModule;
 
 		if(proxy == NULL){
-			ROS_ERROR("ModuleRegistry returns a NULL pointer");
+			REXOS_ERROR("ModuleRegistry returns a NULL pointer");
 			continue;
 		}
 

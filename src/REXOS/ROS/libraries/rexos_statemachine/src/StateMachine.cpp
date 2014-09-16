@@ -107,7 +107,7 @@ Mode StateMachine::getCurrentMode() {
  * @param changeStateActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
 void StateMachine::changeState(State desiredState) {
-	ROS_INFO("changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
+	REXOS_INFO("changeState called with desiredState %s",rexos_statemachine::state_txt[desiredState]);
 	ChangeStateGoal goal;
 	goal.desiredState = desiredState;
 	changeStateActionClient.sendGoal(goal);
@@ -120,7 +120,7 @@ void StateMachine::changeState(State desiredState) {
  * @param changeModeActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
 void StateMachine::changeMode(Mode desiredMode) {
-	ROS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::state_txt[desiredMode]);
+	REXOS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::state_txt[desiredMode]);
 	ChangeModeGoal goal;
 	goal.desiredMode = desiredMode;
 	changeModeActionClient.sendGoal(goal);
@@ -164,7 +164,7 @@ bool StateMachine::transitionToState(rexos_statemachine::State newState) {
 		_setState(changeStateEntry.statePair.second);
 	} else {
 		// transition failed, attempt to revert by calling the abort transition
-		ROS_WARN_STREAM("Transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << " failed");
+		REXOS_WARN_STREAM("Transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << " failed");
 		if(changeStateEntry.abortTransition == NULL) {
 			throw std::logic_error("Trying to access a null abortTransitions state");
 		}
@@ -176,7 +176,7 @@ bool StateMachine::transitionToState(rexos_statemachine::State newState) {
 			_setState(changeStateEntry.statePair.first);
 		} else {
 			// abort transition failed, TODO what to do now?
-			ROS_ERROR_STREAM("Abort transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << " failed");
+			REXOS_ERROR_STREAM("Abort transition from " << changeStateEntry.statePair.first << " to " << changeStateEntry.statePair.second << " failed");
 		}
 	}
 	

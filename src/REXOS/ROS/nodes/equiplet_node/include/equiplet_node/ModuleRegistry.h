@@ -9,6 +9,7 @@
 #define MODULEREGISTRY_H_
 
 #include <ros/ros.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <equiplet_node/RegisterModule.h>
 

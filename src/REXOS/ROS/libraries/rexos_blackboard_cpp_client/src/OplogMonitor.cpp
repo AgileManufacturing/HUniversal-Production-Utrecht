@@ -142,18 +142,18 @@ void OplogMonitor::run()
 			}
 			boost::this_thread::interruption_point();
 		}
-		std::cout << "Cursor is dead. Blackboard (" << oplogNamespace << ") might be empty." << std::endl;
+		REXOS_ERROR_STREAM("Cursor is dead. Blackboard (" << oplogNamespace << ") might be empty." << std::endl);
 	} catch (boost::thread_interrupted& e) {
 		// Thread has been interrupted, work is done.
-		std::cout << "Interrupted cursorid: " << currentCursorId << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl;
+		REXOS_ERROR_STREAM("Interrupted cursorid: " << currentCursorId << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl);
 	} catch (mongo::AssertionException& ex) {
-		std::cout << "Assertion exception: " << ex.what() << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl;
+		REXOS_ERROR_STREAM("Assertion exception: " << ex.what() << "\noplogNamespace: " << oplogNamespace << "\nquery: " << query << "\nskipCount: " << skipCount << std::endl);
 	}
 
 	connection->done();
 	delete connection;
 
-	std::cout << "run stopped" << std::endl;
+	REXOS_INFO_STREAM("run stopped" << std::endl);
 }
 
 void OplogMonitor::addSubscription(BlackboardSubscription& sub)

@@ -54,7 +54,7 @@ cv::Mat FishEyeCorrector::handleFrame(cv::Mat& frame) {
 }
 
 bool FishEyeCorrector::setCorrectionMatrices(vision_node::setCorrectionMatrices::Request& request, vision_node::setCorrectionMatrices::Response& response) {
-	ROS_DEBUG("Service setCorrectionMatrices");        
+	REXOS_DEBUG("Service setCorrectionMatrices");        
 	// matrices are stored in row major order
 	cv::Mat distCoeffs = (cv::Mat_<double>(1,5) <<
 			request.distCoeffs[0],
@@ -78,8 +78,8 @@ bool FishEyeCorrector::setCorrectionMatrices(vision_node::setCorrectionMatrices:
 	rectifier.loadMatrices(cameraMatrix, distCoeffs);
 	areMatricesSet = true;
 	
-	ROS_INFO_STREAM("Dist Coeffs: " << std::endl << rectifier.distCoeffs);
-	ROS_INFO_STREAM("Camera matrix: " << std::endl << rectifier.cameraMatrix);
+	REXOS_INFO_STREAM("Dist Coeffs: " << std::endl << rectifier.distCoeffs);
+	REXOS_INFO_STREAM("Camera matrix: " << std::endl << rectifier.cameraMatrix);
 	
 	return true;
 }

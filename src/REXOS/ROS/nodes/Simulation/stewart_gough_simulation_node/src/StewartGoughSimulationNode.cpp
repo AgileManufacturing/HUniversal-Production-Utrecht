@@ -65,21 +65,21 @@ double angles[10][6] = {
 	int timer = 0;
 	int patternIndex = 0;
 	bool pattern = true;
-	ROS_INFO("=====Simulation is running======");
+	REXOS_INFO("=====Simulation is running======");
 	
 	while (ros::ok()){
 		
 		for(int i = 0; i < 6; i++){
 			motors[i].update();
 		}
-		ROS_INFO("I iz inside1");
+		REXOS_INFO("I iz inside1");
 	
 		if(pattern == true){
 			if(timer > 100){
 				for(int i = 0; i < 6; i++){
 					motors[i].goToAngleDegrees(angles[patternIndex][i]);
 				}
-				ROS_INFO("I iz inside2");
+				REXOS_INFO("I iz inside2");
 	
 				patternIndex++;
 				if(patternIndex > 9){patternIndex = 0;}

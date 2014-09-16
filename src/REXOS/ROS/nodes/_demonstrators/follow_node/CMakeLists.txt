@@ -4,7 +4,7 @@ project(follow_node)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS crate_locator_node delta_robot_node)
+find_package(catkin REQUIRED COMPONENTS crate_locator_node delta_robot_node rexos_logger)
 
 
 
@@ -17,8 +17,8 @@ find_package(catkin REQUIRED COMPONENTS crate_locator_node delta_robot_node)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   #INCLUDE_DIRS include
-  LIBRARIES follow_node
-  CATKIN_DEPENDS crate_locator_node delta_robot_node
+  LIBRARIES follow_node rexos_logger
+  CATKIN_DEPENDS crate_locator_node delta_robot_node rexos_logger
 )
 
 ###########

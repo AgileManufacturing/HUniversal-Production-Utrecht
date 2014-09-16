@@ -42,6 +42,7 @@
 #include <rexos_statemachine/Transitions.h>
 #include <rexos_knowledge_database/Module.h>
 #include "equiplet_node/RegisterModule.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>

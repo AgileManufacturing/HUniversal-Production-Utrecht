@@ -74,11 +74,11 @@ FollowNode::~FollowNode(){
 void FollowNode::callback(const crate_locator_node::CrateEventMsg::ConstPtr& msg){
 	switch(msg->event){
 	case rexos_vision::CrateEvent::type_in:
-		std::cout << "[DEBUG] New crate " << msg->crate.name << "found!" << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] New crate " << msg->crate.name << "found!" << std::endl);
 		if(updateCrateIDFlag){
 			crateID = msg->crate.name;
 			getCrateService.request.name = crateID;
-			std::cout << "[DEBUG] Tracking new crate " << crateID << std::endl;
+			REXOS_DEBUG_STREAM("[DEBUG] Tracking new crate " << crateID << std::endl);
 			updateCrateIDFlag = false;
 		}
 
@@ -91,14 +91,14 @@ void FollowNode::callback(const crate_locator_node::CrateEventMsg::ConstPtr& msg
 		 }*/
 		break;
 	case rexos_vision::CrateEvent::type_out:
-		std::cout << "[DEBUG] Deleted crate " << msg->crate.name << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] Deleted crate " << msg->crate.name << std::endl);
 		//if(crateID.compare(msg->crate.name) == 0){
 		//	crateID = "";
 		//	std::cout << "[DEBUG] Lost crate " << msg->crate.name << ". Stopped the follow process " << std::endl;
 		//}
 		break;
 	case rexos_vision::CrateEvent::type_moving:
-		std::cout << "[DEBUG] Start moving crate " << msg->crate.name << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] Start moving crate " << msg->crate.name << std::endl);
 		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
 		 moveToPointService.request.motion.x = msg->crate.x;
@@ -107,7 +107,7 @@ void FollowNode::callback(const crate_locator_node::CrateEventMsg::ConstPtr& msg
 		 }*/
 		break;
 	case rexos_vision::CrateEvent::type_moved:
-		std::cout << "[DEBUG] Moved crate " << msg->crate.name << std::endl;
+		REXOS_DEBUG_STREAM("[DEBUG] Moved crate " << msg->crate.name << std::endl);
 		/*if(crateID.compare(msg->crate.name) == 0){
 		 std::cout << "[DEBUG] Moving to new coordinate " << msg->crate.x << "," << msg->crate.y << std::endl;
 		 moveToPointService.request.motion.x = msg->crate.x;
@@ -120,9 +120,9 @@ void FollowNode::callback(const crate_locator_node::CrateEventMsg::ConstPtr& msg
 
 void FollowNode::run( ){
 
-	std::cout << "Welcome to the followNode. This tool will try to follow a crate that has been scanned before. :)."
+	REXOS_INFO_STREAM("Welcome to the followNode. This tool will try to follow a crate that has been scanned before. :)."
 			<< std::endl << "A\tAssign crate name to tracker ID" << std::endl << "S\tStop following a crate"
-			<< std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
+			<< std::endl << "Q\tQuit program" << std::endl << "Enter a key and press the \"Enter\" button" << std::endl);
 
 	ros::Subscriber subscriber = nodeHandle.subscribe(CrateLocatorNodeTopics::CRATE_EVENT, 1000, &FollowNode::callback,
 			this);
@@ -132,7 +132,7 @@ void FollowNode::run( ){
 
 		if(crateLocatorClient.call(getCrateService)
 				&& getCrateService.response.state != rexos_datatypes::Crate::state_non_existing){
-			std::cout << getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl;
+			REXOS_INFO_STREAM(getCrateService.response.crate.x << " " << getCrateService.response.crate.y << std::endl);
 			//moveToPointService.request.motion.x = getCrateService.response.crate.x;
 			//moveToPointService.request.motion.y = getCrateService.response.crate.y;
 			//deltaRobotClient.call(moveToPointService);
@@ -147,18 +147,18 @@ void FollowNode::inputThreadMethod(FollowNode* that){
 		while(that->inputRunning){
 			std::cin >> key;
 			if(key == 'a' || key == 'A'){
-				std::cout << "[DEBUG] Looking for a new crate (first new crate is assigned!)" << std::endl;
+				REXOS_DEBUG_STREAM("[DEBUG] Looking for a new crate (first new crate is assigned!)" << std::endl);
 				that->updateCrateIDFlag = true;
 			} else if(key == 's' || key == 'S'){
 				that->crateID = "";
 				that->getCrateService.request.name = that->crateID;
-				std::cout << "[DEBUG] Deleted crateID. Stopped following." << std::endl;
+				REXOS_DEBUG_STREAM("[DEBUG] Deleted crateID. Stopped following." << std::endl);
 			} else if(key == 'q' || key == 'Q'){
 				that->inputRunning = false;
 				that->topicRunning = false;
 			}
 
-			std::cout.flush();
+			//std::cout.flush();
 			ros::spinOnce();
 		}
 

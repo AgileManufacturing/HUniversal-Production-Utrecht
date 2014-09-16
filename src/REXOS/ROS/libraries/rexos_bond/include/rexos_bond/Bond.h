@@ -36,6 +36,7 @@
 #include <boost/thread/condition.hpp>
 
 #include <ros/ros.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <rexos_bond/Timeout.h>
 #include <rexos_bond/BondListener.h>

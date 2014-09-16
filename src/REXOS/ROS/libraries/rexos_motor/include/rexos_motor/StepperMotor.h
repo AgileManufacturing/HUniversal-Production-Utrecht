@@ -33,6 +33,7 @@
 
 #include <queue>
 #include <boost/thread.hpp>
+#include "rexos_logger/rexos_logger.h"
 
 #include <rexos_motor/MotorRotation.h>
 #include <rexos_modbus/ModbusException.h>

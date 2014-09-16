@@ -42,42 +42,42 @@ namespace rexos_delta_robot {
 		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
 			if(it->name() == "baseRadius"){
 				base = it->as_float();
-				ROS_INFO_STREAM("found baseRadius " << base);
+				REXOS_INFO_STREAM("found baseRadius " << base);
 			} else if(it->name() == "hipLength"){
 				hip = it->as_float();
-				ROS_INFO_STREAM("found hipLength " << hip);
+				REXOS_INFO_STREAM("found hipLength " << hip);
 			} else if(it->name() == "effectorRadius"){
 				effector = it->as_float();
-				ROS_INFO_STREAM("found effectorRadius " << effector);
+				REXOS_INFO_STREAM("found effectorRadius " << effector);
 			} else if(it->name() == "ankleLength"){
 				ankle = it->as_float();
-				ROS_INFO_STREAM("found ankleLength " << ankle);
+				REXOS_INFO_STREAM("found ankleLength " << ankle);
 			
 			} else if(it->name() == "hipAnleMaxAngleDegrees"){
 				maxAngleHipAnkle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
+				REXOS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
 			} else if(it->name() == "motorFromZeroToTopAngleDegrees"){
 				motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
+				REXOS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
 			
 			} else if(it->name() == "boundaryBoxMinX"){
 				boundaryBoxMinX = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
+				REXOS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
 			} else if(it->name() == "boundaryBoxMaxX"){
 				boundaryBoxMaxX = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMaxX " << boundaryBoxMaxX);
+				REXOS_INFO_STREAM("found boundaryBoxMaxX " << boundaryBoxMaxX);
 			} else if(it->name() == "boundaryBoxMinY"){
 				boundaryBoxMinY = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMinY " << boundaryBoxMinY);
+				REXOS_INFO_STREAM("found boundaryBoxMinY " << boundaryBoxMinY);
 			} else if(it->name() == "boundaryBoxMaxY"){
 				boundaryBoxMaxY = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMaxY " << boundaryBoxMaxY);
+				REXOS_INFO_STREAM("found boundaryBoxMaxY " << boundaryBoxMaxY);
 			} else if(it->name() == "boundaryBoxMinZ"){
 				boundaryBoxMinZ = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMinZ " << boundaryBoxMinZ);
+				REXOS_INFO_STREAM("found boundaryBoxMinZ " << boundaryBoxMinZ);
 			} else if(it->name() == "boundaryBoxMaxZ"){
 				boundaryBoxMaxZ = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMaxZ " << boundaryBoxMaxZ);
+				REXOS_INFO_STREAM("found boundaryBoxMaxZ " << boundaryBoxMaxZ);
 			} else {
 				// some other property, ignore it
 			}

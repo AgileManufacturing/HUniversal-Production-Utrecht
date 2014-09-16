@@ -7,6 +7,7 @@
 #include <rexos_statemachine/StateMachine.h>
 #include <rexos_statemachine/Listener.h>
 #include <rexos_knowledge_database/ModuleIdentifier.h>
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_statemachine{
 

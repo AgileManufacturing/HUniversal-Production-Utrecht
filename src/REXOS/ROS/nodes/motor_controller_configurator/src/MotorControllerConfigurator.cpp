@@ -22,30 +22,30 @@ int main(int argc, char **argv){
 		
 		
 		
-		std::cout << "Device number to configure: ";
+		REXOS_INFO("Device number to configure: ");
 		std::string deviceNumberString;
 		std::cin >> deviceNumberString;
 		uint16_t deviceNumber = rexos_utilities::stringToInt(deviceNumberString);
 		
-		std::cout << "Address to use: ";
+		REXOS_INFO("Address to use: ");
 		std::string addressString;
 		std::cin >> addressString;
 		uint16_t address = rexos_utilities::stringToInt(addressString);
 		
-		std::cout << "field length (16 or 32 bits): ";
+		REXOS_INFO("field length (16 or 32 bits): ");
 		std::string fieldLengthString;
 		std::cin >> fieldLengthString;
 		uint16_t fieldLength = rexos_utilities::stringToInt(fieldLengthString);
 		
-		std::cout << "Value to set (leave empty for read): ";
+		REXOS_INFO_STREAM("Value to set (leave empty for read): ");
 		std::string valueString;
 		std::cin >> valueString;
 		if(valueString.length() == 0) {
 			// reading mode
 			if(fieldLength == 16) {
-				std::cout << "@" << address + ": " << modbus.readU16(deviceNumber, address);
+				REXOS_INFO_STREAM("@" << address + ": " << modbus.readU16(deviceNumber, address));
 			} else if(fieldLength == 32) {
-				std::cout << "@" << address + ": " << modbus.readU32(deviceNumber, address);
+				REXOS_INFO_STREAM("@" << address + ": " << modbus.readU32(deviceNumber, address));
 				
 			}
 		} else {
@@ -53,10 +53,10 @@ int main(int argc, char **argv){
 			uint32_t value = rexos_utilities::stringToInt(valueString);
 			if(fieldLength == 16) {
 				modbus.writeU16(deviceNumber, address, value, false);
-				std::cout << "@" << address + "= " << modbus.readU16(deviceNumber, address);
+				REXOS_INFO_STREAM("@" << address + "= " << modbus.readU16(deviceNumber, address));
 			} else if(fieldLength == 32) {
 				modbus.writeU32(deviceNumber, address, value, false);
-				std::cout << "@" << address + "= " << modbus.readU32(deviceNumber, address);
+				REXOS_INFO_STREAM("@" << address + "= " << modbus.readU32(deviceNumber, address));
 			}
 			
 		}

@@ -13,6 +13,7 @@
 
 #include <smclib/statemap.h>
 
+
 // Forward declarations.
 class SM;
 class SM_WaitingForSister;

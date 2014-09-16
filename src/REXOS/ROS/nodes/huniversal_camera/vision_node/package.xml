@@ -29,6 +29,9 @@
   
   <build_depend>image_transport</build_depend>
   <run_depend>image_transport</run_depend>
+
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
   <export>
   </export>
 </package>

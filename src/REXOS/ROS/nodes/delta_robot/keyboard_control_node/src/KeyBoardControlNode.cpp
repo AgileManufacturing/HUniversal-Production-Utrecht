@@ -53,7 +53,7 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
 	currentZPos(-200.0),
 	maxAcceleration("50.0") {
 
-	ROS_INFO("Constructing");
+	REXOS_INFO("Constructing");
 
 	//DirectMoveStepsBlackBoard
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "DirectMoveStepsBlackBoard");
@@ -69,14 +69,14 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
 
 	equipletStepBlackboardClient->removeDocuments("");
 
-	ROS_INFO("Reading from keyboard");
-	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
+	REXOS_INFO("Reading from keyboard");
+	REXOS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
 	run();
 }
 
 KeyBoardControlNode::~KeyBoardControlNode(){
-	ROS_INFO("Destructing");
+	REXOS_INFO("Destructing");
 }
 
 void KeyBoardControlNode::run(){
@@ -96,37 +96,37 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 	// Check which key was pressed.
 	switch(inputCharacter){
 		case KEYCODE_UP:
-			ROS_INFO("PRESSED UP");
+			REXOS_INFO("PRESSED UP");
 			//z + step
 			currentZPos = currentZPos + STEP;
 			break;
 
 		case KEYCODE_DOWN:
-			ROS_INFO("PRESSED DOWN");
+			REXOS_INFO("PRESSED DOWN");
 			//z - step
 			currentZPos = currentZPos - STEP;
 		break;
 
 		case KEYCODE_W:
-			ROS_INFO("PRESSED W");
+			REXOS_INFO("PRESSED W");
 			//y + step
 			currentYPos = currentYPos + STEP;
 		break;
 
 		case KEYCODE_A:
-			ROS_INFO("PRESSED A");
+			REXOS_INFO("PRESSED A");
 			//x - step
 			currentXPos = currentXPos - STEP;
 		break;
 
 		case KEYCODE_S:
-			ROS_INFO("PRESSED S");
+			REXOS_INFO("PRESSED S");
 			//y - step
 			currentYPos = currentYPos - STEP;
 			break;
 
 		case KEYCODE_D:
-			ROS_INFO("PRESSED D");
+			REXOS_INFO("PRESSED D");
 			//x + step
 			currentXPos = currentXPos + STEP;
 			break;
@@ -165,7 +165,7 @@ void KeyBoardControlNode::writeToBlackBoard(std::string x, std::string y, std::s
             look_up_parameters, payload);
 
 	if(equipletStepBlackboardClient->insertDocument(instructionData->toJSONString())) {
-		std::cout << "printed: " << instructionData->toJSONString() << "to blackboard." << std::endl;
+		REXOS_INFO_STREAM("printed: " << instructionData->toJSONString() << "to blackboard." << std::endl);
 	}
 
 }

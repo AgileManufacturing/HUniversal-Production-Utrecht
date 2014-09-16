@@ -71,7 +71,7 @@ namespace rexos_motor {
 			
 			//Reset alarm
 			//std::cout << "motor index: ";
-			std::cout << motorIndex << std::endl;
+			REXOS_INFO_STREAM(motorIndex << std::endl);
 			
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 0);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::RESET_ALARM, 1);
@@ -129,7 +129,7 @@ namespace rexos_motor {
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::STOP);
 			modbus->writeU16(motorIndex, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		} catch(rexos_modbus::ModbusException& exception){
-			std::cerr << "steppermotor::stop failed: " << std::endl << "what(): " << exception.what() << std::endl;
+			REXOS_ERROR_STREAM("steppermotor::stop failed: " << std::endl << "what(): " << exception.what() << std::endl);
 		}
 	}
 
@@ -323,7 +323,7 @@ namespace rexos_motor {
 	 **/
 	void StepperMotor::checkMotionSlot(int motionSlot){
 		if(motionSlot < 1 || motionSlot > CRD514KD::MOTION_SLOTS_USED){
-			std::cerr << "Motion slot: " << motionSlot << std::endl;
+			REXOS_ERROR_STREAM("Motion slot: " << motionSlot << std::endl);
 			throw std::out_of_range("Motion slot out of range.");
 		}
 	}

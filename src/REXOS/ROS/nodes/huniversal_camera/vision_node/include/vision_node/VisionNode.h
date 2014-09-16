@@ -31,6 +31,7 @@
 #define CAMERANODE_H
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 // standard services
 #include <std_msgs/Header.h>
 #include <std_srvs/Empty.h>

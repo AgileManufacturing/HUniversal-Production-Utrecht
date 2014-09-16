@@ -55,8 +55,8 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
 				boost::bind(&GripperNode::onSetInstruction, this, _1), 
 				false) {
-	ROS_INFO("GripperNode Constructor entering...");
-	ROS_INFO("1");
+	REXOS_INFO("GripperNode Constructor entering...");
+	REXOS_INFO("1");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
@@ -68,13 +68,13 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 		jsonNode.push_back(*it);
 	}
 
-	ROS_INFO("4");
+	REXOS_INFO("4");
 	gripper = new rexos_gripper::Gripper(jsonNode, this, NULL);
 	setInstructionActionServer.start();
 }
 
 GripperNode::~GripperNode() {
-	std::cout << "~GripperNode" << std::endl;
+	REXOS_INFO_STREAM("~GripperNode" << std::endl);
 	delete gripper;
 	// Destructor of modbus will close the modbus connection!
 	delete modbus;
@@ -82,7 +82,7 @@ GripperNode::~GripperNode() {
 
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	JSONNode instructionDataNode = libjson::parse(goal->json);
-	ROS_WARN_STREAM(goal->json);
+	REXOS_WARN_STREAM(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 
@@ -91,32 +91,32 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
     while (i != instructionDataNode.end()){
 
         const char * nodeName = i -> name().c_str();
-		ROS_WARN_STREAM("command " << nodeName);
+		REXOS_WARN_STREAM("command " << nodeName);
 
 		if(strcmp(nodeName, "command") == 0) {
 			std::string value = parseNodeValue("command", instructionDataNode);
 
-			ROS_WARN_STREAM("value " << value);
+			REXOS_WARN_STREAM("value " << value);
 			if(strcmp(value.c_str(), "activate") == 0) {
-				std::cout << "Activating gripper" << std::endl;
+				REXOS_INFO_STREAM("Activating gripper" << std::endl);
 				//gripper->grab();
 				//std::cout << "Gripper activated" << std::endl;
 				setInstructionActionServer.setSucceeded(result_);
-				std::cout << "setSucceeded" << std::endl;
+				REXOS_INFO_STREAM("setSucceeded" << std::endl);
 				return;
 			} else if(strcmp(value.c_str(), "deactivate") == 0) {
-				std::cout << "Deactivating gripper" << std::endl;
+				REXOS_INFO_STREAM("Deactivating gripper" << std::endl);
 				//gripper->release();
 				//std::cout << "Gripper deactivated" << std::endl;
 				setInstructionActionServer.setSucceeded(result_);
-				std::cout << "setSucceeded" << std::endl;
+				REXOS_INFO_STREAM("setSucceeded" << std::endl);
 				return;
 			}
 		}
     	++i;
 	}
 
-	std::cout << "Failed setting gripper" << std::endl;
+	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
 	setInstructionActionServer.setAborted(result_);
 }
 
@@ -138,12 +138,12 @@ void GripperNode::error() {
 }
 
 bool GripperNode::transitionInitialize() {
-	ROS_INFO("Initialize transition called");
+	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
 bool GripperNode::transitionDeinitialize() {
-	ROS_INFO("Deinitialize transition called");
+	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
 }
@@ -153,7 +153,7 @@ bool GripperNode::transitionDeinitialize() {
  * @return 0 if everything went OK else error
  **/
 bool GripperNode::transitionSetup() {
-	ROS_INFO("Setup transition called");
+	REXOS_INFO("Setup transition called");
 	// Set currentState to start
 	//gripper->startWatchdog();
 	
@@ -166,7 +166,7 @@ bool GripperNode::transitionSetup() {
  * @return 0 if everything went OK else error
  **/
 bool GripperNode::transitionShutdown() {
-	ROS_INFO("Shutdown transition called");
+	REXOS_INFO("Shutdown transition called");
 	// Set currentState to stop
 	//gripper->stopWatchdog();
 	//gripper->release();
@@ -180,7 +180,7 @@ bool GripperNode::transitionShutdown() {
  * @return 0 if everything went OK else error
  **/
 bool GripperNode::transitionStart() {
-	ROS_INFO("Start transition called");
+	REXOS_INFO("Start transition called");
 
 	return true;
 }
@@ -189,7 +189,7 @@ bool GripperNode::transitionStart() {
  * @return 0 if everything went OK else error
  **/
 bool GripperNode::transitionStop() {
-	ROS_INFO("Stop transition called");
+	REXOS_INFO("Stop transition called");
 
 	return true;
 }
@@ -221,14 +221,14 @@ bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Rel
 std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
 	JSONNode::const_iterator i = n.begin();
 	std::string result;
-	ROS_ERROR_STREAM(nodeName);
+	REXOS_ERROR_STREAM(nodeName);
 	while(i != n.end()) {
 		// get the JSON node name and value as a string
 		std::string node_name = i->name();
-		ROS_ERROR_STREAM(" " << node_name);
+		REXOS_ERROR_STREAM(" " << node_name);
 
 		if(node_name == nodeName) {
-			ROS_ERROR_STREAM(" found");
+			REXOS_ERROR_STREAM(" found");
 			result = i->as_string();
 		} 
 
@@ -244,18 +244,18 @@ int main(int argc, char** argv) {
 	ros::init(argc, argv, NODE_NAME);
 	
 	if(argc < 5){
-		ROS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
 	std::string equipletName = argv[1];
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 	
-	ROS_INFO("Creating GripperNode");
+	REXOS_INFO("Creating GripperNode");
 
 	GripperNode gripperNode(equipletName, moduleIdentifier);
 
-	ROS_INFO("Running StateEngine");
+	REXOS_INFO("Running StateEngine");
 	ros::spin();
 	return 0;
 }

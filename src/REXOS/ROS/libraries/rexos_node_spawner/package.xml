@@ -17,4 +17,7 @@
   <build_depend>ZLIB</build_depend>
   <run_depend>ZLIB</run_depend>
 
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+
 </package>

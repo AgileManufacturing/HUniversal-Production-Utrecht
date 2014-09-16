@@ -31,6 +31,7 @@
 #pragma once
 
 #include <libjson/libjson.h>
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_delta_robot{
 	/**

@@ -80,8 +80,8 @@ namespace rexos_delta_robot{
 	 **/
     bool EffectorBoundaries::checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const{
 
-    	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
-		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
+    	REXOS_INFO_STREAM("fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl);
+		REXOS_INFO_STREAM("tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl);
 
 
     	double x_length = to.x - from.x;
@@ -103,24 +103,24 @@ namespace rexos_delta_robot{
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
 			if(temp.x < 0 || temp.y < 0 || temp.z < 0) {
-				std::cout << "temp.x: " << temp.x << " or temp.y: " << temp.y << std::endl;
+				REXOS_INFO_STREAM("temp.x: " << temp.x << " or temp.y: " << temp.y << std::endl);
 				return false;
 			}
 
 			if(temp.x > width){
-				std::cout << "temp.x: " << temp.x << " > width: " << width << std::endl;
+				REXOS_INFO_STREAM("temp.x: " << temp.x << " > width: " << width << std::endl);
 				return false;
 			}
 			if(temp.y > depth){
-				std::cout << "temp.y: " << temp.y << " > depth: " << depth << std::endl;
+				REXOS_INFO_STREAM("temp.y: " << temp.y << " > depth: " << depth << std::endl);
 				return false;
 			}
 			if(temp.z > height){
-				std::cout << "temp.z: " << temp.z << " > height: " << height << std::endl;
+				REXOS_INFO_STREAM("temp.z: " << temp.z << " > height: " << height << std::endl);
 				return false;
 			}
 			if(boundariesBitmap[index] != VALID){
-				std::cout << "boundariesBitmap[index]: " << boundariesBitmap[index] << "!= VALID: " << VALID << std::endl;
+				REXOS_INFO_STREAM("boundariesBitmap[index]: " << boundariesBitmap[index] << "!= VALID: " << VALID << std::endl);
 				return false;
 			}
 		}

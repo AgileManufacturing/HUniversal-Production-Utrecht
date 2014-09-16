@@ -32,6 +32,7 @@
 #define ENVIRONMENTCACHE_H
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 #include <environment_cache/UpdateEnvironmentCache.h>
 #include <environment_cache/LookupEnvironmentObject.h>
 #include <string>

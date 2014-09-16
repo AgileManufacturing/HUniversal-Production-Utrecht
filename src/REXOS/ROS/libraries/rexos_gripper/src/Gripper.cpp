@@ -43,26 +43,26 @@ namespace rexos_gripper {
 		Gripper::Gripper(JSONNode node, void* gripperNodeObject, watchdogWarningHandler warningHandler) : 
 				OutputDevice(node), warningHandler(warningHandler), gripperNode(gripperNodeObject), 
 				watchdogRunning(false), state(false), previousState(false), warned(false), overheated(false) {
-			std::cout << "a";
+			REXOS_INFO("a");
 			readJSONNode(node);
-			std::cout << "b";
+			REXOS_INFO("b");
 		}
 
 		void Gripper::readJSONNode(const JSONNode node) {
 			for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
 				if(it->name() == "gripperEnabledMaxSeconds"){
 					gripperEnabledMax = it->as_int() * 1000;
-					ROS_INFO_STREAM("found gripperEnabledMaxSeconds " << gripperEnabledMax);
+					REXOS_INFO_STREAM("found gripperEnabledMaxSeconds " << gripperEnabledMax);
 				} else if(it->name() == "gripperEnabledWarningSeconds"){
 					gripperEnabledWarning = it->as_int() * 1000;
-					ROS_INFO_STREAM("found gripperEnabledWarningSeconds " << gripperEnabledWarning);
+					REXOS_INFO_STREAM("found gripperEnabledWarningSeconds " << gripperEnabledWarning);
 				} else if(it->name() == "gripperEnabledCooldownSeconds"){
 					gripperEnabledCooldown = it->as_int() * 1000;
-					ROS_INFO_STREAM("found gripperEnabledCooldownSeconds " << gripperEnabledCooldown);
+					REXOS_INFO_STREAM("found gripperEnabledCooldownSeconds " << gripperEnabledCooldown);
 					
 				} else if(it->name() == "watchdogInterval"){
 					watchdogInterval = it->as_int();
-					ROS_INFO_STREAM("found watchdogInterval " << watchdogInterval);
+					REXOS_INFO_STREAM("found watchdogInterval " << watchdogInterval);
 				} else {
 					// some other property, ignore it
 				}
@@ -77,7 +77,7 @@ namespace rexos_gripper {
 		 * Destructor to interrupt the watchdogThread
 		 **/
 		Gripper::~Gripper( ) {
-			std::cout << "~Gripper" << std::endl;
+			REXOS_INFO_STREAM("~Gripper" << std::endl);
 			if (watchdogRunning) {
 				stopWatchdog();
 			}
@@ -112,7 +112,7 @@ namespace rexos_gripper {
 		 **/
 		void Gripper::watchdogFunction(Gripper* device) {
 			try {
-				std::cout << "[GRIPPER WATCHDOG] Watchdog started" << std::endl;
+				REXOS_INFO_STREAM("[GRIPPER WATCHDOG] Watchdog started" << std::endl);
 				while (device->watchdogRunning) {
 
 					// The watchdog in the IO controller disables pins if there is no communication in X amount of time
@@ -138,7 +138,7 @@ namespace rexos_gripper {
 
 						// Test for max time, and close valve when reached.
 						if (timeEnabled > device->gripperEnabledMax) {
-							std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the limit of " << device->gripperEnabledMax << " milliseconds. Gripper will go in cooldown mode now." << std::endl;
+							REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve open time has reached the limit of " << device->gripperEnabledMax << " milliseconds. Gripper will go in cooldown mode now." << std::endl);
 							device->overheated = true;
 							device->timeCooldownStarted = rexos_utilities::timeNow();
 							device->disable();
@@ -146,14 +146,14 @@ namespace rexos_gripper {
 
 						// Test for warning time. Send warning to the warning handler.
 						} else if (!device->warned && timeEnabled > device->gripperEnabledWarning) {
-							std::cerr << "[GRIPPER WATCHDOG] Valve open time has reached the warning limit of " << device->gripperEnabledWarning << " milliseconds." << std::endl;
+							REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve open time has reached the warning limit of " << device->gripperEnabledWarning << " milliseconds." << std::endl);
 							device->warningHandler(device->gripperNode);
 							device->warned = true;
 						}
 
 					// If device was cooling down, check if the time has been passed.
 					} else if (device->overheated && ((rexos_utilities::timeNow() - device->timeCooldownStarted) > device->gripperEnabledCooldown)) {
-						std::cerr << "[GRIPPER WATCHDOG] Valve cooled down. Returning to normal mode." << std::endl;
+						REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve cooled down. Returning to normal mode." << std::endl);
 						device->overheated = false;
 					}
 
@@ -164,7 +164,7 @@ namespace rexos_gripper {
 			} catch (boost::thread_interrupted& ignored) {
 				// Ignore interrupt and exit thread.
 			}
-			std::cout << "[GRIPPER WATCHDOG] Watchdog stopped" << std::endl;
+			REXOS_INFO_STREAM("[GRIPPER WATCHDOG] Watchdog stopped" << std::endl);
 		}
 
 }
