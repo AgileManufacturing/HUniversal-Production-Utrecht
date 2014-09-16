@@ -13,16 +13,15 @@ namespace rexos_knowledge_database{
 	std::string ModuleIdentifier::toString() {
 		return "{\"manufacturer\":" + getManufacturer() + "\"typeNumber\":" + getTypeNumber() + "\"serialNumber\":" + getSerialNumber() + "}";
 	}
-	JSONNode ModuleIdentifier::toJSONObject() {
-		JSONNode output;
-		output.push_back(JSONNode("manufacturer", getManufacturer()));
-		output.push_back(JSONNode("typeNumber", getTypeNumber()));
-		output.push_back(JSONNode("serialNumber", getSerialNumber()));
+	Json::Value ModuleIdentifier::toJSONObject() {
+		Json::Value output;
+		output["manufacturer"] = getManufacturer();
+		output["typeNumber"] = getTypeNumber();
+		output["serialNumber"] = getSerialNumber();
 		return output;
 	}
 	bool ModuleIdentifier::operator==(const ModuleIdentifier& rhs) {
-		if(
-				this->getManufacturer() == rhs.getManufacturer() &&
+		if(		this->getManufacturer() == rhs.getManufacturer() &&
 				this->getTypeNumber() == rhs.getTypeNumber() &&
 				this->getSerialNumber() == rhs.getSerialNumber()) {
 			return true;

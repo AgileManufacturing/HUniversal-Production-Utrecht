@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_stewart_gough{
 	/**
@@ -105,6 +105,6 @@ namespace rexos_stewart_gough{
 		double boundaryBoxMaxZ;
 		
 		
-		StewartGoughMeasures(JSONNode properties);
+		StewartGoughMeasures(Json::Value properties);
 	};
 }

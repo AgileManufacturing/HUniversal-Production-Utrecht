@@ -8,6 +8,7 @@
 #include "equiplet_node/ModuleProxy.h"
 #include <actionlib/client/simple_action_client.h>
 #include <node_spawner_node/spawnNode.h>
+#include <jsoncpp/json/writer.h>
 
 namespace equiplet_node {
 
@@ -112,15 +113,17 @@ void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 	changeModeActionClient.sendGoal(goal);
 }
 
-void ModuleProxy::setInstruction(std::string OID, JSONNode n) {
-	ROS_INFO_STREAM("Sent Instruction to module: " << moduleIdentifier.toString().c_str());
+void ModuleProxy::setInstruction(std::string OID, Json::Value n) {
+	ROS_INFO_STREAM("Sent Instruction to module: " << moduleIdentifier.toString());
 	if(connectedWithNode == false) {
 		ROS_ERROR("Sent intruction to module which is not connected to the ROS node");
 		return;
 	}
 	rexos_statemachine::SetInstructionGoal goal;
-
-	goal.json = n.write();
+	
+	Json::StyledWriter writer;
+	
+	goal.json = writer.write(n);
 	goal.OID = OID;
 
 	setInstructionActionClient.sendGoal(goal, boost::bind(&ModuleProxy::onInstructionServiceCallback, this, _1, _2), NULL, NULL);

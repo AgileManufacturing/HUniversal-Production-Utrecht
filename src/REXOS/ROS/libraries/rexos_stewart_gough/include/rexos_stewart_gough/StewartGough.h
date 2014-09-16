@@ -37,8 +37,7 @@
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_stewart_gough/SixAxisCalculations.h>
-//#include <rexos_stewart_gough/EffectorBoundaries.h>
-//#include <rexos_stewart_gough/InverseKinematics.h>
+#include <jsoncpp/json/value.h>
 
 #include <vector>
 
@@ -64,16 +63,15 @@ namespace rexos_stewart_gough{
 	};
 	
 	
-	class StewartGough;
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
 	class StewartGough{
 	public:
-		StewartGough(JSONNode node);
+		StewartGough(Json::Value node);
 		~StewartGough();
 		
-		void readJSONNode(JSONNode node);
+		void readJSONNode(Json::Value node);
 
 		/**
 		 * Gets the EffectorBoundaries of the deltarobot.

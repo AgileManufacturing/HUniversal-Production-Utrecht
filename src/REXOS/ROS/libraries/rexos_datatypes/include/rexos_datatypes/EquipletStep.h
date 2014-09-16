@@ -16,29 +16,21 @@
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
 
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_datatypes{
     
     class EquipletStep {
     public:
-        EquipletStep(JSONNode n);
+        EquipletStep(Json::Value n);
         virtual ~EquipletStep();
 
         std::string getId();
         void setId(std::string id);
 
-        std::string getServiceStepID();
-        void setServiceStepID(std::string serviceStepID);
-
-        std::string getNextStep();
-        void setNextStep(std::string nextStep);
-
         rexos_knowledge_database::ModuleIdentifier getModuleIdentifier();
 		 void setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
-		 void setModuleIdentifier(const JSONNode & n);
+		 void setModuleIdentifier(const Json::Value & n);
 
         InstructionData getInstructionData();
         void setInstructionData(InstructionData instructionData);
@@ -46,26 +38,16 @@ namespace rexos_datatypes{
         std::string getStatus();
         void setStatus(std::string status);
 
-        std::map<std::string, std::string> getStatusData();
-        void setStatusData(map<std::string, std::string> statusData);
-
-        TimeData getTimeData();
-        void setTimeData(TimeData timeData);
-
-        JSONNode getJsonNode();
+        Json::Value getJsonNode();
         std::string toJSONString();
     private:
-            JSONNode jsonNode;
-            std::string _id;
-            std::string serviceStepID;
-            std::string nextStep;
-            rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
-            InstructionData instructionData;
-            std::string status;
-            std::map<std::string, std::string> statusData;
-            TimeData timeData;
-            void setValues(const JSONNode & n);
-            TimeData setTimeDataFromNode(const JSONNode & n);
+		Json::Value jsonNode;
+		std::string id;
+		rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
+		InstructionData instructionData;
+		// TODO enum
+		std::string status;
+		void setValues(const Json::Value & n);
     };
 }
 #endif	/* EQUIPLETSTEP_H */

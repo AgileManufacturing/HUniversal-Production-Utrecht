@@ -40,7 +40,7 @@ namespace rexos_gripper {
 		 * @param gripperNodeObject ROS node that will receive the gripper overheat warning
 		 * @param warningHandler Handler to warn when the valve is almost opened for too long.
 		 **/
-		Gripper::Gripper(JSONNode node, void* gripperNodeObject, watchdogWarningHandler warningHandler) : 
+		Gripper::Gripper(Json::Value node, void* gripperNodeObject, watchdogWarningHandler warningHandler) : 
 				OutputDevice(node), warningHandler(warningHandler), gripperNode(gripperNodeObject), 
 				watchdogRunning(false), state(false), previousState(false), warned(false), overheated(false) {
 			std::cout << "a";
@@ -48,26 +48,15 @@ namespace rexos_gripper {
 			std::cout << "b";
 		}
 
-		void Gripper::readJSONNode(const JSONNode node) {
-			for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
-				if(it->name() == "gripperEnabledMaxSeconds"){
-					gripperEnabledMax = it->as_int() * 1000;
-					ROS_INFO_STREAM("found gripperEnabledMaxSeconds " << gripperEnabledMax);
-				} else if(it->name() == "gripperEnabledWarningSeconds"){
-					gripperEnabledWarning = it->as_int() * 1000;
-					ROS_INFO_STREAM("found gripperEnabledWarningSeconds " << gripperEnabledWarning);
-				} else if(it->name() == "gripperEnabledCooldownSeconds"){
-					gripperEnabledCooldown = it->as_int() * 1000;
-					ROS_INFO_STREAM("found gripperEnabledCooldownSeconds " << gripperEnabledCooldown);
-					
-				} else if(it->name() == "watchdogInterval"){
-					watchdogInterval = it->as_int();
-					ROS_INFO_STREAM("found watchdogInterval " << watchdogInterval);
-				} else {
-					// some other property, ignore it
-				}
-			}
-			
+		void Gripper::readJSONNode(const Json::Value node) {
+			gripperEnabledMax = node["gripperEnabledMaxSeconds"].asInt() * 1000;
+			ROS_INFO_STREAM("found gripperEnabledMaxSeconds " << gripperEnabledMax);
+			gripperEnabledWarning = node["gripperEnabledWarningSeconds"].asInt() * 1000;
+			ROS_INFO_STREAM("found gripperEnabledWarningSeconds " << gripperEnabledWarning);
+			gripperEnabledCooldown = node["gripperEnabledCooldownSeconds"].asInt() * 1000;
+			ROS_INFO_STREAM("found gripperEnabledCooldownSeconds " << gripperEnabledCooldown);
+			watchdogInterval = node["watchdogInterval"].asInt() * 1000;
+			ROS_INFO_STREAM("found watchdogInterval " << watchdogInterval);
 		}
 /*		Gripper::Gripper(InputOutputController* ioController, void* gripperNodeObject, watchdogWarningHandler warningHandler) :
 				OutputDevice(ioController, GRIPPER_MODBUS_ADRESS, GRIPPER_DEVICE_PIN), warningHandler(warningHandler), gripperNode(gripperNodeObject), watchdogRunning(false), state(false), previousState(false), warned(false), overheated(false) {

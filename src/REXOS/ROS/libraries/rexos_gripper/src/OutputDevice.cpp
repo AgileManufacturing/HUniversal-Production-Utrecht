@@ -38,23 +38,16 @@ namespace rexos_gripper {
 	 * @param address Register address that contains the device boolean.
 	 * @param pin The pin (bit) that is connected to the device.
 	 **/
-	OutputDevice::OutputDevice(JSONNode node) {
+	OutputDevice::OutputDevice(Json::Value node) {
 		readJSONNode(node);
 		
 		ioController = new InputOutputController(node);
 	}
-	void OutputDevice::readJSONNode(const JSONNode node) {
-		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
-			if(it->name() == "modbusAddress"){
-				address = it->as_int();
-				ROS_INFO_STREAM("found modbusAddress " << address);
-			} else if(it->name() == "modbusDevicePin"){
-				pin = it->as_int();
-				ROS_INFO_STREAM("found modbusDevicePin " << pin);
-			} else {
-				// some other property, ignore it
-			}
-		}
+	void OutputDevice::readJSONNode(const Json::Value node) {
+		address = node["modbusAddress"].asInt();
+		ROS_INFO_STREAM("found modbusAddress " << address);
+		pin = node["modbusDevicePin"].asInt();
+		ROS_INFO_STREAM("found modbusDevicePin " << pin);
 	}
 	
 	/*OutputDevice::OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin) :

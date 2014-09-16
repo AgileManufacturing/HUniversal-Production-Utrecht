@@ -125,30 +125,4 @@ namespace rexos_utilities{
 
         return o.str();
     }
-
-    std::string mapToJsonString(std::map<std::string, std::string> map){
-        std::stringstream mapStream;
-        std::map<std::string, std::string>::iterator iter;
-
-        for (iter = map.begin(); iter != map.end(); ++iter) {
-            if ((iter != map.end()) && (iter == --map.end())) {
-                mapStream << "\"" << iter->first << "\" : \"" << iter->second << "\" ";
-            } else {
-                mapStream << "\"" << iter->first << "\" : \"" << iter->second << "\", ";
-            }
-        }
-        return mapStream.str();
-    }
-
-    std::map<std::string, std::string> setMapFromNode(const JSONNode & n) {
-        std::map<std::string, std::string> * newMap = new std::map<std::string, std::string>();
-        
-        JSONNode::const_iterator i = n.begin();
-         while (i != n.end()){
-             newMap->insert(std::pair<std::string,std::string>(i->name(),i->as_string()));
-             i++;
-         }
-        
-        return *newMap;
-    }
 }

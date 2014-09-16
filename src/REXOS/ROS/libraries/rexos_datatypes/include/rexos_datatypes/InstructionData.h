@@ -14,50 +14,24 @@
 #include <map>
 #include <utility>
 
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
  
 
 using namespace std;
 
 namespace rexos_datatypes{
-    class InstructionData {
-    public:
-        InstructionData();
-        InstructionData(JSONNode n); 
-        InstructionData(std::string command, std::string destination, std::string look_up, 
-            std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload); 
+	class InstructionData {
+	public:
+		InstructionData();
+		InstructionData(Json::Value n); 
+		
+		Json::Value getJsonNode();
+		void setJsonNode(Json::Value jsonNode);
 
-        std::string getCommand();
-        void setCommand(std::string command);
-
-        std::string getDestination();
-        void setDestination(std::string destination);
-
-        std::string getLook_up();
-        void setLook_up(std::string look_up);
-
-        std::map<std::string, std::string> getLook_up_parameters();
-        void setLook_up_parameters(map<std::string, std::string> look_up_parameters);
-
-        std::map<std::string, std::string> getPayload();
-        void setPayload(map<std::string, std::string> payload);
-
-        JSONNode getJsonNode();
-        void setJsonNode(JSONNode jsonNode);
-
-        std::string toJSONString();
-
-        void setInstructionData(const JSONNode & n);
-    private:
-        JSONNode jsonNode;
-        std::string command;
-        std::string destination;
-        std::string look_up;
-        std::map<std::string, std::string> look_up_parameters;
-        std::map<std::string, std::string> payload;
-    };
+		std::string toJSONString();
+	private:
+		Json::Value jsonNode;
+	};
 }
 
 #endif	/* INSTRUCTIONDATA_H */

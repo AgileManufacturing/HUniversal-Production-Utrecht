@@ -28,9 +28,7 @@
 
 #include "equiplet_node/ModuleProxyListener.h"
  
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace equiplet_node {
 
@@ -54,7 +52,7 @@ public:
 
 	void changeState(rexos_statemachine::State state);
 	void changeMode(rexos_statemachine::Mode mode);
-	void setInstruction(std::string OID, JSONNode n);
+	void setInstruction(std::string OID, Json::Value n);
 	void goToNextTransitionPhase();
 
 private:

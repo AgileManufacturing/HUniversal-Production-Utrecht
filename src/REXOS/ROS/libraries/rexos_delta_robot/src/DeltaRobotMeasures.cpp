@@ -38,57 +38,41 @@
 #include "ros/ros.h"
 
 namespace rexos_delta_robot {
-	DeltaRobotMeasures::DeltaRobotMeasures(JSONNode properties) {
-		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
-			if(it->name() == "baseRadius"){
-				base = it->as_float();
-				ROS_INFO_STREAM("found baseRadius " << base);
-			} else if(it->name() == "hipLength"){
-				hip = it->as_float();
-				ROS_INFO_STREAM("found hipLength " << hip);
-			} else if(it->name() == "effectorRadius"){
-				effector = it->as_float();
-				ROS_INFO_STREAM("found effectorRadius " << effector);
-			} else if(it->name() == "ankleLength"){
-				ankle = it->as_float();
-				ROS_INFO_STREAM("found ankleLength " << ankle);
-			
-			} else if(it->name() == "hipAnleMaxAngleDegrees"){
-				maxAngleHipAnkle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
-			} else if(it->name() == "motorFromZeroToTopAngleDegrees"){
-				motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
-			
-			} else if(it->name() == "boundaryBoxMinX"){
-				boundaryBoxMinX = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
-			} else if(it->name() == "boundaryBoxMaxX"){
-				boundaryBoxMaxX = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMaxX " << boundaryBoxMaxX);
-			} else if(it->name() == "boundaryBoxMinY"){
-				boundaryBoxMinY = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMinY " << boundaryBoxMinY);
-			} else if(it->name() == "boundaryBoxMaxY"){
-				boundaryBoxMaxY = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMaxY " << boundaryBoxMaxY);
-			} else if(it->name() == "boundaryBoxMinZ"){
-				boundaryBoxMinZ = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMinZ " << boundaryBoxMinZ);
-			} else if(it->name() == "boundaryBoxMaxZ"){
-				boundaryBoxMaxZ = it->as_float();
-				ROS_INFO_STREAM("found boundaryBoxMaxZ " << boundaryBoxMaxZ);
-			} else {
-				// some other property, ignore it
-			}
-		}
+	DeltaRobotMeasures::DeltaRobotMeasures(Json::Value properties) {
+		base = properties["baseRadius"].asDouble();
+		ROS_INFO_STREAM("found baseRadius " << base);
+		
+		hip = properties["hipLength"].asDouble();
+		ROS_INFO_STREAM("found hipLength " << hip);
+		
+		effector = properties["effectorRadius"].asDouble();
+		ROS_INFO_STREAM("found effectorRadius " << effector);
+		
+		ankle = properties["ankleLength"].asDouble();
+		ROS_INFO_STREAM("found ankleLength " << ankle);
+		
+		maxAngleHipAnkle = rexos_utilities::degreesToRadians(properties["hipAnleMaxAngleDegrees"].asDouble());
+		ROS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
+		
+		motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(properties["motorFromZeroToTopAngleDegrees"].asDouble());
+		ROS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
+		
+		boundaryBoxMinX = properties["boundaryBoxMinX"].asDouble();
+		ROS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
+		
+		boundaryBoxMaxX = properties["boundaryBoxMaxX"].asDouble();
+		ROS_INFO_STREAM("found boundaryBoxMaxX " << boundaryBoxMaxX);
+		
+		boundaryBoxMinY = properties["boundaryBoxMinY"].asDouble();
+		ROS_INFO_STREAM("found boundaryBoxMinY " << boundaryBoxMinY);
+		
+		boundaryBoxMaxY = properties["boundaryBoxMaxY"].asDouble();
+		ROS_INFO_STREAM("found boundaryBoxMaxY " << boundaryBoxMaxY);
+		
+		boundaryBoxMinZ = properties["boundaryBoxMinZ"].asDouble();
+		ROS_INFO_STREAM("found boundaryBoxMinZ " << boundaryBoxMinZ);
+		
+		boundaryBoxMaxZ = properties["boundaryBoxMaxZ"].asDouble();
+		ROS_INFO_STREAM("found boundaryBoxMaxZ " << boundaryBoxMaxZ);
 	}
-/*	JSONNode StepperMotorProperties::findJsonNode(JSONNode input, std::string name) {
-		for(JSONNode::const_iterator it = input.begin(); it != input.end(); it++) {
-			if(it->name() == name) {
-				return it->as_node();
-			}
-		}
-		throw std::runtime_error("JSONNode not found by name " + name + " in " input.write_formatted());
-	}*/
 }

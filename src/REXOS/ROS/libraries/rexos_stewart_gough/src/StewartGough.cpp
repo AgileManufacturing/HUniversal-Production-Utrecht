@@ -58,7 +58,7 @@ namespace rexos_stewart_gough{
      * @param motors The motor array with the three motor objects.
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
-    StewartGough::StewartGough(JSONNode node) :
+    StewartGough::StewartGough(Json::Value node) :
 			motorManager(NULL),
 			effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
 			boundariesGenerated(false),
@@ -138,32 +138,23 @@ namespace rexos_stewart_gough{
         //delete kinematics;
     }
     
-	void StewartGough::readJSONNode(const JSONNode node) {
-		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
-			if(it->name() == "modbusIp"){
-				modbusIp = it->as_string();
-				ROS_INFO_STREAM("found modbusIp " << modbusIp);
-			} else if(it->name() == "modbusPort"){
-				modbusPort = it->as_int();
-				ROS_INFO_STREAM("found modbusPort " << modbusPort);
-			
-			} else if(it->name() == "calibrationBigStepFactor"){
-				calibrationBigStepFactor = it->as_int();
-				ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
-			
-			
-			} else if(it->name() == "stepperMotorProperties"){
-				JSONNode node = it->as_node();
-				stepperMotorProperties = new rexos_motor::StepperMotorProperties(node);
-				ROS_INFO_STREAM("found stepperMotorProperties");
-			} else if(it->name() == "stewartGoughMeasures"){
-				JSONNode node = it->as_node();
-				stewartGoughMeasures = new rexos_stewart_gough::StewartGoughMeasures(node);
-				ROS_INFO_STREAM("found stewartGoughMeasures");
-			} else {
-				// some other property, ignore it
-			}
-		}
+	void StewartGough::readJSONNode(const Json::Value node) {
+		modbusIp = node["modbusIp"].asString();
+		ROS_INFO_STREAM("found modbusIp " << modbusIp);
+		
+		modbusPort = node["modbusPort"].asInt();
+		ROS_INFO_STREAM("found modbusPort " << modbusPort);
+		
+		calibrationBigStepFactor = node["calibrationBigStepFactor"].asInt();
+		ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
+		
+		Json::Value stepperMotorPropertiesNode = node["stepperMotorProperties"];
+		stepperMotorProperties = new rexos_motor::StepperMotorProperties(stepperMotorPropertiesNode);
+		ROS_INFO_STREAM("found stepperMotorProperties");
+		
+		Json::Value stewartGoughNode = node["stewartGoughMeasures"];
+		stewartGoughMeasures = new rexos_stewart_gough::StewartGoughMeasures(stewartGoughNode);
+		ROS_INFO_STREAM("found stewartGoughMeasures");
 	}
     /**
      * Generates the effectorBoundaries for the given voxelSize.

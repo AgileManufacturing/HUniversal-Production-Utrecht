@@ -49,8 +49,7 @@
 #include <equiplet_node/ModuleProxy.h>
 #include <equiplet_node/scada/EquipletScada.h>
 
-#pragma GCC system_header
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 #include <actionlib/client/simple_action_client.h>
 
@@ -90,11 +89,10 @@ private:
 
 	void updateEquipletStateOnBlackboard();
 
-	void handleEquipletCommand(JSONNode n);
+	void handleEquipletCommand(Json::Value n);
 
 	void handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId);
 
-	void handleDirectMoveCommand(rexos_knowledge_database::ModuleIdentifier moduleIdentifier, mongo::OID targetObjectId);
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet

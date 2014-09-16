@@ -31,7 +31,7 @@
 
 #include <string>
 #include <rexos_knowledge_database/ModuleTypeIdentifier.h>
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_knowledge_database {
 	class ModuleIdentifier : public ModuleTypeIdentifier{
@@ -44,7 +44,7 @@ namespace rexos_knowledge_database {
 		
 		std::string getSerialNumber() const;
 		std::string toString();
-		JSONNode toJSONObject();
+		Json::Value toJSONObject();
 		bool operator==(const ModuleIdentifier& rhs);
 	};
 	std::ostream& operator<<(std::ostream& os, const ModuleIdentifier& obj);

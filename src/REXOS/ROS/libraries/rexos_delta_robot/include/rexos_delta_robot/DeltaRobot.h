@@ -41,6 +41,7 @@
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
+#include <jsoncpp/json/value.h>
 
 #include <vector>
 
@@ -51,10 +52,10 @@ namespace rexos_delta_robot{
 	 **/
 	class DeltaRobot{
 	public:
-		DeltaRobot(JSONNode node);
+		DeltaRobot(Json::Value node);
 		~DeltaRobot();
 		
-		void readJSONNode(JSONNode node);
+		void readJSONNode(Json::Value node);
 
 		/**
 		 * Gets the EffectorBoundaries of the deltarobot.

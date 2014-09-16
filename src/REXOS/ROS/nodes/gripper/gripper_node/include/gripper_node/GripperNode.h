@@ -46,10 +46,8 @@
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
+#include <jsoncpp/json/value.h>
 
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
 /**
  * Gripper node that provides services to control the gripper valve
  **/
@@ -76,7 +74,6 @@ public:
 	bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
 	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
-	std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
 
 private:
 	/**

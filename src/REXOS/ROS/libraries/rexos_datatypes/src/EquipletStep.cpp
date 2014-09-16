@@ -31,36 +31,22 @@
 #include "rexos_datatypes/EquipletStep.h"
 #include "rexos_utilities/Utilities.h"
 
+#include <jsoncpp/json/writer.h>
+
 namespace rexos_datatypes{
 
-    EquipletStep::EquipletStep(JSONNode n) :
+    EquipletStep::EquipletStep(Json::Value n) :
 			moduleIdentifier("", "", "") // shut up the complaining compiler. TODO: nicer solution
 	{
 		setValues(n);
     }
 
     std::string EquipletStep::getId(){
-        return this->_id;
+        return this->id;
     }
 
     void EquipletStep::setId(std::string id){
-        this->_id = id;    
-    }
-
-    std::string EquipletStep::getServiceStepID(){
-        return this->serviceStepID;
-    }
-
-    void EquipletStep::setServiceStepID(std::string serviceStepID){
-        this->serviceStepID = serviceStepID;
-    }
-
-    std::string EquipletStep::getNextStep(){
-        return this->nextStep;
-    }
-
-    void EquipletStep::setNextStep(std::string nextStep){
-        this->nextStep = nextStep;
+        this->id = id;    
     }
 
     rexos_knowledge_database::ModuleIdentifier EquipletStep::getModuleIdentifier(){
@@ -71,26 +57,10 @@ namespace rexos_datatypes{
         this->moduleIdentifier = moduleIdentifier;
     }
 
-    void EquipletStep::setModuleIdentifier(const JSONNode & n){
-		std::string manufacturer;
-		std::string typeNumber;
-		std::string serialNumber;
-		
-       //Iterate them nodes.
-       JSONNode::const_iterator i = n.begin();
-
-       while (i != n.end()){
-			const char * node_name = i -> name().c_str();
-			
-           if (strcmp(node_name, "manufacturer") == 0){
-               manufacturer = i -> as_string();
-           } else if (strcmp(node_name, "typeNumber") == 0){
-               typeNumber = i -> as_string();
-           } else if (strcmp(node_name, "serialNumber") == 0){
-               serialNumber = i -> as_string();
-           }
-		    i++;
-	   }
+    void EquipletStep::setModuleIdentifier(const Json::Value & n){
+		std::string manufacturer = n["manufacturer"].asString();
+		std::string typeNumber = n["typeNumber"].asString();
+		std::string serialNumber = n["serialNumber"].asString();
        this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
 	 }
 
@@ -110,88 +80,27 @@ namespace rexos_datatypes{
         this->status = status;
     }
 
-    std::map<std::string, std::string> EquipletStep::getStatusData(){
-        return this->statusData;
-    }
-
-    void EquipletStep::setStatusData(std::map<std::string, std::string> statusData){
-        this->statusData = statusData;
-    }
-
-    TimeData EquipletStep::getTimeData(){
-        return this->timeData;
-    }
-    
-    void EquipletStep::setTimeData(TimeData timeData){
-        this->timeData = timeData;
-    }
-
     EquipletStep::~EquipletStep() {
         //std::cout << "Delete Equipletstep called." std::endl;
     }
 
-    JSONNode EquipletStep::getJsonNode(){
-        return this-> jsonNode;
+    Json::Value EquipletStep::getJsonNode(){
+        return this->jsonNode;
     }
     
-    void EquipletStep::setValues(const JSONNode & n){
-        //Iterate them nodes.
-        JSONNode::const_iterator i = n.begin();
-
-        while (i != n.end()){
-            
-            const char * node_name = i -> name().c_str();
-            
-            if (strcmp(node_name, "serviceStepID") == 0){
-                setServiceStepID(i -> as_string());
-            }
-            else if (strcmp(node_name, "nextStep") == 0){
-                setNextStep(i -> as_string());
-            }
-            else if (strcmp(node_name, "moduleIdentifier") == 0){
-                setModuleIdentifier(i -> as_node());
-            }
-            else if (strcmp(node_name, "instructionData") == 0){
-                setInstructionData(InstructionData(*i));
-            }
-            else if (strcmp(node_name, "status") == 0){
-                setStatus(i -> as_string());
-            }
-            else if (strcmp(node_name, "statusData") == 0){
-                setStatusData(rexos_utilities::setMapFromNode(*i));
-            }
-            else if (strcmp(node_name, "timeData") == 0){
-                setTimeData(setTimeDataFromNode(*i));
-            }
-            ++i;
-        }        
+    void EquipletStep::setValues(const Json::Value & n){
+		setModuleIdentifier(n["moduleIdentifier"]);
+		setInstructionData(InstructionData(n["instructionData"]));
+		setStatus(n["status"].asString());
     }
 
     std::string EquipletStep::toJSONString(){
-
-        std::stringstream ss;
-
-        ss << "{ ";
-        ss << "\"serviceStepID\" : \"" << this->serviceStepID << "\", ";
-        ss << "\"nextStep\" : \"" << this->nextStep << "\", ";
-        ss << "\"moduleIdentifier\" : " << this->moduleIdentifier.toString() << ", ";
-        ss << "\"instructionData\" : " << this->instructionData.toJSONString() << ", ";
-        ss << "\"status\" : \"" << this->status << "\" ";
-        ss << " } ";
-
-        return ss.str();
+		Json::Value output;
+		output["moduleIdentifier"] = moduleIdentifier.toString();
+		output["instructionData"] = instructionData.getJsonNode();
+		output["status"] = status;
+		
+		Json::StyledWriter styledWriter;
+		return styledWriter.write(output);
     }
-    
-    TimeData EquipletStep::setTimeDataFromNode(const JSONNode & n){
-        TimeData * timeData = new TimeData();
-        //For now its only 1 value. This might be more in the future
-        JSONNode::const_iterator i = n.begin();
-        
-        while (i != n.end()){
-            timeData->setDuration(i-> as_int());
-            i++;
-        }
-        return *timeData;
-    }
-   
 }

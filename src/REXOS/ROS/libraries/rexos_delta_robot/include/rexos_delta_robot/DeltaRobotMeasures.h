@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_delta_robot{
 	/**
@@ -105,6 +105,6 @@ namespace rexos_delta_robot{
 		double boundaryBoxMaxZ;
 		
 		
-		DeltaRobotMeasures(JSONNode properties);
+		DeltaRobotMeasures(Json::Value properties);
 	};
 }

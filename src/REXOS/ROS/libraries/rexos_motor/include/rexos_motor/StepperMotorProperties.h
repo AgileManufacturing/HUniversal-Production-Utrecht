@@ -39,7 +39,7 @@
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorInterface.h>
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_motor{
 	class StepperMotorProperties{
@@ -84,7 +84,7 @@ namespace rexos_motor{
 		 **/
 		double maxSpeed;
 	public:
-		StepperMotorProperties(JSONNode properties);
+		StepperMotorProperties(Json::Value properties);
 		
 	/*private:
 		JSONNode findJsonNode(JSONNode input, std::string name);*/

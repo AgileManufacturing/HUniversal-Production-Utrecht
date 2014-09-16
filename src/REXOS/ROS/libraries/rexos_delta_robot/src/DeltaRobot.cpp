@@ -56,7 +56,7 @@ namespace rexos_delta_robot{
      * @param motors The motor array with the three motor objects.
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
-    DeltaRobot::DeltaRobot(JSONNode node) :
+    DeltaRobot::DeltaRobot(Json::Value node) :
 			kinematics(NULL),
 			motorManager(NULL),
 			boundaries(NULL),
@@ -104,32 +104,23 @@ namespace rexos_delta_robot{
         delete kinematics;
     }
     
-	void DeltaRobot::readJSONNode(const JSONNode node) {
-		for(JSONNode::const_iterator it = node.begin(); it != node.end(); it++) {
-			if(it->name() == "modbusIp"){
-				modbusIp = it->as_string();
-				ROS_INFO_STREAM("found modbusIp " << modbusIp);
-			} else if(it->name() == "modbusPort"){
-				modbusPort = it->as_int();
-				ROS_INFO_STREAM("found modbusPort " << modbusPort);
-			
-			} else if(it->name() == "calibrationBigStepFactor"){
-				calibrationBigStepFactor = it->as_int();
-				ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
-			
-			
-			} else if(it->name() == "stepperMotorProperties"){
-				JSONNode node = it->as_node();
-				stepperMotorProperties = new rexos_motor::StepperMotorProperties(node);
-				ROS_INFO_STREAM("found stepperMotorProperties");
-			} else if(it->name() == "deltaRobotMeasures"){
-				JSONNode node = it->as_node();
-				deltaRobotMeasures = new rexos_delta_robot::DeltaRobotMeasures(node);
-				ROS_INFO_STREAM("found deltraRobotMeasures");
-			} else {
-				// some other property, ignore it
-			}
-		}
+	void DeltaRobot::readJSONNode(const Json::Value node) {
+		modbusIp = node["modbusIp"].asString();
+		ROS_INFO_STREAM("found modbusIp " << modbusIp);
+		
+		modbusPort = node["modbusPort"].asInt();
+		ROS_INFO_STREAM("found modbusPort " << modbusPort);
+		
+		calibrationBigStepFactor = node["calibrationBigStepFactor"].asInt();
+		ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
+		
+		Json::Value stepperMotorPropertiesNode = node["stepperMotorProperties"];
+		stepperMotorProperties = new rexos_motor::StepperMotorProperties(stepperMotorPropertiesNode);
+		ROS_INFO_STREAM("found stepperMotorProperties");
+		
+		Json::Value deltaRobotNode = node["deltaRobotMeasures"];
+		deltaRobotMeasures = new rexos_delta_robot::DeltaRobotMeasures(deltaRobotNode);
+		ROS_INFO_STREAM("found deltraRobotMeasures");
 	}
     /**
      * Generates the effectorBoundaries for the given voxelSize.

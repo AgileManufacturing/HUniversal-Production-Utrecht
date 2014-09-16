@@ -31,107 +31,26 @@
 #include "rexos_datatypes/InstructionData.h"
 #include "rexos_utilities/Utilities.h"
 
+#include <jsoncpp/json/writer.h>
+
 namespace rexos_datatypes{
 
     InstructionData::InstructionData(){}
 
-    InstructionData::InstructionData(JSONNode n){
-        setInstructionData(n);
+    InstructionData::InstructionData(Json::Value n){
+		jsonNode = n;
     }
 
-    InstructionData::InstructionData(std::string command, std::string destination, std::string look_up, 
-        std::map<std::string, std::string> look_up_parameters, std::map<std::string, std::string> payload) {
-        this->command = command;
-        this->destination = destination;
-        this->look_up = look_up;
-        this->look_up_parameters = look_up_parameters;
-        this->payload = payload;
+    Json::Value InstructionData::getJsonNode(){
+        return this->jsonNode;
     }
 
-    std::string InstructionData::getCommand(){
-        return this->command;
-    }
-    void InstructionData::setCommand(std::string command){
-        this->command = command;
-    }
-
-    std::string InstructionData::getDestination(){
-        return this->destination;
-    }
-    void InstructionData::setDestination(std::string destination){
-        this->destination = destination;
-    }
-
-    std::string InstructionData::getLook_up(){
-        return this->look_up;
-    }
-    void InstructionData::setLook_up(std::string look_up){
-        this->look_up = look_up;
-    }
-
-    std::map<std::string, std::string> InstructionData::getLook_up_parameters(){
-        return this->look_up_parameters;
-    }
-    void InstructionData::setLook_up_parameters(map<std::string, std::string> look_up_parameters){
-        this->look_up_parameters = look_up_parameters;
-    }
-
-    std::map<std::string, std::string> InstructionData::getPayload(){
-        return this->payload;    
-    }
-    void InstructionData::setPayload(std::map<std::string, std::string> payload){
-        this->payload = payload;
-    }
-
-    JSONNode InstructionData::getJsonNode(){
-        return this-> jsonNode;
-    }
-
-    void InstructionData::setJsonNode(JSONNode jsonNode){
+    void InstructionData::setJsonNode(Json::Value jsonNode){
         this->jsonNode = jsonNode;
     }
 
-    void InstructionData::setInstructionData(const JSONNode & n){
-         //Iterate them nodes.
-        JSONNode::const_iterator i = n.begin();
-        setJsonNode(n);
-        
-        while (i != n.end()){
-            
-            const char * node_name = i -> name().c_str();
-            
-            if (strcmp(node_name, "command") == 0){
-                setCommand(i -> as_string());
-            }
-            else if (strcmp(node_name, "destination") == 0){
-                setDestination(i -> as_string());
-            }
-            else if (strcmp(node_name, "look_up") == 0){
-                setLook_up(i -> as_string());
-            }
-            else if (strcmp(node_name, "look_up_parameters") == 0){
-                setLook_up_parameters(rexos_utilities::setMapFromNode(*i));
-            }
-            else if (strcmp(node_name, "payload") == 0){
-                setPayload(rexos_utilities::setMapFromNode(*i));
-            }
-            //increment the iterator
-            ++i;
-        }
-    }
-
     std::string InstructionData::toJSONString(){
-
-        std::stringstream ss;
-
-        ss << "{";
-        ss << "\"command\" : \"" << this->command << "\", ";
-        ss << "\"destination\" : \"" << this->destination << "\", ";
-        ss << "\"look_up\" : \"" << this->look_up << "\", ";
-        ss << "\"look_up_parameters\" : { " << rexos_utilities::mapToJsonString(this->look_up_parameters) << " }, ";
-        ss << "\"payload\" : { " << rexos_utilities::mapToJsonString(this->payload) << " } ";
-        ss << " }";
-
-        return ss.str();
+		Json::StyledWriter styledWriter;
+		return styledWriter.write(jsonNode);
     }
 }

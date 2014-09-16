@@ -35,6 +35,8 @@
 #include <execinfo.h>
 #include <signal.h>
 
+#include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/writer.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "StewartGoughNode"
@@ -64,15 +66,20 @@ stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipl
 	std::string typeProperties = this->getModuleTypeProperties();
 
 
-	JSONNode jsonNode = libjson::parse(properties);
-	JSONNode typeJsonNode = libjson::parse(typeProperties);
-
-	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
-		jsonNode.push_back(*it);
-	}
-
-	ROS_INFO("%s", jsonNode.write_formatted().c_str());
+	Json::Reader reader;
+	Json::Value jsonNode;
+	Json::Value typeJsonNode;
+	reader.parse(properties, jsonNode);
+	reader.parse(typeProperties, typeJsonNode);
 	
+	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
+	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
+	}
+	
+	Json::StyledWriter writer;
+	ROS_INFO("%s", writer.write(jsonNode).c_str());
+		
 	// Create a stewart gough robot
 	stewartGough = new rexos_stewart_gough::StewartGough(jsonNode);
 
@@ -91,7 +98,10 @@ stewartGoughNodeNamespace::StewartGoughNode::~StewartGoughNode() {
 
 
 void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-	JSONNode instructionDataNode = libjson::parse(goal->json);
+	Json::Reader reader;
+	Json::Value instructionDataNode;
+	reader.parse(goal->json, instructionDataNode);
+	
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 	bool lookupIsSet = false;
@@ -106,13 +116,13 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	double angle, rotatedX, rotatedY;
-    JSONNode::const_iterator i = instructionDataNode.begin();
+    /*JSONNode::const_iterator i = instructionDataNode.begin();
 	
 	std::cout << "Json data: " << goal->json << std::endl;
 	
 	
 	
-    while (i != instructionDataNode.end()){
+    /*while (i != instructionDataNode.end()){
         const char * nodeName = i -> name().c_str();
 	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
         if (strcmp(nodeName, "payload") == 0){
@@ -189,9 +199,9 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_s
 				payloadPoint.z = stewartGough->getEffectorLocation().z;
 			}
 			*/
-        }
+        /*}
         i++;
-    }
+    }*/
 
     Vector3 moveVector;
     //lookup is set, so transform the (rotated) crate to a normal position.
@@ -411,7 +421,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  *
  * @return Point object that is initialized from the data in the JSON
  **/
-stewartGoughNodeNamespace::Point stewartGoughNodeNamespace::StewartGoughNode::parsePoint(const JSONNode & n, std::string * valuesSet){
+/*stewartGoughNodeNamespace::Point stewartGoughNodeNamespace::StewartGoughNode::parsePoint(const JSONNode & n, std::string * valuesSet){
 
 	JSONNode::const_iterator i = n.begin();
 	Point p;
@@ -473,7 +483,7 @@ std::string stewartGoughNodeNamespace::StewartGoughNode::parseNodeValue(const st
 		i++;
 	}
 	return result;
-}
+}*/
 
 
 /**
@@ -485,7 +495,7 @@ std::string stewartGoughNodeNamespace::StewartGoughNode::parseNodeValue(const st
  * @return Point object that is initialized from the data in the JSON
  **/
 stewartGoughNodeNamespace::Point* stewartGoughNodeNamespace::StewartGoughNode::parsePointArray(std::string json, int &size){
-	ROS_INFO("Parsing JSON Array");
+/*	ROS_INFO("Parsing JSON Array");
 	std::string discarded;
 	JSONNode pathArray = libjson::parse(json);
 	Point *path = new Point[pathArray.size()];
@@ -504,7 +514,7 @@ stewartGoughNodeNamespace::Point* stewartGoughNodeNamespace::StewartGoughNode::p
 		ROS_INFO("z value of item %d in array on position %d", (int)path[0].z, size);
 	}
 	ROS_INFO("Done parsing JSON Array");
-	return path;
+	return path;*/
 }
 
 /**

@@ -41,7 +41,9 @@
 #include <rexos_knowledge_database/KnowledgeDatabaseException.h>
 #include "rexos_utilities/Utilities.h"
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/writer.h>
 
 #include <string>
 #include <iostream>
@@ -115,31 +117,31 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	getCorrectionMatricesClient.call(getCalibrationMatricesServiceCall);
 	
 	// copy all the distCoeffs from the service
-	JSONNode distCoeffs;
-	distCoeffs.set_name("distCoeffs");
+	Json::Value distCoeffs;
 	for(int i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
-		distCoeffs.push_back(JSONNode("", getCalibrationMatricesServiceCall.response.distCoeffs.at(i)));
+		distCoeffs.append(getCalibrationMatricesServiceCall.response.distCoeffs.at(i));
 	}
 	// copy all the distCoeffs from the service
-	JSONNode cameraMatrix;
-	cameraMatrix.set_name("cameraMatrix");
+	Json::Value cameraMatrix;
 	for(int i = 0; i < 9; i++) {
-		cameraMatrix.push_back(JSONNode("", getCalibrationMatricesServiceCall.response.cameraMatrix.values[i]));
+		cameraMatrix.append(getCalibrationMatricesServiceCall.response.cameraMatrix.values[i]);
 	}
 	
 	// merge the distCoeffs and cameraMatrix in the already existing calibration data
-	JSONNode jsonNode;
+	Json::Value jsonNode;
 	try{
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
-		jsonNode = libjson::parse(properties);
+		Json::Reader reader;
+		reader.parse(properties, jsonNode);
 	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
 		// there is no calibration data, so we start with a new node (which we created above)
 	}
-	jsonNode.push_back(distCoeffs);
-	jsonNode.push_back(cameraMatrix);
+	jsonNode["distCoeffs"] = distCoeffs;
+	jsonNode["cameraMatrix"] = cameraMatrix;
 	
-	ROS_INFO_STREAM("JSON=" << std::cout << jsonNode.write_formatted());
-	this->setCalibrationDataForModuleAndChilds(jsonNode.write_formatted());
+	Json::StyledWriter writer;
+	ROS_INFO_STREAM("JSON=" << writer.write(jsonNode));
+	this->setCalibrationDataForModuleAndChilds(writer.write(jsonNode));
 	return true;
 }
 
@@ -169,35 +171,21 @@ bool CameraControlNode::transitionSetup(){
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
 		ROS_INFO("Trying transition setup a2");
 		ROS_INFO(properties.c_str());
-		JSONNode jsonNode = libjson::parse(properties);
+		Json::Value jsonNode;
+		Json::Reader reader;
+		reader.parse(properties, jsonNode);
 		ROS_INFO("Trying transition setup a3");
 		
-		JSONNode* distCoeffs = NULL;
-		JSONNode* cameraMatrix = NULL;
-		for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
-ROS_INFO("b");
-ROS_INFO(it->name().c_str());
-			if(it->name() == "distCoeffs"){
-ROS_INFO("1");
-				distCoeffs = new JSONNode(it->as_node());
-				ROS_INFO("found distCoeffs");
-			} else if (it->name() == "cameraMatrix") {
-ROS_INFO("2");
-				cameraMatrix = new JSONNode(it->as_node());
-				ROS_INFO("found cameraMatrix");
-			} else {
-ROS_INFO("c");
-				// some other property, ignore it
+		if(jsonNode.isMember("distCoeffs") == false || jsonNode.isMember("cameraMatrix") == false) {
+			if(mannuallyCalibrateLens() == false){
+				return false;
 			}
 		}
 		
-ROS_INFO("d");
-		if(distCoeffs == NULL || cameraMatrix == NULL){
-			if(mannuallyCalibrateLens() == false){
-				return false;
-			} 
-		} else if(cameraMatrix->size() != 9){
-			throw std::runtime_error("The camera matrix does not contain 9 entries" + boost::to_string(cameraMatrix->size()));
+		Json::Value cameraMatrix = jsonNode["cameraMatrix"];
+		Json::Value distCoeffs = jsonNode["distCoeffs"];
+		if(cameraMatrix.size() != 9) {
+			throw std::runtime_error("The camera matrix does not contain 9 entries" + boost::to_string(cameraMatrix.size()));
 		}
 		
 		ROS_INFO("calibrateLens correction matrix found");
@@ -205,12 +193,12 @@ ROS_INFO("d");
 		vision_node::setCorrectionMatrices serviceCall;
 		
 		// copy all the distCoeffs to the service
-		for(JSONNode::const_iterator it = distCoeffs->begin(); it != distCoeffs->end(); it++) {
-			serviceCall.request.distCoeffs.push_back(it->as_float());
+		for(int i = 0; i < distCoeffs.size(); i++) {
+			serviceCall.request.distCoeffs.push_back(distCoeffs[i].asDouble());
 		}
 		// copy all the camera matrix to the service
 		for(int i = 0; i < 9; i++) {
-			serviceCall.request.cameraMatrix.values[i] = cameraMatrix->at(i).as_float();
+			serviceCall.request.cameraMatrix.values[i] = cameraMatrix[i].asDouble();
 		}
 		client.call(serviceCall);
 

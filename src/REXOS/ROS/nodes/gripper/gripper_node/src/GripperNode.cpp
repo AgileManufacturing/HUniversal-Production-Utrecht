@@ -29,24 +29,15 @@
 
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
- #include <boost/bind.hpp>
+#include <boost/bind.hpp>
+
+#include <jsoncpp/json/reader.h>
+
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "GripperNode"
 // @endcond
 
-/**
- * The IP of the modbus we are connecting to
- **/
-#define MODBUS_IP "192.168.0.32"
-/**
- * The port we are connecting to
- **/
-#define MODBUS_PORT 502
-
-/**
- * Constructor
- **/
 GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
 		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
@@ -61,14 +52,12 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
 
-	JSONNode jsonNode = libjson::parse(properties);
-	JSONNode typeJsonNode = libjson::parse(typeProperties);
-
-	for(JSONNode::const_iterator it = typeJsonNode.begin(); it != typeJsonNode.end(); it++) {
-		jsonNode.push_back(*it);
-	}
-
-	ROS_INFO("4");
+	Json::Reader reader;
+	Json::Value jsonNode;
+	Json::Value typeJsonNode;
+	reader.parse(properties, jsonNode);
+	reader.parse(typeProperties, typeJsonNode);
+	
 	gripper = new rexos_gripper::Gripper(jsonNode, this, NULL);
 	setInstructionActionServer.start();
 }
@@ -81,12 +70,17 @@ GripperNode::~GripperNode() {
 }
 
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
-	JSONNode instructionDataNode = libjson::parse(goal->json);
+	Json::Reader reader;
+	Json::Value instructionDataNode;
+	reader.parse(goal->json, instructionDataNode);
+	
 	ROS_WARN_STREAM(goal->json);
 	rexos_statemachine::SetInstructionResult result_;
 	result_.OID = goal->OID;
 
-    JSONNode::const_iterator i = instructionDataNode.begin();
+	/*
+	
+	JSONNode::const_iterator i = instructionDataNode.begin();
 
     while (i != instructionDataNode.end()){
 
@@ -114,7 +108,7 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 			}
 		}
     	++i;
-	}
+	}*/
 
 	std::cout << "Failed setting gripper" << std::endl;
 	setInstructionActionServer.setAborted(result_);
@@ -216,25 +210,6 @@ bool GripperNode::grip(gripper_node::Grip::Request &req, gripper_node::Grip::Res
  **/
 bool GripperNode::release(gripper_node::Release::Request &req, gripper_node::Release::Response &res) {
 	return gripper->release();
-}
-
-std::string GripperNode::parseNodeValue(const std::string nodeName, const JSONNode & n){
-	JSONNode::const_iterator i = n.begin();
-	std::string result;
-	ROS_ERROR_STREAM(nodeName);
-	while(i != n.end()) {
-		// get the JSON node name and value as a string
-		std::string node_name = i->name();
-		ROS_ERROR_STREAM(" " << node_name);
-
-		if(node_name == nodeName) {
-			ROS_ERROR_STREAM(" found");
-			result = i->as_string();
-		} 
-
-		++i;
-	}
-	return result;
 }
 
 /**

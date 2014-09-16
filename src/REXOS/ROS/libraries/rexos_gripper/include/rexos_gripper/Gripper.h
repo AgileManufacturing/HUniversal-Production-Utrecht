@@ -31,7 +31,7 @@
 #include <rexos_gripper/OutputDevice.h>
 #include <boost/thread.hpp>
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_gripper {
 		/**
@@ -87,7 +87,7 @@ namespace rexos_gripper {
 			 **/
 			//const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
 
-			Gripper(JSONNode node, void* GripperNode, watchdogWarningHandler warningHandler);
+			Gripper(Json::Value node, void* GripperNode, watchdogWarningHandler warningHandler);
 			
 			//InputOutputController* ioController, void* GripperNode, watchdogWarningHandler warningHandler);
 			virtual ~Gripper( );
@@ -113,7 +113,7 @@ namespace rexos_gripper {
 			}
 
 		private:
-			void readJSONNode(JSONNode node);
+			void readJSONNode(Json::Value node);
 			
 			int gripperEnabledMax;
 			int gripperEnabledWarning;

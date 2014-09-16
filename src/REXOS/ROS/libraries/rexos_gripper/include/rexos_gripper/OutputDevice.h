@@ -28,7 +28,7 @@
 
 #include <rexos_gripper/InputOutputController.h>
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_gripper
 {
@@ -39,8 +39,8 @@ namespace rexos_gripper
 	class OutputDevice {
 	
 	public:
-		OutputDevice(JSONNode node);
-		void readJSONNode(const JSONNode node);
+		OutputDevice(Json::Value node);
+		void readJSONNode(const Json::Value node);
 		//OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin);
 		virtual ~OutputDevice();
 

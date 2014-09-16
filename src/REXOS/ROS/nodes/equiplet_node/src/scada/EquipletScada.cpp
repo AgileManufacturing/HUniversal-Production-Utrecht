@@ -11,6 +11,9 @@
 #include <algorithm>
 #include <string>
 
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
+
 #ifdef __CDT_PARSER__
 namespace std {
 std::string to_string(...);
@@ -179,43 +182,43 @@ void EquipletScada::mongooseProcessChangeEquipletState(mg_connection* conn, mg_r
 void EquipletScada::mongooseProcessEquipletInfo(mg_connection* conn, mg_request_info* request_info) {
 	const char* state = rexos_statemachine::state_txt[equiplet->getCurrentState()];
 	const char* mode = rexos_statemachine::mode_txt[equiplet->getCurrentMode()];
-	JSONNode jsonObject;
-	jsonObject.push_back(JSONNode("name", equiplet->getEquipletName()));
-	jsonObject.push_back(JSONNode("state", state));
-	jsonObject.push_back(JSONNode("mode", mode));
+	Json::Value jsonObject;
+	jsonObject["name"] = equiplet->getEquipletName();
+	jsonObject["state"] = state;
+	jsonObject["mode"] = mode;
 
 	mg_printf(conn, "%s", ajax_reply_start_success);
 
-	mg_printf(conn, "%s", jsonObject.write_formatted().c_str());
+	Json::StyledWriter writer;
+	mg_printf(conn, "%s", writer.write(jsonObject).c_str());
 }
 
 void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_info* request_info) {
-	JSONNode jsonModules(JSON_ARRAY);
-	jsonModules.set_name("modules");
+	Json::Value jsonModulesArray;
 
 	std::vector<ModuleProxy*> proxies = moduleRegistry->getRegisteredModules();
 	for (ModuleProxy* proxy : proxies) {
-		JSONNode jsonModule;
+		Json::Value jsonModule;
 
 		if(proxy == NULL){
 			ROS_ERROR("ModuleRegistry returns a NULL pointer");
 			continue;
 		}
 
-		JSONNode jsonIdentifier = proxy->getModuleIdentifier().toJSONObject();
-		jsonIdentifier.set_name("identifier");
-		jsonModule.push_back(jsonIdentifier);
-		jsonModule.push_back(JSONNode("mode", rexos_statemachine::mode_txt[proxy->getCurrentMode()]));
-		jsonModule.push_back(JSONNode("state", rexos_statemachine::state_txt[proxy->getCurrentState()]));
-		jsonModules.push_back(jsonModule);
+		Json::Value jsonIdentifier = proxy->getModuleIdentifier().toJSONObject();
+		jsonModule["identifier"] = jsonIdentifier;
+		jsonModule["mode"] = rexos_statemachine::mode_txt[proxy->getCurrentMode()];
+		jsonModule["state"] = rexos_statemachine::state_txt[proxy->getCurrentState()];
+		jsonModulesArray.append(jsonModule);
 	}
 
-	JSONNode jsonObject;
-	jsonObject.push_back(jsonModules);
+	Json::Value jsonObject;
+	jsonObject["modules"] = jsonModulesArray;
 
 	mg_printf(conn, "%s", ajax_reply_start_success);
-
-	mg_printf(conn, "%s", jsonObject.write_formatted().c_str());
+	
+	Json::StyledWriter writer;
+	mg_printf(conn, "%s", writer.write(jsonObject).c_str());
 }
 
 } /* namespace equiplet_node */

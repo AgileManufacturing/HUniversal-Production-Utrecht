@@ -31,7 +31,7 @@
 #include <modbus/modbus.h>
 #include <rexos_modbus/ModbusController.h>
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_gripper
 {
@@ -42,8 +42,8 @@ namespace rexos_gripper
 	class InputOutputController {
 		
 	public:
-		InputOutputController(JSONNode node);
-		void readJSONNode(const JSONNode node);
+		InputOutputController(Json::Value node);
+		void readJSONNode(const Json::Value node);
 		//InputOutputController(rexos_modbus::ModbusController* modbus);
 
 		void pinHigh(uint32_t address, uint8_t pin);

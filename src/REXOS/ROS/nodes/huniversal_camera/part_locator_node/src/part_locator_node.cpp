@@ -33,7 +33,8 @@
 
 #include "rexos_utilities/Utilities.h"
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/reader.h>
 
 #include <algorithm>
 #include <vector>
@@ -45,7 +46,7 @@ using namespace std;
 
 const Vector2 PartLocatorNode::EXPECTED_DIRECTION = Vector2(-1, 0);
 const Vector2 PartLocatorNode::EXPECTED_ITEM_DIRECTION = Vector2(-1, 0);
-const int PartLocatorNode::minCornerSamples = 101;
+const int PartLocatorNode::minCornerSamples = 11;
 const int PartLocatorNode::minItemSamples = 11;
 /*const string PartLocatorNode::TOP_LEFT_VALUE = "WP_800_400_TL";
 const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
@@ -65,35 +66,22 @@ PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_datab
 	ROS_INFO("Constructing");
 	
 	std::string properties = this->getModuleTypeProperties();
-	JSONNode jsonNode = libjson::parse(properties);
 	
-	topLeftValue = std::string();
-	topRightValue = std::string();
-	bottomRightValue = std::string();
-	workPlaneWidth = std::numeric_limits<double>::quiet_NaN();
-	workPlaneHeight = std::numeric_limits<double>::quiet_NaN();
-	workSpaceHeight = std::numeric_limits<double>::quiet_NaN();
+	Json::Reader reader;
+	Json::Value jsonNode;
+	reader.parse(properties, jsonNode);
 	
-	for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
-		if(it->name() == "topLeftValue"){
-			topLeftValue = it->as_string();
-			ROS_INFO_STREAM("found topLeftValue " << topLeftValue);
-		} else if(it->name() == "topRightValue"){
-			topRightValue = it->as_string();
-			ROS_INFO_STREAM("found topRightValue " << topRightValue);
-		} else if(it->name() == "bottomRightValue"){
-			bottomRightValue = it->as_string();
-			ROS_INFO_STREAM("found bottomRightValue " << bottomRightValue);
-		} else if(it->name() == "workPlaneWidth"){
-			workPlaneWidth = it->as_float();
-			ROS_INFO_STREAM("found workPlaneWidth " << workPlaneWidth);
-		} else if(it->name() == "workPlaneHeight"){
-			workPlaneHeight = it->as_float();
-			ROS_INFO_STREAM("found workPlaneHeight " << workPlaneHeight);
-		} else {
-			// some other property, ignore it
-		}
-	}
+	topLeftValue = jsonNode["topLeftValue"].asString();
+	ROS_INFO_STREAM("found topLeftValue " << topLeftValue);
+	topRightValue = jsonNode["topRightValue"].asString();
+	ROS_INFO_STREAM("found topRightValue " << topRightValue);
+	bottomRightValue = jsonNode["bottomRightValue"].asString();
+	ROS_INFO_STREAM("found bottomRightValue " << bottomRightValue);
+	workPlaneWidth = jsonNode["workPlaneWidth"].asDouble();
+	ROS_INFO_STREAM("found workPlaneWidth " << workPlaneWidth);
+	workSpaceHeight = jsonNode["workPlaneHeight"].asDouble();
+	ROS_INFO_STREAM("found workPlaneHeight " << workPlaneHeight);
+	
 	if(std::isnan(workPlaneWidth) || std::isnan(workPlaneHeight) || 
 			topLeftValue.length() == 0 || topRightValue.length() == 0 || bottomRightValue.length() == 0) {
 		throw std::runtime_error("The properties do not contain the top/bottom left/right values or do not contain the workplane width/height");
@@ -198,7 +186,7 @@ void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
 	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor.location);
 	
 	bool updateMatrices = false;
-	for(int i = 0; i < message.qrCodes.size(); i++){		
+	for(int i = 0; i < message.qrCodes.size(); i++) {
 		QrCode qrCode;
 		qrCode.location.x = message.qrCodes[i].corners[1].x;
 		qrCode.location.y = message.qrCodes[i].corners[1].y;

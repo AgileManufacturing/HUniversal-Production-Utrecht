@@ -50,10 +50,8 @@
 #include <actionlib/server/simple_action_server.h>
 #include <rexos_statemachine/SetInstructionAction.h>
 
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
-// ---------------------------------------------
+#include <jsoncpp/json/value.h>
+
 namespace stewartGoughNodeNamespace{
 
 	typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
@@ -93,9 +91,8 @@ namespace stewartGoughNodeNamespace{
 		bool moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration);
 		
 
-		Point parsePoint(const JSONNode & n, std::string * valuesSet);
-		std::string parseNodeValue(const std::string nodeName, const JSONNode & n);
-		Point parseLookup(const JSONNode & n);
+		Point parsePoint(const Json::Value & n, std::string * valuesSet);
+		Point parseLookup(const Json::Value & n);
 		Point *parsePointArray(std::string json, int & size);
 		
 		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
