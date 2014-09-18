@@ -32,7 +32,7 @@
 #pragma once
 
 #include "ros/ros.h"
-#include "lookup_handler/LookupServer.h"
+#include "environment_cache/getData.h"
 
 #include <string>
 #include <vector>
@@ -62,27 +62,20 @@ class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardS
 {
 public:
 	EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules);
-
 	virtual ~EquipletNode();
-
-	void blackboardReadCallback(std::string json);
-
+	
 	std::string getEquipletName();
-
 	ros::NodeHandle& getNodeHandle();
 
-	void onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
-
 private:
+	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
+	void handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo::OID targetObjectId);
+	void onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
+
 	virtual void onStateChanged(rexos_statemachine::State state);
 	virtual void onModeChanged(rexos_statemachine::Mode mode);
 
-	std::map<std::string, std::string> callLookupHandler(std::string lookupType, std::map<std::string, std::string> lookupParameters, std::map<std::string, std::string> payloadMap);
-
-	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
-
-	environment_communication_msgs::Map createMessageFromMap(std::map<std::string, std::string> &Map);
-	map<std::string, std::string> createMapFromMessage(environment_communication_msgs::Map Message);
+	Json::Value callLookupHandler(Json::Value originPlacementParameters);
 
 
 	bool setTransitionDone(rexos_statemachine::State transitionState);
@@ -91,7 +84,6 @@ private:
 
 	void handleEquipletCommand(Json::Value n);
 
-	void handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId);
 
 	/**
 	 * @var int equipletId

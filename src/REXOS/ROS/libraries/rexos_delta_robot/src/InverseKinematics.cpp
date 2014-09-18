@@ -80,13 +80,16 @@ namespace rexos_delta_robot {
 	 * 
 	 * @return The angle, in radians, the motor should move to.
 	 **/
-	double InverseKinematics::motorAngle(const rexos_datatypes::Point3D<double>& destinationPoint, double motorLocation) const{
+	double InverseKinematics::motorAngle(const Vector3& destinationPoint, double motorLocation) const{
 		// Rotate the destination point so calculations can be made as if the motor is always in front
 		// (rotating the point places it in the same position relative to the front motor
 		// as it would be relative to the motor indicated by motor_angle).
-		rexos_datatypes::Point3D<double> destinationPointRotatedAroundZAxis =
-				destinationPoint.rotateAroundZAxis(-motorLocation);
-
+		
+		Matrix4 rotationMatrix;
+		rotationMatrix.rotateZ(motorLocation);
+		
+		Vector3 destinationPointRotatedAroundZAxis = rotationMatrix * destinationPoint;
+		
 		// Places the point towards the "ankle to effector connection".
 		destinationPointRotatedAroundZAxis.y -= effector;
 		
@@ -138,7 +141,7 @@ namespace rexos_delta_robot {
 	 * @param destinationPoint The destination point.
 	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
-	void InverseKinematics::destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint, rexos_motor::MotorRotation* (&rotations)[3]) const{
+	void InverseKinematics::destinationPointToMotorRotations(const Vector3& destinationPoint, rexos_motor::MotorRotation* (&rotations)[3]) const{
 		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
 		// When determining motorAngle the degrees determine the position of the engines:
 		// 	  0 degrees: the hip from this motor moves on the yz plane

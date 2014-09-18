@@ -103,13 +103,13 @@ void ModuleRegistry::onModuleModeChanged(
 	}
 }
 
-void ModuleRegistry::onInstructionStepCompleted(
+void ModuleRegistry::onHardwareStepCompleted(
 	ModuleProxy* moduleProxy,
 	std::string id, 
 	bool completed){
 	
 	if(moduleRegistryListener != NULL){
-		moduleRegistryListener->onInstructionStepCompleted(moduleProxy, id, completed);
+		moduleRegistryListener->onHardwareStepCompleted(moduleProxy, id, completed);
 	}
 }
 

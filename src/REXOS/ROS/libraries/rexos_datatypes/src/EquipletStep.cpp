@@ -64,14 +64,22 @@ namespace rexos_datatypes{
        this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
 	 }
 
-    InstructionData EquipletStep::getInstructionData(){
+    Json::Value EquipletStep::getInstructionData(){
         return this->instructionData;
     }
 
-    void EquipletStep::setInstructionData(InstructionData instructionData){
+    void EquipletStep::setInstructionData(Json::Value instructionData){
         this->instructionData = instructionData;
     }
-
+	
+    OriginPlacement EquipletStep::getOriginPlacement(){
+        return this->originPlacement;
+    }
+	
+    void EquipletStep::setOriginPlacement(OriginPlacement originPlacement){
+        this->originPlacement = originPlacement;
+    }
+	
     std::string EquipletStep::getStatus(){
         return this->status;
     }
@@ -84,23 +92,19 @@ namespace rexos_datatypes{
         //std::cout << "Delete Equipletstep called." std::endl;
     }
 
-    Json::Value EquipletStep::getJsonNode(){
-        return this->jsonNode;
-    }
-    
     void EquipletStep::setValues(const Json::Value & n){
 		setModuleIdentifier(n["moduleIdentifier"]);
-		setInstructionData(InstructionData(n["instructionData"]));
+		setInstructionData(n["instructionData"]);
+		setOriginPlacement(OriginPlacement(n["originPlacement"]));
 		setStatus(n["status"].asString());
     }
 
-    std::string EquipletStep::toJSONString(){
+    Json::Value EquipletStep::toJSON(){
 		Json::Value output;
-		output["moduleIdentifier"] = moduleIdentifier.toString();
-		output["instructionData"] = instructionData.getJsonNode();
+		output["moduleIdentifier"] = moduleIdentifier.toJSONObject();
+		output["instructionData"] = instructionData;
+		output["originPlacement"] = originPlacement.toJSON();
 		output["status"] = status;
-		
-		Json::StyledWriter styledWriter;
-		return styledWriter.write(output);
+		return output;
     }
 }

@@ -15,8 +15,14 @@ namespace rexos_coordinates{
 	Vector3 Module::convertToEquipletCoordinate(Vector3 moduleCoordinate){
 		return moduleCoordinate - moduleToEquiplet;
 	}
+	Vector4 Module::convertToEquipletCoordinate(Vector4 moduleCoordinate){
+		return moduleCoordinate - Vector4(moduleToEquiplet.x, moduleToEquiplet.y, moduleToEquiplet.z, 0);
+	}
 	Vector3 Module::convertToModuleCoordinate(Vector3 equipletCoordinate){
 		return equipletCoordinate - equipletToModule;
+	}
+	Vector4 Module::convertToModuleCoordinate(Vector4 equipletCoordinate){
+		return equipletCoordinate - Vector4(equipletToModule.x, equipletToModule.y, equipletToModule.z, 0);
 	}
 	Module::Module(rexos_knowledge_database::Module* module) :
 			module(module)

@@ -18,7 +18,7 @@ class ModuleRegistryListener{
 public:
 	virtual void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState) = 0;
 	virtual void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode) = 0;
-	virtual void onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed) = 0;
+	virtual void onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed) = 0;
 	virtual void onModuleDied(ModuleProxy* moduleProxy) = 0;
 	virtual void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
 			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 

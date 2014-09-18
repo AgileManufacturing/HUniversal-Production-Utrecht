@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include <rexos_datatypes/Point3D.h>
+#include <vectors/Vectors.h>
 #include <rexos_motor/MotorRotation.h>
 
 namespace rexos_delta_robot{
@@ -103,7 +103,7 @@ namespace rexos_delta_robot{
 		 * @param destinationPoint The destination point.
 		 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 		 **/
-		virtual void destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint,
+		virtual void destinationPointToMotorRotations(const Vector3& destinationPoint,
 				rexos_motor::MotorRotation* (&rotations)[3]) const = 0;
 	};
 }

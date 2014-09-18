@@ -35,6 +35,7 @@
 #include "delta_robot_node/Point.h"
 
 #include <rexos_datatypes/Point3D.h>
+#include <rexos_datatypes/EquipletStep.h>
 #include <rexos_delta_robot/DeltaRobot.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
@@ -84,12 +85,7 @@ namespace deltaRobotNodeNamespace{
 		// Main functions to be called from the services
 		bool calibrate();
 		bool moveToPoint(double x, double y, double z, double maxAcceleration);
-		bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
-
-		Point parsePoint(const Json::Value & n, std::string * valuesSet);
-		Point parseLookup(const Json::Value & n);
-		Point *parsePointArray(std::string json, int & size);
-
+		
 		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
 
 	private:

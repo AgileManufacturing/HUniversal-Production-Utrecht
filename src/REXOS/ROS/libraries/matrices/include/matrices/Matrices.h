@@ -19,7 +19,7 @@
 #ifndef MATH_MATRICES_H
 #define MATH_MATRICES_H
 
-#include "Vectors/Vectors.h"
+#include "vectors/Vectors.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // 2x2 matrix

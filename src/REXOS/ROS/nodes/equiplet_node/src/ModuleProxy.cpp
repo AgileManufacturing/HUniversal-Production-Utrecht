@@ -164,9 +164,9 @@ bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdate
 void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, const rexos_statemachine::SetInstructionResultConstPtr& result){
 
 	if(state == actionlib::SimpleClientGoalState::SUCCEEDED)
-		moduleProxyListener->onInstructionStepCompleted(this, result->OID, true);
+		moduleProxyListener->onHardwareStepCompleted(this, result->OID, true);
 	else
-		moduleProxyListener->onInstructionStepCompleted(this, result->OID, false);
+		moduleProxyListener->onHardwareStepCompleted(this, result->OID, false);
 }
 
 void ModuleProxy::onModuleTransitionGoalCallback(const rexos_statemachine::TransitionGoalConstPtr& goal) {

@@ -78,7 +78,7 @@ namespace rexos_delta_robot{
 	 *
 	 * @return true if a straight path from parameter 'from' to parameter 'to' is valid.
 	 **/
-    bool EffectorBoundaries::checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const{
+    bool EffectorBoundaries::checkPath(const Vector3& from, const Vector3& to) const{
 
     	std::cout << "fromx: " << from.x << " fromy: " << from.y << " fromz: " << from.z << std::endl;
 		std::cout << "tox: " << to.x << " toy: " << to.y << " toz: " << to.z << std::endl;
@@ -99,7 +99,7 @@ namespace rexos_delta_robot{
 			int x = (from.x + x_length * i);
 			int y = (from.y + y_length * i);
 			int z = (from.z + z_length * i);
-			BitmapCoordinate temp = fromRealCoordinate(rexos_datatypes::Point3D<double>(x, y, z));
+			BitmapCoordinate temp = fromRealCoordinate(Vector3(x, y, z));
 			int index = temp.x + temp.y * width + temp.z * width * depth;
 
 			if(temp.x < 0 || temp.y < 0 || temp.z < 0) {
@@ -246,7 +246,7 @@ namespace rexos_delta_robot{
     	std::stack<BitmapCoordinate> cstack;
 
     	// Determine the center of the box.
-    	rexos_datatypes::Point3D<double> point (0, 0, deltaRobotMeasures->boundaryBoxMinZ + (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / 2);
+    	Vector3 point (0, 0, deltaRobotMeasures->boundaryBoxMinZ + (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / 2);
     	
     	// If point pixel is not part of a valid voxel the box dimensions are incorrect.
     	if(!isValid(fromRealCoordinate(point), pointValidityCache)){
@@ -309,7 +309,7 @@ namespace rexos_delta_robot{
 		pointValidityCache = NULL;
 		
 		// Adds all the points within the boundaries.
-		cstack.push(fromRealCoordinate(rexos_datatypes::Point3D<double>(0, 0, deltaRobotMeasures->boundaryBoxMinZ + (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / 2)));
+		cstack.push(fromRealCoordinate(Vector3(0, 0, deltaRobotMeasures->boundaryBoxMinZ + (deltaRobotMeasures->boundaryBoxMaxZ - deltaRobotMeasures->boundaryBoxMinZ) / 2)));
 		while(!cstack.empty()){
 			BitmapCoordinate validVoxel = cstack.top();
 			cstack.pop();

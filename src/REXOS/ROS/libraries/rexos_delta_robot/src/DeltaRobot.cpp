@@ -36,7 +36,6 @@
 #include <stdexcept>
 #include <cmath>
 
-#include <rexos_datatypes/Point3D.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
 #include <rexos_delta_robot/InverseKinematics.h>
 #include <rexos_delta_robot/InverseKinematicsException.h>
@@ -60,7 +59,7 @@ namespace rexos_delta_robot{
 			kinematics(NULL),
 			motorManager(NULL),
 			boundaries(NULL),
-			effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
+			effectorLocation(Vector3(0, 0, 0)), 
 			boundariesGenerated(false),
 			currentMotionSlot(1){
 		ROS_INFO("DeltaRobot constructor entering...");
@@ -68,7 +67,7 @@ namespace rexos_delta_robot{
 		
 		ROS_INFO("Configuring Modbus...");
 		// Initialize modbus for IO controller
-		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
+		/*modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
 		if(modbusIO == NULL){
 			throw std::runtime_error("Unable to allocate libmodbus context");
 		}
@@ -84,7 +83,7 @@ namespace rexos_delta_robot{
 			rexos_motor::CRD514KD::RtuConfig::PARITY,
 			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
 			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-		
+		*/
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, *stepperMotorProperties));
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, *stepperMotorProperties));
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
@@ -153,7 +152,7 @@ namespace rexos_delta_robot{
      * 
      * @return if the path between two points is valid.
      **/
-    bool DeltaRobot::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
+    bool DeltaRobot::checkPath(const Vector3& begin, const Vector3& end){
         return boundaries->checkPath(begin, end);
     }
 
@@ -188,7 +187,7 @@ namespace rexos_delta_robot{
      * @param point 3-dimensional point to move to.
      * @param maxAcceleration the acceleration in radians/s² that the motor with the biggest motion will accelerate at.
      **/
-    void DeltaRobot::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration){
+    void DeltaRobot::moveTo(const Vector3& point, double maxAcceleration){
         // check whether the motors are powered on.
         if(!motorManager->isPoweredOn()){
             throw rexos_motor::MotorException("motor drivers are not powered on");
@@ -511,7 +510,7 @@ namespace rexos_delta_robot{
      *
      * @return The coordinate for the midpoint of the effector.
      **/
-    rexos_datatypes::Point3D<double>& DeltaRobot::getEffectorLocation(){
+    Vector3 DeltaRobot::getEffectorLocation(){
         return effectorLocation;
     }
 }

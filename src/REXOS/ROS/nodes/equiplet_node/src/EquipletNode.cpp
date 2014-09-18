@@ -38,6 +38,7 @@
 #include "rexos_utilities/Utilities.h"
 #include <rexos_knowledge_database/Equiplet.h>
 #include <node_spawner_node/spawnNode.h>
+#include <rexos_datatypes/OriginPlacement.h>
 
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>
@@ -140,11 +141,11 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		Json::Value n;
 		reader.parse(jsonString, n);
 		
-		rexos_datatypes::EquipletStep * step = new rexos_datatypes::EquipletStep(n);
+		rexos_datatypes::EquipletStep step = rexos_datatypes::EquipletStep(n);
 	    //We only need to handle the step if its status is 'WAITING'
-	    if (step->getStatus().compare("WAITING") == 0) {
+	    if (step.getStatus() == "WAITING") {
 	    	ROS_INFO_STREAM("handling step: " << jsonString);
-    		handleEquipletStep(step, targetObjectId);
+    		handleHardwareStep(step, targetObjectId);
 		}
 		
 	} else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet) {
@@ -158,43 +159,37 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	}
 }
 
-void EquipletNode::handleEquipletStep(rexos_datatypes::EquipletStep * step, mongo::OID targetObjectId){
+void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo::OID targetObjectId){
 	rexos_statemachine::Mode currentMode = getCurrentMode();
-	if (currentMode == rexos_statemachine::MODE_NORMAL) {
-		rexos_statemachine::State currentState = getCurrentState();
-		if (currentState == rexos_statemachine::STATE_NORMAL || currentState == rexos_statemachine::STATE_STANDBY) {
-			
-			rexos_datatypes::InstructionData instructionData = step->getInstructionData();
+	if (currentMode != rexos_statemachine::MODE_NORMAL) {
+		ROS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
+		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
+	}
+	rexos_statemachine::State currentState = getCurrentState();
+	if (currentState != rexos_statemachine::STATE_NORMAL && currentState != rexos_statemachine::STATE_STANDBY) {
+		ROS_WARN("Hardware step received but but cannot be processed because current state is %s", rexos_statemachine::state_txt[currentState]);
+		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
+	}
+	
+	// check originPlacement and gather required information
+	rexos_datatypes::OriginPlacement originPlacement = step.getOriginPlacement();
+	ROS_WARN_STREAM(originPlacement.toJSON());
+	if(originPlacement.getOriginPlacementType() == rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER) {
+		ROS_DEBUG("Gathering information from the environment cache");
+		Json::Value result = callLookupHandler(originPlacement.getParameters());
+		originPlacement.setLookupResult(result);
+	}
+	step.setOriginPlacement(originPlacement);
 
-			//we need to call the lookup handler first
-			/*if(instructionData.getLook_up().length() > 0 && instructionData.getLook_up().compare("NULL") != 0) {
-				ROS_INFO("Calling lookuphandler");
-				map<std::string, std::string> newPayload = callLookupHandler(instructionData.getLook_up(), instructionData.getLook_up_parameters(), instructionData.getPayload());
-				std::cout << "newPayload" << std::endl;
-
-				for(std::map<std::string,std::string>::iterator iter = newPayload.begin(); iter != newPayload.end(); ++iter)
-				{
-					std::cout << iter->first << " " << iter->second << std::endl;
-				}
-				instructionData.setPayload(newPayload);
-			}*/
-			
-			//we might still need to update the payload on the bb
-		    ModuleProxy *prox = moduleRegistry.getModule(step->getModuleIdentifier());
-			if(prox != 0) {
-				//prox->changeState(rexos_statemachine::STATE_NORMAL);
-				equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\" }  }");	
-				prox->setInstruction(targetObjectId.toString(), instructionData.getJsonNode());
-			} else {
-				ROS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
-				equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
-			}
-		} else {
-			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
-		}
+	//we might still need to update the payload on the bb
+	ModuleProxy *prox = moduleRegistry.getModule(step.getModuleIdentifier());
+	if(prox == NULL) {
+		ROS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
+		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
 	} else {
-		ROS_INFO("Instruction received but current mode is %s", rexos_statemachine::mode_txt[currentMode]);
-		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\" } } ");
+		//prox->changeState(rexos_statemachine::STATE_NORMAL);
+		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\"}  }");	
+		prox->setInstruction(targetObjectId.toString(), step.toJSON());
 	}
 }
 
@@ -217,7 +212,7 @@ void EquipletNode::handleEquipletCommand(Json::Value n) {
 }
 
 //needed for callback ( from proxy )
-void EquipletNode::onInstructionStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
+void EquipletNode::onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
 
 	//moduleProxy->changeState(rexos_statemachine::STATE_STANDBY);
 	mongo::OID targetObjectId(id);
@@ -269,52 +264,25 @@ ros::NodeHandle& EquipletNode::getNodeHandle() {
  * @param lookupID the ID of the lookup
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
-std::map<std::string, std::string> EquipletNode::callLookupHandler(std::string lookupType, std::map<std::string, std::string> lookupParameters, std::map<std::string, std::string> payloadMap){
- 	
- 	lookup_handler::LookupServer msg;
+Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameters){
+ 	environment_cache::getData msg;
 
-	msg.request.lookupMsg.lookupType = lookupType;
-	msg.request.lookupMsg.lookupParameters = createMessageFromMap(lookupParameters);
-	msg.request.lookupMsg.payLoad = createMessageFromMap(payloadMap);
-
-	ros::NodeHandle nodeHandle;
-	ros::ServiceClient lookupClient = nodeHandle.serviceClient<lookup_handler::LookupServer>("LookupHandler/lookup");
-
+	msg.request.identifier = originPlacementParameters["identifier"].asString();
+	msg.request.paths.push_back("location/x");
+	msg.request.paths.push_back("location/y");
+	msg.request.paths.push_back("location/z");
+	msg.request.paths.push_back("rotation/x");
+	msg.request.paths.push_back("rotation/y");
+	msg.request.paths.push_back("rotation/z");
+	
+	ros::ServiceClient lookupClient = nh.serviceClient<environment_cache::getData>("getData");
 	if(lookupClient.call(msg)){
-		environment_communication_msgs::Map map = msg.response.lookupMsg.payLoad;
-		return createMapFromMessage(map);
+		Json::Reader reader;
+		Json::Value result;
+		reader.parse(msg.response.jsonData, result);
+		return result;
 	} else {
-		ROS_INFO("Could not find anything in the lookup handler");
-		return payloadMap;
+		ROS_WARN("Could not find anything in the lookup handler");
+		return Json::Value::null;
 	}
-}
-/**
- * Create a Map message from a map with strings as keys and strings as values
- *
- * @param Map The map to convert
- *
- * @return environment_communication_msgs::Map The map message object
- **/
-environment_communication_msgs::Map EquipletNode::createMessageFromMap(std::map<std::string, std::string> &Map){
-	std::map<std::string, std::string>::iterator MapIterator;
-	environment_communication_msgs::Map mapMsg;
-	environment_communication_msgs::KeyValuePair prop;
-
-	for(MapIterator = Map.begin(); MapIterator != Map.end(); MapIterator++){
-		prop.key = (*MapIterator).first;
-		prop.value = (*MapIterator).second;
-		mapMsg.map.push_back(prop);
-	}
-
-	return mapMsg;
-}
-
-map<std::string, std::string> EquipletNode::createMapFromMessage(environment_communication_msgs::Map Message){
-    std::map<std::string, std::string> msgMap;    
-
-	for(int i = 0; i < (int)(Message.map.size()); i++){
-		msgMap.insert(std::pair<std::string, std::string>(Message.map[i].key, Message.map[i].value));
-	}
-
-    return msgMap;
 }

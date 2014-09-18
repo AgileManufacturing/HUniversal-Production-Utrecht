@@ -33,7 +33,7 @@
 #pragma once
 
 #include <iostream>
-#include <rexos_datatypes/Point3D.h>
+#include <vectors/Vectors.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
@@ -55,7 +55,7 @@ namespace rexos_delta_robot{
 				const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
 				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
 
-		bool checkPath(const rexos_datatypes::Point3D<double>& from, const rexos_datatypes::Point3D<double>& to) const;
+		bool checkPath(const Vector3& from, const Vector3& to) const;
 
 	private:
 		EffectorBoundaries(const InverseKinematicsModel& model, const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
@@ -102,8 +102,8 @@ namespace rexos_delta_robot{
 		 * 
 		 * @param coordinate The bitmap coordinate.
 		 **/
-		inline rexos_datatypes::Point3D<double> fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
-			return rexos_datatypes::Point3D<double>(
+		inline Vector3 fromBitmapCoordinate(EffectorBoundaries::BitmapCoordinate coordinate) const{
+			return Vector3(
 					(double) coordinate.x * voxelSize + deltaRobotMeasures->boundaryBoxMinX,
 					(double) coordinate.y * voxelSize + deltaRobotMeasures->boundaryBoxMinY,
 					(double) coordinate.z * voxelSize + deltaRobotMeasures->boundaryBoxMinZ);
@@ -114,7 +114,7 @@ namespace rexos_delta_robot{
 		 * 
 		 * @param coordinate The real life coordinate.
 		 **/
-		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(rexos_datatypes::Point3D<double> coordinate) const{
+		inline EffectorBoundaries::BitmapCoordinate fromRealCoordinate(Vector3 coordinate) const{
 			return EffectorBoundaries::BitmapCoordinate(
 				(coordinate.x - deltaRobotMeasures->boundaryBoxMinX) / voxelSize,
 				(coordinate.y - deltaRobotMeasures->boundaryBoxMinY) / voxelSize,

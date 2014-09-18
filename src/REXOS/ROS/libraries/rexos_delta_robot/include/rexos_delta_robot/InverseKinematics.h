@@ -36,7 +36,8 @@
 
 #pragma once
 
-#include <rexos_datatypes/Point3D.h>
+#include <vectors/Vectors.h>
+#include <matrices/Matrices.h>
 #include <rexos_motor/MotorRotation.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/InverseKinematicsModel.h>
@@ -52,8 +53,7 @@ namespace rexos_delta_robot{
 	 **/
 	class InverseKinematics : public InverseKinematicsModel{
 	private:
-		double motorAngle(const rexos_datatypes::Point3D<double>& destinationPoint,
-				double motorLocation) const;
+		double motorAngle(const Vector3& destinationPoint, double motorLocation) const;
 
 	public:
 		InverseKinematics(const double base, const double hip,
@@ -64,7 +64,7 @@ namespace rexos_delta_robot{
 
 		virtual ~InverseKinematics(void);
 		
-		void destinationPointToMotorRotations(const rexos_datatypes::Point3D<double>& destinationPoint,
+		void destinationPointToMotorRotations(const Vector3& destinationPoint,
 				rexos_motor::MotorRotation* (&rotations)[3]) const;
 	};
 }

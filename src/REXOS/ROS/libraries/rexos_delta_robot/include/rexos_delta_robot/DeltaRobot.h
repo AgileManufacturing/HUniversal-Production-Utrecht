@@ -33,7 +33,7 @@
 #pragma once
 
 #include <modbus/modbus.h>
-#include <rexos_datatypes/Point3D.h>
+#include <vectors/Vectors.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
@@ -70,15 +70,15 @@ namespace rexos_delta_robot{
 		inline bool hasBoundaries(){ return boundariesGenerated; }
 
 		void generateBoundaries(double voxelSize);
-		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end);
+		bool checkPath(const Vector3& begin, const Vector3& end);
 
-		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration);
+		void moveTo(const Vector3& point, double maxAcceleration);
 		void calibrateMotor(int motorIndex);
 		bool checkSensor(int sensorIndex);
 		bool calibrateMotors();
 		void powerOff();
 		void powerOn();
-		rexos_datatypes::Point3D<double>& getEffectorLocation();
+		Vector3 getEffectorLocation();
 
 	private:
 		/**
@@ -113,7 +113,7 @@ namespace rexos_delta_robot{
 		 * @var Point3D<double> effectorLocation
 		 * A 3D point in doubles that points to the location of the effector.
 		 **/
-		rexos_datatypes::Point3D<double> effectorLocation;
+		Vector3 effectorLocation;
 
 		/**
 		 * @var bool boundariesGenerated

@@ -34,7 +34,7 @@
 #include <stdexcept>
 
 #include <rexos_motor/MotorRotation.h>
-#include <rexos_datatypes/Point3D.h>
+#include <vectors/Vectors.h>
 
 namespace rexos_delta_robot{
 	/**
@@ -46,7 +46,7 @@ namespace rexos_delta_robot{
 		 * @var Point3D<double> notConvertablePoint
 		 * Point that could not be converted into angles for the motors.
 		 **/
-		rexos_datatypes::Point3D<double> notConvertablePoint;
+		Vector3 notConvertablePoint;
 
 	public:
 		/**
@@ -54,7 +54,7 @@ namespace rexos_delta_robot{
 		 * @param exceptionMessage The exception message
 		 * @param destinationPoint The point of the destination.
 		 **/
-		InverseKinematicsException(const char* exceptionMessage, rexos_datatypes::Point3D<double> destinationPoint) :
+		InverseKinematicsException(const char* exceptionMessage, Vector3 destinationPoint) :
 				std::runtime_error(exceptionMessage), notConvertablePoint(destinationPoint){}
 
 		/**
@@ -66,7 +66,7 @@ namespace rexos_delta_robot{
 		 * Used to access the point that could not be converted.
 		 * @return A point3D<double> of the point that could not be converted.
 		 **/
-		rexos_datatypes::Point3D<double> getNotConvertablePoint(void){
+		Vector3 getNotConvertablePoint(void){
 			return notConvertablePoint;
 		}
 	};

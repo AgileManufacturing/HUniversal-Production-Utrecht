@@ -36,6 +36,8 @@
 	<run_depend>rexos_coordinates</run_depend>
 	<build_depend>equiplet_node</build_depend>
 	<run_depend>equiplet_node</run_depend>
+	<build_depend>matrices</build_depend>
+	<run_depend>matrices</run_depend>
 
 	<export>
 		<cpp cflags="-I${prefix}/include"/>

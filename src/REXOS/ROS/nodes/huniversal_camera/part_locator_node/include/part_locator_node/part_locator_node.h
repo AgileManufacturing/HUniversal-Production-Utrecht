@@ -38,8 +38,8 @@
 #include <iostream>
 #include <string>
 
-#include <Matrices/Matrices.h>
-#include <Vectors/Vectors.h>
+#include <matrices/Matrices.h>
+#include <vectors/Vectors.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include "equiplet_node/RegisterModule.h"

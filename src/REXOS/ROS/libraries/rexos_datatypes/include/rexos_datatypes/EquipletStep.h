@@ -12,6 +12,7 @@
 #include <map>
 #include <utility>
 #include "rexos_datatypes/InstructionData.h"
+#include "rexos_datatypes/OriginPlacement.h"
 #include "rexos_datatypes/TimeData.h"
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
@@ -32,19 +33,21 @@ namespace rexos_datatypes{
 		 void setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 		 void setModuleIdentifier(const Json::Value & n);
 
-        InstructionData getInstructionData();
-        void setInstructionData(InstructionData instructionData);
+        OriginPlacement getOriginPlacement();
+        void setOriginPlacement(OriginPlacement originPlacement);
+
+        Json::Value getInstructionData();
+        void setInstructionData(Json::Value instructionData);
 
         std::string getStatus();
         void setStatus(std::string status);
 
-        Json::Value getJsonNode();
-        std::string toJSONString();
+        Json::Value toJSON();
     private:
-		Json::Value jsonNode;
 		std::string id;
 		rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
-		InstructionData instructionData;
+		Json::Value instructionData;
+		OriginPlacement originPlacement;
 		// TODO enum
 		std::string status;
 		void setValues(const Json::Value & n);

@@ -30,7 +30,7 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-#include <Vectors/Vectors.h>
+#include <vectors/Vectors.h>
 #include <rexos_knowledge_database/Module.h>
 
 /**
@@ -50,9 +50,17 @@ namespace rexos_coordinates {
 		 */
 		Vector3 convertToEquipletCoordinate(Vector3 moduleCoordinate);
 		/**
+		 * Converts a module coordinate to an equiplet coordinate, using the moduleToEquiplet vector
+		 */
+		Vector4 convertToEquipletCoordinate(Vector4 moduleCoordinate);
+		/**
 		 * Converts an equiplet coordinate to a module coordinate, using the equipletToModule vector
 		 */
 		Vector3 convertToModuleCoordinate(Vector3 equipletCoordinate);
+		/**
+		 * Converts an equiplet coordinate to a module coordinate, using the equipletToModule vector
+		 */
+		Vector4 convertToModuleCoordinate(Vector4 equipletCoordinate);
 		
 		/**
 		 * Constructor, reads the module information from the database and updates the local properties. \n

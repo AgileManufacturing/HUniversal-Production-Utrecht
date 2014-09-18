@@ -32,8 +32,6 @@
 #pragma once
 
 #include "ros/ros.h"
-#include "lookup_handler/LookupServer.h"
-
 #include <string>
 #include <vector>
 
