@@ -114,7 +114,7 @@ public class ProductAgent extends Agent {
 			message.setOntology(Ontology.GRID_ONTOLOGY);
 			message.setConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED);
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_ARRIVED + System.currentTimeMillis());
-			message.setContent(Parser.parseProductArrived(time));
+			message.setContent(Parser.parseProductArrived(time, productionStep.getIndex()));
 			send(message);
 
 			// receive reply

@@ -16,6 +16,8 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	 */
 	private static final long serialVersionUID = 1L;
 	private ISimulation simulation;
+
+	// TODO created has become a Tick, so maybe it is not needed to store here, but let the real agent handle the tick, or describe way this is here
 	private Tick created;
 
 	public ProductAgentSim(ISimulation simulation, LinkedList<ProductStep> productSteps, Position position, Tick time, Tick deadline) {
@@ -53,6 +55,11 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	}
 
 	@Override
+	public Tick getDeadline() {
+		return super.getDeadline();
+	}
+
+	@Override
 	protected void onProductStepFinished() {
 		super.onProductStepFinished();
 
@@ -71,7 +78,8 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		super.onProductProcessing();
 
 		// notify the simulation that processing begins
-		simulation.notifyProductProcessing(getLocalName(), getCurrentStep().getEquipletName(), getCurrentStep().getService());
+		ProductionStep step = getCurrentStep();
+		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
 	}
 
 	@Override

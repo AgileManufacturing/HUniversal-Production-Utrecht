@@ -47,7 +47,7 @@ public class Scheduling {
 		graph.add(source);
 		graph.add(sink);
 
-		if (Settings.DEBUG_SCHEDULING) {
+		if (Settings.VERBOSITY > 3) {
 			System.out.printf("\nPA:%s calculate best path \ninfo: \t %s\noptions: \t%s\n", agent, Util.formatArray(equipletInfo), Util.formatArray(serviceOptions));
 		}
 
@@ -58,7 +58,7 @@ public class Scheduling {
 		for (ProductStep step : productSteps) {
 			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(step.getIndex());
 
-			if (Settings.DEBUG_SCHEDULING) {
+			if (Settings.VERBOSITY > 3) {
 				System.out.printf("\nPA:%s construct scheduling graph, step=%s, from nodes=%s, with options=%s.\n\n", agent, step, lastNodes, Util.formatArray(options));
 			}
 
@@ -73,7 +73,7 @@ public class Scheduling {
 					Position lastPosition = node != source ? equipletInfo.get(node.getEquipletAID()).second : position;
 					Position nextPosition = equipletInfo.get(option.getKey()).second;
 					Pair<Position, Position> route = new Pair<>(lastPosition, nextPosition);
-					
+
 					// check if the travel time from the route is know, and is not the the same as the previous
 					if (!travelTimes.containsKey(route) && !lastPosition.equals(nextPosition)) {
 						throw new SchedulingException("route doesn't exists in travel time list: " + route);
@@ -104,7 +104,7 @@ public class Scheduling {
 
 						double cost = 1 - firstPossibility.minus(time).doubleValue() / window.doubleValue();
 
-						if (cost < 0) { // ) && Settings.DEBUG_SCHEDULING) {
+						if (cost < 0) { // ) && Settings.VERBOSITY > 3) {
 							// shouldn't occur as it would mean arrival of first possibility > deadline
 							System.err.println("FAILED maybe because the: deadline=" + deadline);
 							System.err.printf("Should happen: Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
@@ -113,7 +113,7 @@ public class Scheduling {
 						graph.add(node, nextNode, cost);
 						equipletNodes.add(nextNode);
 
-						if (Settings.DEBUG_SCHEDULING) {
+						if (Settings.VERBOSITY > 3) {
 							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
 						}
 					}
@@ -137,7 +137,7 @@ public class Scheduling {
 			throw new SchedulingException("failed to find path int nodes=" + graph + " - " + path);
 		}
 
-		if (Settings.DEBUG_SCHEDULING) {
+		if (Settings.VERBOSITY > 3) {
 			System.out.println("the last equiplet nodes to be processed: " + lastNodes);
 			System.out.println("Graph: " + graph);
 		}
@@ -191,7 +191,7 @@ public class Scheduling {
 			}
 		}
 
-		if (Settings.DEBUG_SCHEDULING) {
+		if (Settings.VERBOSITY > 3) {
 			System.out.println("Scheduling Matrix: step " + productSteps + " \n" + Util.formatMatrix(matrix));
 		}
 
@@ -227,7 +227,7 @@ public class Scheduling {
 					}
 				}
 
-				if (Settings.DEBUG_SCHEDULING) {
+				if (Settings.VERBOSITY > 3) {
 					System.out.println("for equiplet " + equiplet.getLocalName() + "(" + productSteps.get(column).getService() + ") \tscoring=" + highScore
 							+ " , can arrive at (pre=" + previousStep.second + " + " + travelTime + ")=" + arrival + ", duration=" + duration + ", available time:"
 							+ availableTimeSlots + ", so first possibility=" + firstPossibility);
@@ -237,7 +237,8 @@ public class Scheduling {
 					path.add(new ProductionStep(productSteps.get(column), equiplet, equipletInfo.get(equiplet).second, firstPossibility, deadline));
 					previousStep = new Pair<Position, Tick>(equipletInfo.get(equiplet).second, firstPossibility.add(duration));
 				} else {
-					throw new SchedulingException("You selected the wrong equiplet, TODO shit because no available time is found ");
+					// throw new SchedulingException("You selected the wrong equiplet, TODO shit because no available time is found ");
+					throw new SchedulingException("not able to find equiplet available before deadline");
 				}
 
 			} else {

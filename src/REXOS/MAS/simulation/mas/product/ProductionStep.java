@@ -68,7 +68,13 @@ public class ProductionStep {
 		} else {
 			return equipletName;
 		}
+	}
 
+	/**
+	 * @return the index of the product step
+	 */
+	public int getIndex() {
+		return productStep.getIndex();
 	}
 
 	/**
@@ -124,6 +130,6 @@ public class ProductionStep {
 
 	@Override
 	public String toString() {
-		return "Production Step(" + productStep.getService() + "," + getEquipletName() + ", from=" + time + ", until=" + time.add(duration) + ")";
+		return "Production Step(" + productStep.getService() + "," + getEquipletName() + ", " + getIndex() + ", from=" + time + ", until=" + time.add(duration) + ")";
 	}
 }

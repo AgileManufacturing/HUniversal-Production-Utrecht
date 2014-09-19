@@ -112,7 +112,7 @@ class Stochastics {
 	private Tick time(Tick time, DurationType type) {
 		switch (type) {
 		case EXP:
-			// return exp(time);
+			return new Tick(exp(time.doubleValue()));
 		case WEIBULL:
 			// return weibull(1, time);
 		case GAMMA:

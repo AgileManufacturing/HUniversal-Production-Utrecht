@@ -104,7 +104,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	private void handleScheduling(ACLMessage message) {
 		try {
 			// scheduling info = List of product steps :: [< time, deadline, Service, Criteria >]
-			List<Tuple<Tick, Tick, String, Map<String, Object>>> data = Parser.parseScheduleRequest(message.getContent());
+			List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> data = Parser.parseScheduleRequest(message.getContent());
 			boolean success = equiplet.schedule(message.getSender(), data);
 
 			// send can execute reply
@@ -122,8 +122,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	private void handleProductArrived(ACLMessage message) {
 		try {
-			Tick time = Parser.parseProductArrived(message.getContent());
-			equiplet.notifyProductArrived(message.getSender(), time);
+			Pair<Tick, Integer> information = Parser.parseProductArrived(message.getContent());
+			equiplet.notifyProductArrived(message.getSender(), information.first);
 
 			// send can reply
 			ACLMessage reply = message.createReply();

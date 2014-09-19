@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<runlength>10000</runlength>
+	<runlength>100000</runlength>
 	<runs>1</runs>
 	<travel type="normal">1</travel>
 	<products>
-		<arrival type="none">30</arrival>
-		<deadline  type="none">100000</deadline>
+		<arrival type="none">50</arrival>
+		<deadline  type="none">10000</deadline>
 		<path>3</path>
 		<steps>
 			<step probability="50">

@@ -11,6 +11,7 @@ public interface IProductSim {
 
 	Tick getCreated();
 
-	void kill();
+	Tick getDeadline();
 
+	void kill();
 }

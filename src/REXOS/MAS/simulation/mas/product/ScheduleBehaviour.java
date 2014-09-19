@@ -66,8 +66,7 @@ public class ScheduleBehaviour extends Behaviour {
 
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), product.getCreated(), product.getDeadline(), product.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
-			boolean MATRIX_SCHEDULING = false;
-			if (MATRIX_SCHEDULING) {
+			if (Settings.SCHEDULING_MATIX) {
 				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), productionPath);
@@ -167,8 +166,9 @@ public class ScheduleBehaviour extends Behaviour {
 	 * @param suitedEquiplets
 	 *            a map of equiplet with the suited product steps
 	 * @return equiplet info and product step options
+	 * @throws SchedulingException when communication fails
 	 */
-	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) {
+	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) throws SchedulingException {
 		String replyConversation = Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis();
 
 		// send a questions to each of the equilplet if the product step can be executed
@@ -229,7 +229,7 @@ public class ScheduleBehaviour extends Behaviour {
 				// equiplet is not able to execute the product step
 			} else if (msg == null) {
 				// TODO remove!
-				throw new RuntimeException("message not received while waiting on equiplet reply if equiplet can execute product step");
+				throw new SchedulingException("message not received while waiting on equiplet reply if equiplet can execute product step");
 			}
 		}
 

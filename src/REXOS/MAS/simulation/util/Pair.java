@@ -46,7 +46,6 @@ public class Pair<U, V> {
 		}
 		Pair<?, ?> pair = (Pair<?, ?>) obj;
 		return first.equals(pair.first) && second.equals(pair.second);
-
 	}
 
 	@Override

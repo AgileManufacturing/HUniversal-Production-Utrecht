@@ -188,10 +188,8 @@ public class SimulationAgent extends Agent implements ISimControl {
 	}
 
 	private void setOutput() {
-		if (Settings.VERBOSITY  < 1 || Settings.VERBOSITY == 3) {
-			System.out.println("Set output");
+		if (Settings.VERBOSITY  < 1 || Settings.VERBOSITY == 2) {
 			System.setOut(new DummyPrint());
-			System.out.println("Set output");
 		}
 	}
 

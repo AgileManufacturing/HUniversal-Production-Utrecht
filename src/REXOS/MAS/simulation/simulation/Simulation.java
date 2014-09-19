@@ -3,7 +3,9 @@ package MAS.simulation.simulation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,8 +44,10 @@ public class Simulation implements ISimulation, IControl {
 	private static final String STATS_BUSY = "Processing";
 	private static final String STATS_FINISHED = "Finished";
 	private static final String STATS_FAILED = "Failed";
-	private static final String STATS_FAILED_CREATION = "Failed to create";
-	private static final String STATS_SYSTEM = "In System";
+	private static final String STATS_FAILED_CREATION = "Failed to schedule";
+	private static final String STATS_FAILED_DEADLINE = "Failed to meet the deadline";
+	private static final String STATS_SYSTEM = "In system";
+	private static final String STATS_PHYSICAL = "Physically in system";
 	private static final String STATS_BROKEN = "Broken";
 
 	// equiplet statistics
@@ -88,7 +92,7 @@ public class Simulation implements ISimulation, IControl {
 	private int totalSteps;
 
 	// private int traveling;
-	private HashMap<String, Tick> throughput;
+	private HashMap<Tick, Tick> throughput;
 	private Map<String, TreeMap<Tick, Double>> productStatistics;
 	private Map<String, TreeMap<Tick, Double>> equipletStatistics;
 
@@ -134,7 +138,7 @@ public class Simulation implements ISimulation, IControl {
 
 		totalSteps = 0;
 		productCount = 0;
-		throughput = new HashMap<String, Tick>();
+		throughput = new HashMap<Tick, Tick>();
 		productStatistics = new HashMap<String, TreeMap<Tick, Double>>();
 		equipletStatistics = new HashMap<String, TreeMap<Tick, Double>>();
 
@@ -147,7 +151,9 @@ public class Simulation implements ISimulation, IControl {
 		productStatistics.put(STATS_FINISHED, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_FAILED, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_FAILED_CREATION, new TreeMap<Tick, Double>(initStats));
+		productStatistics.put(STATS_FAILED_DEADLINE, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_SYSTEM, new TreeMap<Tick, Double>(initStats));
+		productStatistics.put(STATS_PHYSICAL, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_BROKEN, new TreeMap<Tick, Double>(initStats));
 
 		// equipletStatistics.put(STATS_SCHEDULED, new TreeMap<Tick, Double>(initStats));
@@ -320,7 +326,7 @@ public class Simulation implements ISimulation, IControl {
 
 		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
 			double load = entry.getValue().load(time, LOAD_WINDOW);
-			System.out.println("Simulation: " + entry.getKey() + " load=" + load);
+			// System.out.println("Simulation: " + entry.getKey() + " load=" + load);
 			if (load > 1 || load < 0) {
 				System.out.println(" ERROR: time=" + time + " - " + LOAD_WINDOW + ", load=" + load + " : " + entry.getValue());
 				throw new IllegalArgumentException(" ERROR: time=" + time + ", window=" + LOAD_WINDOW + ", load=" + load + " : " + entry.getValue());
@@ -353,11 +359,11 @@ public class Simulation implements ISimulation, IControl {
 
 		//
 		double l = sumLoad / equiplets.size();
-		System.out.println("sum load " + sumLoad + " / " + equiplets.size() + " = " + l);
+		// System.out.println("sum load " + sumLoad + " / " + equiplets.size() + " = " + l);
 		equipletStatistics.get(STATS_LOAD).put(time, l);
 
 		double lH = sumLoadH / equiplets.size();
-		System.out.println("sum load history " + sumLoadH + " / " + equiplets.size() + " = " + lH);
+		// System.out.println("sum load history " + sumLoadH + " / " + equiplets.size() + " = " + lH);
 		equipletStatistics.get(STATS_LOAD_HISTORY).put(time, lH);
 
 	}
@@ -376,7 +382,7 @@ public class Simulation implements ISimulation, IControl {
 		}
 
 		double sumThroughput = 0.0;
-		for (Entry<String, Tick> entry : throughput.entrySet()) {
+		for (Entry<Tick, Tick> entry : throughput.entrySet()) {
 			sumThroughput += entry.getValue().doubleValue();
 		}
 		double avgThroughput = sumThroughput / throughput.size();
@@ -654,9 +660,12 @@ public class Simulation implements ISimulation, IControl {
 	 *            name of the service that the equiplet is started
 	 */
 	@Override
-	public void notifyProductProcessing(String productName, String equipletName, String service) {
+	public void notifyProductProcessing(String productName, String equipletName, String service, int index) {
 		updateProductStats(STATS_WAITING, -1);
 		updateProductStats(STATS_BUSY, +1);
+		if (index == 0) {
+			updateProductStats(STATS_PHYSICAL, +1);
+		}
 
 		System.out.printf("Simulation: product agent %s notifies processing.\n", productName);
 		Tick productionTime = stochastics.generateProductionTime(equipletName, service);
@@ -715,12 +724,19 @@ public class Simulation implements ISimulation, IControl {
 
 		updateProductStats(STATS_FINISHED, +1);
 		updateProductStats(STATS_SYSTEM, -1);
+		updateProductStats(STATS_PHYSICAL, -1);
 
 		// Product is finished
 		IProductSim productAgent = products.get(productName);
 		productAgent.kill();
 		products.remove(productName);
-		throughput.put(productName, time.minus(productAgent.getCreated()));
+		throughput.put(time, time.minus(productAgent.getCreated()));
+
+		Tick deadline = productAgent.getDeadline();
+		if (time.greaterThan(deadline)) {
+			updateProductStats(STATS_FAILED_DEADLINE, +1);
+		}
+
 		System.out.println("CHECKPOINT INDIA");
 	}
 
@@ -780,13 +796,23 @@ public class Simulation implements ISimulation, IControl {
 		file = new File(path);
 		file.mkdir();
 
+		File configFile = new File(path + "config.txt");
 		File statFile = new File(path + "stats.txt");
 		try {
-			PrintWriter writer = new PrintWriter(statFile);
+			PrintWriter writer = new PrintWriter(configFile);
+			writer.println("Simulation: " + new SimpleDateFormat("dd MM yyyy 'at' HH:mm:ss").format(new Date()));
+			writer.printf("Scheduling: %s\n", (Settings.SCHEDULING_MATIX ? "Matrix Scheduling" : "Graph Scheduling"));
+			writer.printf("Verbosity: %d\n", Settings.VERBOSITY);
+			writer.printf("Communication timeout: %s\n", Settings.COMMUNICATION_TIMEOUT);
+			writer.printf("Configuration:\n%s\n", config);
+			writer.println();
+			writer.close();
+
+			writer = new PrintWriter(statFile);
 			writer.println("Grid Simulation run");
-			writer.printf("run rime: \t%s\r\n", run_length);
-			writer.printf("Settings: \t%s\t\r\n", config);
 			writer.printf("Product Statistics: \t%s\r\n", productStatistics);
+			writer.println();
+			writer.println();
 			writer.printf("Equiplet Statistics: \t%s\r\n", equipletStatistics);
 			writer.println("\r\t");
 
@@ -857,5 +883,10 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public Map<String, Map<Tick, Double>> getEquipletStatistics() {
 		return new HashMap<String, Map<Tick, Double>>(equipletStatistics);
+	}
+
+	@Override
+	public Map<Tick, Tick> getThroughput() {
+		return throughput;
 	}
 }

@@ -48,6 +48,33 @@ public class EquipletAgent extends Agent {
 	private Map<String, Tick> productionTimes;
 
 	/**
+	 * Equiplet agent startup
+	 */
+	@Override
+	public void setup() {
+		Object[] args = getArguments();
+
+		if (args != null && args.length > 0) {
+			try {
+				Pair<Position, List<Capability>> configuration = Parser.parseEquipletConfiguration(args[0].toString());
+
+				init(configuration.first, configuration.second);
+				System.out.printf("EA:%s initialize [pos=%s, capabilties=%s]\n", getLocalName(), position, capabilities);
+
+				register();
+
+				addBehaviour(new EquipletListenerBehaviour(this));
+
+			} catch (JSONException e) {
+				System.err.printf("EA:%s failed to parse the arguments\n", getLocalName());
+				System.err.printf("EA:%s %s", getLocalName(), e.getMessage());
+			}
+		} else {
+			System.err.printf("EA:%s Failed to receive correct arguments\n", getLocalName());
+		}
+	}
+
+	/**
 	 * initialize the equiplet
 	 * 
 	 * @param position
@@ -70,6 +97,36 @@ public class EquipletAgent extends Agent {
 		for (Capability capability : capabilities) {
 			productionTimes.put(capability.getService(), capability.getDuration());
 		}
+	}
+
+	/**
+	 * Register the equiplet services by the Directory Facilitator Agent
+	 */
+	private void register() {
+		DFAgentDescription dfAgentDescription = new DFAgentDescription();
+		dfAgentDescription.setName(getAID());
+		for (Capability capability : capabilities) {
+			ServiceDescription serviceDescription = new ServiceDescription();
+			serviceDescription.setName(capability.getService());
+			serviceDescription.setType(Ontology.SERVICE_SEARCH_TYPE);
+			serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
+			serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+			dfAgentDescription.addServices(serviceDescription);
+		}
+		try {
+			DFService.register(this, dfAgentDescription);
+		} catch (FIPAException fe) {
+			System.err.printf("EA:%s Failed to register services\n", getLocalName());
+			fe.printStackTrace();
+		}
+	}
+
+	/**
+	 * Euiplet agent clean-up operations
+	 */
+	@Override
+	protected void takeDown() {
+		System.out.printf("EA:%s terminating\n", getLocalName());
 	}
 
 	/**
@@ -154,8 +211,22 @@ public class EquipletAgent extends Agent {
 	 * 
 	 * @return if there is job ready for executing
 	 */
-	protected synchronized boolean jobReady() {
-		return !schedule.isEmpty() && schedule.first().isReady();
+	protected synchronized Job jobReady() {
+		int counter = 0;
+		Iterator<Job> it = schedule.iterator();
+		while (it.hasNext()) {
+			Job job = (Job) it.next();
+			if (job.isReady()) {
+				return job;
+			}
+			counter++;
+			if (counter >= 2) {
+
+			}
+		}
+		return null;
+		// return !schedule.isEmpty() && schedule.first().isReady() ? schedule.first() : null;
+		// return !schedule.isEmpty() && schedule.first().isReady();
 	}
 
 	/**
@@ -313,73 +384,18 @@ public class EquipletAgent extends Agent {
 			}
 		}
 
-		// double precision error, dirty fix, can use BigDecimal although performance 
+		// double precision error, dirty fix, can use BigDecimal although performance
 		sum = new Tick(Math.round(sum.doubleValue() * 100000000) / 100000000);
 
 		return 1 - sum.div(window).doubleValue();
 	}
 
 	/**
-	 * Equiplet agent startup
-	 */
-	@Override
-	public void setup() {
-		Object[] args = getArguments();
-
-		if (args != null && args.length > 0) {
-			try {
-				Pair<Position, List<Capability>> configuration = Parser.parseEquipletConfiguration(args[0].toString());
-
-				init(configuration.first, configuration.second);
-				System.out.printf("EA:%s initialize [pos=%s, capabilties=%s]\n", getLocalName(), position, capabilities);
-
-				register();
-
-				addBehaviour(new EquipletListenerBehaviour(this));
-
-			} catch (JSONException e) {
-				System.err.printf("EA:%s failed to parse the arguments\n", getLocalName());
-				System.err.printf("EA:%s %s", getLocalName(), e.getMessage());
-			}
-		} else {
-			System.err.printf("EA:%s Failed to receive correct arguments\n", getLocalName());
-		}
-	}
-
-	/**
-	 * Register the equiplet services by the Directory Facilitator Agent
-	 */
-	private void register() {
-		DFAgentDescription dfAgentDescription = new DFAgentDescription();
-		dfAgentDescription.setName(getAID());
-		for (Capability capability : capabilities) {
-			ServiceDescription serviceDescription = new ServiceDescription();
-			serviceDescription.setName(capability.getService());
-			serviceDescription.setType(Ontology.SERVICE_SEARCH_TYPE);
-			serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
-			serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-			dfAgentDescription.addServices(serviceDescription);
-		}
-		try {
-			DFService.register(this, dfAgentDescription);
-		} catch (FIPAException fe) {
-			System.err.printf("EA:%s Failed to register services\n", getLocalName());
-			fe.printStackTrace();
-		}
-	}
-
-	/**
-	 * Euiplet agent clean-up operations
-	 */
-	@Override
-	protected void takeDown() {
-		System.out.printf("EA:%s terminating\n", getLocalName());
-	}
-
-	/**
 	 * Schedule a job
 	 * 
 	 * @param product
+	 * @param index
+	 *            of the products production path
 	 * @param start
 	 *            time
 	 * @param deadline
@@ -390,38 +406,36 @@ public class EquipletAgent extends Agent {
 	 *            of the job
 	 * @return if it succeeded to schedule the job
 	 */
-	protected synchronized boolean schedule(AID product, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
+	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
 		Tick duration = estimateService(service);
 		System.out.printf("EA:%s schedule [product=%s, start=%s, duration=%s, deadline=%s, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
 
-		if (schedule.subSet(new Job(start, new Tick(0)), true, new Job(start, duration), true).isEmpty()) {
-			Job job = new Job(product, service, criteria, start, start.add(duration), deadline);
+		if (schedule.subSet(new Job(start, start), new Job(start.add(duration), start.add(duration))).isEmpty()) {
+			Job job = new Job(index, product, service, criteria, start, start.add(duration), deadline);
 			return schedule.add(job);
 		} else {
-			return false;
+			// this shouldn't yet occur (not in the simulation), a equiplet should never give a product the available time which cannot be scheduled
+			System.err.println("\n----------\nstart=" + start + ", due=" + start.add(duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
+			throw new IllegalArgumentException("overlap schedule ");
 		}
 	}
 
 	/**
-	 * Schedule multiple jobs for one product
+	 * Schedule multiple jobs for one equiplet
+	 * A request consists of a list of product steps, with a tuple of < production step index, a Pair of <start time, deadline>, service, and criteria >
 	 * 
-	 * @param start
-	 *            time
-	 * @param deadline
-	 *            of job
 	 * @param product
 	 *            agent
-	 * @param service
-	 *            to be performed
-	 * @param criteria
-	 *            of the job
-	 * @return if it succeeded to schedule the job
+	 * @param requests
+	 *            list of product step request of multiple product steps
+	 * @return true if schedule succeeded
 	 */
-	protected synchronized boolean schedule(AID product, List<Tuple<Tick, Tick, String, Map<String, Object>>> requests) {
+	protected synchronized boolean schedule(AID product, List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests) {
 		List<Job> possible = new ArrayList<Job>();
-		for (Tuple<Tick, Tick, String, Map<String, Object>> data : requests) {
-			Tick start = data.first;
-			Tick deadline = data.second;
+		for (Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>> data : requests) {
+			int index = data.first;
+			Tick start = data.second.first;
+			Tick deadline = data.second.second;
 			String service = data.third;
 			Map<String, Object> criteria = data.fourth;
 
@@ -431,18 +445,16 @@ public class EquipletAgent extends Agent {
 				if (!isExecuting() || start.greaterOrEqualThan(executing.getDue())) {
 					Tick duration = estimateService(service);
 
-					System.out.printf("EA:%s schedule [product=%s, start=%s, duration=%s, deadline=%s, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
+					System.out.printf("EA:%s schedule [product=%s, index=%d, start=%s, duration=%s, deadline=%s, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), index, start, duration, deadline, service, criteria);
 
-					// TODO FIX! if in the time between can execute en schedule an other agent has schedule, it should return false
-					if (schedule.subSet(new Job(start, new Tick(0)), true, new Job(start.add(duration), new Tick(0)), true).isEmpty()) {
-						Job job = new Job(product, service, criteria, start, start.add(duration), deadline);
+					if (schedule.subSet(new Job(start, start), new Job(start.add(duration), start.add(duration))).isEmpty()) {
+						Job job = new Job(index, product, service, criteria, start, start.add(duration), deadline);
 
 						possible.add(job);
 					} else {
 						// this shouldn't yet occur (not in the simulation), a equiplet should never give a product the available time which cannot be scheduled
 						System.err.println("\n----------\nstart=" + start + ", due=" + start.add(duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
-						throw new IllegalArgumentException("Overlap schedule ");
-						// return false;
+						throw new IllegalArgumentException("overlap schedule: " + schedule.subSet(new Job(start, start), new Job(start.add(duration), start.add(duration))));
 					}
 				} else {
 					// this shouldn't occur, TODO remove exception and log the error and return false, send fail message which must be handled!
@@ -519,14 +531,75 @@ public class EquipletAgent extends Agent {
 	 * @param start
 	 *            time of the job
 	 */
-	protected synchronized void executeJob(Tick time) {
+	protected synchronized void executeJob__(Tick time) {
+		state = EquipletState.BUSY;
+		executing = null;
+
+		int counter = 0;
+		Iterator<Job> it = schedule.iterator();
+		while (it.hasNext()) {
+			Job job = it.next();
+			if (job.isReady()) {
+				executing = job;
+				schedule.remove(job);
+				break;
+			}
+			counter++;
+			if (counter >= 2) {
+				break;
+			}
+		}
+
+		// update schedule when job are swapped?
+		if (counter > 0) {
+			System.out.printf("EA:%s SWAP job %s in schedule %s\n", getLocalName(), executing, schedule);
+		}
+
+		if (executing != null) {
+			executing = schedule.pollFirst();
+
+			executing.updateStartTime(time);
+			System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
+
+			informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
+
+			execute(executing);
+		}
+	}
+
+	protected synchronized void executeJob_(Tick time) {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
 
 		executing.updateStartTime(time);
 		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
 
-		informProductProcessing(executing.getProductAgent());
+		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
+
+		execute(executing);
+	}
+
+	protected synchronized void executeJob(Tick time, Job job) {
+		state = EquipletState.BUSY;
+		executing = job;
+		schedule.remove(job);
+
+		executing.updateStartTime(time);
+		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
+
+		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
+
+		execute(executing);
+	}
+
+	protected synchronized void executeJob(Tick time, Job job, boolean removed) {
+		state = EquipletState.BUSY;
+		executing = job;
+
+		executing.updateStartTime(time);
+		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
+
+		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
 
 		execute(executing);
 	}
@@ -553,21 +626,49 @@ public class EquipletAgent extends Agent {
 		// check if it is needed to also check the criteria
 		// TODO possible service not necessary, if making the constraint that a
 		// product can only have one job ready by an equiplet
+
+		// check if the job arrived is the first in the schedule, than just execute.
+		// otherwise, if the first job is too late the arrived job is second, this results in that the already too late (first) job is
+		// if there are jobs between the first job and arrived job, swapping of jobs can take place if all deadlines are met.
+		Job ready = null;
+		int index = 0;
 		for (Job job : schedule) {
 			if (job.getProductAgent().equals(product)) {
 				job.setReady();
+
+				// job can only be executed earlier than planned if equiplet is idle
+				if (state == EquipletState.IDLE) {
+					if (index == 0) {
+						ready = schedule.pollFirst();
+					} else if (index == 1) {
+						// swapping jobs
+						ready = job;
+						schedule.remove(job);
+						Job first = schedule.first();
+
+						System.out.printf("EA:%s swapping job %s that is ready with %s\n", getLocalName(), ready, first);
+						System.out.printf("EA:%s equiplet=%s\n", getLocalName(), this);
+
+						// first.updateStartTime(time.add(job.getDuration()));
+						first.updateStartTime(ready.getStartTime());
+
+						System.out.printf("EA:%s equiplet=%s\n", getLocalName(), this);
+					}
+				}
+
 				break;
 			}
+			index++;
 		}
 
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
 
 		// execute the first job in the schedule if the job is ready
-		if (state == EquipletState.IDLE && jobReady()) {
+		if (state == EquipletState.IDLE && ready != null) { // && jobReady()) {
 			// begin with executing job that arrived
-			executeJob(time);
-		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady()) {
+			executeJob(time, ready, true);
+		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady() != null) {
 			// Equiplet is still broken, but as soon as this is repaired it will execute the first job in the schedule
 			System.out.printf("EA:%s product %s going to be executed after repair\n", getLocalName(), product.getLocalName());
 			state = EquipletState.ERROR_READY;
@@ -583,7 +684,7 @@ public class EquipletAgent extends Agent {
 	 * @param product
 	 *            agent address
 	 */
-	protected void informProductProcessing(AID product) {
+	protected void informProductProcessing(AID product, Tick time, int intdex) {
 		try {
 			// send product agent information about going to process product
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -591,7 +692,7 @@ public class EquipletAgent extends Agent {
 			message.setOntology(Ontology.GRID_ONTOLOGY);
 			message.setConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING);
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_PROCESSING + System.currentTimeMillis());
-			message.setContent(Parser.parseConfirmation(true));
+			message.setContent(Parser.parseProductProcessing(time, intdex));
 			send(message);
 
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
@@ -602,7 +703,7 @@ public class EquipletAgent extends Agent {
 			}
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed.\n", getLocalName(), executing.getProductAgentName());
-			System.err.printf("EA:%s %s", getLocalName(), e.getMessage());
+			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
 		}
 	}
 
@@ -612,7 +713,7 @@ public class EquipletAgent extends Agent {
 	 * @param product
 	 *            agents address
 	 */
-	protected void informProductStepFinished(AID product) {
+	protected void informProductStepFinished(AID product, Tick time, int intdex) {
 		try {
 			// send product agent information about going to process product
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -620,7 +721,7 @@ public class EquipletAgent extends Agent {
 			message.setOntology(Ontology.GRID_ONTOLOGY);
 			message.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_FINISHED + System.currentTimeMillis());
-			message.setContent(Parser.parseConfirmation(true));
+			message.setContent(Parser.parseProductFinished(time, intdex));
 			send(message);
 
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
@@ -630,8 +731,9 @@ public class EquipletAgent extends Agent {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
 			}
 		} catch (JSONException e) {
-			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), executing.getProductAgentName());
-			System.err.printf("EA:%s %s", getLocalName(), e.getMessage());
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName()
+					: "null"));
+			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
 		}
 	}
 }

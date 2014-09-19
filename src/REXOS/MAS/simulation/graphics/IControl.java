@@ -9,7 +9,7 @@ import MAS.simulation.util.Triple;
 public interface IControl {
 
 	void step();
-	
+
 	void start();
 
 	void pause();
@@ -21,11 +21,11 @@ public interface IControl {
 	void saveStatistics();
 
 	Map<String, List<Triple<String, Tick, Tick>>> getCompleteSchedule();
-	
+
 	Map<String, List<Triple<String, Tick, Tick>>> getEquipletSchedule();
-	
+
 	Map<String, List<Triple<String, Tick, Tick>>> getEquipletHistory();
-	
+
 	Map<String, Triple<? extends Number, ? extends Number, ? extends Number>> getEquipletUtilization();
 
 	Map<String, Map<Tick, Tick>> getEquipletLatency();
@@ -33,5 +33,7 @@ public interface IControl {
 	Map<String, Map<Tick, Double>> getProductStatistics();
 
 	Map<String, Map<Tick, Double>> getEquipletStatistics();
+
+	Map<? extends Number, ? extends Number> getThroughput();
 
 }

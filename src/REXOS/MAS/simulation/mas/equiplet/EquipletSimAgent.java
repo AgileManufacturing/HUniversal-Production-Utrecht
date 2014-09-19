@@ -236,7 +236,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            time of the job
 	 */
 	@Override
-	protected void executeJob(Tick time) {
+	protected void executeJob_(Tick time) {
 		state = EquipletState.BUSY;
 		executing = schedule.pollFirst();
 
@@ -246,7 +246,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		executing.updateStartTime(time);
 		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
 
-		informProductProcessing(executing.getProductAgent());
+		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
 
 		execute(executing);
 	}
@@ -299,9 +299,12 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			System.out.printf("EA:%s finished with job: %s\n", getLocalName(), executing);
 
 			AID finishedProduct = executing.getProductAgent();
+			int index = executing.getIndex();
 
-			if (!schedule.isEmpty() && jobReady()) {
-				executeJob(time);
+			Job ready = jobReady();
+			if (ready != null) {
+				// if (!schedule.isEmpty() && jobReady()) {
+				executeJob(time, ready);
 			} else {
 				state = EquipletState.IDLE;
 				executing = null;
@@ -310,7 +313,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			// note that the inform processing is done before inform finished
 			// this is because the simulation can delete the product agent (if chosen to do so for performance improvement)
 			// therefore there is no guarantee that informing the product is a blocking as the acknowledge is send before notifying the simulation
-			informProductStepFinished(finishedProduct);
+			informProductStepFinished(finishedProduct, time, index);
 		} else {
 			throw new IllegalArgumentException("EQUIPLET: notify job finished not given in correct state: " + state);
 		}
@@ -359,7 +362,8 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			System.out.printf("EA:%s is repaired at %s and continue with job %s, with %s time remaining.\n", getLocalName(), time, executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
-			executeJob(time);
+			Job ready = jobReady();
+			executeJob(time, ready);
 		} else if (isExecuting()) {
 			// the equiplet is executing a job and is repaired, but waits until a job finished event is received
 			state = EquipletState.ERROR_REPAIRED;

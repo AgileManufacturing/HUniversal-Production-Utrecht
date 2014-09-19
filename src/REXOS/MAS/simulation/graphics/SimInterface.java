@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -215,8 +216,12 @@ public class SimInterface {
 				} else if (index == tabbedPane.indexOfComponent(productStatisticsScroll)) {
 					// Product Statistics
 					Map<String, Map<Tick, Double>> stats = simulation.getProductStatistics();
+					Map<String, Map<? extends Number, ? extends Number>> stats2 = new HashMap<String, Map<? extends Number, ? extends Number>>();
+					Map<? extends Number, ? extends Number> throughput = simulation.getThroughput();
+					stats2.put("Throughput", throughput);
+
 					productStatistics.removeAll();
-					productStatistics.add(Chart.createChart("Product Statistics", "Products", stats));
+					productStatistics.add(Chart.createChart("Product Statistics", "Products", "Time", stats, stats2));
 
 				} else if (index == tabbedPane.indexOfComponent(equipletStatisticsScroll)) {
 					// Equiplet Statistics
