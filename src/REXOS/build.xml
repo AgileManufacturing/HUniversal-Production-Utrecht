@@ -33,7 +33,7 @@
    			<loadfile property="classpath" srcFile="${buildpath}/.export-classpath"/>
    			<mkdir dir="${buildpath}/${relative.dir}"/>
   
-			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}" encoding="ISO-8859-1">
+			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}" classpath="${classpath}" encoding="ISO-8859-1">
 				<compilerarg line="-Xlint:unchecked" />
 			</javac>
    			
@@ -194,5 +194,9 @@
 		<fileset dir="external_libraries">
 		<include name="*.jar"/>
 		</fileset>
-	</path>	
+	</path>
+
+	<target name="emurex">
+    	<jar destfile="../../simulation/simulation.jar" basedir="../../build/REXOS/" includes="MAS/simulation/**" excludes="**/Test.class"/>
+	</target>
 </project>

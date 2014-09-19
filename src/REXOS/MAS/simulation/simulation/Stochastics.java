@@ -36,19 +36,13 @@ class Stochastics {
 	}
 
 	public Tick generateDeadline() {
-		// TODO Auto-generated method stub
-		return new Tick(0);
-	}
-
-	public Tick generateDuetime() {
-		// TODO Auto-generated method stub
-		return new Tick(0);
+		return time(config.getProductDeadline());
 	}
 
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
-			// return generateProductStepsTest();
-
+			return generateProductStepsTest();
+/*
 			LinkedList<ProductStep> steps = new LinkedList<>();
 			List<ProductStep> productSteps = config.getProductSteps();
 
@@ -61,6 +55,7 @@ class Stochastics {
 			}
 
 			return steps;
+			*/
 		}
 
 		@SuppressWarnings("unused")
@@ -87,12 +82,10 @@ class Stochastics {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 
-		steps.add(new ProductStep(0, productSteps.get(0).getService(), productSteps.get(0).getCriteria()));
-		steps.add(new ProductStep(1, productSteps.get(0).getService(), productSteps.get(0).getCriteria()));
-		steps.add(new ProductStep(2, productSteps.get(0).getService(), productSteps.get(0).getCriteria()));
-		steps.add(new ProductStep(3, productSteps.get(1).getService(), productSteps.get(1).getCriteria()));
-		steps.add(new ProductStep(4, productSteps.get(2).getService(), productSteps.get(2).getCriteria()));
-		steps.add(new ProductStep(5, productSteps.get(3).getService(), productSteps.get(3).getCriteria()));
+		for (int i = 0; i < 20; i++) {
+			int x = random.nextInt(productSteps.size());
+			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
+		}
 		return steps;
 	}
 

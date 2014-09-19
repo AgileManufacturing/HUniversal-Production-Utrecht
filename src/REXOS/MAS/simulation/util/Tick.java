@@ -46,6 +46,21 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		Tick tick = (Tick) obj;
+		return dTime.equals(tick.doubleValue());
+	}
+	
+	@Override
 	public double doubleValue() {
 		return dTime;
 	}

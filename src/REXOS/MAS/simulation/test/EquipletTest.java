@@ -32,6 +32,15 @@ class EquipletTest extends EquipletAgent {
 	}
 
 	@Override
+	public double loadHistory(Tick time, Tick window) {
+		return super.loadHistory(time, window);
+	}
+
+	public void history(Job job) {
+		history.add(job);
+	}
+
+	@Override
 	public List<Pair<Tick, Tick>> available(Tick time, Tick duration, Tick deadline) {
 		return super.available(time, duration, deadline);
 	}

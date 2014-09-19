@@ -15,11 +15,13 @@ public interface ISimControl {
 
 	void delay(long delay);
 	
-	IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time) throws Exception;
+	IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) throws Exception;
 	
 	IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception;
 
 	void killAgent(String name);
 
 	void createTrafficAgent(Map<String, Position> equipletPositions) throws Exception;
+
+	void takeDown();
 }
