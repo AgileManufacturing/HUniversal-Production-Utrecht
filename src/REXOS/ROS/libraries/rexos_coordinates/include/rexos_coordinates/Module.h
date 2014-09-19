@@ -32,6 +32,7 @@
 
 #include <vectors/Vectors.h>
 #include <rexos_knowledge_database/Module.h>
+#include "rexos_logger/rexos_logger.h"
 
 /**
  * @brief this class provides a system to translate coordinates from module coordinates to equiplet coordinates.

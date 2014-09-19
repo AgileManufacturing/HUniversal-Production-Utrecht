@@ -38,6 +38,7 @@
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorInterface.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <jsoncpp/json/value.h>
 

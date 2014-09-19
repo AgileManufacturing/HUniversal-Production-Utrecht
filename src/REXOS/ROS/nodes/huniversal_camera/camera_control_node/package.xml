@@ -21,9 +21,9 @@
 	<run_depend>rexos_statemachine</run_depend>
 	<build_depend>rexos_knowledge_database</build_depend>
 	<run_depend>rexos_knowledge_database</run_depend>
+	<build_depend>rexos_logger</build_depend>
+	<run_depend>rexos_logger</run_depend>
 	
-	<build_depend>MYSQLCONNECTORCPP</build_depend>
-	<run_depend>MYSQLCONNECTORCPP</run_depend>
 	<export>
 	</export>
 </package>

@@ -44,12 +44,12 @@ NodeSpawnerNode::NodeSpawnerNode(std::string equipletName, bool spawnEquipletNod
 		NodeSpawner(equipletName)
 {
 	if(spawnEquipletNode == true) {
-		ROS_INFO("spawning equiplet node");
+		REXOS_INFO("spawning equiplet node");
 		NodeSpawner::spawnEquipletNode();
 	}
 	spawnNodeServer = nh.advertiseService("spawnNode", &NodeSpawnerNode::spawnNode, this);
 	
-	ROS_INFO("node_spawner_node has been started");
+	REXOS_INFO("node_spawner_node has been started");
 }
 
 /**

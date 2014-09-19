@@ -62,15 +62,15 @@ CameraControlNode::CameraControlNode(std::string equipletName, rexos_knowledge_d
 }
 
 void CameraControlNode::increaseExposureCall() {
-	ROS_INFO_STREAM("Calling service increaseExposureClient " << increaseExposureClient.call(emptyService));
+	REXOS_INFO_STREAM("Calling service increaseExposureClient " << increaseExposureClient.call(emptyService));
 }
 void CameraControlNode::decreaseExposureCall() {
-	ROS_INFO_STREAM("Calling service decreaseExposureClient " << decreaseExposureClient.call(emptyService));
+	REXOS_INFO_STREAM("Calling service decreaseExposureClient " << decreaseExposureClient.call(emptyService));
 }
 void CameraControlNode::autoWhiteBalanceCall(bool enabled) {
 	vision_node::autoWhiteBalance autoWhiteBalance;
 	autoWhiteBalance.request.enable = enabled;
-	ROS_INFO_STREAM("Calling service autoWhiteBalanceClient " << enabled << " " << autoWhiteBalanceClient.call(autoWhiteBalance));
+	REXOS_INFO_STREAM("Calling service autoWhiteBalanceClient " << enabled << " " << autoWhiteBalanceClient.call(autoWhiteBalance));
 }
 
 void CameraControlNode::run() {
@@ -108,11 +108,11 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	
 	// did we see a chessboard?
 	if(calibrateLensServiceCall.response.processedFrames == 0){
-		ROS_WARN_STREAM("calibrateLens failed, processedFrame = " << calibrateLensServiceCall.response.processedFrames);
+		REXOS_WARN_STREAM("calibrateLens failed, processedFrame = " << calibrateLensServiceCall.response.processedFrames);
 		return false;
 	}
 	
-	ROS_INFO("Saving matrices to database");
+	REXOS_INFO("Saving matrices to database");
 	vision_node::getCorrectionMatrices getCalibrationMatricesServiceCall;
 	getCorrectionMatricesClient.call(getCalibrationMatricesServiceCall);
 	
@@ -140,37 +140,35 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	jsonNode["cameraMatrix"] = cameraMatrix;
 	
 	Json::StyledWriter writer;
-	ROS_INFO_STREAM("JSON=" << writer.write(jsonNode));
+	REXOS_INFO_STREAM("JSON=" << writer.write(jsonNode));
 	this->setCalibrationDataForModuleAndChilds(writer.write(jsonNode));
 	return true;
 }
 
 bool CameraControlNode::transitionInitialize() {
-	ROS_INFO("Initialize transition called");
+	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
 bool CameraControlNode::transitionDeinitialize() {
-	ROS_INFO("Deinitialize transition called");
+	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
 }
 
 
 bool CameraControlNode::transitionSetup(){
-	ROS_INFO("Setup transition called");
+	REXOS_INFO("Setup transition called");
 	
 	std::vector<rexos_knowledge_database::ModuleIdentifier> children = this->getChildModulesIdentifiers();
 	if(children.size() != 1){
-		ROS_ERROR_STREAM("CameraControlNode::transitionSetup: Expected 1 child module (the lens), got " << children.size());
+		REXOS_ERROR_STREAM("CameraControlNode::transitionSetup: Expected 1 child module (the lens), got " << children.size());
 		return false;
 	}
 	
 	try{
-		ROS_INFO("Trying transition setup a1");
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
-		ROS_INFO("Trying transition setup a2");
-		ROS_INFO(properties.c_str());
+		REXOS_INFO(properties.c_str());
 		Json::Value jsonNode;
 		Json::Reader reader;
 		reader.parse(properties, jsonNode);
@@ -188,7 +186,7 @@ bool CameraControlNode::transitionSetup(){
 			throw std::runtime_error("The camera matrix does not contain 9 entries" + boost::to_string(cameraMatrix.size()));
 		}
 		
-		ROS_INFO("calibrateLens correction matrix found");
+		REXOS_INFO("calibrateLens correction matrix found");
 		ros::ServiceClient client = nodeHandle.serviceClient<vision_node::setCorrectionMatrices>(vision_node_services::SET_CORRECTION_MATRICES);
 		vision_node::setCorrectionMatrices serviceCall;
 		
@@ -208,19 +206,18 @@ bool CameraControlNode::transitionSetup(){
 
 		return true;
 	} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
-ROS_INFO("e");
 		if(mannuallyCalibrateLens() == false) return false;
 		else return true;
 	}
 	
 }
 bool CameraControlNode::transitionShutdown(){
-	ROS_INFO("Shutdown transition called");
+	REXOS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	return true;
 }
 bool CameraControlNode::transitionStart(){
-	ROS_INFO("Start transition called");
+	REXOS_INFO("Start transition called");
 	vision_node::enableComponent serviceCall;
 	serviceCall.request.enable = true;
 	enableCameraClient.call(serviceCall);
@@ -228,7 +225,7 @@ bool CameraControlNode::transitionStart(){
 	return true;
 }
 bool CameraControlNode::transitionStop(){
-	ROS_INFO("Stop transition called");
+	REXOS_INFO("Stop transition called");
 	vision_node::enableComponent serviceCall;
 	serviceCall.request.enable = false;
 	enableCameraClient.call(serviceCall);
@@ -240,7 +237,7 @@ int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "camera_control_node");
 	
 	if(argc < 5){
-		ROS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
@@ -249,10 +246,10 @@ int main(int argc, char* argv[]) {
 	
 	CameraControlNode node(equipletName, moduleIdentifier);
 	
-	std::cout << "Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
+	REXOS_INFO_STREAM("Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
 	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl
 	        << "S\tIncrease exposure" << std::endl << "X\tDecrease exposure" << std::endl << "Q\tQuit program"
-	        << std::endl << "Enter a key and press the \"Enter\" button" << std::endl;
+	        << std::endl << "Enter a key and press the \"Enter\" button" << std::endl);
 
 	node.run();
 	return 0;

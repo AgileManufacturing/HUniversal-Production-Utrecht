@@ -42,6 +42,7 @@
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
 #include <jsoncpp/json/value.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 

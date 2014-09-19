@@ -41,23 +41,23 @@ DummyModuleA::DummyModuleA(std::string equipletName, rexos_knowledge_database::M
 }
 
 void DummyModuleA::run() {
-	ROS_INFO("running");
+	REXOS_INFO("running");
 	ros::spin();
 }
 bool DummyModuleA::transitionInitialize() {
-	ROS_INFO("Initialize transition called");
+	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
 bool DummyModuleA::transitionDeinitialize() {
-	ROS_INFO("Deinitialize transition called");
+	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
 }
 
 
 bool DummyModuleA::transitionSetup(){
-	ROS_INFO("Setup transition called");
+	REXOS_INFO("Setup transition called");
 	
 	ros::Duration(5.0).sleep();
 	
@@ -65,32 +65,32 @@ bool DummyModuleA::transitionSetup(){
 	goal.gainedSupportedMutations.push_back("move");
 	
 	transitionActionClient.sendGoal(goal);
-	ROS_INFO("done");
+	REXOS_INFO("done");
 	return true;
 }
 bool DummyModuleA::transitionShutdown(){
-	ROS_INFO("Shutdown transition called");
+	REXOS_INFO("Shutdown transition called");
 	return true;
 }
 bool DummyModuleA::transitionStart(){
-	ROS_INFO("Start transition called");
+	REXOS_INFO("Start transition called");
 	return true;
 }
 bool DummyModuleA::transitionStop(){
-	ROS_INFO("Stop transition called");
+	REXOS_INFO("Stop transition called");
 	return true;
 }
 
 int main(int argc, char* argv[]) {
 	if(argc < 5){
-		ROS_ERROR("Usage: dummy_module_a equipletId, manufacturer, typeNumber, serialNumber");
+		REXOS_ERROR("Usage: dummy_module_a equipletId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
 	
 	std::string equipletName = argv[1];
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 
-	ROS_INFO("Creating DummyModuleA");
+	REXOS_INFO("Creating DummyModuleA");
 	ros::init(argc, argv, std::string("dummy_module_a") + moduleIdentifier.getManufacturer() + "_" + 
 			 moduleIdentifier.getTypeNumber() + "_" + 
 			 moduleIdentifier.getSerialNumber());

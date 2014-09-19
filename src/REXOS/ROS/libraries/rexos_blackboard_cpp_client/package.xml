@@ -12,6 +12,9 @@
   <build_depend>rexos_utilities</build_depend>
   <run_depend>rexos_utilities</run_depend>
 
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+
 
 
   <export>

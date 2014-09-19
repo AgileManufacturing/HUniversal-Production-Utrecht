@@ -30,6 +30,7 @@
  **/
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 #include "delta_robot_node/MovePath.h"
 #include "delta_robot_node/MoveRelativePath.h"
 #include "delta_robot_node/MoveToRelativePoint.h"
@@ -131,10 +132,10 @@ int main(int argc, char **argv){
 	moveToStartPoint();
 
 	// MoveToPoint speed benchmark
-	std::cout << "Press any key to start the MoveToPoint speed benchmark" << std::endl;
+	REXOS_INFO_STREAM("Press any key to start the MoveToPoint speed benchmark" << std::endl);
 	std::cin >> keyPress;
 	for(int acc = 25; acc <= 200; acc += 25){
-		std::cout << "max acceleration: " << acc << std::endl;
+		REXOS_INFO_STREAM("max acceleration: " << acc << std::endl);
 		for(int i = 10; i <= 40; i += 10){
 			moveToPointService.request.motion.x = i;
 			moveToPointService.request.motion.y = i;
@@ -151,7 +152,7 @@ int main(int argc, char **argv){
 	}
 
 	// Test MoveToRelativePoint Service.
-	std:: cout << "Press any key to start the MoveToRelativePoint" << std::endl;
+	REXOS_INFO_STREAM("Press any key to start the MoveToRelativePoint" << std::endl);
 	std:: cin >> keyPress;
 	moveToRelativePointService.request.motion.x = -1;
 	moveToRelativePointService.request.motion.y = -1;
@@ -162,7 +163,7 @@ int main(int argc, char **argv){
 	moveToStartPoint();
 
 	// Test MovePath Service.
-	std:: cout << "Press any key to start the MovePathService" << std::endl;
+	REXOS_INFO_STREAM("Press any key to start the MovePathService" << std::endl);
 	std:: cin >> keyPress;
 	delta_robot_node::Motion point1;
 	delta_robot_node::Motion point2;
@@ -197,7 +198,7 @@ int main(int argc, char **argv){
 	moveToStartPoint();
 
 	// Test MoveRelativePath Service.
-	std:: cout << "Press any key to start the MoveRelativePath" << std::endl;
+	REXOS_INFO_STREAM("Press any key to start the MoveRelativePath" << std::endl);
 	std:: cin >> keyPress;
 	for(double z = 0; z < 10; z++){
 		delta_robot_node::Motion point1;

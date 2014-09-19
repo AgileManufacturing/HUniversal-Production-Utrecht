@@ -37,9 +37,9 @@
 #include <cstdlib>
 #include <part_follow_node/PartFollowNode.h>
 #include <ros/ros.h>
-#include <rexos_datatypes/InstructionData.h>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
 #include <rexos_datatypes/EquipletStep.h>
-#include "rexos_utilities/Utilities.h"
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "part_follow_node"
@@ -49,75 +49,51 @@ using namespace part_follow_node;
 
 
 PartFollowNode::PartFollowNode(std::string blackboardIp) :
-	maxAcceleration("5.0") {
+	maxAcceleration(5.0) {
 
-	ROS_INFO("Constructing");
+	REXOS_INFO("Constructing");
 
-	//DirectMoveStepsBlackBoard
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "EquipletStepsBlackBoard");
-
-
-	equipletStepBlackboardClient->removeDocuments("");
-	ROS_INFO("A");
+	//equipletStepBlackboardClient->removeDocuments("");
 }
 
 PartFollowNode::~PartFollowNode(){
-	ROS_INFO("Destructing");
+	REXOS_INFO("Destructing");
 }
 
 void PartFollowNode::run(){
-	ROS_INFO("B");
 	ros::Rate rate(1);
 
 	while (ros::ok()) {
-	ROS_INFO("C");
 		writeToBlackBoard(maxAcceleration);
 		rate.sleep();
 		ros::spinOnce();
-	}	
+	}
 }
 
-void PartFollowNode::writeToBlackBoard(std::string acceleration){
-	ROS_INFO("D");
-
-	//Need to include InstructionData for the instructiondata
-	//Dont forget to set in package & makelist!
-
-	std::map<std::string, std::string> look_up_parameters;
-	std::map<std::string, std::string> payload;
-
-	payload.insert(pair<string, string>("x", "0.0"));
-	payload.insert(pair<string, string>("y", "0.0"));
-	payload.insert(pair<string, string>("z", "-335"));
-
-	ROS_INFO("E");
-	if(!acceleration.empty()) {
-		payload.insert(pair<string, string>("maxAcceleration", acceleration));
+void PartFollowNode::writeToBlackBoard(double acceleration){
+	rexos_datatypes::EquipletStep equipletStep;
+	Json::Value instructionData;
+	Json::Value moveCommand;
+	
+	moveCommand["x"] = 0;
+	moveCommand["y"] = 0;
+	moveCommand["z"] = 30;
+	moveCommand["maxAcceleration"] = acceleration;
+	
+	instructionData["move"] = moveCommand;
+	equipletStep.setInstructionData(instructionData);
+	
+	rexos_datatypes::OriginPlacement originPlacement = equipletStep.getOriginPlacement();
+	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER);
+	Json::Value parameters;
+	parameters["identifier"] = "GC4x4MB_2";
+	originPlacement.setParameters(parameters);
+	
+	Json::StyledWriter writer;
+	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON()))) {
+		REXOS_INFO_STREAM("printed: " << equipletStep.toJSON() << "to blackboard.");
 	}
-	look_up_parameters.insert(pair<string, string>("ID", "GC4x4MB_2"));
-	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "FIND_ID", 
-            look_up_parameters, payload);
-
-	ROS_INFO("F");
-    std::stringstream ss;
-        ss << "{ ";
-        ss << "\"serviceStepID\" : \"" << "1" << "\", ";
-        ss << "\"nextStep\" : \"" << "NULL" << "\", ";
-        ss << "\"moduleId\" : \"" << "1" << "\", ";
-        ss << "\"instructionData\" : " << instructionData->toJSONString() << ", ";
-        ss << "\"status\" : \"WAITING\" ";
-        ss << " } ";
-	ROS_INFO(ss.str().c_str());
-    rexos_datatypes::EquipletStep step = rexos_datatypes::EquipletStep(libjson::parse(ss.str()));    
-
-
-	ROS_INFO("G");
-	step.setInstructionData(*instructionData);
-
-	if(equipletStepBlackboardClient->insertDocument(step.toJSONString())) {
-		std::cout << "printed: " << step.toJSONString() << "to blackboard." << std::endl;
-	}
-
 }
 
 /**

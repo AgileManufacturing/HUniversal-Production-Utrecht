@@ -70,7 +70,7 @@ void FiducialDetector::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 		fiducialDetector.detect(frame, points);
 	}
 	
-	ROS_DEBUG_STREAM("size= " << points.size());
+	REXOS_DEBUG_STREAM("size= " << points.size());
 	
 	// output message
 	vision_node::Fiducials message;
@@ -81,7 +81,7 @@ void FiducialDetector::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 		fPoint.y = points[i].y;
 		
 		message.fudicials.push_back(fPoint);
-		//ROS_INFO_STREAM("x = "  << fPoint.x << " y = " << fPoint.y);
+		//REXOS_INFO_STREAM("x = "  << fPoint.x << " y = " << fPoint.y);
 	//
 	}
 	

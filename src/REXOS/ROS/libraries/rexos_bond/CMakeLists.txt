@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_bond)
 
 find_package(Boost REQUIRED)
-find_package(catkin REQUIRED bond roscpp smclib)
+find_package(catkin REQUIRED bond roscpp smclib rexos_logger)
 
 include_directories(SYSTEM ${BOOST_INCLUDE_DIRS})
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -15,8 +15,8 @@ endif()
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME} ${UUID_LIB}
-  CATKIN_DEPENDS bond roscpp smclib
+  LIBRARIES ${PROJECT_NAME} ${UUID_LIB} rexos_logger
+  CATKIN_DEPENDS bond roscpp smclib rexos_logger
   DEPENDS Boost
 )
 

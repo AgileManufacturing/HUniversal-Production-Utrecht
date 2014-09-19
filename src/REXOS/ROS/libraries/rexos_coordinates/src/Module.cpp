@@ -28,7 +28,7 @@ namespace rexos_coordinates{
 			module(module)
 	{
 		updateTranslationVectors();
-		ROS_INFO_STREAM("rexos_coordinates: Constructed module");
+		REXOS_INFO_STREAM("rexos_coordinates: Constructed module");
 	}
 	void Module::updateTranslationVectors() {
 		int mountPointX = module->getMountPointX();
@@ -63,7 +63,7 @@ namespace rexos_coordinates{
 		
 		this->equipletToModule = Vector3(offsetX, offsetY, offsetZ);
 		this->moduleToEquiplet = Vector3(-offsetX, -offsetY, -offsetZ);
-		ROS_INFO_STREAM("equipletToModule: " << equipletToModule);
-		ROS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
+		REXOS_INFO_STREAM("equipletToModule: " << equipletToModule);
+		REXOS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
 	}
 }

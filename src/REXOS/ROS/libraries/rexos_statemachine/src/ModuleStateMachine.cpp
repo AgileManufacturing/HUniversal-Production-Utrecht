@@ -35,7 +35,7 @@ ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge
 	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
 	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
 	
-	ROS_INFO_STREAM("binding A on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
+	REXOS_INFO_STREAM("binding A on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
 	bond = new rexos_bond::Bond(equipletNamespaceName + "/bond", moduleNamespaceName, this);
 	bond->start();
 }
@@ -45,7 +45,7 @@ ModuleStateMachine::~ModuleStateMachine(){
 }
 
 void ModuleStateMachine::onStateChanged(rexos_statemachine::State state) {
-	ROS_WARN("onStateChanged");
+	REXOS_WARN("onStateChanged");
 	rexos_statemachine_srvs::StateUpdateRequest req;
 	rexos_statemachine_srvs::StateUpdateResponse res;
 	req.state = getCurrentState();
@@ -53,7 +53,7 @@ void ModuleStateMachine::onStateChanged(rexos_statemachine::State state) {
 }
 
 void ModuleStateMachine::onModeChanged(rexos_statemachine::Mode mode) {
-	ROS_WARN("onModeChanged");
+	REXOS_WARN("onModeChanged");
 	rexos_statemachine_srvs::ModeUpdateRequest req;
 	rexos_statemachine_srvs::ModeUpdateResponse res;
 	req.mode = getCurrentMode();
@@ -68,9 +68,9 @@ void ModuleStateMachine::setInError() {
 }
 void ModuleStateMachine::onBondCallback(rexos_bond::Bond* bond, Event event){
 	if(event == FORMED) {
-		ROS_INFO("Bond has been formed");
+		REXOS_INFO("Bond has been formed");
 	} else {
-		ROS_WARN("Bond has been broken, initiate gracefull shutdown");
+		REXOS_WARN("Bond has been broken, initiate gracefull shutdown");
 		// TODO: implement gracefull shutdown
 	}
 }

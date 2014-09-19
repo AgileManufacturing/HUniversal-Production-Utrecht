@@ -14,6 +14,9 @@
   <build_depend>crate_locator_node</build_depend>
   <run_depend>crate_locator_node</run_depend>
 
+  <build_depend>rexos_logger</build_depend>
+  <run_depend>rexos_logger</run_depend>
+
   <export>
   </export>
 </package>

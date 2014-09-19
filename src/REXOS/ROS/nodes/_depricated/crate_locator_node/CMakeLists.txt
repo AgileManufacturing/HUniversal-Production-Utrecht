@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(crate_locator_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation image_transport cv_bridge sensor_msgs rexos_datatypes rexos_utilities rexos_vision)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation image_transport cv_bridge sensor_msgs rexos_datatypes rexos_utilities rexos_vision rexos_logger)
 find_package(Log4cxx)
 find_package(OpenCV)
 
@@ -23,8 +23,8 @@ generate_messages (
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES  
-CATKIN_DEPENDS roscpp image_transport cv_bridge sensor_msgs rexos_datatypes rexos_utilities rexos_vision
+LIBRARIES rexos_logger  
+CATKIN_DEPENDS roscpp image_transport cv_bridge sensor_msgs rexos_datatypes rexos_utilities rexos_vision rexos_logger
 DEPENDS OpenCV)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

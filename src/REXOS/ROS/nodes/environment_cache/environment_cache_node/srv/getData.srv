@@ -1,0 +1,4 @@
+string identifier
+string[] paths
+---
+string jsonData

@@ -20,9 +20,9 @@ void SDFController::setLinkState(const char * linkName, gazebo_msgs::LinkState s
 	service.request.link_state = state;
 	
 	if (client.call(service)){
-		//ROS_INFO("new link state was sent");
+		//REXOS_INFO("new link state was sent");
 	}else{
-		ROS_ERROR("Failed to call service set_link_state in setLinkState() %s" , service.response.status_message.c_str());
+		REXOS_ERROR("Failed to call service set_link_state in setLinkState() %s" , service.response.status_message.c_str());
 	}
 }
 
@@ -37,7 +37,7 @@ gazebo_msgs::LinkState SDFController::getLinkState(const char * linkName){
 	if (client.call(service)){
 		return service.response.link_state;
 	}else{
-		ROS_ERROR("Failed to call service get_link_state in getLinkState() %s" , service.response.status_message.c_str());
+		REXOS_ERROR("Failed to call service get_link_state in getLinkState() %s" , service.response.status_message.c_str());
 		return service.response.link_state;
 	}
 }
@@ -50,9 +50,9 @@ void SDFController::setJointProperties(const char * jointName, gazebo_msgs::ODEJ
 	service.request.ode_joint_config = jointConfig;
 	
 	if (client.call(service)){
-		//ROS_INFO("sent joint properties of %s success", jointName);
+		//REXOS_INFO("sent joint properties of %s success", jointName);
 	}else{
-		ROS_ERROR("Failed to call service set_joint_properties in setJointProperties() %s" , service.response.status_message.c_str());
+		REXOS_ERROR("Failed to call service set_joint_properties in setJointProperties() %s" , service.response.status_message.c_str());
 	}
 	
 }
@@ -66,14 +66,14 @@ JointProperties SDFController::getJointProperties(const char * jointName){
 	JointProperties jointProperties(0,0,0,0);
 	
 	if (client.call(service)){
-		//ROS_INFO("got joint properties %s", service.response.status_message.c_str());
+		//REXOS_INFO("got joint properties %s", service.response.status_message.c_str());
 		if(service.response.damping.size() > 0){jointProperties.damping = service.response.damping[0];}
 		if(service.response.position.size() > 0){jointProperties.position = service.response.position[0];}
 		if(service.response.rate.size() > 0){jointProperties.rate = service.response.rate[0];}
 		jointProperties.type = service.response.type;
 		return jointProperties;
 	}else{
-		ROS_ERROR("Failed to call service get_joint_properties in getJointProperties() %s" , service.response.status_message.c_str());
+		REXOS_ERROR("Failed to call service get_joint_properties in getJointProperties() %s" , service.response.status_message.c_str());
 		return jointProperties;
 	}
 	
@@ -91,9 +91,9 @@ void SDFController::applyForceToJoint(const char * jointName, double force, doub
 	service.request.duration = duration;
 
 	if (client.call(service)){
-		//ROS_INFO("force added");
+		//REXOS_INFO("force added");
 	}
 	else{
-		ROS_ERROR("Failed to apply force to joint int applyForceToJoint() %s" , service.response.status_message.c_str());
+		REXOS_ERROR("Failed to apply force to joint int applyForceToJoint() %s" , service.response.status_message.c_str());
 	}
 }

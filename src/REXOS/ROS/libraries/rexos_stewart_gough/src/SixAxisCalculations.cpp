@@ -814,7 +814,7 @@ bool SixAxisCalculations::checkPath(Point3D from, double startRotationX, double 
 
 			EffectorMove move = getMotorAngles(Point3D(x, y, z), rotationX, rotationY, rotationZ);
 			if(!move.validMove){
-				std::cout << "invalid position in path: " << move.moveTo << std::endl;
+				REXOS_ERROR_STREAM("invalid position in path: " << move.moveTo << std::endl);
 				return false;
 			}
 		}

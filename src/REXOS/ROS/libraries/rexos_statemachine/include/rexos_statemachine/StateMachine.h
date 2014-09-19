@@ -38,6 +38,7 @@
 #include "rexos_statemachine/State.h"
 #include "rexos_statemachine/Mode.h"
 #include "rexos_statemachine/Listener.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <actionlib/server/simple_action_server.h>
 #include <actionlib/client/simple_action_client.h>

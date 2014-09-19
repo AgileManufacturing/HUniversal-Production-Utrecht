@@ -40,6 +40,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "rexos_logger/rexos_logger.h"
 
 namespace unicap_cv_bridge {
 	/**

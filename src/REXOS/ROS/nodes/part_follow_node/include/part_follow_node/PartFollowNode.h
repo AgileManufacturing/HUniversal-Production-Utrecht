@@ -32,6 +32,7 @@
 #pragma once
 
 #include <ros/ros.h>
+#include "rexos_logger/rexos_logger.h"
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_datatypes/InstructionData.h>
 
@@ -45,13 +46,13 @@ namespace part_follow_node {
 		void run();
 
 		private:
-		void writeToBlackBoard(std::string acceleration);
+		void writeToBlackBoard(double acceleration);
 		
 		/**
 		 * @var double maxAcceleration
 		 * The maxAcceleration of the effector in millimeters per second.
 		 **/
-		std::string maxAcceleration;
+		double maxAcceleration;
 
 		Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 		rexos_datatypes::InstructionData * instructionData;

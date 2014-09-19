@@ -62,12 +62,12 @@ namespace rexos_delta_robot{
 			effectorLocation(Vector3(0, 0, 0)), 
 			boundariesGenerated(false),
 			currentMotionSlot(1){
-		ROS_INFO("DeltaRobot constructor entering...");
+		REXOS_INFO("DeltaRobot constructor entering...");
 		readJSONNode(node);
 		
-		ROS_INFO("Configuring Modbus...");
+		REXOS_INFO("Configuring Modbus...");
 		// Initialize modbus for IO controller
-		/*modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
+		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
 		if(modbusIO == NULL){
 			throw std::runtime_error("Unable to allocate libmodbus context");
 		}
@@ -83,7 +83,7 @@ namespace rexos_delta_robot{
 			rexos_motor::CRD514KD::RtuConfig::PARITY,
 			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
 			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-		*/
+		
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, *stepperMotorProperties));
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, *stepperMotorProperties));
 		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
@@ -105,21 +105,21 @@ namespace rexos_delta_robot{
     
 	void DeltaRobot::readJSONNode(const Json::Value node) {
 		modbusIp = node["modbusIp"].asString();
-		ROS_INFO_STREAM("found modbusIp " << modbusIp);
+		REXOS_INFO_STREAM("found modbusIp " << modbusIp);
 		
 		modbusPort = node["modbusPort"].asInt();
-		ROS_INFO_STREAM("found modbusPort " << modbusPort);
+		REXOS_INFO_STREAM("found modbusPort " << modbusPort);
 		
 		calibrationBigStepFactor = node["calibrationBigStepFactor"].asInt();
-		ROS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
+		REXOS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
 		
 		Json::Value stepperMotorPropertiesNode = node["stepperMotorProperties"];
 		stepperMotorProperties = new rexos_motor::StepperMotorProperties(stepperMotorPropertiesNode);
-		ROS_INFO_STREAM("found stepperMotorProperties");
+		REXOS_INFO_STREAM("found stepperMotorProperties");
 		
 		Json::Value deltaRobotNode = node["deltaRobotMeasures"];
 		deltaRobotMeasures = new rexos_delta_robot::DeltaRobotMeasures(deltaRobotNode);
-		ROS_INFO_STREAM("found deltraRobotMeasures");
+		REXOS_INFO_STREAM("found deltraRobotMeasures");
 	}
     /**
      * Generates the effectorBoundaries for the given voxelSize.
@@ -383,7 +383,7 @@ namespace rexos_delta_robot{
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void DeltaRobot::calibrateMotor(int motorIndex){
-        std::cout << "[DEBUG] Calibrating motor number " << motorIndex << std::endl;
+        REXOS_DEBUG_STREAM("Calibrating motor number " << motorIndex << std::endl);
 
         // Setup for incremental motion in big steps, to get to the sensor quickly.
         motors[motorIndex]->setIncrementalMode(1);
@@ -425,17 +425,17 @@ namespace rexos_delta_robot{
         // Check the availability of the sensors
         bool sensorFailure = false;
         if(checkSensor(0)){
-            std::cerr << "Sensor 0 failure (is the hardware connected?)" << std::endl;
+            REXOS_ERROR_STREAM("Sensor 0 failure (is the hardware connected?)" << std::endl);
             sensorFailure = true;
         }
 
         if(checkSensor(1)){
-            std::cerr << "Sensor 1 failure (is the hardware connected?)" << std::endl;
+            REXOS_ERROR_STREAM("Sensor 1 failure (is the hardware connected?)" << std::endl);
             sensorFailure = true;
         }
 
         if(checkSensor(2)){
-            std::cerr << "Sensor 2 failure (is the hardware connected?)" << std::endl;
+           REXOS_ERROR_STREAM("Sensor 2 failure (is the hardware connected?)" << std::endl);
             sensorFailure = true;
         }
 
@@ -482,7 +482,7 @@ namespace rexos_delta_robot{
                 deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector) * (
                 deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector))
         );
-        std::cout << "[DEBUG] effector location z: " << effectorLocation.z << std::endl; 
+        REXOS_DEBUG_STREAM("effector location z: " << effectorLocation.z); 
 
         return true;
     }

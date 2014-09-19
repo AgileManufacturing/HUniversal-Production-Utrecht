@@ -12,6 +12,9 @@
   <build_depend>delta_robot_node</build_depend>
   <run_depend>delta_robot_node</run_depend>
 
+  <build_depend>rexos_logger</build_depend>
+  <run_depend>rexos_logger</run_depend>
+
   <export>
   </export>
 </package>

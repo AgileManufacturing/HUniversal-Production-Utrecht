@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(gripper_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_gripper)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_gripper rexos_logger)
 find_package(Log4cxx)
 find_package(Jsoncpp)
 
@@ -24,7 +24,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES  
-CATKIN_DEPENDS rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_gripper roscpp std_msgs
+CATKIN_DEPENDS rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_gripper roscpp std_msgs rexos_logger
 DEPENDS Jsoncpp)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

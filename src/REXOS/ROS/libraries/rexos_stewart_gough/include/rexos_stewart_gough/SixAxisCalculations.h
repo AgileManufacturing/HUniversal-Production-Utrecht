@@ -12,6 +12,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+#include "rexos_logger/rexos_logger.h"
 
 
 // Converts degrees to radians.

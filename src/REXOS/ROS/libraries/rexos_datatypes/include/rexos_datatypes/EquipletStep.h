@@ -23,6 +23,7 @@ namespace rexos_datatypes{
     
     class EquipletStep {
     public:
+        EquipletStep();
         EquipletStep(Json::Value n);
         virtual ~EquipletStep();
 

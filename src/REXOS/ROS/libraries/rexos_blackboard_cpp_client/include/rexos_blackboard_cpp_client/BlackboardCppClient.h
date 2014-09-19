@@ -34,6 +34,7 @@
 
 #include <string>
 #include "mongo/client/dbclientinterface.h"
+#include "rexos_logger/rexos_logger.h"
 
 namespace Blackboard {
 class OplogMonitor;

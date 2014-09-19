@@ -48,7 +48,7 @@ VisionNode::VisionNode(int deviceNumber, int formatNumber, std::string pathToXml
 		
 {
 	// Connect to camera. On failure a exception will be thrown.
-	ROS_INFO("Initializing camera");
+	REXOS_INFO("Initializing camera");
 	cam = new unicap_cv_bridge::UnicapCvCamera(deviceNumber, formatNumber);
 	cam->setAutoWhiteBalance(true);
 	cam->setExposure(exposure);
@@ -56,7 +56,7 @@ VisionNode::VisionNode(int deviceNumber, int formatNumber, std::string pathToXml
 
 	fishEyeCorrector.setFrameSize(cv::Size(cam->getImgWidth(), cam->getImgHeight()));
 
-	ROS_INFO("Advertising services");
+	REXOS_INFO("Advertising services");
 	// Advertise the services.
 	increaseExposureService = nodeHandle.advertiseService(vision_node_services::INCREASE_EXPOSURE,
 	        &VisionNode::increaseExposure, this);
@@ -79,9 +79,9 @@ VisionNode::~VisionNode() {
 }
 
 bool VisionNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
-	ROS_DEBUG("Service increaseExposure ");
+	REXOS_DEBUG("Service increaseExposure ");
 	exposure *= 1.125;
-	ROS_DEBUG_STREAM("exposure=" << exposure);
+	REXOS_DEBUG_STREAM("exposure=" << exposure);
 	if(cam) {
 		cam->setExposure(exposure);
 		return true;
@@ -90,9 +90,9 @@ bool VisionNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 	}
 }
 bool VisionNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
-	ROS_DEBUG("Service decreaseExposure ");
+	REXOS_DEBUG("Service decreaseExposure ");
 	exposure /= 1.125;
-	ROS_DEBUG_STREAM("exposure=" << exposure);
+	REXOS_DEBUG_STREAM("exposure=" << exposure);
 	if(cam) {
 		cam->setExposure(exposure);
 		return true;
@@ -102,7 +102,7 @@ bool VisionNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 
 }
 bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& request, vision_node::autoWhiteBalance::Response& response) {
-	ROS_DEBUG_STREAM("Service autoWhiteBalance " << (bool) request.enable);
+	REXOS_DEBUG_STREAM("Service autoWhiteBalance " << (bool) request.enable);
 	if(cam) {
 		cam->setAutoWhiteBalance(request.enable);
 		return true;
@@ -111,7 +111,7 @@ bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& reques
 	}
 }
 bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
-	ROS_DEBUG_STREAM("Service fishEyeCorrection " << request.enable);
+	REXOS_DEBUG_STREAM("Service fishEyeCorrection " << request.enable);
 	if(cam && fishEyeCorrector.isReady() == true) {
 		isFishEyeCorrectorEnabled = request.enable;
 		return true;
@@ -121,7 +121,7 @@ bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& r
 
 }
 bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
-	ROS_DEBUG_STREAM("Service enableCamera " << request.enable);
+	REXOS_DEBUG_STREAM("Service enableCamera " << request.enable);
 	if(cam) {
 		isCameraEnabled = request.enable;
 		return true;
@@ -130,7 +130,7 @@ bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vi
 	}
 }
 bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
-	ROS_DEBUG_STREAM("Service enableQrCodeReader " << request.enable);
+	REXOS_DEBUG_STREAM("Service enableQrCodeReader " << request.enable);
 	if(cam) {
 		isQrCodeReaderEnabled = request.enable;
 		return true;

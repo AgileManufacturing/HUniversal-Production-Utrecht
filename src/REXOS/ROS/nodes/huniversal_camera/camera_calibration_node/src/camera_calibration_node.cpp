@@ -49,13 +49,13 @@ CameraCalibrationNode::CameraCalibrationNode() :
 
 	imageTransport(nodeHandle)
 {
-	ROS_INFO("CalibrateLens constructor");
+	REXOS_INFO("CalibrateLens constructor");
 	calibrateLensServer = 		nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_LENS, 		&CameraCalibrationNode::calibrateLens, this);
 	calibrateEffectorServer = 	nodeHandle.advertiseService(camera_calibration_node_services::CALIBRATE_EFFECTOR, 	&CameraCalibrationNode::calibrateEffector, this);
 }
 
 void CameraCalibrationNode::run() {
-	ROS_DEBUG("Waiting for service calls");
+	REXOS_DEBUG("Waiting for service calls");
 	ros::spin();
 }
 
@@ -63,7 +63,7 @@ bool CameraCalibrationNode::calibrateLens(
 	camera_calibration_node::calibrateLens::Request &request,
 	camera_calibration_node::calibrateLens::Response &response)
 {
-	ROS_INFO("calibrateLens entered");
+	REXOS_INFO("calibrateLens entered");
 	int32_t framesToCapture = request.frameCount;
 	// subscribe to the camera/image feed. The buffersize of 1 is intentional.
 	image_transport::Subscriber imageSubscriber = imageTransport.subscribe("camera/image", 1, &CameraCalibrationNode::handleFrame, this);
@@ -77,16 +77,16 @@ bool CameraCalibrationNode::calibrateLens(
 	imageSubscriber.shutdown();
 	
 	// createMatrices
-	ROS_INFO("Generating matrices...");
+	REXOS_INFO("Generating matrices...");
 	Camera::RectifyImage rectifier;
 	int successes = rectifier.createMatrices(cv::Size(request.boardWidth, request.boardHeight), images);
-	ROS_INFO("Successes: %d", successes);
+	REXOS_INFO("Successes: %d", successes);
 	
 	// did we detect a chessboard on any of the captured frames?
 	if(successes != 0){
-		ROS_DEBUG("Sending matrices...");
-		ROS_INFO_STREAM("Dist Coeffs:" << std::endl << rectifier.distCoeffs);
-		ROS_INFO_STREAM("Camera matrix:" << std::endl << rectifier.cameraMatrix);
+		REXOS_DEBUG("Sending matrices...");
+		REXOS_INFO_STREAM("Dist Coeffs:" << std::endl << rectifier.distCoeffs);
+		REXOS_INFO_STREAM("Camera matrix:" << std::endl << rectifier.cameraMatrix);
 
 		ros::ServiceClient client = nodeHandle.serviceClient<vision_node::setCorrectionMatrices>(vision_node_services::SET_CORRECTION_MATRICES);
 		vision_node::setCorrectionMatrices serviceCall;
@@ -110,10 +110,10 @@ bool CameraCalibrationNode::calibrateLens(
 		
 		client.call(serviceCall);
 	} else {
-		ROS_INFO("No chessboard deteced...");
+		REXOS_INFO("No chessboard deteced...");
 	}
 
-	ROS_INFO("Cleaning up...");
+	REXOS_INFO("Cleaning up...");
 	while(images.size() != 0){
 		cv::Mat* image = images.back();
 		images.pop_back();
@@ -121,7 +121,7 @@ bool CameraCalibrationNode::calibrateLens(
 	}
 	
 	response.processedFrames = successes;
-	ROS_INFO("Done");
+	REXOS_INFO("Done");
 	return true;
 }
 bool CameraCalibrationNode::calibrateEffector(
@@ -138,7 +138,7 @@ void CameraCalibrationNode::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
 	
 	images.push_back(image);
 	//cv::imwrite("/home/agileman/Desktop/images/image.jpg", *image);
-	ROS_DEBUG("image captured");
+	REXOS_DEBUG("image captured");
 }
 
 int main(int argc, char* argv[]) {

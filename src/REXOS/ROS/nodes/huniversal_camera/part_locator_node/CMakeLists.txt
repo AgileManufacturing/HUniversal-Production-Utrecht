@@ -3,15 +3,15 @@ project(part_locator_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node vectors matrices rexos_statemachine rexos_coordinates rexos_utilities environment_cache environment_communication_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation vision_node vectors matrices rexos_statemachine rexos_coordinates rexos_utilities environment_cache environment_communication_msgs rexos_logger)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(Mongo)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES  
-CATKIN_DEPENDS message_runtime roscpp std_msgs vision_node vectors matrices rexos_coordinates environment_cache environment_communication_msgs
+LIBRARIES rexos_logger  
+CATKIN_DEPENDS message_runtime roscpp std_msgs vision_node vectors matrices rexos_coordinates environment_cache environment_communication_msgs rexos_logger
 DEPENDS OpenCV)
 
 SET ( CMAKE_CXX_FLAGS "-std=c++0x" )

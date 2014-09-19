@@ -164,7 +164,7 @@ namespace rexos_vision{
 				if(bounds.contains(point))
 					points.push_back(point);
 				else if(verbose)
-					std::cout << "Center: " << center << " outside ROI!" << std::endl;
+					REXOS_INFO_STREAM("Center: " << center << " outside ROI!" << std::endl);
 			}
 
 		}
@@ -292,9 +292,9 @@ namespace rexos_vision{
 		bool found2 = detectCenterLine(center2, lines2, debugImage);
 
 		if(verbose && !found1)
-			std::cout << "Primary center line not found" << std::endl;
+			REXOS_ERROR_STREAM("Primary center line not found" << std::endl);
 		if(verbose && !found2)
-			std::cout << "Secondary center line not found" << std::endl;
+			REXOS_ERROR_STREAM("Secondary center line not found" << std::endl);
 
 		// If both have lines on opposing sides we can intersect them and find the center
 		if(found1 && found2){
@@ -357,7 +357,7 @@ namespace rexos_vision{
 	bool FiducialDetector::detectCenterLine(cv::Vec2f& centerLine, std::vector<cv::Vec2f> lines, cv::Mat* debugImage){
 		if(lines.size() < 2){
 			if(verbose)
-				std::cout << "Not enough lines" << std::endl;
+				REXOS_ERROR_STREAM("Not enough lines" << std::endl);
 			return false;
 		}
 
@@ -379,7 +379,7 @@ namespace rexos_vision{
 
 		if(lines1.empty()){
 			if(verbose)
-				std::cout << "Primary line not found" << std::endl;
+				REXOS_ERROR_STREAM("Primary line not found" << std::endl);
 			return false;
 		}
 
@@ -388,7 +388,7 @@ namespace rexos_vision{
 
 		if(lines2.empty()){
 			if(verbose)
-				std::cout << "Secondary line not found" << std::endl;
+				REXOS_ERROR_STREAM("Secondary line not found" << std::endl);
 			return false;
 		}
 

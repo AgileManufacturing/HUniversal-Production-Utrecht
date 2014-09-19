@@ -21,6 +21,11 @@
   <run_depend>rexos_datatypes</run_depend>
   <run_depend>rexos_utilities</run_depend>
 
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+  <run_depend>vectors</run_depend>
+  <build_depend>vectors</build_depend>
+
   <export>
     <cpp cflags="-I${prefix}/include"/>
   </export>

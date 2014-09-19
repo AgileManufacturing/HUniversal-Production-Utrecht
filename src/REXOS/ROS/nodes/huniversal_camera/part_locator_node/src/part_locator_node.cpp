@@ -63,7 +63,7 @@ PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_datab
 		samplesTopRight(minCornerSamples),
 		samplesBottomRight(minCornerSamples)
 {
-	ROS_INFO("Constructing");
+	REXOS_INFO("Constructing");
 	
 	std::string properties = this->getModuleTypeProperties();
 	
@@ -72,15 +72,15 @@ PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_datab
 	reader.parse(properties, jsonNode);
 	
 	topLeftValue = jsonNode["topLeftValue"].asString();
-	ROS_INFO_STREAM("found topLeftValue " << topLeftValue);
+	REXOS_INFO_STREAM("found topLeftValue " << topLeftValue);
 	topRightValue = jsonNode["topRightValue"].asString();
-	ROS_INFO_STREAM("found topRightValue " << topRightValue);
+	REXOS_INFO_STREAM("found topRightValue " << topRightValue);
 	bottomRightValue = jsonNode["bottomRightValue"].asString();
-	ROS_INFO_STREAM("found bottomRightValue " << bottomRightValue);
+	REXOS_INFO_STREAM("found bottomRightValue " << bottomRightValue);
 	workPlaneWidth = jsonNode["workPlaneWidth"].asDouble();
-	ROS_INFO_STREAM("found workPlaneWidth " << workPlaneWidth);
+	REXOS_INFO_STREAM("found workPlaneWidth " << workPlaneWidth);
 	workSpaceHeight = jsonNode["workPlaneHeight"].asDouble();
-	ROS_INFO_STREAM("found workPlaneHeight " << workPlaneHeight);
+	REXOS_INFO_STREAM("found workPlaneHeight " << workPlaneHeight);
 	
 	if(std::isnan(workPlaneWidth) || std::isnan(workPlaneHeight) || 
 			topLeftValue.length() == 0 || topRightValue.length() == 0 || bottomRightValue.length() == 0) {
@@ -109,16 +109,16 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 			oldCoor.y = message.qrCodes[i].corners[j].y;
 			oldCoor.z = 1;
 		
-			//ROS_DEBUG_STREAM("QrCode \t" << message.qrCodes[i].value << " corner \t" << j);
-			//if(j == 1) ROS_INFO_STREAM("value: " << message.qrCodes[i].value);
-			//if(j == 1) ROS_INFO_STREAM("oldCoor: " << oldCoor);
+			//REXOS_DEBUG_STREAM("QrCode \t" << message.qrCodes[i].value << " corner \t" << j);
+			//if(j == 1) REXOS_INFO_STREAM("value: " << message.qrCodes[i].value);
+			//if(j == 1) REXOS_INFO_STREAM("oldCoor: " << oldCoor);
 			Vector3 newCoor = totalMatrix * oldCoor;
-			//if(j == 1) ROS_INFO_STREAM("newCoor: " << newCoor);
+			//if(j == 1) REXOS_INFO_STREAM("newCoor: " << newCoor);
 			newCoor = postCorrectionTotalMatrix * newCoor;
-			//if(j == 1) ROS_INFO_STREAM("newCoor: " << newCoor);
-			//if(j == 1) ROS_INFO_STREAM("eqlCoor: " << convertToEquipletCoordinate(newCoor));
+			//if(j == 1) REXOS_INFO_STREAM("newCoor: " << newCoor);
+			//if(j == 1) REXOS_INFO_STREAM("eqlCoor: " << convertToEquipletCoordinate(newCoor));
 			/*if(message.qrCodes[i].value == "GC4x4MB_1") {
-				ROS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
+				REXOS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\toldCoor \t" << oldCoor << "newCoor \t" << newCoor);
 			}*/
 
 			points[j] = Vector2(newCoor.x, newCoor.y);
@@ -126,8 +126,8 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 		Vector2 lineA2B = points[1] - points[0];
 		Vector2 lineB2C = points[2] - points[1];
 		
-		//ROS_DEBUG_STREAM("lineA2B \t" << lineA2B << " length " << lineA2B.length());
-		//ROS_DEBUG_STREAM("lineB2C \t" << lineB2C << " length " << lineB2C.length());
+		//REXOS_DEBUG_STREAM("lineA2B \t" << lineA2B << " length " << lineA2B.length());
+		//REXOS_DEBUG_STREAM("lineB2C \t" << lineB2C << " length " << lineB2C.length());
 		
 		QrCode qrCode;
 		qrCode.location = Vector2(
@@ -140,7 +140,7 @@ void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
 		
 		Vector3 equipletCoor = convertToEquipletCoordinate(Vector3(smoothCenterCoor.location.x, smoothCenterCoor.location.y, 0));
 		/*if(message.qrCodes[i].value == "GC4x4MB_1") {
-			ROS_DEBUG_STREAM("-equipletCoor \t" << equipletCoor);
+			REXOS_DEBUG_STREAM("-equipletCoor \t" << equipletCoor);
 		}*/
 		
 		storeInEnviromentCache(message.qrCodes[i].value, equipletCoor, qrCode.angle);
@@ -181,9 +181,9 @@ PartLocatorNode::QrCode PartLocatorNode::calculateSmoothPos(boost::circular_buff
 }
 
 void PartLocatorNode::detectCorners(const vision_node::QrCodes & message) {
-	ROS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor.location);
-	ROS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor.location);
-	ROS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor.location);
+	REXOS_DEBUG_STREAM("currentTopLeftCoor " << currentTopLeftCoor.location);
+	REXOS_DEBUG_STREAM("currentTopRightCoor " << currentTopRightCoor.location);
+	REXOS_DEBUG_STREAM("currentBottomRightCoor " << currentBottomRightCoor.location);
 	
 	bool updateMatrices = false;
 	for(int i = 0; i < message.qrCodes.size(); i++) {
@@ -232,10 +232,10 @@ double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B) {
 	
 	double angle = actualItemAngle - expectedItemAngle;
 	
-	//ROS_DEBUG_STREAM("-expectedItemAngle \t" << expectedItemAngle);
-	//ROS_DEBUG_STREAM("-actualItemAngle \t" << actualItemAngle);
+	//REXOS_DEBUG_STREAM("-expectedItemAngle \t" << expectedItemAngle);
+	//REXOS_DEBUG_STREAM("-actualItemAngle \t" << actualItemAngle);
 	/*if(message.qrCodes[i].value == "GC4x4MB_1") {
-		ROS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\t-angle \t" << angle);
+		REXOS_DEBUG_STREAM("QrCode " << message.qrCodes[i].value << "\t-angle \t" << angle);
 	}*/
 	return angle;
 }
@@ -268,7 +268,7 @@ void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location
 
 void PartLocatorNode::updateMatrices() {
 	totalMatrix = calculateScaleMatrix() * calculateRotationMatrix() * calculateOffsetMatrix();
-	//ROS_INFO_STREAM("totalMatrix " << totalMatrix);
+	//REXOS_INFO_STREAM("totalMatrix " << totalMatrix);
 	
 }
 Matrix3 PartLocatorNode::calculateOffsetMatrix() {
@@ -279,13 +279,13 @@ Matrix3 PartLocatorNode::calculateOffsetMatrix() {
 	Vector2 lineTl2Tr;
 	lineTl2Tr.x = currentTopRightCoor.location.x - currentTopLeftCoor.location.x;
 	lineTl2Tr.y = currentTopRightCoor.location.y - currentTopLeftCoor.location.y;
-	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
+	REXOS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// line between topRight and bottomRight
 	Vector2 lineTr2Br;
 	lineTr2Br.x = currentBottomRightCoor.location.x - currentTopRightCoor.location.x;
 	lineTr2Br.y = currentBottomRightCoor.location.y - currentTopRightCoor.location.y;
-	ROS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
+	REXOS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
 	
 	// calulate new midpoint by deviding lineTl2Tr and bottomRight and then adding them
 	Vector2 halfLineTl2Tr;
@@ -298,12 +298,12 @@ Matrix3 PartLocatorNode::calculateOffsetMatrix() {
 	Vector2 midPoint;
 	midPoint.x = currentTopLeftCoor.location.x + halfLineTl2Tr.x + halfLineTr2Br.x;
 	midPoint.y = currentTopLeftCoor.location.y + halfLineTl2Tr.y + halfLineTr2Br.y;
-	ROS_DEBUG_STREAM("midpoint " << midPoint);
+	REXOS_DEBUG_STREAM("midpoint " << midPoint);
 	
 	Matrix3 translationMatrix;
 	translationMatrix[2] = -midPoint.x;
 	translationMatrix[5] = -midPoint.y;
-	ROS_DEBUG_STREAM("translationMatrix " << translationMatrix);
+	REXOS_DEBUG_STREAM("translationMatrix " << translationMatrix);
 	
 	return translationMatrix;
 }
@@ -315,7 +315,7 @@ Matrix3 PartLocatorNode::calculateRotationMatrix() {
 	Vector2 lineTl2Tr;
 	lineTl2Tr.x = currentTopRightCoor.location.x - currentTopLeftCoor.location.x;
 	lineTl2Tr.y = currentTopRightCoor.location.y - currentTopLeftCoor.location.y;
-	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
+	REXOS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// the expected vector is horizontal to the left because TR is at the right of TL (eg. walk in this direction to get to TR)
 	Vector2 actualDirection;
@@ -340,10 +340,10 @@ Matrix3 PartLocatorNode::calculateRotationMatrix() {
 	rotationMatrix[1] = -sin(correctionAngle);
 	rotationMatrix[3] = sin(correctionAngle);
 	rotationMatrix[4] = cos(correctionAngle);
-	ROS_DEBUG_STREAM("rotationMatrix " << rotationMatrix);
+	REXOS_DEBUG_STREAM("rotationMatrix " << rotationMatrix);
 
-	ROS_DEBUG_STREAM("actualDirection " << actualDirection);
-	ROS_DEBUG_STREAM("correctionAngle " << correctionAngle);
+	REXOS_DEBUG_STREAM("actualDirection " << actualDirection);
+	REXOS_DEBUG_STREAM("correctionAngle " << correctionAngle);
 	
 	return rotationMatrix;
 }
@@ -355,13 +355,13 @@ Matrix3 PartLocatorNode::calculateScaleMatrix() {
 	Vector2 lineTl2Tr;
 	lineTl2Tr.x = currentTopRightCoor.location.x - currentTopLeftCoor.location.x;
 	lineTl2Tr.y = currentTopRightCoor.location.y - currentTopLeftCoor.location.y;
-	ROS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
+	REXOS_DEBUG_STREAM("lineTl2Tr " << lineTl2Tr);
 	
 	// line between topRight and bottomRight
 	Vector2 lineTr2Br;
 	lineTr2Br.x = currentBottomRightCoor.location.x - currentTopRightCoor.location.x;
 	lineTr2Br.y = currentBottomRightCoor.location.y - currentTopRightCoor.location.y;
-	ROS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
+	REXOS_DEBUG_STREAM("lineTr2Br " << lineTr2Br);
 	
 
 	double workplateWidth = 80;
@@ -369,32 +369,32 @@ Matrix3 PartLocatorNode::calculateScaleMatrix() {
 	Matrix3 scaleMatrix;
 	scaleMatrix[0] = -(	(workplateWidth / 1) / (lineTl2Tr.length()));
 	scaleMatrix[4] = -(	(workplateHeight / 1) / (lineTr2Br.length()));
-	ROS_DEBUG_STREAM("lineTl2Tr.length() " << lineTl2Tr.length());
-	ROS_DEBUG_STREAM("lineTr2Br.length() " << lineTr2Br.length());
-	ROS_DEBUG_STREAM("scaleMatrix " << scaleMatrix);
+	REXOS_DEBUG_STREAM("lineTl2Tr.length() " << lineTl2Tr.length());
+	REXOS_DEBUG_STREAM("lineTr2Br.length() " << lineTr2Br.length());
+	REXOS_DEBUG_STREAM("scaleMatrix " << scaleMatrix);
 	
 	return scaleMatrix;
 }
 
 void PartLocatorNode::run() {
-	ROS_INFO("waiting for camera/qr_codes");
+	REXOS_INFO("waiting for camera/qr_codes");
 	ros::Subscriber sub = nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
 	ros::spin();
 }
 bool PartLocatorNode::transitionInitialize() {
-	ROS_INFO("Initialize transition called");
+	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
 bool PartLocatorNode::transitionDeinitialize() {
-	ROS_INFO("Deinitialize transition called");
+	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
 }
 
 
 bool PartLocatorNode::transitionSetup(){
-	ROS_INFO("Setup transition called");
+	REXOS_INFO("Setup transition called");
 	
 	// @TODO Select either deltarobot or six_axisrobot (defaulted to sixaxis in constructor)
 	//	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
@@ -415,17 +415,17 @@ bool PartLocatorNode::transitionSetup(){
 	requiredMutation.isOptional = false;
 	requiredMutations.push_back(requiredMutation);
 	goal2.requiredMutationsRequiredForNextPhase = requiredMutations;
-	ROS_INFO("SendGoal");
+	REXOS_INFO("SendGoal");
 	transitionActionClient.sendGoal(goal2);
 	transitionActionClient.waitForResult();
 */
 
-	ROS_INFO("Press enter when six-axis has finished calibration");
+	REXOS_INFO("Press enter when six-axis has finished calibration");
 	cin.get();
 	cin.ignore();
 
 
-	ROS_INFO("Continuing calibration");
+	REXOS_INFO("Continuing calibration");
 	
 	double x;
 	double y;
@@ -438,7 +438,7 @@ bool PartLocatorNode::transitionSetup(){
 	rexos_coordinates::Module drModule = rexos_coordinates::Module(&drKnowMod);
 	Vector3 v;
 
-	ROS_INFO("Moving to top left corner");
+	REXOS_INFO("Moving to top left corner");
 	x = 0 - workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
 	z = workSpaceHeight;
@@ -446,20 +446,20 @@ bool PartLocatorNode::transitionSetup(){
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\": "+boost::lexical_cast<std::string>(acceleration) +"} }";
-	ROS_WARN_STREAM(hardwareStep);
+	REXOS_WARN_STREAM(hardwareStep);
 	
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 1;
-	ROS_WARN_STREAM(*goal);
+	REXOS_WARN_STREAM(*goal);
 
 	setInstructionActionClient.sendGoal(*goal);
-	ROS_INFO("enter diff to X");
+	REXOS_INFO("enter diff to X");
 	std::cin >> topLeftOffsetX;
-	ROS_INFO("enter diff to Y");
+	REXOS_INFO("enter diff to Y");
 	std::cin >> topLeftOffsetY;
 	
-	ROS_INFO("Moving to top right corner");
+	REXOS_INFO("Moving to top right corner");
 	x = 0 + workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
 	z = workSpaceHeight;
@@ -467,20 +467,20 @@ bool PartLocatorNode::transitionSetup(){
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
-	ROS_WARN_STREAM(hardwareStep);
+	REXOS_WARN_STREAM(hardwareStep);
 	
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 2;
-	ROS_WARN_STREAM(*goal);
+	REXOS_WARN_STREAM(*goal);
 	
 	setInstructionActionClient.sendGoal(*goal);
-	ROS_INFO("enter diff to X");
+	REXOS_INFO("enter diff to X");
 	std::cin >> topRightOffsetX;
-	ROS_INFO("enter diff to Y");
+	REXOS_INFO("enter diff to Y");
 	std::cin >> topRightOffsetY;
 	
-	ROS_INFO("Moving to bottom right corner");
+	REXOS_INFO("Moving to bottom right corner");
 	x = 0 + workPlaneWidth / 2;
 	y = 0 - workPlaneHeight / 2;
 	z = workSpaceHeight;
@@ -488,17 +488,17 @@ bool PartLocatorNode::transitionSetup(){
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
-	ROS_WARN_STREAM(hardwareStep);
-	ROS_WARN_STREAM(*goal);
+	REXOS_WARN_STREAM(hardwareStep);
+	REXOS_WARN_STREAM(*goal);
 		
 	goal = new rexos_statemachine::SetInstructionGoal();
 	goal->json = hardwareStep;
 	goal->OID = 3;
 	
 	setInstructionActionClient.sendGoal(*goal);
-	ROS_INFO("enter diff to X");
+	REXOS_INFO("enter diff to X");
 	std::cin >> bottomRightOffsetX;
-	ROS_INFO("enter diff to Y");
+	REXOS_INFO("enter diff to Y");
 	std::cin >> bottomRightOffsetY;
 	
 	/*topLeftOffsetX = 0;
@@ -516,14 +516,14 @@ bool PartLocatorNode::transitionSetup(){
 	Vector3 Bproj = Vector3(B.x + topRightOffsetX, B.y + topRightOffsetY, 1);
 	Vector3 Cproj = Vector3(C.x + bottomRightOffsetX, C.y + bottomRightOffsetY, 1);
 	
-	ROS_INFO_STREAM("workPlaneWidth " << workPlaneWidth << " workPlaneHeight " << workPlaneHeight);
-	ROS_INFO_STREAM("A " << A << " B " << B << " C " << C);
-	ROS_INFO_STREAM("Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM("workPlaneWidth " << workPlaneWidth << " workPlaneHeight " << workPlaneHeight);
+	REXOS_INFO_STREAM("A " << A << " B " << B << " C " << C);
+	REXOS_INFO_STREAM("Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	// fancy calulation here
 	// first translate so that A' matches A
-	ROS_INFO_STREAM("x " << -topLeftOffsetX << " y " << -topLeftOffsetY);
+	REXOS_INFO_STREAM("x " << -topLeftOffsetX << " y " << -topLeftOffsetY);
 	
 	Matrix3 postCorrectionTranslationMatrix = Matrix3();
 	postCorrectionTranslationMatrix[2] = -topLeftOffsetX;
@@ -533,9 +533,9 @@ bool PartLocatorNode::transitionSetup(){
 	Bproj = postCorrectionTranslationMatrix * Bproj;
 	Cproj = postCorrectionTranslationMatrix * Cproj;
 	
-	ROS_INFO_STREAM(postCorrectionTranslationMatrix);
-	ROS_INFO_STREAM("translated: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM(postCorrectionTranslationMatrix);
+	REXOS_INFO_STREAM("translated: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	// second rotate so that normalize(A'B') matches normalize(AB)
 	// calulate the angle between A' and B'
@@ -543,7 +543,7 @@ bool PartLocatorNode::transitionSetup(){
 	// calulate the angle between A and B
 	double angleAB = std::atan2(B.y - A.y, B.x - A.x); // should be 0
 	double rotationAngle = angleAB - angleAprojBproj;
-	ROS_INFO_STREAM("angleAprojBproj " << angleAprojBproj << " angleAB " << angleAB << " rotationAngle " << rotationAngle);
+	REXOS_INFO_STREAM("angleAprojBproj " << angleAprojBproj << " angleAB " << angleAB << " rotationAngle " << rotationAngle);
 	
 	Matrix3 postCorrectionRotationMatrix = Matrix3();
 	postCorrectionRotationMatrix[0] = cos(rotationAngle);
@@ -555,9 +555,9 @@ bool PartLocatorNode::transitionSetup(){
 	Bproj = postCorrectionRotationMatrix * Bproj;
 	Cproj = postCorrectionRotationMatrix * Cproj;
 	
-	ROS_INFO_STREAM(postCorrectionRotationMatrix);
-	ROS_INFO_STREAM("rotated: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM(postCorrectionRotationMatrix);
+	REXOS_INFO_STREAM("rotated: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	// third shear so that normalize(B'C') mathces normalize(BC)
 	// calulate the angle between A' and B'
@@ -579,9 +579,9 @@ bool PartLocatorNode::transitionSetup(){
 	Bproj = postCorrectionShearMatrix * Bproj;
 	Cproj = postCorrectionShearMatrix * Cproj;
 	
-	ROS_INFO_STREAM(postCorrectionShearMatrix);
-	ROS_INFO_STREAM("sheared: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM(postCorrectionShearMatrix);
+	REXOS_INFO_STREAM("sheared: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	// fourth scale so that A'B' matches AB and B'C' matches BC
 	Matrix3 postCorrectionScaleMatrix = Matrix3();
@@ -589,22 +589,22 @@ bool PartLocatorNode::transitionSetup(){
 	double scaleY = (C - B).length() / (Cproj - Bproj).length();
 	postCorrectionScaleMatrix[0] = scaleX;
 	postCorrectionScaleMatrix[4] = scaleY;
-	ROS_INFO_STREAM("scaleX: " << scaleX << " scaleY " << scaleY);
+	REXOS_INFO_STREAM("scaleX: " << scaleX << " scaleY " << scaleY);
 	
 	Aproj = postCorrectionScaleMatrix * Aproj;
 	Bproj = postCorrectionScaleMatrix * Bproj;
 	Cproj = postCorrectionScaleMatrix * Cproj;
 	
-	ROS_INFO_STREAM(postCorrectionScaleMatrix);
-	ROS_INFO_STREAM("scale: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM(postCorrectionScaleMatrix);
+	REXOS_INFO_STREAM("scale: Aproj " << Aproj << " Bproj " << Bproj << " Cproj " << Cproj);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	Matrix3 translateToA = Matrix3(1, 0, workPlaneWidth / 2, 0, 1, -workPlaneHeight / 2, 0, 0, 1);
 	Matrix3 translateFromA = Matrix3(1, 0, -workPlaneWidth / 2, 0, 1, workPlaneHeight / 2, 0, 0, 1);
 	
-	ROS_INFO_STREAM(translateToA);
-	ROS_INFO_STREAM(translateFromA);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM(translateToA);
+	REXOS_INFO_STREAM(translateFromA);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	/*postCorrectionTotalMatrix = postCorrectionTranslationMatrix * postCorrectionRotationMatrix * 
 			postCorrectionShearMatrix * postCorrectionScaleMatrix;*/
@@ -612,69 +612,69 @@ bool PartLocatorNode::transitionSetup(){
 			postCorrectionShearMatrix * postCorrectionRotationMatrix * 
 			postCorrectionTranslationMatrix * translateToA;
 	
-	ROS_INFO_STREAM(postCorrectionTotalMatrix);
+	REXOS_INFO_STREAM(postCorrectionTotalMatrix);
 
-	ROS_INFO_STREAM("result: A " << A << "	->	 " << postCorrectionTotalMatrix * A);
-	ROS_INFO_STREAM("A " << A);
-	ROS_INFO_STREAM("A " << translateToA * A);
-	ROS_INFO_STREAM("A " << postCorrectionTranslationMatrix * translateToA * A);
-	ROS_INFO_STREAM("A " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
-	ROS_INFO_STREAM("A " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
-	ROS_INFO_STREAM("A " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
-	ROS_INFO_STREAM("A " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
-	ROS_INFO_STREAM("result: B " << B << "	->	 " << postCorrectionTotalMatrix * B);
-	ROS_INFO_STREAM("B " << B);
-	ROS_INFO_STREAM("B " << translateToA * B);
-	ROS_INFO_STREAM("B " << postCorrectionTranslationMatrix * translateToA * B);
-	ROS_INFO_STREAM("B " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
-	ROS_INFO_STREAM("B " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
-	ROS_INFO_STREAM("B " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
-	ROS_INFO_STREAM("B " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
-	ROS_INFO_STREAM("result: C " << C << "	->	 " << postCorrectionTotalMatrix * C);
-	ROS_INFO_STREAM("C " << C);
-	ROS_INFO_STREAM("C " << translateToA * C);
-	ROS_INFO_STREAM("C " << postCorrectionTranslationMatrix * translateToA * C);
-	ROS_INFO_STREAM("C " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
-	ROS_INFO_STREAM("C " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
-	ROS_INFO_STREAM("C " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
-	ROS_INFO_STREAM("C " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM("result: A " << A << "	->	 " << postCorrectionTotalMatrix * A);
+	REXOS_INFO_STREAM("A " << A);
+	REXOS_INFO_STREAM("A " << translateToA * A);
+	REXOS_INFO_STREAM("A " << postCorrectionTranslationMatrix * translateToA * A);
+	REXOS_INFO_STREAM("A " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
+	REXOS_INFO_STREAM("A " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
+	REXOS_INFO_STREAM("A " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
+	REXOS_INFO_STREAM("A " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * A);
+	REXOS_INFO_STREAM("result: B " << B << "	->	 " << postCorrectionTotalMatrix * B);
+	REXOS_INFO_STREAM("B " << B);
+	REXOS_INFO_STREAM("B " << translateToA * B);
+	REXOS_INFO_STREAM("B " << postCorrectionTranslationMatrix * translateToA * B);
+	REXOS_INFO_STREAM("B " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
+	REXOS_INFO_STREAM("B " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
+	REXOS_INFO_STREAM("B " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
+	REXOS_INFO_STREAM("B " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * B);
+	REXOS_INFO_STREAM("result: C " << C << "	->	 " << postCorrectionTotalMatrix * C);
+	REXOS_INFO_STREAM("C " << C);
+	REXOS_INFO_STREAM("C " << translateToA * C);
+	REXOS_INFO_STREAM("C " << postCorrectionTranslationMatrix * translateToA * C);
+	REXOS_INFO_STREAM("C " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
+	REXOS_INFO_STREAM("C " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
+	REXOS_INFO_STREAM("C " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
+	REXOS_INFO_STREAM("C " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
 	
 	/*double x = 0 + workPlaneWidth / 2;
 	double y = 0 - workPlaneHeight / 2;
 	Vector3 v = Vector3(x, y, 1);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v.z = -15;
 	v = convertToEquipletCoordinate(v);
-	ROS_INFO_STREAM(v);*/
+	REXOS_INFO_STREAM(v);*/
 	
 	
 	x = 0 + workPlaneWidth / 2;
 	y = 0 - workPlaneHeight / 2;
 	v = Vector3(x, y, 1);
-	ROS_WARN_STREAM("--------------------------------------------------------------");
-	ROS_INFO_STREAM("v " << v);
-	ROS_INFO_STREAM("v " << translateToA * v);
-	ROS_INFO_STREAM("v " << postCorrectionTranslationMatrix * translateToA * v);
-	ROS_INFO_STREAM("v " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
-	ROS_INFO_STREAM("v " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
-	ROS_INFO_STREAM("v " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
-	ROS_INFO_STREAM("v " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
+	REXOS_WARN_STREAM("--------------------------------------------------------------");
+	REXOS_INFO_STREAM("v " << v);
+	REXOS_INFO_STREAM("v " << translateToA * v);
+	REXOS_INFO_STREAM("v " << postCorrectionTranslationMatrix * translateToA * v);
+	REXOS_INFO_STREAM("v " << postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
+	REXOS_INFO_STREAM("v " << postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
+	REXOS_INFO_STREAM("v " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
+	REXOS_INFO_STREAM("v " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
 	
 	
-	ROS_INFO("Moving to top left corner");
+	REXOS_INFO("Moving to top left corner");
 	x = 0 - workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
 	v = Vector3(x, y, 1);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v.z = workSpaceHeight;
 	v = convertToEquipletCoordinate(v);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 	
@@ -683,21 +683,21 @@ bool PartLocatorNode::transitionSetup(){
 	goal->OID = 1;
 	setInstructionActionClient.sendGoal(*goal);
 	// @TODO this might be removed?
-	ROS_INFO("Press enter when ready");
+	REXOS_INFO("Press enter when ready");
 	cin.get();
 	cin.ignore();
 	
-	ROS_INFO("Moving to top right corner");
+	REXOS_INFO("Moving to top right corner");
 	x = 0 + workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
 	v = Vector3(x, y, 1);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v.z = workSpaceHeight;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = convertToEquipletCoordinate(v);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 	
@@ -706,21 +706,21 @@ bool PartLocatorNode::transitionSetup(){
 	goal->OID = 2;
 	setInstructionActionClient.sendGoal(*goal);
 	// @TODO this might be removed?
-	ROS_INFO("Press enter when ready");
+	REXOS_INFO("Press enter when ready");
 	cin.get();
 	cin.ignore();
 	
-	ROS_INFO("Moving to bottom right corner");
+	REXOS_INFO("Moving to bottom right corner");
 	x = 0 + workPlaneWidth / 2;
 	y = 0 - workPlaneHeight / 2;
 	v = Vector3(x, y, 1);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v.z = workSpaceHeight; //Changed from -15 to -10
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = convertToEquipletCoordinate(v);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
 		
@@ -731,17 +731,17 @@ bool PartLocatorNode::transitionSetup(){
 	
 	
 	
-	ROS_INFO("Moving orign");
+	REXOS_INFO("Moving orign");
 	x = 0;
 	y = 0;
 	v = Vector3(x, y, 1);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = postCorrectionTotalMatrix * v;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v.z = workSpaceHeight;
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = convertToEquipletCoordinate(v);
-	ROS_INFO_STREAM(v);
+	REXOS_INFO_STREAM(v);
 	v = drModule.convertToModuleCoordinate(v);
 	
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
@@ -754,22 +754,22 @@ bool PartLocatorNode::transitionSetup(){
 	
 	
 	// @TODO this might be removed?
-	ROS_INFO("Press enter when ready");
+	REXOS_INFO("Press enter when ready");
 	cin.get();
 	cin.ignore();
 	
 	return true;
 }
-bool PartLocatorNode::transitionShutdown(){
-	ROS_INFO("Shutdown transition called");
+bool PartLocatorNode::transitionShutdown() {
+	REXOS_INFO("Shutdown transition called");
 	return true;
 }
-bool PartLocatorNode::transitionStart(){
-	ROS_INFO("Start transition called");
+bool PartLocatorNode::transitionStart() {
+	REXOS_INFO("Start transition called");
 	return true;
 }
-bool PartLocatorNode::transitionStop(){
-	ROS_INFO("Stop transition called");
+bool PartLocatorNode::transitionStop() {
+	REXOS_INFO("Stop transition called");
 	return true;
 }
 
@@ -777,26 +777,26 @@ int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "part_locator_node");
 	
 	if(argc < 5){
-		ROS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
+		REXOS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
 		return -1;
 	}
 	for(int i=0; i<argc; i++)
-		std::cout << argv[i] << i << " " << std::endl;
+		REXOS_INFO_STREAM(argv[i] << i << " " << std::endl);
 		
 	// @TODO check if valid identifier
 	std::string eqIdentifier;	
 	if(argc >= 5) {
-		std::cout << "Setting equipletIdentifier to " << argv[5] << std::endl;
+		REXOS_INFO_STREAM("Setting equipletIdentifier to " << argv[5] << std::endl);
 		eqIdentifier = argv[5];
 	} else {
-		std::cout << "Setting equipletIdentifier default \"six_axis_type_A\"" << std::endl;
+		REXOS_INFO_STREAM("Setting equipletIdentifier default \"six_axis_type_A\"" << std::endl);
 		eqIdentifier = "six_axis_type_A"; // Default to something...
 	}
 	
 	std::string equipletName = argv[1]; // = EQ3
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
 
-	ROS_INFO("Creating PartLocatorNode");
+	REXOS_INFO("Creating PartLocatorNode");
 	PartLocatorNode node(equipletName, moduleIdentifier, eqIdentifier);
 	node.run();
 	

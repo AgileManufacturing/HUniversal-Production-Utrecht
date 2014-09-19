@@ -9,7 +9,7 @@
  *
  * @section LICENSE
  * License: newBSD
- *
+ * 
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -64,7 +64,7 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(std::string equipletName
 	lastY(0.0),
 	lastZ(0.0)
 {
-	ROS_INFO("DeltaRobotnode Constructor entering...");
+	REXOS_INFO("DeltaRobotnode Constructor entering...");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
@@ -81,29 +81,27 @@ deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(std::string equipletName
 	}
 
 	Json::StyledWriter writer;
-	ROS_INFO("%s", writer.write(jsonNode).c_str());
+	REXOS_INFO("%s", writer.write(jsonNode).c_str());
 
 	// Create a deltarobot
 	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 
 	setInstructionActionServer.start();
 
-	ROS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " <<
+	REXOS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " <<
 	                moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() <<
 	                "/set_instruction");
 }
 
 
 
-deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode()
-{
+deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
 	delete deltaRobot;
 }
 
 
-void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal)
-{
-	ROS_INFO_STREAM("parsing hardwareStep: " << goal->json);
+void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal) {
+	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
@@ -111,7 +109,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	
 	rexos_statemachine::SetInstructionResult result;
 	result.OID = goal->OID;
-
+	
 	Vector4 origin;
 	// the rotation of the axis of the tangent space against the normal space in radians
 	double rotationX, rotationY, rotationZ = 0;
@@ -134,7 +132,6 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 		}
 		case rexos_datatypes::OriginPlacement::RELATIVE_TO_CURRENT_POSITION: {
 			// set the origin to the current position of the effector
-			// TODO get rid of Point3D
 			origin.set(deltaRobot->getEffectorLocation().x, deltaRobot->getEffectorLocation().y, deltaRobot->getEffectorLocation().z, 1);
 			break;
 		}
@@ -167,7 +164,7 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	// get the max acceleration
 	double maxAcceleration;
 	if(moveCommand.isMember("maxAcceleration") == false) {
-		ROS_WARN("move command does not contain maxAcceleration, assuming ");
+		REXOS_WARN("move command does not contain maxAcceleration, assuming ");
 		maxAcceleration = 50.0;
 	} else {
 		maxAcceleration = moveCommand["maxAcceleration"].asDouble();
@@ -181,13 +178,14 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
 	
 	Vector4 targetVector = origin + rotationMatrix * offsetVector;
 	
-	ROS_INFO_STREAM("moving from " << deltaRobot->getEffectorLocation() << " to " << targetVector);
+	REXOS_INFO_STREAM("moving from " << deltaRobot->getEffectorLocation() << " to " << targetVector);
 
+  	// finally move to point
 	if(moveToPoint(targetVector.x, targetVector.y, targetVector.z, maxAcceleration))
 	{
 		setInstructionActionServer.setSucceeded(result);
 	} else {
-		ROS_WARN("Failed moving to point");
+		REXOS_WARN("Failed moving to point");
 		setInstructionActionServer.setAborted(result);
 	}
 }
@@ -199,10 +197,9 @@ void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_state
  *
  * @return true if the calibration was successful else false
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate()
-{
+bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate() {
 	if(!deltaRobot->calibrateMotors()) {
-		ROS_ERROR("Calibration FAILED. EXITING.");
+		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
 	}
 	return true;
@@ -215,11 +212,10 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate()
  * @param y destination y-coordinate
  * @param z destination z-coordinate
  * @param maxAcceleration maximum acceleration
- *
+ * 
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, double z, double maxAcceleration)
-{
+bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, double z, double maxAcceleration) {
 	Vector3 oldLocation(deltaRobot->getEffectorLocation());
 	Vector3 newLocation(x,y,z);
 
@@ -231,16 +227,13 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, do
 }
 
 
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize()
-{
-	ROS_INFO("Initialize transition called");
-
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize() {
+	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize()
-{
-	ROS_INFO("Deinitialize transition called");
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize() {
+	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
 }
@@ -249,21 +242,20 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize()
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup()
-{
-	ROS_INFO("Setup transition called");
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
+	REXOS_INFO("Setup transition called");
 	// Generate the effector boundaries with voxel size 2
 	deltaRobot->generateBoundaries(2);
 	// Power on the deltarobot and calibrate the motors.
 	deltaRobot->powerOn();
 	// Calibrate the motors
 	if(!deltaRobot->calibrateMotors()) {
-		ROS_ERROR("Calibration FAILED. EXITING.");
+		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
 	} else {
 		rexos_statemachine::TransitionGoal goal;
 		goal.gainedSupportedMutations.push_back("move");
-
+		
 		transitionActionClient.sendGoal(goal);
 		return true;
 	}
@@ -274,9 +266,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup()
  * Will turn power off the motor
  * @return will be 0 if everything went ok else error
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown()
-{
-	ROS_INFO("Shutdown transition called");
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
+	REXOS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	deltaRobot->powerOff();
 	return true;
@@ -286,9 +277,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown()
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStart()
-{
-	ROS_INFO("Start transition called");
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
+	REXOS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
 	return true;
 }
@@ -296,9 +286,8 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStart()
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStop()
-{
-	ROS_INFO("Stop transition called");
+bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
+	REXOS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
 	return true;
 	// Go to base (Motors on 0 degrees)
@@ -308,19 +297,18 @@ bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStop()
 /**
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	ros::init(argc, argv, NODE_NAME);
-
-	if(argc < 5) {
-		ROS_ERROR("Usage: delta_robot_node equipletName manufacturer typeNumber serialNumber");
+	
+	if(argc < 5){
+		REXOS_ERROR("Usage: delta_robot_node equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
-
+	
 	std::string equipletName = argv[1];
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
-
-	ROS_INFO("Creating DeltaRobotNode");
+	
+	REXOS_INFO("Creating DeltaRobotNode");
 	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletName, moduleIdentifier);
 
 	ros::spin();

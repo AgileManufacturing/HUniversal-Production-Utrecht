@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "rexos_logger/rexos_logger.h"
 
 #include <rexos_knowledge_database/ModuleType.h>
 #include <rexos_knowledge_database/ModuleIdentifier.h>

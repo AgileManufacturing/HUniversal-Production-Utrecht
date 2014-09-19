@@ -35,6 +35,11 @@
 
 namespace rexos_datatypes{
 
+    EquipletStep::EquipletStep() :
+			moduleIdentifier("", "", "") // shut up the complaining compiler. TODO: nicer solution
+	{
+    }
+
     EquipletStep::EquipletStep(Json::Value n) :
 			moduleIdentifier("", "", "") // shut up the complaining compiler. TODO: nicer solution
 	{

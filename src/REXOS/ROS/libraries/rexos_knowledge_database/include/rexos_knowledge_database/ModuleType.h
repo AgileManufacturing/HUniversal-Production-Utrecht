@@ -39,6 +39,7 @@
 #include <rexos_knowledge_database/TransitionPhase.h>
 
 #include "mysql_connection.h"
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_knowledge_database {
 	class ModuleType{

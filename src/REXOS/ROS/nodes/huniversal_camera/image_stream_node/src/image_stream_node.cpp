@@ -36,7 +36,7 @@
 
 ImageStreamNode::ImageStreamNode(int argc, char * argv[]) : imageTransport(nodeHandle) {
 	if(argc != 2){
-		std::cout << "Usage: image_stream_node <pathToImageFile>" << std::endl;
+		REXOS_INFO_STREAM("Usage: image_stream_node <pathToImageFile>" << std::endl);
 		exit(-1);
 	}
 	pathToImageFile = argv[1];
@@ -67,15 +67,15 @@ void ImageStreamNode::run() {
 	
 	
 	
-std::cout << "a" << std::endl;
+REXOS_INFO_STREAM("a" << std::endl);
 	
 	
 cv::Mat img = cv::imread(pathToImageFile, CV_LOAD_IMAGE_GRAYSCALE);
-std::cout << "b" << std::endl;
+REXOS_INFO_STREAM("b" << std::endl);
 
 //create a CLAHE object (Arguments are optional).
 cv::CLAHE* clahe = cv::createCLAHE(4.0, cv::Size(8, 8));
-std::cout << "clahe ptr: " << (long) clahe << std::endl;
+REXOS_INFO_STREAM("clahe ptr: " << (long) clahe << std::endl);
 //clahe->setClipLimit(4.0);
 
 clahe->apply(img, dst);
@@ -86,7 +86,7 @@ clahe->apply(img, dst);
 	
 
 	/*if(img == 0){
-		ROS_ERROR("Loading image failed");
+		REXOS_ERROR("Loading image failed");
 		exit(-2);
 	}*//*
 	while(ros::ok()) {
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
 	
 	ImageStreamNode isn(argc, argv);
 
-	std::cout << "[DEBUG] Advertising services" << std::endl;
+	//std::cout << "[DEBUG] Advertising services" << std::endl;
 	ros::NodeHandle nodeHandle;
 
 

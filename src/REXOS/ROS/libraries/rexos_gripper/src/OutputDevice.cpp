@@ -45,9 +45,9 @@ namespace rexos_gripper {
 	}
 	void OutputDevice::readJSONNode(const Json::Value node) {
 		address = node["modbusAddress"].asInt();
-		ROS_INFO_STREAM("found modbusAddress " << address);
+		REXOS_INFO_STREAM("found modbusAddress " << address);
 		pin = node["modbusDevicePin"].asInt();
-		ROS_INFO_STREAM("found modbusDevicePin " << pin);
+		REXOS_INFO_STREAM("found modbusDevicePin " << pin);
 	}
 	
 	/*OutputDevice::OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin) :

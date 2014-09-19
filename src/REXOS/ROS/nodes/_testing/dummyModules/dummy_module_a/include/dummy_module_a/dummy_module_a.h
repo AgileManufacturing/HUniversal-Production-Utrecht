@@ -36,6 +36,8 @@
 
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
+#include "rexos_logger/rexos_logger.h"
+
 
 class DummyModuleA : public rexos_knowledge_database::Module,
 		public rexos_statemachine::ModuleStateMachine {

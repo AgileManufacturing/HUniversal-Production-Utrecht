@@ -31,6 +31,7 @@
 #define IMAGESTREAMNODE_H
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <opencv/cvwimage.h>
 #include <cv_bridge/cv_bridge.h>

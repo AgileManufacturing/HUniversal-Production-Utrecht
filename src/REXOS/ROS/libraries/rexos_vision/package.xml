@@ -11,6 +11,9 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rexos_datatypes</build_depend>
   <run_depend>rexos_datatypes</run_depend>
+
+  <build_depend>rexos_logger</build_depend>
+  <run_depend>rexos_logger</run_depend>
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_vision"/>
   </export>

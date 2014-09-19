@@ -30,6 +30,7 @@
 
 #include <rexos_gripper/OutputDevice.h>
 #include <boost/thread.hpp>
+#include "rexos_logger/rexos_logger.h"
 
 #include <jsoncpp/json/value.h>
 

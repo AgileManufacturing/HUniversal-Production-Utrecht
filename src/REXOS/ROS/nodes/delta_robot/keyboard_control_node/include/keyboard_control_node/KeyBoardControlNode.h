@@ -34,6 +34,8 @@
 #include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_datatypes/InstructionData.h>
+#include "rexos_logger/rexos_logger.h"
+#include <vectors/Vectors.h>
 
 namespace keyboard_control_node {
 
@@ -46,16 +48,13 @@ namespace keyboard_control_node {
 		private:
 		void readInputFromKeyBoard(int inputCharacter);
 		void run();
-		void writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration);
-		float currentXPos;
-		float currentYPos;
-		float currentZPos;
+		void writeToBlackBoard(Vector3 direction, double acceleration);
 		
 		/**
 		 * @var double maxAcceleration
 		 * The maxAcceleration of the effector in millimeters per second.
 		 **/
-		std::string maxAcceleration;
+		double maxAcceleration;
 		/**
 		 * @var char KEYCODE_UP
 		 * The ascii representation of the up key on the keyboard.
@@ -120,10 +119,8 @@ namespace keyboard_control_node {
 		 * A terminal interface data struct.
 		 **/
 		struct termios oldTerminalSettings, newTerminalSettings;
-		Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
+		Blackboard::BlackboardCppClient* equipletStepBlackboardClient;
 		char inputCharacter;
-		rexos_datatypes::InstructionData * instructionData;
-
 	};
 
 }

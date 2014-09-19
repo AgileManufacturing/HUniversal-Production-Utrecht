@@ -37,11 +37,11 @@ ModuleProxy::ModuleProxy(std::string equipletName, rexos_knowledge_database::Mod
 	
 	transitionActionServer.start();
 	
-	ROS_INFO_STREAM("Setting state action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/change_state");
-	ROS_INFO_STREAM("Setting mode action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/change_mode");
-	ROS_INFO_STREAM("Setting instruction action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/set_instruction");
-	ROS_INFO_STREAM("Setting state update server: " << equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
-	ROS_INFO_STREAM("Setting mode update server: " << equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
+	REXOS_INFO_STREAM("Setting state action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/change_state");
+	REXOS_INFO_STREAM("Setting mode action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/change_mode");
+	REXOS_INFO_STREAM("Setting instruction action client: " << equipletNamespaceName + "/" + moduleNamespaceName << "/set_instruction");
+	REXOS_INFO_STREAM("Setting state update server: " << equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
+	REXOS_INFO_STREAM("Setting mode update server: " << equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
 	
 
 }
@@ -68,13 +68,11 @@ void ModuleProxy::setModuleProxyListener(ModuleProxyListener* mpl){
 }
 
 void ModuleProxy::changeState(rexos_statemachine::State state) {
-	ROS_INFO("ModuleProxy of %s send new state goal %s", moduleIdentifier.toString().c_str(), rexos_statemachine::state_txt[state]);
-	ROS_INFO_STREAM("state " << rexos_statemachine::state_txt[state] << " " << rexos_statemachine::state_txt[getCurrentState()]);
-	ROS_INFO("a");
+	REXOS_INFO("ModuleProxy of %s send new state goal %s", moduleIdentifier.toString().c_str(), rexos_statemachine::state_txt[state]);
+	REXOS_INFO_STREAM("state " << rexos_statemachine::state_txt[state] << " " << rexos_statemachine::state_txt[getCurrentState()]);
+	
 	if(state == rexos_statemachine::State::STATE_SAFE && getCurrentState() == rexos_statemachine::State::STATE_OFFLINE) {
-	ROS_INFO("b");
 		if(connectedWithNode == false) {
-	ROS_INFO("c");
 			ros::ServiceClient spanNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
 			ROS_INFO_STREAM("Spawning node for " << moduleIdentifier);
 			node_spawner_node::spawnNode spawnNodeCall;
@@ -84,30 +82,25 @@ void ModuleProxy::changeState(rexos_statemachine::State state) {
 			spanNodeClient.call(spawnNodeCall);
 			
 			// wait for the node to come online
-	ROS_INFO("d");
 			if(connectedWithNode == false) {
-	ROS_INFO("e");
 				boost::unique_lock<boost::mutex> lock(nodeStartupMutex);
 				nodeStartupCondition.wait(lock);
 			}
 		} else {
-			ROS_WARN("Node has already been stated, which is not expected (did someone manually start this node?)");
+			REXOS_WARN("Node has already been stated, which is not expected (did someone manually start this node?)");
 		}
 	}
 	
-	ROS_INFO("f");
 	desiredState = state;
 	
 	rexos_statemachine::ChangeStateGoal goal;
 	goal.desiredState = desiredState;
 	changeStateActionClient.waitForServer();
-	ROS_INFO("g");
 	changeStateActionClient.sendGoal(goal);
-	ROS_INFO("h");
 }
 
 void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
-	ROS_INFO("ModuleProxy of %s send new mode goal %s", moduleIdentifier.toString().c_str(), rexos_statemachine::mode_txt[mode]);
+	REXOS_INFO("ModuleProxy of %s send new mode goal %s", moduleIdentifier.toString().c_str(), rexos_statemachine::mode_txt[mode]);
 	rexos_statemachine::ChangeModeGoal goal;
 	goal.desiredMode = mode;
 	changeModeActionClient.sendGoal(goal);
@@ -136,7 +129,7 @@ void ModuleProxy::goToNextTransitionPhase() {
 }
 
 bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpdateResponse &res){
-	//ROS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
+	//REXOS_INFO("ModuleProxy of %s received state change to %s", moduleNodeName.c_str(), rexos_statemachine::state_txt[currentState]);
 
 	rexos_statemachine::State previousState = currentState;
 	currentState = static_cast<rexos_statemachine::State>(req.state);
@@ -149,7 +142,7 @@ bool ModuleProxy::onStateChangeServiceCallback(StateUpdateRequest &req, StateUpd
 }
 
 bool ModuleProxy::onModeChangeServiceCallback(ModeUpdateRequest &req, ModeUpdateResponse &res){
-	//ROS_INFO("ModuleProxy of %s received mode change to %s", moduleNodeName.c_str(), rexos_statemachine::Mode_txt[currentMode]);
+	//REXOS_INFO("ModuleProxy of %s received mode change to %s", moduleNodeName.c_str(), rexos_statemachine::Mode_txt[currentMode]);
 
 	rexos_statemachine::Mode previousMode = currentMode;
 	currentMode = static_cast<rexos_statemachine::Mode>(req.mode);
@@ -170,7 +163,7 @@ void ModuleProxy::onInstructionServiceCallback(const actionlib::SimpleClientGoal
 }
 
 void ModuleProxy::onModuleTransitionGoalCallback(const rexos_statemachine::TransitionGoalConstPtr& goal) {
-	ROS_INFO("Recieved a goal call");
+	REXOS_INFO("Recieved a goal call");
 	std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations;
 	for(int i = 0; i < goal->gainedSupportedMutations.size(); i++) {
 		rexos_knowledge_database::SupportedMutation supportedMutation(
@@ -188,16 +181,16 @@ void ModuleProxy::onModuleTransitionGoalCallback(const rexos_statemachine::Trans
 	boost::unique_lock<boost::mutex> lock(transitionPhaseMutex);
 	while(allowedToContinue == false) transitionPhaseCondition.wait(lock);
 	allowedToContinue = false;
-	ROS_WARN("Leaving method");
+	REXOS_WARN("Leaving method");
 }
 
 void ModuleProxy::onBondCallback(rexos_bond::Bond* bond, Event event){
 	if(event == FORMED) {
-		ROS_INFO("Bond has been formed");
+		REXOS_INFO("Bond has been formed");
 		connectedWithNode = true;
 		nodeStartupCondition.notify_one();
 	} else {
-		ROS_WARN("Bond has been broken");
+		REXOS_WARN("Bond has been broken");
 		moduleProxyListener->onModuleDied(this);
 		connectedWithNode = false;
 		delete bond;
@@ -205,7 +198,7 @@ void ModuleProxy::onBondCallback(rexos_bond::Bond* bond, Event event){
 	}
 }
 void ModuleProxy::bind() {
-	ROS_INFO_STREAM("binding B on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
+	REXOS_INFO_STREAM("binding B on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
 	bond = new rexos_bond::Bond(equipletNamespaceName + "/bond", moduleNamespaceName, this);
 	bond->start();
 }

@@ -4,7 +4,7 @@ project(delta_robot_test)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS delta_robot_node)
+find_package(catkin REQUIRED COMPONENTS delta_robot_node rexos_logger)
 
 
 
@@ -17,8 +17,8 @@ find_package(catkin REQUIRED COMPONENTS delta_robot_node)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   #INCLUDE_DIRS include
-  LIBRARIES delta_robot_test
-  CATKIN_DEPENDS delta_robot_node
+  LIBRARIES delta_robot_test rexos_logger
+  CATKIN_DEPENDS delta_robot_node rexos_logger
 )
 
 ###########

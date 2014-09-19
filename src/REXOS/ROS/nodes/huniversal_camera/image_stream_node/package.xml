@@ -27,6 +27,9 @@
 
   <build_depend>cv_bridge</build_depend>
   <run_depend>cv_bridge</run_depend>
+
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
   <export>
   </export>
 </package>

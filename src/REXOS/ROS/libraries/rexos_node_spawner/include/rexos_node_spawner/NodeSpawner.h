@@ -33,6 +33,7 @@
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_node_spawner{
 	class NodeSpawner{

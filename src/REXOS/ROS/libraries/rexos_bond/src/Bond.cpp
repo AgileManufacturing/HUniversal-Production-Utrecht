@@ -88,7 +88,7 @@ Bond::~Bond()
   breakBond();
   if (!waitUntilBroken(ros::Duration(1.0)))
   {
-    ROS_DEBUG("Bond failed to break on destruction %s (%s)", id_.c_str(), instance_id_.c_str());
+    REXOS_DEBUG("Bond failed to break on destruction %s (%s)", id_.c_str(), instance_id_.c_str());
   }
 
   // Must destroy the subscription before locking mutex_: shutdown()
@@ -111,7 +111,7 @@ Bond::~Bond()
 void Bond::setConnectTimeout(double dur)
 {
   if (started_) {
-    ROS_ERROR("Cannot set timeouts after calling start()");
+    REXOS_ERROR("Cannot set timeouts after calling start()");
     return;
   }
 
@@ -122,7 +122,7 @@ void Bond::setConnectTimeout(double dur)
 void Bond::setDisconnectTimeout(double dur)
 {
   if (started_) {
-    ROS_ERROR("Cannot set timeouts after calling start()");
+    REXOS_ERROR("Cannot set timeouts after calling start()");
     return;
   }
 
@@ -133,7 +133,7 @@ void Bond::setDisconnectTimeout(double dur)
 void Bond::setHeartbeatTimeout(double dur)
 {
   if (started_) {
-    ROS_ERROR("Cannot set timeouts after calling start()");
+    REXOS_ERROR("Cannot set timeouts after calling start()");
     return;
   }
 
@@ -144,7 +144,7 @@ void Bond::setHeartbeatTimeout(double dur)
 void Bond::setHeartbeatPeriod(double dur)
 {
   if (started_) {
-    ROS_ERROR("Cannot set timeouts after calling start()");
+    REXOS_ERROR("Cannot set timeouts after calling start()");
     return;
   }
 
@@ -154,7 +154,7 @@ void Bond::setHeartbeatPeriod(double dur)
 void Bond::setCallbackQueue(ros::CallbackQueueInterface *queue)
 {
   if (started_) {
-    ROS_ERROR("Cannot set callback queue after calling start()");
+    REXOS_ERROR("Cannot set callback queue after calling start()");
     return;
   }
 
@@ -264,7 +264,7 @@ void Bond::onHeartbeatTimeout()
   bool disable_heartbeat_timeout;
   nh_.param(bond::Constants::DISABLE_HEARTBEAT_TIMEOUT_PARAM, disable_heartbeat_timeout, false);
   if (disable_heartbeat_timeout) {
-    ROS_WARN("Heartbeat timeout is disabled.  Not breaking bond (topic: %s, id: %s)",
+    REXOS_WARN("Heartbeat timeout is disabled.  Not breaking bond (topic: %s, id: %s)",
              topic_.c_str(), id_.c_str());
     return;
   }
@@ -295,7 +295,7 @@ void Bond::bondStatusCB(const bond::Status::ConstPtr &msg)
       if (sister_instance_id_.empty())
         sister_instance_id_ = msg->instance_id;
       if (sister_instance_id_ != msg->instance_id) {
-        ROS_ERROR("More than two locations are trying to use a single bond (topic: %s, id: %s).  "
+        REXOS_ERROR("More than two locations are trying to use a single bond (topic: %s, id: %s).  "
                   "You should only instantiate at most two bond instances for each (topic, id) pair.",
                   topic_.c_str(), id_.c_str());
         return;

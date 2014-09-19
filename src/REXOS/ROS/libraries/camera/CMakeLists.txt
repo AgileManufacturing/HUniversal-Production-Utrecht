@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(camera)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED rexos_logger)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(Boost REQUIRED COMPONENTS)
 find_package(Unicap REQUIRED COMPONENTS)
@@ -10,8 +10,8 @@ find_package(Unicap REQUIRED COMPONENTS)
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include ${UNICAP_INCLUDE_DIRS}
-LIBRARIES camera
-CATKIN_DEPENDS 
+LIBRARIES camera rexos_logger
+CATKIN_DEPENDS rexos_logger
 DEPENDS OpenCV Boost Unicap)
 
 MESSAGE(hoi: ${UNICAP_INCLUDE_DIRS})

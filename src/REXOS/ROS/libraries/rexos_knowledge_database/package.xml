@@ -10,6 +10,9 @@
 	<author email="koenbraham@gmail.com">KBraham</author>
 	<buildtool_depend>catkin</buildtool_depend>
 	
+	<build_depend>rexos_logger</build_depend>
+	<run_depend>rexos_logger</run_depend>
+	
 	<export>
 		<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_utilities"/>
 	</export>

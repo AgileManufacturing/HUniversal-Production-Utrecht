@@ -44,7 +44,7 @@
 #include <iostream>
 
 QrCodeReader::QrCodeReader(ros::NodeHandle& nodeHandle, image_transport::ImageTransport& imageTransport) {
-	ROS_INFO("Advertising topic");
+	REXOS_INFO("Advertising topic");
 	qrCodesPublisher = nodeHandle.advertise<vision_node::QrCodes>("camera/qr_codes", 10);
 	debugImagePublisher = imageTransport.advertise("camera/qr_debug_image", 1);
 }
@@ -55,7 +55,7 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	
 	qrCodeDetector.detectQRCodes(frame, qrCodes);
 	
-	ROS_DEBUG_STREAM("QrCodes detected=" << qrCodes.size());
+	REXOS_DEBUG_STREAM("QrCodes detected=" << qrCodes.size());
 	for(int i = 0; i < qrCodes.size(); i++){
 		vision_node::QrCode qrCode;
 		qrCode.value = qrCodes[i].name;
@@ -79,7 +79,7 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 		
 		message.qrCodes.push_back(qrCode);
 	
-		ROS_INFO_STREAM("QR-code\tpointA = " << pointA << " pointB = " << pointB << " pointC = " << pointC << "Value = " << qrCode.value);
+		REXOS_INFO_STREAM("QR-code\tpointA = " << pointA << " pointB = " << pointB << " pointC = " << pointC << "Value = " << qrCode.value);
 	}
 	if(debugFrame != NULL && debugImagePublisher.getNumSubscribers() != 0){
 		// we are changing the image, so we need a copy

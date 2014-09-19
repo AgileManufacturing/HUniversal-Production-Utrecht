@@ -38,6 +38,7 @@
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_stewart_gough/SixAxisCalculations.h>
 #include <jsoncpp/json/value.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 

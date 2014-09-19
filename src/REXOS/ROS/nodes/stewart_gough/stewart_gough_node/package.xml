@@ -36,6 +36,8 @@
 	<run_depend>rexos_stewart_gough</run_depend>
 	<build_depend>rexos_coordinates</build_depend>
 	<run_depend>rexos_coordinates</run_depend>
+	<build_depend>rexos_logger</build_depend>
+	<run_depend>rexos_logger</run_depend>
 	
 	<export>
 		<cpp cflags="-I${prefix}/include"/>

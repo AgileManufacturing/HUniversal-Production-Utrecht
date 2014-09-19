@@ -36,7 +36,7 @@
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "vision_node");
-	ROS_INFO("This node must be run with ROOT priveleges when using the DFK 22AUC03");
+	REXOS_INFO("This node must be run with ROOT priveleges when using the DFK 22AUC03");
 	
 	// Check arguments
 	if(argc < 3) {
@@ -47,31 +47,31 @@ int main(int argc, char* argv[]) {
 	}
 	std::vector<std::string> devices;
 	devices = unicap_cv_bridge::listDevices();
-	std::cout << "Devices:" << std::endl;
+	REXOS_INFO_STREAM("Devices:" << std::endl);
 	for(int i = 0; i < devices.size(); i++){
-		std::cout << "\t" << devices[i] << std::endl;
+		REXOS_INFO_STREAM("\t" << devices[i] << std::endl);
 	}
 	
 	int deviceNumber;
 	try{
 		deviceNumber = rexos_utilities::stringToInt(argv[1]);
 	} catch(std::runtime_error ex){
-		ROS_ERROR("Device number is not a valid number.");
+		REXOS_ERROR("Device number is not a valid number.");
 		exit(-2);
 	}
 	
 	std::vector<std::string> formats;
 	formats = unicap_cv_bridge::listFormats(deviceNumber);
-	std::cout << "Formats:" << std::endl;
+	REXOS_INFO_STREAM("Formats:" << std::endl);
 	for(int i = 0; i < formats.size(); i++){
-		std::cout << "\t" << formats[i] << std::endl;
+		REXOS_INFO_STREAM("\t" << formats[i] << std::endl);
 	}
 
 	int formatNumber;
 	try{
 		formatNumber = rexos_utilities::stringToInt(argv[2]);
 	} catch(std::runtime_error ex){
-		ROS_ERROR("Format number is not a valid number.");
+		REXOS_ERROR("Format number is not a valid number.");
 		exit(-3);
 	}
 	

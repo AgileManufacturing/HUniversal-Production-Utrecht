@@ -33,6 +33,7 @@
 #define CAPTURE_RATE 2
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <image_transport/image_transport.h>
 

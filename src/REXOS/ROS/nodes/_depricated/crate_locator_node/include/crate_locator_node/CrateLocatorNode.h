@@ -51,6 +51,7 @@
 #include <crate_locator_node/getCrate.h>
 #include <crate_locator_node/getAllCrates.h>
 #include <crate_locator_node/CrateEventMsg.h>
+#include "rexos_logger/rexos_logger.h"
 
 
 /**

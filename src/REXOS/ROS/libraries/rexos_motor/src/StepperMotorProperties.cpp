@@ -48,24 +48,24 @@ namespace rexos_motor {
 	 **/
 	StepperMotorProperties::StepperMotorProperties(Json::Value properties) {
 		motorMinAngle = rexos_utilities::degreesToRadians(properties["motorMinAngleDegrees"].asDouble());
-		ROS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
+		REXOS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
 		
 		motorMaxAngle = rexos_utilities::degreesToRadians(properties["motorMaxAngleDegrees"].asDouble());
-		ROS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
+		REXOS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
 		
 		microStepAngle = rexos_utilities::degreesToRadians(properties["microStepAngleDegrees"].asDouble());
-		ROS_INFO_STREAM("found microStepAngle " << microStepAngle);
+		REXOS_INFO_STREAM("found microStepAngle " << microStepAngle);
 		
 		minAcceleration = rexos_utilities::degreesToRadians(properties["minAccelerationDegrees"].asDouble());
-		ROS_INFO_STREAM("found minAcceleration " << minAcceleration);
+		REXOS_INFO_STREAM("found minAcceleration " << minAcceleration);
 		
 		maxAcceleration = rexos_utilities::degreesToRadians(properties["maxAccelerationDegrees"].asDouble());
-		ROS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
+		REXOS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
 		
 		minSpeed = rexos_utilities::degreesToRadians(properties["minSpeedDegrees"].asDouble());
-		ROS_INFO_STREAM("found minSpeed " << minSpeed);
+		REXOS_INFO_STREAM("found minSpeed " << minSpeed);
 		
 		maxSpeed = rexos_utilities::degreesToRadians(properties["maxSpeedDegrees"].asDouble());
-		ROS_INFO_STREAM("found maxSpeed " << maxSpeed);
+		REXOS_INFO_STREAM("found maxSpeed " << maxSpeed);
 	}
 }

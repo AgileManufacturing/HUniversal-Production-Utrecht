@@ -30,6 +30,7 @@
 #pragma once
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <opencv/cv.h>
 #include <opencv2/highgui/highgui.hpp>

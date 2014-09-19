@@ -3,15 +3,15 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_blackboard_cpp_client)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_utilities)
+find_package(catkin REQUIRED rexos_logger COMPONENTS rexos_utilities)
 find_package(Boost)
 find_package(Mongo)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES rexos_blackboard_cpp_client 
-CATKIN_DEPENDS rexos_utilities
+LIBRARIES rexos_blackboard_cpp_client  rexos_logger
+CATKIN_DEPENDS rexos_utilities rexos_logger
 DEPENDS Boost Mongo)
 
 SET ( CMAKE_CXX_FLAGS "-std=c++0x" )

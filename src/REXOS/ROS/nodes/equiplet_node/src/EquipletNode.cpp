@@ -59,13 +59,13 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 		scada(this, &moduleRegistry) 
 {
 	if(spawnNodesForModules == true) {
-		ROS_INFO_STREAM("Spawning nodes at startup");
+		REXOS_INFO_STREAM("Spawning nodes at startup");
 		rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
 		std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
 		
 		ros::ServiceClient spanNodeClient(nh.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
 		for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
-			ROS_INFO_STREAM("Spawning node for " << *it);
+			REXOS_INFO_STREAM("Spawning node for " << *it);
 			node_spawner_node::spawnNode spawnNodeCall;
 			spawnNodeCall.request.manufacturer = it->getManufacturer();
 			spawnNodeCall.request.typeNumber = it->getTypeNumber();
@@ -73,7 +73,7 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 			spanNodeClient.call(spawnNodeCall);
 		}
 	}
-	ROS_DEBUG("Subscribing to EquipletStepsBlackBoard");
+	REXOS_DEBUG("Subscribing to EquipletStepsBlackBoard");
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "EquipletStepsBlackBoard");
 	//equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
@@ -82,7 +82,7 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 	subscriptions.push_back(equipletStepSubscription);
 	sleep(1);
 
-	ROS_DEBUG("Subscribing to equipletCommands");
+	REXOS_DEBUG("Subscribing to equipletCommands");
 	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
@@ -93,18 +93,18 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 	subscriptions.push_back(equipletCommandSubscriptionSet);
 	sleep(1);
 
-	ROS_DEBUG("Subscribing to equipletState");
+	REXOS_DEBUG("Subscribing to equipletState");
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 	sleep(1);
 
-	ROS_DEBUG("Subscribing to DirectMoveStepsBlackBoard");
+	REXOS_DEBUG("Subscribing to DirectMoveStepsBlackBoard");
 	directMoveBlackBoardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "DirectMoveStepsBlackBoard");
 	directMoveSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	directMoveBlackBoardClient->subscribe(*directMoveSubscription);
 	subscriptions.push_back(directMoveSubscription);
 	sleep(1);
 	
-	ROS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
+	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }
 
 /**
@@ -144,7 +144,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		rexos_datatypes::EquipletStep step = rexos_datatypes::EquipletStep(n);
 	    //We only need to handle the step if its status is 'WAITING'
 	    if (step.getStatus() == "WAITING") {
-	    	ROS_INFO_STREAM("handling step: " << jsonString);
+	    	REXOS_INFO_STREAM("handling step: " << jsonString);
     		handleHardwareStep(step, targetObjectId);
 		}
 		
@@ -162,20 +162,20 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo::OID targetObjectId){
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	if (currentMode != rexos_statemachine::MODE_NORMAL) {
-		ROS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
+		REXOS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
 	}
 	rexos_statemachine::State currentState = getCurrentState();
 	if (currentState != rexos_statemachine::STATE_NORMAL && currentState != rexos_statemachine::STATE_STANDBY) {
-		ROS_WARN("Hardware step received but but cannot be processed because current state is %s", rexos_statemachine::state_txt[currentState]);
+		REXOS_WARN("Hardware step received but but cannot be processed because current state is %s", rexos_statemachine::state_txt[currentState]);
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
 	}
 	
 	// check originPlacement and gather required information
 	rexos_datatypes::OriginPlacement originPlacement = step.getOriginPlacement();
-	ROS_WARN_STREAM(originPlacement.toJSON());
+	REXOS_WARN_STREAM(originPlacement.toJSON());
 	if(originPlacement.getOriginPlacementType() == rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER) {
-		ROS_DEBUG("Gathering information from the environment cache");
+		REXOS_DEBUG("Gathering information from the environment cache");
 		Json::Value result = callLookupHandler(originPlacement.getParameters());
 		originPlacement.setLookupResult(result);
 	}
@@ -184,7 +184,7 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	//we might still need to update the payload on the bb
 	ModuleProxy *prox = moduleRegistry.getModule(step.getModuleIdentifier());
 	if(prox == NULL) {
-		ROS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
+		REXOS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
 	} else {
 		//prox->changeState(rexos_statemachine::STATE_NORMAL);
@@ -196,31 +196,31 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 void EquipletNode::handleEquipletCommand(Json::Value n) {
 	// TODO is this neccesary? Does the json sometimes contain a set and sometimes not (difference between update and insert?)
 	if(n.isMember("$set")) {
-		ROS_DEBUG("EquipletNode::handleEquipletCommand: Using the set entry");
+		REXOS_DEBUG("EquipletNode::handleEquipletCommand: Using the set entry");
 		n = n["$set"];
 	}
 	
 	if(n.isMember("desiredState")) {
-		ROS_INFO("ChangeState to %s", n["desiredState"].asCString());
+		REXOS_INFO("ChangeState to %s", n["desiredState"].asCString());
 		// TODO atoi?
 		changeState((rexos_statemachine::State) atoi(n["desiredState"].asCString()));
 	} else if(n.isMember("desiredMode")) {
-		ROS_INFO("ChangeMode to %s", n["desiredMode"].asCString());
+		REXOS_INFO("ChangeMode to %s", n["desiredMode"].asCString());
 		// TODO atoi?
 		changeMode((rexos_statemachine::Mode) atoi(n["desiredState"].asCString()));
 	}
 }
 
 //needed for callback ( from proxy )
-void EquipletNode::onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed){
+void EquipletNode::onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed) {
 
 	//moduleProxy->changeState(rexos_statemachine::STATE_STANDBY);
 	mongo::OID targetObjectId(id);
 
 	if(completed) {
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
-    	ROS_INFO_STREAM("Done with step with id: " << id);
-		ROS_INFO("Updated status on BB to done.");
+    	REXOS_INFO_STREAM("Done with step with id: " << id);
+		REXOS_INFO("Updated status on BB to done.");
 	} else {
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
 	}
@@ -243,7 +243,7 @@ void EquipletNode::updateEquipletStateOnBlackboard(){
 
 	std::ostringstream stringStream;
 	stringStream << "{$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}";
-	ROS_INFO_STREAM("updating state on blackboard; {$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}");
+	REXOS_INFO_STREAM("updating state on blackboard; {$set: { state: " << getCurrentState() << ",mode: " << getCurrentMode() << "}}");
 	
 	Json::StyledWriter writer;
 	equipletStateBlackboardClient->updateDocuments(writer.write(jsonUpdateQuery), stringStream.str());
@@ -282,7 +282,7 @@ Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameter
 		reader.parse(msg.response.jsonData, result);
 		return result;
 	} else {
-		ROS_WARN("Could not find anything in the lookup handler");
+		REXOS_WARN("Could not find anything in the lookup handler");
 		return Json::Value::null;
 	}
 }

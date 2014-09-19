@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	if(argc < 2) {
-		ROS_ERROR("Usage: node_spawner_node (--spawnEquipletNode) equipletName");
+		REXOS_ERROR("Usage: node_spawner_node (--spawnEquipletNode) equipletName");
 		return -2;
 	}
 	

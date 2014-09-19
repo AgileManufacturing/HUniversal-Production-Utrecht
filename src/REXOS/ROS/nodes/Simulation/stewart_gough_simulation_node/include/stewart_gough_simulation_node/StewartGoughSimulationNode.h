@@ -36,6 +36,7 @@
 #include "rexos_gazebo/SimulatedMotor.h"
 #include "stewart_gough_simulation_node/rotate.h"
 #include <vector>
+#include "rexos_logger/rexos_logger.h"
 
 class StewartGoughSimulationNode{
 	

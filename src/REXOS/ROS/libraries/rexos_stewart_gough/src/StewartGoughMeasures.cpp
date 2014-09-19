@@ -32,44 +32,45 @@
 #include <cmath>
 #include <iostream>
 #include <rexos_utilities/Utilities.h>
+#include "rexos_logger/rexos_logger.h"
 #include "ros/ros.h"
 
 namespace rexos_stewart_gough {
 	StewartGoughMeasures::StewartGoughMeasures(Json::Value properties) {
 		base = properties["baseRadius"].asDouble();
-		ROS_INFO_STREAM("found baseRadius " << base);
+		REXOS_INFO_STREAM("found baseRadius " << base);
 		
 		hip = properties["hipLength"].asDouble();
-		ROS_INFO_STREAM("found hipLength " << hip);
+		REXOS_INFO_STREAM("found hipLength " << hip);
 		
 		effector = properties["effectorRadius"].asDouble();
-		ROS_INFO_STREAM("found effectorRadius " << effector);
+		REXOS_INFO_STREAM("found effectorRadius " << effector);
 		
 		ankle = properties["ankleLength"].asDouble();
-		ROS_INFO_STREAM("found ankleLength " << ankle);
+		REXOS_INFO_STREAM("found ankleLength " << ankle);
 		
 		maxAngleHipAnkle = rexos_utilities::degreesToRadians(properties["hipAnleMaxAngleDegrees"].asDouble());
-		ROS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
+		REXOS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
 		
 		motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(properties["motorFromZeroToTopAngleDegrees"].asDouble());
-		ROS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
+		REXOS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
 		
 		boundaryBoxMinX = properties["boundaryBoxMinX"].asDouble();
-		ROS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
+		REXOS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
 		
 		boundaryBoxMaxX = properties["boundaryBoxMaxX"].asDouble();
-		ROS_INFO_STREAM("found boundaryBoxMaxX " << boundaryBoxMaxX);
+		REXOS_INFO_STREAM("found boundaryBoxMaxX " << boundaryBoxMaxX);
 		
 		boundaryBoxMinY = properties["boundaryBoxMinY"].asDouble();
-		ROS_INFO_STREAM("found boundaryBoxMinY " << boundaryBoxMinY);
+		REXOS_INFO_STREAM("found boundaryBoxMinY " << boundaryBoxMinY);
 		
 		boundaryBoxMaxY = properties["boundaryBoxMaxY"].asDouble();
-		ROS_INFO_STREAM("found boundaryBoxMaxY " << boundaryBoxMaxY);
+		REXOS_INFO_STREAM("found boundaryBoxMaxY " << boundaryBoxMaxY);
 		
 		boundaryBoxMinZ = properties["boundaryBoxMinZ"].asDouble();
-		ROS_INFO_STREAM("found boundaryBoxMinZ " << boundaryBoxMinZ);
+		REXOS_INFO_STREAM("found boundaryBoxMinZ " << boundaryBoxMinZ);
 		
 		boundaryBoxMaxZ = properties["boundaryBoxMaxZ"].asDouble();
-		ROS_INFO_STREAM("found boundaryBoxMaxZ " << boundaryBoxMaxZ);
+		REXOS_INFO_STREAM("found boundaryBoxMaxZ " << boundaryBoxMaxZ);
 	}
 }

@@ -37,8 +37,10 @@
 #include <cstdlib>
 #include <keyboard_control_node/KeyBoardControlNode.h>
 #include <ros/ros.h>
-#include <rexos_datatypes/InstructionData.h>
 #include "rexos_utilities/Utilities.h"
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
+#include <rexos_datatypes/EquipletStep.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "KeyBoardControlNode"
@@ -48,15 +50,12 @@ using namespace keyboard_control_node;
 
 
 KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
-	currentXPos(0.0),
-	currentYPos(-0.0),
-	currentZPos(-200.0),
-	maxAcceleration("50.0") {
+	maxAcceleration(50.0) {
 
-	ROS_INFO("Constructing");
+	REXOS_INFO("Constructing");
 
 	//DirectMoveStepsBlackBoard
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "DirectMoveStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "EquipletStepsBlackBoard");
 
 	tcgetattr(KEYBOARDNUMBER, &oldTerminalSettings);
 	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
@@ -69,14 +68,14 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
 
 	equipletStepBlackboardClient->removeDocuments("");
 
-	ROS_INFO("Reading from keyboard");
-	ROS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
+	REXOS_INFO("Reading from keyboard");
+	REXOS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
 
 	run();
 }
 
 KeyBoardControlNode::~KeyBoardControlNode(){
-	ROS_INFO("Destructing");
+	REXOS_INFO("Destructing");
 }
 
 void KeyBoardControlNode::run(){
@@ -92,82 +91,63 @@ void KeyBoardControlNode::run(){
 
 void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 // Reads keyboard input and does things. Doesnt keep track of actual robot location, just relative. Starts on 0.0, 0.0, 0.0
+	Vector3 direction;
 
 	// Check which key was pressed.
 	switch(inputCharacter){
 		case KEYCODE_UP:
-			ROS_INFO("PRESSED UP");
-			//z + step
-			currentZPos = currentZPos + STEP;
-			break;
-
+			REXOS_INFO("PRESSED UP");
+			direction.z+= STEP;
+		break;
 		case KEYCODE_DOWN:
-			ROS_INFO("PRESSED DOWN");
-			//z - step
-			currentZPos = currentZPos - STEP;
+			REXOS_INFO("PRESSED DOWN");
+			direction.z-= STEP;
 		break;
 
 		case KEYCODE_W:
-			ROS_INFO("PRESSED W");
-			//y + step
-			currentYPos = currentYPos + STEP;
+			REXOS_INFO("PRESSED W");
+			direction.y+= STEP;
 		break;
 
 		case KEYCODE_A:
-			ROS_INFO("PRESSED A");
-			//x - step
-			currentXPos = currentXPos - STEP;
+			REXOS_INFO("PRESSED A");
+			direction.x-= STEP;
 		break;
 
 		case KEYCODE_S:
-			ROS_INFO("PRESSED S");
-			//y - step
-			currentYPos = currentYPos - STEP;
+			REXOS_INFO("PRESSED S");
+			direction.y-= STEP;
 			break;
 
 		case KEYCODE_D:
-			ROS_INFO("PRESSED D");
-			//x + step
-			currentXPos = currentXPos + STEP;
+			REXOS_INFO("PRESSED D");
+			direction.x+= STEP;
 			break;
 
 		case KEYCODE_C:
 			//calibrateClient.call(calibrateService);
 		break;
 	}
-		writeToBlackBoard(rexos_utilities::doubleToString(currentXPos), rexos_utilities::doubleToString(currentYPos), rexos_utilities::doubleToString(currentZPos), maxAcceleration);
+		writeToBlackBoard(direction, maxAcceleration);
 }
 
-void KeyBoardControlNode::writeToBlackBoard(std::string x, std::string y, std::string z, std::string acceleration){
-	//Need to include InstructionData for the instructiondata
-	//Dont forget to set in package & makelist!
-
-	std::map<std::string, std::string> look_up_parameters;
-	std::map<std::string, std::string> payload;
-
-	if(!x.empty()) {
-		payload.insert(pair<string, string>("x", x));
+void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double acceleration){
+	rexos_datatypes::EquipletStep equipletStep;
+	Json::Value instructionData;
+	Json::Value moveCommand;
+	
+	moveCommand["x"] = direction.x;
+	moveCommand["y"] = direction.y;
+	moveCommand["z"] = direction.z;
+	moveCommand["maxAcceleration"] = acceleration;
+	
+	instructionData["move"] = moveCommand;
+	equipletStep.setInstructionData(instructionData);
+	
+	Json::StyledWriter writer;
+	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON()))) {
+		REXOS_INFO_STREAM("printed: " << equipletStep.toJSON() << "to blackboard.");
 	}
-
-	if(!y.empty()) {
-		payload.insert(pair<string, string>("y", y));
-	}
-
-	if(!z.empty()) {
-		payload.insert(pair<string, string>("z", z));
-	}
-
-	if(!acceleration.empty()) {
-		payload.insert(pair<string, string>("maxAcceleration", acceleration));
-	}
-
-	instructionData = new rexos_datatypes::InstructionData("move", "deltarobot", "NULL", 
-            look_up_parameters, payload);
-
-	if(equipletStepBlackboardClient->insertDocument(instructionData->toJSONString())) {
-		std::cout << "printed: " << instructionData->toJSONString() << "to blackboard." << std::endl;
-	}
-
 }
 
 /**

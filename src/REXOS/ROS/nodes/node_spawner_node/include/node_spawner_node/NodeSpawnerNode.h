@@ -35,6 +35,7 @@
 #include <string>
 #include <vector>
 
+#include "rexos_logger/rexos_logger.h"
 #include <node_spawner_node/spawnNode.h>
 #include <rexos_node_spawner/NodeSpawner.h>
 

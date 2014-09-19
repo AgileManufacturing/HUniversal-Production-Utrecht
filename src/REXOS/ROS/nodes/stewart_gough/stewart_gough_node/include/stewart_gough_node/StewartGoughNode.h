@@ -31,6 +31,7 @@
 #define STEWARTGOUGH_H
 
 #include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
 #include "rexos_std_srvs/Module.h"
 #include "stewart_gough_node/Point.h"
 

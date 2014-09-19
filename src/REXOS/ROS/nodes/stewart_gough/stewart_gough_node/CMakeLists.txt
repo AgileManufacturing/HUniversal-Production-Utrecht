@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(stewart_gough_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_stewart_gough actionlib rexos_coordinates)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_datatypes rexos_stewart_gough actionlib rexos_coordinates rexos_logger)
 find_package(Log4cxx)
 find_package(Jsoncpp)
 
@@ -24,7 +24,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES  
-CATKIN_DEPENDS actionlib rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_stewart_gough rexos_datatypes roscpp std_msgs rexos_coordinates
+CATKIN_DEPENDS actionlib rexos_statemachine rexos_modbus rexos_std_msgs rexos_std_srvs rexos_utilities rexos_stewart_gough rexos_datatypes roscpp std_msgs rexos_coordinates rexos_logger
 DEPENDS Jsoncpp)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
