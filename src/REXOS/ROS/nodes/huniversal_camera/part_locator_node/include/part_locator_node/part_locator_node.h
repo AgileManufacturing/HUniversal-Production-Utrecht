@@ -84,7 +84,7 @@ protected:
 	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 
 public:
-	PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, std::string equipletIdentifier);
+	PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
 	void run();
 	
 	virtual bool transitionInitialize();

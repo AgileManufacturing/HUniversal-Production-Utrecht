@@ -52,8 +52,7 @@ const int PartLocatorNode::minItemSamples = 11;
 const string PartLocatorNode::TOP_RIGHT_VALUE = "WP_800_400_TR";
 const string PartLocatorNode::BOTTOM_RIGHT_VALUE = "WP_800_400_BR";*/
 
-PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, std::string equipletIdentifier):
-		equipletIdentifier(equipletIdentifier),
+PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier):
 		equipletName(equipletName),
 		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
@@ -431,9 +430,9 @@ bool PartLocatorNode::transitionSetup(){
 	double y;
 	double z;
 	int acceleration = 20;
-	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
+	rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
 	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU", "six_axis_type_A", "1"));
-	rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU",equipletIdentifier, "1"));
+	//rexos_knowledge_database::Module drKnowMod = rexos_knowledge_database::Module(rexos_knowledge_database::ModuleIdentifier("HU",equipletIdentifier, "1"));
 	
 	rexos_coordinates::Module drModule = rexos_coordinates::Module(&drKnowMod);
 	Vector3 v;
@@ -776,28 +775,11 @@ bool PartLocatorNode::transitionStop() {
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "part_locator_node");
 	
-	if(argc < 5){
-		REXOS_ERROR("Usage: camera_control_node equipletId, manufacturer, typeNumber, serialNumber");
-		return -1;
-	}
-	for(int i=0; i<argc; i++)
-		REXOS_INFO_STREAM(argv[i] << i << " " << std::endl);
-		
-	// @TODO check if valid identifier
-	std::string eqIdentifier;	
-	if(argc >= 5) {
-		REXOS_INFO_STREAM("Setting equipletIdentifier to " << argv[5] << std::endl);
-		eqIdentifier = argv[5];
-	} else {
-		REXOS_INFO_STREAM("Setting equipletIdentifier default \"six_axis_type_A\"" << std::endl);
-		eqIdentifier = "six_axis_type_A"; // Default to something...
-	}
-	
-	std::string equipletName = argv[1]; // = EQ3
+	std::string equipletName = argv[1];
 	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
-
+	
 	REXOS_INFO("Creating PartLocatorNode");
-	PartLocatorNode node(equipletName, moduleIdentifier, eqIdentifier);
+	PartLocatorNode node(equipletName, moduleIdentifier);
 	node.run();
 	
 	return 0;
