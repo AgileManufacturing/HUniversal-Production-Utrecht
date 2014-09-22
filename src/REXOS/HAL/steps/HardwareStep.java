@@ -90,10 +90,18 @@ public class HardwareStep {
 			returnValue.put(MODULE_IDENTIFIER, moduleIdentifier.toJSON());
 			returnValue.put(STATUS, hardwareStepStatus.toString());
 			returnValue.put(INSTRUCTION_DATA, instructionData);
-			returnValue.put(ORIGIN_PLACEMENT, originPlacement.toJSON());
+			if(originPlacement != null) {
+				returnValue.put(ORIGIN_PLACEMENT, originPlacement.toJSON());
+			} else {
+				returnValue.put(ORIGIN_PLACEMENT, JSONObject.NULL);
+			}
 		} catch (JSONException ex) {
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
 		}
 		return returnValue;
+	}
+	
+	public String toString() {
+		return toJSON().toString();
 	}
 }

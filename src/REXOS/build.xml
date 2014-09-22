@@ -37,9 +37,9 @@
 				<compilerarg line="-Xlint:unchecked" />
 			</javac>
    			
-			<antcall target="add-path-to-classpath">
+			<!--<antcall target="add-path-to-classpath">
 				<param name="path" value="${buildpath}/${relative.dir}"/>
-			</antcall>
+			</antcall>-->
 		</sequential>
 	</macrodef>
 
@@ -97,6 +97,9 @@
 		<delete file ="${buildpath}/.export-classpath"/> 
  		<touch file ="${buildpath}/.export-classpath"/> 
 		<antcall target="allpackages"/>
+		<antcall target="add-path-to-classpath">
+			<param name="path" value="${buildpath}/"/>
+		</antcall>
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
@@ -180,8 +183,8 @@
 
 	<target name="Launch-HAL">
 		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="HAL.testerClasses.StewartGoughHALTesterClass" failonerror="true" fork="yes">
-			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
+		<java classname="HAL.testerClasses.HALTesterClassPickAndPlace" failonerror="true" fork="yes">
+			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/util/configuration/"/>
 			<classpath refid="java" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />

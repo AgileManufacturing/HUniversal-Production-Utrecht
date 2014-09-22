@@ -3,6 +3,8 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import util.log.LogLevel;
+import util.log.Logger;
 import util.math.Vector3;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
@@ -34,12 +36,13 @@ public class Gripper extends ModuleActor {
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
+		Logger.log("Gripper is translating compositeStep: " + compositeStep.toJSON().toString());
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		compositeStep = adjustMoveWithDimensions(compositeStep, new Vector3(0, 0, GRIPPER_SIZE));
 		
 		//Pop command identifier
 		boolean isPick = false, isPlace = false;
-		if (compositeStep.getCommand().get(PICK) != null) {
+		if (compositeStep.getCommand().has(PICK) == true) {
 			compositeStep.popCommandIdentifier(PICK);
 			isPick = true;
 		} else {
@@ -48,7 +51,8 @@ public class Gripper extends ModuleActor {
 		}
 
 		translatedHardwareSteps.addAll(forwardCompositeStep(compositeStep));
-		int placeholderId = getPlaceholderID(translatedHardwareSteps);
+		int placeholderId = getPlaceholderIndex(translatedHardwareSteps);
+		Logger.log(LogLevel.ERROR, "placeHolderId", placeholderId);
 
 		// Set hardwareSteps
 		if (isPick || isPlace) {
@@ -67,6 +71,8 @@ public class Gripper extends ModuleActor {
 			} else {
 				translatedHardwareSteps.set(placeholderId, harwareStep);
 			}
+		} else {
+			// nothing to do
 		}
 
 		return translatedHardwareSteps;

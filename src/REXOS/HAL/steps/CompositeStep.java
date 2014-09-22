@@ -42,12 +42,12 @@ public class CompositeStep{
 		return this.originPlacement;
 	}
 	public JSONObject popCommandIdentifier(String identifier) throws ModuleTranslatingException{
-		JSONObject jsonIdentifier = (JSONObject) command.remove(identifier);
-		
-		if (jsonIdentifier == null){
+		if (command.has(identifier) == false){
 			throw new ModuleTranslatingException ("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command, this);
 		}
-		return jsonIdentifier;
+		JSONObject mutation = command.optJSONObject(identifier);
+		command.remove(identifier);
+		return mutation;
 	}
 	
 	public JSONObject toJSON() {

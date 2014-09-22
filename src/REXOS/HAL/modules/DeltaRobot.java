@@ -30,13 +30,13 @@ public class DeltaRobot extends ModuleActor {
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
-		Logger.log(compositeStep.toJSON().toString());
+		Logger.log("Delta robot is translating compositeStep: " + compositeStep.toJSON().toString());
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		JSONObject commandMove = compositeStep.popCommandIdentifier(COMMAND_IDENTIFIER);
 		
 		//Adjust for maxAcceleration
 		double maxAcceleration = MAX_ACCELERATION;
-		if (commandMove.get(ModuleActor.MAX_ACCELERATION) != null){
+		if (commandMove.has(ModuleActor.MAX_ACCELERATION) == true){
 			if (commandMove.getDouble(ModuleActor.MAX_ACCELERATION) < maxAcceleration){
 				//New maxAcceleration is set
 				maxAcceleration = (double) commandMove.remove(ModuleActor.MAX_ACCELERATION);

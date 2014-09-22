@@ -306,15 +306,14 @@ public class Logger {
 					logFile.createNewFile();
 				} else if(eraseLogFileOnStartup == true) {
 					eraseLogFile();
-				} else if(seperateStartupInLogFile == true) {
-					logFileFileWriter = new FileWriter(logFile, true);
-					logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
+				}
+				logFileFileWriter = new FileWriter(logFile, true);
+				logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
+				if(seperateStartupInLogFile == true) {
 					logFileBufferedWriter.write(logFileSeperator);
-				} else {
-					logFileFileWriter = new FileWriter(logFile, true);
-					logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
 				}
 			}
+			
 			logFileBufferedWriter.write(serializedLogEntry);
 			// mimic println by adding a new line at the end of every logEntry
 			logFileBufferedWriter.write("\n");

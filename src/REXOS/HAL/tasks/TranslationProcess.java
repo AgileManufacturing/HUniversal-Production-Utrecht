@@ -65,7 +65,7 @@ public class TranslationProcess implements Runnable{
 					return;
 				} catch (CapabilityException ex) {
 					Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Capability " + capabilities.get(i).getName() + 
-							" failed to translate product step: " + productStep);
+							" failed to translate product step: " + productStep, ex);
 				}
 			}
 			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, "No capability was able to translated product step: " + productStep);

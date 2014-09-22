@@ -155,9 +155,9 @@ public abstract class ModuleActor extends Module {
 	 * Returns -1 if not found.
 	 * 
 	 */
-	protected int getPlaceholderID(ArrayList<HardwareStep> hardwareSteps){
+	protected int getPlaceholderIndex(ArrayList<HardwareStep> hardwareSteps){
 		if (hardwareSteps != null){
-			for (int i=0;i<hardwareSteps.size();i++){
+			for (int i = 0; i < hardwareSteps.size(); i++){
 				if (hardwareSteps.get(i) == null){
 					return i;
 				}

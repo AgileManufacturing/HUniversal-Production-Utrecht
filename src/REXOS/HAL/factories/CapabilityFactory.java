@@ -324,8 +324,9 @@ public class CapabilityFactory extends Factory{
 					JSONArray requiredMutationsTrees = capabilityTypeEntry.getJSONArray("requiredMutationsTrees");
 					deserializeRequiredMutations(name, requiredMutationsTrees);
 					
-					for (int j = 0; j < capabilityTypeEntry.length(); j++) {
-						String serviceName = capabilityTypeEntry.getJSONArray("services").getString(j);
+					JSONArray services = capabilityTypeEntry.getJSONArray("services");
+					for (int j = 0; j < services.length(); j++) {
+						String serviceName = services.getString(j);
 						knowledgeDBClient.executeUpdateQuery(addServiceType, serviceName);
 						knowledgeDBClient.executeUpdateQuery(addServiceType_CapabilityType, serviceName,name);
 					}
