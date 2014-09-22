@@ -33,6 +33,7 @@ libraries/mongo-cxx-driver/config.log
 libraries/blackboardJavaClient/*.jar
 build/
 devel/
+jars/
 
 # Ignore project file, cmake text file and editor temporary files
 
@@ -61,10 +62,9 @@ product-*.xml
 gridLog.txt
 src/REXOS/MAS/configuration/knowledge_db.properties
 src/REXOS/databases/equipletRecord.sql
-src/REXOS/databases/equipletRecord.sql
-src/REXOS/databases/equipletRecord.sql
 log.txt
 *.txt
 /bin
 
 output/
+/bin

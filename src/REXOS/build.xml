@@ -1,5 +1,11 @@
 <project name="REXOS" default="all" basedir=".">
-
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="/usr/share/java/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
+	
+	
 	<!-- java source root -->
 	<property name="rexos-java-root" value="${basedir}"/>
 
@@ -191,7 +197,30 @@
 			</classpath>
 		</java>
 	</target>
-
+	
+	<target name="Generate-JARs">
+		<foreach target="Generate-JAR" param="theFile">
+			<path id="modulesPathId">
+				<fileset dir="HAL/modules" casesensitive="yes">
+					<include name="**/*.java"/>
+				</fileset>
+			</path>
+		</foreach>
+		<foreach target="Generate-JAR" param="theFile">
+			<path id="capabilitiesPathId">
+				<fileset dir="HAL/capabilities" casesensitive="yes">
+					<include name="**/*.java"/>
+				</fileset>
+			</path>
+		</foreach>
+	</target>
+	
+	<target name="Generate-JAR">
+		<basename property="jar.filename" file="${theFile}" suffix=".java"/>
+		<dirname property="jar.basedir" file="${theFile}"/>
+		<jar destfile="${repo-root}/jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.java"/>
+	</target>
+	
 	<path id="java">
 		<pathelement location="${output}"/>
 		<fileset dir="external_libraries">
