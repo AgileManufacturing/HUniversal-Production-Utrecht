@@ -234,20 +234,20 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * 
 	 * @param start
 	 *            time of the job
+	 * @param job
+	 *            to be executed
 	 */
 	@Override
-	protected void executeJob_(Tick time) {
+	protected synchronized void executeJob(Tick time, Job job) {
 		state = EquipletState.BUSY;
-		executing = schedule.pollFirst();
+		executing = job;
 
 		Tick latency = time.minus(executing.getStartTime());
 		scheduleLatency.put(time, latency);
-
 		executing.updateStartTime(time);
 		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
 
 		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-
 		execute(executing);
 	}
 
@@ -304,6 +304,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			Job ready = jobReady();
 			if (ready != null) {
 				// if (!schedule.isEmpty() && jobReady()) {
+				schedule.remove(ready);
 				executeJob(time, ready);
 			} else {
 				state = EquipletState.IDLE;
@@ -363,6 +364,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
 			Job ready = jobReady();
+			schedule.remove(ready);
 			executeJob(time, ready);
 		} else if (isExecuting()) {
 			// the equiplet is executing a job and is repaired, but waits until a job finished event is received

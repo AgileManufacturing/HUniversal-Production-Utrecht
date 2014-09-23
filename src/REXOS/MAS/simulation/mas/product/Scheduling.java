@@ -3,6 +3,7 @@ package MAS.simulation.mas.product;
 import jade.core.AID;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,11 @@ public class Scheduling {
 	private Tick deadline;
 	private Position position;
 	private List<ProductStep> productSteps;
+
+	// service options :: Map < product step index, [ options :: <Equiplet, Triple < estimate duration of service, [ possibilities :: < from time, until time > ] > > ] >
 	private Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> serviceOptions;
+
+	// equiplet info :: list of equiplet with the load and position of the equiplet
 	private Map<AID, Pair<Double, Position>> equipletInfo;
 	private Map<Pair<Position, Position>, Tick> travelTimes;
 
@@ -188,6 +193,16 @@ public class Scheduling {
 						firstInSequence = -1;
 					}
 				}
+			}
+		}
+
+		// apply load information to the scores
+		for (int row = 0; row < equiplets.size(); row++) {
+			AID equiplet = equiplets.get(row);
+			double load = equipletInfo.get(equiplet).first;
+
+			for (int column = 0; column < productSteps.size(); column++) {
+				matrix[row][column] = matrix[row][column] * load;
 			}
 		}
 

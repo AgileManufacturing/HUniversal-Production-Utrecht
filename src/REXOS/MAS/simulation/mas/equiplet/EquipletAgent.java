@@ -530,69 +530,10 @@ public class EquipletAgent extends Agent {
 	 * 
 	 * @param start
 	 *            time of the job
+	 * @param job
+	 *            to be executed
 	 */
-	protected synchronized void executeJob__(Tick time) {
-		state = EquipletState.BUSY;
-		executing = null;
-
-		int counter = 0;
-		Iterator<Job> it = schedule.iterator();
-		while (it.hasNext()) {
-			Job job = it.next();
-			if (job.isReady()) {
-				executing = job;
-				schedule.remove(job);
-				break;
-			}
-			counter++;
-			if (counter >= 2) {
-				break;
-			}
-		}
-
-		// update schedule when job are swapped?
-		if (counter > 0) {
-			System.out.printf("EA:%s SWAP job %s in schedule %s\n", getLocalName(), executing, schedule);
-		}
-
-		if (executing != null) {
-			executing = schedule.pollFirst();
-
-			executing.updateStartTime(time);
-			System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
-
-			informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-
-			execute(executing);
-		}
-	}
-
-	protected synchronized void executeJob_(Tick time) {
-		state = EquipletState.BUSY;
-		executing = schedule.pollFirst();
-
-		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
-
-		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-
-		execute(executing);
-	}
-
 	protected synchronized void executeJob(Tick time, Job job) {
-		state = EquipletState.BUSY;
-		executing = job;
-		schedule.remove(job);
-
-		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
-
-		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-
-		execute(executing);
-	}
-
-	protected synchronized void executeJob(Tick time, Job job, boolean removed) {
 		state = EquipletState.BUSY;
 		executing = job;
 
@@ -667,7 +608,7 @@ public class EquipletAgent extends Agent {
 		// execute the first job in the schedule if the job is ready
 		if (state == EquipletState.IDLE && ready != null) { // && jobReady()) {
 			// begin with executing job that arrived
-			executeJob(time, ready, true);
+			executeJob(time, ready);
 		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady() != null) {
 			// Equiplet is still broken, but as soon as this is repaired it will execute the first job in the schedule
 			System.out.printf("EA:%s product %s going to be executed after repair\n", getLocalName(), product.getLocalName());

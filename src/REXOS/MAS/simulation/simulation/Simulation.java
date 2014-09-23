@@ -189,7 +189,7 @@ public class Simulation implements ISimulation, IControl {
 			}
 
 			Tick breakdown = stochastics.generateBreakdownTime(entry.getKey());
-			eventStack.add(new Event(time.add(breakdown), EventType.BREAKDOWN, equipletName));
+			//eventStack.add(new Event(time.add(breakdown), EventType.BREAKDOWN, equipletName));
 		}
 
 		try {
