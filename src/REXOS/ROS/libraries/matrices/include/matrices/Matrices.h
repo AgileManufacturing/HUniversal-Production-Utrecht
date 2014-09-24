@@ -170,10 +170,15 @@ public:
     // transform matrix
     Matrix4&    translate(float x, float y, float z);   // translation by (x,y,z)
     Matrix4&    translate(const Vector3& v);            //
+    Matrix4&    rotateDegree(float angle, const Vector3& axis); // rotate angle(degree) along the given axix
     Matrix4&    rotate(float angle, const Vector3& axis); // rotate angle(degree) along the given axix
+    Matrix4&    rotateDegree(float angle, float x, float y, float z);
     Matrix4&    rotate(float angle, float x, float y, float z);
+    Matrix4&    rotateXDegree(float angle);                   // rotate on X-axis with degree
     Matrix4&    rotateX(float angle);                   // rotate on X-axis with degree
+    Matrix4&    rotateYDegree(float angle);                   // rotate on Y-axis with degree
     Matrix4&    rotateY(float angle);                   // rotate on Y-axis with degree
+    Matrix4&    rotateZDegree(float angle);                   // rotate on Z-axis with degree
     Matrix4&    rotateZ(float angle);                   // rotate on Z-axis with degree
     Matrix4&    scale(float scale);                     // uniform scale
     Matrix4&    scale(float sx, float sy, float sz);    // scale by (sx, sy, sz) on each axis
