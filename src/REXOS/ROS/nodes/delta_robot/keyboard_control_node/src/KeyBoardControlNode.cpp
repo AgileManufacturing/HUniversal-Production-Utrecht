@@ -144,6 +144,15 @@ void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double accelerati
 	instructionData["move"] = moveCommand;
 	equipletStep.setInstructionData(instructionData);
 	
+	rexos_datatypes::OriginPlacement originPlacement;
+	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_CURRENT_POSITION);
+	equipletStep.setOriginPlacement(originPlacement);
+	
+	rexos_knowledge_database::ModuleIdentifier identifier("HU", "delta_robot_type_B", "1");
+	equipletStep.setModuleIdentifier(identifier);
+	
+	equipletStep.setStatus("WAITING");
+	
 	Json::StyledWriter writer;
 	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON()))) {
 		REXOS_INFO_STREAM("printed: " << equipletStep.toJSON() << "to blackboard.");

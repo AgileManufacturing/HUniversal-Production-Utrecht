@@ -86,7 +86,7 @@ namespace rexos_delta_robot {
 		// as it would be relative to the motor indicated by motor_angle).
 		
 		Matrix4 rotationMatrix;
-		rotationMatrix.rotateZ(motorLocation);
+		rotationMatrix.rotateZ(-motorLocation);
 		
 		Vector3 destinationPointRotatedAroundZAxis = rotationMatrix * destinationPoint;
 		
