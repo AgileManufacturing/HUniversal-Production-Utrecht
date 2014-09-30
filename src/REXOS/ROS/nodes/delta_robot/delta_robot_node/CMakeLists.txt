@@ -31,7 +31,6 @@ file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS} ${LOG4CXX_INCLUDE_DIR})
 add_executable(delta_robot_node src/DeltaRobotNode.cpp)
 
-
 target_link_libraries(delta_robot_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES} ${JSONCPP_LIBRARIES})
 add_dependencies(delta_robot_node delta_robot_node_gencpp)
 

@@ -57,7 +57,7 @@ PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_datab
 		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
 		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
-		environmentCacheClient(nodeHandle.serviceClient<environment_cache::UpdateEnvironmentCache>("updateEnvironmentCache")),
+		environmentCacheClient(nodeHandle.serviceClient<environment_cache::setData>("updateEnvironmentCache")),
 		samplesTopLeft(minCornerSamples),
 		samplesTopRight(minCornerSamples),
 		samplesBottomRight(minCornerSamples)
@@ -239,29 +239,19 @@ double PartLocatorNode::getItemRotationAngle(Vector2 lineA2B) {
 	return angle;
 }
 void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location, double angle) {
-		environment_cache::UpdateEnvironmentCache serviceCall;
-		serviceCall.request.cacheUpdate.event = EnvironmentCache::ADD_OR_UPDATE;
-		serviceCall.request.cacheUpdate.id = value;
-		environment_communication_msgs::Map properties;
-		environment_communication_msgs::KeyValuePair keyValuePair; 
+		environment_cache::setData serviceCall;
+		serviceCall.request.identifier = value;
 		
-		keyValuePair.key = "locationX";
-		keyValuePair.value = boost::lexical_cast<string>(location.x);
-		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
+		Json::Value data;
+		Json::Value locationJson;
+		locationJson["x"] = location.x;
+		locationJson["y"] = location.y;
+		locationJson["z"] = location.z;
+		Json::Value rotationJson;
+		rotationJson["z"] = angle;
 		
-		keyValuePair.key = "locationY";
-		keyValuePair.value = boost::lexical_cast<string>(location.y);
-		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
-		
-		keyValuePair.key = "locationZ";
-		keyValuePair.value = boost::lexical_cast<string>(location.z);
-		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
-		
-		keyValuePair.key = "angle";
-		keyValuePair.value = boost::lexical_cast<string>(angle);
-		properties.map.push_back(environment_communication_msgs::KeyValuePair(keyValuePair));
-		
-		serviceCall.request.cacheUpdate.properties = properties;
+		data["location"] = locationJson;
+		data["rotation"] = rotationJson;
 		environmentCacheClient.call(serviceCall);
 }
 

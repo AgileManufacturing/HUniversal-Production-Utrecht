@@ -33,49 +33,50 @@
 
 #include "ros/ros.h"
 #include "rexos_logger/rexos_logger.h"
-#include <environment_cache/UpdateEnvironmentCache.h>
-#include <environment_cache/LookupEnvironmentObject.h>
-#include <string>
+#include <environment_cache/getData.h>
+#include <environment_cache/setData.h>
+#include <environment_cache/removeData.h>
 #include <map>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
 
 /**
  * This class represents the environment cache
  **/
 class EnvironmentCache{
 public:
-	/**
-	 * @var environmentAction
-	 * The enum for environment actions that are possible
-	 **/
-	enum environmentAction {ADD, UPDATE, ADD_OR_UPDATE, REMOVE};
 	EnvironmentCache();
-	bool lookupEnvironmentObject(environment_cache::LookupEnvironmentObject::Request &req, environment_cache::LookupEnvironmentObject::Response &res);
-	bool updateEnvironmentCache(environment_cache::UpdateEnvironmentCache::Request &req, environment_cache::UpdateEnvironmentCache::Response &res);
+	bool getData(environment_cache::getData::Request& req, environment_cache::getData::Response& res);
+	bool setData(environment_cache::setData::Request& req, environment_cache::setData::Response& res);
+	bool removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res);
 	void printEnvironmentCache();
 
 private:
-	bool addItemToCache(std::string id, const std::vector<environment_communication_msgs::KeyValuePair> &properties);
-	bool updateItemInCache(std::string id, const std::vector<environment_communication_msgs::KeyValuePair> &properties);
-	bool removeItemFromCache(std::string id);
-	void createMapFromVector(const std::vector<environment_communication_msgs::KeyValuePair> &propertiesVector, std::map<std::string, std::string> &propertiesMap);
-	environment_communication_msgs::Map createMapMessageFromProperties(std::map<std::string, std::string> &properties);
-
+	void getJsonNodeForItem(std::string identifier);
+	bool getItemDataInCache(std::string identifier, std::string paths[]);
+	bool setItemDataInCache(std::string identifier, Json::Value data);
+	bool removeDataOfItemFromCache(std::string identifier, std::string paths[]);
+	
 	/**
-	 * @var std::map< std::string, std::map<std::string, std::string> > cache
-	 * Map that is used for caching the data
+	 * @var The cache used for actually storing the data. The key is the identifier of the item for which the data is stored. 
+	 * The value is the JSON node containing all the data.
 	 **/
-	std::map< std::string, std::map<std::string, std::string> > cache;
-
+	std::map<std::string, Json::Value> cache;
 	/**
-	 * @var ros::ServiceServer lookupEnvironmentObjectService
-	 * The service object for calling the lookup environment
+	 * @var The Ros nodehandle
 	 **/
-	ros::ServiceServer lookupEnvironmentObjectService;
-
+	ros::NodeHandle nh;
 	/**
-	 * @var ros::ServiceServer updateEnvironmentCacheService
-	 * Server thats gets called to update the data in the update environment cache
+	 * @var The ROS service server for the getData service
 	 **/
-	ros::ServiceServer updateEnvironmentCacheService;
+	ros::ServiceServer getDataServiceServer;
+	/**
+	 * @var The ROS service server for the setData service
+	 **/
+	ros::ServiceServer setDataServiceServer;
+	/**
+	 * @var The ROS service server for the removeData service
+	 **/
+	ros::ServiceServer removeDataServiceServer;
 };
 #endif
