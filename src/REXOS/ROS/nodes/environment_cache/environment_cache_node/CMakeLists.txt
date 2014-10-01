@@ -6,10 +6,10 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation envir
 find_package(Log4cxx)
 find_package(Jsoncpp)
 
-file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
-add_message_files(
-DIRECTORY msg
-FILES ${msgs} )
+#file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
+#add_message_files(
+#DIRECTORY msg
+#FILES ${msgs} )
   	
 file(GLOB_RECURSE srvs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
 add_service_files(
