@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<runlength>10000</runlength>
+	<runs>1</runs>
+	<travel type="normal">1</travel>
+	<products>
+		<arrival type="none">30</arrival>
+		<deadline  type="none">100000</deadline>
+		<path>3</path>
+		<steps>
+			<step probability="50">
+				<name>screw</name>
+				<estimate>10</estimate>
+			</step>
+			<step probability="10">
+				<name>unscrew</name>
+				<estimate>10</estimate>
+			</step>
+			<step probability="20">
+				<name>saw</name>
+				<estimate>50</estimate>
+			</step>
+			<step probability="20">
+				<name>glue</name>
+				<estimate>40</estimate>
+			</step>
+		</steps>
+	</products>
+	<equiplets>
+		<equiplet>
+			<name>E1</name>
+			<position>
+				<x>0</x>
+				<y>0</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>screw</name>
+					<duration type="exp">10</duration>
+					<limitations>
+						<limitation type="min-size">10</limitation>
+						<limitation type="max-size">20</limitation>
+						<limitation type="material">magnetic</limitation>
+					</limitations>
+				</capability>
+				<capability>
+					<name>unscrew</name>
+					<duration type="exp">10</duration>
+					<limitations>
+						<limitation type="min-size">10</limitation>
+						<limitation type="max-size">20</limitation>
+						<limitation type="material">magnetic</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E2</name>
+			<position>
+				<x>0</x>
+				<y>2</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>screw</name>
+					<duration type="exp">10</duration>
+					<limitations>
+						<limitation type="min-size">10</limitation>
+						<limitation type="max-size">20</limitation>
+						<limitation type="material">magnetic</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E3</name>
+			<position>
+				<x>2</x>
+				<y>0</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">40</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">20</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">paper</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E4</name>
+			<position>
+				<x>2</x>
+				<y>2</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E5</name>
+			<position>
+				<x>0</x>
+				<y>4</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E6</name>
+			<position>
+				<x>4</x>
+				<y>0</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E7</name>
+			<position>
+				<x>4</x>
+				<y>2</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>saw</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E8</name>
+			<position>
+				<x>4</x>
+				<y>4</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E9</name>
+			<position>
+				<x>4</x>
+				<y>6</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E10</name>
+			<position>
+				<x>6</x>
+				<y>4</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E11</name>
+			<position>
+				<x>2</x>
+				<y>6</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E12</name>
+			<position>
+				<x>2</x>
+				<y>8</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E13</name>
+			<position>
+				<x>4</x>
+				<y>8</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+		<equiplet>
+			<name>E14</name>
+			<position>
+				<x>0</x>
+				<y>8</y>
+			</position>
+			<breakdown type="exp">1000</breakdown>
+			<repaired type="exp">20</repaired>
+			<capabilities>
+				<capability>
+					<name>glue</name>
+					<duration type="exp">50</duration>
+					<limitations>
+						<limitation type="max-bound">100</limitation>
+						<limitation type="material">wood</limitation>
+					</limitations>
+				</capability>
+			</capabilities>
+		</equiplet>
+	</equiplets>
+</config>
