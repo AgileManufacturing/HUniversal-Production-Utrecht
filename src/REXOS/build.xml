@@ -1,7 +1,7 @@
 <project name="REXOS" default="all" basedir=".">
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 		<classpath>
-			<pathelement location="/usr/share/java/ant-contrib.jar" />
+			<pathelement location="${repo-root}/src/REXOS/external_libraries/ant-contrib.jar" />
 		</classpath>
 	</taskdef>
 	

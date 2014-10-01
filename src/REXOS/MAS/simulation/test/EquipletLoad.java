@@ -11,7 +11,7 @@ public class EquipletLoad {
 
 	@Test
 	public void testEmptySchedule() {
-		System.out.println("\n testEmptySchedule");
+		//System.out.println("\n testEmptySchedule");
 		EquipletTest equiplet = new EquipletTest();
 		double load = equiplet.load(new Tick(0), new Tick(1000));
 		assertEquals("load must be 1 with an empty schedule", 1, load, 0);
@@ -19,7 +19,7 @@ public class EquipletLoad {
 
 	@Test
 	public void testOneJobFullInside() {
-		System.out.println("\n testOneJobFullInside");
+		//System.out.println("\n testOneJobFullInside");
 		double window = 1000;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -30,7 +30,7 @@ public class EquipletLoad {
 
 	@Test
 	public void testOneJobPartialInside() {
-		System.out.println("\n testOneJobPartialInside");
+		//System.out.println("\n testOneJobPartialInside");
 		double window = 1000;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -41,7 +41,7 @@ public class EquipletLoad {
 
 	@Test
 	public void testTwoJobPartialInside() {
-		System.out.println("\n test executing");
+		//System.out.println("\n test executing");
 		double window = 1000d;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -53,7 +53,7 @@ public class EquipletLoad {
 
 	@Test
 	public void testTwoJobOutside() {
-		System.out.println("\n testTwoJobOutside");
+		//System.out.println("\n testTwoJobOutside");
 		double window = 1000d;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -65,7 +65,7 @@ public class EquipletLoad {
 
 	@Test
 	public void testMultipleJobsInside() {
-		System.out.println("\n testMultipleJobsInside");
+		//System.out.println("\n testMultipleJobsInside");
 		double window = 1000d;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -82,20 +82,20 @@ public class EquipletLoad {
 
 	@Test
 	public void testExecuting() {
-		System.out.println("\n testExecuting");
+		//System.out.println("\n testExecuting");
 		double window = 1000d;
 
 		EquipletTest equiplet = new EquipletTest();
 		equiplet.execute(new Job(new Tick(50), new Tick(100)));
 
 		double load = equiplet.load(new Tick(60), new Tick(window));
-		System.out.println("load must be " + (1 - 0 / window) + "  with an empty schedule " + load);
+		//System.out.println("load must be " + (1 - 0 / window) + "  with an empty schedule " + load);
 		assertEquals("load must be " + (1 - 0 / window) + "  with an empty schedule", (1 - (0 / window)), load, 0);
 	}
 
 	@Test
 	public void testFullSchedule() {
-		System.out.println("\n testFullSchedule");
+		//System.out.println("\n testFullSchedule");
 		double window = 500d;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -112,14 +112,14 @@ public class EquipletLoad {
 		equiplet.schedule(new Job(new Tick(500), new Tick(550)));
 
 		double load = equiplet.load(new Tick(40), new Tick(window));
-		System.out.println("load must be " + (1 - window / window) + "  with an full schedule " + load);
+		//System.out.println("load must be " + (1 - window / window) + "  with an full schedule " + load);
 		assertEquals("load must be " + (1 - window / window) + "  with an empty schedule", (1 - (window / window)), load, 0);
 	}
 
 	@Test
 	public void testWindowsEqualToSchedule() {
-		System.out.println("\n testWindowsEqualToSchedule");
-		System.out.println("double problem: (1 - 0.1 - 0.1 - 0.1 - 0.1) = " + (1 - 0.1 - 0.1 - 0.1 - 0.1) + " != 0.6");
+		//System.out.println("\n testWindowsEqualToSchedule");
+		//System.out.println("double problem: (1 - 0.1 - 0.1 - 0.1 - 0.1) = " + (1 - 0.1 - 0.1 - 0.1 - 0.1) + " != 0.6");
 		double window = 100d;
 
 		EquipletTest equiplet = new EquipletTest();
@@ -129,7 +129,7 @@ public class EquipletLoad {
 		equiplet.schedule(new Job(new Tick(166), new Tick(216)));
 
 		double load = equiplet.load(new Tick(28.269870205410786), new Tick(window));
-		System.out.println("load must be " + (1 - window / window) + "  with an full schedule " + load);
+		//System.out.println("load must be " + (1 - window / window) + "  with an full schedule " + load);
 		assertEquals("load must be " + (1 - window / window) + "  with an empty schedule", (1 - (window / window)), load, 0);
 	}
 }
