@@ -82,7 +82,7 @@ public class CreateAgent {
 			agent.setProductSteps(args);
 			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 			try{		
-				AgentController ac = container.acceptNewAgent( container.getContainerName()+identifier, agent);
+				AgentController ac = container.acceptNewAgent( container.getContainerName(), agent);
 				
 				ac.start();	
 				

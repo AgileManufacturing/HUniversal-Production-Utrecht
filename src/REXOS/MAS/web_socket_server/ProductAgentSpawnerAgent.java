@@ -18,9 +18,8 @@ public class ProductAgentSpawnerAgent extends Agent {
 	 
 	public void sendMessage(String message, int type){
 		  ACLMessage acl = new ACLMessage(type);
-		  AID aid=new AID(ServerConfigurations.GS_NAME,AID.ISGUID);
+		  AID aid=new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
 		  aid.addAddresses(ServerConfigurations.GS_ADDRESS);
-		  
 		  acl.addReceiver(aid);
 		  acl.setContent(message);
 		  System.out.println("Send acl: " + acl);
@@ -28,6 +27,7 @@ public class ProductAgentSpawnerAgent extends Agent {
 		  System.out.println("Send message: " + message);
 	}
 	protected void setup(){
+		System.out.println("Hello. My name is "+this.getLocalName());
 		System.out.println(productSteps);
 		System.out.println("Agent name: "+ this.getName());
 		sendMessage(productSteps, 0);

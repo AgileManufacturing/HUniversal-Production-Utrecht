@@ -424,7 +424,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		
 		hal.translateProductStep(
-				new ProductStep("1", criteria, new Service("place")));
+				new ProductStep(1, criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);

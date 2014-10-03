@@ -120,7 +120,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * @var EQName
 	  * Hardcoded EquipletName. This should be changed in the future.
 	  */
-	private String EQName = "EQ3";
+	private String EQName = "EQ2";
 	
 	/**
 	  * @var equipletActive
@@ -286,13 +286,14 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		        	JSONObject message = new JSONObject();
 		        	message.put("startTime", "0");
 		        	message.put("duration", "100");
-		        	message.put("productStepId", productSteps.getString("id"));	       	
+		        	message.put("productStepId", productSteps.getInt("id"));	       	
 		        	
 		        	return message.toString();
 		        }	        
 			}
 		} catch (JSONException ex) {
 			ex.printStackTrace();
+			System.out.println("\nTHE MESSAGE WAS:\n" + msg + "\n");
 		}
 		return "false";
 	}
@@ -306,7 +307,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		try {
 			JSONObject productSteps = new JSONObject(new JSONTokener(msg));
 			Job job = new Job(productSteps.getString("startTime"), productSteps.getString("duration"), 
-					productSteps.getString("productStepId"), productSteps.getJSONObject("productStep"));
+					productSteps.getInt("productStepId"), productSteps.getJSONObject("productStep"));
 	    	equipletSchedule.add(job);
 	    	productStepCounter++;
 			System.out.println(equipletSchedule.size()+" =Length");

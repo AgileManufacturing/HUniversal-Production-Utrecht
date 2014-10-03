@@ -471,7 +471,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		criteria2.put("subjects", subjects2);	
 		
 		hal.translateProductStep(
-				new ProductStep("1", criteria1, new Service("place")));		
+				new ProductStep(1, criteria1, new Service("place")));		
 
 	}
 	
@@ -515,11 +515,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		if(state){
 			state = false;
 			hal.translateProductStep(
-					new ProductStep("1", criteria1, new Service("place")));	
+					new ProductStep(1 , criteria1, new Service("place")));	
 		}else{
 			state = true;
 			hal.translateProductStep(
-					new ProductStep("1", criteria2, new Service("place")));
+					new ProductStep(1, criteria2, new Service("place")));
 		}
 	}
 
