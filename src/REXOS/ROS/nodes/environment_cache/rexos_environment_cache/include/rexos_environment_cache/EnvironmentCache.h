@@ -1,5 +1,5 @@
 /**
- * @file EnvironmentCache.cpp
+ * @file EnvironmentCache.h
  * @brief The EnvironmentCache definition
  * @date Created: 2014-10-02
  *
@@ -28,49 +28,36 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <environment_cache/EnvironmentCache.h>
+#pragma once 
+
+#include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
+#include <map>
 #include <iostream>
-#include <jsoncpp/json/writer.h>
-#include <jsoncpp/json/reader.h>
-#include <boost/algorithm/string.hpp>
+#include <jsoncpp/json/value.h>
 
-#define ENVIRONMENT_CACHE_DEBUG
-
-/**
- * The constructor of the EnvironmentCache class
- **/
-EnvironmentCache::EnvironmentCache() {
-	// Initialise services
-	getDataServiceServer = nh.advertiseService("getData", &EnvironmentCache::getData, this);
-	setDataServiceServer = nh.advertiseService("setData", &EnvironmentCache::setData, this);
-	removeDataServiceServer = nh.advertiseService("removeData", &EnvironmentCache::removeData, this);
-}
-
-bool EnvironmentCache::getData(environment_cache::getData::Request& req, environment_cache::getData::Response& res) {
-	Json::StyledWriter writer;
-	try {
-		res.jsonData = writer.write(cache.getItemDataInCache(req.identifier, req.paths));
-		return true;
-	} catch (std::runtime_error ex) {
-		return false;
-	}
-}
-bool EnvironmentCache::setData(environment_cache::setData::Request& req, environment_cache::setData::Response& res) {
-	Json::Reader reader;
-	Json::Value jsonNode;
-	if(reader.parse(req.json, jsonNode) == false) return false;
-	cache.setItemDataInCache(req.identifier, jsonNode);
-}
-bool EnvironmentCache::removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res) {
-	cache.removeDataOfItemFromCache(req.identifier, req.paths);
-}
-
-/** 
- * Main that creates the environment cache
- **/
-int main(int argc, char **argv){
-	ros::init(argc, argv, "EnvironmentCache");
-	EnvironmentCache envCache;
-	ros::spin();
-	return 0;
+namespace rexos_environment_cache{
+	/**
+	 * This class represents the environment cache
+	 **/
+	class EnvironmentCache{
+	public:
+		std::string printEnvironmentCache();
+		
+		Json::Value getItemDataInCache(std::string identifier, std::vector<std::string> paths);
+		void setItemDataInCache(std::string identifier, Json::Value data);
+		void removeDataOfItemFromCache(std::string identifier, std::vector<std::string> paths);
+		
+	private:
+		Json::Value& getJsonNodeForItem(std::string identifier);
+		void mergeJsonNode(Json::Value& toBeMerged, Json::Value& mergeTarget);
+		
+		/**
+		 * @var The cache used for actually storing the data. The key is the identifier of the item for which the data is stored. 
+		 * The value is the JSON node containing all the data.
+		 **/
+		std::map<std::string, Json::Value> cache;
+	public:
+		std::map<std::string, Json::Value> getCache();
+	};
 }

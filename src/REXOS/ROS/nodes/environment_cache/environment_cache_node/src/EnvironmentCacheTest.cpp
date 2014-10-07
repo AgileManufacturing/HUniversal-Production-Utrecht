@@ -1,7 +1,7 @@
 /**
- * @file EnvironmentCache.h
+ * @file EnvironmentCacheTest.cpp
  * @brief The EnvironmentCache definition
- * @date Created: 2014-10-02
+ * @date Created: 2014-10-03
  *
  * @author Tommas Bakker
  *
@@ -28,47 +28,73 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef ENVIRONMENTCACHE_H
-#define ENVIRONMENTCACHE_H
 
-#include "ros/ros.h"
-#include "rexos_logger/rexos_logger.h"
 #include <rexos_environment_cache/EnvironmentCache.h>
-#include <environment_cache/getData.h>
-#include <environment_cache/setData.h>
-#include <environment_cache/removeData.h>
-#include <map>
-#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
 
-/**
- * This class represents the environment cache
+
+
+
+
+
+
+/** 
+ * Main that runs the tests
  **/
-class EnvironmentCache{
-public:
-	EnvironmentCache();
-	bool getData(environment_cache::getData::Request& req, environment_cache::getData::Response& res);
-	bool setData(environment_cache::setData::Request& req, environment_cache::setData::Response& res);
-	bool removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res);
-	
-	/**
-	 * @var The enviroment cache
-	 **/
+int main(int argc, char **argv){
 	rexos_environment_cache::EnvironmentCache cache;
-	/**
-	 * @var The Ros nodehandle
-	 **/
-	ros::NodeHandle nh;
-	/**
-	 * @var The ROS service server for the getData service
-	 **/
-	ros::ServiceServer getDataServiceServer;
-	/**
-	 * @var The ROS service server for the setData service
-	 **/
-	ros::ServiceServer setDataServiceServer;
-	/**
-	 * @var The ROS service server for the removeData service
-	 **/
-	ros::ServiceServer removeDataServiceServer;
-};
-#endif
+	
+	Json::StyledWriter writer;
+	Json::Value result;
+	
+	Json::Value partA;
+	partA["location"]["x"] = -30.5;
+	partA["location"]["y"] = 24.1;
+	partA["rotation"]["z"] = -0.12;
+	partA["weight"] = 813;
+	cache.setItemDataInCache("partA", partA);
+	if(cache.getCache().at("partA") != partA) {
+		ROS_ERROR_STREAM("Test 1 failed: \n" << cache.printEnvironmentCache());
+		return -1;
+	}
+	
+	Json::Value partB;
+	partB["location"]["z"] = -76.1;
+	partB["rotation"]["z"] = 1.3;
+	partB["temperature"] = 300;
+	cache.setItemDataInCache("partB", partB);
+	if(cache.getCache().at("partB") != partB) {
+		ROS_ERROR_STREAM("Test 2 failed: \n" << cache.printEnvironmentCache());
+		return -2;
+	}
+	
+	partB["location"]["z"] = 0;
+	partB["rotation"]["z"] = 0;
+	partB["temperature"] = 0;
+	cache.setItemDataInCache("partB", partB);
+	if(cache.getCache().at("partB") != partB) {
+		ROS_ERROR_STREAM("Test 3 failed: \n" << cache.printEnvironmentCache());
+		return -3;
+	}
+	
+	std::vector<std::string> partAGetPaths;
+	partAGetPaths.push_back("location/x");
+	result = cache.getItemDataInCache("partA", partAGetPaths);
+	if(result["location"]["x"] != partA["location"]["x"]) {
+		ROS_ERROR_STREAM("Test 4 failed: \n" << writer.write(result));
+		return -4;
+	}
+	
+	std::vector<std::string> partARemovePaths;
+	partARemovePaths.push_back("location");
+	partARemovePaths.push_back("weight");
+	partARemovePaths.push_back("rotation/z");
+	cache.removeDataOfItemFromCache("partA", partARemovePaths);
+	auto interalCache = cache.getCache();
+	if(interalCache.find("partA") != interalCache.end()) {
+		ROS_ERROR_STREAM("Test 5 failed: \n" << cache.printEnvironmentCache());
+		return -5;
+	}
+	
+	return 0;
+}
