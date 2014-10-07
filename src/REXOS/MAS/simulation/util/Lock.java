@@ -11,7 +11,7 @@ public class Lock {
 	}
 
 	public synchronized void unlock() {
-		System.out.println("Simulation: lock.unlock();");
+		//System.out.println("Simulation: lock.unlock();");
 		isLocked = false;
 		notify();
 	}

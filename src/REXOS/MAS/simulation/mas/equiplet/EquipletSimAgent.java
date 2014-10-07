@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.json.JSONException;
 
+import MAS.simulation.simulation.ISimulation;
 import MAS.simulation.util.Parser;
 import MAS.simulation.util.Position;
 import MAS.simulation.util.Tick;
@@ -36,8 +37,10 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 	// Simulation performances
 	/**
-	 * statistics Statistics contains the time the equiplet is in one of the states <BUSY, IDLE, ERROR>
-	 * The states ERROR_READY and ERROR_FINISHED are counted as ERROR and ERROR_REPAIRED as BUSY
+	 * statistics Statistics contains the time the equiplet is in one of the
+	 * states <BUSY, IDLE, ERROR>
+	 * The states ERROR_READY and ERROR_FINISHED are counted as ERROR and
+	 * ERROR_REPAIRED as BUSY
 	 */
 	private Triple<Tick, Tick, Tick> statistics;
 
@@ -48,18 +51,22 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	private Tick lastStatisticsUpdate;
 
 	/**
-	 * scheduleLatency A list of differences between the time and the time scheduled
+	 * scheduleLatency A list of differences between the time and the time
+	 * scheduled
 	 */
 	private Map<Tick, Tick> scheduleLatency;
 
-	public EquipletSimAgent(Position position, List<Capability> capabilities) {
+	private ISimulation simulation;
+
+	public EquipletSimAgent(ISimulation simulation, Position position, List<Capability> capabilities) {
 		try {
 			Object[] args = new Object[] { Parser.parseEquipletConfiguration(position, capabilities) };
 			setArguments(args);
 		} catch (JSONException e) {
 			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
 		}
-
+		
+		this.simulation = simulation;
 		lastStatisticsUpdate = new Tick(0);
 		statistics = new Triple<Tick, Tick, Tick>(new Tick(0), new Tick(0), new Tick(0));
 		scheduleLatency = new HashMap<Tick, Tick>();
@@ -89,6 +96,41 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	@Override
+	public List<Capability> getCapabilities() {
+		return capabilities;
+	}
+
+	/**
+	 * 
+	 * @param capabilities
+	 */
+	@Override
+	public void reconfigureStart(List<Capability> capabilities) {
+		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
+		reconfigure = true;
+		deregister();
+		this.capabilities = capabilities;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void reconfigureFinished() {
+		System.out.printf("EA:%s reconfigure finished he has new capabilties %s \n", getLocalName(), capabilities);
+		if (schedule.isEmpty()) {
+			reconfigure = false;
+			for (Capability capability : capabilities) {
+				productionTimes.put(capability.getService(), capability.getDuration());
+			}
+			register();
+			state = EquipletState.IDLE;
+		} else {
+			throw new IllegalArgumentException("Equiplet has not an empty schedule while being reconfigured");
+		}
+	}
+
+	@Override
 	public double load(Tick time, Tick window) {
 		return super.load(time, window);
 	}
@@ -112,8 +154,10 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * Get the complete schedule of the equiplet, the job which are executed, executing and to be executed
-	 * The schedule contains a list of jobs with the start and end time and the product agent for whom the job is (to be) executed
+	 * Get the complete schedule of the equiplet, the job which are executed,
+	 * executing and to be executed
+	 * The schedule contains a list of jobs with the start and end time and the
+	 * product agent for whom the job is (to be) executed
 	 * 
 	 * @return a list of jobs
 	 */
@@ -172,7 +216,8 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * Information for updating the gui Tuple < name of equiplet, position, services, Tuple < state, waiting, scheduled, executed > >
+	 * Information for updating the gui Tuple < name of equiplet, position,
+	 * services, Tuple < state, waiting, scheduled, executed > >
 	 * 
 	 * @return information
 	 */
@@ -182,7 +227,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		for (Capability capability : capabilities) {
 			services.add(capability.getService());
 		}
-		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString(), getWaiting(), getScheduled(), getExecuted());
+		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() +(reconfigure ?" reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
 		return new Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>(getLocalName(), getPosition(), services, info);
 	}
 
@@ -195,7 +240,8 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * Update the statistics This method should be called before each state change
+	 * Update the statistics This method should be called before each state
+	 * change
 	 * 
 	 * @param time
 	 */
@@ -306,6 +352,12 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 				// if (!schedule.isEmpty() && jobReady()) {
 				schedule.remove(ready);
 				executeJob(time, ready);
+			} else if (reconfigure && schedule.isEmpty()) {
+				state = EquipletState.RECONFIG;
+				if (simulation == null) {
+					throw new IllegalArgumentException("FUCK sim" );
+				}
+				simulation.notifyReconfigReady(getLocalName());
 			} else {
 				state = EquipletState.IDLE;
 				executing = null;

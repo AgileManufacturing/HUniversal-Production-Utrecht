@@ -12,4 +12,6 @@ public interface ISimulation {
 
 	void notifyProductFinished(String productName);
 
+	void notifyReconfigReady(String equipletName);
+
 }

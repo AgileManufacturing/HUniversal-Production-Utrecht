@@ -42,20 +42,23 @@ class Stochastics {
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
 			return generateProductStepsTest();
-/*
-			LinkedList<ProductStep> steps = new LinkedList<>();
-			List<ProductStep> productSteps = config.getProductSteps();
-
-			int minProductSteps = 3;
-			int avgProductSteps = productSteps.size();
-			int n = minProductSteps + random.nextInt(avgProductSteps - minProductSteps);
-			for (int i = 0; i < n; i++) {
-				ProductStep step = productSteps.get(random.nextInt(productSteps.size()));
-				steps.add(new ProductStep(i, step.getService(), step.getCriteria()));
-			}
-
-			return steps;
-			*/
+			/*
+			 * LinkedList<ProductStep> steps = new LinkedList<>();
+			 * List<ProductStep> productSteps = config.getProductSteps();
+			 * 
+			 * int minProductSteps = 3;
+			 * int avgProductSteps = productSteps.size();
+			 * int n = minProductSteps + random.nextInt(avgProductSteps -
+			 * minProductSteps);
+			 * for (int i = 0; i < n; i++) {
+			 * ProductStep step =
+			 * productSteps.get(random.nextInt(productSteps.size()));
+			 * steps.add(new ProductStep(i, step.getService(),
+			 * step.getCriteria()));
+			 * }
+			 * 
+			 * return steps;
+			 */
 		}
 
 		@SuppressWarnings("unused")
@@ -107,6 +110,10 @@ class Stochastics {
 
 	private Tick time(Pair<Tick, DurationType> data) {
 		return time(data.first, data.second);
+	}
+
+	public Tick generateReconfigTime() {
+		return new Tick(200);
 	}
 
 	private Tick time(Tick time, DurationType type) {

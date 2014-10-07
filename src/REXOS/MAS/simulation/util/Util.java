@@ -1,7 +1,10 @@
 package MAS.simulation.util;
 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.TreeMap;
 
 public class Util {
 
@@ -23,5 +26,24 @@ public class Util {
 			buffer.append(System.getProperty("line.separator"));
 		}
 		return buffer.toString();
+	}
+	
+	public static TreeMap<Tick, Double> movingAverage(TreeMap<Tick, Double> map, int period) {
+		TreeMap<Tick, Double> newMap = new TreeMap<Tick, Double>();
+	    Queue<Double> window = new LinkedList<Double>();
+	    double sum = 0.0;
+	 
+	    assert period > 0 : "Period must be a positive integer";
+	    
+	    for (Entry<Tick, Double> entry : map.entrySet()) {
+	        sum += entry.getValue();
+	        window.add(entry.getValue());
+	        if (window.size() > period) {
+	            sum -= window.remove();
+	        }
+	        
+	        newMap.put(entry.getKey(), sum / window.size());
+		}
+	    return newMap;
 	}
 }

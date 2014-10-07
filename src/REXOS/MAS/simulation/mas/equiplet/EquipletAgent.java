@@ -43,9 +43,10 @@ public class EquipletAgent extends Agent {
 	// Equiplet state
 	protected TreeSet<Job> schedule;
 	protected EquipletState state;
+	protected boolean reconfigure;
 	protected Job executing;
 	protected TreeSet<Job> history;
-	private Map<String, Tick> productionTimes;
+	protected Map<String, Tick> productionTimes;
 
 	/**
 	 * Equiplet agent startup
@@ -89,6 +90,7 @@ public class EquipletAgent extends Agent {
 		this.capabilities = capabilities;
 
 		this.state = EquipletState.IDLE;
+		this.reconfigure = false;
 		this.executing = null;
 		this.schedule = new TreeSet<>();
 		this.history = new TreeSet<>();
@@ -102,7 +104,7 @@ public class EquipletAgent extends Agent {
 	/**
 	 * Register the equiplet services by the Directory Facilitator Agent
 	 */
-	private void register() {
+	protected void register() {
 		DFAgentDescription dfAgentDescription = new DFAgentDescription();
 		dfAgentDescription.setName(getAID());
 		for (Capability capability : capabilities) {
@@ -118,6 +120,17 @@ public class EquipletAgent extends Agent {
 		} catch (FIPAException fe) {
 			System.err.printf("EA:%s Failed to register services\n", getLocalName());
 			fe.printStackTrace();
+		}
+	}
+
+	/**
+	 * Deregister the equiplet services by the Directory Facilitator Agent
+	 */
+	public void deregister() {
+		try {
+			DFService.deregister(this);
+		} catch (FIPAException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -206,7 +219,8 @@ public class EquipletAgent extends Agent {
 
 	/**
 	 * Checks whether a job is ready for execution
-	 * TODO check not only the first in the schedule but also after if job can be executed earlier than
+	 * TODO check not only the first in the schedule but also after if job can
+	 * be executed earlier than
 	 * planned, which increases complexity
 	 * 
 	 * @return if there is job ready for executing
@@ -230,9 +244,14 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * check whether the equiplet can execute a list of product steps within a time frame
-	 * this returns the list of services that can be performed @see {@code isCapable}, with the estimate duration of the service and a list of possible time frames
-	 * the time frame is a list of times from which the equiplet is free until the equiplet busy again where the deadline is the time till when is looked
+	 * check whether the equiplet can execute a list of product steps within a
+	 * time frame
+	 * this returns the list of services that can be performed @see
+	 * {@code isCapable}, with the estimate duration of the service and a list
+	 * of possible time frames
+	 * the time frame is a list of times from which the equiplet is free until
+	 * the equiplet busy again where the deadline is the time till when is
+	 * looked
 	 * 
 	 * @param time
 	 *            of the first possibility to perform the product steps
@@ -259,7 +278,8 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * check whether the equiplet is capable to perform a service with certain criteria
+	 * check whether the equiplet is capable to perform a service with certain
+	 * criteria
 	 * 
 	 * @param service
 	 * @param criteria
@@ -277,7 +297,8 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * the first possible time there is enough room in the schedule to perform a service
+	 * the first possible time there is enough room in the schedule to perform a
+	 * service
 	 * load = 1 - Sr / Sw
 	 * 
 	 * @param time
@@ -289,6 +310,12 @@ public class EquipletAgent extends Agent {
 	 */
 	protected synchronized List<Pair<Tick, Tick>> available(Tick time, Tick duration, Tick deadline) {
 		List<Pair<Tick, Tick>> available = new ArrayList<Pair<Tick, Tick>>();
+
+		// not availale when going to be reconfigured
+		if (reconfigure) {
+			return available;
+		}
+
 		Tick start = time;
 		if (isExecuting()) {
 			start = start.max(executing.getDue());
@@ -342,8 +369,7 @@ public class EquipletAgent extends Agent {
 		Tick sum = new Tick(0);
 
 		for (Job job : schedule) {
-			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
-					&& job.getDue().lessOrEqualThan(time.add(window))) {
+			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time) && job.getDue().lessOrEqualThan(time.add(window))) {
 				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
 			}
 
@@ -361,7 +387,8 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * calculate the load of the history of the equiplet from a certain time with a window
+	 * calculate the load of the history of the equiplet from a certain time
+	 * with a window
 	 * 
 	 * @param time
 	 *            from which the load needs to be calculated
@@ -375,8 +402,7 @@ public class EquipletAgent extends Agent {
 		Iterator<Job> iterator = history.descendingIterator();
 		while (iterator.hasNext()) {
 			Job job = iterator.next();
-			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
-					&& job.getDue().lessOrEqualThan(time.add(window))) {
+			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time) && job.getDue().lessOrEqualThan(time.add(window))) {
 				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
 			} else if (job.getDue().lessThan(time)) {
 				// the jobs are outside the scope of the load window
@@ -407,6 +433,11 @@ public class EquipletAgent extends Agent {
 	 * @return if it succeeded to schedule the job
 	 */
 	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
+		// do not schedule a job when going to be reconfigured
+		if (reconfigure) {
+			return false;
+		}
+
 		Tick duration = estimateService(service);
 		System.out.printf("EA:%s schedule [product=%s, start=%s, duration=%s, deadline=%s, service=%s, criteria=%s]\n", getLocalName(), product.getLocalName(), start, duration, deadline, service, criteria);
 
@@ -422,7 +453,9 @@ public class EquipletAgent extends Agent {
 
 	/**
 	 * Schedule multiple jobs for one equiplet
-	 * A request consists of a list of product steps, with a tuple of < production step index, a Pair of <start time, deadline>, service, and criteria >
+	 * A request consists of a list of product steps, with a tuple of <
+	 * production step index, a Pair of <start time, deadline>, service, and
+	 * criteria >
 	 * 
 	 * @param product
 	 *            agent
@@ -431,6 +464,11 @@ public class EquipletAgent extends Agent {
 	 * @return true if schedule succeeded
 	 */
 	protected synchronized boolean schedule(AID product, List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests) {
+		// do not schedule a job when going to be reconfigured
+		if (reconfigure) {
+			return false;
+		}
+
 		List<Job> possible = new ArrayList<Job>();
 		for (Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>> data : requests) {
 			int index = data.first;
@@ -481,7 +519,8 @@ public class EquipletAgent extends Agent {
 		 * }
 		 * }
 		 * 
-		 * // rollback added jobs, although first checked if it is possible, there is still gone something wrong
+		 * // rollback added jobs, although first checked if it is possible,
+		 * there is still gone something wrong
 		 * if (!successful) {
 		 * for (int i = job; i >= 0; i--) {
 		 * schedule.remove(possible.get(i));
@@ -520,12 +559,12 @@ public class EquipletAgent extends Agent {
 
 	@Override
 	public String toString() {
-		return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities, (state == EquipletState.IDLE ? "null"
-				: executing), schedule.size(), getWaiting(), history.size(), schedule);
+		return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities, (state == EquipletState.IDLE ? "null" : executing), schedule.size(), getWaiting(), history.size(), "schedule");
 	}
 
 	/**
-	 * Start with executing the first job in the schedule Note: that the first job in the schedule need to be ready
+	 * Start with executing the first job in the schedule Note: that the first
+	 * job in the schedule need to be ready
 	 * TODO fix that the job can be performed earlier that scheduled.
 	 * 
 	 * @param start
@@ -619,7 +658,8 @@ public class EquipletAgent extends Agent {
 	}
 
 	/**
-	 * Inform the product agent that the job started to be executed is for the product agent
+	 * Inform the product agent that the job started to be executed is for the
+	 * product agent
 	 * Thereafter wait for confirmation of the message is received
 	 * 
 	 * @param product
@@ -672,8 +712,7 @@ public class EquipletAgent extends Agent {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
 			}
 		} catch (JSONException e) {
-			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName()
-					: "null"));
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName() : "null"));
 			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
 		}
 	}

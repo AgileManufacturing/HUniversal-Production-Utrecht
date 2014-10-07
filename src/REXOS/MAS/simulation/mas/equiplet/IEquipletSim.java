@@ -14,6 +14,8 @@ public interface IEquipletSim {
 
 	EquipletState getEquipletState();
 
+	List<Capability> getCapabilities();
+
 	double load(Tick time, Tick window);
 
 	double loadHistory(Tick time, Tick window);
@@ -39,4 +41,8 @@ public interface IEquipletSim {
 	Map<Tick, Tick> getLatency();
 
 	void kill();
+
+	void reconfigureStart(List<Capability> services);
+
+	void reconfigureFinished();
 }

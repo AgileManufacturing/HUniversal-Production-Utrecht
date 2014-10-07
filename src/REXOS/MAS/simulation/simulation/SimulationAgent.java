@@ -14,7 +14,6 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -54,6 +53,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 		}
 		setOutput();
 		simulation = new Simulation(this);
+		simulation.init();
 		addBehaviour(new SimulationBehaviour());
 
 		// no use of gui, so start direct the simulation
@@ -118,7 +118,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 	public IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception {
 		try {
 			// Create and start the agent
-			EquipletSimAgent equiplet = new EquipletSimAgent(position, capabilities);
+			EquipletSimAgent equiplet = new EquipletSimAgent(simulation, position, capabilities);
 
 			ContainerController cc = getContainerController();
 			AgentController ac = cc.acceptNewAgent(name, equiplet);
