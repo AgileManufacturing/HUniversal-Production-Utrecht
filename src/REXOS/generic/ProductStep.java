@@ -20,11 +20,11 @@ public class ProductStep {
 	
 	private Service service;
 	private JSONObject criteria;
-	private String id;
+	private int id;
 	
 	public ProductStep(JSONObject json){
 		if (json.has(ID)){
-			this.id = json.optString(ID);
+			this.id = json.optInt(ID);
 		}
 		if (json.has(SERVICE)){
 			this.service = new Service(json.optString(SERVICE));
@@ -34,7 +34,7 @@ public class ProductStep {
 		}
 	}
 	
-	public ProductStep(String productStepId, JSONObject criteria, Service service){
+	public ProductStep(int productStepId, JSONObject criteria, Service service){
 		this.id = productStepId;
 		this.criteria = criteria;
 		this.service = service;
@@ -46,7 +46,7 @@ public class ProductStep {
 	public JSONObject getCriteria(){
 		return this.criteria;
 	}
-	public String getId(){
+	public int getId(){
 		return this.id;
 	}
 	

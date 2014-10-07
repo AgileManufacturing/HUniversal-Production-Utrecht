@@ -39,8 +39,10 @@
 package MAS.grid_server;
 
 import MAS.product.product_agent.ProductAgent;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.AMSService;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
@@ -65,32 +67,47 @@ public class GridAgent extends Agent{
     				ContainerController cc = getContainerController();
     				String name="ProductAgent-"+productAgentCounter;
 					AgentController ac;
-					try {
-						Object[] arguments = new Object[1];
-						arguments[0]=msg.getContent();
-						ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
-	    				ac.start();
-	    				productAgentCounter++;
-
-					} catch (StaleProxyException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					//This will confirm that the sent pong was received
+					if(msg.getContent().equals("Pong")){
+						System.out.println(getName() + ": Pong was succesfully received from "+ msg.getSender());
 					}
-                    System.out.println(msg.getSender().getName()+" Send: "+msg.getContent() );
-
-                    if(!msg.getSender().equals(this.getAgent().getAID())) {  
-                    	if(msg.getPerformative()==ACLMessage.INFORM){
-                    		
-                    	}	                    
-                    }
+					else{
+						try {
+							Object[] arguments = new Object[1];
+							arguments[0]=msg.getContent();
+							ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
+		    				ac.start();
+		    				confirmCreation();
+		    				productAgentCounter++;
+	
+						} catch (StaleProxyException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+                    //System.out.println(msg.getSender().getName()+" Send: "+msg.getContent() );                    
                  }
                 block();				
 			}		
 		});		
+		
 	}
 	@Override
 	protected void takeDown(){
 		
+	}
+	
+	/**
+     * Function that sends a ping to the latest created productagent 
+     * 
+     **/
+	public void confirmCreation() {
+		AID r = new AID ("ProductAgent-" + productAgentCounter + "@145.89.166.82:1099/JADE", AID.ISGUID);
+		ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
+		aclMessage.addReceiver(r);
+		aclMessage.setContent("Ping");
+		System.out.println(getName() + ": Ping");
+		this.send(aclMessage);
 	}
 	
 }

@@ -517,7 +517,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
-		hal.translateProductStep(new ProductStep("1", criteria, new Service("place")));
+		hal.translateProductStep(new ProductStep(1 , criteria, new Service("place")));
 	}
 
 	@Override

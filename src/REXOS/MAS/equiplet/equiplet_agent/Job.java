@@ -63,7 +63,7 @@ public class Job {
 	  * @var productStepId
 	  * The productedStepId that was given by the ProductAgent
 	  */
-	private String productStepId;
+	private int productStepId;
 	
 	/**
 	  * @object productStep
@@ -76,7 +76,7 @@ public class Job {
 	  * The constructor initializes the variables.
 	 * @throws JSONException 
 	  */
-	public Job(String startTime, String duration, String productStepId, JSONObject jsonProductStep) throws JSONException{
+	public Job(String startTime, String duration, int productStepId, JSONObject jsonProductStep) throws JSONException{
 		this.startTime = startTime;
 		this.duration = duration;
 		this.productStepId = productStepId;
@@ -104,7 +104,7 @@ public class Job {
 	  * getProductStepId()
 	  * @return The String productStepId
 	  */
-	public String getProductStepId(){
+	public int getProductStepId(){
 		return productStepId;
 	}
 	

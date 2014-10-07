@@ -125,6 +125,9 @@ public class MonitoringAgent extends Agent{
 		@Override
 		public void onError(Exception ex) {
 			// TODO Auto-generated method stub
+			System.out.println("THE ERROR WAS: " + ex);
+			System.out.println("" + mws.getResourceDescriptor());
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 			
 		}		
 	}
