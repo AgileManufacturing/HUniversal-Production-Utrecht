@@ -12,19 +12,23 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
+import HAL.libraries.knowledgedb_client.KeyNotFoundException;
+import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.ModuleListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.*;
 
 public class Gripper extends ModuleActor {
+	
+	private KnowledgeDBClient knowledgeDBClient;
+	
 	// Gonna be loaded from KDB:
-	private static final double GRIPPER_SIZE = 46.54;
-
+	private static final String GET_GRIPPER_SIZE = "SELECT * FROM ModuleType WHERE typeNumber = 'gripper_type_A'";
 	private static final String ACTIVATE = "activate";
 	private static final String DEACTIVATE = "deactivate";
 	private static final String PICK = "pick";
@@ -32,13 +36,35 @@ public class Gripper extends ModuleActor {
 
 	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory, moduleListener);
+		knowledgeDBClient = new KnowledgeDBClient();
+		System.out.println("Fallout: "+ getGripperSize());
+		getGripperSize();
+	}
+	
+	/*
+	 * getGripperSize()
+	 * This function gets gripperSize out of the ModuleType Json which is stored on the database.
+	 * @returns double gripperSize 
+	 */
+	public double getGripperSize() {
+		double gs = 0.0;
+		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_GRIPPER_SIZE );
+			String json = resultSet[0].get("moduleTypeProperties").toString();
+			JSONTokener token = new JSONTokener(json);
+			try {
+				JSONObject theProperties = new JSONObject(token);
+				gs = theProperties.optDouble("gripperSize");
+			} catch (JSONException e1) {
+				System.err.println("No gripperSize defined.");
+			}
+		return gs;
 	}
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
 		Logger.log("Gripper is translating compositeStep: " + compositeStep.toJSON().toString());
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
-		compositeStep = adjustMoveWithDimensions(compositeStep, new Vector3(0, 0, GRIPPER_SIZE));
+		compositeStep = adjustMoveWithDimensions(compositeStep, new Vector3(0, 0, getGripperSize()));
 		
 		//Pop command identifier
 		boolean isPick = false, isPlace = false;
