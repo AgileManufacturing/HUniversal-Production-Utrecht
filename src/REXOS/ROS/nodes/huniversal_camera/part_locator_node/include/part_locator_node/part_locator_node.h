@@ -79,7 +79,6 @@ protected:
 	double bottomRightOffsetX, bottomRightOffsetY;
 	
 	std::string equipletName;
-	std::string equipletIdentifier;
 	
 	std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
 

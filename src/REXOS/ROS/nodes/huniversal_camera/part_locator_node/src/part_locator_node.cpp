@@ -390,9 +390,9 @@ bool PartLocatorNode::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
 	// @TODO Select either deltarobot or six_axisrobot (defaulted to sixaxis in constructor)
-	//	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
+	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/delta_robot_type_B/1/set_instruction");
 	//  actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/six_axis_type_A/1/set_instruction");
-	actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/" +equipletIdentifier+"/1/set_instruction");
+	//actionlib::SimpleActionClient<rexos_statemachine::SetInstructionAction> setInstructionActionClient(nodeHandle, equipletName + "/HU/" +equipletIdentifier+"/1/set_instruction");
 	std::string hardwareStep;
 	rexos_statemachine::SetInstructionGoal* goal;
 	
@@ -432,12 +432,27 @@ bool PartLocatorNode::transitionSetup(){
 	Vector3 v;
 
 	REXOS_INFO("Moving to top left corner");
-	x = 0 - workPlaneWidth / 2;
+	/*x = 0 - workPlaneWidth / 2;
 	y = 0 + workPlaneHeight / 2;
 	z = workSpaceHeight;
 	v = Vector3(x, y, z);
 	v = convertToEquipletCoordinate(v);
 	v = drModule.convertToModuleCoordinate(v);
+	rexos_datatypes::EquipletStep equipletStep;
+	equipletStep.setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
+	
+	rexos_datatypes::OriginPlacement originPlacement;
+	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_MODULE_ORIGIN);
+	equipletStep.setOriginPlacement(originPlacement);
+	
+	Json::Value moveCommand;
+	moveCommand["x"] = v.x;
+	moveCommand["x"] = v.y;
+	moveCommand["x"] = v.z;
+	Json::Value instructionData;
+	instructionData["move"] = moveCommand;
+	equipletStep.setInstructionData(instructionData);*/
+	
 	hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\": "+boost::lexical_cast<std::string>(acceleration) +"} }";
 	REXOS_WARN_STREAM(hardwareStep);
 	
@@ -493,13 +508,6 @@ bool PartLocatorNode::transitionSetup(){
 	std::cin >> bottomRightOffsetX;
 	REXOS_INFO("enter diff to Y");
 	std::cin >> bottomRightOffsetY;
-	
-	/*topLeftOffsetX = 0;
-	topLeftOffsetY = 0;
-	topRightOffsetX = 80;
-	topRightOffsetY = 0;
-	bottomRightOffsetX = 80;
-	bottomRightOffsetY = -80;*/
 	
 	Vector3 A = Vector3(0						, 0						, 1);
 	Vector3 B = Vector3(0 + workPlaneWidth	, 0						, 1);
@@ -599,8 +607,6 @@ bool PartLocatorNode::transitionSetup(){
 	REXOS_INFO_STREAM(translateFromA);
 	REXOS_WARN_STREAM("--------------------------------------------------------------");
 	
-	/*postCorrectionTotalMatrix = postCorrectionTranslationMatrix * postCorrectionRotationMatrix * 
-			postCorrectionShearMatrix * postCorrectionScaleMatrix;*/
 	postCorrectionTotalMatrix = translateFromA * postCorrectionScaleMatrix * 
 			postCorrectionShearMatrix * postCorrectionRotationMatrix * 
 			postCorrectionTranslationMatrix * translateToA;
@@ -632,17 +638,6 @@ bool PartLocatorNode::transitionSetup(){
 	REXOS_INFO_STREAM("C " << postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
 	REXOS_INFO_STREAM("C " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * C);
 	REXOS_WARN_STREAM("--------------------------------------------------------------");
-	
-	
-	/*double x = 0 + workPlaneWidth / 2;
-	double y = 0 - workPlaneHeight / 2;
-	Vector3 v = Vector3(x, y, 1);
-	REXOS_INFO_STREAM(v);
-	v = postCorrectionTotalMatrix * v;
-	REXOS_INFO_STREAM(v);
-	v.z = -15;
-	v = convertToEquipletCoordinate(v);
-	REXOS_INFO_STREAM(v);*/
 	
 	
 	x = 0 + workPlaneWidth / 2;
