@@ -158,6 +158,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			+ "		\"properties\":\"{"
 			+ "	\\\"modbusAddress\\\" : 8001,"
 			+ "	\\\"modbusDevicePin\\\" : 0,"
+			+ " \\\"gripperSize\\\" : 46.54,"
 			+ "	\\\"gripperEnabledMaxSeconds\\\" : 60,"
 			+ "	\\\"gripperEnabledWarningSeconds\\\" : 50,"
 			+ "	\\\"gripperEnabledCooldownSeconds\\\" : 180,"
@@ -506,7 +507,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	@Override
 	public String getEquipletName() {
 		// TODO hardcoded!!!!!!
-		return "EQ2";
+		return "EQ3";
 	}
 
 	@Override

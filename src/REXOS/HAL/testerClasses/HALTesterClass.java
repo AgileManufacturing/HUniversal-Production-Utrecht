@@ -28,7 +28,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "/home/t/Desktop/";
+	//static final String baseDir = "/home/t/Desktop/"; 		// <-- Tommas
+	static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
 	
 	// delta robot
 	static String moduleA_01 = "{"
@@ -155,6 +156,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			+ "		\"properties\":\"{"
 			+ "	\\\"modbusAddress\\\" : 8001,"
 			+ "	\\\"modbusDevicePin\\\" : 0,"
+			+ " \\\"gripperSize\\\" : 46.54,"
 			+ "	\\\"gripperEnabledMaxSeconds\\\" : 60,"
 			+ "	\\\"gripperEnabledWarningSeconds\\\" : 50,"
 			+ "	\\\"gripperEnabledCooldownSeconds\\\" : 180,"
