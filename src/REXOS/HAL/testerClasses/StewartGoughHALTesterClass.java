@@ -158,6 +158,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 			+ "		\"properties\":\"{"
 			+ "	\\\"modbusAddress\\\" : 8001,"
 			+ "	\\\"modbusDevicePin\\\" : 0,"
+			+ " \\\"gripperSize\\\" : 46.54,"
 			+ "	\\\"gripperEnabledMaxSeconds\\\" : 60,"
 			+ "	\\\"gripperEnabledWarningSeconds\\\" : 50,"
 			+ "	\\\"gripperEnabledCooldownSeconds\\\" : 180,"
