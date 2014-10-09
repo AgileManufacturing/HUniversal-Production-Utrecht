@@ -35,6 +35,7 @@
 
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/writer.h>
 
 #include <algorithm>
 #include <vector>
@@ -57,7 +58,7 @@ PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_knowledge_datab
 		rexos_knowledge_database::Module(moduleIdentifier),
 		rexos_coordinates::Module(this),
 		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
-		environmentCacheClient(nodeHandle.serviceClient<environment_cache::setData>("updateEnvironmentCache")),
+		environmentCacheClient(nodeHandle.serviceClient<environment_cache::setData>("setData")),
 		samplesTopLeft(minCornerSamples),
 		samplesTopRight(minCornerSamples),
 		samplesBottomRight(minCornerSamples)
@@ -252,6 +253,9 @@ void PartLocatorNode::storeInEnviromentCache(std::string value, Vector3 location
 		
 		data["location"] = locationJson;
 		data["rotation"] = rotationJson;
+		
+		Json::StyledWriter writer;
+		serviceCall.request.json = writer.write(data);
 		environmentCacheClient.call(serviceCall);
 }
 

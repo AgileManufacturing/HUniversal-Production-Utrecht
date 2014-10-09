@@ -47,21 +47,26 @@ EnvironmentCache::EnvironmentCache() {
 }
 
 bool EnvironmentCache::getData(environment_cache::getData::Request& req, environment_cache::getData::Response& res) {
+	ROS_INFO("Getting data");
 	Json::StyledWriter writer;
 	try {
 		res.jsonData = writer.write(cache.getItemDataInCache(req.identifier, req.paths));
+		ROS_INFO_STREAM(res.jsonData);
 		return true;
 	} catch (std::runtime_error ex) {
 		return false;
 	}
 }
 bool EnvironmentCache::setData(environment_cache::setData::Request& req, environment_cache::setData::Response& res) {
+	ROS_INFO("Setting data");
 	Json::Reader reader;
 	Json::Value jsonNode;
 	if(reader.parse(req.json, jsonNode) == false) return false;
+	ROS_INFO_STREAM(jsonNode);
 	cache.setItemDataInCache(req.identifier, jsonNode);
 }
 bool EnvironmentCache::removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res) {
+	ROS_INFO("Removing data");
 	cache.removeDataOfItemFromCache(req.identifier, req.paths);
 }
 
