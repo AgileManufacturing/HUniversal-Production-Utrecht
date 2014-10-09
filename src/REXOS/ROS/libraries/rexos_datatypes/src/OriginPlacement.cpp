@@ -38,9 +38,15 @@ namespace rexos_datatypes{
     OriginPlacement::OriginPlacement(){}
 
     OriginPlacement::OriginPlacement(Json::Value n){
-		setOriginPlacementType(n["originPlacementType"].asString());
-		parameters = n["parameters"];
-		lookupResult = n["lookupResult"];
+		if(n == Json::Value::null) {
+			setOriginPlacementType(OriginPlacementType::UNDEFINED);
+			parameters = Json::Value::null;
+			lookupResult = Json::Value::null;
+		} else {
+			setOriginPlacementType(n["originPlacementType"].asString());
+			parameters = n["parameters"];
+			lookupResult = n["lookupResult"];
+		}
     }
 
 	OriginPlacement::OriginPlacementType OriginPlacement::getOriginPlacementType() {
@@ -89,10 +95,14 @@ namespace rexos_datatypes{
 	}
 	
     Json::Value OriginPlacement::toJSON(){
-		Json::Value output;
-		output["originPlacementType"] = getOriginPlacementTypeAsString();
-		output["parameters"] = parameters;
-		output["lookupResult"] = lookupResult;
-		return output;
+		if(originPlacementType == OriginPlacementType::UNDEFINED) {
+			return Json::Value::null;
+		} else {
+			Json::Value output;
+			output["originPlacementType"] = getOriginPlacementTypeAsString();
+			output["parameters"] = parameters;
+			output["lookupResult"] = lookupResult;
+			return output;
+		}
     }
 }

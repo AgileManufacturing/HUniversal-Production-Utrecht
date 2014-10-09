@@ -24,7 +24,8 @@ namespace rexos_datatypes {
 			RELATIVE_TO_IDENTIFIER,
 			RELATIVE_TO_CURRENT_POSITION,
 			RELATIVE_TO_MODULE_ORIGIN,
-			RELATIVE_TO_EQUIPLET_ORIGIN
+			RELATIVE_TO_EQUIPLET_ORIGIN,
+			UNDEFINED
 		};
 		
 		OriginPlacement(); 
@@ -32,8 +33,8 @@ namespace rexos_datatypes {
 		
 		OriginPlacementType getOriginPlacementType();
 		std::string getOriginPlacementTypeAsString();
-		void setOriginPlacementType(OriginPlacementType result);
-		void setOriginPlacementType(std::string result);
+		void setOriginPlacementType(OriginPlacementType type);
+		void setOriginPlacementType(std::string type);
 
 		Json::Value getLookupResult();
 		void setLookupResult(Json::Value jsonNode);

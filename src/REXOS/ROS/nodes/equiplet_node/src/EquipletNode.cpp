@@ -164,11 +164,13 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	if (currentMode != rexos_statemachine::MODE_NORMAL) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
+		return;
 	}
 	rexos_statemachine::State currentState = getCurrentState();
 	if (currentState != rexos_statemachine::STATE_NORMAL && currentState != rexos_statemachine::STATE_STANDBY) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current state is %s", rexos_statemachine::state_txt[currentState]);
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
+		return;
 	}
 	
 	// check originPlacement and gather required information
@@ -186,11 +188,11 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	if(prox == NULL) {
 		REXOS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
-	} else {
-		//prox->changeState(rexos_statemachine::STATE_NORMAL);
-		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\"}  }");	
-		prox->setInstruction(targetObjectId.toString(), step.toJSON());
+		return;
 	}
+	//prox->changeState(rexos_statemachine::STATE_NORMAL);
+	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\"}  }");	
+	prox->setInstruction(targetObjectId.toString(), step.toJSON());
 }
 
 void EquipletNode::handleEquipletCommand(Json::Value n) {
