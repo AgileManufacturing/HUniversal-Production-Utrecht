@@ -20,8 +20,10 @@ import HAL.libraries.blackboard_client.data_classes.MongoOperation;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
 import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.BlackboardModuleListener;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 
 import org.json.JSONObject;
+
 import com.mongodb.DBObject;
 
 
@@ -147,10 +149,11 @@ public class BlackboardHandler implements BlackboardSubscriber {
 					dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
 						String status = dbObject.get("status").toString();
-						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed");
+						String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
+						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
 						
 						for(BlackboardModuleListener listener: moduleSubscribers) {
-							listener.onProcessStatusChanged(status); 
+							listener.onProcessStatusChanged(HardwareStepStatus.valueOf(status), id); 
 						}
 					}
 				    break;

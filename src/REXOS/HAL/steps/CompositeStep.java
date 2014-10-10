@@ -18,7 +18,7 @@ import util.log.Logger;
  * @author Bas Voskuijlen
  *
  */
-public class CompositeStep{
+public class CompositeStep implements Cloneable {
 	private ProductStep productStep;
 	private JSONObject command;
 	private OriginPlacement originPlacement;
@@ -59,5 +59,13 @@ public class CompositeStep{
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
 		}
 		return returnValue;
+	}
+	public CompositeStep clone() {
+		try {
+			return new CompositeStep(productStep, new JSONObject(command.toString()), originPlacement.clone());
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+			return null;
+		}
 	}
 }

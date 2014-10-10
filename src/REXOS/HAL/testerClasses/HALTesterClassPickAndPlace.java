@@ -17,6 +17,7 @@ import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -412,11 +413,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JSONObject targetMove1 = new JSONObject();
 		targetMove1.put("x", 0);
 		targetMove1.put("y", 0);
-		targetMove1.put("z", 30);
+		targetMove1.put("z", 0);
 		JSONObject targetMove1Approach = new JSONObject(); 
 		targetMove1Approach.put("x", 0);
 		targetMove1Approach.put("y", 0);
-		targetMove1Approach.put("z", 45);
+		targetMove1Approach.put("z", 15);
 		targetMove1.put("approach", targetMove1Approach);
 		target1.put("move",targetMove1);
 		target1.put("identifier", "GC4x4MB_1");
@@ -426,11 +427,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JSONObject subjectMove1 = new JSONObject();
 		subjectMove1.put("x", 0);
 		subjectMove1.put("y", 0);
-		subjectMove1.put("z", 30);
+		subjectMove1.put("z", 0);
 		JSONObject subjectMove1Approach = new JSONObject(); 
+		subjectMove1Approach.put("x", 0);
 		subjectMove1Approach.put("y", 0);
-		subjectMove1Approach.put("z", 0);
-		subjectMove1Approach.put("z", 45);
+		subjectMove1Approach.put("z", 15);
 		subjectMove1.put("approach", subjectMove1Approach);
 		subject1.put("move",subjectMove1);
 		subject1.put("identifier", "GC4x4MB_6");
@@ -440,11 +441,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JSONObject targetMove2 = new JSONObject();
 		targetMove2.put("x", 0);
 		targetMove2.put("y", 0);
-		targetMove2.put("z", 30);
+		targetMove2.put("z", 0);
 		JSONObject targetMove2Approach = new JSONObject(); 
 		targetMove2Approach.put("x", 0);
 		targetMove2Approach.put("y", 0);
-		targetMove2Approach.put("z", 45);
+		targetMove2Approach.put("z", 15);
 		targetMove2.put("approach", targetMove2Approach);
 		target2.put("move",targetMove2);
 		target2.put("identifier", "GC4x4MB_6");
@@ -454,11 +455,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		JSONObject subjectMove2 = new JSONObject();
 		subjectMove2.put("x", 0);
 		subjectMove2.put("y", 0);
-		subjectMove2.put("z", 30);
+		subjectMove2.put("z", 0);
 		JSONObject subjectMove2Approach = new JSONObject(); 
+		subjectMove2Approach.put("x", 0);
 		subjectMove2Approach.put("y", 0);
-		subjectMove2Approach.put("z", 0);
-		subjectMove2Approach.put("z", 45);
+		subjectMove2Approach.put("z", 15);
 		subjectMove2.put("approach", subjectMove2Approach);
 		subject2.put("move",subjectMove2);
 		subject2.put("identifier", "GC4x4MB_1");
@@ -487,7 +488,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	}
 	
 	@Override
-	public void onProcessStatusChanged(String status, 
+	public void onProcessStatusChanged(HardwareStepStatus status, 
 			Module module, HardwareStep hardwareStep) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}
@@ -505,7 +506,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	@Override
 	public String getEquipletName() {
 		// TODO hardcoded!!!!!!
-		return "EQ3";
+		return "EQ2";
 	}
 
 	@Override

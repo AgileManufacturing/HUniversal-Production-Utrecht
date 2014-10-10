@@ -3,6 +3,7 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import util.log.LogLevel;
 import util.log.Logger;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
@@ -66,6 +67,10 @@ public class DeltaRobot extends ModuleActor {
 		} else {
 			//Approach
 			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
+			commandApproach.put(MOVE_X, commandApproach.getDouble(MOVE_X) + commandMove.getDouble(MOVE_X));
+			commandApproach.put(MOVE_Y, commandApproach.getDouble(MOVE_Y) + commandMove.getDouble(MOVE_Y));
+			commandApproach.put(MOVE_Z, commandApproach.getDouble(MOVE_Z) + commandMove.getDouble(MOVE_Z));
+			Logger.log(LogLevel.ALERT, "a: ", commandApproach);
 			JSONObject approachInstructionData = new JSONObject();
 			approachInstructionData.put(MOVE, commandApproach);
 			

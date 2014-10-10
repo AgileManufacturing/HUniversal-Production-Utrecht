@@ -17,6 +17,7 @@ import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -494,7 +495,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	}
 
 	@Override
-	public void onProcessStatusChanged(String status, 
+	public void onProcessStatusChanged(HardwareStepStatus status, 
 			Module module, HardwareStep hardwareStep) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}

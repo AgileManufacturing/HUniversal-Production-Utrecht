@@ -180,9 +180,12 @@ public abstract class ModuleActor extends Module {
 		
 		JSONObject move = compositeCommand.getJSONObject(MOVE);
 		if (move != null){
-			double originalX = (double) move.remove(MOVE_X);
-			double originalY = (double) move.remove(MOVE_Y);
-			double originalZ = (double) move.remove(MOVE_Z);
+			double originalX = move.getDouble(MOVE_X);
+			move.remove(MOVE_X);
+			double originalY = move.getDouble(MOVE_Y);
+			move.remove(MOVE_Y);
+			double originalZ = move.getDouble(MOVE_Z);
+			move.remove(MOVE_Z);
 			
 			Matrix rotationMatrix = directionAngles.generateRotationMatrix();
 			
@@ -203,12 +206,14 @@ public abstract class ModuleActor extends Module {
 
 
 	@Override
-	public void onProcessStatusChanged(String status) {
-		if(processListener != null){
-			processListener.onProcessStateChanged(status, 0, this);
+	public void onProcessStatusChanged(HardwareStepStatus status, String hardwareStepSerialId) {
+		if(processListener != null) {
+			// the listener might reset the processListener, and therefore the listener must be set before calling the listener
+			ProcessListener temp = processListener;
 			if(status.equals(HardwareStepStatus.DONE) || status.equals(HardwareStepStatus.FAILED)){
 				processListener = null;
 			}
+			temp.onProcessStatusChanged(status, hardwareStepSerialId, this);
 		}
 	}
 }

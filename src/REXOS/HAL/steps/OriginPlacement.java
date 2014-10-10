@@ -7,7 +7,7 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 
-public class OriginPlacement {
+public class OriginPlacement implements Cloneable {
 	private OriginPlacementType originPlacementType;
 	private JSONObject parameters;
 	
@@ -32,5 +32,13 @@ public class OriginPlacement {
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
 		}
 		return output;
+	}
+	public OriginPlacement clone() {
+		try {
+			return new OriginPlacement(originPlacementType, new JSONObject(parameters.toString()));
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+			return null;
+		}
 	}
 }

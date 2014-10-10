@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.tasks.ExecutionProcess;
 import HAL.testerClasses.HALTesterClass;
 /**
@@ -21,7 +22,7 @@ public interface HardwareAbstractionLayerListener {
 	 * @param module
 	 * @param hardwareStep
 	 */
-	public void onProcessStatusChanged(String status, Module module, HardwareStep hardwareStep);
+	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep);
 	/**
 	 * This method is called when the execution of the {@link HardwareStep}s has finished (e.g. when a {@link ExecutionProcess} finishes)
 	 */
