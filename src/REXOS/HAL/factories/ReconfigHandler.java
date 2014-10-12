@@ -64,8 +64,10 @@ import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 
-public class ReconfigFactory extends Factory {
-	//Modules
+public class ReconfigHandler {
+	// ##############################################################################################
+	// # Modules																					#
+	// ##############################################################################################
 	/**
 	 * SQL query for adding a module which is connected to the mountPlate. 
 	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber, moduleProperties, equiplet, mountPointX, mountPointY
@@ -205,6 +207,7 @@ public class ReconfigFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			");"; 
+	
 	/**
 	 * SQL query for removing the right space of a module in the nested set tree.
 	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
@@ -219,7 +222,56 @@ public class ReconfigFactory extends Factory {
 			"		typeNumber = ? AND \n" + 
 			"		serialNumber = ? \n" + 
 			");"; 
-	//Capabilities
+	
+	/**
+	 * SQL query for selecting all the associated ModuleCalibrationData for a module (which is identified using a {@link ModuleIdentifier}).
+	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
+	 * ModuleCalibrationData is associated when at least one of the ModuleIdentifiers in the module set matches the ModuleIdentifier of this module.
+	 */
+	private static final String getAllModuleCalibrationDataForModule =
+			"SELECT id, date, properties \n" + 
+			"FROM ModuleCalibration \n" + 
+			"WHERE id IN ( \n" +
+			"	SELECT ModuleCalibration \n" + 
+			"	FROM ModuleCalibrationModuleSet \n" + 
+			"	WHERE manufacturer = ? AND \n" + 
+			"		typeNumber = ? AND \n" + 
+			"		serialNumber = ? \n" + 
+			"); \n";
+	
+	/**
+	 * SQL query for selecting all the data of moduleType.
+	 * Input: moduleTypeManufacturer, moduleTypeTypeNumber
+	 */
+	private static final String getModuleType =
+			"SELECT * \n" +
+			"FROM ModuleType \n" +
+			"WHERE manufacturer = ? AND \n" + 
+			"	typeNumber = ?;"; 
+
+	/**
+	 * SQL query for selecting all the {@link ModuleIdentifier} in the moduleSet of the ModuleCalibrationData.
+	 * Input: ModuleCalibrationId
+	 */
+	private static final String getModuleSetForModuleCalibrationData =
+			"SELECT manufacturer, typeNumber, serialNumber \n" + 
+			"FROM ModuleCalibrationModuleSet \n" + 
+			"WHERE ModuleCalibration = ?;";	
+	
+	/**
+	 * SQL query for selecting all the data of a module 
+	 * Input: moduleManufacturer, moduleTypeNumber
+	 */
+	private static final String getModule =
+			"SELECT * \n" +
+			"FROM Module \n" +
+			"WHERE manufacturer = ? AND \n" + 
+			"	typeNumber = ? AND \n" + 
+			"	serialNumber = ?;"; 
+	
+	// ##############################################################################################
+	// # Capabilities																				#
+	// ##############################################################################################
 	/**
 	 * SQL query for adding a capabilityType.
 	 * Input: capabilityTypeName, halSoftwareId
@@ -305,7 +357,7 @@ public class ReconfigFactory extends Factory {
 	 * SQL query for selecting required mutations for a capabilityType.
 	 * Input: capabilityTypeName
 	 */
-	public static final String getRequiredMutationsForCapabilityType =
+	private static final String getRequiredMutationsForCapabilityType =
 			"SELECT mutation, treeNumber \n" + 
 			"FROM CapabilityTypeRequiredMutation \n" + 
 			"WHERE capabilityType = ?;";
@@ -315,7 +367,7 @@ public class ReconfigFactory extends Factory {
 	 * Input: ModuleIdentifierManufacturer, ModuleIdentifierTypeNumber
 	 * A capabilityTypes is considered associated when at least one required mutation matches with a supported mutation of this module type (which is identified with by {@link ModuleIdentifier}).
 	 */
-	public static final String getAllAssociatedCapabilityTypesForModuleIdentifier = 
+	private static final String getAllAssociatedCapabilityTypesForModuleIdentifier = 
 			"SELECT DISTINCT capabilityType \n" + 
 			"FROM CapabilityTypeRequiredMutation \n" + 
 			"WHERE mutation IN( \n" + 
@@ -326,50 +378,42 @@ public class ReconfigFactory extends Factory {
 			");";
 	
 	/**
-	 * SQL query for selecting all the associated ModuleCalibrationData for a module (which is identified using a {@link ModuleIdentifier}).
-	 * Input: moduleManufacturer, moduleTypeNumber, moduleSerialNumber
-	 * ModuleCalibrationData is associated when at least one of the ModuleIdentifiers in the module set matches the ModuleIdentifier of this module.
+	 * SQL query for selecting the serviceTypes for a capabilityType.
+	 * Input: capabilityTypeName
 	 */
-	public static final String getAllModuleCalibrationDataForModule =
-			"SELECT id, date, properties \n" + 
-			"FROM ModuleCalibration \n" + 
-			"WHERE id IN ( \n" +
-			"	SELECT ModuleCalibration \n" + 
-			"	FROM ModuleCalibrationModuleSet \n" + 
-			"	WHERE manufacturer = ? AND \n" + 
-			"		typeNumber = ? AND \n" + 
-			"		serialNumber = ? \n" + 
-			"); \n";
+	private static final String getServiceTypesForCapabilityType =
+			"SELECT serviceType \n" + 
+			"FROM ServiceType_CapabilityType \n" + 
+			"WHERE capabilityType = ?;";
 	
 	/**
-	 * SQL query for selecting all the data of moduleType.
-	 * Input: moduleTypeManufacturer, moduleTypeTypeNumber
+	 * SQL query for adding a relation between a serviceType and a capabilityType.
+	 * Input: serviceTypeName, capabilityTypeName
 	 */
-	public static final String getModuleType =
-			"SELECT * \n" +
-			"FROM ModuleType \n" +
-			"WHERE manufacturer = ? AND \n" + 
-			"	typeNumber = ?;"; 
-
-	/**
-	 * SQL query for selecting all the {@link ModuleIdentifier} in the moduleSet of the ModuleCalibrationData.
-	 * Input: ModuleCalibrationId
-	 */
-	public static final String getModuleSetForModuleCalibrationData =
-			"SELECT manufacturer, typeNumber, serialNumber \n" + 
-			"FROM ModuleCalibrationModuleSet \n" + 
-			"WHERE ModuleCalibration = ?;";	
+	private static final String addServiceType_CapabilityType = 
+			"INSERT IGNORE INTO ServiceType_CapabilityType \n" + 
+					"(serviceType,capabilityType) \n" + 
+					"VALUES(?, ?);";
 	
-	/**
-	 * SQL query for selecting all the data of a module 
-	 * Input: moduleManufacturer, moduleTypeNumber
-	 */
-	public static final String getModule =
-			"SELECT * \n" +
-			"FROM Module \n" +
-			"WHERE manufacturer = ? AND \n" + 
-			"	typeNumber = ? AND \n" + 
-			"	serialNumber = ?;"; 
+	// ##############################################################################################
+	// # Private fields																				#
+	// ##############################################################################################
+	private KnowledgeDBClient knowledgeDBClient;
+	private HardwareAbstractionLayer hal;
+	private CapabilityFactory capabilityFactory;
+	private ModuleFactory moduleFactory;
+	
+	public ReconfigHandler(HardwareAbstractionLayer hal, CapabilityFactory capabilityFactory, ModuleFactory moduleFactory) {
+		this.hal = hal;
+		this.capabilityFactory = capabilityFactory;
+		this.moduleFactory = moduleFactory;
+		knowledgeDBClient = new KnowledgeDBClient();
+	}
+	
+	private void logSqlResult(String sqlQueryName, Row[] rows) {
+		String message = "The SQL result from query " + sqlQueryName + ":";
+		Logger.log(LogSection.HAL_RECONFIG_SQL, LogLevel.DEBUG, message, rows);
+	}
 	
 	/**
 	 * This method will serialize all the capabilityTypes associated with the moduleType (which is identified by the {@link ModuleIdentifier}).
@@ -378,7 +422,7 @@ public class ReconfigFactory extends Factory {
 	 * @param moduleIdentifier
 	 * @return The serialized associated capabilities.
 	 */
-	public JSONArray removeCapabilities(CapabilityFactory cf, ModuleIdentifier moduleIdentifier) {
+	private JSONArray removeCapabilities(ModuleIdentifier moduleIdentifier) {
 		ArrayList<String> capabilityNames = new ArrayList<String>();
 		try{
 			try{
@@ -400,7 +444,7 @@ public class ReconfigFactory extends Factory {
 					
 					//TODO actually remove the capability
 					JSONArray services = new JSONArray();
-					Row[] serviceRows = knowledgeDBClient.executeSelectQuery(cf.getServiceTypesForCapabilityType, capabilityName);
+					Row[] serviceRows = knowledgeDBClient.executeSelectQuery(getServiceTypesForCapabilityType, capabilityName);
 					for (Row serviceRow : serviceRows) {
 						services.put(serviceRow.get("serviceType"));
 					}
@@ -419,23 +463,7 @@ public class ReconfigFactory extends Factory {
 			return null;
 		}
 	}
-
-	private HardwareAbstractionLayer hal;
-
-	public ReconfigFactory(HardwareAbstractionLayer hal) {
-		super(new KnowledgeDBClient());
-		this.hal = hal;
-	}
 	
-	/**
-	 * SQL query for adding a relation between a serviceType and a capabilityType.
-	 * Input: serviceTypeName, capabilityTypeName
-	 */
-	private static final String addServiceType_CapabilityType = 
-			"INSERT IGNORE INTO ServiceType_CapabilityType \n" + 
-					"(serviceType,capabilityType) \n" + 
-					"VALUES(?, ?);";
-
 	/**
 	 * This methods attempts to insert a module in the database using the data
 	 * provided in the JSONObjects.
@@ -448,10 +476,7 @@ public class ReconfigFactory extends Factory {
 	 *            position, attached to other modules, orientation, etc).
 	 * @return true if insertion of the module is successful, false otherwise.
 	 */
-	
-//MODULE
-	public boolean insertModule(JSONObject staticSettings,
-			JSONObject dynamicSettings) {
+	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) {
 		try {
 			try {
 				knowledgeDBClient.getConnection().setAutoCommit(false);
@@ -461,11 +486,9 @@ public class ReconfigFactory extends Factory {
 						staticSettings.getString("serialNumber"));
 
 				if (isModuleTypeKnown(moduleIdentifier)) {
-					updateModuleType(moduleIdentifier,
-							staticSettings.getJSONObject("type"));
+					updateModuleType(moduleIdentifier, staticSettings.getJSONObject("type"));
 				} else {
-					insertModuleType(moduleIdentifier,
-							staticSettings.getJSONObject("type"));
+					insertModuleType(moduleIdentifier, staticSettings.getJSONObject("type"));
 				}
 
 				String properties = staticSettings.getString("properties");
@@ -479,19 +502,16 @@ public class ReconfigFactory extends Factory {
 							moduleIdentifier.getTypeNumber(),
 							moduleIdentifier.getSerialNumber(), properties,
 							hal.getEquipletName(), mountPointX, mountPointY);
-				} else if (dynamicSettings.isNull("mountPointX")
-						|| dynamicSettings.isNull("mountPointY")) {
+				} else if (dynamicSettings.isNull("mountPointX") || dynamicSettings.isNull("mountPointY")) {
 					// this module is attached to another module
-					JSONObject parentModuleJson = dynamicSettings
-							.getJSONObject("attachedTo");
+					JSONObject parentModuleJson = dynamicSettings.getJSONObject("attachedTo");
 					ModuleIdentifier parentModuleIdentifier = new ModuleIdentifier(
 							parentModuleJson.getString("manufacturer"),
 							parentModuleJson.getString("typeNumber"),
 							parentModuleJson.getString("serialNumber"));
 
 					insertSpace(parentModuleIdentifier);
-					knowledgeDBClient.executeUpdateQuery(
-							addModuleAttachedToModule,
+					knowledgeDBClient.executeUpdateQuery(addModuleAttachedToModule,
 							moduleIdentifier.getManufacturer(),
 							moduleIdentifier.getTypeNumber(),
 							moduleIdentifier.getSerialNumber(), properties,
@@ -503,30 +523,27 @@ public class ReconfigFactory extends Factory {
 							parentModuleIdentifier.getTypeNumber(),
 							parentModuleIdentifier.getSerialNumber());
 				} else {
-					throw new FactoryException(
-							"Module both attached to the mountplate and a module");
+					throw new FactoryException("Module both attached to the mountplate and a module");
 				}
 
 				// calibration
-				JSONArray calibrationEntries = staticSettings
-						.getJSONArray("calibrationData");
+				JSONArray calibrationEntries = staticSettings.getJSONArray("calibrationData");
 				deserializeModuleCalibrationData(calibrationEntries);
 
+				knowledgeDBClient.getConnection().commit();
+				return true;
 			} catch (Exception ex) {
-				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.ERROR,
-						"Error occured while inserting module ", ex);
+				Logger.log(LogSection.HAL_RECONFIG, LogLevel.ERROR, "Error occured while inserting module ", ex);
 				knowledgeDBClient.getConnection().rollback();
-				knowledgeDBClient.getConnection().setAutoCommit(true);
 				return false;
+			} finally {
+				knowledgeDBClient.getConnection().setAutoCommit(true);
 			}
-			knowledgeDBClient.getConnection().commit();
-			knowledgeDBClient.getConnection().setAutoCommit(true);
-			return true;
 		} catch (SQLException ex) {
 			return false;
 		}
 	}
-
+	
 	/**
 	 * This methods attempts to update a module in the database using the data
 	 * provided in the JSONObjects.
@@ -536,12 +553,13 @@ public class ReconfigFactory extends Factory {
 	 *            properties, calibrationData, etc).
 	 * @return true if insertion of the module is successful, false otherwise.
 	 */
-	public boolean updateModule(JSONObject staticSettings,
-			JSONObject dynamicSettings) {
+	public boolean updateModule(JSONObject staticSettings, JSONObject dynamicSettings) {
+		//moduleFactory.removeModuleFromCache();
+	
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	/**
 	 * This method updates a moduleType in the knowledge database. It will
 	 * update the software of the moduleType if the buildNumber of the provided
@@ -551,38 +569,35 @@ public class ReconfigFactory extends Factory {
 	 * @param type
 	 * @throws JSONException
 	 */
-	private void updateModuleType(ModuleIdentifier moduleIdentifier,
-			JSONObject type) throws JSONException {
+	private void updateModuleType(ModuleIdentifier moduleIdentifier, JSONObject type) throws JSONException {
 		JSONObject halSoftwareObject = type.getJSONObject("halSoftware");
 
-		JavaSoftware javaSoftware = JavaSoftware
-				.getJavaSoftwareForModuleIdentifier(moduleIdentifier,
-						knowledgeDBClient);
+		JavaSoftware javaSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(
+				moduleIdentifier, knowledgeDBClient);
 		int currentJavaSoftwareBuildNumber = javaSoftware.getBuildNumber();
-		int newJavaSoftwareBuildNumber = JavaSoftware
-				.getBuildNumber(halSoftwareObject);
+		int newJavaSoftwareBuildNumber = JavaSoftware.getBuildNumber(halSoftwareObject);
 		if (newJavaSoftwareBuildNumber > currentJavaSoftwareBuildNumber) {
 			// update the halSoftware
 			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION,
 					"Updating HAL software for module " + moduleIdentifier);
 			javaSoftware.updateJavaSoftware(halSoftwareObject);
 		}
-
+		
 		JSONObject rosSoftwareObject = type.getJSONObject("rosSoftware");
-		RosSoftware rosSoftware = RosSoftware
-				.getRosSoftwareForModuleIdentifier(moduleIdentifier,
-						knowledgeDBClient);
+		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(
+				moduleIdentifier, knowledgeDBClient);
 		int currentRosSoftwareBuildNumber = rosSoftware.getBuildNumber();
-		int newRosSoftwareBuildNumber = RosSoftware
-				.getBuildNumber(rosSoftwareObject);
+		int newRosSoftwareBuildNumber = RosSoftware.getBuildNumber(rosSoftwareObject);
 		if (newRosSoftwareBuildNumber > currentRosSoftwareBuildNumber) {
 			// update the rosSoftware
 			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION,
 					"Updating ROS software for module " + moduleIdentifier);
 			rosSoftware.updateRosSoftware(rosSoftwareObject);
 		}
+		
+		moduleFactory.removeModulesOfTypeFromCache();
 	}
-
+	
 	/**
 	 * This method will serialize all the moduleCalibrationData associated with
 	 * the module identified by the {@link ModuleIdentifier}. This method will
@@ -599,13 +614,10 @@ public class ReconfigFactory extends Factory {
 				moduleIdentifier.getManufacturer(),
 				moduleIdentifier.getTypeNumber(),
 				moduleIdentifier.getSerialNumber());
-		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL,
-				"getAllModuleCalibrationDataForModule", calibrationDataRows);
+		logSqlResult("getAllModuleCalibrationDataForModule", calibrationDataRows);
 		for (Row calibrationDataRow : calibrationDataRows) {
-			Integer moduleCalibrationId = (Integer) calibrationDataRow
-					.get("id");
-			String dateTime = ((Timestamp) calibrationDataRow.get("date"))
-					.toString();
+			Integer moduleCalibrationId = (Integer) calibrationDataRow.get("id");
+			String dateTime = ((Timestamp) calibrationDataRow.get("date")).toString();
 			String properties = (String) calibrationDataRow.get("properties");
 
 			JSONObject calibrationDataEntry = new JSONObject();
@@ -617,8 +629,7 @@ public class ReconfigFactory extends Factory {
 			Row[] moduleSetrows = knowledgeDBClient.executeSelectQuery(
 					getModuleSetForModuleCalibrationData,
 					moduleCalibrationId);
-			logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL,
-					"getModuleSetForModuleCalibrationData", calibrationDataRows);
+			logSqlResult("getModuleSetForModuleCalibrationData", calibrationDataRows);
 			for (Row moduleSetrow : moduleSetrows) {
 				String manufacturer = (String) moduleSetrow.get("manufacturer");
 				String typeNumber = (String) moduleSetrow.get("typeNumber");
@@ -637,7 +648,7 @@ public class ReconfigFactory extends Factory {
 		}
 		return calibrationEntries;
 	}
-
+	
 	/**
 	 * This method inserts a moduleType in the knowledge database.
 	 * 
@@ -645,41 +656,33 @@ public class ReconfigFactory extends Factory {
 	 * @param type
 	 * @return
 	 * @throws KnowledgeException
+	 * @throws JSONException 
 	 */
-	private boolean insertModuleType(ModuleIdentifier moduleIdentifier,
-			JSONObject type) throws KnowledgeException {
-		try {
-			JSONObject halSoftwareObject = type.getJSONObject("halSoftware");
-			JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(
-					halSoftwareObject, knowledgeDBClient);
-			int halSoftwareId = halSoftware.getId();
+	private void insertModuleType(ModuleIdentifier moduleIdentifier, JSONObject type) 
+			throws KnowledgeException, JSONException {
+		JSONObject halSoftwareObject = type.getJSONObject("halSoftware");
+		JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(halSoftwareObject, knowledgeDBClient);
+		int halSoftwareId = halSoftware.getId();
 
-			// not every module has rosSoftware
-			Integer rosSoftwareId = null;
-			if (type.isNull("rosSoftware") == false) {
-				JSONObject rosSoftwareObject = type
-						.getJSONObject("rosSoftware");
-				RosSoftware rosSoftware = RosSoftware.insertRosSoftware(
-						rosSoftwareObject, knowledgeDBClient);
-				rosSoftwareId = rosSoftware.getId();
-			}
-
-			String properties = type.getString("properties");
-			knowledgeDBClient.executeUpdateQuery(addModuleType,
-					moduleIdentifier.getManufacturer(),
-					moduleIdentifier.getTypeNumber(), properties,
-					halSoftwareId, rosSoftwareId);
-
-			JSONArray supportedMutationEntries = type
-					.getJSONArray("supportedMutations");
-			Mutation.insertSupportedMutations(moduleIdentifier,
-					supportedMutationEntries, knowledgeDBClient);
-		} catch (JSONException ex) {
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.ERROR,
-					"Unable to insert module due to illegally formatted JSON",
-					ex);
+		// not every module has rosSoftware
+		Integer rosSoftwareId = null;
+		if (type.isNull("rosSoftware") == false) {
+			JSONObject rosSoftwareObject = type.getJSONObject("rosSoftware");
+			RosSoftware rosSoftware = RosSoftware.insertRosSoftware(rosSoftwareObject, knowledgeDBClient);
+			rosSoftwareId = rosSoftware.getId();
 		}
-		return true;
+
+		String properties = type.getString("properties");
+		knowledgeDBClient.executeUpdateQuery(addModuleType,
+				moduleIdentifier.getManufacturer(),
+				moduleIdentifier.getTypeNumber(), properties,
+				halSoftwareId, rosSoftwareId);
+
+		JSONArray supportedMutationEntries = type.getJSONArray("supportedMutations");
+		Mutation.insertSupportedMutations(moduleIdentifier, supportedMutationEntries, knowledgeDBClient);
+		
+		JSONArray capabilityTypes = type.getJSONArray("capabilities");
+		insertCapabilityTypes(capabilityTypes);
 	}
 
 	/**
@@ -689,18 +692,15 @@ public class ReconfigFactory extends Factory {
 	 * @param moduleCalibrationEntries
 	 * @throws JSONException
 	 */
-	private void deserializeModuleCalibrationData(
-			JSONArray moduleCalibrationEntries) throws JSONException {
+	private void deserializeModuleCalibrationData(JSONArray moduleCalibrationEntries) throws JSONException {
 		for (int i = 0; i < moduleCalibrationEntries.length(); i++) {
-			JSONObject moduleCalibrationEntry = moduleCalibrationEntries
-					.getJSONObject(i);
+			JSONObject moduleCalibrationEntry = moduleCalibrationEntries.getJSONObject(i);
 			String dateTime = moduleCalibrationEntry.getString("date");
 			String properties = moduleCalibrationEntry.getString("data");
 			int calibrationDataId = knowledgeDBClient.executeUpdateQuery(
 					addModuleCalibrationData, dateTime, properties);
 
-			JSONArray moduleSetEntries = moduleCalibrationEntry
-					.getJSONArray("moduleSet");
+			JSONArray moduleSetEntries = moduleCalibrationEntry.getJSONArray("moduleSet");
 			for (int j = 0; j < moduleSetEntries.length(); j++) {
 				JSONObject moduleSetEntry = moduleSetEntries.getJSONObject(j);
 
@@ -742,51 +742,41 @@ public class ReconfigFactory extends Factory {
 	 * @return the static information of the module.
 	 * @throws JSONException
 	 */
-	public JSONObject removeModule(ModuleFactory mf,
-			ModuleIdentifier moduleIdentifier) throws JSONException {
+	public JSONObject removeModule(ModuleIdentifier moduleIdentifier) throws JSONException {
 		JSONObject output = new JSONObject();
 		output.put("manufacturer", moduleIdentifier.getManufacturer());
 		output.put("typeNumber", moduleIdentifier.getTypeNumber());
 		output.put("serialNumber", moduleIdentifier.getSerialNumber());
 
 		JSONObject type = new JSONObject();
-		Module module = mf.getModuleByIdentifier(moduleIdentifier);
+		Module module = moduleFactory.getModuleByIdentifier(moduleIdentifier);
 		String moduleProperties = module.getProperties();
 		type.put("properties", moduleProperties);
 
 		// fetch halSoftware
-		JavaSoftware halSoftware = JavaSoftware
-				.getJavaSoftwareForModuleIdentifier(moduleIdentifier);
+		JavaSoftware halSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier);
 		type.put("halSoftware", halSoftware.serialize());
 		// fetch rosSoftware
-		RosSoftware rosSoftware = RosSoftware
-				.getRosSoftwareForModuleIdentifier(moduleIdentifier);
+		RosSoftware rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier);
 		type.put("rosSoftware", rosSoftware.serialize());
 
-		type.put("supportedMutations", Mutation.serializeAllSupportedMutations(
-				moduleIdentifier, knowledgeDBClient));
+		type.put("supportedMutations", Mutation.serializeAllSupportedMutations(moduleIdentifier, knowledgeDBClient));
 		Mutation.removeSupportedMutations(moduleIdentifier, knowledgeDBClient);
 
-		output.put("calibrationData",
-				serializeModuleCalibrationData(moduleIdentifier));
+		output.put("calibrationData", serializeModuleCalibrationData(moduleIdentifier));
 		knowledgeDBClient.executeUpdateQuery(removeAllCalibrationDataForModule,
 				moduleIdentifier.getManufacturer(),
 				moduleIdentifier.getTypeNumber(),
 				moduleIdentifier.getSerialNumber());
 
 		Row[] moduleTypeRows = knowledgeDBClient.executeSelectQuery(
-				getModuleType, moduleIdentifier.getManufacturer(),
-				moduleIdentifier.getTypeNumber());
-		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleType",
-				moduleTypeRows);
-		type.put("properties",
-				(String) moduleTypeRows[0].get("moduleTypeProperties"));
+				getModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
+		logSqlResult("getModuleType", moduleTypeRows);
+		type.put("properties", (String) moduleTypeRows[0].get("moduleTypeProperties"));
 
 		Row[] moduleRows = knowledgeDBClient.executeSelectQuery(getModule,
-				moduleIdentifier.getManufacturer(),
-				moduleIdentifier.getTypeNumber(),
-				moduleIdentifier.getSerialNumber());
-		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModule", moduleRows);
+				moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber(), moduleIdentifier.getSerialNumber());
+		logSqlResult("getModule", moduleRows);
 		output.put("properties", (String) moduleRows[0].get("moduleProperties"));
 
 		removeSpace(moduleIdentifier);
@@ -795,8 +785,13 @@ public class ReconfigFactory extends Factory {
 				moduleIdentifier.getTypeNumber(),
 				moduleIdentifier.getSerialNumber());
 		knowledgeDBClient.executeUpdateQuery(removeModuleTypesWithNoModules);
+		
+		type.put("capabilities", removeCapabilities(moduleIdentifier));
 
 		output.put("type", type);
+
+		moduleFactory.removeModuleFromCache(moduleIdentifier);
+		
 		return output;
 	}
 
@@ -807,8 +802,7 @@ public class ReconfigFactory extends Factory {
 	 *            is the identifier of the module to be removed.
 	 * @throws KnowledgeException
 	 */
-	private void removeSpace(ModuleIdentifier moduleIdentifier)
-			throws KnowledgeException {
+	private void removeSpace(ModuleIdentifier moduleIdentifier) throws KnowledgeException {
 		knowledgeDBClient.executeUpdateQuery(
 				removeSpaceInNestedTreeForModuleLeft,
 				moduleIdentifier.getManufacturer(),
@@ -826,40 +820,29 @@ public class ReconfigFactory extends Factory {
 	 * This method will insert a array of capabilityTypes into the knowledge database, using the data provided in the JSONArray.
 	 * @param capabilityTypes
 	 * @return true if successful, false otherwise
+	 * @throws JSONException 
 	 */
-	public boolean insertCapabilityTypes(JSONArray capabilityTypes) {
-		try{
-			try{
-				for (int i = 0; i < capabilityTypes.length(); i++) {
-					JSONObject capabilityTypeEntry = capabilityTypes.getJSONObject(i);
-					String name = capabilityTypeEntry.getString("name");
-					
-					JSONObject capabilitySoftware = capabilityTypeEntry.getJSONObject("halSoftware");
-					JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(capabilitySoftware, knowledgeDBClient);
-					int halSoftwareId = halSoftware.getId();
-					
-					knowledgeDBClient.executeUpdateQuery(addCapabilityType, name, halSoftwareId);
-					//TODO update behavior for the required mutations
-					JSONArray requiredMutationsTrees = capabilityTypeEntry.getJSONArray("requiredMutationsTrees");
-					deserializeRequiredMutations(name, requiredMutationsTrees);
-					
-					JSONArray services = capabilityTypeEntry.getJSONArray("services");
-					for (int j = 0; j < services.length(); j++) {
-						String serviceName = services.getString(j);
-						knowledgeDBClient.executeUpdateQuery(addServiceType, serviceName);
-						knowledgeDBClient.executeUpdateQuery(addServiceType_CapabilityType, serviceName,name);
-					}
-				}
-			} catch(Exception ex) {
-				Logger.log(LogSection.HAL_CAPABILITY_FACTORY, LogLevel.WARNING, "Error occured while inserting capability ", ex);
-				knowledgeDBClient.getConnection().rollback();
-				knowledgeDBClient.getConnection().setAutoCommit(true);
-				return false;
+	private void insertCapabilityTypes(JSONArray capabilityTypes) throws JSONException {
+		for (int i = 0; i < capabilityTypes.length(); i++) {
+			JSONObject capabilityTypeEntry = capabilityTypes.getJSONObject(i);
+			String name = capabilityTypeEntry.getString("name");
+			
+			JSONObject capabilitySoftware = capabilityTypeEntry.getJSONObject("halSoftware");
+			JavaSoftware halSoftware = JavaSoftware.insertJavaSoftware(capabilitySoftware, knowledgeDBClient);
+			int halSoftwareId = halSoftware.getId();
+			
+			knowledgeDBClient.executeUpdateQuery(addCapabilityType, name, halSoftwareId);
+			//TODO update behavior for the required mutations
+			JSONArray requiredMutationsTrees = capabilityTypeEntry.getJSONArray("requiredMutationsTrees");
+			deserializeRequiredMutations(name, requiredMutationsTrees);
+			
+			JSONArray services = capabilityTypeEntry.getJSONArray("services");
+			for (int j = 0; j < services.length(); j++) {
+				String serviceName = services.getString(j);
+				knowledgeDBClient.executeUpdateQuery(addServiceType, serviceName);
+				knowledgeDBClient.executeUpdateQuery(addServiceType_CapabilityType, serviceName,name);
 			}
-		} catch (SQLException ex) {
-			return false;
 		}
-		return true;
 	}
 	
 	/**
@@ -912,7 +895,7 @@ public class ReconfigFactory extends Factory {
 	}
 	
 	/**
-	 * This method will all return all the services supported by this equiplet.
+	 * This method will return all the services supported by this equiplet.
 	 * @return
 	 */
 	public ArrayList<Service> getAllSupportedServices() {
@@ -931,9 +914,9 @@ public class ReconfigFactory extends Factory {
 	 * @param moduleIdentifier
 	 * @return true if the moduleType is known in the knowledge database, false otherwise.
 	 */
-	public boolean isModuleTypeKnown(ModuleIdentifier moduleIdentifier) {
+	private boolean isModuleTypeKnown(ModuleIdentifier moduleIdentifier) {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleType, moduleIdentifier.getManufacturer(), moduleIdentifier.getTypeNumber());
-		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModuleType", rows);
+		logSqlResult("getModuleType", rows);
 		if(rows.length == 1) {
 			return true;
 		} else {

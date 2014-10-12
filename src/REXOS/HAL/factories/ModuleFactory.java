@@ -204,4 +204,16 @@ public class ModuleFactory extends Factory {
 	public HardwareAbstractionLayer getHAL() {
 		return hal;
 	}
+	public void removeModuleFromCache(ModuleIdentifier identifier) {
+		loadedModules.remove(identifier);
+	}
+	public void removeModulesOfTypeFromCache() {
+		ArrayList<ModuleIdentifier> modulesToRemove = new ArrayList<ModuleIdentifier>();
+		for (ModuleIdentifier key : loadedModules.keySet()) {
+			modulesToRemove.add(key);
+		}
+		for (ModuleIdentifier moduleIdentifier : modulesToRemove) {
+			removeModuleFromCache(moduleIdentifier);
+		}
+	}
 }

@@ -10,6 +10,7 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
+import HAL.factories.ReconfigHandler;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.BlackboardEquipletListener;
@@ -19,7 +20,6 @@ import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 /**
  * The main interface of the HAL for the equiplet agent. This class manages the factories and the blackboard handler.
@@ -29,6 +29,7 @@ import org.json.JSONObject;
 public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquipletListener {
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
+	private ReconfigHandler reconfigHandler;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private BlackboardHandler blackboardHandler;
 	
@@ -51,6 +52,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
+		reconfigHandler = new ReconfigHandler(this, capabilityFactory, moduleFactory);
 		blackboardHandler = new BlackboardHandler(equipletName);
 		blackboardHandler.addBlackboardEquipletListener(this);
 	}
@@ -80,10 +82,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
 	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
-		JSONArray capabilities = staticSettings.optJSONObject("type").optJSONArray("capabilities");
-		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilityTypes(capabilities);
-		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
+		return reconfigHandler.insertModule(staticSettings, dynamicSettings);
 	}
 	/**
 	 * This method will update a module by copying data from the staticSettings and dynamicSettings JSONObjects to the database and invoking the Equiplet Node to reload the modules.
@@ -95,7 +94,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
 	public boolean updateModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		return moduleFactory.updateModule(staticSettings, dynamicSettings);
+		return reconfigHandler.updateModule(staticSettings, dynamicSettings);
 	}
 	/**
 	 * This method will remove a module by moving data from the database to the JSONObject and invoking the Equiplet Node to remove the module.
@@ -107,10 +106,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws FactoryException if the instantiation of the class in the jarFile failed 
 	 */
 	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
-		JSONArray capabilities = capabilityFactory.removeCapabilities(moduleIdentifier);
-		JSONObject module = moduleFactory.removeModule(moduleIdentifier);			
-		module.optJSONObject("type").put("capabilities", capabilities);
-		return module;
+		return reconfigHandler.removeModule(moduleIdentifier);
 	}
 	/**
 	 * This method will return the modules which have no child (and thus are the bottom modules)
@@ -125,7 +121,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @return
 	 */
 	public ArrayList<Service> getSupportedServices() {
-		return capabilityFactory.getAllSupportedServices();
+		return reconfigHandler.getAllSupportedServices();
 	}
 	
 	/**

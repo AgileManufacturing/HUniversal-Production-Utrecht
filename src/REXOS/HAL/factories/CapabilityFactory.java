@@ -119,15 +119,6 @@ public class CapabilityFactory extends Factory{
 	
 
 	/**
-	 * SQL query for selecting the serviceTypes for a capabilityType.
-	 * Input: capabilityTypeName
-	 */
-	public static final String getServiceTypesForCapabilityType =
-			"SELECT serviceType \n" + 
-			"FROM ServiceType_CapabilityType \n" + 
-			"WHERE capabilityType = ?;";
-	
-	/**
 	 * The {@link DynamicClassFactory} used by the CapabilityFactory to load classes of capabilities.
 	 */
 	private DynamicClassFactory<Capability> dynamicClassFactory;
@@ -200,9 +191,9 @@ public class CapabilityFactory extends Factory{
 		}
 		try {
 			Class<Capability> capabilityClass = dynamicClassFactory.getClassFromDescription(description);
-			Capability capability = capabilityClass.getConstructor(CapabilityFactory.class).newInstance(hal.getModuleFactory());
+			Capability capability = capabilityClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
 			loadedCapabilities.put(capabilityTypeName, capability);
-			return null;
+			return capability;
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | InstantiateClassException ex) {
