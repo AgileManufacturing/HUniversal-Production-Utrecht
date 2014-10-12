@@ -56,6 +56,7 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 import MAS.agents.data_classes.MessageType;
 import MAS.equiplet.equiplet_agent.reconfigure.behaviours.ReconfigureBehaviour;
 
@@ -354,8 +355,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onProcessStatusChanged(String status, Module module, HardwareStep hardwareStep) {
-		if(status.equals("FAILED")){
+	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
+		if(status == HardwareStepStatus.FAILED){
 			equipletActive=false;
 			scheduleCounter=0;
 			equipletSchedule.clear();
