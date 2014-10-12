@@ -283,13 +283,19 @@ public class Logger {
 			case ALERT:
 			case CRITICAL:
 			case ERROR:
-				System.err.println(serializedLogEntry);
+				System.out.println((char) 27 + "[31m" + serializedLogEntry + (char) 27 + "[0m");
 				break;
 			case WARNING:
+				System.out.println((char) 27 + "[33m" + serializedLogEntry + (char) 27 + "[0m");
+				break;
 			case NOTIFICATION:
+				System.out.println((char) 27 + "[33m" + serializedLogEntry + (char) 27 + "[0m");
+				break;
 			case INFORMATION:
+				System.out.println((char) 27 + "[30m" + serializedLogEntry + (char) 27 + "[0m");
+				break;
 			case DEBUG:
-				System.out.println(serializedLogEntry);
+				System.out.println((char) 27 + "[32m" + serializedLogEntry + (char) 27 + "[0m");
 				break;
 		}
 	}
