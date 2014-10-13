@@ -10,6 +10,7 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
+import HAL.factories.ReconfigFactory;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.BlackboardEquipletListener;
@@ -29,6 +30,7 @@ import org.json.JSONObject;
 public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquipletListener {
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
+	private ReconfigFactory reconfigFactory;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private BlackboardHandler blackboardHandler;
 	
@@ -80,9 +82,9 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
 	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		boolean isModuleAdditionSuccesful = moduleFactory.insertModule(staticSettings, dynamicSettings);
+		boolean isModuleAdditionSuccesful = reconfigFactory.insertModule(staticSettings, dynamicSettings);
 		JSONArray capabilities = staticSettings.optJSONObject("type").optJSONArray("capabilities");
-		boolean isCapabilityAdditionSuccesful = capabilityFactory.insertCapabilityTypes(capabilities);
+		boolean isCapabilityAdditionSuccesful = reconfigFactory.insertCapabilityTypes(capabilities);
 		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
 	}
 	/**
@@ -95,7 +97,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
 	public boolean updateModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		return moduleFactory.updateModule(staticSettings, dynamicSettings);
+		return reconfigFactory.updateModule(staticSettings, dynamicSettings);
 	}
 	/**
 	 * This method will remove a module by moving data from the database to the JSONObject and invoking the Equiplet Node to remove the module.
@@ -107,8 +109,8 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws FactoryException if the instantiation of the class in the jarFile failed 
 	 */
 	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
-		JSONArray capabilities = capabilityFactory.removeCapabilities(moduleIdentifier);
-		JSONObject module = moduleFactory.removeModule(moduleIdentifier);			
+		JSONArray capabilities = reconfigFactory.removeCapabilities(capabilityFactory, moduleIdentifier);
+		JSONObject module = reconfigFactory.removeModule(moduleFactory, moduleIdentifier);			
 		module.optJSONObject("type").put("capabilities", capabilities);
 		return module;
 	}
@@ -124,8 +126,9 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will return all the (most likely) supported services
 	 * @return
 	 */
+	
 	public ArrayList<Service> getSupportedServices() {
-		return capabilityFactory.getAllSupportedServices();
+		return reconfigFactory.getAllSupportedServices();
 	}
 	
 	/**
