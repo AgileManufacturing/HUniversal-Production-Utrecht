@@ -25,6 +25,7 @@ import MAS.simulation.util.Pair;
 import MAS.simulation.util.Parser;
 import MAS.simulation.util.Position;
 import MAS.simulation.util.Settings;
+import MAS.simulation.util.SchedulingAlgorithm;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 
@@ -66,7 +67,8 @@ public class ScheduleBehaviour extends Behaviour {
 
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), product.getCreated(), product.getDeadline(), product.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
-			if (Settings.SCHEDULING_MATIX) {
+			switch (Settings.SCHEDULING) {
+			case MATRIX:
 				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), productionPath);
@@ -76,13 +78,26 @@ public class ScheduleBehaviour extends Behaviour {
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 
 				product.schedulingFinished(true, productionPath);
-			} else {
-				LinkedList<Node> nodes = scheduling.calculateEDDPath();
+				break;
+			case LOAD:
+				LinkedList<Node> nodes = scheduling.calculateScorePath();
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
 
-				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
+				productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 				product.schedulingFinished(true, productionPath);
+				break;
+			case EDD:
+			default:
+				// default option
+				nodes = scheduling.calculateEDDPath();
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
+
+				productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
+				product.schedulingFinished(true, productionPath);
+				break;
+				
 			}
 
 			done = true;

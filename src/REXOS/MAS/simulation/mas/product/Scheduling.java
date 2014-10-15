@@ -3,11 +3,12 @@ package MAS.simulation.mas.product;
 import jade.core.AID;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import MAS.simulation.util.Pair;
 import MAS.simulation.util.Position;
@@ -16,7 +17,7 @@ import MAS.simulation.util.Tick;
 import MAS.simulation.util.Tuple;
 import MAS.simulation.util.Util;
 
-public class Scheduling {
+public class Scheduling<K> {
 
 	private String agent;
 	private Tick time;
@@ -115,18 +116,39 @@ public class Scheduling {
 							System.err.printf("Should happen: Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
 						}
 
-						graph.add(node, nextNode, cost);
-						equipletNodes.add(nextNode);
+						boolean added = graph.add(node, nextNode, cost);
+
+						if (equipletNodes.contains(nextNode)) {
+							int index = equipletNodes.indexOf(nextNode);
+							Node similarNode = equipletNodes.get(index);
+
+							// WTF this should work, but life sucks...
+							// if (nextNode.getTime().lessThan(similarNode.getTime())) {
+							if (nextNode.getTime().doubleValue() < similarNode.getTime().doubleValue()) {
+								equipletNodes.remove(index);
+								equipletNodes.add(nextNode);
+							}
+						} else {
+							equipletNodes.add(nextNode);
+						}
 
 						if (Settings.VERBOSITY > 3) {
-							System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
+							// System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window,
+							// arrival);
 						}
 					}
 				}
 			}
 
+			System.out.println(" equiplet nodes " + equipletNodes);
+
 			lastNodes.clear();
 			lastNodes.addAll(equipletNodes);
+
+			System.out.println("Graph so far:");
+			System.out.println("Graph: " + graph);
+			System.out.println("\nGraph: " + graph.prettyPrint(source));
+			// System.out.println();
 		}
 
 		// add vertces from all the nodes in the last column to the sink node
@@ -148,6 +170,261 @@ public class Scheduling {
 		}
 
 		return path;
+	}
+
+	class Score {
+
+		private double score;
+
+		public Score(double score) {
+			this.score = score;
+		}
+
+		double score() {
+			return score;
+		}
+	}
+
+	public LinkedList<Node> calculateScorePath() throws SchedulingException {
+
+		if (Settings.VERBOSITY > 3) {
+			System.out.println("product steps: " + productSteps);
+			System.out.println("service options: " + Util.formatArray(serviceOptions));
+			System.out.println("equiplet info: " + Util.formatArray(equipletInfo));
+			System.out.println("travel times: " + Util.formatArray(travelTimes));
+		}
+		/*
+		 * 
+		 * Node source = new Node(time);
+		 * Node sink = new Node();
+		 * 
+		 * Graph<Node> graph = new Graph<>();
+		 * graph.add(source);
+		 * graph.add(sink);
+		 * 
+		 * // list of node in the last column
+		 * ArrayList<Node> lastNodes = new ArrayList<Node>();
+		 * lastNodes.add(source);
+		 * 
+		 * for (ProductStep step : productSteps) {
+		 * Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(step.getIndex());
+		 * 
+		 * // keep track of the equiplets to process in the next iteration
+		 * ArrayList<Node> equipletNodes = new ArrayList<Node>();
+		 * 
+		 * // add a node with an arc to each node in the previous column
+		 * for (Node previousNode : lastNodes) {
+		 * 
+		 * // Entry < Equiplet, Pair < duration, List of possible time options > >
+		 * for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : options.entrySet()) {
+		 * AID equiplet = option.getKey();
+		 * Tick duration = option.getValue().first;
+		 * 
+		 * Node nextNode = new Node(equiplet, new Tick(1), duration, step.getIndex());
+		 * double load = equipletInfo.get(equiplet).first;
+		 * 
+		 * boolean added = graph.add(previousNode, nextNode, load);
+		 * 
+		 * if (added) {
+		 * equipletNodes.add(nextNode);
+		 * }
+		 * }
+		 * }
+		 * 
+		 * lastNodes.clear();
+		 * lastNodes.addAll(equipletNodes);
+		 * 
+		 * // System.out.println("Graph so far:");
+		 * // System.out.println("Graph: " + graph);
+		 * // System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
+		 * }
+		 * 
+		 * // add vertces from all the nodes in the last column to the sink node
+		 * for (Node node : lastNodes) {
+		 * graph.add(node, sink, 0);
+		 * }
+		 * 
+		 * // path through graph calculation
+		 * LinkedList<Node> optimumPath = graph.optimumPath(source, sink);
+		 * if (optimumPath.size() > 1) {
+		 * optimumPath.removeFirst();
+		 * optimumPath.removeLast();
+		 * } else if (optimumPath.isEmpty() || optimumPath.size() != productSteps.size()) {
+		 * throw new SchedulingException("failed to find path int nodes=" + graph + " - " + optimumPath);
+		 * }
+		 * 
+		 * if (Settings.VERBOSITY > 3) {
+		 * System.out.println("the last equiplet nodes to be processed: " + lastNodes);
+		 * System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
+		 * System.out.println("Graph: " + graph);
+		 * System.out.println(" Optimum Path : " + optimumPath);
+		 * }
+		 */
+
+		// +++++++++++++++++++
+		//
+		TreeSet<Pair<Double, LinkedList<Node>>> paths = new TreeSet<Pair<Double, LinkedList<Node>>>(new Comparator<Pair<Double, LinkedList<Node>>>() {
+			@Override
+			public int compare(Pair<Double, LinkedList<Node>> o1, Pair<Double, LinkedList<Node>> o2) {
+				return o1.first.equals(o2.first) ? -1 : o2.first.compareTo(o1.first);
+			}
+		});
+
+		// options for the first product step
+		int firstIndex = productSteps.get(0).getIndex();
+		Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> firstOptions = serviceOptions.get(firstIndex);
+		for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : firstOptions.entrySet()) {
+			AID equiplet = option.getKey();
+			double load = equipletInfo.get(equiplet).first;
+
+			Position nextPosition = equipletInfo.get(option.getKey()).second;
+			Pair<Position, Position> route = new Pair<>(position, nextPosition);
+
+			// check if the travel time from the route is know, and is not the the same as the previous
+			if (!travelTimes.containsKey(route)) {
+				throw new SchedulingException("route doesn't exists in travel time list: " + route);
+			}
+
+			Tick duration = option.getValue().first;
+			Tick travel = travelTimes.get(route);
+			Tick arrival = time.add(travel);
+			Tick firstPossibility = deadline;
+
+			// Time option is the time from (=option.first) until (=option.second) the equiplet is possible to perform the service
+			for (Pair<Tick, Tick> timeOption : option.getValue().second) {
+				// choose the best time to perform the product step
+				// is the first available time earlier than first possibility and the product can arrive + duration is within the time window
+				if (timeOption.first.lessThan(firstPossibility) && arrival.add(duration).lessThan(timeOption.second)) {
+
+					// TODO performance improvement
+					// set the first possibility, the first is the time the equiplet is able to perform or when the product can arrive by the equiplet
+					firstPossibility = timeOption.first.max(arrival);
+				}
+			}
+
+			LinkedList<Node> path = new LinkedList<>();
+			path.add(new Node(equiplet, firstPossibility, duration, firstIndex));
+
+			paths.add(new Pair<Double, LinkedList<Node>>(load, path));
+			// System.out.println(" added initial : " + new Pair<Double, LinkedList<Node>>(load, path));
+		}
+
+		// memory optimalization
+		double thres_value = 1.0;
+		int THRESHOLD = 100;
+
+		while (!paths.isEmpty()) {
+			if (Settings.VERBOSITY > 3) {
+				// //System.out.println(" PATHS =" + Util.formatPairList(paths));
+				System.out.println(" PATHS =" + paths.size());
+			}
+
+			// get the first possible path to explore with the highest score
+			Pair<Double, LinkedList<Node>> first = paths.pollFirst();
+			LinkedList<Node> path = first.second;
+			double score = first.first;
+			Node node = path.getLast();
+
+			int index = node.getIndex() + 1;
+			if (index < serviceOptions.size()) {
+				// processing not finished
+				Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(index);
+				for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : options.entrySet()) {
+					AID equiplet = option.getKey();
+					double load = equipletInfo.get(equiplet).first;
+
+					Position lastPosition = equipletInfo.get(node.getEquipletAID()).second;
+					Position nextPosition = equipletInfo.get(option.getKey()).second;
+					Pair<Position, Position> route = new Pair<>(lastPosition, nextPosition);
+
+					// check if the travel time from the route is know, and is not the the same as the previous
+					if (!travelTimes.containsKey(route) && !lastPosition.equals(nextPosition)) {
+						throw new SchedulingException("route doesn't exists in travel time list: " + route);
+					}
+
+					Tick duration = option.getValue().first;
+					Tick travel = lastPosition.equals(nextPosition) ? new Tick(0) : travelTimes.get(route);
+					Tick arrival = node.getTime().add(node.getDuration()).add(travel);
+					Tick firstPossibility = deadline;
+
+					// Time option is the time from (=option.first) until (=option.second) the equiplet is possible to perform the service
+					for (Pair<Tick, Tick> timeOption : option.getValue().second) {
+						// choose the best time to perform the product step
+						// is the first available time earlier than first possibility and the product can arrive + duration is within the time window
+						if (timeOption.first.lessThan(firstPossibility) && arrival.add(duration).lessThan(timeOption.second)) {
+
+							// TODO performance improvement
+							// set the first possibility, the first is the time the equiplet is able to perform or when the product can arrive by the equiplet
+							firstPossibility = timeOption.first.max(arrival);
+						}
+					}
+
+					Node nextNode = new Node(equiplet, firstPossibility, duration, index);
+					if (Settings.VERBOSITY > 3) {
+						System.out.println(" add to path [last in path=" + node + ", nextNode=" + nextNode + " + in path=" + path + "]");
+					}
+
+					if (firstPossibility.greaterOrEqualThan(deadline)) {
+						throw new SchedulingException("failed to find path withing deadline=" + deadline);// + " best path so far=" + paths.first());
+					}
+
+					if (score * load > thres_value) {
+						LinkedList<Node> newPath = new LinkedList<>(path);
+						newPath.add(nextNode);
+						paths.add(new Pair<Double, LinkedList<Node>>(score * load, newPath));
+
+						if (paths.size() > THRESHOLD) {
+							paths.remove(paths.last());
+						}
+					} else if (paths.size() < THRESHOLD) {
+						thres_value = score * load;
+						LinkedList<Node> newPath = new LinkedList<>(path);
+						newPath.add(nextNode);
+						paths.add(new Pair<Double, LinkedList<Node>>(score * load, newPath));
+					}
+				}
+			} else {
+
+				// shit should not be equal but is loads are the same for equiplet with the
+				// if loads are equal of equiplets with same capabilities, shit goes wrong a bit random.
+				boolean shitCanFail = false;
+				for (Entry<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options : serviceOptions.entrySet()) {
+					double lowestLoad = Double.MAX_VALUE;
+					double counter = 0;
+
+					for (AID equiplet : options.getValue().keySet()) {
+						double load = equipletInfo.get(equiplet).first;
+						if (load < lowestLoad) {
+							lowestLoad = load;
+							counter = 1;
+						} else if (load == lowestLoad) {
+							counter++;
+						}
+					}
+					if (counter > 1) {
+						shitCanFail = true;
+					}
+				}
+
+				return path;
+				/*
+				 * 
+				 * // all option should be explored
+				 * if (Settings.VERBOSITY > 3) {
+				 * System.out.println("Scheduling: found path with possible best score: " + path + " comparing=" + path.equals(optimumPath) + ", can fail=" + shitCanFail);
+				 * }
+				 * 
+				 * 
+				 * if (path.equals(optimumPath) || shitCanFail) {
+				 * return path;
+				 * } else {
+				 * throw new SchedulingException("Scheduling: should found the same path or maybe not: " + path + " == " + optimumPath);
+				 * }
+				 */
+			}
+		}
+
+		throw new SchedulingException("Scheduling: failed to find a path in paths: " + paths);
 	}
 
 	public LinkedList<ProductionStep> calculateMatrixPath() throws SchedulingException {

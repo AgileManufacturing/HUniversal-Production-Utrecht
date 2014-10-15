@@ -4,7 +4,7 @@
 	<runs>1</runs>
 	<travel type="normal">1</travel>
 	<products>
-		<arrival type="none">50</arrival>
+		<arrival type="none">20</arrival>
 		<deadline  type="none">10000</deadline>
 		<path>3</path>
 		<steps>

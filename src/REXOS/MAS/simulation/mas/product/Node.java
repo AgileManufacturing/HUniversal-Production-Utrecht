@@ -6,7 +6,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import MAS.simulation.util.Tick;
 
-public class Node {
+public class Node implements Comparable<Node> {
 
 	private AID equipletAID;
 	private String equiplet;
@@ -44,7 +44,7 @@ public class Node {
 	}
 
 	public String getEquiplet() {
-		return equiplet;
+		return equipletAID != null ? equipletAID.getLocalName() : equiplet;
 	}
 
 	public AID getEquipletAID() {
@@ -59,9 +59,13 @@ public class Node {
 		return duration;
 	}
 
+	public int getIndex() {
+		return index;
+	}
+
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(43, 67).append(equipletAID).append(time).append(duration).append(index).toHashCode();
+		return new HashCodeBuilder(47, 67).append(equipletAID).append(duration).append(index).toHashCode();
 	}
 
 	@Override
@@ -77,13 +81,15 @@ public class Node {
 			return false;
 		}
 
-		return equipletAID.equals(node.getEquipletAID()) && time == node.getTime() && duration == node.getDuration() && index == node.index;
+		return (equipletAID != null && equipletAID.equals(node.getEquipletAID()) || equiplet != null && equiplet.equals(node.getEquiplet())) && duration.equals(node.getDuration())
+				&& index == node.index;
 	}
 
 	@Override
 	public String toString() {
 		if (equipletAID != null) {
 			return String.format("N(%s), %d, %s, %s", equipletAID.getLocalName(), index, time, duration);
+			//return String.format("N(%s)", equipletAID.getLocalName());
 		} else if (equiplet != null) {
 			return String.format("N(%s), %d, %s, %s", equiplet, index, time, duration);
 		} else if (time.greaterThan(-1)) {
@@ -91,5 +97,10 @@ public class Node {
 		} else {
 			return "N(sink)";
 		}
+	}
+
+	@Override
+	public int compareTo(Node o) {
+		return index - o.index;
 	}
 }

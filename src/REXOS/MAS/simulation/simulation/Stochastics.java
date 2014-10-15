@@ -8,6 +8,7 @@ import MAS.simulation.config.DurationType;
 import MAS.simulation.config.IConfig;
 import MAS.simulation.mas.product.ProductStep;
 import MAS.simulation.util.Pair;
+import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 
 class Stochastics {
@@ -85,8 +86,8 @@ class Stochastics {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 
-		for (int i = 0; i < 20; i++) {
-			int x = random.nextInt(productSteps.size());
+		for (int i = 0; i < productSteps.size() * 2; i++) {
+			int x = i % productSteps.size(); // random.nextInt(productSteps.size());
 			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
 		}
 		return steps;
@@ -113,10 +114,13 @@ class Stochastics {
 	}
 
 	public Tick generateReconfigTime() {
-		return new Tick(200);
+		return new Tick(Settings.RECONFIGATION_TIME);
 	}
 
 	private Tick time(Tick time, DurationType type) {
+		if (!Settings.STOCHASTICS) {
+			return time;
+		}
 		switch (type) {
 		case EXP:
 			return new Tick(exp(time.doubleValue()));

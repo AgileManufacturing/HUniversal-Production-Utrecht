@@ -255,7 +255,7 @@ class Test {
 	/**
 	 * Test node for the graph
 	 */
-	static class TNode {
+	static class TNode extends Node {
 		String name;
 
 		public TNode(String name) {

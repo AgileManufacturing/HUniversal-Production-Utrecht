@@ -70,21 +70,16 @@ public class Job implements Comparable<Job> {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
-			// System.out.println(this + " equals " + obj + "== false null");
 			return false;
 		}
 		if (obj == this) {
-			// System.out.println(this + " equals " + obj + "== TRUE obj==this");
 			return true;
 		}
 		if (obj.getClass() != getClass()) {
-			// System.out.println(this + " equals " + obj + "== class");
 			return false;
 		}
 		Job job = (Job) obj;
-		// System.out.println(this + " equals " + obj + "==" + (job.getProductAgent().equals(getProductAgent()) && job.getIndex() == index));
 		return job.getProductAgent().equals(getProductAgent()) && job.getIndex() == index;
-
 	}
 
 	@Override

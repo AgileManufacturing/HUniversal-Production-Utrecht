@@ -65,7 +65,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} catch (JSONException e) {
 			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
 		}
-		
+
 		this.simulation = simulation;
 		lastStatisticsUpdate = new Tick(0);
 		statistics = new Triple<Tick, Tick, Tick>(new Tick(0), new Tick(0), new Tick(0));
@@ -227,7 +227,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		for (Capability capability : capabilities) {
 			services.add(capability.getService());
 		}
-		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() +(reconfigure ?" reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
+		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() + (reconfigure ? " reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
 		return new Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>(getLocalName(), getPosition(), services, info);
 	}
 
@@ -355,7 +355,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			} else if (reconfigure && schedule.isEmpty()) {
 				state = EquipletState.RECONFIG;
 				if (simulation == null) {
-					throw new IllegalArgumentException("FUCK sim" );
+					throw new IllegalArgumentException("FUCK sim");
 				}
 				simulation.notifyReconfigReady(getLocalName());
 			} else {
@@ -380,7 +380,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            of the breakdown
 	 */
 	public void notifyBreakdown(Tick time) {
-		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED) {
+		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED || state == EquipletState.RECONFIG) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
@@ -403,7 +403,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            of repair
 	 */
 	public void notifyRepaired(Tick time) {
-		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED) {
+		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED || state == EquipletState.RECONFIG) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 		historyUpdate(time);

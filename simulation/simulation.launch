@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
-
-	<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-		<listEntry value="1"/>
-	</listAttribute>
-	
-	<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
-		<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
-	</listAttribute>
-	
-	<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-	<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" 
-		value=
-		"-verbosity 2
-		-agents 
-		&quot;Simulation:MAS.simulation.simulation.SimulationAgent;&quot;
-		"/>
-	<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
-	
+<setAttribute key="name.schedenig.eclipse.grepconsole.DisabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.EnabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.FilterDisabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.FilterEnabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.StatisticsDisabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.StatisticsEnabledIds"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/HUniversal-Production-Utrecht/src/REXOS/external_libraries/jade.jar"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;Simulation:MAS.simulation.simulation.SimulationAgent;&quot; -local-port 1110 -verbosity 2"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
 </launchConfiguration>

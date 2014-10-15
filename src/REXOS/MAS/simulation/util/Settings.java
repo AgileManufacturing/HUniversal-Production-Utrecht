@@ -11,11 +11,13 @@ public class Settings {
 	 * 4: all above with addition of scheduling information
 	 */
 	public static int VERBOSITY = 3;
-	public final static boolean SCHEDULING_MATIX = true;
+	public final static SchedulingAlgorithm SCHEDULING = SchedulingAlgorithm.LOAD;
+	public final static boolean STOCHASTICS = false;
 	public final static String TRAFFIC_AGENT = "traffic-controller";
 	public final static long COMMUNICATION_TIMEOUT = 30000;
 	public final static String SIMULATION_CONFIG = "simulation/simulation.xml";
 	public final static String SIMULATION_EQUIPLET_CONFIG = "simulation/equiplets.csv";
 	public final static String SIMULATION_OUTPUT = "simulation/output";
+	public static final double RECONFIGATION_TIME = 200;
 
 }

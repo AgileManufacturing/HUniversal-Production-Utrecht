@@ -1,5 +1,7 @@
 package MAS.simulation.util;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 public class Tick extends Number implements Comparable<Tick> {
 
 	/**
@@ -46,6 +48,11 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(29, 73).append(dTime).append(lTime).toHashCode();
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -57,7 +64,7 @@ public class Tick extends Number implements Comparable<Tick> {
 			return false;
 		}
 		Tick tick = (Tick) obj;
-		return dTime.equals(tick.doubleValue());
+		return dTime.doubleValue() == tick.doubleValue();
 	}
 	
 	@Override
