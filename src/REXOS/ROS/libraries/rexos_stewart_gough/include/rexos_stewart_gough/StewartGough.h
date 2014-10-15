@@ -32,6 +32,7 @@
 #include <modbus/modbus.h>
 #include <rexos_datatypes/Point3D.h>
 #include <rexos_stewart_gough/StewartGoughMeasures.h>
+#include <rexos_stewart_gough/StewartGoughLocation.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
@@ -43,8 +44,6 @@
 #include <vector>
 
 namespace rexos_stewart_gough{
-	
-	
 	struct MotorMap {
 		int motor;
 		int sensor;
@@ -63,7 +62,6 @@ namespace rexos_stewart_gough{
 				motorIndex2(motorIndex2){}
 	};
 	
-	
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
@@ -73,27 +71,9 @@ namespace rexos_stewart_gough{
 		~StewartGough();
 		
 		void readJSONNode(Json::Value node);
-
-		/**
-		 * Gets the EffectorBoundaries of the deltarobot.
-		 * @return The EffectorBoundaries of the deltarobot.
-		 **/
-		//inline EffectorBoundaries* getBoundaries(){ return boundaries; }
-
-		/**
-		 * Checks whether the EffectorBoundaries have been generated, via the boundariesGenerated boolean.
-		 * @return True if the EffectorBoundaries have been generated.
-		 **/
-		inline bool hasBoundaries(){ return boundariesGenerated; }
-
-		void generateBoundaries(double voxelSize);
-		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end);
 		
-		bool checkPath(const rexos_datatypes::Point3D<double>& begin, const double beginRotationX, const double beginRotationY, const double beginRotationZ, const rexos_datatypes::Point3D<double>& end, const double endRotationX, const double endRotationY, const double endRotationZ);
-
-
-		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ);
-		void moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration);
+		bool checkPath(const StewartGoughLocation& begin, const StewartGoughLocation& end);
+		void moveTo(StewartGoughLocation point, double maxAcceleration);
 		
 		void calibrateMotor(int motorIndex1,int motorIndex2);
 		bool checkSensor(int sensorIndex);
@@ -101,102 +81,66 @@ namespace rexos_stewart_gough{
 		void powerOff();
 		void powerOn();
 		
-		rexos_datatypes::Point3D<double>& getEffectorLocation();
+		StewartGoughLocation getEffectorLocation();
 		
-		double getEffectorRotationX();
-		double getEffectorRotationY();
-		double getEffectorRotationZ();
-
-		
-		// the inital motors and sensors are positioned on the wrong locations
-		// this is used to map them on the right locations
-		MotorMap motorMap[6];
 	private:
-
-		
-		SixAxisCalculations * sixAxisCalculations;
-
-
-		
-		/**
-		 * @var InverseKinematicsModel* kinematics
-		 * A pointer to the kinematics model used by the DeltaRobot.
-		 **/
-		//InverseKinematics* kinematics;
-
-		rexos_stewart_gough::StewartGoughMeasures * stewartGoughMeasures;
-		rexos_motor::StepperMotorProperties * stepperMotorProperties;
-	
-		int calibrationBigStepFactor;
 		/**
 		 * @var StepperMotor* motors
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
 		std::vector<rexos_motor::StepperMotor*> motors;
-
+		
+                /**
+                 *
+                 * @var ModbusController::ModbusController* modbus
+                 * the modbuscontroller
+                 **/
+                rexos_modbus::ModbusController modbus;
+                rexos_modbus::ModbusController createModbus();
+		
+		// the inital motors and sensors are positioned on the wrong locations
+		// this is used to map them on the right locations
+		MotorMap motorMap[6];
+		
+		//SixAxisCalculations * sixAxisCalculations;
+		
+		rexos_stewart_gough::StewartGoughMeasures stewartGoughMeasures;
+		rexos_motor::StepperMotorProperties stepperMotorProperties;
+		
 		/**
 		 * @var MotorManager* motorManager
 		 * A pointer to the MotorManager that handles the movement for the DeltaRobot.
 		 **/
-		rexos_motor::MotorManager* motorManager;
-
-		/**
-		 * @var EffectorBoundaries* boundaries
-		 * A pointer to the EffectorBoundaries of the DeltaRobot.
-		 **/
-		//EffectorBoundaries* boundaries;
-
-		/**
-		 * @var Point3D<double> effectorLocation
-		 * A 3D point in doubles that points to the location of the effector.
-		 **/
-		rexos_datatypes::Point3D<double> effectorLocation;
+		rexos_motor::MotorManager motorManager;
+		rexos_motor::MotorManager createMotorManager();
 		
-		/**
-		 * @var double rotationX
-		 * Current effector rotation around the x axis
-		 **/
-		double currentEffectorRotationX;
-		
-		/**
-		 * @var double rotationY
-		 * Current effector rotation around the y axis
-		 **/
-		double currentEffectorRotationY;
-		
-		/**
-		 * @var double rotationZ
-		 * Current effector rotation around the z axis
-		 **/
-		double currentEffectorRotationZ;
-		
-
-		/**
-		 * @var bool boundariesGenerated
-		 * A boolean indicating whether the EffectorBoundaries have been generated or not.
-		 **/
-		bool boundariesGenerated;
-
-		std::string modbusIp;
-		int modbusPort;
 		/**
 		 * @var modbus_t* modbusIO
 		 * A pointer to the TCP modbus connection for the IO controller.
 		 **/
 		modbus_t* modbusIO;
+		
+		SixAxisCalculations* sixAxisCalculations;
+		
+		
 		/**
-		 *
-		 * @var ModbusController::ModbusController* modbus
-		 * the modbuscontroller
+		 * @var Point3D<double> effectorLocation
+		 * A 3D point in doubles that points to the location of the effector.
 		 **/
-		rexos_modbus::ModbusController* modbus;
+		StewartGoughLocation effectorLocation;
+		
 
+		int calibrationBigStepFactor;
+		std::string modbusIp;
+		int modbusPort;
+		
+		
 		/**
 		 * @var int currentMotionSlot
 		 * The motion slot currently in use. The deltarobot switches between these slots when moving.
 		 **/
 		int currentMotionSlot;
-
+		
 		bool isValidAngle(int motorIndex, double angle);
 		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_motor::MotorRotation motorRotation1 ,rexos_motor::MotorRotation motorRotation2, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
@@ -206,6 +150,5 @@ namespace rexos_stewart_gough{
 		int getMotorIndexByNumber(int number);
 		
 		void deleteMotorRotationObjects(rexos_motor::MotorRotation* rotations[6]);
-		
 	};
 }

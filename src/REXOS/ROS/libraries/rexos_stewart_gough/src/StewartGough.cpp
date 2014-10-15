@@ -36,10 +36,7 @@
 #include <cmath>
 
 #include <rexos_datatypes/Point3D.h>
-//#include <rexos_stewart_gough/EffectorBoundaries.h>
 
-//#include <rexos_stewart_gough/InverseKinematics.h>
-//#include <rexos_stewart_gough/InverseKinematicsException.h>
 #include <rexos_stewart_gough/StewartGough.h>
 #include <rexos_motor/MotorException.h>
 #include <rexos_motor/MotorInterface.h>
@@ -50,6 +47,42 @@
 #include "rexos_stewart_gough/SixAxisCalculations.h"
 
 namespace rexos_stewart_gough{
+	rexos_modbus::ModbusController StewartGough::createModbus() {
+		REXOS_INFO("Creating modbus");
+		rexos_modbus::ModbusController controller(modbus_new_rtu(
+			"/dev/ttyS0",
+			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
+			rexos_motor::CRD514KD::RtuConfig::PARITY,
+			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
+			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
+		REXOS_INFO_STREAM(&controller);
+		return controller;
+	}
+	
+	rexos_motor::MotorManager StewartGough::createMotorManager() {
+		REXOS_INFO_STREAM("Creating motor manager " << &modbus);
+		REXOS_INFO_STREAM("motors size: " << motors.size());
+		//REXOS_INFO_STREAM("stepperMotorProperties: " << stepperMotorProperties);
+		// initialize motors
+		motors.push_back(new rexos_motor::StepperMotor(&modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(&modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(&modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(&modbus, rexos_motor::CRD514KD::Slaves::MOTOR_3, stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(&modbus, rexos_motor::CRD514KD::Slaves::MOTOR_4, stepperMotorProperties));
+		motors.push_back(new rexos_motor::StepperMotor(&modbus, rexos_motor::CRD514KD::Slaves::MOTOR_5, stepperMotorProperties));
+		
+		REXOS_INFO("part 2");
+		motorMap[0] = MotorMap(0,3);
+		motorMap[1] = MotorMap(1,2);
+		motorMap[2] = MotorMap(2,1);
+		motorMap[3] = MotorMap(3,0);
+		motorMap[4] = MotorMap(4,4);
+		motorMap[5] = MotorMap(5,5);
+		
+		return rexos_motor::MotorManager(&modbus, motors);
+	}
+	
+	
     /**
      * Constructor of a sixaxis robot.
      * 
@@ -59,10 +92,13 @@ namespace rexos_stewart_gough{
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
     StewartGough::StewartGough(Json::Value node) :
-			motorManager(NULL),
-			effectorLocation(rexos_datatypes::Point3D<double>(0, 0, 0)), 
-			boundariesGenerated(false),
-			currentMotionSlot(1){
+			effectorLocation(),
+			motors(), 
+			currentMotionSlot(1), 
+			modbus(createModbus()), 
+			stewartGoughMeasures(node["stewartGoughMeasures"]), 
+			stepperMotorProperties(node["stepperMotorProperties"]),
+			motorManager(createMotorManager()) {
 		REXOS_INFO("StewartGough constructor entering...");
 		readJSONNode(node);
 		
@@ -75,47 +111,19 @@ namespace rexos_stewart_gough{
 		if(modbus_connect(modbusIO) == -1) {
 			throw std::runtime_error("Modbus connection to IO controller failed");
 		}
-		assert(modbusIO != NULL);
 		
-		// initialize motors
-		modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
-			"/dev/ttyS0",
-			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-			rexos_motor::CRD514KD::RtuConfig::PARITY,
-			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-		
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_3, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_4, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_5, *stepperMotorProperties));
-		
-		motorMap[0] = MotorMap(0,3);
-		motorMap[1] = MotorMap(1,2);
-		motorMap[2] = MotorMap(2,1);
-		motorMap[3] = MotorMap(3,0);
-		motorMap[4] = MotorMap(4,4);
-		motorMap[5] = MotorMap(5,5);
-
-		//int motorMap1[][2] = {{1, 2}, {1, 2}};
-		
-		motorManager = new rexos_motor::MotorManager(modbus, motors);
-
-
 		sixAxisCalculations = new SixAxisCalculations(
-			stewartGoughMeasures->hip,
+			stewartGoughMeasures.hip,
 			//stewartGoughMesuares->ankle,
 			300.00, //ankle currently returns wrong value: 250.0, 19-05-2014
-			stewartGoughMeasures->base,
+			101.3,
 			//stewartGoughMeasures->effector,
-			55.0, //effector retuns wrong value: 44.x, 19-05-2014
-			stewartGoughMeasures->maxAngleHipAnkle
+			43.14, //effector retuns wrong value: 44.x, 19-05-2014
+			stewartGoughMeasures.maxAngleHipAnkle
 			//0.26
 			);
 
-		REXOS_INFO_STREAM(" max angle: " << stewartGoughMeasures->maxAngleHipAnkle << std::endl); 
+		REXOS_INFO_STREAM(" max angle: " << stewartGoughMeasures.maxAngleHipAnkle << std::endl); 
 	
 
        // kinematics = new InverseKinematics;
@@ -127,11 +135,9 @@ namespace rexos_stewart_gough{
      * Deconstructor of a stewart gough. Turns off the motors and deletes the kinematics model.
      **/
     StewartGough::~StewartGough(void){
-        if(motorManager->isPoweredOn()){
-            motorManager->powerOff();
+        if(motorManager.isPoweredOn()){
+            motorManager.powerOff();
         }
-		delete sixAxisCalculations;
-        //delete kinematics;
     }
     
 	void StewartGough::readJSONNode(const Json::Value node) {
@@ -143,25 +149,8 @@ namespace rexos_stewart_gough{
 		
 		calibrationBigStepFactor = node["calibrationBigStepFactor"].asInt();
 		REXOS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
-		
-		Json::Value stepperMotorPropertiesNode = node["stepperMotorProperties"];
-		stepperMotorProperties = new rexos_motor::StepperMotorProperties(stepperMotorPropertiesNode);
-		REXOS_INFO_STREAM("found stepperMotorProperties");
-		
-		Json::Value stewartGoughNode = node["stewartGoughMeasures"];
-		stewartGoughMeasures = new rexos_stewart_gough::StewartGoughMeasures(stewartGoughNode);
-		REXOS_INFO_STREAM("found stewartGoughMeasures");
 	}
-    /**
-     * Generates the effectorBoundaries for the given voxelSize.
-     *
-     * @param voxelSize The size in millimeters of a side of a voxel in the boundaries.
-     *
-    void StewartGough::generateBoundaries(double voxelSize) {
-		boundaries = EffectorBoundaries::generateEffectorBoundaries((*kinematics), stewartGoughMeasures, motors, voxelSize);
-		boundariesGenerated = true;
-    }
-*/
+	
     /**
      * Checks the validity of an angle for a motor.
      *
@@ -175,26 +164,6 @@ namespace rexos_stewart_gough{
         return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
     }
 
-    /**
-     * Checks the path between two points.
-     * 
-     * @param begin The starting point.
-     * @param end The end point.
-     * 
-     * @return if the path between two points is valid.
-     **/
-    bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin, const rexos_datatypes::Point3D<double>& end){
-		return sixAxisCalculations->checkPath(
-			SixAxisCalculations::Point3D(begin.x, begin.y, begin.z), 
-			0, 0, 0, //Rotations start
-			SixAxisCalculations::Point3D(end.x, end.y, end.z),
-			0, 0, 0 //Rotations end
-			);
-			
-		//return true;
-        //return boundaries->checkPath(begin, end);
-    }
-	
 	/**
      * Checks the path between two points.
      * 
@@ -203,20 +172,8 @@ namespace rexos_stewart_gough{
      * 
      * @return if the path between two points is valid.
      **/
-	bool StewartGough::checkPath(const rexos_datatypes::Point3D<double>& begin,
-		const double beginRotationX,
-		const double beginRotationY,
-		const double beginRotationZ,
-		const rexos_datatypes::Point3D<double>& end,
-		const double endRotationX,
-		const double endRotationY,
-		const double endRotationZ){
-    		return sixAxisCalculations->checkPath(
-			SixAxisCalculations::Point3D(begin.x, begin.y, begin.z), 
-			beginRotationX, beginRotationY, beginRotationZ, //Rotations start
-			SixAxisCalculations::Point3D(end.x, end.y, end.z),
-			endRotationX, endRotationY, endRotationZ //Rotations end
-			);
+	bool StewartGough::checkPath(const StewartGoughLocation& begin, const StewartGoughLocation& end) {
+		return sixAxisCalculations->checkPath(begin, end);
 	}
 			
 	
@@ -248,30 +205,18 @@ namespace rexos_stewart_gough{
     }
 
 
-	void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration){
-		moveTo(point, maxAcceleration, 0.0, 0.0, 0.0);
-	}
-
-
-    void StewartGough::moveTo(const rexos_datatypes::Point3D<double>& point, double maxAcceleration, double rotationX, double rotationY, double rotationZ){
+	void StewartGough::moveTo(StewartGoughLocation point, double maxAcceleration){
 		//maxAcceleration = 1;
-		REXOS_INFO_STREAM("moveTo: point(x:" << point.x << ", y:" << point.y << ", z:" << point.z << ") rotation(x:" << rotationX << ", y:" << rotationY << ", z:" << rotationZ << ")" << std::endl);
-		
-		//rexos_datatypes::Point3D<double> roundedPoint(roundf(point.x), roundf(point.y), roundf(point.z));
-		//std::cout << "moveTo (rounded): point(x:" << roundedPoint.x << ", y:" << roundedPoint.y << ", z:" << roundedPoint.z << ")" << std::endl;
-		
+		REXOS_INFO_STREAM("moveTo: point(x:" << point.location.x << ", y:" << point.location.y << ", z:" << point.location.z << ") rotation(x:" << point.rotationX << ", y:" << point.rotationY << ", z:" << point.rotationZ << ")" << std::endl);
 		
 		// check whether the motors are powered on.
-		if(!motorManager->isPoweredOn()){
+		if(!motorManager.isPoweredOn()){
 			throw rexos_motor::MotorException("motor drivers are not powered on");
 		}
 
 		//check if the requested location is the effectors current location,
 		//if so the method can be cut short.
-        if(effectorLocation == point
-				&& currentEffectorRotationX == rotationX
-				&& currentEffectorRotationY == rotationY
-				&& currentEffectorRotationZ == rotationZ){
+        if(effectorLocation == point) {
 			return;
         }
 
@@ -291,25 +236,35 @@ namespace rexos_stewart_gough{
 		
         // Get the motor angles from the kinematics model
         try{
+			SixAxisCalculations::EffectorMove effectorMove = sixAxisCalculations->getMotorAngles(point);
+	REXOS_INFO_STREAM("----------");
+	REXOS_INFO_STREAM("----------");
+	REXOS_INFO_STREAM(effectorMove.moveTo.location);
+	REXOS_INFO_STREAM(effectorMove.moveTo.rotationX);
+	REXOS_INFO_STREAM(effectorMove.moveTo.rotationY);
+	REXOS_INFO_STREAM(effectorMove.moveTo.rotationZ);
+	REXOS_INFO_STREAM(effectorMove.validMove);
+	REXOS_INFO_STREAM("----------");
+	REXOS_INFO_STREAM(effectorMove.angles[0]);
+	REXOS_INFO_STREAM(effectorMove.angles[1]);
+	REXOS_INFO_STREAM(effectorMove.angles[2]);
+	REXOS_INFO_STREAM(effectorMove.angles[3]);
+	REXOS_INFO_STREAM(effectorMove.angles[4]);
+	REXOS_INFO_STREAM(effectorMove.angles[5]);
+	REXOS_INFO_STREAM("----------");
+	REXOS_INFO_STREAM(effectorMove.angles[0] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(effectorMove.angles[1] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(effectorMove.angles[2] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(effectorMove.angles[3] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(effectorMove.angles[4] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(effectorMove.angles[5] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM("----------");
+	REXOS_INFO_STREAM("----------");
 			
-			
-	
-			SixAxisCalculations::EffectorMove effectorMove;
-			
-			
-			
-			effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(point.x, -point.y, point.z), rotationX, rotationY, rotationZ);
-			
-			
-		//std::cout << "Rotation args from effectorMove: " << effectorMove.effectorRotationX << " " << effectorMove.effectorRotationY << " " << effectorMove.effectorRotationZ << std::endl;
-		
-			
-			//calc.getAngles(angles, SixAxisCalculations::Point3D(point.x/10, point.y/10, point.z/10), rotationX, rotationY, rotationZ);
 			if(!effectorMove.validMove){
 				throw std::out_of_range("invalid angles"); 
 			}
-			for(int i = 0; i < 6;i++){
-			
+			for(int i = 0; i < 6; i++){
 				//Swap 2 and 3
 				if(i == 2){
 					rotations[i]->angle = effectorMove.angles[3];
@@ -327,10 +282,6 @@ namespace rexos_stewart_gough{
 				
 				REXOS_INFO_STREAM("Angle for motor: " << i << " = " << effectorMove.angles[i] << std::endl);
 			}
-			
-		
-			
-            //kinematics->destinationPointToMotorRotations(point, rotations);
         } catch(std::out_of_range& ex){
 			deleteMotorRotationObjects(rotations);
             throw ex;
@@ -349,26 +300,17 @@ namespace rexos_stewart_gough{
 
 		
         // Check if the path fits within the boundaries
-        if(!checkPath(effectorLocation,
-			currentEffectorRotationX,
-			currentEffectorRotationY,
-			currentEffectorRotationZ,
-			point,
-			rotationX,
-			rotationY,
-			rotationZ)){
-            delete rotations[0];
-            delete rotations[1];
-            delete rotations[2];
+        if(!checkPath(effectorLocation, point)) {
+			delete rotations[0];
+			delete rotations[1];
+			delete rotations[2];
 			delete rotations[3];
-            delete rotations[4];
-            delete rotations[5];
-            throw std::out_of_range("invalid path");
-        }
-			
-
-
-        try{
+			delete rotations[4];
+			delete rotations[5];
+			throw std::out_of_range("invalid path");
+		}
+		
+		try{
             // An array to hold the relative angles for the motors
             double relativeAngles[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 
@@ -452,7 +394,7 @@ namespace rexos_stewart_gough{
 			
 			
 			//long timer2 = rexos_utilities::timeNow();
-            motorManager->startMovement(currentMotionSlot);
+            motorManager.startMovement(currentMotionSlot);
 			//std::cout << "startMovement time: " << rexos_utilities::timeNow() - timer2 << "ms" << std::endl;
 		
 			
@@ -463,10 +405,6 @@ namespace rexos_stewart_gough{
         }
 
         deleteMotorRotationObjects(rotations);
-		
-		currentEffectorRotationX = rotationX;
-		currentEffectorRotationY = rotationY;
-		currentEffectorRotationZ = rotationZ;
         effectorLocation = point;
     }
 
@@ -573,8 +511,8 @@ namespace rexos_stewart_gough{
 		//std::cout << actualAngleInSteps1 << std::endl;
 		//calculate and set the deviation.
 		//std::cout << stewartGoughMeasures->motorFromZeroToTopAngle << std::endl;
-        double deviation1 = (actualAngleInSteps1 * motors.at(motorIndex1)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
-        double deviation2 = (actualAngleInSteps2 * motors.at(motorIndex2)->getMicroStepAngle()) + stewartGoughMeasures->motorFromZeroToTopAngle;
+        double deviation1 = (actualAngleInSteps1 * motors.at(motorIndex1)->getMicroStepAngle()) + stewartGoughMeasures.motorFromZeroToTopAngle;
+        double deviation2 = (actualAngleInSteps2 * motors.at(motorIndex2)->getMicroStepAngle()) + stewartGoughMeasures.motorFromZeroToTopAngle;
 		
 		//std::cout << "passed 1" << std::endl;
 		motors[motorIndex1]->setDeviationAndWriteMotorLimits(deviation1);
@@ -604,7 +542,7 @@ namespace rexos_stewart_gough{
 		
 		// Check the availability of the sensors
 		for(int i = 0; i < 6; i++){
-			motorManager->powerOffSingleMotor(i);
+			motorManager.powerOffSingleMotor(i);
 		}
 		
         bool sensorFailure = false;
@@ -626,7 +564,7 @@ namespace rexos_stewart_gough{
 
 
 		for(int i = 0; i < 6; i++){
-			motorManager->powerOnSingleMotor(getMotorIndexByNumber(0 + i));
+			motorManager.powerOnSingleMotor(getMotorIndexByNumber(0 + i));
 			getMotor(0 + i)->setDeviationAndWriteMotorLimits(0);
 			getMotor(0 + i)->writeRotationData(motorRotation, 1);
 			getMotor(0 + i)->startMovement(1);
@@ -646,19 +584,19 @@ namespace rexos_stewart_gough{
 	
 		
 		
-        effectorLocation.x = 0;
-        effectorLocation.y = 0;
-        effectorLocation.z = -270; // yet to be set 
+        effectorLocation.location.x = 0;
+        effectorLocation.location.y = 0;
+        effectorLocation.location.z = -270; // yet to be set 
 		
-		currentEffectorRotationX = 0;
-		currentEffectorRotationY = 0;
-		currentEffectorRotationZ = 0;
+		effectorLocation.rotationX = 0;
+		effectorLocation.rotationY = 0;
+		effectorLocation.rotationZ = 0;
 		
 		
 		
 		
 			
-		REXOS_DEBUG_STREAM("Debuging sixaxis calculations" << std::endl);
+		/*REXOS_DEBUG_STREAM("Debuging sixaxis calculations" << std::endl);
 		
 		SixAxisCalculations::EffectorMove effectorMove = sixAxisCalculations->getMotorAngles(SixAxisCalculations::Point3D(0, 0, 300), 0, 0, 0);
 		REXOS_DEBUG_STREAM("Move: " << effectorMove.moveTo << std::endl);
@@ -677,7 +615,7 @@ namespace rexos_stewart_gough{
 		REXOS_DEBUG_STREAM("Move: " << effectorMove.moveTo << std::endl);
 		for(int i = 0; i < 6; i++){
 			REXOS_DEBUG_STREAM("Angle for motor " << i << " =" << effectorMove.angles[i] << std::endl);
-		}
+		}*/
 		
 		
 		/*
@@ -796,7 +734,7 @@ namespace rexos_stewart_gough{
 		*/
 		
 		
-        REXOS_DEBUG_STREAM("effector location z: " << effectorLocation.z << std::endl); 
+        REXOS_DEBUG_STREAM("effector location z: " << effectorLocation.location.z << std::endl); 
 		
         return true;
     }
@@ -805,8 +743,8 @@ namespace rexos_stewart_gough{
      * Shuts down the stewart gough's hardware.
      **/
     void StewartGough::powerOff(void){
-        if(motorManager->isPoweredOn()){
-            motorManager->powerOff();
+        if(motorManager.isPoweredOn()){
+            motorManager.powerOff();
         }
     }
 
@@ -815,8 +753,8 @@ namespace rexos_stewart_gough{
      **/
     void StewartGough::powerOn(void){
 		//REXOS_INFO("powering motors on");
-        if(!motorManager->isPoweredOn()){
-            motorManager->powerOn();
+        if(!motorManager.isPoweredOn()){
+            motorManager.powerOn();
         }
     }
 
@@ -825,21 +763,9 @@ namespace rexos_stewart_gough{
      *
      * @return The coordinate for the midpoint of the effector.
      **/
-    rexos_datatypes::Point3D<double>& StewartGough::getEffectorLocation(){
+    StewartGoughLocation StewartGough::getEffectorLocation(){
         return effectorLocation;
     }
-	
-	double StewartGough::getEffectorRotationX(){
-		return currentEffectorRotationX;
-	}
-	
-	double StewartGough::getEffectorRotationY(){
-		return currentEffectorRotationY;
-	}
-	
-	double StewartGough::getEffectorRotationZ(){
-		return currentEffectorRotationZ;
-	}
 	
 	rexos_motor::StepperMotor* StewartGough::getMotor(int number){
 		return motors[getMotorIndexByNumber(number)];

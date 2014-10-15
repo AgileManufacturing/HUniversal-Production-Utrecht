@@ -38,6 +38,8 @@
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>
 
+#include <matrices/Matrices.h>
+
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "StewartGoughNode"
 // @endcond
@@ -98,156 +100,120 @@ stewartGoughNodeNamespace::StewartGoughNode::~StewartGoughNode() {
 
 
 void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
+	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
-	Json::Value instructionDataNode;
-	reader.parse(goal->json, instructionDataNode);
+	Json::Value equipletStepNode;
+	reader.parse(goal->json, equipletStepNode);
+	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 	
-	rexos_statemachine::SetInstructionResult result_;
-	result_.OID = goal->OID;
-	bool lookupIsSet = false;
-	bool movementZ = false;
-	std::string setValues;
+	rexos_statemachine::SetInstructionResult result;
+	result.OID = goal->OID;
 	
-    //construct a payload
-    //construct lookupvalues.
-	REXOS_INFO_STREAM("onSetInstruction" << std::endl);
-	Point payloadPoint, lookupResultPoint;
+	rexos_stewart_gough::StewartGoughLocation origin;
+	// the rotation of the axis of the tangent space against the normal space in radians
+	double rotationX, rotationY, rotationZ = 0;
 	
-	double rotationX = 0, rotationY = 0, rotationZ = 0;
-	
-	double angle, rotatedX, rotatedY;
-    /*JSONNode::const_iterator i = instructionDataNode.begin();
-	
-	REXOS_INFO_STREAM("Json data: " << goal->json << std::endl);
-	
-	
-	
-    /*while (i != instructionDataNode.end()){
-        const char * nodeName = i -> name().c_str();
-	    // keep in mind that a payload may or may not contain all values. Use lastXYZ to determine these values if they are not set.
-        if (strcmp(nodeName, "payload") == 0){
-
-			
-			payloadPoint = parsePoint(*i, &setValues);
-			lookupResultPoint = parseLookup(*i);
-			std::string angleValue = parseNodeValue("angle", *i);
-			angle = rexos_utilities::stringToDouble(angleValue);
-			
-			
-			//std::string rotateString = parseNodeValue("rotate", *i);
-			
-			//std::cout << "Rotate value: " << rotateString << std::endl;
-				
-			//if(!rotateString.empty()){
-				
-				
-				//JSONNode::const_iterator rotateIterator = libjson::parse(rotateString).begin();
-				
-				
-				std::string rotationValueX = parseNodeValue("rotationX", *i);
-				rotationX = rexos_utilities::stringToDouble(rotationValueX);
-				if(rotationValueX.empty()){
-					rotationX = stewartGough->getEffectorRotationX();
-				}
-				
-				std::string rotationValueY = parseNodeValue("rotationY", *i);
-				rotationY = rexos_utilities::stringToDouble(rotationValueY);
-				if(rotationValueY.empty()){
-					rotationY = stewartGough->getEffectorRotationY();
-				}
-				
-				std::string rotationValueZ = parseNodeValue("rotationZ", *i);
-				rotationZ = rexos_utilities::stringToDouble(rotationValueZ);
-				if(rotationValueZ.empty()){
-					rotationZ = stewartGough->getEffectorRotationZ();
-				
-				}
-			
-			
-			REXOS_INFO_STREAM("rotationX: " << rotationX << std::endl);
-			REXOS_INFO_STREAM("rotationY: " << rotationY << std::endl);
-			REXOS_INFO_STREAM("rotationZ: " << rotationZ << std::endl);
-			
-			
-			//check whether lookup is set. If all values are 0, we can presume the lookup isnt set.
-			//Bit dangerous tho, what happends if they are all exactly 0?
-			if(!(lookupResultPoint.x == 0 && lookupResultPoint.y == 0 && angle == 0)){
-				lookupIsSet = true;
+	// determine the position of the origin and the rotation of the axis
+	switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
+		case rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER: {
+			// set the origin to the result of the lookup
+			if(equipletStep.getOriginPlacement().getLookupResult().isMember("location") == false) {
+				throw std::runtime_error("lookup result does not contain location");
+			} else if(equipletStep.getOriginPlacement().getLookupResult().isMember("rotation") == false) {
+				throw std::runtime_error("lookup result does not contain rotation");
 			}
-			
-
-			if(setValues.find("x") == -1) {
-				payloadPoint.x = stewartGough->getEffectorLocation().x;
-			}
-			if(setValues.find("y") == -1) {
-				payloadPoint.y = stewartGough->getEffectorLocation().y;
-			}
-			if(setValues.find("z") == -1) {
-				payloadPoint.z = stewartGough->getEffectorLocation().z;
-			}
-			
-			
-			/*
-			if(setValues.find("x") == -1 && setValues.find("y") == -1) {
-				// Probably a Z movement
-				payloadPoint.x = stewartGough->getEffectorLocation().x;
-				payloadPoint.y = stewartGough->getEffectorLocation().y;
-				movementZ = true;
-			}
-			if(setValues.find("z") == -1) {
-				// Probably a XY movement
-				payloadPoint.z = stewartGough->getEffectorLocation().z;
-			}
-			*/
-        /*}
-        i++;
-    }*/
-
-    Vector3 moveVector;
-    //lookup is set, so transform the (rotated) crate to a normal position.
-    if(lookupIsSet) {
-		
-		Vector3 lookupVector(lookupResultPoint.x, lookupResultPoint.y, lookupResultPoint.z);
-
-		double theta = angle * 3.141592653589793 / 180.0;
-		double cs = cos(theta);
-		double sn = sin(theta);
-		rotatedX = payloadPoint.x * cs - payloadPoint.y * sn;
-		rotatedY = payloadPoint.x * sn + payloadPoint.y * cs;
-
-	    //translate the relative point to real equiplet coordinates.
-		Vector3 translatedVector = convertToModuleCoordinate(lookupVector);
-
-		REXOS_INFO_STREAM("[TranslatedVectorX]: \t" << translatedVector.x << "\n[TranslatedVectorY]: \t" << translatedVector.y << std::endl);
-		
-		if(setValues.find("x")!= -1 && setValues.find("y")!= -1 
-				&& setValues.find("z")!= -1){
-			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), (translatedVector.z + payloadPoint.z));
-
+			Json::Value location = equipletStep.getOriginPlacement().getLookupResult()["location"];
+			origin.location.set(location["x"].asDouble(), location["y"].asDouble(), location["z"].asDouble());
+			origin.location = convertToModuleCoordinate(origin.location);
+			Json::Value rotation = equipletStep.getOriginPlacement().getLookupResult()["rotation"];
+			rotationZ = rotation["z"].asDouble();
+			break;
 		}
-		/*
-		if(movementZ) {
-			// Z Movement
-			moveVector.set(payloadPoint.x, payloadPoint.y, (translatedVector.z + payloadPoint.z));
-		} else {
-			// XY Movement
-			moveVector.set((translatedVector.x + rotatedX), (translatedVector.y + rotatedY), payloadPoint.z);
-			std::cout << "[MoveVectorX]: \t" << moveVector.x << "\n[MoveVectorY]: \t" << moveVector.y << std::endl;
+		case rexos_datatypes::OriginPlacement::RELATIVE_TO_CURRENT_POSITION: {
+			// set the origin to the current position of the effector
+			origin.location.set(stewartGough->getEffectorLocation().location.x, stewartGough->getEffectorLocation().location.y, 
+					stewartGough->getEffectorLocation().location.z);
+			origin.rotationX = stewartGough->getEffectorLocation().rotationX;
+			origin.rotationY = stewartGough->getEffectorLocation().rotationY;
+			origin.rotationZ = stewartGough->getEffectorLocation().rotationZ;
+			break;
 		}
-		*/
+		case rexos_datatypes::OriginPlacement::RELATIVE_TO_MODULE_ORIGIN: {
+			// set the origin to the origin of the module (eg set it to 0, 0, 0)
+			origin.location.set(0, 0, 0);
+			origin.rotationX = 0;
+			origin.rotationY = 0;
+			origin.rotationZ = 0;
+			break;
+		}
+		case rexos_datatypes::OriginPlacement::RELATIVE_TO_EQUIPLET_ORIGIN: {
+			// set the origin to the origin of the module (eg set it to 0, 0, 0)
+			origin.location = convertToModuleCoordinate(Vector3(0, 0, 0));
+			origin.rotationX = 0;
+			origin.rotationY = 0;
+			origin.rotationZ = 0;
+			break;
+		}
+	}
+	
+	// get the vector from the instruction data
+	Json::Value instructionData = equipletStep.getInstructionData();
+	if(instructionData.isMember("move") == false) {
+		throw std::runtime_error("instruction data does not contain move");
+	}
+	Json::Value moveCommand = equipletStep.getInstructionData()["move"];
+	Vector3 offsetVector;
+	if(moveCommand.isMember("x")) offsetVector.x = moveCommand["x"].asDouble();
+	else offsetVector.x = stewartGough->getEffectorLocation().location.x;
+	if(moveCommand.isMember("y")) offsetVector.y = moveCommand["y"].asDouble();
+	else offsetVector.y = stewartGough->getEffectorLocation().location.y;
+	if(moveCommand.isMember("z")) offsetVector.z = moveCommand["z"].asDouble();
+	else offsetVector.z = stewartGough->getEffectorLocation().location.z;
+	
+	// get the max acceleration
+	double maxAcceleration;
+	if(moveCommand.isMember("maxAcceleration") == false) {
+		REXOS_WARN("move command does not contain maxAcceleration, assuming ");
+		maxAcceleration = 50.0;
 	} else {
-		moveVector.set(payloadPoint.x, payloadPoint.y, payloadPoint.z);
+		maxAcceleration = moveCommand["maxAcceleration"].asDouble();
 	}
-
-	//std::cout << "trying to move to x: " << moveVector.x << " y: " << moveVector.y << " z: " <<  moveVector.z << " with acceleration: " << payloadPoint.maxAcceleration << std::endl;
-	if(moveToPoint(moveVector.x, moveVector.y, moveVector.z, rotationX, rotationY, rotationZ, payloadPoint.maxAcceleration)){
-		setInstructionActionServer.setSucceeded(result_);
-		return;
+	
+	// get the rotation from the instruction data
+	if(instructionData.isMember("rotate") == false) {
+		throw std::runtime_error("instruction data does not contain rotate");
 	}
-
-  	//finally move to point.
-	REXOS_INFO("Failed moving to point");
-	setInstructionActionServer.setAborted(result_);
+	Json::Value rotateCommand = equipletStep.getInstructionData()["rotate"];
+	double targetRotationX, targetRotationY, targetRotationZ;
+	if(rotateCommand.isMember("x")) targetRotationX = rotateCommand["x"].asDouble();
+	else targetRotationX = stewartGough->getEffectorLocation().rotationX;
+	if(rotateCommand.isMember("y")) targetRotationY = rotateCommand["y"].asDouble();
+	else targetRotationY = stewartGough->getEffectorLocation().rotationY;
+	if(rotateCommand.isMember("z")) targetRotationZ = rotateCommand["z"].asDouble();
+	else targetRotationZ = stewartGough->getEffectorLocation().rotationZ;
+	
+	// calculate the target vector
+	Matrix4 rotationMatrix;
+	rotationMatrix.rotateX(rotationX);
+	rotationMatrix.rotateY(rotationY);
+	rotationMatrix.rotateZ(rotationZ);
+	
+	Vector3 targetVector = origin.location + rotationMatrix * offsetVector;
+	targetRotationX += origin.rotationX;
+	targetRotationY += origin.rotationY;
+	targetRotationZ += origin.rotationZ;
+	rexos_stewart_gough::StewartGoughLocation targetLocation(targetVector.x, targetVector.y, targetVector.z, 
+			targetRotationX, targetRotationY, targetRotationZ);
+	
+	REXOS_INFO_STREAM("moving from " << stewartGough->getEffectorLocation() << " to " << targetLocation);
+	
+  	// finally move to point
+	if(moveToPoint(targetLocation, maxAcceleration)) {
+		setInstructionActionServer.setSucceeded(result);
+	} else {
+		REXOS_WARN("Failed moving to point");
+		setInstructionActionServer.setAborted(result);
+	}
 }
 
 
@@ -279,38 +245,22 @@ bool stewartGoughNodeNamespace::StewartGoughNode::calibrate(){
  * 
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y, double z, double maxAcceleration){
-	return moveToPoint(x, y, z, 0, 0, 0, maxAcceleration);
-}
-
-
-
-/**
- * moveToPoint function, is called by the json service functions and the old deprecated service functions.
- *
- * @param x destination x-coordinate
- * @param y destination y-coordinate
- * @param z destination z-coordinate
- * @param maxAcceleration maximum acceleration
- * 
- * @return false if the path is illegal, true if the motion is executed succesfully.
- **/
-bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration){
-
+bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration){
 	if(maxAcceleration > 20){
 		maxAcceleration = 20;
 	}
 	
-	REXOS_INFO_STREAM("moveTo rotation: " << rotationX << " " << rotationY << " " << rotationZ << std::endl);
+	REXOS_INFO_STREAM("moveTo rotation: " << to.rotationX << " " << to.rotationY << " " << to.rotationZ << std::endl);
 		
 	
-	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
-	rexos_datatypes::Point3D<double> newLocation(x,y,z);
+	rexos_stewart_gough::StewartGoughLocation oldLocation(stewartGough->getEffectorLocation());
+	rexos_stewart_gough::StewartGoughLocation newLocation(to);
 
 	try {
-		stewartGough->moveTo(newLocation, maxAcceleration, rotationX, rotationY, rotationZ);
+		stewartGough->moveTo(newLocation, maxAcceleration);
 		return true;
 	} catch(std::out_of_range& ex){
+		REXOS_INFO_STREAM(ex.what());
 		return false;
 	}
 	
@@ -419,6 +369,34 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv){
+	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
+				0, 0, 
+				0.46);
+//	rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -200 * std::sqrt(2)), 0, 0, 0.0);
+	rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), 0, 0, 0.0);
+	rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
+	
+	REXOS_INFO_STREAM(movement.moveTo.location);
+	REXOS_INFO_STREAM(movement.moveTo.rotationX);
+	REXOS_INFO_STREAM(movement.moveTo.rotationY);
+	REXOS_INFO_STREAM(movement.moveTo.rotationZ);
+	REXOS_INFO_STREAM(movement.validMove);
+	REXOS_INFO_STREAM("----------");
+	REXOS_INFO_STREAM(movement.angles[0]);
+	REXOS_INFO_STREAM(movement.angles[1]);
+	REXOS_INFO_STREAM(movement.angles[2]);
+	REXOS_INFO_STREAM(movement.angles[3]);
+	REXOS_INFO_STREAM(movement.angles[4]);
+	REXOS_INFO_STREAM(movement.angles[5]);
+	REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
+	REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
+	
+	
+	
 	ros::init(argc, argv, NODE_NAME);
 	
 	if(argc < 5){

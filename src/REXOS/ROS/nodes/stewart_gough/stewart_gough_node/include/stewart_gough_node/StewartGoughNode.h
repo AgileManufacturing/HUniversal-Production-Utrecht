@@ -35,9 +35,11 @@
 #include "rexos_std_srvs/Module.h"
 #include "stewart_gough_node/Point.h"
 
+#include <rexos_datatypes/EquipletStep.h>
 #include <rexos_datatypes/Point3D.h>
 #include <rexos_utilities/Utilities.h>
 #include <rexos_stewart_gough/StewartGough.h>
+#include <rexos_stewart_gough/StewartGoughLocation.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
 #include <stewart_gough_node/Services.h>
@@ -86,12 +88,8 @@ namespace stewartGoughNodeNamespace{
 			
 		// Main functions to be called from the services
 		bool calibrate();
-		bool moveToPoint(double x, double y, double z, double maxAcceleration);
-		//bool moveToRelativePoint(double x, double y, double z, double maxAcceleration);
-
-		bool moveToPoint(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double maxAcceleration);
+		bool moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration);
 		
-
 		Point parsePoint(const Json::Value & n, std::string * valuesSet);
 		Point parseLookup(const Json::Value & n);
 		Point *parsePointArray(std::string json, int & size);

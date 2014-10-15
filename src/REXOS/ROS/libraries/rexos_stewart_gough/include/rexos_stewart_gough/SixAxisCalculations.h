@@ -1,84 +1,46 @@
-/*
- * SixAxisMath.h
- *  Copyright: Rolf Smit
- *  Created on: 4 apr. 2014
- *      Author: Rolf
- */
-
-#ifndef SIXAXISMATH_H_
-#define SIXAXISMATH_H_
-
 #include <iostream>
 #include <cmath>
 #include <stdexcept>
 #include <vector>
 #include "rexos_logger/rexos_logger.h"
+#include <rexos_stewart_gough/StewartGoughLocation.h>
 
+#pragma once
 
-// Converts degrees to radians.
-#define DEGREES_TO_RADIANS(angleDegrees) (angleDegrees * M_PI / 180.0)
-
-// Converts radians to degrees.
-#define RADIANS_TO_DEGREES(angleRadians) (angleRadians * 180.0 / M_PI)
-
-#define HALF_PI (M_PI/2)
-#define GET_INDEX(row, col, maxCols) (row * maxCols + col)
-
-
-
-#define MATRIX_IDENTITY_4X4 {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
-#define MATRIX_POINT_4X1 	{0, 0, 0, 1}
-#define MATRIX_EMPTY_4X1 	{0, 0, 0, 0}
-#define MATRIX_EMPTY_4X4 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
-#define MATRIX_IDENTITY_3X3 {1, 0, 0, 0, 1, 0, 0, 0, 1}
-#define MATRIX_POINT_3X1 	{0, 0, 1}
-#define MATRIX_EMPTY_3X1 	{0, 0, 0}
-#define MATRIX_EMPTY_3X3 	{0, 0, 0, 0, 0, 0, 0, 0, 0}
-
-
+namespace rexos_stewart_gough{
 class SixAxisCalculations {
 
 	public:
-        struct Point3D {
-        	double x, y, z;
-        	Point3D(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {
-        	}
-
-        	friend std::ostream &operator<<(std::ostream &stream, Point3D const &p) {
-        		return stream << "(" << p.x << ", " << p.y << ", " << p.z << ")";
-        	}
-        };
-
+		enum JointPositionInGroup {
+			left,
+			right
+		};
+	
+	
 		struct EffectorMove {
-			Point3D moveTo;
-			double effectorRotationX;
-			double effectorRotationY;
-			double effectorRotationZ;
+			StewartGoughLocation moveTo;
 			bool validMove;
 			double angles[6];
 		};
 
-		SixAxisCalculations(double upperArmLength = 100.00, double lowerArmLength = 300.00, double motorAxisToCenterDistance = 101.30, double effectorJointtoCenterDistance = 55.00, double maxJointAngle = 0.46):
+		SixAxisCalculations(double upperArmLength = 100.00, double lowerArmLength = 300.00, 
+				double motorAxisToCenterDistance = 101.30, double effectorJointtoCenterDistance = 43.14, 
+				double maxJointAngle = 0.46):
 			upperArmLength(upperArmLength),
 			lowerArmLength(lowerArmLength),
-			motorAxisToCenterDistance(motorAxisToCenterDistance),
-			effectorJointtoCenterDistance(effectorJointtoCenterDistance),
-			maxJointAngle(maxJointAngle){
+			baseRadius(motorAxisToCenterDistance),
+			effectorRadius(effectorJointtoCenterDistance),
+			maxJointAngle(maxJointAngle),
+			effectorJointOffset(35.0),
+			motorJointOffset(35.0)
+			{
 		}
 
-		EffectorMove getMotorAngles(Point3D moveTo, double xRotation, double yRotation, double zRotation);
-		double * getAngles(double angles[6], Point3D moveTo, double xRotation, double yRotation, double zRotation);
-
-		//
-		bool isValidMove(double angles[6]);
-
-		//void matrixTest();
-
-		bool checkPath(Point3D from, double startRotationX, double startRotationY, double startRotationZ, Point3D to, double endRotationX, double endRotationY, double endRotationZ);
+		EffectorMove getMotorAngles(StewartGoughLocation moveTo);
+		bool checkPath(StewartGoughLocation from, StewartGoughLocation to);
 
 
-		static constexpr double EFFECTOR_MAGIC_NUMBER = 37.198;
+		/*static constexpr double EFFECTOR_MAGIC_NUMBER = 37.198;
 
 		/*
 		 * Can be calculated using:
@@ -107,59 +69,26 @@ class SixAxisCalculations {
 		static constexpr double MOTOR_C2_POS 			= 240 + 19.1624;
 
 	private:
-        double upperArmLength;
-        double lowerArmLength;
-        double motorAxisToCenterDistance;
-        double effectorJointtoCenterDistance;
-        double maxJointAngle;
-
-        Point3D effectorJointPositionCache[6];
-
-
+		double upperArmLength;
+		double lowerArmLength;
+		double baseRadius;
+		double motorJointOffset;
+		double effectorRadius;
+		double effectorJointOffset;
+		double maxJointAngle;
 		
-		//Matrix operations
-		void getMultiplyMatrix(double result[], double matrixA[], int rowsA, int colsA, double matrixB[], int rowsB, int colsB);
+		static constexpr double numberOfGroups = 3;
+		
+		double getAngleForGroup(int jointIndex);
+		Vector2 getIntersectionPoint(Vector2 pointA, double radiusA, Vector2 pointB, double radiusB);
+		Vector3 getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, double groupAngle);
+		Vector3 getMotorAxisPosition(JointPositionInGroup jointPosition);
+		double getMotorAngle(StewartGoughLocation effectorLocation, int motorIndex);
+		
+		
 
-
-		/*
-        //4*4 Matrix functions
-        std::vector< std::vector<double> > get4x4IdentityMatrix();
-        std::vector< std::vector<double> > get4x4RotationMatrix(double xRotation, double yRotation, double zRotation);
-        std::vector< std::vector<double> > get4x4RotationMatrixX(double xRotation);
-        std::vector< std::vector<double> > get4x4RotationMatrixY(double yRotation);
-        std::vector< std::vector<double> > get4x4RotationMatrixZ(double zRotation);
-        std::vector< std::vector<double> > get4x4TransalationMatrix(Point3D point);
-        std::vector< std::vector<double> > get1x4PointMatrix(Point3D point);
-
-        //3*3 Matrix functions
-        std::vector< std::vector<double> > get3x3IdentityMatrix();
-        std::vector< std::vector<double> > get3x3RotationMatrix(double degrees);
-        std::vector< std::vector<double> > get3x3TransalationMatrix(double x, double y);
-        std::vector< std::vector<double> > get1x3PointMatrix(Point3D point);
-		*/
-
-		//4*4 Matrix functions
-		void get4x4RotationMatrix(double result[], double xRotation, double yRotation, double zRotation);
-		void get4x4RotationMatrixX(double result[], double xRotation);
-		void get4x4RotationMatrixY(double result[], double yRotation);
-		void get4x4RotationMatrixZ(double result[], double zRotation);
-		void get4x4TransalationMatrix(double result[], Point3D point);
-		void get1x4PointMatrix(double result[], Point3D point);
-
-		void get3x3RotationMatrix(double result[], double degrees);
-		void get3x3TransalationMatrix(double result[], double x, double y);
-		void get1x3PointMatrix(double result[], Point3D point);
-
-
-
-		Point3D getIntersectionPoint(double x1, double y1, double r1, double x2, double y2, double r2);
-
-
-        //Matrix operations
-        std::vector< std::vector<double> > multiplyMatrix(std::vector< std::vector<double> > matrixA, int rowsA, int colsA, std::vector< std::vector<double> > matrixB, int rowsB, int colsB);
-
-        //Vector operations
-        double getAngleBetween(Point3D vectorOne, Point3D vectorTwo);
+        /*//Vector operations
+        double getAngleBetween(Vector3 vectorOne, Vector3 vectorTwo);
 
         //Motor angle calculation and validation
         double getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double motorJointPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ);
@@ -170,7 +99,6 @@ class SixAxisCalculations {
         double calculateAngle(double d2);
         double calculateCircleIntersectionX(double CenterDistance, double radiusOne, double radiusTwo);
         double calculateCircleDistanceD(Point3D motorOrgin, Point3D effectorJointA);
-        double calculateAB(Point3D enginePosition, Point3D jointPosition);
+        double calculateAB(Point3D enginePosition, Point3D jointPosition);*/
 };
-
-#endif /* SIXAXISMATH_H_ */
+}
