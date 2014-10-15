@@ -49,13 +49,13 @@
 using namespace keyboard_control_node;
 
 
-KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
-	maxAcceleration(50.0) {
-
+KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+	maxAcceleration(50.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
+{
 	REXOS_INFO("Constructing");
 
 	//DirectMoveStepsBlackBoard
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "EquipletStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "EquipletStepsBlackBoard");
 
 	tcgetattr(KEYBOARDNUMBER, &oldTerminalSettings);
 	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
@@ -66,20 +66,34 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp) :
 	newTerminalSettings.c_cc[VEOF] = 2;
 	tcsetattr(KEYBOARDNUMBER, TCSANOW, &newTerminalSettings);
 
-	equipletStepBlackboardClient->removeDocuments("");
-
 	REXOS_INFO("Reading from keyboard");
-	REXOS_INFO("Start controlling the robot by pressing WASD keys and Up and Down keys");
-
-	run();
+	REXOS_INFO_STREAM("Start controlling the robot by pressing the following keys:" << std::endl <<
+			"KEY   ACTION                    MUTATION" << std::endl <<
+			"-----------------------------------------" << std::endl <<
+			"W     Forward                   MoveY++" << std::endl <<
+			"D     Backward                  MoveY--" << std::endl <<
+			"A     Left                      MoveX--" << std::endl <<
+			"D     Right                     MoveX++" << std::endl <<
+			"UP    Up                        MoveZ++" << std::endl <<
+			"DOWN  Down                      MoveZ--" << std::endl <<
+			"J     Rorate to the left        RotateX++" << std::endl <<
+			"L     Rorate to the right       RotateX--" << std::endl <<
+			"I     Rorate to the front       RotateY++" << std::endl <<
+			"K     Rorate to the back        RotateY++" << std::endl <<
+			"U     Rotate clockwise          RotateZ++" << std::endl <<
+			"O     Rotate counter clockwise  RotateZ--" << std::endl <<
+			"Q     Quit program");
 }
 
-KeyBoardControlNode::~KeyBoardControlNode(){
+KeyBoardControlNode::~KeyBoardControlNode() {
 	REXOS_INFO("Destructing");
+	tcsetattr(KEYBOARDNUMBER, TCSANOW, &oldTerminalSettings);
 }
 
-void KeyBoardControlNode::run(){
-	for(;;){
+void KeyBoardControlNode::run() {
+	while(exitProgram == false) {
+		char inputCharacter;
+		
 		// Get the next event from the keyboard.
 		if(read(KEYBOARDNUMBER, &inputCharacter, 1) < 0){
 			perror("read():");
@@ -90,11 +104,28 @@ void KeyBoardControlNode::run(){
 }
 
 void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
-// Reads keyboard input and does things. Doesnt keep track of actual robot location, just relative. Starts on 0.0, 0.0, 0.0
+	// Reads keyboard input and does things. Doesnt keep track of actual robot location, just relative
 	Vector3 direction;
+	double rotationX = 0, rotationY = 0, rotationZ = 0;
 
 	// Check which key was pressed.
 	switch(inputCharacter){
+		case KEYCODE_W:
+			REXOS_INFO("PRESSED W");
+			direction.y+= STEP;
+		break;
+		case KEYCODE_A:
+			REXOS_INFO("PRESSED A");
+			direction.x-= STEP;
+		break;
+		case KEYCODE_S:
+			REXOS_INFO("PRESSED S");
+			direction.y-= STEP;
+		break;
+		case KEYCODE_D:
+			REXOS_INFO("PRESSED D");
+			direction.x+= STEP;
+		break;
 		case KEYCODE_UP:
 			REXOS_INFO("PRESSED UP");
 			direction.z+= STEP;
@@ -103,59 +134,75 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 			REXOS_INFO("PRESSED DOWN");
 			direction.z-= STEP;
 		break;
-
-		case KEYCODE_W:
-			REXOS_INFO("PRESSED W");
-			direction.y+= STEP;
+		
+		case KEYCODE_J:
+			REXOS_INFO("PRESSED J");
+			rotationY -= STEP_ANGLE;
 		break;
-
-		case KEYCODE_A:
-			REXOS_INFO("PRESSED A");
-			direction.x-= STEP;
+		case KEYCODE_L:
+			REXOS_INFO("PRESSED L");
+			rotationY += STEP_ANGLE;
 		break;
-
-		case KEYCODE_S:
-			REXOS_INFO("PRESSED S");
-			direction.y-= STEP;
+		case KEYCODE_I:
+			REXOS_INFO("PRESSED I");
+			rotationX -= STEP_ANGLE;
+		break;
+		case KEYCODE_K:
+			REXOS_INFO("PRESSED K");
+			rotationX += STEP_ANGLE;
+		break;
+		case KEYCODE_U:
+			REXOS_INFO("PRESSED U");
+			rotationZ += STEP_ANGLE;
+		break;
+		case KEYCODE_O:
+			REXOS_INFO("PRESSED O");
+			rotationZ -= STEP_ANGLE;
+		break;
+		
+		case KEYCODE_Q:
+			exitProgram = true;
 			break;
-
-		case KEYCODE_D:
-			REXOS_INFO("PRESSED D");
-			direction.x+= STEP;
-			break;
-
-		case KEYCODE_C:
-			//calibrateClient.call(calibrateService);
+		default:
+			REXOS_INFO_STREAM("Unknown character: " << inputCharacter);
 		break;
+			
 	}
-		writeToBlackBoard(direction, maxAcceleration);
+	if(exitProgram == false) {
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+	}
 }
 
-void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double acceleration){
+void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double acceleration, double rotationX, double rotationY, double rotationZ){
 	rexos_datatypes::EquipletStep equipletStep;
 	Json::Value instructionData;
-	Json::Value moveCommand;
 	
+	Json::Value moveCommand;
 	moveCommand["x"] = direction.x;
 	moveCommand["y"] = direction.y;
 	moveCommand["z"] = direction.z;
-	moveCommand["maxAcceleration"] = acceleration;
-	
+	moveCommand["maxAcceleration"] = 5.0;
 	instructionData["move"] = moveCommand;
+	
+	Json::Value rotateCommand;
+	rotateCommand["x"] = rotationX;
+	rotateCommand["y"] = rotationY;
+	rotateCommand["z"] = rotationZ;
+	instructionData["rotate"] = rotateCommand;
+	
 	equipletStep.setInstructionData(instructionData);
 	
 	rexos_datatypes::OriginPlacement originPlacement;
 	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_CURRENT_POSITION);
 	equipletStep.setOriginPlacement(originPlacement);
 	
-	rexos_knowledge_database::ModuleIdentifier identifier("HU", "delta_robot_type_B", "1");
 	equipletStep.setModuleIdentifier(identifier);
-	
 	equipletStep.setStatus("WAITING");
 	
+	REXOS_INFO_STREAM("hardware step: " << equipletStep.toJSON());
 	Json::StyledWriter writer;
-	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON()))) {
-		REXOS_INFO_STREAM("printed: " << equipletStep.toJSON() << "to blackboard.");
+	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON())) == false) {
+		REXOS_WARN("insertion of hardware step on blackboard failed!");
 	}
 }
 
@@ -172,15 +219,8 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	ros::init(argc, argv, "keyBoardControlNode");
-	KeyBoardControlNode keyBoardControlNode("145.89.191.131");
-
-	ros::Rate poll_rate(5);
-
-	while (ros::ok()) {
-		poll_rate.sleep();
-		ros::spinOnce();
-	}
-
+	KeyBoardControlNode keyBoardControlNode("145.89.191.131", "EQ3", rexos_knowledge_database::ModuleIdentifier("HU", "six_axis_type_A", "1"));
+	keyBoardControlNode.run();
+	
 	return 0;
 }

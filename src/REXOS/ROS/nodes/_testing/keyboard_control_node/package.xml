@@ -25,6 +25,8 @@
   <build_depend>rexos_logger</build_depend>
   <run_depend>vectors</run_depend>
   <build_depend>vectors</build_depend>
+  <run_depend>rexos_knowledge_database</run_depend>
+  <build_depend>rexos_knowledge_database</build_depend>
 
   <export>
     <cpp cflags="-I${prefix}/include"/>

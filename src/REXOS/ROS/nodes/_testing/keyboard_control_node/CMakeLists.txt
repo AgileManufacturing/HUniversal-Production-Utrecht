@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(keyboard_control_node)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger vectors)
+find_package(catkin REQUIRED COMPONENTS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger vectors rexos_knowledge_database)
 find_package(Mongo)
 find_package(Log4cxx)
 find_package(Jsoncpp)
@@ -15,7 +15,7 @@ find_package(Jsoncpp)
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES 
-CATKIN_DEPENDS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger vectors
+CATKIN_DEPENDS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger vectors rexos_knowledge_database
 DEPENDS Jsoncpp)
 
 ###########

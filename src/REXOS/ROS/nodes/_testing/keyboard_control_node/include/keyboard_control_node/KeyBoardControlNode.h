@@ -33,6 +33,7 @@
 
 #include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
+#include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_datatypes/InstructionData.h>
 #include "rexos_logger/rexos_logger.h"
 #include <vectors/Vectors.h>
@@ -41,68 +42,34 @@ namespace keyboard_control_node {
 
 	class KeyBoardControlNode 
 	{
-		public:
-		KeyBoardControlNode(std::string blackboardIp);
-		virtual ~KeyBoardControlNode();
-
-		private:
-		void readInputFromKeyBoard(int inputCharacter);
+	public:
+		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+		~KeyBoardControlNode();
 		void run();
-		void writeToBlackBoard(Vector3 direction, double acceleration);
+		
+	private:
+		void readInputFromKeyBoard(int inputCharacter);
+		void writeToBlackBoard(Vector3 direction, double acceleration, double rotationX, double rotationY, double rotationZ);
 		
 		/**
 		 * @var double maxAcceleration
 		 * The maxAcceleration of the effector in millimeters per second.
 		 **/
 		double maxAcceleration;
-		/**
-		 * @var char KEYCODE_UP
-		 * The ascii representation of the up key on the keyboard.
-		 **/
-		static const char KEYCODE_UP = 0x41;
-
-		/**
-		 * @var char KEYCODE_DOWN
-		 * The ascii representation of the down key on the keyboard.
-		 **/
-		static const char KEYCODE_DOWN = 0x42;
-
-		/**
-		 * @var char KEYCODE_Q
-		 * The ascii representation of the Q key on the keyboard.
-		 **/
-		static const char KEYCODE_Q = 0x71;
-
-		/**
-		 * @var char KEYCODE_W
-		 * The ascii representation of the W key on the keyboard.
-		 **/
 		static const char KEYCODE_W = 0x77;
-
-		/**
-		 * @var char KEYCODE_A
-		 * The ascii representation of the A key on the keyboard.
-		 **/
-		static const char KEYCODE_A = 0x61;
-
-		/**
-		 * @var char KEYCODE_S
-		 * The ascii representation of the S key on the keyboard.
-		 **/
 		static const char KEYCODE_S = 0x73;
-
-		/**
-		 * @var char KEYCODE_D
-		 * The ascii representation of the D key on the keyboard.
-		 **/
+		static const char KEYCODE_A = 0x61;
 		static const char KEYCODE_D = 0x64;
-
-		/**
-		 * @var char KEYCODE_C
-		 * The ascii representation of the C key on the keyboard.
-		 **/
-		static const char KEYCODE_C = 0x63;
-
+		static const char KEYCODE_UP = 0x41;
+		static const char KEYCODE_DOWN = 0x42;
+		static const char KEYCODE_J = 0x6A;
+		static const char KEYCODE_L = 0x6C;
+		static const char KEYCODE_I = 0x69;
+		static const char KEYCODE_K = 0x6B;
+		static const char KEYCODE_U = 0x75;
+		static const char KEYCODE_O = 0x6F;
+		static const char KEYCODE_Q = 0x71;
+		
 		/**
 		 * @var int keyboardNumber
 		 * The number of the keyboard, e.g.: 0 is the primary keyboard.
@@ -114,13 +81,16 @@ namespace keyboard_control_node {
 		 * The size in millimeters per movement.
 		 **/
 		static constexpr double STEP = 1.0;
+		static constexpr double STEP_ANGLE = 0.1;
 
 		/**
 		 * A terminal interface data struct.
 		 **/
 		struct termios oldTerminalSettings, newTerminalSettings;
 		Blackboard::BlackboardCppClient* equipletStepBlackboardClient;
-		char inputCharacter;
+		bool exitProgram;
+		rexos_knowledge_database::ModuleIdentifier identifier;
+		std::string equipletName;
 	};
 
 }
