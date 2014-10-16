@@ -80,7 +80,7 @@ public class ScheduleBehaviour extends Behaviour {
 				product.schedulingFinished(true, productionPath);
 				break;
 			case LOAD:
-				LinkedList<Node> nodes = scheduling.calculateScorePath();
+				LinkedList<Node> nodes = scheduling.calculateLoadPath();
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
 
 				productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
@@ -90,7 +90,7 @@ public class ScheduleBehaviour extends Behaviour {
 			case EDD:
 			default:
 				// default option
-				nodes = scheduling.calculateEDDPath();
+				nodes = scheduling.calculateOptimumEDDPath();
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
 
 				productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());

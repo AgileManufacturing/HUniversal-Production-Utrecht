@@ -32,8 +32,7 @@ public class Scheduling<K> {
 	private Map<AID, Pair<Double, Position>> equipletInfo;
 	private Map<Pair<Position, Position>, Tick> travelTimes;
 
-	public Scheduling(String agent, Tick time, Tick deadline, Position position, List<ProductStep> productSteps,
-			Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo, Map<Pair<Position, Position>, Tick> travelTimes) {
+	public Scheduling(String agent, Tick time, Tick deadline, Position position, List<ProductStep> productSteps, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo, Map<Pair<Position, Position>, Tick> travelTimes) {
 		this.agent = agent;
 		this.time = time;
 		this.deadline = deadline;
@@ -42,9 +41,57 @@ public class Scheduling<K> {
 		this.serviceOptions = options;
 		this.equipletInfo = equipletInfo;
 		this.travelTimes = travelTimes;
+
+		if (Settings.VERBOSITY > 3) {
+			System.out.println("product steps: " + productSteps);
+			System.out.println("service options: " + Util.formatArray(serviceOptions));
+			System.out.println("equiplet info: " + Util.formatArray(equipletInfo));
+			System.out.println("travel times: " + Util.formatArray(travelTimes));
+		}
 	}
 
-	public LinkedList<Node> calculateEDDPath() throws SchedulingException {
+	public void validateAlgorithm() throws SchedulingException {
+		LinkedList<Node> optimumPath = calculateOptimumLoadPath();
+		LinkedList<Node> loadPath = calculateLoadPath();
+
+		// shit should not be equal but is loads are the same for equiplet with the
+		// if loads are equal of equiplets with same capabilities, shit goes wrong a bit random.
+		boolean shitCanFail = false;
+		for (Entry<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options : serviceOptions.entrySet()) {
+			double lowestLoad = Double.MAX_VALUE;
+			double counter = 0;
+
+			for (AID equiplet : options.getValue().keySet()) {
+				double load = equipletInfo.get(equiplet).first;
+				if (load < lowestLoad) {
+					lowestLoad = load;
+					counter = 1;
+				} else if (load == lowestLoad) {
+					counter++;
+				}
+			}
+			if (counter > 1) {
+				shitCanFail = true;
+			}
+		}
+
+		// all option should be explored
+		if (Settings.VERBOSITY > 3) {
+			System.out.println("Scheduling: found path with possible best score: " + loadPath + " comparing=" + loadPath.equals(optimumPath) + ", can fail=" + shitCanFail);
+		}
+
+		if (!loadPath.equals(optimumPath) && shitCanFail) {
+			throw new SchedulingException("Scheduling: should found the same path or maybe not: " + loadPath + " == " + optimumPath);
+		}
+	}
+
+	/**
+	 * bad performance
+	 * 
+	 * @return
+	 * @throws SchedulingException
+	 */
+	public LinkedList<Node> calculateOptimumEDDPath() throws SchedulingException {
 		Graph<Node> graph = new Graph<>();
 
 		Node source = new Node(time);
@@ -116,7 +163,7 @@ public class Scheduling<K> {
 							System.err.printf("Should happen: Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window, arrival);
 						}
 
-						boolean added = graph.add(node, nextNode, cost);
+						graph.add(node, nextNode, cost);
 
 						if (equipletNodes.contains(nextNode)) {
 							int index = equipletNodes.indexOf(nextNode);
@@ -172,97 +219,110 @@ public class Scheduling<K> {
 		return path;
 	}
 
-	class Score {
+	/**
+	 * This algorithm searches for the path with the equiplets with the least
+	 * load. It will construct a Graph G = (N, A).
+	 * If the options of each product steps are the same: the graph will consist
+	 * of (2 + # product steps * # options per product step) nodes and (2 * #
+	 * product steps + # product steps * # options per product step ^ 2)
+	 * This has bad performance if there are many options for each product step
+	 * and even lead to: OutOfMemoryError exception: Java heap space.
+	 * the reason of the memory problems are that each path will be calculated.
+	 * #options per product step ^ # product steps
+	 * The function should only be used for debug purposes.
+	 * 
+	 * @return path
+	 * @throws SchedulingException
+	 *             if no path will can be found within the deadline
+	 */
+	public LinkedList<Node> calculateOptimumLoadPath() throws SchedulingException {
+		Node source = new Node(time);
+		Node sink = new Node();
 
-		private double score;
+		Graph<Node> graph = new Graph<>();
+		graph.add(source);
+		graph.add(sink);
 
-		public Score(double score) {
-			this.score = score;
+		// list of node in the last column
+		ArrayList<Node> lastNodes = new ArrayList<Node>();
+		lastNodes.add(source);
+
+		for (ProductStep step : productSteps) {
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(step.getIndex());
+
+			// keep track of the equiplets to process in the next iteration
+			ArrayList<Node> equipletNodes = new ArrayList<Node>();
+
+			// add a node with an arc to each node in the previous column
+			for (Node previousNode : lastNodes) {
+
+				// Entry < Equiplet, Pair < duration, List of possible time options > >
+				for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : options.entrySet()) {
+					AID equiplet = option.getKey();
+					Tick duration = option.getValue().first;
+
+					Node nextNode = new Node(equiplet, new Tick(1), duration, step.getIndex());
+					double load = equipletInfo.get(equiplet).first;
+
+					boolean added = graph.add(previousNode, nextNode, load);
+
+					if (added) {
+						equipletNodes.add(nextNode);
+					}
+				}
+			}
+
+			lastNodes.clear();
+			lastNodes.addAll(equipletNodes);
+
+			// System.out.println("Graph so far:");
+			// System.out.println("Graph: " + graph);
+			// System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
 		}
 
-		double score() {
-			return score;
+		// add vertces from all the nodes in the last column to the sink node
+		for (Node node : lastNodes) {
+			graph.add(node, sink, 0);
 		}
-	}
 
-	public LinkedList<Node> calculateScorePath() throws SchedulingException {
+		// path through graph calculation
+		LinkedList<Node> optimumPath = graph.optimumPath(source, sink);
+		if (optimumPath.size() > 1) {
+			optimumPath.removeFirst();
+			optimumPath.removeLast();
+		} else if (optimumPath.isEmpty() || optimumPath.size() != productSteps.size()) {
+			throw new SchedulingException("failed to find path int nodes=" + graph + " - " + optimumPath);
+		}
 
 		if (Settings.VERBOSITY > 3) {
-			System.out.println("product steps: " + productSteps);
-			System.out.println("service options: " + Util.formatArray(serviceOptions));
-			System.out.println("equiplet info: " + Util.formatArray(equipletInfo));
-			System.out.println("travel times: " + Util.formatArray(travelTimes));
+			System.out.println("the last equiplet nodes to be processed: " + lastNodes);
+			System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
+			System.out.println("Graph: " + graph);
+			System.out.println(" Optimum Path : " + optimumPath);
 		}
-		/*
-		 * 
-		 * Node source = new Node(time);
-		 * Node sink = new Node();
-		 * 
-		 * Graph<Node> graph = new Graph<>();
-		 * graph.add(source);
-		 * graph.add(sink);
-		 * 
-		 * // list of node in the last column
-		 * ArrayList<Node> lastNodes = new ArrayList<Node>();
-		 * lastNodes.add(source);
-		 * 
-		 * for (ProductStep step : productSteps) {
-		 * Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(step.getIndex());
-		 * 
-		 * // keep track of the equiplets to process in the next iteration
-		 * ArrayList<Node> equipletNodes = new ArrayList<Node>();
-		 * 
-		 * // add a node with an arc to each node in the previous column
-		 * for (Node previousNode : lastNodes) {
-		 * 
-		 * // Entry < Equiplet, Pair < duration, List of possible time options > >
-		 * for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : options.entrySet()) {
-		 * AID equiplet = option.getKey();
-		 * Tick duration = option.getValue().first;
-		 * 
-		 * Node nextNode = new Node(equiplet, new Tick(1), duration, step.getIndex());
-		 * double load = equipletInfo.get(equiplet).first;
-		 * 
-		 * boolean added = graph.add(previousNode, nextNode, load);
-		 * 
-		 * if (added) {
-		 * equipletNodes.add(nextNode);
-		 * }
-		 * }
-		 * }
-		 * 
-		 * lastNodes.clear();
-		 * lastNodes.addAll(equipletNodes);
-		 * 
-		 * // System.out.println("Graph so far:");
-		 * // System.out.println("Graph: " + graph);
-		 * // System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
-		 * }
-		 * 
-		 * // add vertces from all the nodes in the last column to the sink node
-		 * for (Node node : lastNodes) {
-		 * graph.add(node, sink, 0);
-		 * }
-		 * 
-		 * // path through graph calculation
-		 * LinkedList<Node> optimumPath = graph.optimumPath(source, sink);
-		 * if (optimumPath.size() > 1) {
-		 * optimumPath.removeFirst();
-		 * optimumPath.removeLast();
-		 * } else if (optimumPath.isEmpty() || optimumPath.size() != productSteps.size()) {
-		 * throw new SchedulingException("failed to find path int nodes=" + graph + " - " + optimumPath);
-		 * }
-		 * 
-		 * if (Settings.VERBOSITY > 3) {
-		 * System.out.println("the last equiplet nodes to be processed: " + lastNodes);
-		 * System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
-		 * System.out.println("Graph: " + graph);
-		 * System.out.println(" Optimum Path : " + optimumPath);
-		 * }
-		 */
 
-		// +++++++++++++++++++
-		//
+		return optimumPath;
+	}
+
+	/**
+	 * Calculate a good path on the basis of the load of equiplets. This will
+	 * explore only the options if they remain with the best T options,
+	 * therefore it can not ensure the optimum path is found.
+	 * 
+	 * The algorithm keep a sorted list, on the basis of score, of the
+	 * calculated sub paths. While there are paths and #elements in the path are
+	 * smaller than the #product steps: the best path so far will be
+	 * removed and for each neighbor a new sub path added.
+	 * 
+	 * @return best path
+	 * @throws SchedulingException
+	 */
+	public LinkedList<Node> calculateLoadPath() throws SchedulingException {
+		// memory optimalization
+		double thres_value = 1.0;
+		int THRESHOLD = 100;
+
+		// initialize the paths :: <score, path> with a comparator that unsure the path with the best score are first in the list 
 		TreeSet<Pair<Double, LinkedList<Node>>> paths = new TreeSet<Pair<Double, LinkedList<Node>>>(new Comparator<Pair<Double, LinkedList<Node>>>() {
 			@Override
 			public int compare(Pair<Double, LinkedList<Node>> o1, Pair<Double, LinkedList<Node>> o2) {
@@ -309,10 +369,6 @@ public class Scheduling<K> {
 			// System.out.println(" added initial : " + new Pair<Double, LinkedList<Node>>(load, path));
 		}
 
-		// memory optimalization
-		double thres_value = 1.0;
-		int THRESHOLD = 100;
-
 		while (!paths.isEmpty()) {
 			if (Settings.VERBOSITY > 3) {
 				// //System.out.println(" PATHS =" + Util.formatPairList(paths));
@@ -353,7 +409,6 @@ public class Scheduling<K> {
 						// is the first available time earlier than first possibility and the product can arrive + duration is within the time window
 						if (timeOption.first.lessThan(firstPossibility) && arrival.add(duration).lessThan(timeOption.second)) {
 
-							// TODO performance improvement
 							// set the first possibility, the first is the time the equiplet is able to perform or when the product can arrive by the equiplet
 							firstPossibility = timeOption.first.max(arrival);
 						}
@@ -384,49 +439,32 @@ public class Scheduling<K> {
 					}
 				}
 			} else {
-
-				// shit should not be equal but is loads are the same for equiplet with the
-				// if loads are equal of equiplets with same capabilities, shit goes wrong a bit random.
-				boolean shitCanFail = false;
-				for (Entry<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options : serviceOptions.entrySet()) {
-					double lowestLoad = Double.MAX_VALUE;
-					double counter = 0;
-
-					for (AID equiplet : options.getValue().keySet()) {
-						double load = equipletInfo.get(equiplet).first;
-						if (load < lowestLoad) {
-							lowestLoad = load;
-							counter = 1;
-						} else if (load == lowestLoad) {
-							counter++;
-						}
-					}
-					if (counter > 1) {
-						shitCanFail = true;
-					}
-				}
-
+				// found a good path
 				return path;
-				/*
-				 * 
-				 * // all option should be explored
-				 * if (Settings.VERBOSITY > 3) {
-				 * System.out.println("Scheduling: found path with possible best score: " + path + " comparing=" + path.equals(optimumPath) + ", can fail=" + shitCanFail);
-				 * }
-				 * 
-				 * 
-				 * if (path.equals(optimumPath) || shitCanFail) {
-				 * return path;
-				 * } else {
-				 * throw new SchedulingException("Scheduling: should found the same path or maybe not: " + path + " == " + optimumPath);
-				 * }
-				 */
 			}
 		}
 
 		throw new SchedulingException("Scheduling: failed to find a path in paths: " + paths);
 	}
 
+	/**
+	 * This scheduling algorithm is made by Leo van Moergestel and implemented
+	 * by Laurens van den Brink, for further explanations and results see
+	 * plublications.
+	 * 
+	 * The algorithm will make a matrix m x n with m equiplets and n product
+	 * steps. The value of (r, c) with r < m and c < n will be 1 if the equiplet
+	 * r can execute the product step c, otherwise 0. If the equiplet can
+	 * execute multiple consecutive product steps the values will # of product
+	 * steps - 1. The next steps is to multiply the values with the load of
+	 * equiplet.
+	 * 
+	 * @ref to paper 'Multiagent-based agile manufacturing: from user
+	 *      requirements to product' - Leo van Moergestel section 3.2
+	 * 
+	 * @return the production steps
+	 * @throws SchedulingException
+	 */
 	public LinkedList<ProductionStep> calculateMatrixPath() throws SchedulingException {
 		double[][] matrix = new double[equipletInfo.size()][productSteps.size()];
 		List<AID> equiplets = new ArrayList<>(equipletInfo.keySet());
@@ -507,8 +545,7 @@ public class Scheduling<K> {
 				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(column).get(equiplet);
 				List<Pair<Tick, Tick>> availableTimeSlots = option.second;
 
-				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0)
-						: travelTimes.get(new Pair<Position, Object>(previousStep.first, equipletInfo.get(equiplet).second));
+				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0) : travelTimes.get(new Pair<Position, Object>(previousStep.first, equipletInfo.get(equiplet).second));
 				Tick arrival = previousStep.second.add(travelTime);
 				Tick duration = option.first;
 				Tick firstPossibility = deadline;
@@ -520,9 +557,7 @@ public class Scheduling<K> {
 				}
 
 				if (Settings.VERBOSITY > 3) {
-					System.out.println("for equiplet " + equiplet.getLocalName() + "(" + productSteps.get(column).getService() + ") \tscoring=" + highScore
-							+ " , can arrive at (pre=" + previousStep.second + " + " + travelTime + ")=" + arrival + ", duration=" + duration + ", available time:"
-							+ availableTimeSlots + ", so first possibility=" + firstPossibility);
+					System.out.println("for equiplet " + equiplet.getLocalName() + "(" + productSteps.get(column).getService() + ") \tscoring=" + highScore + " , can arrive at (pre=" + previousStep.second + " + " + travelTime + ")=" + arrival + ", duration=" + duration + ", available time:" + availableTimeSlots + ", so first possibility=" + firstPossibility);
 				}
 
 				if (firstPossibility.lessThan(deadline)) {
@@ -542,12 +577,15 @@ public class Scheduling<K> {
 	}
 
 	/**
-	 * Generates the scheduleMatrix for all productsteps & equiplets. For more information see
+	 * Generates the scheduleMatrix for all productsteps & equiplets. For more
+	 * information see
 	 * 
-	 * @ref to paper 'Multiagent-based agile manufacturing: from user requirements to product' - Leo van Moergestel section 3.2
+	 * @ref to paper 'Multiagent-based agile manufacturing: from user
+	 *      requirements to product' - Leo van Moergestel section 3.2
 	 * 
 	 * @param equiplets
-	 *            Map < Equiplet, < List<Service able to perform>, load of equiplet>
+	 *            Map < Equiplet, < List<Service able to perform>, load of
+	 *            equiplet>
 	 * @param productSteps
 	 *            list of product steps of the product
 	 * @return the generated scheduleMatrix

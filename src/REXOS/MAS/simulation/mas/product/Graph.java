@@ -48,6 +48,7 @@ public class Graph<V extends Node> {
 		} else {
 			graph.get(from).put(to, cost);
 		}
+
 		return added;
 	}
 
