@@ -22,18 +22,18 @@ class Stochastics {
 
 	int x = 0;
 
-	public Tick generateProductArrival() {
-		return time(config.getProductArrival());
-		/*
-		 * if (x < 15) {
-		 * x++;
-		 * return 100;
-		 * } else {
-		 * return 10000000;
-		 * }
-		 */
-		// return 10; // TODO too deterministic
-		// return time(config.getProductArrival());
+	public Tick generateProductArrival(Tick time) {
+		if (time.greaterThan(6000)) {
+			double meanProcessingTime = 20;
+			int meanOperations = config.getProductSteps().size() * 2;
+			double utilization = 0.95;
+			int equiplets = config.getEquipletsConfigurations().size();
+
+			double interarrival = (meanProcessingTime * meanOperations) / (utilization * equiplets);
+			return new Tick(interarrival);
+		} else {
+			return time(config.getProductArrival());
+		}
 	}
 
 	public Tick generateDeadline() {
@@ -87,7 +87,8 @@ class Stochastics {
 		List<ProductStep> productSteps = config.getProductSteps();
 
 		for (int i = 0; i < productSteps.size() * 2; i++) {
-			int x = i % productSteps.size(); // random.nextInt(productSteps.size());
+			// int x = i % productSteps.size();
+			int x = random.nextInt(productSteps.size());
 			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
 		}
 		return steps;

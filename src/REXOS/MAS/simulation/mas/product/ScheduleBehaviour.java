@@ -24,8 +24,8 @@ import MAS.simulation.util.Ontology;
 import MAS.simulation.util.Pair;
 import MAS.simulation.util.Parser;
 import MAS.simulation.util.Position;
-import MAS.simulation.util.Settings;
 import MAS.simulation.util.SchedulingAlgorithm;
+import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 
@@ -67,8 +67,7 @@ public class ScheduleBehaviour extends Behaviour {
 
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), product.getCreated(), product.getDeadline(), product.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
-			switch (Settings.SCHEDULING) {
-			case MATRIX:
+			if (Settings.SCHEDULING == SchedulingAlgorithm.MATRIX) {
 				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), productionPath);
@@ -78,26 +77,21 @@ public class ScheduleBehaviour extends Behaviour {
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 
 				product.schedulingFinished(true, productionPath);
-				break;
-			case LOAD:
-				LinkedList<Node> nodes = scheduling.calculateLoadPath();
+			} else {
+				LinkedList<Node> nodes;
+				if (Settings.SCHEDULING == SchedulingAlgorithm.EDD) {
+					nodes = scheduling.calculateEDDPath();
+				} else if (Settings.SCHEDULING == SchedulingAlgorithm.LOAD) {
+					nodes = scheduling.calculateLoadPath();
+				} else {
+					nodes = scheduling.calculateSuprimePath();
+				}
+
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
 
-				productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
+				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 				product.schedulingFinished(true, productionPath);
-				break;
-			case EDD:
-			default:
-				// default option
-				nodes = scheduling.calculateOptimumEDDPath();
-				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
-
-				productionPath = schedule(nodes, productSteps, equipletInfo, product.getDeadline());
-				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
-				product.schedulingFinished(true, productionPath);
-				break;
-				
 			}
 
 			done = true;
@@ -181,9 +175,11 @@ public class ScheduleBehaviour extends Behaviour {
 	 * @param suitedEquiplets
 	 *            a map of equiplet with the suited product steps
 	 * @return equiplet info and product step options
-	 * @throws SchedulingException when communication fails
+	 * @throws SchedulingException
+	 *             when communication fails
 	 */
-	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets) throws SchedulingException {
+	private Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets(HashMap<AID, LinkedList<ProductStep>> suitedEquiplets)
+			throws SchedulingException {
 		String replyConversation = Ontology.CONVERSATION_CAN_EXECUTE + System.currentTimeMillis();
 
 		// send a questions to each of the equilplet if the product step can be executed

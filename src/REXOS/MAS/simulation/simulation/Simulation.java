@@ -210,8 +210,10 @@ public class Simulation implements ISimulation, IControl {
 				e.printStackTrace();
 			}
 
-			Tick breakdown = stochastics.generateBreakdownTime(entry.getKey());
-			eventStack.add(new Event(time.add(breakdown), EventType.BREAKDOWN, equipletName));
+			if (Settings.BREAKDOWNS) {
+				Tick breakdown = stochastics.generateBreakdownTime(entry.getKey());
+				eventStack.add(new Event(time.add(breakdown), EventType.BREAKDOWN, equipletName));
+			}
 		}
 
 		try {
@@ -275,7 +277,7 @@ public class Simulation implements ISimulation, IControl {
 					break;
 				}
 
-//				reconfiguration();
+				// reconfiguration();
 
 				if (Settings.VERBOSITY > 1) {
 					lock.await();
@@ -760,7 +762,7 @@ public class Simulation implements ISimulation, IControl {
 		simulation.killAgent(productName);
 
 		// schedule next product arrival
-		Tick arrivalTime = stochastics.generateProductArrival();
+		Tick arrivalTime = stochastics.generateProductArrival(time);
 		eventStack.add(new Event(time.add(arrivalTime), EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %s + %s\n", time, arrivalTime);
 
@@ -806,7 +808,7 @@ public class Simulation implements ISimulation, IControl {
 		updateProductStats(STATS_TRAVEL, +1);
 
 		// schedule next product arrival
-		Tick arrivalTime = stochastics.generateProductArrival();
+		Tick arrivalTime = stochastics.generateProductArrival(time);
 		eventStack.add(new Event(time.add(arrivalTime), EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %s + %s\n", time, arrivalTime);
 
@@ -984,7 +986,11 @@ public class Simulation implements ISimulation, IControl {
 			PrintWriter writer = new PrintWriter(configFile);
 			writer.println("Simulation: " + new SimpleDateFormat("dd MM yyyy 'at' HH:mm:ss").format(new Date()));
 			writer.printf("Scheduling: %s\n", Settings.SCHEDULING);
+			writer.printf("Stochastics: %s\n", Settings.STOCHASTICS);
+			writer.printf("Breakdowns: %s\n", Settings.BREAKDOWNS);
+			writer.printf("Queue jump: %s\n", Settings.QUEUE_JUMP);
 			writer.printf("Verbosity: %d\n", Settings.VERBOSITY);
+			writer.printf("Reconfiguration time: %s\n", Settings.RECONFIGATION_TIME);
 			writer.printf("Communication timeout: %s\n", Settings.COMMUNICATION_TIMEOUT);
 			writer.printf("Configuration:\n%s\n", config);
 			writer.println();
@@ -999,7 +1005,7 @@ public class Simulation implements ISimulation, IControl {
 			writer.println("\r\t");
 			writer.println("reconfigured:");
 
-			// sort reconfigured the ugly way, sort hashmap on value
+			// sort reconfigured the ugly way I think, sort hashmap on value
 			List<Entry<String, Tuple<String, Tick, Tick, String>>> list = new LinkedList<Entry<String, Tuple<String, Tick, Tick, String>>>(reconfigured.entrySet());
 
 			Collections.sort(list, new Comparator<Entry<String, Tuple<String, Tick, Tick, String>>>() {
@@ -1036,6 +1042,10 @@ public class Simulation implements ISimulation, IControl {
 		Chart.save(path, "Product Statistics", "Products", productStatistics);
 		Chart.save(path, "Equiplet Loads", "Equiplets", mvAVGLoad);
 		Chart.save(path, "Equiplet Load Histories", "Equiplets", mvAVGLoadHistory);
+
+		HashMap<String, Map<Tick, Tick>> map = new HashMap<>();
+		map.put("Throughput", throughput);
+		Chart.save(path, "Product Throuhput", "Prodcuts", map);
 	}
 
 	@Override

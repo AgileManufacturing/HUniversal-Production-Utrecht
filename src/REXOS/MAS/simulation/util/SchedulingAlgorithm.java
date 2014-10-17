@@ -1,5 +1,5 @@
 package MAS.simulation.util;
 
 public enum SchedulingAlgorithm {
-	MATRIX, LOAD, EDD
+	MATRIX, LOAD, EDD, SUPRIME
 }

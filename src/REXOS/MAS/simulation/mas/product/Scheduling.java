@@ -17,7 +17,7 @@ import MAS.simulation.util.Tick;
 import MAS.simulation.util.Tuple;
 import MAS.simulation.util.Util;
 
-public class Scheduling<K> {
+public class Scheduling {
 
 	private String agent;
 	private Tick time;
@@ -32,7 +32,8 @@ public class Scheduling<K> {
 	private Map<AID, Pair<Double, Position>> equipletInfo;
 	private Map<Pair<Position, Position>, Tick> travelTimes;
 
-	public Scheduling(String agent, Tick time, Tick deadline, Position position, List<ProductStep> productSteps, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo, Map<Pair<Position, Position>, Tick> travelTimes) {
+	public Scheduling(String agent, Tick time, Tick deadline, Position position, List<ProductStep> productSteps,
+			Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo, Map<Pair<Position, Position>, Tick> travelTimes) {
 		this.agent = agent;
 		this.time = time;
 		this.deadline = deadline;
@@ -318,11 +319,46 @@ public class Scheduling<K> {
 	 * @throws SchedulingException
 	 */
 	public LinkedList<Node> calculateLoadPath() throws SchedulingException {
+		return calculatePath(new Score() {
+			@Override
+			double score(Tick possibility, double load) {
+				return load;
+			}
+
+		}, 100);
+	}
+
+	public LinkedList<Node> calculateEDDPath() throws SchedulingException {
+		return calculatePath(new Score() {
+			@Override
+			double score(Tick possibility, double load) {
+				Tick window = deadline.minus(time);
+				return 1 - possibility.minus(time).doubleValue() / window.doubleValue();
+			}
+
+		}, 1000);
+	}
+
+	public LinkedList<Node> calculateSuprimePath() throws SchedulingException {
+		return calculatePath(new Score() {
+			@Override
+			double score(Tick possibility, double load) {
+				Tick window = deadline.minus(time);
+				return (1 - possibility.minus(time).doubleValue() / window.doubleValue()) * load;
+			}
+
+		}, 100);
+	}
+
+	abstract class Score {
+		abstract double score(Tick possibility, double load);
+	}
+
+	public LinkedList<Node> calculatePath(Score scoring, int threshold) throws SchedulingException {
 		// memory optimalization
 		double thres_value = 1.0;
-		int THRESHOLD = 100;
 
-		// initialize the paths :: <score, path> with a comparator that unsure the path with the best score are first in the list 
+		// initialize the paths :: <score, path> with a comparator that unsure the path with the best score are first in the list
 		TreeSet<Pair<Double, LinkedList<Node>>> paths = new TreeSet<Pair<Double, LinkedList<Node>>>(new Comparator<Pair<Double, LinkedList<Node>>>() {
 			@Override
 			public int compare(Pair<Double, LinkedList<Node>> o1, Pair<Double, LinkedList<Node>> o2) {
@@ -356,7 +392,6 @@ public class Scheduling<K> {
 				// is the first available time earlier than first possibility and the product can arrive + duration is within the time window
 				if (timeOption.first.lessThan(firstPossibility) && arrival.add(duration).lessThan(timeOption.second)) {
 
-					// TODO performance improvement
 					// set the first possibility, the first is the time the equiplet is able to perform or when the product can arrive by the equiplet
 					firstPossibility = timeOption.first.max(arrival);
 				}
@@ -365,7 +400,9 @@ public class Scheduling<K> {
 			LinkedList<Node> path = new LinkedList<>();
 			path.add(new Node(equiplet, firstPossibility, duration, firstIndex));
 
-			paths.add(new Pair<Double, LinkedList<Node>>(load, path));
+			double score = scoring.score(firstPossibility, load);
+
+			paths.add(new Pair<Double, LinkedList<Node>>(score, path));
 			// System.out.println(" added initial : " + new Pair<Double, LinkedList<Node>>(load, path));
 		}
 
@@ -423,19 +460,21 @@ public class Scheduling<K> {
 						throw new SchedulingException("failed to find path withing deadline=" + deadline);// + " best path so far=" + paths.first());
 					}
 
-					if (score * load > thres_value) {
+					double newScore = score * scoring.score(firstPossibility, load);
+
+					if (newScore > thres_value) {
 						LinkedList<Node> newPath = new LinkedList<>(path);
 						newPath.add(nextNode);
-						paths.add(new Pair<Double, LinkedList<Node>>(score * load, newPath));
+						paths.add(new Pair<Double, LinkedList<Node>>(newScore, newPath));
 
-						if (paths.size() > THRESHOLD) {
+						if (paths.size() > threshold) {
 							paths.remove(paths.last());
 						}
-					} else if (paths.size() < THRESHOLD) {
-						thres_value = score * load;
+					} else if (paths.size() < threshold) {
+						thres_value = newScore;
 						LinkedList<Node> newPath = new LinkedList<>(path);
 						newPath.add(nextNode);
-						paths.add(new Pair<Double, LinkedList<Node>>(score * load, newPath));
+						paths.add(new Pair<Double, LinkedList<Node>>(newScore, newPath));
 					}
 				}
 			} else {
@@ -545,7 +584,8 @@ public class Scheduling<K> {
 				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(column).get(equiplet);
 				List<Pair<Tick, Tick>> availableTimeSlots = option.second;
 
-				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0) : travelTimes.get(new Pair<Position, Object>(previousStep.first, equipletInfo.get(equiplet).second));
+				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0)
+						: travelTimes.get(new Pair<Position, Object>(previousStep.first, equipletInfo.get(equiplet).second));
 				Tick arrival = previousStep.second.add(travelTime);
 				Tick duration = option.first;
 				Tick firstPossibility = deadline;
@@ -557,7 +597,9 @@ public class Scheduling<K> {
 				}
 
 				if (Settings.VERBOSITY > 3) {
-					System.out.println("for equiplet " + equiplet.getLocalName() + "(" + productSteps.get(column).getService() + ") \tscoring=" + highScore + " , can arrive at (pre=" + previousStep.second + " + " + travelTime + ")=" + arrival + ", duration=" + duration + ", available time:" + availableTimeSlots + ", so first possibility=" + firstPossibility);
+					System.out.println("for equiplet " + equiplet.getLocalName() + "(" + productSteps.get(column).getService() + ") \tscoring=" + highScore
+							+ " , can arrive at (pre=" + previousStep.second + " + " + travelTime + ")=" + arrival + ", duration=" + duration + ", available time:"
+							+ availableTimeSlots + ", so first possibility=" + firstPossibility);
 				}
 
 				if (firstPossibility.lessThan(deadline)) {

@@ -135,16 +135,36 @@ public class Chart {
 
 		return chart;
 	}
-
-	public static void save(String path, String title, String yLabel, Map<String, TreeMap<Tick, Double>> data) {
+	
+	public static <M extends Map<Tick, T>, T extends Number> void save(String path, String title, String yLabel, Map<String, M> data) {
 		try {
 			File file = new File(path + title.replace(" ", "_") + ".png");
 
 			final XYSeriesCollection dataset = new XYSeriesCollection();
-			for (Entry<String, TreeMap<Tick, Double>> entry : data.entrySet()) {
+			for (Entry<String, M> entry : data.entrySet()) {
 				final XYSeries series = new XYSeries(entry.getKey());
-				for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
-					series.add(point.getKey().doubleValue(), point.getValue());
+				for (Entry<Tick, T> point : entry.getValue().entrySet()) {
+					series.add(point.getKey().doubleValue(), point.getValue().doubleValue());
+				}
+				dataset.addSeries(series);
+			}
+
+			final JFreeChart chart = createChart(title, yLabel, dataset);
+			ChartUtilities.saveChartAsPNG(file, chart, 1024, 720);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static <M extends TreeMap<T, T>, T extends Number> void saves(String path, String title, String yLabel, Map<String, M> data, boolean fuckjava) {
+		try {
+			File file = new File(path + title.replace(" ", "_") + ".png");
+
+			final XYSeriesCollection dataset = new XYSeriesCollection();
+			for (Entry<String, M> entry : data.entrySet()) {
+				final XYSeries series = new XYSeries(entry.getKey());
+				for (Entry<T, T> point : entry.getValue().entrySet()) {
+					series.add(point.getKey().doubleValue(), point.getValue().doubleValue());
 				}
 				dataset.addSeries(series);
 			}
@@ -218,7 +238,7 @@ public class Chart {
 		plot.setRangeAxis(1, axis2);
 		plot.setDataset(1, dataset2);
 		plot.mapDatasetToRangeAxis(1, 1);
-		
+
 		LegendItemCollection legendItems = plot.getLegendItems();
 		for (int i = 0; i < legendItems.getItemCount(); i++) {
 			LegendItem item = legendItems.get(i);

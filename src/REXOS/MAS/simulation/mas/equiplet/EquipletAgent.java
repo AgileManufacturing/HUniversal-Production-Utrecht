@@ -234,8 +234,8 @@ public class EquipletAgent extends Agent {
 				return job;
 			}
 			counter++;
-			if (counter >= 2) {
-
+			if (counter >= Settings.QUEUE_JUMP) {
+				break;
 			}
 		}
 		return null;
