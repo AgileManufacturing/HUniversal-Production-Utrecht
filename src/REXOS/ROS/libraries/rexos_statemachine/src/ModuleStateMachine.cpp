@@ -1,8 +1,8 @@
 #include <rexos_statemachine/ModuleStateMachine.h>
 
-#include <rexos_statemachine_srvs/StateUpdate.h>
-#include <rexos_statemachine_srvs/ModeUpdate.h>
-#include <rexos_statemachine_srvs/RegisterModule.h>
+#include <rexos_statemachine/StateUpdate.h>
+#include <rexos_statemachine/ModeUpdate.h>
+#include <rexos_statemachine/RegisterModule.h>
 
 using namespace rexos_statemachine;
 
@@ -21,10 +21,10 @@ ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge
 	std::string equipletNamespaceName = equipletName;
 
 	//Register module on equiplet
-	ros::ServiceClient registerModuleServiceClient = nodeHandle.serviceClient<rexos_statemachine_srvs::RegisterModule>(equipletNamespaceName + "/register_module");
+	ros::ServiceClient registerModuleServiceClient = nodeHandle.serviceClient<rexos_statemachine::RegisterModule>(equipletNamespaceName + "/register_module");
 	registerModuleServiceClient.waitForExistence();
-	rexos_statemachine_srvs::RegisterModuleRequest req;
-	rexos_statemachine_srvs::RegisterModuleResponse res;
+	rexos_statemachine::RegisterModuleRequest req;
+	rexos_statemachine::RegisterModuleResponse res;
 	req.manufacturer = moduleIdentifier.getManufacturer();
 	req.typeNumber = moduleIdentifier.getTypeNumber();
 	req.serialNumber = moduleIdentifier.getSerialNumber();
@@ -32,8 +32,8 @@ ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge
 		throw std::runtime_error("Module registration failed");
 	}
 
-	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
-	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine_srvs::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
+	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
+	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
 	
 	REXOS_INFO_STREAM("binding A on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
 	bond = new rexos_bond::Bond(equipletNamespaceName + "/bond", moduleNamespaceName, this);
@@ -46,16 +46,16 @@ ModuleStateMachine::~ModuleStateMachine(){
 
 void ModuleStateMachine::onStateChanged(rexos_statemachine::State state) {
 	REXOS_WARN("onStateChanged");
-	rexos_statemachine_srvs::StateUpdateRequest req;
-	rexos_statemachine_srvs::StateUpdateResponse res;
+	rexos_statemachine::StateUpdateRequest req;
+	rexos_statemachine::StateUpdateResponse res;
 	req.state = getCurrentState();
 	changeStateNotificationClient.call(req, res);
 }
 
 void ModuleStateMachine::onModeChanged(rexos_statemachine::Mode mode) {
 	REXOS_WARN("onModeChanged");
-	rexos_statemachine_srvs::ModeUpdateRequest req;
-	rexos_statemachine_srvs::ModeUpdateResponse res;
+	rexos_statemachine::ModeUpdateRequest req;
+	rexos_statemachine::ModeUpdateResponse res;
 	req.mode = getCurrentMode();
 	changeModeNotificationClient.call(req, res);
 }

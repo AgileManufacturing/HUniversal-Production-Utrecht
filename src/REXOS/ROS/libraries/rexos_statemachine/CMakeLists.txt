@@ -15,6 +15,11 @@ add_message_files(
 DIRECTORY msg
 FILES ${messages} )
 
+file(GLOB_RECURSE services RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/srv" "*.srv")
+add_service_files(
+DIRECTORY srv
+FILES ${services} )
+
 generate_messages (
 	DEPENDENCIES actionlib_msgs std_msgs
 )
@@ -28,7 +33,6 @@ DEPENDS Boost)
 
 file(GLOB_RECURSE sources "src/**.c" "src/**.cpp")
 include_directories(include ${catkin_INCLUDE_DIRS} ${MONGO_INCLUDE_DIRS})
-message(STATUS "sources: ${sources}")
 add_library(rexos_statemachine ${sources})
 
 target_link_libraries(rexos_statemachine ${catkin_LIBRARIES} ${MONGO_LIBRARIES})

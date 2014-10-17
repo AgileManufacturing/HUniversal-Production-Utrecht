@@ -8,12 +8,7 @@
 #define	EQUIPLETSTEP_H
 
 #include <string.h>
-#include <iostream>
-#include <map>
-#include <utility>
-#include "rexos_datatypes/InstructionData.h"
 #include "rexos_datatypes/OriginPlacement.h"
-#include "rexos_datatypes/TimeData.h"
 
 #include <rexos_knowledge_database/ModuleIdentifier.h>
 
