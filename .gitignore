@@ -63,7 +63,6 @@ gridLog.txt
 src/REXOS/MAS/configuration/knowledge_db.properties
 src/REXOS/databases/equipletRecord.sql
 log.txt
-*.txt
 /bin
 
 output/
