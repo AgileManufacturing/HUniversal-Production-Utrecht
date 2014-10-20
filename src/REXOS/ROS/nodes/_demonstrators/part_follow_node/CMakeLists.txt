@@ -4,7 +4,6 @@ project(part_follow_node)
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger)
 find_package(Mongo)
-find_package(Log4cxx)
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -26,8 +25,8 @@ SET ( CMAKE_CXX_FLAGS "-std=c++0x" )
 #${Boost_INCLUDE_DIRS})
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
-include_directories(include ${catkin_INCLUDE_DIRS} ${LOG4CXX_INCLUDE_DIR})
+include_directories(include ${catkin_INCLUDE_DIRS}
 add_executable(part_follow_node ${sources})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(part_follow_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES} rexos_utilities)
+target_link_libraries(part_follow_node ${catkin_LIBRARIES} rexos_utilities)
