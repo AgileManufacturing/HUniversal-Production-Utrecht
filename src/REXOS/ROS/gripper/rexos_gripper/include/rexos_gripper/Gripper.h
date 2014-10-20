@@ -29,10 +29,14 @@
 #define GRIPPER_H
 
 #include <rexos_gripper/OutputDevice.h>
-#include <boost/thread.hpp>
 #include "rexos_logger/rexos_logger.h"
+//#include "REXOS/nodes/gripper/gripper_node/include/gripper_node/Observer.h"
+#include "rexos_gripper/Observer.h"
 
 #include <jsoncpp/json/value.h>
+#include <vector>
+#include <typeinfo>
+#include <string>
 
 namespace rexos_gripper {
 		/**
@@ -46,73 +50,19 @@ namespace rexos_gripper {
 			 * Notifies the handler when valve open time > GRIPPER_TIME_ENABLED_WARNING
 			 **/
 			typedef void (*watchdogWarningHandler)(void* object);
-
+			std::vector<Observer* > observers;
+			
 		public:
-			// Config parameters
-			/**
-			 * @var static int GRIPPER_MODBUS_ADRESS
-			 * Register containing the bit (port) for the gripper device
-			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
-			 **/
-			//const static int GRIPPER_MODBUS_ADRESS = 8001;
-
-			/**
-			 * @var static int GRIPPER_DEVICE_PIN
-			 * Pin (port / bit) of the gripper device
-			 * TODO: Should be moved into a dynamic location? QRCODE / Database?
-			 **/
-			//const static int GRIPPER_DEVICE_PIN = 0;
-
-			/**
-			 * @var static int GRIPPER_TIME_ENABLED_MAX
-			 * Maximum time for the gripper valve to be opened
-			 **/
-			//const static int GRIPPER_TIME_ENABLED_MAX = 60 * 1000;
-
-			/**
-			 * @var static int GRIPPER_TIME_ENABLED_WARNING
-			 * Maximum time before a warning is thrown
-			 **/
-			//const static int GRIPPER_TIME_ENABLED_WARNING = 50 * 1000;
-
-			/**
-			 * @var static int GRIPPER_TIME_COOLDOWN
-			 * Cooldown time for the gripper valve
-			 **/
-			//const static int GRIPPER_TIME_COOLDOWN = 3 * 60 * 1000;
-
-			/**
-			 * @var static int GRIPPER_TIME_WATCHDOG_INTERVAL
-			 * Watchdog loop interval.
-			 * TODO: tune for optimal performance?
-			 **/
-			//const static int GRIPPER_TIME_WATCHDOG_INTERVAL = 100;
-
 			Gripper(Json::Value node, void* GripperNode, watchdogWarningHandler warningHandler);
 			
 			//InputOutputController* ioController, void* GripperNode, watchdogWarningHandler warningHandler);
-			virtual ~Gripper( );
+			virtual ~Gripper();
 
-			void startWatchdog( );
-			void stopWatchdog( );
-
-			/**
-			 * Turn the gripper on
-			 **/
-			bool grab( ) {
-				if (!overheated) {
-					state = true;
-				}
-				return state;
-			}
-			/**
-			 * Turn the gripper off
-			 **/
-			bool release( ) {
-				state = false;
-				return !state; //return whether or not turning off succeeded.
-			}
-
+			void startWatchdog();
+			void stopWatchdog();			
+			void registerObserver(Observer* o);			
+			void unregisterObserver(Observer* o);
+			
 		private:
 			void readJSONNode(Json::Value node);
 			
@@ -146,21 +96,17 @@ namespace rexos_gripper {
 			bool watchdogRunning;
 
 			/**
-			 * @var bool state
-			 * The current state of the gripper
-			 * True is enabled
-			 * False is disabled
+			 * @var bool isActivated
+			 * Determens whether the gripper is activated
 			 **/
-			bool state;
-
+			bool isActivated;
+			
 			/**
-			 * @var bool previousState
-			 * The state of the gripper in the past
-			 * True is enabled
-			 * False is disabled
+			 * @var bool wasActivated
+			 * bool that says whether the gripper was activated before the current state
 			 **/
-			bool previousState;
-
+			bool wasActivated;
+			
 			/**
 			 * @var bool warned
 			 * Flag whether the warning function has been called after the last warning timeout
@@ -186,6 +132,8 @@ namespace rexos_gripper {
 			unsigned long timeCooldownStarted;
 
 			static void watchdogFunction(Gripper* device);
+
+			void notifyObservers();
 		};
 	}
 

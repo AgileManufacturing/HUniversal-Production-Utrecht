@@ -29,6 +29,7 @@
 #include <rexos_gripper/InputOutputController.h>
 
 #include <jsoncpp/json/value.h>
+#include <mutex>
 
 namespace rexos_gripper
 {
@@ -41,13 +42,18 @@ namespace rexos_gripper
 	public:
 		OutputDevice(Json::Value node);
 		void readJSONNode(const Json::Value node);
-		//OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin);
 		virtual ~OutputDevice();
 
 		virtual void enable();
 		virtual void disable();
 
 	private:
+		/**
+		 * @var std::mutex mu
+		 * The mutex for the lock on the ioController
+		 **/
+		 std::mutex mu;
+		 
 		/**
 		 * @var InputOutputController& ioController
 		 * The InputOutput interface

@@ -75,43 +75,26 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 	Json::Value instructionDataNode;
 	reader.parse(goal->json, instructionDataNode);
 	
-	rexos_statemachine::SetInstructionResult result_;
-	result_.OID = goal->OID;
-
-	/*
+	rexos_statemachine::SetInstructionResult result;
+	result.OID = goal->OID;
 	
-	JSONNode::const_iterator i = instructionDataNode.begin();
-
-    while (i != instructionDataNode.end()){
-
-        const char * nodeName = i -> name().c_str();
-		REXOS_WARN_STREAM("command " << nodeName);
-
-		if(strcmp(nodeName, "command") == 0) {
-			std::string value = parseNodeValue("command", instructionDataNode);
-
-			REXOS_WARN_STREAM("value " << value);
-			if(strcmp(value.c_str(), "activate") == 0) {
-				REXOS_INFO_STREAM("Activating gripper" << std::endl);
-				//gripper->grab();
-				//std::cout << "Gripper activated" << std::endl;
-				setInstructionActionServer.setSucceeded(result_);
-				REXOS_INFO_STREAM("setSucceeded" << std::endl);
-				return;
-			} else if(strcmp(value.c_str(), "deactivate") == 0) {
-				REXOS_INFO_STREAM("Deactivating gripper" << std::endl);
-				//gripper->release();
-				//std::cout << "Gripper deactivated" << std::endl;
-				setInstructionActionServer.setSucceeded(result_);
-				REXOS_INFO_STREAM("setSucceeded" << std::endl);
-				return;
-			}
+	//if(strcmp(nodeName, "command") == 0) {
+	
+		if (instructionDataNode.isMember("activate") == true){
+			gripper->enable();	
+			setInstructionActionServer.setSucceeded(result);	
+			return;
 		}
-    	++i;
-	}*/
-
+		
+		else if (instructionDataNode.isMember("deactivate") == true){
+			gripper->disable();
+			setInstructionActionServer.setSucceeded(result);	
+			return;
+			
+		}
+	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
-	setInstructionActionServer.setAborted(result_);
+	setInstructionActionServer.setAborted(result);
 }
 
 
@@ -148,8 +131,9 @@ bool GripperNode::transitionDeinitialize() {
  **/
 bool GripperNode::transitionSetup() {
 	REXOS_INFO("Setup transition called");
-	// Set currentState to start
-	//gripper->startWatchdog();
+	gripper->registerObserver(this);
+	//Set currentState to start
+	gripper->startWatchdog();
 	
 	//The service servers should be set, to provide the normal methods for the equiplet
 	return true;
@@ -162,9 +146,8 @@ bool GripperNode::transitionSetup() {
 bool GripperNode::transitionShutdown() {
 	REXOS_INFO("Shutdown transition called");
 	// Set currentState to stop
-	//gripper->stopWatchdog();
-	//gripper->release();
-	//gripper->disable();
+	gripper->stopWatchdog();
+	gripper->disable();
 
 	return true;
 }
@@ -187,6 +170,19 @@ bool GripperNode::transitionStop() {
 
 	return true;
 }
+
+	void GripperNode::notifyWarning(){
+		
+	}
+	
+	void GripperNode::notifyOverheated(){
+		
+	}
+	
+	void GripperNode::notifyCooledDown(){
+		
+	}
+	
 
 /**
  * Main that starts the gripper node and its statemachine.

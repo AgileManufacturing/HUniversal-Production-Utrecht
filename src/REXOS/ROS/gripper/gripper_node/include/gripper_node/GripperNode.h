@@ -34,6 +34,7 @@
 #include "ros/ros.h"
 #include "iostream"
 #include <rexos_gripper/Gripper.h>
+#include <rexos_gripper/Observer.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_statemachine/Transitions.h>
 #include <rexos_knowledge_database/Module.h>
@@ -51,7 +52,9 @@
 typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
 
 class GripperNode : public rexos_statemachine::ModuleStateMachine, 
-		public rexos_knowledge_database::Module  {
+	public rexos_knowledge_database::Module, 
+	Observer {
+	
 public:
 
 	GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
@@ -67,8 +70,11 @@ public:
 	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
 	
-	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
+	//bool grip(gripper_node::Grip::Request &req, gripper_node::Grip::Response &res);
+	//bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
+	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
+	
 private:
 	/**
 	 * @var modbus_t* modbusContext
@@ -92,10 +98,23 @@ private:
 	rexos_modbus::ModbusController* modbus;
 
 	/**
-	 * @var InputOutput::InputOutputController* controller;
-	 * Input output controller that contains the logic to switch devices
-	 */
-	rexos_gripper::InputOutputController* controller;
+	 * @var ros::ServiceServer gripService
+	 * The service for enabling the gripper
+	 **/
+	ros::ServiceServer gripService;
+
+	/**
+	 * @var ros::ServiceServer releaseService
+	 * The service for releasing the gripper
+	 **/
+	ros::ServiceServer releaseService;
+	
+	void notifyWarning();
+	
+	void notifyOverheated();
+	
+	void notifyCooledDown();
+	
 };
 
 #endif /* GRIPPERNODE_H_ */

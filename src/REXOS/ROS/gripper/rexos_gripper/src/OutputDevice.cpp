@@ -50,10 +50,6 @@ namespace rexos_gripper {
 		REXOS_INFO_STREAM("found modbusDevicePin " << pin);
 	}
 	
-	/*OutputDevice::OutputDevice(InputOutputController* ioController, uint32_t address, uint8_t pin) :
-		ioController(ioController), address(address), pin(pin) {}*/
-
-
 	/**
 	 * Virtual destructor for extensions of OutputDevice.
 	 */
@@ -64,6 +60,7 @@ namespace rexos_gripper {
 	 * Turns on the pin of the output device
 	 **/
 	void OutputDevice::enable(){
+		std::lock_guard<std::mutex> guard(mu);
 		ioController->pinHigh(address, pin);
 	}
 
@@ -71,6 +68,7 @@ namespace rexos_gripper {
 	 * Turns off the pin of the output device
 	 **/
 	void OutputDevice::disable(){
+		std::lock_guard<std::mutex> guard(mu);
 		ioController->pinLow(address, pin);
 	}
 }
