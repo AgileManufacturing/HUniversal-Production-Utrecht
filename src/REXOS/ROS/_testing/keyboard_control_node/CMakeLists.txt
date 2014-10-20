@@ -26,7 +26,7 @@ SET ( CMAKE_CXX_FLAGS "-std=c++0x" )
 #${Boost_INCLUDE_DIRS})
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
-include_directories(include ${catkin_INCLUDE_DIRS}
+include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(keyboard_control_node ${sources})
 
 ## Specify libraries to link a library or executable target against
