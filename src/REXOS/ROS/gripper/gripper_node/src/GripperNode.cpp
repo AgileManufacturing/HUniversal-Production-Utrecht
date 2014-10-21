@@ -58,6 +58,11 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 	reader.parse(properties, jsonNode);
 	reader.parse(typeProperties, typeJsonNode);
 	
+	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
+	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
+	}
+	
 	gripper = new rexos_gripper::Gripper(jsonNode, this, NULL);
 	setInstructionActionServer.start();
 }
