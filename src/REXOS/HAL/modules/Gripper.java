@@ -12,7 +12,6 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.knowledgedb_client.KeyNotFoundException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
@@ -22,6 +21,11 @@ import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
 import org.json.*;
+
+/**
+ * @author Lars Veenendaal
+ *
+ */
 
 public class Gripper extends ModuleActor {
 	
@@ -37,7 +41,6 @@ public class Gripper extends ModuleActor {
 	public Gripper(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory, moduleListener);
 		knowledgeDBClient = new KnowledgeDBClient();
-		System.out.println("Fallout: "+ getGripperSize());
 		getGripperSize();
 	}
 	

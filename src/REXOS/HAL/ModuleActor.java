@@ -28,7 +28,8 @@ import org.json.JSONObject;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
- *
+ * @author Lars Veenendaal
+ * 
  */
 public abstract class ModuleActor extends Module {
 	protected static final String MODULE_COMMAND = "module_command";
@@ -82,6 +83,23 @@ public abstract class ModuleActor extends Module {
 			throw new RuntimeException("Executing invalid DBNamespace", ex);
 		} catch (GeneralMongoException ex) {
 			throw new RuntimeException("General mongo exception while trying to execute", ex);
+		}
+	}
+
+	/**
+	 * [executeReloadEquipletCommand This function fires a 'ReloadEquiplet' message.]
+	 */
+	protected void executeReloadEquipletCommand(){
+		try{
+			moduleFactory.getHAL().getBlackBoardHandler().postReloadEquiplet();
+		} catch (JSONException ex) {
+ 			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()");
+		} catch (InvalidJSONException ex) {
+			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()", ex);
+		} catch (InvalidDBNamespaceException ex) {
+			throw new RuntimeException("Executing invalid DBNamespace - executeReloadEquipletCommand()", ex);
+		} catch (GeneralMongoException ex) {
+			throw new RuntimeException("General mongo exception while trying to execute - executeReloadEquipletCommand()", ex);
 		}
 	}
 	
@@ -140,6 +158,7 @@ public abstract class ModuleActor extends Module {
 	 * This method will forward the changed MAST module state to the {@link ModuleListener}
 	 * Do not call this method!
 	 */
+	@Override
 	public void onModuleStateChanged(String state){
 		moduleListener.onModuleStateChanged(state, this);
 	}
@@ -147,6 +166,7 @@ public abstract class ModuleActor extends Module {
 	 * This method will forward the changed MAST module mode to the {@link ModuleListener}
 	 * Do not call this method!
 	 */
+	@Override
 	public void onModuleModeChanged(String mode){
 		moduleListener.onModuleModeChanged(mode, this);
 	}

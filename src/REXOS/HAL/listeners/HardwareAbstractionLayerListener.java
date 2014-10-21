@@ -72,4 +72,10 @@ public interface HardwareAbstractionLayerListener {
 	 * @return
 	 */
 	public String getEquipletName();
+
+	/**
+	 * This method is called when the MAST mode of the equiplet is supposed to Reload
+	 * @param state
+	 */
+	public void onReloadEquiplet(String state);
 }

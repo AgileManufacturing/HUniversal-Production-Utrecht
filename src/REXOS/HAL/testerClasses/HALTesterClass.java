@@ -426,9 +426,10 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		criteria.put("subjects", subjects);
 		
 		
-		hal.translateProductStep(
-				new ProductStep(1, criteria, new Service("place")));
-		
+		hal.translateProductStep(new ProductStep(1, criteria, new Service("place")));
+		// Sending reloadEquiplet command to Blackboard
+		// UNTESTED W.I.P (Lars Veenendaal)]
+		hal.sendReloadEquiplet();
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/
@@ -467,6 +468,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public String getEquipletName() {
 		// TODO hardcoded!!!!!!
+		
 		return "EQ2";
 	}
 
@@ -489,5 +491,15 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	public void onExecutionFailed() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/**
+	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
+	 * @param state [description]
+	 */
+	@Override
+	public void onReloadEquiplet(String state){
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
+
 	}
 }
