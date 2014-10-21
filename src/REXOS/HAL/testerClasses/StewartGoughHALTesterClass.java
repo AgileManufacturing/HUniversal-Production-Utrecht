@@ -538,4 +538,13 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 		
 	}
 	
+	/**
+	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
+	 * @param state [description]
+	 */
+	@Override
+	public void onReloadEquiplet(String state){
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
+
+	}
 }
