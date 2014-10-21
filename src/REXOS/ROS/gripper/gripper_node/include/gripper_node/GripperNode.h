@@ -6,6 +6,7 @@
  * @author Koen Braham
  * @author Dick vd Steen
  * @author Alexander Streng
+ * @author Peter Markotic
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -69,9 +70,6 @@ public:
 
 	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
-	
-	//bool grip(gripper_node::Grip::Request &req, gripper_node::Grip::Response &res);
-	//bool release(gripper_node::Release::Request &req, gripper_node::Release::Response &res);
 
 	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
 	
@@ -109,7 +107,7 @@ private:
 	 **/
 	ros::ServiceServer releaseService;
 	
-	void notifyWarning();
+	void notifyWarned();
 	
 	void notifyOverheated();
 	

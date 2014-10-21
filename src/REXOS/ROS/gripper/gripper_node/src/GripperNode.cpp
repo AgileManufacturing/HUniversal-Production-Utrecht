@@ -5,6 +5,7 @@
  *
  * @author Koen Braham
  * @author Dick vd Steen
+ * @author Peter Markotic
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -63,7 +64,7 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 	
-	gripper = new rexos_gripper::Gripper(jsonNode, this, NULL);
+	gripper = new rexos_gripper::Gripper(jsonNode);
 	setInstructionActionServer.start();
 }
 
@@ -86,16 +87,17 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 	//if(strcmp(nodeName, "command") == 0) {
 	
 		if (instructionDataNode.isMember("activate") == true){
-			gripper->enable();	
+			gripper->activate();	
 			setInstructionActionServer.setSucceeded(result);	
+			std::cout << "Gripper activated" << std::endl;
 			return;
 		}
 		
 		else if (instructionDataNode.isMember("deactivate") == true){
-			gripper->disable();
+			gripper->deactivate();
 			setInstructionActionServer.setSucceeded(result);	
-			return;
-			
+			std::cout << "Gripper deactivated" << std::endl;
+			return;			
 		}
 	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
@@ -139,8 +141,7 @@ bool GripperNode::transitionSetup() {
 	gripper->registerObserver(this);
 	//Set currentState to start
 	gripper->startWatchdog();
-	
-	//The service servers should be set, to provide the normal methods for the equiplet
+
 	return true;
 }
 
@@ -152,8 +153,8 @@ bool GripperNode::transitionShutdown() {
 	REXOS_INFO("Shutdown transition called");
 	// Set currentState to stop
 	gripper->stopWatchdog();
-	gripper->disable();
-
+	gripper->deactivate();
+	
 	return true;
 }
 
@@ -166,6 +167,7 @@ bool GripperNode::transitionStart() {
 
 	return true;
 }
+
 /**
  * Transition from Normal to Standby state
  * @return 0 if everything went OK else error
@@ -176,17 +178,19 @@ bool GripperNode::transitionStop() {
 	return true;
 }
 
-	void GripperNode::notifyWarning(){
-		
-	}
+//TODO: Implement the following methods, there must be a MAST functionallity implemented here when a certain event occurs. Like when the gripper is overheated,
+//the gripper should look for a save place to drop the current item.
+void GripperNode::notifyWarned(){
+	REXOS_INFO("GripperNode is Warned ");	
+}
 	
-	void GripperNode::notifyOverheated(){
-		
-	}
+void GripperNode::notifyOverheated(){
+	REXOS_INFO("GripperNode is Overheated");
+}
 	
-	void GripperNode::notifyCooledDown(){
-		
-	}
+void GripperNode::notifyCooledDown(){
+	REXOS_INFO("GripperNode is CooledDown");
+}
 	
 
 /**

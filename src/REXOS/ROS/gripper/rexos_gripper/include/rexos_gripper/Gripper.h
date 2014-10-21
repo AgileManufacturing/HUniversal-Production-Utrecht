@@ -4,6 +4,7 @@
  * @date Created: 2012-10-16
  *
  * @author Koen Braham
+ * @author Peter Markotic
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -44,24 +45,57 @@ namespace rexos_gripper {
 		 * Gripper valve could be overheated. A watchdog is running to check the valve is not opened for too long.
 		 **/
 		class Gripper: public OutputDevice {
-
-			/**
-			 * @typedef void (*watchdogWarningHandler)(void* object);
-			 * Notifies the handler when valve open time > GRIPPER_TIME_ENABLED_WARNING
-			 **/
-			typedef void (*watchdogWarningHandler)(void* object);
-			std::vector<Observer* > observers;
 			
 		public:
-			Gripper(Json::Value node, void* GripperNode, watchdogWarningHandler warningHandler);
+			/**
+			* Constructor for Gripper
+			* @param ioController Output controller for the ouput device (controller contains the registers)
+			**/
+			Gripper(Json::Value node);
 			
-			//InputOutputController* ioController, void* GripperNode, watchdogWarningHandler warningHandler);
+			/**
+			* Destructor to interrupt the watchdogThread
+			**/
 			virtual ~Gripper();
-
+			
+			/**
+			 * List of all the observers listening to the gripper's calls
+			 **/
+			std::vector<Observer* > observers;
+			
+			/**
+			 * Start the Watchdog Thread
+			 **/
 			void startWatchdog();
-			void stopWatchdog();			
-			void registerObserver(Observer* o);			
+			/**
+			 * Stop the Watchdog Thread
+			 **/
+			void stopWatchdog();
+			/**
+			 * Register an Observer so it will listen to the gripper calls
+			 * @param Observer o Pointer to the observer to be added to the list
+			 **/
+			void registerObserver(Observer* o);		
+			/**
+			 * Unregistrer an Observer so it will stop listening to the gripper calls
+			 * @param Observer o Pointer to the observer to be removed form the list
+			 **/
 			void unregisterObserver(Observer* o);
+			
+			/**
+			 * Turn the gripper on
+			 **/
+			void activate();
+			
+			/**
+			 * Turn the gripper off
+			 **/
+			void deactivate();
+			
+			enum Notify
+			{
+				Warned, CooledDown, Overheated			
+			};
 			
 		private:
 			void readJSONNode(Json::Value node);
@@ -76,12 +110,6 @@ namespace rexos_gripper {
 			 * The thread that checks the watchdog
 			 **/
 			boost::thread* watchdogThread;
-
-			/**
-			 * @var watchdogWarningHandler warningHandler
-			 * The callback function when the gripper is powered on too long
-			 **/
-			watchdogWarningHandler warningHandler;
 
 			/**
 			 * @var void* gripperNode
@@ -133,8 +161,9 @@ namespace rexos_gripper {
 
 			static void watchdogFunction(Gripper* device);
 
-			void notifyObservers();
+			void notifyObservers(Notify n);
+			
 		};
-	}
+}
 
 #endif

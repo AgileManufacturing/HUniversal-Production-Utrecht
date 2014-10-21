@@ -31,7 +31,7 @@
 class Observer
 {
 public:
-    virtual void notifyWarning() = 0;
+    virtual void notifyWarned() = 0;
 	virtual void notifyOverheated() = 0;
 	virtual void notifyCooledDown() = 0;
     virtual ~Observer() {};

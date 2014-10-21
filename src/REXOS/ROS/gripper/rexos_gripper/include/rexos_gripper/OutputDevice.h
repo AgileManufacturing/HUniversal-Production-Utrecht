@@ -4,6 +4,7 @@
 * @date Created: 2012-10-16
 *
 * @author Koen Braham
+* @author Peter Markotic
 *
 * @section LICENSE
 * Copyright © 2012, HU University of Applied Sciences Utrecht.
