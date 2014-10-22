@@ -2,7 +2,6 @@ package HAL;
 
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
-import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
@@ -83,9 +82,8 @@ public abstract class Module implements BlackboardModuleListener {
 	 * This method will return the parent module of this module
 	 * @return The parent module or null if no parent module exists
 	 * @throws FactoryException
-	 * @throws JarFileLoaderException 
 	 */
-	public Module getParentModule() {		
+	public Module getParentModule() throws FactoryException {		
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_PARENT_MODULE,
 																moduleIdentifier.getManufacturer(),
 																moduleIdentifier.getTypeNumber(),
@@ -93,21 +91,15 @@ public abstract class Module implements BlackboardModuleListener {
 																moduleIdentifier.getManufacturer(),
 																moduleIdentifier.getTypeNumber(),
 																moduleIdentifier.getSerialNumber());
-
+		
 		if (resultSet.length == 1){
 			ModuleIdentifier moduleIdentifier = new ModuleIdentifier(
 					resultSet[0].get("manufacturer").toString(),
 					resultSet[0].get("typeNumber").toString(),
 					resultSet[0].get("serialNumber").toString());
-				try {
-					return this.moduleFactory.getSomethingByIdentifier(moduleIdentifier);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.out.println("Module, getParentModule(): Error here");
-					return null;
-				} 				
-				} else {return null;}
+			return this.moduleFactory.getModuleByIdentifier(moduleIdentifier);
+		}
+		else return null;
 	}
 
 	/**

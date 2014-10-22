@@ -31,7 +31,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static JSONObject criteria2 = new JSONObject();
 	boolean state = false;
 	
-	static final String baseDir = "/home/niek/git/HUniversal-Production-Utrecht/";
+	static final String baseDir = "/home/t/Desktop/";
 	
 	// delta robot
 	static String moduleA_01 = "{"

@@ -8,9 +8,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.Module;
 import HAL.ModuleActor;
-import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
-import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
@@ -55,17 +53,8 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		try {
 			while(!toExecuteSteps.isEmpty()){
 				currentStep = toExecuteSteps.poll();
-				ModuleActor module;
-				try {
-					module = (ModuleActor) moduleFactory.getSomethingByIdentifier(currentStep.getModuleIdentifier());
-					module.executeHardwareStep(this, currentStep);
-				} catch (FactoryException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (JarFileLoaderException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				ModuleActor module = (ModuleActor) moduleFactory.getModuleByIdentifier(currentStep.getModuleIdentifier());
+				module.executeHardwareStep(this, currentStep);
 				Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "Wait for hardware step to finish: " + currentStep);
 				
 				this.wait();

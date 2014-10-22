@@ -73,7 +73,7 @@ public class EQSpawnClass extends Agent {
 		 java.util.Date date= new java.util.Date();
 		//Spanwing EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
-		Profile profile = new ProfileImpl();
+		Profile profile = new ProfileImpl();		
 		profile.setParameter(Profile.MAIN_HOST,MAIN_HOST);
 		profile.setParameter(Profile.MAIN_PORT,MAIN_PORT);
 		profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME);

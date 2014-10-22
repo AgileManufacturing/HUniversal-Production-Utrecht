@@ -66,16 +66,16 @@ public class DeltaRobot extends ModuleActor {
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
 		} else {
 			//Approach
-			//JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
-			//commandApproach.put(MOVE_X, commandApproach.getDouble(MOVE_X) + commandMove.getDouble(MOVE_X));
-			//commandApproach.put(MOVE_Y, commandApproach.getDouble(MOVE_Y) + commandMove.getDouble(MOVE_Y));
-			//commandApproach.put(MOVE_Z, commandApproach.getDouble(MOVE_Z) + commandMove.getDouble(MOVE_Z));
-			//Logger.log(LogLevel.ALERT, "a: ", commandApproach);
-			//JSONObject approachInstructionData = new JSONObject();
-			//approachInstructionData.put(MOVE, commandApproach);
+			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
+			commandApproach.put(MOVE_X, commandApproach.getDouble(MOVE_X) + commandMove.getDouble(MOVE_X));
+			commandApproach.put(MOVE_Y, commandApproach.getDouble(MOVE_Y) + commandMove.getDouble(MOVE_Y));
+			commandApproach.put(MOVE_Z, commandApproach.getDouble(MOVE_Z) + commandMove.getDouble(MOVE_Z));
+			Logger.log(LogLevel.ALERT, "a: ", commandApproach);
+			JSONObject approachInstructionData = new JSONObject();
+			approachInstructionData.put(MOVE, commandApproach);
 			
 			//Entry point
-			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 			
 			//Actual point
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));
@@ -84,7 +84,7 @@ public class DeltaRobot extends ModuleActor {
 			translatedHardwareSteps.add(null);
 
 			//Exit point
-			//translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 		}
 		
 		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(), compositeStep.getCommand(), compositeStep.getOriginPlacement()));

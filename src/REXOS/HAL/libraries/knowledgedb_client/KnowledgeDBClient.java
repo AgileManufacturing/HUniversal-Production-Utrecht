@@ -54,7 +54,7 @@ public class KnowledgeDBClient {
 
 
     /**
-     * Public constructor to create a mysql connection.
+     * Private constructor to create a mysql connection.
      * @throws KnowledgeException Creating a connection to the knowledge database has failed.
      **/
     public KnowledgeDBClient() throws KnowledgeException {

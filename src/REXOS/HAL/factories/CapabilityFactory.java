@@ -2,7 +2,6 @@ package HAL.factories;
 
 import generic.Service;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,10 +33,9 @@ import org.json.JSONObject;
  * The CapabilityFactory is the factory for the {@link Capability}. 
  * It does not only instantiate capabilities using the {@link DynamicClassFactory} (allowing dynamic addition of classes) but also manages part of the knowledge database.
  * @author Tommas Bakker
- * @author Niek Arends
  *
  */
-public class CapabilityFactory extends Factory<String, Capability>{
+public class CapabilityFactory extends Factory{
 	// SQL queries
 
 	/**
@@ -121,15 +119,6 @@ public class CapabilityFactory extends Factory<String, Capability>{
 	
 
 	/**
-	 * SQL query for selecting the serviceTypes for a capabilityType.
-	 * Input: capabilityTypeName
-	 */
-	public static final String getServiceTypesForCapabilityType =
-			"SELECT serviceType \n" + 
-			"FROM ServiceType_CapabilityType \n" + 
-			"WHERE capabilityType = ?;";
-	
-	/**
 	 * The {@link DynamicClassFactory} used by the CapabilityFactory to load classes of capabilities.
 	 */
 	private DynamicClassFactory<Capability> dynamicClassFactory;
@@ -141,7 +130,7 @@ public class CapabilityFactory extends Factory<String, Capability>{
 	 * @throws KnowledgeException
 	 */
 	public CapabilityFactory(HardwareAbstractionLayer hal) throws KnowledgeException {
-		super(new KnowledgeDBClient(), hal);
+		super(new KnowledgeDBClient());
 		this.hal = hal;
 		this.dynamicClassFactory = new DynamicClassFactory<>();
 		this.loadedCapabilities = new HashMap<String, Capability>();
@@ -158,7 +147,7 @@ public class CapabilityFactory extends Factory<String, Capability>{
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypes, hal.getEquipletName());
 		for (Row row : rows) {
 			String capabilityName = (String) row.get("name");
-			capabilities.add(this.<String, Capability>getSomethingByIdentifier(capabilityName));
+			capabilities.add(this.getCapabilityByName(capabilityName));
 		}
 		return capabilities;
 	}
@@ -176,22 +165,39 @@ public class CapabilityFactory extends Factory<String, Capability>{
 		for (Row row : rows) {
 			String capabilityName = (String) row.get("name");
 			try{
-				capabilities.add(this.getSomethingByIdentifier(capabilityName));
+				capabilities.add(this.getCapabilityByName(capabilityName));
 			} catch (FactoryException | JarFileLoaderException ex) {
 				Logger.log(LogSection.HAL_CAPABILITY_FACTORY, LogLevel.ERROR, "Unable to get capability with name: " + capabilityName, ex);
 			}
 		}
 		return capabilities;
 	}
-
-	protected JavaSoftware getJavaSoftware(String identifier) {
-		// TODO Auto-generated method stub
-		return JavaSoftware.getJavaSoftwareForCapabilityIdentifier(identifier);
-	}
-
-	@Override
-	protected Capability getConstuctorforThisFactory(Class<Capability> myClass, String key) throws NoSuchMethodException,	SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		// TODO Auto-generated method stub
-		return myClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
+	/**
+	 * This method will return the instantiated capability for the capabilityTypeName.
+	 * If the capability has not been instantiated, it will be instantiated by downloading the software from the knowledge database and dynamically loading the class.
+	 * @param capabilityName
+	 * @return
+	 * @throws FactoryException 
+	 * @throws JarFileLoaderException 
+	 * @throws  
+	 */
+	
+	private Capability getCapabilityByName(String capabilityTypeName) throws FactoryException, JarFileLoaderException {
+		DynamicClassDescription description = JavaSoftware.getJavaSoftwareForCapabilityName(capabilityTypeName).getDynamicClassDescription();
+		for (String loadedCapabilityIdentifier : loadedCapabilities.keySet()) {
+			if(capabilityTypeName.equals(loadedCapabilities) == true) {
+				return loadedCapabilities.get(loadedCapabilityIdentifier);
+			}			
+		}
+		try {
+			Class<Capability> capabilityClass = dynamicClassFactory.getClassFromDescription(description);
+			Capability capability = capabilityClass.getConstructor(ModuleFactory.class).newInstance(hal.getModuleFactory());
+			loadedCapabilities.put(capabilityTypeName, capability);
+			return capability;
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException | InstantiateClassException ex) {
+			throw new FactoryException("well, we are fucked", ex);
+		}
 	}
 }

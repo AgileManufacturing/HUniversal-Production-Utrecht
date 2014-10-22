@@ -1,4 +1,3 @@
-
 package HAL.capabilities;
 
 import generic.ProductStep;
