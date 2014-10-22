@@ -97,7 +97,7 @@ public abstract class Module implements BlackboardModuleListener {
 					resultSet[0].get("manufacturer").toString(),
 					resultSet[0].get("typeNumber").toString(),
 					resultSet[0].get("serialNumber").toString());
-			return this.moduleFactory.getModuleByIdentifier(moduleIdentifier);
+			return this.moduleFactory.getSomethingByIdentifier(moduleIdentifier);
 		}
 		else return null;
 	}

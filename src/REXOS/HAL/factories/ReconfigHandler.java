@@ -595,7 +595,7 @@ public class ReconfigHandler {
 			rosSoftware.updateRosSoftware(rosSoftwareObject);
 		}
 		
-		moduleFactory.removeModulesOfTypeFromCache();
+		moduleFactory.removeModulesOfTypeFromCache(moduleIdentifier);
 	}
 	
 	/**
@@ -749,7 +749,7 @@ public class ReconfigHandler {
 		output.put("serialNumber", moduleIdentifier.getSerialNumber());
 
 		JSONObject type = new JSONObject();
-		Module module = moduleFactory.getModuleByIdentifier(moduleIdentifier);
+		Module module = moduleFactory.getSomethingByIdentifier(moduleIdentifier);
 		String moduleProperties = module.getProperties();
 		type.put("properties", moduleProperties);
 
@@ -790,7 +790,7 @@ public class ReconfigHandler {
 
 		output.put("type", type);
 
-		moduleFactory.removeModuleFromCache(moduleIdentifier);
+		moduleFactory.removeItemFromCache(moduleIdentifier);
 		
 		return output;
 	}

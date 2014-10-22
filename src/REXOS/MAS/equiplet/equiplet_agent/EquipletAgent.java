@@ -178,7 +178,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			public void action() {
 				ACLMessage msg = receive();
 				if (msg!=null) {
-					System.out.println(msg.getSender() + msg.getContent());
+					//System.out.println(msg.getSender() + msg.getContent());
 					if(!msg.getSender().equals(this.getAgent().getAID())) {  
                     	if(msg.getPerformative()==MessageType.CAN_EXECUTE_PRODUCT_STEP){
                     		String result =canExecute(msg.getContent());
@@ -256,6 +256,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
+		System.out.println("HIERO");
 	}
 	DFAgentDescription dfd = new DFAgentDescription();
 	for(int i =0; i < serviceList.size(); i++){
@@ -278,7 +279,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	  * @return false if the service can't be executed, returns an startTime, duration and ID of the product step if it can be executed.
 	  */
 	private String canExecute(String msg){
-		System.out.println("Can execute?");
+		System.out.println(this.getLocalName() + ": Can execute?");
 		try {
 			JSONObject productSteps = new JSONObject(new JSONTokener(msg));
 			for(int i =0; i < serviceList.size(); i++){
@@ -420,5 +421,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		// TODO Auto-generated method stub
 		
 	}
-	
+	@Override
+	public void onReloadEquiplet(String state) {
+		// TODO Auto-generated method stub	
+	}	
 }
