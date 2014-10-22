@@ -30,7 +30,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static BlackboardHandler blackboardUpdated;
 	
 	//static final String baseDir = "/home/t/Desktop/"; 		// <-- Tommas
-	static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
+	//static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
+	static final String baseDir = "/home/peter/lib/";
 	
 	// delta robot
 	static String moduleA_01 = "{"

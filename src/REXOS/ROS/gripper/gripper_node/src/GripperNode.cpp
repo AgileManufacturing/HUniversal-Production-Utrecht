@@ -78,27 +78,26 @@ GripperNode::~GripperNode() {
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	REXOS_INFO_STREAM("handling hardwareStep: " << goal->json);
 	Json::Reader reader;
-	Json::Value instructionDataNode;
-	reader.parse(goal->json, instructionDataNode);
+	Json::Value equipletStepNode;
+	reader.parse(goal->json, equipletStepNode);
+	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 	
 	rexos_statemachine::SetInstructionResult result;
 	result.OID = goal->OID;
 	
-	//if(strcmp(nodeName, "command") == 0) {
+	if (instructionData.isMember("activate") == true){
+		gripper->activate();	
+		setInstructionActionServer.setSucceeded(result);	
+		std::cout << "Gripper activated" << std::endl;
+		return;
+	}
 	
-		if (instructionDataNode.isMember("activate") == true){
-			gripper->activate();	
-			setInstructionActionServer.setSucceeded(result);	
-			std::cout << "Gripper activated" << std::endl;
-			return;
-		}
-		
-		else if (instructionDataNode.isMember("deactivate") == true){
-			gripper->deactivate();
-			setInstructionActionServer.setSucceeded(result);	
-			std::cout << "Gripper deactivated" << std::endl;
-			return;			
-		}
+	else if (instructionData.isMember("deactivate") == true){
+		gripper->deactivate();
+		setInstructionActionServer.setSucceeded(result);	
+		std::cout << "Gripper deactivated" << std::endl;
+		return;			
+	}
 	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
 	setInstructionActionServer.setAborted(result);
