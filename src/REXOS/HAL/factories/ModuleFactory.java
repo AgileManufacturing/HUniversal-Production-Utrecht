@@ -1,5 +1,6 @@
 package HAL.factories;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -38,9 +39,10 @@ import org.json.JSONObject;
  * The ModuleFactory is the factory for the {@link Module}s. 
  * It does not only instantiate capabilities using the {@link DynamicClassFactory} (allowing dynamic addition of classes) but also manages part of the knowledge database.
  * @author Tommas Bakker
+ * @author Niek Arends
  *
  */
-public class ModuleFactory extends Factory {
+public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	// SQL queries
 	/**
 	 * SQL query for selecting the moduleIdentifiers of the modules which are bottomModules for an equiplet
@@ -106,7 +108,7 @@ public class ModuleFactory extends Factory {
 	 * @throws KnowledgeException
 	 */
 	public ModuleFactory(ModuleListener moduleListener, HardwareAbstractionLayer hal) throws KnowledgeException{
-		super(new KnowledgeDBClient());
+		super(new KnowledgeDBClient(), hal);
 		this.moduleListener = moduleListener;
 		this.dynamicClassFactory = new DynamicClassFactory<>();
 		this.hal = hal;
@@ -130,7 +132,15 @@ public class ModuleFactory extends Factory {
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
 			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			modules.add((ModuleActor) this.getModuleByIdentifier(identifier));
+			try {
+				modules.add((ModuleActor) this.getSomethingByIdentifier(identifier));
+			} catch (FactoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JarFileLoaderException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.DEBUG, "Found bottomModules for function module tree " + treeNumber + " of capability " + capability.getName() + ":", 
 				modules);
@@ -152,7 +162,12 @@ public class ModuleFactory extends Factory {
 			String serialNumber = (String) row.get("serialNumber");
 			
 			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			modules.add(this.getModuleByIdentifier(identifier));
+			try {
+				modules.add(this.getSomethingByIdentifier(identifier));
+			} catch (JarFileLoaderException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return modules;
@@ -165,55 +180,29 @@ public class ModuleFactory extends Factory {
 	 * @throws ModuleExecutingException
 	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws FactoryException{
-		ModuleActor module = (ModuleActor) getModuleByIdentifier(hardwareStep.getModuleIdentifier());
-		module.executeHardwareStep(processListener, hardwareStep);
+		ModuleActor module;
+		try {
+			module = (ModuleActor) this.getSomethingByIdentifier(hardwareStep.getModuleIdentifier());
+			module.executeHardwareStep(processListener, hardwareStep);	
+		} catch (JarFileLoaderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
-	/**
-	 * This method will return the instantiated module for the {@link ModuleIdentifier}.
-	 * If the module has not been instantiated, it will be instantiated by downloading the software from the knowledge database and dynamically loading the class.
-	 * @param moduleIdentifier
-	 * @return
-	 * @throws FactoryException
-	 */
-	public Module getModuleByIdentifier(ModuleIdentifier moduleIdentifier) {
-		for (ModuleIdentifier loadedModuleIdentifier : loadedModules.keySet()) {
-			if(moduleIdentifier.equals(loadedModuleIdentifier) == true) {
-				return loadedModules.get(loadedModuleIdentifier);
-			}
-			
-		}
-		DynamicClassDescription description = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier).getDynamicClassDescription();
-		try {
-			Class<Module> moduleClass = dynamicClassFactory.getClassFromDescription(description);
-			Module module = moduleClass.getConstructor(ModuleIdentifier.class, ModuleFactory.class, ModuleListener.class).
-					newInstance(moduleIdentifier, this, moduleListener);
-			loadedModules.put(moduleIdentifier, module);
-			return module;
-		} catch (InstantiateClassException | InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException ex) {
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "well, we are fucked", ex);
-			return null;
-		} catch (JarFileLoaderException ex) {
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.CRITICAL, "Unable to load the jarFile of the module");
-			return null;
-		}
+	protected JavaSoftware getJavaSoftware(ModuleIdentifier key) {
+		return JavaSoftware.getJavaSoftwareForModuleIdentifier(key);
 	}
+	
 	
 	public HardwareAbstractionLayer getHAL() {
 		return hal;
 	}
-	public void removeModuleFromCache(ModuleIdentifier identifier) {
-		loadedModules.remove(identifier);
-	}
-	public void removeModulesOfTypeFromCache() {
-		ArrayList<ModuleIdentifier> modulesToRemove = new ArrayList<ModuleIdentifier>();
-		for (ModuleIdentifier key : loadedModules.keySet()) {
-			modulesToRemove.add(key);
-		}
-		for (ModuleIdentifier moduleIdentifier : modulesToRemove) {
-			removeModuleFromCache(moduleIdentifier);
-		}
+	@Override
+	protected Module getConstuctorforThisFactory(Class<Module> myClass, ModuleIdentifier key) throws NoSuchMethodException,
+			SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		// TODO Auto-generated method stub
+		return myClass.getConstructor(ModuleIdentifier.class ,ModuleFactory.class ,ModuleListener.class).newInstance(key, this, moduleListener);
 	}
 }

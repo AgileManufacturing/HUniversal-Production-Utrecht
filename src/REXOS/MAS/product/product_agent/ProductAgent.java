@@ -35,26 +35,29 @@ public class ProductAgent extends Agent {
 	private int currentPlannedProductStep = 0;
 	private boolean supplied = false;
 
-	protected void setup() {
-		System.out.println("Hello. My name is " + this.getLocalName());
-		Object[] arguments = this.getArguments();
-		if (arguments.length <= 0) {
-			System.out
-					.println("No arguments received! Expected product steps in json format");
-		} else {
-			try {
-				JSONObject productSteps = new JSONObject(new JSONTokener(
-						arguments[0].toString()));
-				if (productSteps != null) {
-					productStepList = productSteps.getJSONArray(PRODUCT_STEPS);
-					System.out.println("Productagent received product steps: "
-							+ productSteps.toString());
-					planCurrentProductStep();
+	public void startPlanning(){
+		//System.out.println("Hello. My name is " + this.getLocalName());
+				Object[] arguments = this.getArguments();
+				if (arguments.length <= 0) {
+					System.out
+							.println("No arguments received! Expected product steps in json format");
+				} else {
+					try {
+						JSONObject productSteps = new JSONObject(new JSONTokener(
+								arguments[0].toString()));
+						if (productSteps != null) {
+							productStepList = productSteps.getJSONArray(PRODUCT_STEPS);
+							System.out.println(this.getLocalName() + " received the following product steps: "
+									+ productSteps.toString());
+							planCurrentProductStep();
+						}
+					} catch (JSONException ex) {
+						System.out.println("Invalid JSON format! " + ex);
+					}
 				}
-			} catch (JSONException ex) {
-				System.out.println("Invalid JSON format! " + ex);
-			}
-		}
+	}
+	protected void setup() {
+		
 		addBehaviour(new CyclicBehaviour() {
 			private static final long serialVersionUID = 1L;
 			private ArrayList<Proposal> proposals = new ArrayList<Proposal>();
@@ -63,10 +66,11 @@ public class ProductAgent extends Agent {
 				try {
 					ACLMessage msg = receive();
 					if (msg != null) {
-						System.out.println(msg.getSender().getName()
-								+ " Send: " + msg.getContent());
+						System.out.println("\u001b[7;34m" + this.getAgent().getLocalName() + ":\u001b[0m; " + msg.getSender().getName()
+								+ " has sent me: " + ACLMessage.getPerformative(msg.getPerformative()) + " " + msg.getContent());
 						if(msg.getContent().equals("Ping")){
 							sendPingResponse(msg.getSender());
+							startPlanning();
 						}
 						else {
 							if (msg.getPerformative() == MessageType.AVAILABLE_TO_PLAN) {
@@ -85,13 +89,10 @@ public class ProductAgent extends Agent {
 											break;
 										}
 									}
-									System.out.println("Sending plan message: "
+									System.out.println("\u001b[7;34m" + this.getAgent().getLocalName() + ":\u001b[0m; " + "Sending plan message: "
 											+ proposal.toString());
 	
-									sendMessage(MessageType.PLAN_PRODUCT_STEP,
-											getAID(), proposals.get(0)
-													.getEquipletAgent(),
-											proposal.toString(), "meta");
+									sendMessage(MessageType.PLAN_PRODUCT_STEP,getAID(), proposals.get(0).getEquipletAgent(),proposal.toString(), "meta");
 								}
 							} else if (msg.getPerformative() == MessageType.CONFIRM_PLANNED) {
 								// If the product step was successfully planned, go
@@ -106,7 +107,7 @@ public class ProductAgent extends Agent {
 								supplied = true;
 								JSONObject productStep = new JSONObject(
 										new JSONTokener(msg.getContent()));
-								System.out.println(productStep);
+								//System.out.println(productStep);
 								JSONArray newList = new JSONArray();
 								for (int i = 0; i < productStepList.length(); i++) {
 									if (i != currentPlannedProductStep) {
@@ -118,8 +119,7 @@ public class ProductAgent extends Agent {
 								productStepList = newList;
 								planCurrentProductStep();
 							} else {
-								System.out
-										.println("Received message is not any of capabile Performative MessageType! "
+								System.out.println("Received message is not any of capabile Performative MessageType! "
 												+ "Could not process incomming message: "
 												+ msg.getContent());
 							}
@@ -135,17 +135,19 @@ public class ProductAgent extends Agent {
 
 	private void planCurrentProductStep() throws JSONException {
 		if (productStepList.length() > currentPlannedProductStep) {
-			System.out.println(productStepList.length());
+			//System.out.println(productStepList.length());
 			ProductStep productStep = (new ProductStep(
 					productStepList.getJSONObject(currentPlannedProductStep)));
+			//System.out.println(productStep.getService().getName().equals("place")+ ""+  supplied);
+
 			if (productStep.getService().getName().equals("place") && !supplied) {
 				String message = productStepList.getJSONObject(
 						currentPlannedProductStep).toString();
 				AID supplierAgent = new AID();
 				// HARDCODED
 				supplierAgent.addAddresses(ServerConfigurations.GS_ADDRESS);
-				supplierAgent.setName("SupplyAgent@145.89.166.82:1099/JADE");
-				System.out.println("PA SEND=" + message);
+				supplierAgent.setName("SupplyAgent@10.0.1.231:1099/JADE");
+				//System.out.println("PA SEND=" + message);
 				sendMessage(MessageType.SUPPLIER_REQUEST, getAID(),
 						supplierAgent, message, "meta");
 			} else {
@@ -164,6 +166,8 @@ public class ProductAgent extends Agent {
 						AID aid = equipletAgents[j].getName();
 						sendMessage(MessageType.CAN_EXECUTE_PRODUCT_STEP,
 								getAID(), aid, message.toString(), "meta");
+						//System.out.println(this.getLocalName() + " Numero uno");
+
 					}
 					if (equipletAgents.length == 0) {
 						System.out
@@ -171,14 +175,13 @@ public class ProductAgent extends Agent {
 										+ productStep.getService().getName());
 					}
 				} catch (FIPAException e) {
-					System.out.println("DF Search Error");
+					System.out.println("\u001b[7;31m" + "DF Search Error" + "\u001b[0m");
 					e.printStackTrace();
 				}
 				supplied = false;
 			}
 		} else {
-			System.out.println("No more product steps to plan");
-			System.out.println("Product Agent AWAYYYYYYY!!!!");
+			System.out.println("\u001b[7;32m"+ this.getLocalName()+ ": No more product steps to plan" + "\u001b[0m");
 			this.doDelete();
 
 		}

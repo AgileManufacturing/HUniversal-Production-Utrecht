@@ -10,7 +10,7 @@
  *         .MN.      MMMMM;  ?^ ,THM		@brief 	This class/Agent is being used to add agents to the grid.
  *          dM@      dMMM3  .ga...g,    	@date Created:	2014-06-06
  *       ..MMM#      ,MMr  .MMMMMMMMr   
- *     .dMMMM@`       TMMp   ?TMMMMMN   	@author	Tom Oosterwijk
+ *     .dMMMM@`       TMMp   ?TMMMMMN   	@author Tom Oosterwijk
  *   .dMMMMMF           7Y=d9  dMMMMMr    
  *  .MMMMMMF        JMMm.?T!   JMMMMM#		@section LICENSE
  *  MMMMMMM!       .MMMML .MMMMMMMMMM#  	License:	newBSD
@@ -38,6 +38,7 @@
  **/
 package MAS.grid_server;
 
+import MAS.agents.data_classes.MessageType;
 import MAS.product.product_agent.ProductAgent;
 import jade.core.AID;
 import jade.core.Agent;
@@ -63,20 +64,21 @@ public class GridAgent extends Agent{
 			public void action() {
 				ACLMessage msg = receive();
                 if (msg!=null) {
-                	System.out.println("New Msg");
+                	//System.out.println("New Msg: " + msg.toString());
     				ContainerController cc = getContainerController();
     				String name="ProductAgent-"+productAgentCounter;
 					AgentController ac;
 					//This will confirm that the sent pong was received
 					if(msg.getContent().equals("Pong")){
-						System.out.println(getName() + ": Pong was succesfully received from "+ msg.getSender());
+						System.out.println("\u001b[1;31m" + getName() + ": Pong was succesfully received from "+ msg.getSender() + "\u001b[0m");
 					}
-					else{
+					else {
 						try {
 							Object[] arguments = new Object[1];
 							arguments[0]=msg.getContent();
 							ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
 		    				ac.start();
+		    				//Confirm a product agent was created
 		    				confirmCreation();
 		    				productAgentCounter++;
 	
@@ -102,7 +104,8 @@ public class GridAgent extends Agent{
      * 
      **/
 	public void confirmCreation() {
-		AID r = new AID ("ProductAgent-" + productAgentCounter + "@145.89.166.82:1099/JADE", AID.ISGUID);
+		//HARDCODED!!!
+		AID r = new AID ("ProductAgent-" + productAgentCounter + "@10.0.1.231:1099/JADE", AID.ISGUID);
 		ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
 		aclMessage.addReceiver(r);
 		aclMessage.setContent("Ping");

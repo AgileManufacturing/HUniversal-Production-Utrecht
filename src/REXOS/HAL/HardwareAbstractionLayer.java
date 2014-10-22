@@ -10,10 +10,7 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
-import HAL.factories.ReconfigHandler;
-import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
+import HAL.factories.ReconfigFactory;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.BlackboardEquipletListener;
@@ -23,20 +20,17 @@ import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
 
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 /**
  * The main interface of the HAL for the equiplet agent. This class manages the factories and the blackboard handler.
- * 
  * @author Bas Voskuijlen
- * @author Lars Veenendaal
- * 
  * @see http://wiki.agilemanufacturing.nl/index.php/HAL
  */
 public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquipletListener {
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
-	private ReconfigHandler reconfigHandler;
+	private ReconfigFactory reconfigFactory;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	private BlackboardHandler blackboardHandler;
 	
@@ -58,8 +52,8 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
-		moduleFactory     = new ModuleFactory(this, this);
-		reconfigHandler   = new ReconfigHandler(this, capabilityFactory, moduleFactory);
+		moduleFactory = new ModuleFactory(this, this);
+		this.reconfigFactory = new ReconfigFactory(this);
 		blackboardHandler = new BlackboardHandler(equipletName);
 		blackboardHandler.addBlackboardEquipletListener(this);
 	}
@@ -89,7 +83,10 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
 	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		return reconfigHandler.insertModule(staticSettings, dynamicSettings);
+		boolean isModuleAdditionSuccesful = reconfigFactory.insertModule(staticSettings, dynamicSettings);
+		JSONArray capabilities = staticSettings.optJSONObject("type").optJSONArray("capabilities");
+		boolean isCapabilityAdditionSuccesful = reconfigFactory.insertCapabilityTypes(capabilities);
+		return isModuleAdditionSuccesful == true && isCapabilityAdditionSuccesful == true;
 	}
 	/**
 	 * This method will update a module by copying data from the staticSettings and dynamicSettings JSONObjects to the database and invoking the Equiplet Node to reload the modules.
@@ -101,7 +98,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException if the equiplet is not in the correct mode.
 	 */
 	public boolean updateModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		return reconfigHandler.updateModule(staticSettings, dynamicSettings);
+		return reconfigFactory.updateModule(staticSettings, dynamicSettings);
 	}
 	/**
 	 * This method will remove a module by moving data from the database to the JSONObject and invoking the Equiplet Node to remove the module.
@@ -113,7 +110,10 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws FactoryException if the instantiation of the class in the jarFile failed 
 	 */
 	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
-		return reconfigHandler.removeModule(moduleIdentifier);
+		JSONArray capabilities = reconfigFactory.removeCapabilities(capabilityFactory, moduleIdentifier);
+		JSONObject module = reconfigFactory.removeModule(moduleFactory, moduleIdentifier);			
+		module.optJSONObject("type").put("capabilities", capabilities);
+		return module;
 	}
 	/**
 	 * This method will return the modules which have no child (and thus are the bottom modules)
@@ -127,12 +127,11 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will return all the (most likely) supported services
 	 * @return
 	 */
+	
 	public ArrayList<Service> getSupportedServices() {
-		return reconfigHandler.getAllSupportedServices();
+		return reconfigFactory.getAllSupportedServices();
 	}
 	
-
-
 	/**
 	 * This method will be called by the blackboard handler when the state of the equiplet has changed. Do not call this method!
 	 */
@@ -169,26 +168,5 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	@Override
 	public void onEquipletModeChanged(String mode) {
 		hardwareAbstractionLayerListener.onEquipletModeChanged(mode);
-	}
-
-	/**
-	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
-	 * @param state [description]
-	 */
-	@Override
-	public void onReloadEquiplet(String state) {
-		hardwareAbstractionLayerListener.onReloadEquiplet(state);
-	}
-	
-	/**
-	 * [sendReloadEquiplet - This method call the blackboard handler to submit a reloadEquiplet command - UNTESTED W.I.P (Lars Veenendaal)]
-	 * @throws GeneralMongoException 
-	 * @throws InvalidDBNamespaceException 
-	 * @throws InvalidJSONException 
-	 * @throws JSONException 
-	 */
-	@Override
-	public void sendReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException{
-		blackboardHandler.postReloadEquiplet();
 	}
 }

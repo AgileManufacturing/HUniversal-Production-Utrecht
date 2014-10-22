@@ -142,7 +142,7 @@ public class SupplyAgent extends Agent{
 				try {
 					ACLMessage msg = receive();
 					if (msg!=null) {
-						System.out.println("PARTS AGENTS!!");
+						//System.out.println("PARTS AGENTS!!");
 						if (msg.getPerformative() == MessageType.SUPPLIER_REQUEST){
 							JSONObject partRequest = new JSONObject(new JSONTokener(msg.getContent()));
 							partRequest.getJSONObject("criteria").getJSONObject("target").remove("identifier");

@@ -135,6 +135,16 @@ public class JavaSoftware implements JarFileLoader {
 		
 		javaSoftwareInstances.put(id, this);
 	}
+
+	public static <T> JavaSoftware getJavaSoftwareForIdentifier(T aapkip) {
+		if(aapkip.getClass().equals(String.class)) {
+			return getJavaSoftwareForCapabilityIdentifier((String)aapkip);
+		}
+		else { 
+			return getJavaSoftwareForModuleIdentifier((ModuleIdentifier)aapkip);
+		}
+	}
+	
 	/**
 	 * This method will get the JavaSoftware associated with the module. 
 	 * If the JavaSoftware has not been instantiated, it will be constructed with a new KnowledgeDBClient.
@@ -174,7 +184,7 @@ public class JavaSoftware implements JarFileLoader {
 	 * @param capabilityName
 	 * @return
 	 */
-	public static JavaSoftware getJavaSoftwareForCapabilityName(String capabilityName) {
+	public static JavaSoftware getJavaSoftwareForCapabilityIdentifier(String capabilityName) {
 		KnowledgeDBClient knowledgeDBClient = new KnowledgeDBClient();
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForCapabilityName, capabilityName);
 		
