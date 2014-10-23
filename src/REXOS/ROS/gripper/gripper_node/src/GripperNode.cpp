@@ -31,7 +31,7 @@
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
 #include <boost/bind.hpp>
-
+#include <rexos_datatypes/EquipletStep.h>
 #include <jsoncpp/json/reader.h>
 
 
@@ -85,6 +85,7 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 	rexos_statemachine::SetInstructionResult result;
 	result.OID = goal->OID;
 	
+	Json::Value instructionData = equipletStep.getInstructionData();
 	if (instructionData.isMember("activate") == true){
 		gripper->activate();	
 		setInstructionActionServer.setSucceeded(result);	
@@ -102,7 +103,6 @@ void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalC
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
 	setInstructionActionServer.setAborted(result);
 }
-
 
 /**
  * A wrapper for the gripper error handler so that we can use a member function
@@ -180,7 +180,7 @@ bool GripperNode::transitionStop() {
 //TODO: Implement the following methods, there must be a MAST functionallity implemented here when a certain event occurs. Like when the gripper is overheated,
 //the gripper should look for a save place to drop the current item.
 void GripperNode::notifyWarned(){
-	REXOS_INFO("GripperNode is Warned ");	
+	REXOS_INFO("GripperNode is Warned");	
 }
 	
 void GripperNode::notifyOverheated(){
