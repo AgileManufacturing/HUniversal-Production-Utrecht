@@ -25,12 +25,32 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 	
 	for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
 		ModuleProxy* proxy = new ModuleProxy(
-				equipletName,
-				rexos_knowledge_database::ModuleIdentifier(it->getManufacturer(), it->getTypeNumber(), it->getSerialNumber()),
-				this);
+			equipletName,
+			rexos_knowledge_database::ModuleIdentifier(it->getManufacturer(), it->getTypeNumber(), it->getSerialNumber()),
+			this);
 		registeredModules.push_back(proxy);
 	}
 	
+}
+
+void ModuleRegistry::reloadModules(){
+	// THIS SLAMS THE MODULES IN SAFE STATE
+	for(ModuleProxy* proxy : registeredModules){
+		proxy->changeState(rexos_statemachine::State::STATE_SAFE);
+		// IF NOT IN DATABASE SWITCH STATE OFFLINE
+		// REMOVE AFTERWARDS
+	}
+
+	//getModuleIdentifier
+	// std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+	
+	// for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
+	// 	ModuleProxy* proxy = new ModuleProxy(
+	// 		equipletName,
+	// 		rexos_knowledge_database::ModuleIdentifier(it->getManufacturer(), it->getTypeNumber(), it->getSerialNumber()),
+	// 		this);
+	// }
+
 }
 
 ModuleRegistry::~ModuleRegistry() {

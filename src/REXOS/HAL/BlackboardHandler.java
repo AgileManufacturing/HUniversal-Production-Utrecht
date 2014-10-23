@@ -206,7 +206,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * @throws GeneralMongoException
 	 */
 	public void postReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		JSONObject reloadEQ = new JSONObject("{\"reloadEquiplet\":true}");
+		JSONObject reloadEQ = new JSONObject("{\"reloadEquiplet\":RELOAD_ALL_MODULES}");
 		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
 

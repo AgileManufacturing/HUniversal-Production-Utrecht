@@ -50,6 +50,11 @@ public:
 	std::vector<ModuleProxy*> getRegisteredModules();
 
 	ModuleProxy* getModule(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+	
+	/**
+	 * [reloadModules - WIP LARS]
+	 */
+ 	void reloadModules();
 
 private:
 	bool onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res);
