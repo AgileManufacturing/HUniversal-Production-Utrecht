@@ -3,17 +3,15 @@ package HAL;
 import java.util.HashMap;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import HAL.libraries.dynamicloader.DynamicClassDescription;
 import HAL.libraries.dynamicloader.JarFileLoader;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
-import HAL.libraries.knowledgedb_client.KeyNotFoundException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 /**
  * This class provides methods for serializing and deserializing of JavaSoftware and the loading of jarFiles. 
  * @author Tommas Bakker

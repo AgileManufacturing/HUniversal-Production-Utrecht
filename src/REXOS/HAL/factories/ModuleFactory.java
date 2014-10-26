@@ -1,11 +1,7 @@
 package HAL.factories;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -17,13 +13,9 @@ import HAL.Module;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.ModuleTypeIdentifier;
-import HAL.Mutation;
-import HAL.RosSoftware;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
-import HAL.libraries.dynamicloader.DynamicClassDescription;
 import HAL.libraries.dynamicloader.DynamicClassFactory;
-import HAL.libraries.dynamicloader.InstantiateClassException;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
@@ -31,10 +23,6 @@ import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * The ModuleFactory is the factory for the {@link Module}s. 

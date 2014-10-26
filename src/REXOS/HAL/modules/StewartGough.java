@@ -3,6 +3,9 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
@@ -15,10 +18,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.steps.OriginPlacement;
-import HAL.steps.OriginPlacementType;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class StewartGough extends ModuleActor {
 	public final static double MAX_ACCELERATION = 4;
@@ -62,7 +61,7 @@ public class StewartGough extends ModuleActor {
 
 		JSONObject instructionData = new JSONObject();
 		instructionData.put(MOVE, commandMove);
-		instructionData.put(ROTATE, commandMove);
+		instructionData.put(ROTATE, commandRotate);
 		if (forceStraightLine){
 			//Straight line
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
@@ -71,7 +70,7 @@ public class StewartGough extends ModuleActor {
 			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
 			JSONObject approachInstructionData = new JSONObject();
 			approachInstructionData.put(MOVE, commandApproach);
-			approachInstructionData.put(ROTATE, commandMove);
+			approachInstructionData.put(ROTATE, commandRotate);
 			
 			//Entry point
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));

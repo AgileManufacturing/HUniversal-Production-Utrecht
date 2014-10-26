@@ -42,15 +42,14 @@ public abstract class Factory <K ,V> {
 	protected abstract V getConstuctorforThisFactory(Class<V> myClass, K key) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException;
 	
 	public V getSomethingByIdentifier(K identifier) {
-		DynamicClassDescription description = getJavaSoftware(identifier).getDynamicClassDescription();
-		for(K cacheidentifier : cache.keySet()) {
-			if(cacheidentifier.equals(cache) == true) {
-				return cache.get(identifier);
-			}
+		if(cache.containsKey(identifier)) {
+			return cache.get(identifier);
 		}
 		try {
+			DynamicClassDescription description = getJavaSoftware(identifier).getDynamicClassDescription();
 			Class<V> tempclass = (Class<V>) dynamicClassFactory.getClassFromDescription(description);
 			V returnvalue = getConstuctorforThisFactory(tempclass, identifier);
+			cache.put(identifier, returnvalue);
 			return returnvalue;
 		} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | 
 				InstantiateClassException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {

@@ -5,15 +5,10 @@ import generic.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import util.log.LogLevel;
-import util.log.LogSection;
-import util.log.Logger;
 import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
 import HAL.JavaSoftware;
-import HAL.exceptions.FactoryException;
 import HAL.libraries.dynamicloader.DynamicClassFactory;
-import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
