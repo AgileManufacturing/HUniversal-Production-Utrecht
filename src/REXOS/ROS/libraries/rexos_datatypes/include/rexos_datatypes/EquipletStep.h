@@ -26,8 +26,9 @@ namespace rexos_datatypes{
         void setId(std::string id);
 
         rexos_knowledge_database::ModuleIdentifier getModuleIdentifier();
-		 void setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
-		 void setModuleIdentifier(const Json::Value & n);
+        
+        void setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+        void setModuleIdentifier(const Json::Value & n);
 
         OriginPlacement getOriginPlacement();
         void setOriginPlacement(OriginPlacement originPlacement);
@@ -38,6 +39,17 @@ namespace rexos_datatypes{
         std::string getStatus();
         void setStatus(std::string status);
 
+        /**
+         * [getReloadEquiplet - WIP LARS]
+         * @return [description]
+         */
+        std::string getReloadEquiplet();
+        /**
+         * [setReloadEquiplet - WIP LARS]
+         * @param status [description]
+         */
+        void setReloadEquiplet(std::string status);
+
         Json::Value toJSON();
     private:
 		std::string id;
@@ -46,6 +58,7 @@ namespace rexos_datatypes{
 		OriginPlacement originPlacement;
 		// TODO enum
 		std::string status;
+        std::string reloadEquiplet;
 		void setValues(const Json::Value & n);
     };
 }

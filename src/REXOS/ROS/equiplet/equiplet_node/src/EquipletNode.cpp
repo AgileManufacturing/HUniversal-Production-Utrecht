@@ -120,7 +120,6 @@ EquipletNode::~EquipletNode(){
 	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
 		delete *iter;
 	}
-
 	subscriptions.clear();
 }
 
@@ -146,8 +145,11 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	    if (step.getStatus() == "WAITING") {
 	    	REXOS_INFO_STREAM("handling step: " << jsonString);
     		handleHardwareStep(step, targetObjectId);
+		}else if(step.getReloadEquiplet() == "RELOAD_ALL_MODULES"){
+			REXOS_INFO_STREAM("HAL > ReloadEquiplet: " << jsonString);
+			//reloadModules
+			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {reloadEquiplet: \"RELOADING_COMPLETED\"} } ");
 		}
-		
 	} else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet) {
 		ROS_INFO("Received equiplet statemachine command");
 		

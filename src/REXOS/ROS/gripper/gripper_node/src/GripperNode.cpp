@@ -31,7 +31,7 @@
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
 #include <boost/bind.hpp>
-
+#include <rexos_datatypes/EquipletStep.h>
 #include <jsoncpp/json/reader.h>
 
 
@@ -78,32 +78,31 @@ GripperNode::~GripperNode() {
 void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
 	REXOS_INFO_STREAM("handling hardwareStep: " << goal->json);
 	Json::Reader reader;
-	Json::Value instructionDataNode;
-	reader.parse(goal->json, instructionDataNode);
+	Json::Value equipletStepNode;
+	reader.parse(goal->json, equipletStepNode);
+	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 	
 	rexos_statemachine::SetInstructionResult result;
 	result.OID = goal->OID;
 	
-	//if(strcmp(nodeName, "command") == 0) {
+	Json::Value instructionData = equipletStep.getInstructionData();
+	if (instructionData.isMember("activate") == true){
+		gripper->activate();	
+		setInstructionActionServer.setSucceeded(result);	
+		std::cout << "Gripper activated" << std::endl;
+		return;
+	}
 	
-		if (instructionDataNode.isMember("activate") == true){
-			gripper->activate();	
-			setInstructionActionServer.setSucceeded(result);	
-			std::cout << "Gripper activated" << std::endl;
-			return;
-		}
-		
-		else if (instructionDataNode.isMember("deactivate") == true){
-			gripper->deactivate();
-			setInstructionActionServer.setSucceeded(result);	
-			std::cout << "Gripper deactivated" << std::endl;
-			return;			
-		}
+	else if (instructionData.isMember("deactivate") == true){
+		gripper->deactivate();
+		setInstructionActionServer.setSucceeded(result);	
+		std::cout << "Gripper deactivated" << std::endl;
+		return;			
+	}
 	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
 	setInstructionActionServer.setAborted(result);
 }
-
 
 /**
  * A wrapper for the gripper error handler so that we can use a member function
@@ -181,7 +180,7 @@ bool GripperNode::transitionStop() {
 //TODO: Implement the following methods, there must be a MAST functionallity implemented here when a certain event occurs. Like when the gripper is overheated,
 //the gripper should look for a save place to drop the current item.
 void GripperNode::notifyWarned(){
-	REXOS_INFO("GripperNode is Warned ");	
+	REXOS_INFO("GripperNode is Warned");	
 }
 	
 void GripperNode::notifyOverheated(){

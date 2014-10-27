@@ -93,6 +93,14 @@ namespace rexos_datatypes{
         this->status = status;
     }
 
+    std::string EquipletStep::getReloadEquiplet(){
+        return this->reloadEquiplet;
+    }
+
+    void EquipletStep::setReloadEquiplet(std::string RE){
+        this->reloadEquiplet = RE;
+    }
+
     EquipletStep::~EquipletStep() {
         //std::cout << "Delete Equipletstep called." std::endl;
     }
@@ -102,6 +110,7 @@ namespace rexos_datatypes{
 		setInstructionData(n["instructionData"]);
 		setOriginPlacement(OriginPlacement(n["originPlacement"]));
 		setStatus(n["status"].asString());
+        setReloadEquiplet(n["reloadEquiplet"].asString());
     }
 
     Json::Value EquipletStep::toJSON(){
@@ -110,6 +119,7 @@ namespace rexos_datatypes{
 		output["instructionData"] = instructionData;
 		output["originPlacement"] = originPlacement.toJSON();
 		output["status"] = status;
+        output["reloadEquiplet"] = reloadEquiplet;
 		return output;
     }
 }

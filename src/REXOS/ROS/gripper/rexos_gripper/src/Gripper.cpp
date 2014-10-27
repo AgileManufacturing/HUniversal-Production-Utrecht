@@ -30,7 +30,6 @@
 #include <iostream>
 #include <rexos_gripper/Gripper.h>
 #include <rexos_utilities/Utilities.h>
-
 #include "ros/ros.h"
 
 namespace rexos_gripper {
@@ -46,12 +45,12 @@ namespace rexos_gripper {
 			REXOS_INFO_STREAM("found gripperEnabledWarningSeconds " << gripperEnabledWarning);
 			gripperEnabledCooldown = node["gripperEnabledCooldownSeconds"].asInt() * 1000;
 			REXOS_INFO_STREAM("found gripperEnabledCooldownSeconds " << gripperEnabledCooldown);
-			watchdogInterval = node["watchdogInterval"].asInt() * 1000;
+			watchdogInterval = node["watchdogInterval"].asInt();
 			REXOS_INFO_STREAM("found watchdogInterval " << watchdogInterval);
 		}
 		
 
-		Gripper::~Gripper( ) {
+		Gripper::~Gripper() {
 			REXOS_INFO_STREAM("~Gripper" << std::endl);
 			if (watchdogRunning) {
 				stopWatchdog();
@@ -81,26 +80,24 @@ namespace rexos_gripper {
 		}
 		
 		void Gripper::registerObserver(Observer* o){
-			Gripper::observers.push_back(o);
+			observers.push_back(o);
 		}
 		
 		void Gripper::unregisterObserver(Observer* o){
-		   observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
+			observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
 		}
 		
 		void Gripper::activate() {	
-			if (!Gripper::overheated) {
-				Gripper::enable();
-				Gripper::isActivated = true;
+			if (overheated == false) {
+				enable();
+				isActivated = true;
 			}
 		}
 			
 		void Gripper::deactivate() {
-			Gripper::disable();
-			Gripper::isActivated = false;
-		}
-				
-			
+			disable();
+			isActivated = false;
+		}					
 		
 		void Gripper::notifyObservers(Notify n){
 			for (auto iter = observers.begin(); iter != observers.end(); ++iter){
