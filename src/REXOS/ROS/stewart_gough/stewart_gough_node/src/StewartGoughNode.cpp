@@ -369,32 +369,33 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  **/
 int main(int argc, char **argv){
 	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
-				0, 0, 
+				50, 50, 
 				0.46);
-//	rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -200 * std::sqrt(2)), 0, 0, 0.0);
-	rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), 0, 0, 0.0);
-	rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
 	
-	REXOS_INFO_STREAM(movement.moveTo.location);
-	REXOS_INFO_STREAM(movement.moveTo.rotationX);
-	REXOS_INFO_STREAM(movement.moveTo.rotationY);
-	REXOS_INFO_STREAM(movement.moveTo.rotationZ);
-	REXOS_INFO_STREAM(movement.validMove);
-	REXOS_INFO_STREAM("----------");
-	REXOS_INFO_STREAM(movement.angles[0]);
-	REXOS_INFO_STREAM(movement.angles[1]);
-	REXOS_INFO_STREAM(movement.angles[2]);
-	REXOS_INFO_STREAM(movement.angles[3]);
-	REXOS_INFO_STREAM(movement.angles[4]);
-	REXOS_INFO_STREAM(movement.angles[5]);
-	REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
-	
-	
+	{
+		rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), rexos_utilities::degreesToRadians(45), 0, 0.0);
+		rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
+		REXOS_INFO_STREAM("----------");
+		REXOS_INFO_STREAM(movement.validMove);
+		REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
+	}
+	{
+		rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), rexos_utilities::degreesToRadians(45), 0, 0.0);
+		rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
+		REXOS_INFO_STREAM("----------");
+		REXOS_INFO_STREAM(movement.validMove);
+		REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
+	}
 	
 	ros::init(argc, argv, NODE_NAME);
 	

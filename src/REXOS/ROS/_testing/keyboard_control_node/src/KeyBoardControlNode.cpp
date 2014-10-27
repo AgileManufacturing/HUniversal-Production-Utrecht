@@ -106,57 +106,70 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 	// Reads keyboard input and does things. Doesnt keep track of actual robot location, just relative
 	Vector3 direction;
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
-
+	bool sendMessage = false;
+	
 	// Check which key was pressed.
 	switch(inputCharacter){
 		case KEYCODE_W:
 			REXOS_INFO("PRESSED W");
 			direction.y+= STEP;
+			sendMessage = true;
 		break;
 		case KEYCODE_A:
 			REXOS_INFO("PRESSED A");
 			direction.x-= STEP;
+			sendMessage = true;
 		break;
 		case KEYCODE_S:
 			REXOS_INFO("PRESSED S");
 			direction.y-= STEP;
+			sendMessage = true;
 		break;
 		case KEYCODE_D:
 			REXOS_INFO("PRESSED D");
 			direction.x+= STEP;
+			sendMessage = true;
 		break;
 		case KEYCODE_UP:
 			REXOS_INFO("PRESSED UP");
 			direction.z+= STEP;
+			sendMessage = true;
 		break;
 		case KEYCODE_DOWN:
 			REXOS_INFO("PRESSED DOWN");
 			direction.z-= STEP;
+			sendMessage = true;
 		break;
 		
 		case KEYCODE_J:
 			REXOS_INFO("PRESSED J");
 			rotationY -= STEP_ANGLE;
+			sendMessage = true;
 		break;
 		case KEYCODE_L:
 			REXOS_INFO("PRESSED L");
 			rotationY += STEP_ANGLE;
+			sendMessage = true;
 		break;
 		case KEYCODE_I:
 			REXOS_INFO("PRESSED I");
 			rotationX -= STEP_ANGLE;
+			sendMessage = true;
 		break;
 		case KEYCODE_K:
 			REXOS_INFO("PRESSED K");
 			rotationX += STEP_ANGLE;
+			sendMessage = true;
 		break;
 		case KEYCODE_U:
 			REXOS_INFO("PRESSED U");
 			rotationZ += STEP_ANGLE;
+			sendMessage = true;
 		break;
 		case KEYCODE_O:
 			REXOS_INFO("PRESSED O");
 			rotationZ -= STEP_ANGLE;
+			sendMessage = true;
 		break;
 		
 		case KEYCODE_Q:
@@ -167,7 +180,7 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 		break;
 			
 	}
-	if(exitProgram == false) {
+	if(sendMessage == true) {
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 	}
 }

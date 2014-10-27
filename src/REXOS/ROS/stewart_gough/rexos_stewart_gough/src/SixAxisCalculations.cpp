@@ -418,10 +418,7 @@ Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA
 	}
 	
 	// Determine the distance from point A to the intersection line
-	// TODO bug here? should be (std::pow(distance, 2) - std::pow(radiusA, 2) + std::pow(radiusB, 2) + ) / (2.0 * distance)
-	//double intersectionLineDistance = (std::pow(radiusA, 2) - std::pow(radiusB, 2) + std::pow(distance, 2)) / (2.0 * distance);
-	//double intersectionLineDistance = (std::pow(distance, 2) - std::pow(radiusA, 2) + std::pow(radiusB, 2)) / (2.0 * distance);
-	double intersectionLineDistance = (std::pow(distance, 2) - std::pow(radiusB, 2) + std::pow(radiusA, 2)) / (2.0 * distance);
+	double intersectionLineDistance = (std::pow(distance, 2) - std::pow(radiusB, 2) + std::pow(radiusA, 2)) / (2 * distance);
 	ROS_INFO_STREAM("--deltaAB: " << deltaAB);
 	ROS_INFO_STREAM("--distance: " << distance);
 	ROS_INFO_STREAM("--intersectionLineDistance: " << intersectionLineDistance);
@@ -440,6 +437,8 @@ Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA
 	// Determine the absolute intersection points.
 	Vector2 intersectionPointA = interSectionLineOnLineAB + (intersectionLine);
 	Vector2 intersectionPointB = interSectionLineOnLineAB + (-intersectionLine);
+	ROS_INFO_STREAM("--intersectionPointA: " << intersectionPointA);
+	ROS_INFO_STREAM("--intersectionPointB: " << intersectionPointB);
 	
 	return intersectionPointA;
 }
@@ -521,8 +520,13 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 			Vector2(effectorJointPosition.y, effectorJointPosition.z), innerCircleRadius);
 	ROS_INFO_STREAM("upperArmLowerArmIntersectionPoint: " << upperArmLowerArmIntersectionPoint);
 	
+	Vector2 relativeUpperArmLowerArmIntersectionPoint = Vector2(
+			upperArmLowerArmIntersectionPoint.x - motorAxisPosition.y, 
+			upperArmLowerArmIntersectionPoint.y - motorAxisPosition.z);
+	ROS_INFO_STREAM("relativeUpperArmLowerArmIntersectionPoint: " << relativeUpperArmLowerArmIntersectionPoint);
+	
 	// Determine the angle for the motor
-	return std::atan2(upperArmLowerArmIntersectionPoint.y, upperArmLowerArmIntersectionPoint.x);
+	return (0 - std::atan2(relativeUpperArmLowerArmIntersectionPoint.y, relativeUpperArmLowerArmIntersectionPoint.x));
 }
 
 SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(StewartGoughLocation moveTo) {

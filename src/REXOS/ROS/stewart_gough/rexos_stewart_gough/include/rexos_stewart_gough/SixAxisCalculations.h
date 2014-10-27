@@ -31,8 +31,8 @@ class SixAxisCalculations {
 			baseRadius(motorAxisToCenterDistance),
 			effectorRadius(effectorJointtoCenterDistance),
 			maxJointAngle(maxJointAngle),
-			effectorJointOffset(35.0),
-			motorJointOffset(35.0)
+			effectorJointOffset(20),
+			motorJointOffset(20)
 			{
 		}
 
