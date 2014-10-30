@@ -266,41 +266,6 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_goug
 	
 }
 
-
-
-
-
-
-
-/**
- * Function that moves the stewart int that is relative to the current. 
- *
- * @param x destination relative x-coordinate
- * @param y destination relative y-coordinate
- * @param z destination relative z-coordinate
- * @param maxAcceleration maximum acceleration
- * 
- * @return false if the path is illegal, true if the motion is executed succesfully.
- **/
- 
- /*
-bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, double y, double z, double maxAcceleration){
-	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
-	rexos_datatypes::Point3D<double> newLocation(x,y,z);
-	newLocation += oldLocation;
-	try {
-		REXOS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
-		stewartGough->moveTo(newLocation, maxAcceleration);
-		return true;
-	} catch(std::out_of_range& ex){
-		return false;
-	}
-	
-}
-*/
-
-
-
 bool stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(){
 	REXOS_INFO("Initialize transition called");
 	return true;
@@ -370,6 +335,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
 int main(int argc, char **argv){
 	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
 				50, 50, 
+				20, 20,
 				0.46);
 	
 	{
