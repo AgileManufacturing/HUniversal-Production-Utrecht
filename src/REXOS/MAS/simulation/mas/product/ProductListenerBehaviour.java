@@ -55,7 +55,7 @@ public class ProductListenerBehaviour extends Behaviour {
 			Pair<Tick, Integer> information = Parser.parseProductProcessing(message.getContent());
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
 			if (confirmation) {
-				product.onProductProcessing();
+				product.onProductProcessing(information.first);
 			} else {
 				System.err.printf("PA:%s received wrong product step index that is processing\n", myAgent.getLocalName());
 				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index " + information.second + " that is processing which should be: "
@@ -78,7 +78,7 @@ public class ProductListenerBehaviour extends Behaviour {
 			Pair<Tick, Integer> information = Parser.parseProductFinished(message.getContent());
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
 			if (confirmation) {
-				product.onProductStepFinished();
+				product.onProductStepFinished(information.first);
 			} else {
 				System.err.printf("PA:%s received wrong product step index that is finished\n", myAgent.getLocalName());
 				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index that is processing " + product.getCurrentStep().getIndex() + "== "

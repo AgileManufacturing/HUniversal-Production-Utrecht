@@ -74,15 +74,15 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 	@Override
 	public void kill() {
-		try {
-			// deregister equiplet by the df
-			DFService.deregister(this);
-		} catch (FIPAException e) {
-			System.err.println("failed to deregister equiplet");
-			e.printStackTrace();
-		} finally {
-			super.doDelete();
-		}
+		// try {
+		// // deregister equiplet by the df
+		// DFService.deregister(this);
+		// } catch (FIPAException e) {
+		// System.err.println("failed to deregister equiplet");
+		// e.printStackTrace();
+		// } finally {
+		super.doDelete();
+		// }
 	}
 
 	@Override
@@ -105,18 +105,23 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @param capabilities
 	 */
 	@Override
-	public void reconfigureStart(List<Capability> capabilities) {
+	public void reconfigureStart() {
 		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
 		reconfigure = true;
 		deregister();
-		this.capabilities = capabilities;
+
+		if (state == EquipletState.IDLE && schedule.isEmpty()) {
+			state = EquipletState.RECONFIG;
+			simulation.notifyReconfigReady(getLocalName());
+		}
 	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void reconfigureFinished() {
+	public void reconfigureFinished(List<Capability> capabilities) {
+		this.capabilities = capabilities;
 		System.out.printf("EA:%s reconfigure finished he has new capabilties %s \n", getLocalName(), capabilities);
 		if (schedule.isEmpty()) {
 			reconfigure = false;
@@ -126,6 +131,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			register();
 			state = EquipletState.IDLE;
 		} else {
+			System.err.printf("WHAA");
 			throw new IllegalArgumentException("Equiplet has not an empty schedule while being reconfigured");
 		}
 	}
@@ -285,7 +291,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	protected synchronized void executeJob(Tick time, Job job) {
+		System.out.println(" Execute Job " + time + " job = " + job);
 		state = EquipletState.BUSY;
+		System.out.println(" Execute Job " + time + " job = " + job);
 		executing = job;
 
 		Tick latency = time.minus(executing.getStartTime());
@@ -346,7 +354,8 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 			AID finishedProduct = executing.getProductAgent();
 			int index = executing.getIndex();
-
+			executing = null;
+			
 			Job ready = jobReady();
 			if (ready != null) {
 				// if (!schedule.isEmpty() && jobReady()) {
@@ -354,13 +363,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 				executeJob(time, ready);
 			} else if (reconfigure && schedule.isEmpty()) {
 				state = EquipletState.RECONFIG;
-				if (simulation == null) {
-					throw new IllegalArgumentException("FUCK sim");
-				}
 				simulation.notifyReconfigReady(getLocalName());
 			} else {
 				state = EquipletState.IDLE;
-				executing = null;
 			}
 
 			// note that the inform processing is done before inform finished
@@ -381,6 +386,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	public void notifyBreakdown(Tick time) {
 		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED || state == EquipletState.RECONFIG) {
+			System.err.printf("WHAA 1");
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
@@ -404,6 +410,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	public void notifyRepaired(Tick time) {
 		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED || state == EquipletState.RECONFIG) {
+			System.err.printf("WHAA 2");
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 		historyUpdate(time);
@@ -431,9 +438,18 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			// executeJob(time);
 			// System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 		} else {
-			// the equiplet has nothing to do and goes into IDLE state
-			System.out.printf("EA:%s is repaired at %s \n", getLocalName(), time);
-			state = EquipletState.IDLE;
+			Job ready = jobReady();
+			if (ready != null) {
+				// when the equiplet was in the error state there became a job ready which arrived before the breakdown
+				// not sure if this could happen
+				System.err.println("EQUIPLET ERROR? " + schedule);
+				executeJob(time, ready);
+				System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
+			} else {
+				// the equiplet has nothing to do and goes into IDLE state
+				System.out.printf("EA:%s is repaired at %s \n", getLocalName(), time);
+				state = EquipletState.IDLE;
+			}
 		}
 
 		updateSchedule();

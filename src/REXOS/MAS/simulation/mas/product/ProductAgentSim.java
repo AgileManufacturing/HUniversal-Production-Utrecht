@@ -60,13 +60,14 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	}
 
 	@Override
-	protected void onProductStepFinished() {
-		super.onProductStepFinished();
-
+	protected void onProductStepFinished(Tick time) {
+		super.onProductStepFinished(time);
+		
 		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
+			simulation.log("products", getLocalName(), "PA:" + getLocalName() + " finished: " + history);
 		} else if (getProductState() == ProductState.TRAVELING) {
 			// notify the simulation that the product is traveling
 			simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
@@ -74,11 +75,12 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	}
 
 	@Override
-	protected void onProductProcessing() {
-		super.onProductProcessing();
+	protected void onProductProcessing(Tick time) {
+		super.onProductProcessing(time);
 
 		// notify the simulation that processing begins
 		ProductionStep step = getCurrentStep();
+		step.updateStart(time);
 		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
 	}
 

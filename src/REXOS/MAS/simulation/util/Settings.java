@@ -10,17 +10,17 @@ public class Settings {
 	 * 3: the gui is used in combination with the debug information in the console
 	 * 4: all above with addition of scheduling information
 	 */
-	public static int VERBOSITY = 3;
+	public static int VERBOSITY = 2;
 
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = true;
+	public final static boolean STOCHASTICS = false;
 
 	/**
 	 * whether equiplets can breakdown
 	 */
-	public final static boolean BREAKDOWNS = false;
+	public final static boolean BREAKDOWNS = true;
 
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
@@ -31,6 +31,11 @@ public class Settings {
 	 * the number of jobs an just arrives job can overtake in the queue
 	 */
 	public static final int QUEUE_JUMP = 0;
+	
+	/**
+	 * the maximun number of jobs in an equiplet queue, when there is no scheduling
+	 */
+	public static final int QUEUE_CAPACITY= 40;
 
 	/**
 	 * Scheduling algorithm used by product agent to schedule his product step
@@ -52,6 +57,6 @@ public class Settings {
 	/**
 	 * Communication time out, the time an agent wait when he is expecting a communication message until he continues
 	 */
-	public final static long COMMUNICATION_TIMEOUT = 30000;
+	public final static long COMMUNICATION_TIMEOUT = 5000;
 
 }

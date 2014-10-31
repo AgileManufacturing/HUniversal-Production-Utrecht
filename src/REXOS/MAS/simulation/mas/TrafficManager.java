@@ -8,8 +8,11 @@ import jade.lang.acl.MessageTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.json.JSONException;
+
+import com.mongodb.util.Hash;
 
 import MAS.simulation.config.Config;
 import MAS.simulation.util.Ontology;
@@ -26,6 +29,11 @@ public class TrafficManager extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Map<String, Position> equiplets;
 	private Tick travelTime;
+	
+	public TrafficManager() {
+		this.equiplets = new HashMap<String, Position>();
+		this.travelTime = new Tick();
+	}
 
 	public TrafficManager(Map<String, Position> equiplets) {
 		this.equiplets = equiplets;
@@ -60,7 +68,7 @@ public class TrafficManager extends Agent {
 
 	private Tick caclulateTravelTime(Position a, Position b) {
 		int travelSquares = Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
-		return travelTime.times(travelSquares);
+		return travelTime.multiply(travelSquares);
 	}
 
 	class TraficListenerBehaviour extends CyclicBehaviour {

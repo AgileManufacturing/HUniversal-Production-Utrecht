@@ -4,11 +4,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import MAS.simulation.mas.product.Node;
 
 public class Util {
 
@@ -47,7 +44,7 @@ public class Util {
 		double sum = 0.0;
 
 		assert period > 0 : "Period must be a positive integer";
-
+		
 		for (Entry<Tick, Double> entry : map.entrySet()) {
 			sum += entry.getValue();
 			window.add(entry.getValue());

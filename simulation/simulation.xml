@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<runlength>100000</runlength>
+	<runlength>500000</runlength>
 	<runs>1</runs>
 	<travel type="normal">1</travel>
 	<products>

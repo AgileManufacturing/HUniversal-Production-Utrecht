@@ -106,6 +106,15 @@ public class ProductionStep {
 	}
 
 	/**
+	 * set the time the production step is finished
+	 * 
+	 * @param time
+	 */
+	public void setFinished(Tick finished) {
+		duration = time.minus(finished);
+	}
+
+	/**
 	 * {@link ProductionStep#duration}
 	 * 
 	 * @return the estimate duration of the product step
@@ -130,6 +139,6 @@ public class ProductionStep {
 
 	@Override
 	public String toString() {
-		return "Production Step(" + productStep.getService() + "," + getEquipletName() + ", " + getIndex() + ", from=" + time + ", until=" + time.add(duration) + ")";
+		return "PS(" + productStep.getService() + "," + getEquipletName() + ", " + getIndex() + ", from=" + time + ", until=" + time.add(duration) + ")";
 	}
 }

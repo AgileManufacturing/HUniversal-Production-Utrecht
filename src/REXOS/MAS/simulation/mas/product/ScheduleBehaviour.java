@@ -49,7 +49,6 @@ public class ScheduleBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		try {
-
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
 			HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = searchSuitedEquiplets(productSteps);
 
@@ -218,7 +217,7 @@ public class ScheduleBehaviour extends Behaviour {
 			if (msg != null && msg.getPerformative() == ACLMessage.PROPOSE) {
 				counter++;
 
-				System.out.printf("PA:%s can execute reply received from %s : %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getContent());
+				System.out.printf("PA:%s can execute reply received from %s : %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), "" );//msg.getContent());
 				try {
 					// Triple < List of product steps, load, position >
 					Triple<List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position> answer = Parser.parseCanExecuteAnswer(msg.getContent());
@@ -247,6 +246,18 @@ public class ScheduleBehaviour extends Behaviour {
 		return new Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>>(equipletInfo, serviceOptions);
 	}
 
+	/**
+	 * retrieve the travel times from equiplet to equiplet by the traffic manager agent
+	 * 
+	 * @param position
+	 *            of the product
+	 * @param options
+	 *            for executing a product step, for each product step a list of possible equiplets with estimate of duration and available times
+	 * @param equipletInfo
+	 *            information of the equiplet, load and position
+	 * @return
+	 * @throws SchedulingException
+	 */
 	private Map<Pair<Position, Position>, Tick> retrieveTravelTimes(Position position, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo)
 			throws SchedulingException {
 		// the routes of equiplet to equiplet for which the time is needed for scheduling
@@ -356,6 +367,16 @@ public class ScheduleBehaviour extends Behaviour {
 		return path;
 	}
 
+	/**
+	 * Schedule a list of production steps.
+	 * This will grouped by equiplets and requested to be executed
+	 * 
+	 * @param path
+	 *            of production steps
+	 * @param deadline
+	 *            of the product
+	 * @throws SchedulingException
+	 */
 	private void schedule(LinkedList<ProductionStep> path, Tick deadline) throws SchedulingException {
 		// construct send list grouped by equiplet
 		HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
@@ -369,6 +390,15 @@ public class ScheduleBehaviour extends Behaviour {
 		schedule(sendList, deadline);
 	}
 
+	/**
+	 * Schedule a list of production steps grouped by equiplets
+	 * 
+	 * @param sendList
+	 *            map of equiplets with the product step to schedule
+	 * @param deadline
+	 *            of the product
+	 * @throws SchedulingException
+	 */
 	private void schedule(HashMap<AID, ArrayList<ProductionStep>> sendList, Tick deadline) throws SchedulingException {
 		String replyConversation = Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis();
 		int sendCounter = 0;

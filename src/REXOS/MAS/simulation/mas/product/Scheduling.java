@@ -25,7 +25,7 @@ public class Scheduling {
 	private Position position;
 	private List<ProductStep> productSteps;
 
-	// service options :: Map < product step index, [ options :: <Equiplet, Triple < estimate duration of service, [ possibilities :: < from time, until time > ] > > ] >
+	// service options :: Map < product step index, [ options :: <Equiplet, Pair < estimate duration of service, [ possibilities :: < from time, until time > ] > > ] >
 	private Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> serviceOptions;
 
 	// equiplet info :: list of equiplet with the load and position of the equiplet
@@ -332,8 +332,9 @@ public class Scheduling {
 		return calculatePath(new Score() {
 			@Override
 			double score(Tick possibility, double load) {
-				Tick window = deadline.minus(time);
-				return 1 - possibility.minus(time).doubleValue() / window.doubleValue();
+				return deadline.minus(possibility).doubleValue() / deadline.minus(time).doubleValue();
+//				Tick window = deadline.minus(time);
+//				return 1 - possibility.minus(time).doubleValue() / window.doubleValue();
 			}
 
 		}, 1000);

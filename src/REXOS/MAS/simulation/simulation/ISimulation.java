@@ -2,9 +2,11 @@ package MAS.simulation.simulation;
 
 public interface ISimulation {
 
-	void notifyProductCreationFailed(String localName);
-
 	void notifyProductCreated(String productName, String equipletName);
+
+	void notifyProductCreationFailed(String productName);
+	
+	void notifyProductOverdue(String productName);
 
 	void notifyProductTraveling(String productName, String equipletName);
 
@@ -13,5 +15,7 @@ public interface ISimulation {
 	void notifyProductFinished(String productName);
 
 	void notifyReconfigReady(String equipletName);
+
+	void log(String info, String agent, String message);
 
 }

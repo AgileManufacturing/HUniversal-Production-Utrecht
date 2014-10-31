@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -144,26 +143,6 @@ public class Chart {
 			for (Entry<String, M> entry : data.entrySet()) {
 				final XYSeries series = new XYSeries(entry.getKey());
 				for (Entry<Tick, T> point : entry.getValue().entrySet()) {
-					series.add(point.getKey().doubleValue(), point.getValue().doubleValue());
-				}
-				dataset.addSeries(series);
-			}
-
-			final JFreeChart chart = createChart(title, yLabel, dataset);
-			ChartUtilities.saveChartAsPNG(file, chart, 1024, 720);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static <M extends TreeMap<T, T>, T extends Number> void saves(String path, String title, String yLabel, Map<String, M> data, boolean fuckjava) {
-		try {
-			File file = new File(path + title.replace(" ", "_") + ".png");
-
-			final XYSeriesCollection dataset = new XYSeriesCollection();
-			for (Entry<String, M> entry : data.entrySet()) {
-				final XYSeries series = new XYSeries(entry.getKey());
-				for (Entry<T, T> point : entry.getValue().entrySet()) {
 					series.add(point.getKey().doubleValue(), point.getValue().doubleValue());
 				}
 				dataset.addSeries(series);

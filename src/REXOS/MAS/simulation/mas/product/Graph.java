@@ -16,9 +16,11 @@ import MAS.simulation.util.Settings;
 public class Graph<V extends Node> {
 
 	private HashMap<V, HashMap<V, Double>> graph;
+	private int arcs;
 
 	public Graph() {
 		this.graph = new HashMap<V, HashMap<V, Double>>();
+		this.arcs = 0;
 	}
 
 	/**
@@ -48,6 +50,7 @@ public class Graph<V extends Node> {
 		} else {
 			graph.get(from).put(to, cost);
 		}
+		System.err.println("Graph [node=" + graph.size() + ", arcs=" + ++arcs + "]");
 
 		return added;
 	}

@@ -4,6 +4,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -22,11 +23,13 @@ public class ProductAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	private Tick created;
-	private LinkedList<ProductStep> productSteps;
+	protected LinkedList<ProductStep> productSteps;
 	private LinkedList<ProductionStep> productionPath;
-	private Position position;
+	protected ArrayList<ProductionStep> history;
+
+	protected Position position;
 	private Tick deadline;
-	private ProductState state;
+	protected ProductState state;
 
 	public void setup() {
 		Object[] args = getArguments();
@@ -35,6 +38,7 @@ public class ProductAgent extends Agent {
 				Triple<LinkedList<ProductStep>, Position, Tick> configuration = Parser.parseProductConfiguration(args[0].toString());
 				setup(configuration.first, configuration.second, configuration.third);
 				this.created = new Tick();
+				this.history = new ArrayList<>();
 
 				addBehaviour(new ScheduleBehaviour(this, productSteps));
 				addBehaviour(new ProductListenerBehaviour(this));
@@ -130,10 +134,12 @@ public class ProductAgent extends Agent {
 		}
 	}
 
-	protected void onProductStepFinished() {
+	protected void onProductStepFinished(Tick time) {
 		// remove the first production step as this is finished
-		productionPath.pop();
-
+		ProductionStep step = productionPath.pop();
+		step.setFinished(time);
+		history.add(step);
+		
 		if (productionPath.isEmpty()) {
 			state = ProductState.FINISHED;
 		} else {
@@ -141,14 +147,14 @@ public class ProductAgent extends Agent {
 		}
 	}
 
-	protected void onProductProcessing() {
+	protected void onProductProcessing(Tick time) {
 		state = ProductState.PROCESSING;
 	}
 
 	protected void onProductDelayed(Tick start) {
-		Tick delay;
-		for (ProductionStep productionStep : productionPath) {
-
-		}
+		// Tick delay;
+		// for (ProductionStep productionStep : productionPath) {
+		//
+		// }
 	}
 }

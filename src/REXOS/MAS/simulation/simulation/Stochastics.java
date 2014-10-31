@@ -23,16 +23,17 @@ class Stochastics {
 	int x = 0;
 
 	public Tick generateProductArrival(Tick time) {
+
 		if (time.greaterThan(6000)) {
 			double meanProcessingTime = 20;
-			int meanOperations = config.getProductSteps().size() * 2;
+			int meanOperations = 20;
 			double utilization = 0.95;
 			int equiplets = config.getEquipletsConfigurations().size();
 
 			double interarrival = (meanProcessingTime * meanOperations) / (utilization * equiplets);
 			return new Tick(interarrival);
 		} else {
-			return time(config.getProductArrival());
+			return new Tick(10);
 		}
 	}
 
@@ -86,7 +87,7 @@ class Stochastics {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 
-		for (int i = 0; i < productSteps.size() * 2; i++) {
+		for (int i = 0; i < 20; i++) {
 			// int x = i % productSteps.size();
 			int x = random.nextInt(productSteps.size());
 			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
@@ -95,7 +96,7 @@ class Stochastics {
 	}
 
 	public Tick generateTravelTime(int travelSquares) {
-		return time(config.getTravelTime()).times(travelSquares);
+		return time(config.getTravelTime()).multiply(travelSquares);
 	}
 
 	public Tick generateProductionTime(String equiplet, String service) {

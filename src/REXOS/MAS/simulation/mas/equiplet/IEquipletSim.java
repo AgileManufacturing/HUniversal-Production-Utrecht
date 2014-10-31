@@ -42,7 +42,9 @@ public interface IEquipletSim {
 
 	void kill();
 
-	void reconfigureStart(List<Capability> services);
+	void reconfigureStart();
 
-	void reconfigureFinished();
+	void reconfigureFinished(List<Capability> capabilities);
+	
+	boolean isExecuting();
 }

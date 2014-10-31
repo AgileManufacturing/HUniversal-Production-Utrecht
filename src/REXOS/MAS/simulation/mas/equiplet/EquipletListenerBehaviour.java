@@ -93,7 +93,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			reply.setPerformative(ACLMessage.PROPOSE);
 			equiplet.send(reply);
 
-			System.out.printf("EA:%s send reply to %s : %s\n", equiplet.getLocalName(), message.getSender().getLocalName(), reply.getContent());
+			System.out.printf("EA:%s send reply to %s : %s\n", equiplet.getLocalName(), message.getSender().getLocalName(), "" );//reply.getContent());
 
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to parse can execute()\n", equiplet.getLocalName());
