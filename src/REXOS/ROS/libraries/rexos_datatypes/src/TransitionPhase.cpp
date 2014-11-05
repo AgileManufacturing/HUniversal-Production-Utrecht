@@ -1,26 +1,24 @@
-#include <rexos_knowledge_database/TransitionPhase.h>
-
+#include <rexos_datatypes/TransitionPhase.h>
 #include <iostream>
 
-namespace rexos_knowledge_database
-{
-	TransitionPhase::TransitionPhase(rexos_knowledge_database::ModuleTypeIdentifier moduleTypeIdentifier, int phase, 
-				std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations, 
-				std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations) :
+namespace rexos_datatypes {
+	TransitionPhase::TransitionPhase(rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier, int phase, 
+				std::vector<rexos_datatypes::RequiredMutation> requiredMutations, 
+				std::vector<rexos_datatypes::SupportedMutation> supportedMutations) :
 		moduleTypeIdentifier(moduleTypeIdentifier), phase(phase), requiredMutations(requiredMutations), supportedMutations(supportedMutations)
 	{
 		// nothing to do here
 	}
-	rexos_knowledge_database::ModuleTypeIdentifier TransitionPhase::getModuleTypeIdentifier() const {
+	rexos_datatypes::ModuleTypeIdentifier TransitionPhase::getModuleTypeIdentifier() const {
 		return moduleTypeIdentifier;
 	}
 	int TransitionPhase::getPhase() const {
 		return phase;
 	}
-	std::vector<rexos_knowledge_database::RequiredMutation> TransitionPhase::getRequiredMutations() const {
+	std::vector<rexos_datatypes::RequiredMutation> TransitionPhase::getRequiredMutations() const {
 		return requiredMutations;
 	}
-	std::vector<rexos_knowledge_database::SupportedMutation> TransitionPhase::getSupportedMutations() const {
+	std::vector<rexos_datatypes::SupportedMutation> TransitionPhase::getSupportedMutations() const {
 		return supportedMutations;
 	}
 	std::ostream& operator<<(std::ostream& os, const TransitionPhase& obj) {

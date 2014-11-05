@@ -3,7 +3,7 @@
 namespace equiplet_node
 {
 
-CyclicDependencyException::CyclicDependencyException(std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> partlyResolvedGraph) :
+CyclicDependencyException::CyclicDependencyException(std::vector<std::vector<rexos_datatypes::TransitionPhase>> partlyResolvedGraph) :
 	std::runtime_error("Unable to fully resolve graph due to cyclic depenency"), partlyResolvedGraph(partlyResolvedGraph)
 {
 	// nothing to do here
@@ -11,7 +11,7 @@ CyclicDependencyException::CyclicDependencyException(std::vector<std::vector<rex
 CyclicDependencyException::~CyclicDependencyException() throw() {
 	// nothing to do here
 }
-std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> CyclicDependencyException::getPartlyResolvedGraph() {
+std::vector<std::vector<rexos_datatypes::TransitionPhase>> CyclicDependencyException::getPartlyResolvedGraph() {
 	return partlyResolvedGraph;
 }
 }

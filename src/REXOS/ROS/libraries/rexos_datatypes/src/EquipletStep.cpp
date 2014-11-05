@@ -54,11 +54,11 @@ namespace rexos_datatypes{
         this->id = id;    
     }
 
-    rexos_knowledge_database::ModuleIdentifier EquipletStep::getModuleIdentifier(){
+    rexos_datatypes::ModuleIdentifier EquipletStep::getModuleIdentifier(){
         return this->moduleIdentifier;
     }
 
-    void EquipletStep::setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
+    void EquipletStep::setModuleIdentifier(rexos_datatypes::ModuleIdentifier moduleIdentifier){
         this->moduleIdentifier = moduleIdentifier;
     }
 
@@ -66,7 +66,7 @@ namespace rexos_datatypes{
 		std::string manufacturer = n["manufacturer"].asString();
 		std::string typeNumber = n["typeNumber"].asString();
 		std::string serialNumber = n["serialNumber"].asString();
-       this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+       this->moduleIdentifier = rexos_datatypes::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
 	 }
 
     Json::Value EquipletStep::getInstructionData(){

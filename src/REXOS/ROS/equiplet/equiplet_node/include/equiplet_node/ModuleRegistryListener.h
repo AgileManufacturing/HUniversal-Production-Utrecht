@@ -6,23 +6,25 @@
  */
 #pragma once
 
-#include "equiplet_node/ModuleProxy.h"
+#include <rexos_module/ModuleProxy.h>
+#include <rexos_module/ModuleInterface.h>
 #include <rexos_statemachine/State.h>
 #include <rexos_statemachine/Mode.h>
-#include <rexos_knowledge_database/RequiredMutation.h>
-#include <rexos_knowledge_database/SupportedMutation.h>
+#include <rexos_datatypes/RequiredMutation.h>
+#include <rexos_datatypes/SupportedMutation.h>
 
 namespace equiplet_node {
 
 class ModuleRegistryListener{
 public:
-	virtual void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState) = 0;
-	virtual void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode) = 0;
-	virtual void onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed) = 0;
-	virtual void onModuleDied(ModuleProxy* moduleProxy) = 0;
-	virtual void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
-			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
-			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase) = 0;
+	virtual void onModuleStateChanged	(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::State newState, rexos_statemachine::State previousState) = 0;
+	virtual void onModuleModeChanged	(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode) = 0;
+	virtual void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed) = 0;
+	virtual void onModuleDied(rexos_module::ModuleProxy* moduleProxy) = 0;
+	virtual void onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
+			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase) = 0;
+	virtual void spawnNode(rexos_module::ModuleProxy* moduleProxy) = 0;
 };
 
 }

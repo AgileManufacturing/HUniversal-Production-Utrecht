@@ -28,17 +28,17 @@
  **/
 #pragma once
 
-#include <rexos_knowledge_database/TransitionPhase.h>
+#include <rexos_datatypes/TransitionPhase.h>
 
 namespace equiplet_node{
 class CyclicDependencyException : public std::runtime_error{
 private:
-	std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> partlyResolvedGraph;
+	std::vector<std::vector<rexos_datatypes::TransitionPhase>> partlyResolvedGraph;
 public:
-	CyclicDependencyException(std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> partlyResolvedGraph);
+	CyclicDependencyException(std::vector<std::vector<rexos_datatypes::TransitionPhase>> partlyResolvedGraph);
 	~CyclicDependencyException() throw();
 	
 	
-	std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> getPartlyResolvedGraph();
+	std::vector<std::vector<rexos_datatypes::TransitionPhase>> getPartlyResolvedGraph();
 };
 }

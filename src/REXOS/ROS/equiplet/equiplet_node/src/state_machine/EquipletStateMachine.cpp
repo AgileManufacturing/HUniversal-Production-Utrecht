@@ -1,6 +1,7 @@
 #include <equiplet_node/state_machine/EquipletStateMachine.h>
-#include <equiplet_node/CyclicDependencyException.h>
 
+#include <equiplet_node/CyclicDependencyException.h>
+#include <node_spawner_node/spawnNode.h>
 #include <rexos_knowledge_database/ModuleType.h>
 
 using namespace equiplet_node;
@@ -27,24 +28,18 @@ EquipletStateMachine::EquipletStateMachine(std::string equipletName):
 EquipletStateMachine::~EquipletStateMachine(){
 }
 
-void EquipletStateMachine::changeModuleStates(rexos_statemachine::State desiredState){
-	REXOS_INFO("\n\n\n\n\n\n\n\n\n\n");
-		currenntlySupportedMutations = new std::vector<rexos_knowledge_database::SupportedMutation>();
-		pendingTransitionPhases = new std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>();
+void EquipletStateMachine::changeModuleStates(rexos_statemachine::State desiredState) {
+	currenntlySupportedMutations = new std::vector<rexos_datatypes::SupportedMutation>();
+	pendingTransitionPhases = new std::map<rexos_module::ModuleProxy*, std::vector<rexos_datatypes::RequiredMutation>>();
 
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	if(desiredState == rexos_statemachine::STATE_STANDBY && 
-			this->getCurrentState() == rexos_statemachine::STATE_SETUP) {
-		REXOS_INFO("A");
+	std::vector<rexos_module::ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+	if(desiredState == rexos_statemachine::STATE_STANDBY && this->getCurrentState() == rexos_statemachine::STATE_SETUP) {
 		// we are calibrating the modules, use the required and supported calibration mutations to determine the right order.
-		REXOS_INFO("B");
 		try{
-			std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> calibrationSteps = calculateOrderOfCalibrationSteps();
+			std::vector<std::vector<rexos_datatypes::TransitionPhase>> calibrationSteps = calculateOrderOfCalibrationSteps();
 			for (int i = 0; i < modules.size(); i++) {
-				REXOS_INFO("C");
 				modules[i]->changeState(desiredState);
 			}
-			REXOS_INFO("D");
 		} catch(CyclicDependencyException ex) {
 			REXOS_WARN("Cyclic dependency detected");
 		}
@@ -53,7 +48,6 @@ void EquipletStateMachine::changeModuleStates(rexos_statemachine::State desiredS
 	for (int i = 0; i < modules.size(); i++) {
 		modules[i]->changeState(desiredState);
 	}
-	REXOS_INFO("E");
 }
 
 void EquipletStateMachine::onStateChanged(rexos_statemachine::State state){
@@ -73,18 +67,15 @@ void EquipletStateMachine::onModeChanged(rexos_statemachine::Mode mode){
 	}
 
 	if(changeModuleModes){
-		std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+		std::vector<rexos_module::ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
 		for (int i = 0; i < modules.size(); i++) {
 			modules[i]->changeMode(currentMode);
 		}
 	}
 }
 
-void EquipletStateMachine::onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState){
-	ROS_INFO("Module State Changed received from %s a state change from %s to %s",
-			moduleProxy->getModuleIdentifier().toString().c_str(),
-			rexos_statemachine::state_txt[previousState],
-			rexos_statemachine::state_txt[newState]);
+void EquipletStateMachine::onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, 
+		rexos_statemachine::State newState, rexos_statemachine::State previousState) {
 	if(rexos_statemachine::is_transition_state[getCurrentState()] && allModulesInDesiredState(desiredState) ) {
 		condit.notify_one();
 		delete pendingTransitionPhases;
@@ -92,23 +83,19 @@ void EquipletStateMachine::onModuleStateChanged(ModuleProxy* moduleProxy,rexos_s
 	}
 }
 
-void EquipletStateMachine::onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode){
-	ROS_INFO("Module Mode Changed received from %s a mode change from %s to %s",
-			moduleProxy->getModuleIdentifier().toString().c_str(),
-			rexos_statemachine::mode_txt[previousMode],
-			rexos_statemachine::mode_txt[newMode]);
+void EquipletStateMachine::onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode) {
 	if(newMode > getCurrentMode()){
 		changeMode(newMode);
 	}
 }
 
-void EquipletStateMachine::onModuleDied(ModuleProxy* moduleProxy){
+void EquipletStateMachine::onModuleDied(rexos_module::ModuleProxy* moduleProxy){
 	REXOS_ERROR("module has died!");
 }
 
-void EquipletStateMachine::onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
-		std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
-		std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase) {
+void EquipletStateMachine::onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
+		std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
+		std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase) {
 	REXOS_INFO_STREAM("Module " << moduleProxy->getModuleIdentifier() << " done with transition");
 	for(int i = 0; i < gainedSupportedMutations.size(); i++) {
 		currenntlySupportedMutations->push_back(gainedSupportedMutations.at(i));
@@ -120,7 +107,7 @@ void EquipletStateMachine::onModuleTransitionPhaseCompleted(ModuleProxy* moduleP
 	}
 	
 	
-	for(std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>::iterator it = pendingTransitionPhases->begin(); 
+	for(auto it = pendingTransitionPhases->begin(); 
 			it != pendingTransitionPhases->end(); it++) {
 		bool canContinue = areAllRequiredMutationsAvailiable(it->second, *currenntlySupportedMutations);
 		if(canContinue == true) {
@@ -129,12 +116,23 @@ void EquipletStateMachine::onModuleTransitionPhaseCompleted(ModuleProxy* moduleP
 			// TODO is this safe?
 			pendingTransitionPhases->erase(it);
 		}
-}
 	}
+}
+void EquipletStateMachine::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
+	ros::ServiceClient spanNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
+	ROS_INFO_STREAM("Spawning node for " << moduleProxy->getModuleIdentifier());
+	node_spawner_node::spawnNode spawnNodeCall;
+	spawnNodeCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
+	spawnNodeCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
+	spawnNodeCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	spanNodeClient.waitForExistence();
+	spanNodeClient.call(spawnNodeCall);
+}
+
 
 bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State desiredState){
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	for(int i=0; i < modules.size(); i++){
+	std::vector<rexos_module::ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+	for(int i = 0; i < modules.size(); i++){
 		if(modules[i]->getCurrentState() != desiredState){
 			return false;
 		}
@@ -143,7 +141,7 @@ bool EquipletStateMachine::allModulesInDesiredState(rexos_statemachine::State de
 }
 
 bool EquipletStateMachine::transitionInitialize(){
-	REXOS_INFO( "transitionInitialize called");
+	REXOS_INFO("transitionInitialize called");
 	changeModuleStates(rexos_statemachine::STATE_SAFE);
 	
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_SAFE)) {
@@ -154,7 +152,7 @@ bool EquipletStateMachine::transitionInitialize(){
 	return true;
 }
 bool EquipletStateMachine::transitionDeinitialize(){
-	REXOS_INFO( "transitionDeinitialize called");
+	REXOS_INFO("transitionDeinitialize called");
 	changeModuleStates(rexos_statemachine::STATE_OFFLINE);
 	
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_OFFLINE)) {
@@ -165,7 +163,7 @@ bool EquipletStateMachine::transitionDeinitialize(){
 	return true;
 }
 bool EquipletStateMachine::transitionSetup(){
-	REXOS_INFO( "transitionSetup called");
+	REXOS_INFO("transitionSetup called");
 	moduleRegistry.setNewRegistrationsAllowed(false);
 
 	changeModuleStates(rexos_statemachine::STATE_STANDBY);
@@ -179,7 +177,7 @@ bool EquipletStateMachine::transitionSetup(){
 }
 
 bool EquipletStateMachine::transitionShutdown(){
-	REXOS_INFO( "transitionShutdown called");
+	REXOS_INFO("transitionShutdown called");
 	changeModuleStates(rexos_statemachine::STATE_SAFE);
 
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_SAFE)) {
@@ -200,13 +198,13 @@ bool EquipletStateMachine::transitionStop(){
 	return true;
 }
 
-std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStateMachine::calculateOrderOfCalibrationSteps() {
-	std::vector<ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
-	std::vector<rexos_knowledge_database::TransitionPhase> pendingTransitionPhases;
-	std::vector<rexos_knowledge_database::SupportedMutation> availiableSupportedMutations;
+std::vector<std::vector<rexos_datatypes::TransitionPhase>> EquipletStateMachine::calculateOrderOfCalibrationSteps() {
+	std::vector<rexos_module::ModuleProxy*> modules = moduleRegistry.getRegisteredModules();
+	std::vector<rexos_datatypes::TransitionPhase> pendingTransitionPhases;
+	std::vector<rexos_datatypes::SupportedMutation> availiableSupportedMutations;
 	for(int i = 0; i < modules.size(); i++) {
 		rexos_knowledge_database::ModuleType moduleType = rexos_knowledge_database::ModuleType(modules.at(i)->getModuleIdentifier());
-		std::vector<rexos_knowledge_database::TransitionPhase> transitionPhases =  moduleType.getTransitionPhases();
+		std::vector<rexos_datatypes::TransitionPhase> transitionPhases =  moduleType.getTransitionPhases();
 		
 		// add all to the pendingTransitionPhases
 		for(int j = 0; j < transitionPhases.size(); j++) {
@@ -215,13 +213,13 @@ std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStat
 		}
 	}
 	
-	std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> output;
+	std::vector<std::vector<rexos_datatypes::TransitionPhase>> output;
 	// actually resolve the graph
 	while(pendingTransitionPhases.size() != 0) {
 		REXOS_INFO("New round");
-		std::vector<rexos_knowledge_database::TransitionPhase> currentRound;
+		std::vector<rexos_datatypes::TransitionPhase> currentRound;
 		
-		std::vector<rexos_knowledge_database::TransitionPhase>::iterator it = pendingTransitionPhases.begin();
+		std::vector<rexos_datatypes::TransitionPhase>::iterator it = pendingTransitionPhases.begin();
 		while(it != pendingTransitionPhases.end()) {
 			REXOS_INFO_STREAM("-" << *it);
 			bool areAllRequiredMutationsAreAvailiable = areAllRequiredMutationsAvailiable(
@@ -246,7 +244,7 @@ std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStat
 			// there was a cyclic dependency (or a depencency is just not supported) as no new transition phase could be performed
 			// add the remaining pendingTransitionPhases to the output in sequentional order
 			for(int i = 0; i < pendingTransitionPhases.size(); i++) {
-				std::vector<rexos_knowledge_database::TransitionPhase> transitionPhasesToAdd;
+				std::vector<rexos_datatypes::TransitionPhase> transitionPhasesToAdd;
 				transitionPhasesToAdd.push_back(pendingTransitionPhases.at(i));
 				output.push_back(transitionPhasesToAdd);
 			}
@@ -254,7 +252,7 @@ std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStat
 		} else {
 			// we succesfully completed a round, add the gained transition phases to the availiable list
 			for(int i = 0; i < currentRound.size(); i++) {
-				std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations = currentRound.at(i).getSupportedMutations();
+				std::vector<rexos_datatypes::SupportedMutation> supportedMutations = currentRound.at(i).getSupportedMutations();
 				for(int j = 0; j < supportedMutations.size(); j++) {
 					availiableSupportedMutations.push_back(supportedMutations.at(j));
 				}
@@ -264,11 +262,11 @@ std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> EquipletStat
 	REXOS_INFO("done");
 	return output;
 }
-bool EquipletStateMachine::areAllRequiredMutationsAvailiable(std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations, 
-		std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations) {
+bool EquipletStateMachine::areAllRequiredMutationsAvailiable(std::vector<rexos_datatypes::RequiredMutation> requiredMutations, 
+		std::vector<rexos_datatypes::SupportedMutation> supportedMutations) {
 	bool areAllRequiredMutationsAreAvailiable = true;
 	for(int j = 0; j < requiredMutations.size(); j++) {
-		rexos_knowledge_database::RequiredMutation requiredMutation = requiredMutations.at(j);
+		rexos_datatypes::RequiredMutation requiredMutation = requiredMutations.at(j);
 		
 		bool isCurrentRequiredMutationsAreAvailiable = false;
 		for(int k = 0; k < supportedMutations.size(); k++) {

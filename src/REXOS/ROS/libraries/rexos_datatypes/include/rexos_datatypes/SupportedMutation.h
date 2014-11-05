@@ -31,7 +31,7 @@
 
 #include <string>
 
-namespace rexos_knowledge_database {
+namespace rexos_datatypes {
 	class SupportedMutation {
 	private:
 		std::string mutation;

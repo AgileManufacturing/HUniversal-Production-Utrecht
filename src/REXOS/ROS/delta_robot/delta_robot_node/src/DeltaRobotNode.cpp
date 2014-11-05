@@ -44,254 +44,242 @@
 #define NODE_NAME "DeltaRobotNode"
 // @endcond
 
-/**
- * Constructor
- * @param equipletID identifier for the equiplet
- * @param moduleID identifier for the deltarobot
- **/
-deltaRobotNodeNamespace::DeltaRobotNode::DeltaRobotNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
-	rexos_knowledge_database::Module(moduleIdentifier),
-	rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
-	rexos_coordinates::Module(this),
-	deltaRobot(NULL),
-	setInstructionActionServer(
-	    nodeHandle,
-	    equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction",
-	    boost::bind(&deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction, this, _1),
-	    false),
-	lastX(0.0),
-	lastY(0.0),
-	lastZ(0.0)
-{
-	REXOS_INFO("DeltaRobotnode Constructor entering...");
-	// get the properties and combine them for the deltarobot
-	std::string properties = this->getModuleProperties();
-	std::string typeProperties = this->getModuleTypeProperties();
-
-	Json::Reader reader;
-	Json::Value jsonNode;
-	Json::Value typeJsonNode;
-	reader.parse(properties, jsonNode);
-	reader.parse(typeProperties, typeJsonNode);
-
-	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
-	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
-		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
-	}
-
-	Json::StyledWriter writer;
-	REXOS_INFO("%s", writer.write(jsonNode).c_str());
-
-	// Create a deltarobot
-	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
-
-	setInstructionActionServer.start();
-
-	REXOS_INFO_STREAM("DeltaRobotNode initialized. Advertising actionserver on " <<
-	                moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() <<
-	                "/set_instruction");
-}
-
-
-
-deltaRobotNodeNamespace::DeltaRobotNode::~DeltaRobotNode() {
-	delete deltaRobot;
-}
-
-
-void deltaRobotNodeNamespace::DeltaRobotNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal) {
-	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
-	Json::Reader reader;
-	Json::Value equipletStepNode;
-	reader.parse(goal->json, equipletStepNode);
-	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
-	
-	rexos_statemachine::SetInstructionResult result;
-	result.OID = goal->OID;
-	
-	Vector4 origin;
-	// the rotation of the axis of the tangent space against the normal space in radians
-	double rotationX, rotationY, rotationZ = 0;
-	
-	// determine the position of the origin and the rotation of the axis
-	switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
-		case rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER: {
-			// set the origin to the result of the lookup
-			if(equipletStep.getOriginPlacement().getLookupResult().isMember("location") == false) {
-				throw std::runtime_error("lookup result does not contain location");
-			} else if(equipletStep.getOriginPlacement().getLookupResult().isMember("rotation") == false) {
-				throw std::runtime_error("lookup result does not contain rotation");
-			}
-			Json::Value location = equipletStep.getOriginPlacement().getLookupResult()["location"];
-			origin.set(location["x"].asDouble(), location["y"].asDouble(), location["z"].asDouble(), 1);
-			origin = convertToModuleCoordinate(origin);
-			Json::Value rotation = equipletStep.getOriginPlacement().getLookupResult()["rotation"];
-			rotationZ = rotation["z"].asDouble();
-			break;
-		}
-		case rexos_datatypes::OriginPlacement::RELATIVE_TO_CURRENT_POSITION: {
-			// set the origin to the current position of the effector
-			origin.set(deltaRobot->getEffectorLocation().x, deltaRobot->getEffectorLocation().y, deltaRobot->getEffectorLocation().z, 1);
-			break;
-		}
-		case rexos_datatypes::OriginPlacement::RELATIVE_TO_MODULE_ORIGIN: {
-			// set the origin to the origin of the module (eg set it to 0, 0, 0)
-			origin.set(0, 0, 0, 1);
-			break;
-		}
-		case rexos_datatypes::OriginPlacement::RELATIVE_TO_EQUIPLET_ORIGIN: {
-			// set the origin to the origin of the module (eg set it to 0, 0, 0)
-			origin = convertToModuleCoordinate(Vector4(0, 0, 0, 1));
-			break;
-		}
-	}
-	
-	// get the vector from the instruction data
-	Json::Value instructionData = equipletStep.getInstructionData();
-	if(instructionData.isMember("move") == false) {
-		throw std::runtime_error("instruction data does not contain move");
-	}
-	Json::Value moveCommand = equipletStep.getInstructionData()["move"];
-	Vector4 offsetVector;
-	if(moveCommand.isMember("x")) offsetVector.x = moveCommand["x"].asDouble();
-	else offsetVector.x = deltaRobot->getEffectorLocation().x;
-	if(moveCommand.isMember("y")) offsetVector.y = moveCommand["y"].asDouble();
-	else offsetVector.y = deltaRobot->getEffectorLocation().y;
-	if(moveCommand.isMember("z")) offsetVector.z = moveCommand["z"].asDouble();
-	else offsetVector.z = deltaRobot->getEffectorLocation().z;
-	
-	// get the max acceleration
-	double maxAcceleration;
-	if(moveCommand.isMember("maxAcceleration") == false) {
-		REXOS_WARN("move command does not contain maxAcceleration, assuming ");
-		maxAcceleration = 50.0;
-	} else {
-		maxAcceleration = moveCommand["maxAcceleration"].asDouble();
-	}
-	
-	// calculate the target vector
-	Matrix4 rotationMatrix;
-	rotationMatrix.rotateX(rotationX);
-	rotationMatrix.rotateY(rotationY);
-	rotationMatrix.rotateZ(rotationZ);
-	
-	Vector4 targetVector = origin + rotationMatrix * offsetVector;
-	
-	REXOS_INFO_STREAM("moving from " << deltaRobot->getEffectorLocation() << " to " << targetVector);
-
-  	// finally move to point
-	if(moveToPoint(targetVector.x, targetVector.y, targetVector.z, maxAcceleration))
+namespace delta_robot {
+	/**
+	 * Constructor
+	 * @param equipletID identifier for the equiplet
+	 * @param moduleID identifier for the deltarobot
+	 **/
+	DeltaRobotNode::DeltaRobotNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
+		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier),
+		deltaRobot(NULL),
+		lastX(0.0),
+		lastY(0.0),
+		lastZ(0.0)
 	{
-		setInstructionActionServer.setSucceeded(result);
-	} else {
-		REXOS_WARN("Failed moving to point");
-		setInstructionActionServer.setAborted(result);
+		REXOS_INFO("DeltaRobotnode Constructor entering...");
+		// get the properties and combine them for the deltarobot
+		std::string properties = this->getModuleProperties();
+		std::string typeProperties = this->getModuleTypeProperties();
+
+		Json::Reader reader;
+		Json::Value jsonNode;
+		Json::Value typeJsonNode;
+		reader.parse(properties, jsonNode);
+		reader.parse(typeProperties, typeJsonNode);
+
+		std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
+		for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+			jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
+		}
+
+		Json::StyledWriter writer;
+		REXOS_INFO("%s", writer.write(jsonNode).c_str());
+
+		// Create a deltarobot
+		deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
 	}
-}
 
 
-// Calibrate service functions ------------------------------------------------
-/**
- * Main function for starting the (re)calibratiion of the robot. Is called from the service functions.
- *
- * @return true if the calibration was successful else false
- **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::calibrate() {
-	if(!deltaRobot->calibrateMotors()) {
-		REXOS_ERROR("Calibration FAILED. EXITING.");
-		return false;
+
+	DeltaRobotNode::~DeltaRobotNode() {
+		delete deltaRobot;
 	}
-	return true;
-}
-
-/**
- * moveToPoint function, is called by the json service functions and the old deprecated service functions.
- *
- * @param x destination x-coordinate
- * @param y destination y-coordinate
- * @param z destination z-coordinate
- * @param maxAcceleration maximum acceleration
- * 
- * @return false if the path is illegal, true if the motion is executed succesfully.
- **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::moveToPoint(double x, double y, double z, double maxAcceleration) {
-	Vector3 oldLocation(deltaRobot->getEffectorLocation());
-	Vector3 newLocation(x,y,z);
-
-	if(deltaRobot->checkPath(oldLocation, newLocation)) {
-		deltaRobot->moveTo(newLocation, maxAcceleration);
-		return true;
-	}
-	return false;
-}
 
 
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionInitialize() {
-	REXOS_INFO("Initialize transition called");
-	return true;
-}
-
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionDeinitialize() {
-	REXOS_INFO("Deinitialize transition called");
-	ros::shutdown();
-	return true;
-}
-
-/**
- * Transition from Safe to Standby state
- * @return 0 if everything went OK else error
- **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionSetup() {
-	REXOS_INFO("Setup transition called");
-	// Generate the effector boundaries with voxel size 2
-	deltaRobot->generateBoundaries(2);
-	// Power on the deltarobot and calibrate the motors.
-	deltaRobot->powerOn();
-	// Calibrate the motors
-	if(!deltaRobot->calibrateMotors()) {
-		REXOS_ERROR("Calibration FAILED. EXITING.");
-		return false;
-	} else {
-		rexos_statemachine::TransitionGoal goal;
-		goal.gainedSupportedMutations.push_back("move");
+	void DeltaRobotNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal) {
+		REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
+		Json::Reader reader;
+		Json::Value equipletStepNode;
+		reader.parse(goal->json, equipletStepNode);
+		rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 		
-		transitionActionClient.sendGoal(goal);
+		rexos_module::SetInstructionResult result;
+		result.OID = goal->OID;
+		
+		Vector4 origin;
+		// the rotation of the axis of the tangent space against the normal space in radians
+		double rotationX, rotationY, rotationZ = 0;
+		
+		// determine the position of the origin and the rotation of the axis
+		switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
+			case rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER: {
+				// set the origin to the result of the lookup
+				if(equipletStep.getOriginPlacement().getLookupResult().isMember("location") == false) {
+					throw std::runtime_error("lookup result does not contain location");
+				} else if(equipletStep.getOriginPlacement().getLookupResult().isMember("rotation") == false) {
+					throw std::runtime_error("lookup result does not contain rotation");
+				}
+				Json::Value location = equipletStep.getOriginPlacement().getLookupResult()["location"];
+				origin.set(location["x"].asDouble(), location["y"].asDouble(), location["z"].asDouble(), 1);
+				origin = convertToModuleCoordinate(origin);
+				Json::Value rotation = equipletStep.getOriginPlacement().getLookupResult()["rotation"];
+				rotationZ = rotation["z"].asDouble();
+				break;
+			}
+			case rexos_datatypes::OriginPlacement::RELATIVE_TO_CURRENT_POSITION: {
+				// set the origin to the current position of the effector
+				origin.set(deltaRobot->getEffectorLocation().x, deltaRobot->getEffectorLocation().y, deltaRobot->getEffectorLocation().z, 1);
+				break;
+			}
+			case rexos_datatypes::OriginPlacement::RELATIVE_TO_MODULE_ORIGIN: {
+				// set the origin to the origin of the module (eg set it to 0, 0, 0)
+				origin.set(0, 0, 0, 1);
+				break;
+			}
+			case rexos_datatypes::OriginPlacement::RELATIVE_TO_EQUIPLET_ORIGIN: {
+				// set the origin to the origin of the module (eg set it to 0, 0, 0)
+				origin = convertToModuleCoordinate(Vector4(0, 0, 0, 1));
+				break;
+			}
+		}
+		
+		// get the vector from the instruction data
+		Json::Value instructionData = equipletStep.getInstructionData();
+		if(instructionData.isMember("move") == false) {
+			throw std::runtime_error("instruction data does not contain move");
+		}
+		Json::Value moveCommand = equipletStep.getInstructionData()["move"];
+		Vector4 offsetVector;
+		if(moveCommand.isMember("x")) offsetVector.x = moveCommand["x"].asDouble();
+		else offsetVector.x = deltaRobot->getEffectorLocation().x;
+		if(moveCommand.isMember("y")) offsetVector.y = moveCommand["y"].asDouble();
+		else offsetVector.y = deltaRobot->getEffectorLocation().y;
+		if(moveCommand.isMember("z")) offsetVector.z = moveCommand["z"].asDouble();
+		else offsetVector.z = deltaRobot->getEffectorLocation().z;
+		
+		// get the max acceleration
+		double maxAcceleration;
+		if(moveCommand.isMember("maxAcceleration") == false) {
+			REXOS_WARN("move command does not contain maxAcceleration, assuming ");
+			maxAcceleration = 50.0;
+		} else {
+			maxAcceleration = moveCommand["maxAcceleration"].asDouble();
+		}
+		
+		// calculate the target vector
+		Matrix4 rotationMatrix;
+		rotationMatrix.rotateX(rotationX);
+		rotationMatrix.rotateY(rotationY);
+		rotationMatrix.rotateZ(rotationZ);
+		
+		Vector4 targetVector = origin + rotationMatrix * offsetVector;
+		
+		REXOS_INFO_STREAM("moving from " << deltaRobot->getEffectorLocation() << " to " << targetVector);
+
+		// finally move to point
+		if(moveToPoint(targetVector.x, targetVector.y, targetVector.z, maxAcceleration))
+		{
+			setInstructionActionServer.setSucceeded(result);
+		} else {
+			REXOS_WARN("Failed moving to point");
+			setInstructionActionServer.setAborted(result);
+		}
+	}
+
+
+	// Calibrate service functions ------------------------------------------------
+	/**
+	 * Main function for starting the (re)calibratiion of the robot. Is called from the service functions.
+	 *
+	 * @return true if the calibration was successful else false
+	 **/
+	bool DeltaRobotNode::calibrate() {
+		if(!deltaRobot->calibrateMotors()) {
+			REXOS_ERROR("Calibration FAILED. EXITING.");
+			return false;
+		}
 		return true;
 	}
-}
 
-/**
- * Transition from Standby to Safe state
- * Will turn power off the motor
- * @return will be 0 if everything went ok else error
- **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionShutdown() {
-	REXOS_INFO("Shutdown transition called");
-	// Should have information about the workspace, calculate a safe spot and move towards it
-	deltaRobot->powerOff();
-	return true;
-}
+	/**
+	 * moveToPoint function, is called by the json service functions and the old deprecated service functions.
+	 *
+	 * @param x destination x-coordinate
+	 * @param y destination y-coordinate
+	 * @param z destination z-coordinate
+	 * @param maxAcceleration maximum acceleration
+	 * 
+	 * @return false if the path is illegal, true if the motion is executed succesfully.
+	 **/
+	bool DeltaRobotNode::moveToPoint(double x, double y, double z, double maxAcceleration) {
+		Vector3 oldLocation(deltaRobot->getEffectorLocation());
+		Vector3 newLocation(x,y,z);
 
-/**
- * Transition from Standby to Normal state
- * @return will be 0 if everything went ok else error
- **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStart() {
-	REXOS_INFO("Start transition called");
-	//The service servers should be set, to provide the normal methods for the equiplet
-	return true;
-}
-/**
- * Transition from Normal to Standby state
- * @return will be 0 if everything went ok else error
- **/
-bool deltaRobotNodeNamespace::DeltaRobotNode::transitionStop() {
-	REXOS_INFO("Stop transition called");
-	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
-	return true;
-	// Go to base (Motors on 0 degrees)
-}
+		if(deltaRobot->checkPath(oldLocation, newLocation)) {
+			deltaRobot->moveTo(newLocation, maxAcceleration);
+			return true;
+		}
+		return false;
+	}
 
+
+	bool DeltaRobotNode::transitionInitialize() {
+		REXOS_INFO("Initialize transition called");
+		return true;
+	}
+
+	bool DeltaRobotNode::transitionDeinitialize() {
+		REXOS_INFO("Deinitialize transition called");
+		ros::shutdown();
+		return true;
+	}
+
+	/**
+	 * Transition from Safe to Standby state
+	 * @return 0 if everything went OK else error
+	 **/
+	bool DeltaRobotNode::transitionSetup() {
+		REXOS_INFO("Setup transition called");
+		// Generate the effector boundaries with voxel size 2
+		deltaRobot->generateBoundaries(2);
+		// Power on the deltarobot and calibrate the motors.
+		deltaRobot->powerOn();
+		// Calibrate the motors
+		if(!deltaRobot->calibrateMotors()) {
+			REXOS_ERROR("Calibration FAILED. EXITING.");
+			return false;
+		} else {
+			rexos_module::TransitionGoal goal;
+			goal.gainedSupportedMutations.push_back("move");
+			
+			transitionActionClient.sendGoal(goal);
+			return true;
+		}
+	}
+
+	/**
+	 * Transition from Standby to Safe state
+	 * Will turn power off the motor
+	 * @return will be 0 if everything went ok else error
+	 **/
+	bool DeltaRobotNode::transitionShutdown() {
+		REXOS_INFO("Shutdown transition called");
+		// Should have information about the workspace, calculate a safe spot and move towards it
+		deltaRobot->powerOff();
+		return true;
+	}
+
+	/**
+	 * Transition from Standby to Normal state
+	 * @return will be 0 if everything went ok else error
+	 **/
+	bool DeltaRobotNode::transitionStart() {
+		REXOS_INFO("Start transition called");
+		//The service servers should be set, to provide the normal methods for the equiplet
+		return true;
+	}
+	/**
+	 * Transition from Normal to Standby state
+	 * @return will be 0 if everything went ok else error
+	 **/
+	bool DeltaRobotNode::transitionStop() {
+		REXOS_INFO("Stop transition called");
+		//The service servers should be set off, so the equiplet isn't able to set tasks for the module
+		return true;
+		// Go to base (Motors on 0 degrees)
+	}
+}
 
 /**
  * Main that creates the deltaRobotNode and starts the statemachine
@@ -305,10 +293,10 @@ int main(int argc, char **argv) {
 	}
 	
 	std::string equipletName = argv[1];
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
 	
 	REXOS_INFO("Creating DeltaRobotNode");
-	deltaRobotNodeNamespace::DeltaRobotNode drn(equipletName, moduleIdentifier);
+	delta_robot::DeltaRobotNode drn(equipletName, moduleIdentifier);
 
 	ros::spin();
 	return 0;

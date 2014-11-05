@@ -29,20 +29,30 @@
 
 #pragma once
 
+#include <actionlib/client/simple_action_client.h>
 #include <string>
-#include <vector>
-#include <memory>
+#include <jsoncpp/json/value.h>
 
-#include "mysql_connection.h"
+#include <rexos_module/ModuleInterfaceListener.h>
+#include <rexos_module/SetInstructionAction.h>
+#include <rexos_module/AbstractModule.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
-namespace rexos_knowledge_database {
-	class ModuleTypeIdentifier{
+namespace rexos_module {
+	typedef actionlib::SimpleActionClient<rexos_module::SetInstructionAction> SetInstructionActionClient;
+	
+	class ModuleInterface : public rexos_module::AbstractModule {
 	public:
-		ModuleTypeIdentifier(std::string manufacturer, std::string typeNumber);
-		std::string getManufacturer() const;
-		std::string getTypeNumber() const;
-	private:
-		std::string manufacturer, typeNumber;
+		ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
+		ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleInterfaceListener* moduleInterfaceListener);
+		
+		void setInstruction(std::string OID, Json::Value n);
+	protected:
+		void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, 
+				const rexos_module::SetInstructionResultConstPtr& result);
+	protected:
+		ModuleInterfaceListener* moduleInterfaceListener;
+	protected:
+		SetInstructionActionClient setInstructionActionClient;
 	};
-	std::ostream& operator<<(std::ostream& os, const ModuleTypeIdentifier& obj);
 }

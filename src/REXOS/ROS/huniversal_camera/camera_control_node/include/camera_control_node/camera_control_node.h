@@ -40,14 +40,14 @@
 #include "equiplet_node/RegisterModule.h"
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 #include <rexos_knowledge_database/Module.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 
 
 class CameraControlNode : public rexos_statemachine::ModuleStateMachine, 
 		public rexos_knowledge_database::Module{
 public:
-	CameraControlNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+	CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	
 	/**
 	 * calls increaseExposure service of the camera_node

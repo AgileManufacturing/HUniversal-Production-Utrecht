@@ -1,7 +1,7 @@
-#include <rexos_knowledge_database/SupportedMutation.h>
+#include <rexos_datatypes/SupportedMutation.h>
 #include <iostream>
 
-namespace rexos_knowledge_database {
+namespace rexos_datatypes {
 	SupportedMutation::SupportedMutation(std::string mutation) : 
 		mutation(mutation)
 	{

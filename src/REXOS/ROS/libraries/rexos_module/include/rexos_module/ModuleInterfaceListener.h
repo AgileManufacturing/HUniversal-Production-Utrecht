@@ -29,24 +29,12 @@
 
 #pragma once
 
-#include <string>
-#include <rexos_knowledge_database/ModuleTypeIdentifier.h>
-#include <jsoncpp/json/value.h>
+#include <string.h>
 
-namespace rexos_knowledge_database {
-	class ModuleIdentifier : public ModuleTypeIdentifier{
-	protected:
-		std::string manufacturer;
-		std::string typeNumber;
-		std::string serialNumber;
+namespace rexos_module {
+	class ModuleInterface;
+	class ModuleInterfaceListener {
 	public:
-		ModuleIdentifier(std::string manufacturer, std::string typeNumber, std::string serialNumber);
-		
-		std::string getSerialNumber() const;
-		std::string toString();
-		Json::Value toJSONObject();
-		bool operator==(const ModuleIdentifier& rhs);
+		virtual void onHardwareStepCompleted(ModuleInterface* moduleInterface, std::string id, bool completed) = 0;
 	};
-	std::ostream& operator<<(std::ostream& os, const ModuleIdentifier& obj);
 }
-

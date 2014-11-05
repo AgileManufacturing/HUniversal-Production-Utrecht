@@ -47,7 +47,6 @@
 
 #include <equiplet_node/state_machine/EquipletStateMachine.h>
 #include <equiplet_node/ModuleRegistry.h>
-#include <equiplet_node/ModuleProxy.h>
 #include <equiplet_node/scada/EquipletScada.h>
 
 #include <jsoncpp/json/value.h>
@@ -71,7 +70,7 @@ public:
 private:
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 	void handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo::OID targetObjectId);
-	void onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
+	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed);
 
 	virtual void onStateChanged(rexos_statemachine::State state);
 	virtual void onModeChanged(rexos_statemachine::Mode mode);

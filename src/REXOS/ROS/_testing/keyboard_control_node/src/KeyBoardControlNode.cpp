@@ -48,7 +48,8 @@
 using namespace keyboard_control_node;
 
 
-KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, 
+		std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
 	maxAcceleration(50.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
 {
 	REXOS_INFO("Constructing");
@@ -231,7 +232,8 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	KeyBoardControlNode keyBoardControlNode("145.89.191.131", "EQ2", rexos_knowledge_database::ModuleIdentifier("HU", "stewart_gough_type_A", "1"));
+	KeyBoardControlNode keyBoardControlNode("145.89.191.131", "EQ2", 
+			rexos_datatypes::ModuleIdentifier("HU", "stewart_gough_type_A", "1"));
 	keyBoardControlNode.run();
 	
 	return 0;

@@ -91,10 +91,9 @@ void EquipletScada::mongooseProcessChangeModuleMode(mg_connection* conn, mg_requ
 	mg_get_var(query, query_len, "serialNumber", moduleSerialNumber, sizeof(moduleSerialNumber));
 	mg_get_var(query, query_len, "mode", moduleModi, sizeof(moduleModi));
 	
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(
-			moduleManufacturer, moduleTypeNumber, moduleSerialNumber);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(moduleManufacturer, moduleTypeNumber, moduleSerialNumber);
 
-	ModuleProxy* moduleProxy = moduleRegistry->getModule(moduleIdentifier);
+	rexos_module::ModuleProxy* moduleProxy = moduleRegistry->getModule(moduleIdentifier);
 	if(moduleProxy == NULL) {
 		mg_printf(conn, "%s", ajax_reply_start_failed);
 		return;
@@ -196,8 +195,8 @@ void EquipletScada::mongooseProcessEquipletInfo(mg_connection* conn, mg_request_
 void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_info* request_info) {
 	Json::Value jsonModulesArray;
 
-	std::vector<ModuleProxy*> proxies = moduleRegistry->getRegisteredModules();
-	for (ModuleProxy* proxy : proxies) {
+	std::vector<rexos_module::ModuleProxy*> proxies = moduleRegistry->getRegisteredModules();
+	for (rexos_module::ModuleProxy* proxy : proxies) {
 		Json::Value jsonModule;
 
 		if(proxy == NULL){

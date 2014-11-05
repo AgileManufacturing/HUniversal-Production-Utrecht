@@ -23,7 +23,6 @@
 	<run_depend>rexos_knowledge_database</run_depend>
 	<build_depend>rexos_logger</build_depend>
 	<run_depend>rexos_logger</run_depend>
-	
-	<export>
-	</export>
+	<build_depend>rexos_datatypes</build_depend>
+	<run_depend>rexos_datatypes</run_depend>
 </package>

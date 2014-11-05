@@ -3,7 +3,7 @@
  * @brief locates objects and rotates points.
  * @date Created: 2013-09-20
  *
- * @author Garik hakopian
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -31,21 +31,17 @@
 
 #include "ros/ros.h"
 
-#include <rexos_knowledge_database/Module.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
-
-#include <rexos_statemachine/ModuleStateMachine.h>
-#include <rexos_statemachine/Transitions.h>
-#include "rexos_logger/rexos_logger.h"
+#include <rexos_module/Module.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_logger/rexos_logger.h>
 
 
-class DummyModuleA : public rexos_knowledge_database::Module,
-		public rexos_statemachine::ModuleStateMachine {
+class DummyModuleA : public rexos_module::Module {
 public:
 protected:
 	std::string equipletName;
 public:
-	DummyModuleA(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+	DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	void run();
 	
 	virtual bool transitionInitialize();

@@ -6,7 +6,7 @@
 #include <cppconn/prepared_statement.h>
 
 namespace rexos_knowledge_database{
-	ModuleType::ModuleType(ModuleTypeIdentifier moduleTypeIdentifier) :
+	ModuleType::ModuleType(rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier) :
 				moduleTypeIdentifier(moduleTypeIdentifier)
 	{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
@@ -33,13 +33,13 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return jsonProperties;
 	}
-	std::vector<TransitionPhase> ModuleType::getTransitionPhases() {
-		std::vector<TransitionPhase> output;
-		std::map<int, std::vector<RequiredMutation>> requiredMutations = getRequiredMutations();
-		std::map<int, std::vector<SupportedMutation>> supportedMutations = getSupportedMutations();
+	std::vector<rexos_datatypes::TransitionPhase> ModuleType::getTransitionPhases() {
+		std::vector<rexos_datatypes::TransitionPhase> output;
+		std::map<int, std::vector<rexos_datatypes::RequiredMutation>> requiredMutations = getRequiredMutations();
+		std::map<int, std::vector<rexos_datatypes::SupportedMutation>> supportedMutations = getSupportedMutations();
 		int currentPhase = 1;
 		while(requiredMutations[currentPhase].size() != 0 || supportedMutations[currentPhase].size() != 0) {
-			TransitionPhase transitionPhase(moduleTypeIdentifier, currentPhase, 
+			rexos_datatypes::TransitionPhase transitionPhase(moduleTypeIdentifier, currentPhase, 
 				requiredMutations[currentPhase], supportedMutations[currentPhase]);
 			output.push_back(transitionPhase);
 			currentPhase++;
@@ -47,7 +47,7 @@ namespace rexos_knowledge_database{
 		return output;
 	}
 	
-	std::map<int, std::vector<RequiredMutation>> ModuleType::getRequiredMutations() {
+	std::map<int, std::vector<rexos_datatypes::RequiredMutation>> ModuleType::getRequiredMutations() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT phase, mutation, isOptional \
 		FROM RequiredCalibrationMutation \
@@ -57,10 +57,10 @@ namespace rexos_knowledge_database{
 		preparedStmt->setString(2, moduleTypeIdentifier.getTypeNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
-		std::map<int, std::vector<RequiredMutation>> requiredMutations;
+		std::map<int, std::vector<rexos_datatypes::RequiredMutation>> requiredMutations;
 		while(result->next() == true) {
 			int phase = result->getInt("phase");
-			RequiredMutation m = RequiredMutation(result->getString("mutation"), result->getBoolean("isOptional"));
+			rexos_datatypes::RequiredMutation m(result->getString("mutation"), result->getBoolean("isOptional"));
 			
 			// insertion will be automatically performed when key does not exists, see http://en.cppreference.com/w/cpp/container/map/operator_at
 			requiredMutations[phase].push_back(m);
@@ -72,7 +72,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return requiredMutations;
 	}
-	std::map<int, std::vector<SupportedMutation>> ModuleType::getSupportedMutations() {
+	std::map<int, std::vector<rexos_datatypes::SupportedMutation>> ModuleType::getSupportedMutations() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT phase, mutation \
 		FROM SupportedCalibrationMutation \
@@ -82,10 +82,10 @@ namespace rexos_knowledge_database{
 		preparedStmt->setString(2, moduleTypeIdentifier.getTypeNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
-		std::map<int, std::vector<SupportedMutation>> supportedMutations;
+		std::map<int, std::vector<rexos_datatypes::SupportedMutation>> supportedMutations;
 		while(result->next() == true) {
 			int phase = result->getInt("phase");
-			SupportedMutation m = SupportedMutation(result->getString("mutation"));
+			rexos_datatypes::SupportedMutation m(result->getString("mutation"));
 			
 			// insertion will be automatically performed when key does not exists, see http://en.cppreference.com/w/cpp/container/map/operator_at
 			supportedMutations[phase].push_back(m);

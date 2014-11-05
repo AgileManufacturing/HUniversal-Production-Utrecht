@@ -61,10 +61,10 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 	if(spawnNodesForModules == true) {
 		REXOS_INFO_STREAM("Spawning nodes at startup");
 		rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
-		std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
+		std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
 		
 		ros::ServiceClient spanNodeClient(nh.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
-		for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
+		for(std::vector<rexos_datatypes::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
 			REXOS_INFO_STREAM("Spawning node for " << *it);
 			node_spawner_node::spawnNode spawnNodeCall;
 			spawnNodeCall.request.manufacturer = it->getManufacturer();
@@ -186,7 +186,7 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	step.setOriginPlacement(originPlacement);
 
 	//we might still need to update the payload on the bb
-	ModuleProxy *prox = moduleRegistry.getModule(step.getModuleIdentifier());
+	rexos_module::ModuleProxy *prox = moduleRegistry.getModule(step.getModuleIdentifier());
 	if(prox == NULL) {
 		REXOS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
 		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
@@ -216,17 +216,16 @@ void EquipletNode::handleEquipletCommand(Json::Value n) {
 }
 
 //needed for callback ( from proxy )
-void EquipletNode::onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed) {
-
+void EquipletNode::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed) {
 	//moduleProxy->changeState(rexos_statemachine::STATE_STANDBY);
 	mongo::OID targetObjectId(id);
 
 	if(completed) {
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
-    	REXOS_INFO_STREAM("Done with step with id: " << id);
-		REXOS_INFO("Updated status on BB to done.");
+    	REXOS_INFO_STREAM("Module " << moduleInterface->getModuleIdentifier() << " is done step with id: " << id);
 	} else {
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
+    	REXOS_INFO_STREAM("Module " << moduleInterface->getModuleIdentifier() << " has failed step with id: " << id);
 	}
 
 }

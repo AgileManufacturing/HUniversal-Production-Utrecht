@@ -33,7 +33,7 @@
 
 #include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include "rexos_logger/rexos_logger.h"
 #include <vectors/Vectors.h>
 
@@ -42,7 +42,7 @@ namespace keyboard_control_node {
 	class KeyBoardControlNode 
 	{
 	public:
-		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		~KeyBoardControlNode();
 		void run();
 		
@@ -88,7 +88,7 @@ namespace keyboard_control_node {
 		struct termios oldTerminalSettings, newTerminalSettings;
 		Blackboard::BlackboardCppClient* equipletStepBlackboardClient;
 		bool exitProgram;
-		rexos_knowledge_database::ModuleIdentifier identifier;
+		rexos_datatypes::ModuleIdentifier identifier;
 		std::string equipletName;
 	};
 

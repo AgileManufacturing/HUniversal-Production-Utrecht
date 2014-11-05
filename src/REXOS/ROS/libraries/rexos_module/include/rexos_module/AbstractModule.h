@@ -30,17 +30,21 @@
 #pragma once
 
 #include <string>
-#include <rexos_knowledge_database/SupportedMutation.h>
+#include "ros/ros.h"
 
-namespace rexos_knowledge_database {
-	class RequiredMutation : public SupportedMutation {
-	private:
-		bool isOptional;
-	public:
-		RequiredMutation(std::string mutation, bool isOptional);
-		
-		bool getIsOptional() const;
-		bool operator==(SupportedMutation& rhs) const;
+#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_knowledge_database/Module.h>
+#include <rexos_coordinates/Module.h>
+
+namespace rexos_module {
+	class AbstractModule : public rexos_knowledge_database::Module, 
+			public rexos_coordinates::Module {
+	protected:
+		AbstractModule(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
+	protected:
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier identifier;
+		std::string advertisementPath;
+		ros::NodeHandle nodeHandle;
 	};
-	std::ostream& operator<<(std::ostream& os, const RequiredMutation& obj);
 }

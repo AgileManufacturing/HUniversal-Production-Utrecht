@@ -1,7 +1,7 @@
-#include <rexos_knowledge_database/RequiredMutation.h>
+#include <rexos_datatypes/RequiredMutation.h>
 #include <iostream>
 
-namespace rexos_knowledge_database {
+namespace rexos_datatypes {
 	RequiredMutation::RequiredMutation(std::string mutation, bool isOptional) : 
 		SupportedMutation(mutation), isOptional(isOptional)
 	{

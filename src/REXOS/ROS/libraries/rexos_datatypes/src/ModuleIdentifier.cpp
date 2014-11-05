@@ -1,6 +1,6 @@
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
-namespace rexos_knowledge_database{
+namespace rexos_datatypes{
 	ModuleIdentifier::ModuleIdentifier(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
 			ModuleTypeIdentifier(manufacturer, typeNumber), 
 			manufacturer(manufacturer), typeNumber(typeNumber), serialNumber(serialNumber)

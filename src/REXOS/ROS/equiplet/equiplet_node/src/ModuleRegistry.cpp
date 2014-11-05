@@ -21,13 +21,10 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 			&ModuleRegistry::onRegisterServiceModuleCallback,
 			this);
 	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
-	std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+	std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
 	
-	for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
-		ModuleProxy* proxy = new ModuleProxy(
-			equipletName,
-			rexos_knowledge_database::ModuleIdentifier(it->getManufacturer(), it->getTypeNumber(), it->getSerialNumber()),
-			this);
+	for(auto it = identifiers.begin(); it < identifiers.end(); it++) {
+		rexos_module::ModuleProxy* proxy = new rexos_module::ModuleProxy(equipletName, *it, this);
 		registeredModules.push_back(proxy);
 	}
 	
@@ -35,7 +32,7 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 
 void ModuleRegistry::reloadModules(){
 	// THIS SLAMS THE MODULES IN SAFE STATE
-	for(ModuleProxy* proxy : registeredModules){
+	for(rexos_module::ModuleProxy* proxy : registeredModules){
 		proxy->changeState(rexos_statemachine::State::STATE_SAFE);
 		// IF NOT IN DATABASE SWITCH STATE OFFLINE
 		// REMOVE AFTERWARDS
@@ -55,8 +52,7 @@ void ModuleRegistry::reloadModules(){
 
 ModuleRegistry::~ModuleRegistry() {
 	for(auto it = registeredModules.begin(); it != registeredModules.end(); it++) {
-		ModuleProxy* proxy = *it;
-		delete proxy;
+		delete *it;
 	}
 }
 
@@ -69,12 +65,12 @@ void ModuleRegistry::setNewRegistrationsAllowed(bool allowed){
 	newRegistrationsAllowed = allowed;
 }
 
-std::vector<ModuleProxy*> ModuleRegistry::getRegisteredModules(){
+std::vector<rexos_module::ModuleProxy*> ModuleRegistry::getRegisteredModules(){
 	return registeredModules;
 }
 
-ModuleProxy* ModuleRegistry::getModule(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
-	for(ModuleProxy* proxy : registeredModules){
+rexos_module::ModuleProxy* ModuleRegistry::getModule(rexos_datatypes::ModuleIdentifier moduleIdentifier){
+	for(rexos_module::ModuleProxy* proxy : registeredModules){
 		if(proxy->getModuleIdentifier() == moduleIdentifier)
 			return proxy;
 	}
@@ -85,11 +81,11 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &re
 	REXOS_INFO("ModuleRegistry: Module %s %s %s registering", req.manufacturer.c_str(), req.typeNumber.c_str(), req.serialNumber.c_str());
 	
 	if(!newRegistrationsAllowed) {
-		REXOS_INFO("registration of new module not allowed");
+		REXOS_WARN("registration of new module not allowed");
 		return false;
 	}
 	
-	rexos_knowledge_database::ModuleIdentifier newModuleIdentifier(req.manufacturer, req.typeNumber, req.serialNumber);
+	rexos_datatypes::ModuleIdentifier newModuleIdentifier(req.manufacturer, req.typeNumber, req.serialNumber);
 	for (int i = 0; i < registeredModules.size(); i++) {
 		if(registeredModules[i]->getModuleIdentifier() == newModuleIdentifier) {
 			registeredModules[i]->bind();
@@ -102,7 +98,7 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &re
 }
 
 void ModuleRegistry::onModuleStateChanged(
-	ModuleProxy* moduleProxy,
+	rexos_module::ModuleProxy* moduleProxy,
 	rexos_statemachine::State newState, 
 	rexos_statemachine::State previousState)
 {
@@ -113,7 +109,7 @@ void ModuleRegistry::onModuleStateChanged(
 }
 
 void ModuleRegistry::onModuleModeChanged(
-	ModuleProxy* moduleProxy, 
+	rexos_module::ModuleProxy* moduleProxy, 
 	rexos_statemachine::Mode newMode, 
 	rexos_statemachine::Mode previousMode)
 {
@@ -123,31 +119,22 @@ void ModuleRegistry::onModuleModeChanged(
 	}
 }
 
-void ModuleRegistry::onHardwareStepCompleted(
-	ModuleProxy* moduleProxy,
-	std::string id, 
-	bool completed){
-	
-	if(moduleRegistryListener != NULL){
-		moduleRegistryListener->onHardwareStepCompleted(moduleProxy, id, completed);
+void ModuleRegistry::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed) {
+	if(moduleRegistryListener != NULL) {
+		moduleRegistryListener->onHardwareStepCompleted(moduleInterface, id, completed);
 	}
 }
 
-void ModuleRegistry::onModuleDied(ModuleProxy* moduleProxy){
+void ModuleRegistry::onModuleDied(rexos_module::ModuleProxy* moduleProxy){
 	REXOS_WARN("Module has died! :(");
-	for(std::vector<ModuleProxy*>::iterator it = registeredModules.begin(); it != registeredModules.end(); it++){
-		if(*it == moduleProxy){
-			REXOS_INFO("found me");
-			registeredModules.erase(it);
-			delete *it;
-			break;
-		}
-	}
 }
 
-	void ModuleRegistry::onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
-			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
-			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase) {
-		moduleRegistryListener->onModuleTransitionPhaseCompleted(moduleProxy, gainedSupportedMutations, requiredMutationsRequiredForNextPhase);
-	}
+void ModuleRegistry::onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
+		std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
+		std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase) {
+	moduleRegistryListener->onModuleTransitionPhaseCompleted(moduleProxy, gainedSupportedMutations, requiredMutationsRequiredForNextPhase);
+}
+void ModuleRegistry::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
+	moduleRegistryListener->spawnNode(moduleProxy);
+}
 } /* namespace equiplet_node */

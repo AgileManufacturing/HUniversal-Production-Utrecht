@@ -39,16 +39,9 @@
 #define NODE_NAME "GripperNode"
 // @endcond
 
-GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
-		rexos_knowledge_database::Module(moduleIdentifier),
-		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
-		setInstructionActionServer(
-				nodeHandle, 
-				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
-				boost::bind(&GripperNode::onSetInstruction, this, _1), 
-				false) {
+GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
+		rexos_module::ActorModule(equipletName, moduleIdentifier) {
 	REXOS_INFO("GripperNode Constructor entering...");
-	REXOS_INFO("1");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
@@ -65,7 +58,6 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 	}
 	
 	gripper = new rexos_gripper::Gripper(jsonNode);
-	setInstructionActionServer.start();
 }
 
 GripperNode::~GripperNode() {
@@ -75,14 +67,14 @@ GripperNode::~GripperNode() {
 	delete modbus;
 }
 
-void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
+void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
 	REXOS_INFO_STREAM("handling hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
 	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 	
-	rexos_statemachine::SetInstructionResult result;
+	rexos_module::SetInstructionResult result;
 	result.OID = goal->OID;
 	
 	Json::Value instructionData = equipletStep.getInstructionData();
@@ -204,7 +196,7 @@ int main(int argc, char** argv) {
 	}
 	
 	std::string equipletName = argv[1];
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
 	
 	REXOS_INFO("Creating GripperNode");
 
