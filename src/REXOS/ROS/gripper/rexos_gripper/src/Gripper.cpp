@@ -91,13 +91,15 @@ namespace rexos_gripper {
 			if (overheated == false) {
 				enable();
 				isActivated = true;
+			} else {
+				throw std::runtime_error("Gripper activated while it was overheated");
 			}
 		}
 			
 		void Gripper::deactivate() {
 			disable();
 			isActivated = false;
-		}					
+		}
 		
 		void Gripper::notifyObservers(Notify n){
 			for (auto iter = observers.begin(); iter != observers.end(); ++iter){
@@ -124,7 +126,7 @@ namespace rexos_gripper {
 		 **/
 		void Gripper::watchdogFunction(Gripper* device) {
 			try {
-				REXOS_INFO_STREAM("[GRIPPER WATCHDOG] Watchdog started" << std::endl);
+				REXOS_INFO_STREAM("[GRIPPER WATCHDOG] Watchdog started");
 				while (device->watchdogRunning) {
 
 					// The watchdog in the IO controller disables pins if there is no communication in X amount of time
@@ -135,7 +137,7 @@ namespace rexos_gripper {
 					} else {
 						device->disable();
 					}
-
+					
 					// Semi correcting the loop time by calculating the run time of the loop.
 					long nextRunTime = rexos_utilities::timeNow() + device->watchdogInterval;
 
@@ -170,7 +172,6 @@ namespace rexos_gripper {
 						device->overheated = false;
 						device->notifyObservers(CooledDown);
 					}
-
 					// Save the original isActivated and wait for the next check.
 					device->wasActivated = device->isActivated;
 					rexos_utilities::sleep(nextRunTime - rexos_utilities::timeNow());

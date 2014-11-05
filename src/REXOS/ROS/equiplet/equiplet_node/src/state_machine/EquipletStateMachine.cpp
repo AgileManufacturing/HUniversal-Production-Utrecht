@@ -90,7 +90,7 @@ void EquipletStateMachine::onModuleModeChanged(rexos_module::ModuleProxy* module
 }
 
 void EquipletStateMachine::onModuleDied(rexos_module::ModuleProxy* moduleProxy){
-	REXOS_ERROR("module has died!");
+	REXOS_ERROR_STREAM("module " << moduleProxy->getModuleIdentifier() << " has died!");
 }
 
 void EquipletStateMachine::onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 

@@ -30,6 +30,7 @@
 
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
+#include <rexos_datatypes/EquipletStep.h>
 #include <boost/bind.hpp>
 #include <rexos_datatypes/EquipletStep.h>
 #include <jsoncpp/json/reader.h>
@@ -83,9 +84,7 @@ void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPt
 		setInstructionActionServer.setSucceeded(result);	
 		std::cout << "Gripper activated" << std::endl;
 		return;
-	}
-	
-	else if (instructionData.isMember("deactivate") == true){
+	} else if (instructionData.isMember("deactivate") == true){
 		gripper->deactivate();
 		setInstructionActionServer.setSucceeded(result);	
 		std::cout << "Gripper deactivated" << std::endl;
@@ -172,7 +171,7 @@ bool GripperNode::transitionStop() {
 //TODO: Implement the following methods, there must be a MAST functionallity implemented here when a certain event occurs. Like when the gripper is overheated,
 //the gripper should look for a save place to drop the current item.
 void GripperNode::notifyWarned(){
-	REXOS_INFO("GripperNode is Warned");	
+	REXOS_INFO("GripperNode is Warned ");	
 }
 	
 void GripperNode::notifyOverheated(){

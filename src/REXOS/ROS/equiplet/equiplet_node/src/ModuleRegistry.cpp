@@ -126,7 +126,9 @@ void ModuleRegistry::onHardwareStepCompleted(rexos_module::ModuleInterface* modu
 }
 
 void ModuleRegistry::onModuleDied(rexos_module::ModuleProxy* moduleProxy){
-	REXOS_WARN("Module has died! :(");
+	if(moduleRegistryListener != NULL) {
+		moduleRegistryListener->onModuleDied(moduleProxy);
+	}
 }
 
 void ModuleRegistry::onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 

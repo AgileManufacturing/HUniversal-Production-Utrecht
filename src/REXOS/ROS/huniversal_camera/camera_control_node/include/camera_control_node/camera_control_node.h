@@ -32,20 +32,15 @@
 #define CAMERACONTROLNODE_H_
 
 #include "ros/ros.h"
-// standard services
 #include <std_msgs/Header.h>
 #include <std_srvs/Empty.h>
-#include <rexos_statemachine/ModuleStateMachine.h>
-#include <rexos_statemachine/Transitions.h>
-#include "equiplet_node/RegisterModule.h"
-#include <rexos_knowledge_database/rexos_knowledge_database.h>
-#include <rexos_knowledge_database/Module.h>
+
+#include <rexos_module/Module.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 
 
 
-class CameraControlNode : public rexos_statemachine::ModuleStateMachine, 
-		public rexos_knowledge_database::Module{
+class CameraControlNode : public rexos_module::Module{
 public:
 	CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	
@@ -107,3 +102,4 @@ private:
 };
 
 #endif /* CAMERACONTROLNODE_H_ */
+

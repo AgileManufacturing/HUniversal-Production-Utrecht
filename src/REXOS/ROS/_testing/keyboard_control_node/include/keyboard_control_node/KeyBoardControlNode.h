@@ -79,7 +79,7 @@ namespace keyboard_control_node {
 		 * @var double step
 		 * The size in millimeters per movement.
 		 **/
-		static constexpr double STEP = 1.0;
+		static constexpr double STEP = 10.0;
 		static constexpr double STEP_ANGLE = 0.1;
 
 		/**

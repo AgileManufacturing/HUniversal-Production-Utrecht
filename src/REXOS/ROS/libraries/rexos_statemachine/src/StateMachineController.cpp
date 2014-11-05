@@ -4,7 +4,9 @@
 namespace rexos_statemachine{
 	StateMachineController::StateMachineController(std::string advertisementPath) :
 			changeStateActionClient	(nodeHandle, advertisementPath + "change_state"),
-			changeModeActionClient	(nodeHandle, advertisementPath + "change_mode")
+			changeModeActionClient	(nodeHandle, advertisementPath + "change_mode"),
+			currentState(STATE_OFFLINE),
+			currentMode(MODE_SERVICE)
 		{
 		stateUpdateServiceServer = nodeHandle.advertiseService	(advertisementPath + "state_update",
 				&StateMachineController::onStateChangeServiceCallback, this);
