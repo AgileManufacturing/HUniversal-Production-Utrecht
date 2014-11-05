@@ -351,7 +351,6 @@ namespace part_locator_node {
 		REXOS_INFO("Setup transition called");
 		
 		// @TODO Select either deltarobot or six_axisrobot (defaulted to sixaxis in constructor)
-		rexos_module::ModuleInterface moverInterface(rexos_module::AbstractModule::equipletName, identifier);
 		rexos_module::SetInstructionGoal* instructionGoal;
 		rexos_module::TransitionGoal transitionGoal;
 		
@@ -368,10 +367,10 @@ namespace part_locator_node {
 		rexos_module::TransitionResultConstPtr result = transitionActionClient.getResult();
 		
 		bool foundCandidate = false;
-		rexos_datatypes::ModuleIdentifier identifier;
+		rexos_datatypes::ModuleIdentifier moverIdentifier;
 		for(rexos_module::CandidateModules candidates : result->candidates) {
 			if(candidates.mutation == "move") {
-				identifier = rexos_datatypes::ModuleIdentifier(
+				moverIdentifier = rexos_datatypes::ModuleIdentifier(
 						candidates.manufacturer[0], candidates.typeNumber[0], candidates.serialNumber[0]);
 				foundCandidate = true;
 			}
@@ -381,7 +380,8 @@ namespace part_locator_node {
 			return false;
 		}
 		
-		REXOS_INFO_STREAM("Accuired mover " << identifier);
+		REXOS_INFO_STREAM("Accuired mover " << moverIdentifier);
+		rexos_module::ModuleInterface moverInterface(rexos_module::AbstractModule::equipletName, moverIdentifier);
 		
 		int acceleration = 20;
 		double workSpaceHeight = 50;
