@@ -34,6 +34,7 @@
 #include <rexos_module/ModuleInterface.h>
 #include <rexos_module/ModuleProxyListener.h>
 #include <rexos_module/TransitionAction.h>
+#include <rexos_module/CandidateModules.h>
 #include <rexos_bond/BondListener.h>
 #include <rexos_bond/Bond.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
@@ -50,7 +51,7 @@ namespace rexos_module {
 		
 		void changeState(rexos_statemachine::State state);
 		void changeMode(rexos_statemachine::Mode mode);
-		void goToNextTransitionPhase();
+		void goToNextTransitionPhase(std::vector<rexos_module::CandidateModules> candidateModules);
 		void bind();
 	protected:
 		void onStateChange(rexos_statemachine::State newState, rexos_statemachine::State previousState);

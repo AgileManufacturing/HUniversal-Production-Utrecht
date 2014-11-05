@@ -39,6 +39,11 @@ namespace rexos_datatypes {
 		SupportedMutation(std::string mutation);
 		
 		std::string getMutation() const;
+		
+		/**
+		 * Compare operator for std::map
+		 **/
+		bool operator<(const SupportedMutation rhs) const;
 	};
 	std::ostream& operator<<(std::ostream& os, const SupportedMutation& obj);
 }

@@ -1,9 +1,13 @@
 #include <rexos_datatypes/ModuleIdentifier.h>
 
 namespace rexos_datatypes{
+	ModuleIdentifier::ModuleIdentifier() :
+			ModuleTypeIdentifier("", ""), serialNumber("")
+	{
+		// nothing to do here
+	}
 	ModuleIdentifier::ModuleIdentifier(std::string manufacturer, std::string typeNumber, std::string serialNumber) :
-			ModuleTypeIdentifier(manufacturer, typeNumber), 
-			manufacturer(manufacturer), typeNumber(typeNumber), serialNumber(serialNumber)
+			ModuleTypeIdentifier(manufacturer, typeNumber), serialNumber(serialNumber)
 	{
 		// nothing to do here
 	}
@@ -20,7 +24,7 @@ namespace rexos_datatypes{
 		output["serialNumber"] = getSerialNumber();
 		return output;
 	}
-	bool ModuleIdentifier::operator==(const ModuleIdentifier& rhs) {
+	bool ModuleIdentifier::operator==(const ModuleIdentifier& rhs) const {
 		if(		this->getManufacturer() == rhs.getManufacturer() &&
 				this->getTypeNumber() == rhs.getTypeNumber() &&
 				this->getSerialNumber() == rhs.getSerialNumber()) {

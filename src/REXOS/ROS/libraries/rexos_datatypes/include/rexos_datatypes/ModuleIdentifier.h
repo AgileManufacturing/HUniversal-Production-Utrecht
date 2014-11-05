@@ -36,16 +36,15 @@
 namespace rexos_datatypes {
 	class ModuleIdentifier : public ModuleTypeIdentifier{
 	protected:
-		std::string manufacturer;
-		std::string typeNumber;
 		std::string serialNumber;
 	public:
+		ModuleIdentifier();
 		ModuleIdentifier(std::string manufacturer, std::string typeNumber, std::string serialNumber);
 		
 		std::string getSerialNumber() const;
 		std::string toString();
 		Json::Value toJSONObject();
-		bool operator==(const ModuleIdentifier& rhs);
+		bool operator==(const ModuleIdentifier& rhs) const;
 	};
 	std::ostream& operator<<(std::ostream& os, const ModuleIdentifier& obj);
 }

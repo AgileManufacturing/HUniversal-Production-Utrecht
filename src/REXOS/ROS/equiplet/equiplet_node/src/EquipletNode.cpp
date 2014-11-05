@@ -227,7 +227,6 @@ void EquipletNode::onHardwareStepCompleted(rexos_module::ModuleInterface* module
     	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
     	REXOS_INFO_STREAM("Module " << moduleInterface->getModuleIdentifier() << " has failed step with id: " << id);
 	}
-
 }
 
 void EquipletNode::onStateChanged(rexos_statemachine::State state){

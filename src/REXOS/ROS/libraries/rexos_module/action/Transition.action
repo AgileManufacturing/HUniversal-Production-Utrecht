@@ -1,7 +1,5 @@
 string[] gainedSupportedMutations
 RequiredMutation[] requiredMutationsRequiredForNextPhase
 ---
-string manufacturer
-string typeNumber
-string serialNumber
+CandidateModules[] candidates
 ---

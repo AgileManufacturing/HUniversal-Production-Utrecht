@@ -366,40 +366,43 @@ namespace part_locator_node {
 		transitionActionClient.sendGoal(transitionGoal);
 		transitionActionClient.waitForResult();
 		rexos_module::TransitionResultConstPtr result = transitionActionClient.getResult();
-		rexos_datatypes::ModuleIdentifier identifier(result->manufacturer, result->typeNumber, result->serialNumber);
+		
+		bool foundCandidate = false;
+		rexos_datatypes::ModuleIdentifier identifier;
+		for(rexos_module::CandidateModules candidates : result->candidates) {
+			if(candidates.mutation == "move") {
+				identifier = rexos_datatypes::ModuleIdentifier(
+						candidates.manufacturer[0], candidates.typeNumber[0], candidates.serialNumber[0]);
+				foundCandidate = true;
+			}
+		}
+		if(foundCandidate == false) {
+			REXOS_ERROR("did not acquire mover");
+			return false;
+		}
+		
 		REXOS_INFO_STREAM("Accuired mover " << identifier);
 		
-		double x;
-		double y;
-		double z;
 		int acceleration = 20;
 		double workSpaceHeight = 50;
 		Vector3 v;
-
-		REXOS_INFO("Moving to top left corner");
-		x = 0 - workPlaneWidth / 2;
-		y = 0 + workPlaneHeight / 2;
-		z = workSpaceHeight;
-		v = Vector3(x, y, z);
-		v = convertToEquipletCoordinate(v);
-		v = moverInterface.convertToModuleCoordinate(v);
+		
 		rexos_datatypes::EquipletStep equipletStep;
 		equipletStep.setModuleIdentifier(moverInterface.getModuleIdentifier());
-		
 		rexos_datatypes::OriginPlacement originPlacement;
-		originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_MODULE_ORIGIN);
+		originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_EQUIPLET_ORIGIN);
 		equipletStep.setOriginPlacement(originPlacement);
-		
-		Json::Value moveCommand;
-		moveCommand["x"] = v.x;
-		moveCommand["y"] = v.y;
-		moveCommand["z"] = v.z;
 		Json::Value instructionData;
-		instructionData["move"] = moveCommand;
-		equipletStep.setInstructionData(instructionData);
+		instructionData["move"]["maxAcceleration"] = acceleration;
 		
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\": "+boost::lexical_cast<std::string>(acceleration) +"} }";
-		//REXOS_WARN_STREAM(hardwareStep);
+		
+		REXOS_INFO("Moving to top left corner");
+		v = Vector3(0 - workPlaneWidth / 2, 0 + workPlaneHeight / 2, workSpaceHeight);
+		v = convertToEquipletCoordinate(v);
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
 		
 		moverInterface.setInstruction("1", equipletStep.toJSON());
 		REXOS_INFO("enter diff to X");
@@ -408,14 +411,12 @@ namespace part_locator_node {
 		std::cin >> topLeftOffsetY;
 		
 		REXOS_INFO("Moving to top right corner");
-		x = 0 + workPlaneWidth / 2;
-		y = 0 + workPlaneHeight / 2;
-		z = workSpaceHeight;
-		v = Vector3(x, y, z);
+		v = Vector3(0 + workPlaneWidth / 2, 0 + workPlaneHeight / 2, workSpaceHeight);
 		v = convertToEquipletCoordinate(v);
-		v = moverInterface.convertToModuleCoordinate(v);
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
-		//REXOS_WARN_STREAM(hardwareStep);
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
 		
 		moverInterface.setInstruction("2", equipletStep.toJSON());
 		REXOS_INFO("enter diff to X");
@@ -424,15 +425,13 @@ namespace part_locator_node {
 		std::cin >> topRightOffsetY;
 		
 		REXOS_INFO("Moving to bottom right corner");
-		x = 0 + workPlaneWidth / 2;
-		y = 0 - workPlaneHeight / 2;
-		z = workSpaceHeight;
-		v = Vector3(x, y, z);
+		v = Vector3(0 + workPlaneWidth / 2, 0 - workPlaneHeight / 2, workSpaceHeight);
 		v = convertToEquipletCoordinate(v);
-		v = moverInterface.convertToModuleCoordinate(v);
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
-		//REXOS_WARN_STREAM(hardwareStep);
-			
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
+		
 		moverInterface.setInstruction("3", equipletStep.toJSON());
 		REXOS_INFO("enter diff to X");
 		std::cin >> bottomRightOffsetX;
@@ -570,9 +569,7 @@ namespace part_locator_node {
 		REXOS_WARN_STREAM("--------------------------------------------------------------");
 		
 		
-		x = 0 + workPlaneWidth / 2;
-		y = 0 - workPlaneHeight / 2;
-		v = Vector3(x, y, 1);
+		v = Vector3(0 + workPlaneWidth / 2, 0 - workPlaneHeight / 2, workSpaceHeight);
 		REXOS_WARN_STREAM("--------------------------------------------------------------");
 		REXOS_INFO_STREAM("v " << v);
 		REXOS_INFO_STREAM("v " << translateToA * v);
@@ -583,81 +580,54 @@ namespace part_locator_node {
 		REXOS_INFO_STREAM("v " << translateFromA * postCorrectionScaleMatrix * postCorrectionShearMatrix * postCorrectionRotationMatrix * postCorrectionTranslationMatrix * translateToA * v);
 		
 		
+		// @TODO this might be removed?
+		
 		REXOS_INFO("Moving to top left corner");
-		x = 0 - workPlaneWidth / 2;
-		y = 0 + workPlaneHeight / 2;
-		v = Vector3(x, y, 1);
-		REXOS_INFO_STREAM(v);
-		v = postCorrectionTotalMatrix * v;
-		REXOS_INFO_STREAM(v);
-		v.z = workSpaceHeight;
+		v = Vector3(0 - workPlaneWidth / 2, 0 + workPlaneHeight / 2, workSpaceHeight);
 		v = convertToEquipletCoordinate(v);
-		REXOS_INFO_STREAM(v);
-		v = moverInterface.convertToModuleCoordinate(v);
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
 		
 		moverInterface.setInstruction("4", equipletStep.toJSON());
-		// @TODO this might be removed?
 		REXOS_INFO("Press enter when ready");
 		cin.get();
 		cin.ignore();
 		
 		REXOS_INFO("Moving to top right corner");
-		x = 0 + workPlaneWidth / 2;
-		y = 0 + workPlaneHeight / 2;
-		v = Vector3(x, y, 1);
-		REXOS_INFO_STREAM(v);
-		v = postCorrectionTotalMatrix * v;
-		REXOS_INFO_STREAM(v);
-		v.z = workSpaceHeight;
-		REXOS_INFO_STREAM(v);
+		v = Vector3(0 + workPlaneWidth / 2, 0 + workPlaneHeight / 2, workSpaceHeight);
 		v = convertToEquipletCoordinate(v);
-		REXOS_INFO_STREAM(v);
-		v = moverInterface.convertToModuleCoordinate(v);
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
 		
 		moverInterface.setInstruction("5", equipletStep.toJSON());
-		// @TODO this might be removed?
 		REXOS_INFO("Press enter when ready");
 		cin.get();
 		cin.ignore();
 		
 		REXOS_INFO("Moving to bottom right corner");
-		x = 0 + workPlaneWidth / 2;
-		y = 0 - workPlaneHeight / 2;
-		v = Vector3(x, y, 1);
-		REXOS_INFO_STREAM(v);
-		v = postCorrectionTotalMatrix * v;
-		REXOS_INFO_STREAM(v);
-		v.z = workSpaceHeight; //Changed from -15 to -10
-		REXOS_INFO_STREAM(v);
+		v = Vector3(0 - workPlaneWidth / 2, 0 - workPlaneHeight / 2, workSpaceHeight);
 		v = convertToEquipletCoordinate(v);
-		REXOS_INFO_STREAM(v);
-		v = moverInterface.convertToModuleCoordinate(v);
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
 			
 		moverInterface.setInstruction("6", equipletStep.toJSON());
 		
-		REXOS_INFO("Moving orign");
-		x = 0;
-		y = 0;
-		v = Vector3(x, y, 1);
-		REXOS_INFO_STREAM(v);
-		v = postCorrectionTotalMatrix * v;
-		REXOS_INFO_STREAM(v);
-		v.z = workSpaceHeight;
-		REXOS_INFO_STREAM(v);
+		REXOS_INFO("Moving origin");
+		v = Vector3(0, 0, workSpaceHeight);
 		v = convertToEquipletCoordinate(v);
-		REXOS_INFO_STREAM(v);
-		v = moverInterface.convertToModuleCoordinate(v);
+		instructionData["move"]["x"] = v.x;
+		instructionData["move"]["y"] = v.y;
+		instructionData["move"]["z"] = v.z;
+		equipletStep.setInstructionData(instructionData);
 		
-		//hardwareStep = "{\"command\":\"move\", \"look_up\":NULL, \"look_up_parameters\":NULL, \"payload\":{\"x\":" + boost::lexical_cast<std::string>(v.x) + ",\"y\":" + boost::lexical_cast<std::string>(v.y) + ",\"z\":" + boost::lexical_cast<std::string>(v.z) + ", \"maxAcceleration\":"+boost::lexical_cast<std::string>(acceleration) +" } }";
+		moverInterface.setInstruction("7", equipletStep.toJSON());
 		
-		moverInterface.setInstruction("6", equipletStep.toJSON());
-		
-		
-		
-		// @TODO this might be removed?
 		REXOS_INFO("Press enter when ready");
 		cin.get();
 		cin.ignore();

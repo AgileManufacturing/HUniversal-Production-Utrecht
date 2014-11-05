@@ -5,8 +5,8 @@ namespace rexos_module {
 			ModuleInterface(equipletName, identifier), 
 			rexos_statemachine::StateMachineController(advertisementPath), 
 			moduleProxyListener(moduleProxyListener),
-			transitionActionServer(AbstractModule::nodeHandle, advertisementPath + "/transition", 
-				boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), false),
+			transitionActionServer(AbstractModule::nodeHandle, advertisementPath + "transition", 
+				boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), true),
 			bond(NULL)
 	{
 		
@@ -30,8 +30,10 @@ namespace rexos_module {
 	void ModuleProxy::changeMode(rexos_statemachine::Mode mode) {
 		StateMachineController::changeMode(mode);
 	}
-	void ModuleProxy::goToNextTransitionPhase() {
-		transitionActionServer.setSucceeded();
+	void ModuleProxy::goToNextTransitionPhase(std::vector<rexos_module::CandidateModules> candidateModules) {
+		rexos_module::TransitionResult result;
+		result.candidates = candidateModules;
+		transitionActionServer.setSucceeded(result);
 		boost::unique_lock<boost::mutex> lock(transitionPhaseMutex);
 		allowedToContinue = true;
 		transitionPhaseCondition.notify_one();

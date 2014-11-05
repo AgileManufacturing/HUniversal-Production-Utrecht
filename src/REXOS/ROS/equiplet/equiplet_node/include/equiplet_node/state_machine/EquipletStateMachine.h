@@ -93,8 +93,8 @@ private:
 private:
 	std::vector<std::vector<rexos_datatypes::TransitionPhase>> calculateOrderOfCalibrationSteps();
 	bool areAllRequiredMutationsAvailiable(std::vector<rexos_datatypes::RequiredMutation> requiredMutations, 
-			std::vector<rexos_datatypes::SupportedMutation> supportedMutations);
-	std::vector<rexos_datatypes::SupportedMutation>* currenntlySupportedMutations;
+			std::map<rexos_datatypes::SupportedMutation, std::vector<rexos_module::ModuleProxy*>> supportedMutations);
+	std::map<rexos_datatypes::SupportedMutation, std::vector<rexos_module::ModuleProxy*>>* currentlySupportedMutations;
 	std::map<rexos_module::ModuleProxy*, std::vector<rexos_datatypes::RequiredMutation>>* pendingTransitionPhases;
 };
 
