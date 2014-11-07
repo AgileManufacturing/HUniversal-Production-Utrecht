@@ -115,6 +115,7 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 		case KEYCODE_X:
 			REXOS_INFO("PRESSED X");
 			this->playRoutine();
+			REXOS_INFO("routuneplayed.asdasdjhbaskdjnsa");
 		break;
 		case KEYCODE_W:
 			REXOS_INFO("PRESSED W");
@@ -226,14 +227,18 @@ void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double accelerati
 }
 
 void KeyBoardControlNode::playRoutine(){
+	REXOS_INFO("IN DE FUNCITE");
 	Vector3 direction;
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	while(exitProgram == true){
 		direction.z += 5;
+		REXOS_INFO("OMHOOG1");
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		REXOS_INFO("OMHOOG2");
 		ros::Duration(1).sleep();
 		if(cin.peek() == EOF){
+			REXOS_INFO("OMHOOG3");
 			return;
 		}
 		
