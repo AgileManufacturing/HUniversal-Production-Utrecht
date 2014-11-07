@@ -231,7 +231,7 @@ void KeyBoardControlNode::playRoutine(){
 	Vector3 direction;
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
-	while(exitProgram == true){
+	while(true){
 		direction.z += 5;
 		REXOS_INFO("OMHOOG1");
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
