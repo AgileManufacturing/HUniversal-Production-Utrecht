@@ -58,6 +58,7 @@ namespace keyboard_control_node {
 		 * The maxAcceleration of the effector in millimeters per second.
 		 **/
 		double maxAcceleration;
+		static const char KEYCODE_X = 0x78;
 		static const char KEYCODE_W = 0x77;
 		static const char KEYCODE_S = 0x73;
 		static const char KEYCODE_A = 0x61;

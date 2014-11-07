@@ -113,7 +113,7 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 	// Check which key was pressed.
 	switch(inputCharacter){
 		case KEYCODE_X:
-			REXOS_INFO("Pressed X");
+			REXOS_INFO("PRESSED X");
 			this->playRoutine();
 		break;
 		case KEYCODE_W:
@@ -229,67 +229,69 @@ void KeyBoardControlNode::playRoutine(){
 	Vector3 direction;
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
-	while(exitprogram == true){
+	while(exitProgram == true){
 		direction.z += 5;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
 		direction.z -= 10;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
-		
+
+
 		direction.z += 5;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
+		
 		
 		direction.y += 5;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
 		direction.y -= 10;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
 		direction.y += 5;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
 		direction.x += 5;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
 		direction.x -= 10;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
 		direction.x += 5;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(1).sleep();
-		if(std::cin.peek() != std::ios::EOF){
+		if(cin.peek() == EOF){
 			return;
 		}
 		
