@@ -597,6 +597,5 @@ bool SixAxisCalculations::checkPath(StewartGoughLocation from, StewartGoughLocat
 			}
 		}
         return true;
-
 }
 }
