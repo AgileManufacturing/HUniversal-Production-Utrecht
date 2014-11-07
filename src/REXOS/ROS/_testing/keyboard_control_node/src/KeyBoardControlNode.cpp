@@ -232,7 +232,7 @@ void KeyBoardControlNode::playRoutine(){
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	while(true){
-		direction.z += 15;
+		direction.z = 15;
 		REXOS_INFO("OMHOOG1");
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		REXOS_INFO("OMHOOG2");
@@ -240,42 +240,42 @@ void KeyBoardControlNode::playRoutine(){
 		REXOS_INFO("OMHOOG3");
 		
 		
-		direction.z -= 30;
+		direction.z = -30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
 	
 
-		direction.z += 15;
+		direction.z = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
 		
 		
-		direction.y += 15;
-		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
-	
-		
-		direction.y -= 30;
-		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
-		
-		
-		direction.y += 15;
-		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
-		
-		
-		direction.x += 15;
-		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
-		
-		
-		direction.x -= 30;
+		direction.y = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
 	
 		
-		direction.x += 15;
+		direction.y = -30;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		
+		
+		direction.y = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		
+		
+		direction.x = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		
+		
+		direction.x = -30;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+	
+		
+		direction.x = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
 		
