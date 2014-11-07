@@ -232,70 +232,70 @@ void KeyBoardControlNode::playRoutine(){
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	while(true){
-		direction.z += 5;
+		direction.z += 20;
 		REXOS_INFO("OMHOOG1");
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		REXOS_INFO("OMHOOG2");
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			REXOS_INFO("OMHOOG3");
 			return;
 		}
 		
-		direction.z -= 10;
+		direction.z -= 40;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 
 
-		direction.z += 5;
+		direction.z += 20;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 		
 		
-		direction.y += 5;
+		direction.y += 20;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 		
-		direction.y -= 10;
+		direction.y -= 40;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 		
-		direction.y += 5;
+		direction.y += 20;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 		
-		direction.x += 5;
+		direction.x += 20;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 		
-		direction.x -= 10;
+		direction.x -= 40;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
 		
-		direction.x += 5;
+		direction.x += 20;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(1).sleep();
+		ros::Duration(0.5).sleep();
 		if(cin.peek() == EOF){
 			return;
 		}
