@@ -232,73 +232,52 @@ void KeyBoardControlNode::playRoutine(){
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	while(true){
-		direction.z += 20;
+		direction.z += 15;
 		REXOS_INFO("OMHOOG1");
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		REXOS_INFO("OMHOOG2");
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			REXOS_INFO("OMHOOG3");
-			return;
-		}
+		REXOS_INFO("OMHOOG3");
 		
-		direction.z -= 40;
+		
+		direction.z -= 30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
+	
 
-
-		direction.z += 20;
+		direction.z += 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
 		
 		
-		direction.y += 20;
+		direction.y += 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
+	
 		
-		direction.y -= 40;
+		direction.y -= 30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
 		
-		direction.y += 20;
+		
+		direction.y += 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
 		
-		direction.x += 20;
+		
+		direction.x += 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
 		
-		direction.x -= 40;
+		
+		direction.x -= 30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
+	
 		
-		direction.x += 20;
+		direction.x += 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
-		if(cin.peek() == EOF){
-			return;
-		}
 		
 		//This is the above code but then in less rules
 		/*for(int i = 0; i < 9; ++i;){
