@@ -1,10 +1,12 @@
 /**
  * @file KeyBoardControlNode.h
  * @brief An ROS node for controlling the delta robot with the keyboard
- * @date Created: 2012-10-12
+ * @date Created: 2014-11-12
  *
  * @author ??
  * @author Alexander Streng
+ * @author Tommas Bakker
+ * @author Peter Markotic
  *
  * @section LICENSE
  * License: newBSD
@@ -49,6 +51,7 @@ namespace keyboard_control_node {
 	private:
 		void readInputFromKeyBoard(int inputCharacter);
 		void writeToBlackBoard(Vector3 direction, double acceleration, double rotationX, double rotationY, double rotationZ);
+		void playRoutine();
 		
 		/**
 		 * @var double maxAcceleration

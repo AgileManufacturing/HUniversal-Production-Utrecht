@@ -1,10 +1,12 @@
 /**
  * @file KeyBoardControlNode.cpp
  * @brief Control the robot with the WASD UP and Down keys.
- * @date Created: 2012-10-05
+ * @date Created: 2014-11-05
  *
  * @author Dick van der Steen
  * @author Dennis Koole
+ * @author Tommas Bakker
+ * @author Peter Markotic
  *
  * @section LICENSE
  * License: newBSD
@@ -49,7 +51,7 @@ using namespace keyboard_control_node;
 
 
 KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
-	maxAcceleration(50.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
+	maxAcceleration(5.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
 {
 	REXOS_INFO("Constructing");
 
@@ -110,6 +112,10 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 	
 	// Check which key was pressed.
 	switch(inputCharacter){
+		case KEYCODE_X:
+			REXOS_INFO("Pressed X");
+			this->playRoutine();
+		break;
 		case KEYCODE_W:
 			REXOS_INFO("PRESSED W");
 			direction.y+= STEP;
@@ -185,6 +191,7 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 	}
 }
 
+
 void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double acceleration, double rotationX, double rotationY, double rotationZ){
 	rexos_datatypes::EquipletStep equipletStep;
 	Json::Value instructionData;
@@ -215,6 +222,99 @@ void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double accelerati
 	Json::StyledWriter writer;
 	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON())) == false) {
 		REXOS_WARN("insertion of hardware step on blackboard failed!");
+	}
+}
+
+void KeyBoardControlNode::playRoutine(){
+	Vector3 direction;
+	double rotationX = 0, rotationY = 0, rotationZ = 0;
+	
+	while(exitprogram == true){
+		direction.z += 5;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.z -= 10;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.z += 5;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.y += 5;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.y -= 10;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.y += 5;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.x += 5;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.x -= 10;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		direction.x += 5;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(1).sleep();
+		if(std::cin.peek() != std::ios::EOF){
+			return;
+		}
+		
+		//This is the above code but then in less rules
+		/*for(int i = 0; i < 9; ++i;){
+			int j = (((i * 5)%10) + 5);
+			
+			if(i < 3){
+				if(i % 2 == 0){
+					direction.z -= j;
+				} else direction.z += j;
+			} else if(i < 6){
+				if(i % 2 == 0){
+					direction.y -= j;
+				} else direction.y += j;
+			} else {
+				if(i % 2 == 0){
+					direction.x -= j;
+				} else direction.x += j;
+			}	
+			
+			writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+			ros::sleep(1000);
+			std::cin.peek() != EOF;
+		}*/
 	}
 }
 
