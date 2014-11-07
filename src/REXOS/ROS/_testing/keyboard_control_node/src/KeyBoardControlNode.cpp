@@ -248,6 +248,7 @@ void KeyBoardControlNode::playRoutine(){
 		direction.z = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
+		direction.z = 0;
 		
 		
 		direction.y = 15;
@@ -263,6 +264,7 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
+		direction.y = 0;
 		
 		
 		direction.x = 15;
@@ -278,6 +280,7 @@ void KeyBoardControlNode::playRoutine(){
 		direction.x = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(0.5).sleep();
+		direction.x = 0;
 		
 		//This is the above code but then in less rules
 		/*for(int i = 0; i < 9; ++i;){
