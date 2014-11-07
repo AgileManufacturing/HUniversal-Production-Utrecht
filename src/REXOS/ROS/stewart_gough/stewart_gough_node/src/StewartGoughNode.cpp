@@ -370,6 +370,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
 int main(int argc, char **argv){
 	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
 				50, 50, 
+				20, 20,
 				0.46);
 	
 	{

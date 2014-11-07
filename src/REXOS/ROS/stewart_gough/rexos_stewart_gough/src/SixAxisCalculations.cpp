@@ -440,7 +440,7 @@ Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA
 	ROS_INFO_STREAM("--intersectionPointA: " << intersectionPointA);
 	ROS_INFO_STREAM("--intersectionPointB: " << intersectionPointB);
 	
-	return intersectionPointA;
+	return intersectionPointB;
 }
 
 Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, 
@@ -526,10 +526,13 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	ROS_INFO_STREAM("relativeUpperArmLowerArmIntersectionPoint: " << relativeUpperArmLowerArmIntersectionPoint);
 	
 	// Determine the angle for the motor
-	return (0 - std::atan2(relativeUpperArmLowerArmIntersectionPoint.y, relativeUpperArmLowerArmIntersectionPoint.x));
+	double rotationAngle = std::atan2(relativeUpperArmLowerArmIntersectionPoint.y, relativeUpperArmLowerArmIntersectionPoint.x);
+	double motorRotationAngle = rexos_utilities::degreesToRadians(180) + rotationAngle;
+	return motorRotationAngle;
 }
 
 SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(StewartGoughLocation moveTo) {
+	ROS_WARN_STREAM("moveTo: " << moveTo);
 	EffectorMove result;
 
 	result.moveTo = moveTo;
@@ -537,6 +540,7 @@ SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(StewartGou
 
 	for(int i = 0; i < 6; i++) {
 		result.angles[i] = getMotorAngle(moveTo, i);
+		ROS_INFO_STREAM("Angle " << (double) i << ": " << result.angles[i]);
 		if(std::isnan(result.angles[i])) {
 			result.validMove = false;
 			break;

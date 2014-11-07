@@ -111,14 +111,10 @@ namespace rexos_stewart_gough{
 		}
 		
 		sixAxisCalculations = new SixAxisCalculations(
-			stewartGoughMeasures.hip,
-			//stewartGoughMesuares->ankle,
-			300.00, //ankle currently returns wrong value: 250.0, 19-05-2014
-			101.3,
-			//stewartGoughMeasures->effector,
-			43.14, //effector retuns wrong value: 44.x, 19-05-2014
-			stewartGoughMeasures.maxAngleHipAnkle
-			//0.26
+			100, 300.00,
+			101.3, 40.93,
+			31.05, 32.59,
+			0.26
 			);
 
 		REXOS_INFO_STREAM(" max angle: " << stewartGoughMeasures.maxAngleHipAnkle << std::endl); 
@@ -264,7 +260,12 @@ namespace rexos_stewart_gough{
 			}
 			for(int i = 0; i < 6; i++){
 				//Swap 2 and 3
-				if(i == 2){
+				if(i == 4){
+					rotations[i]->angle = effectorMove.angles[5];
+				} else if(i == 5){
+					rotations[i]->angle = effectorMove.angles[4];
+				}
+				/*if(i == 2){
 					rotations[i]->angle = effectorMove.angles[3];
 				} else if(i == 3){
 					rotations[i]->angle = effectorMove.angles[2];
@@ -274,7 +275,7 @@ namespace rexos_stewart_gough{
 					rotations[i]->angle = effectorMove.angles[1];
 				} else if(i == 1){
 					rotations[i]->angle = effectorMove.angles[0];
-				} else {
+				}*/ else {
 					rotations[i]->angle = effectorMove.angles[i];
 				}
 				

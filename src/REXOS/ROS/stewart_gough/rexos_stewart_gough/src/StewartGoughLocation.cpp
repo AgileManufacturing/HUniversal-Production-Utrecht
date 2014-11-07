@@ -39,9 +39,7 @@ namespace rexos_stewart_gough {
 	}
 	StewartGoughLocation::StewartGoughLocation(double locationX, double locationY, double locationZ, 
 			double rotationX, double rotationY, double rotationZ) :
-		rotationX(rotationX), rotationY(rotationY), rotationZ(rotationZ) {
-		location = Vector3(locationX, locationY, locationZ);
-		
+		location(locationX, locationY, locationZ), rotationX(rotationX), rotationY(rotationY), rotationZ(rotationZ) {
 	}
 	bool StewartGoughLocation::operator==(const StewartGoughLocation& rhs) {
 		if(location != rhs.location) return false;
