@@ -28,9 +28,12 @@ namespace rexos_module {
 	}
 	void ModuleInterface::onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, 
 			const rexos_module::SetInstructionResultConstPtr& result) {
-		if(state == actionlib::SimpleClientGoalState::SUCCEEDED)
-			moduleInterfaceListener->onHardwareStepCompleted(this, result->OID, true);
-		else
-			moduleInterfaceListener->onHardwareStepCompleted(this, result->OID, false);
+		if(moduleInterfaceListener != NULL) {
+			if(state == actionlib::SimpleClientGoalState::SUCCEEDED) {
+				moduleInterfaceListener->onHardwareStepCompleted(this, result->OID, true);
+			} else {
+				moduleInterfaceListener->onHardwareStepCompleted(this, result->OID, false);
+			}
+		}
 	}
 }

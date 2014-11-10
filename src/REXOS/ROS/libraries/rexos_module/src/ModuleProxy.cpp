@@ -2,7 +2,7 @@
 
 namespace rexos_module {
 	ModuleProxy::ModuleProxy(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleProxyListener* moduleProxyListener) :
-			ModuleInterface(equipletName, identifier), 
+			ModuleInterface(equipletName, identifier, moduleProxyListener), 
 			rexos_statemachine::StateMachineController(advertisementPath), 
 			moduleProxyListener(moduleProxyListener),
 			transitionActionServer(AbstractModule::nodeHandle, advertisementPath + "transition", 

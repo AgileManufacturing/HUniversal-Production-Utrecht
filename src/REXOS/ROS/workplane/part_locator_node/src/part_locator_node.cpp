@@ -384,7 +384,7 @@ namespace part_locator_node {
 		rexos_module::ModuleInterface moverInterface(rexos_module::AbstractModule::equipletName, moverIdentifier);
 		
 		int acceleration = 20;
-		double workSpaceHeight = 50;
+		double workSpaceHeight = 35;
 		Vector3 v;
 		
 		rexos_datatypes::EquipletStep equipletStep;
@@ -569,7 +569,7 @@ namespace part_locator_node {
 		REXOS_WARN_STREAM("--------------------------------------------------------------");
 		
 		
-		v = Vector3(0 + workPlaneWidth / 2, 0 - workPlaneHeight / 2, workSpaceHeight);
+		v = Vector3(0 + workPlaneWidth / 2, 0 - workPlaneHeight / 2, 1);
 		REXOS_WARN_STREAM("--------------------------------------------------------------");
 		REXOS_INFO_STREAM("v " << v);
 		REXOS_INFO_STREAM("v " << translateToA * v);
@@ -583,7 +583,9 @@ namespace part_locator_node {
 		// @TODO this might be removed?
 		
 		REXOS_INFO("Moving to top left corner");
-		v = Vector3(0 - workPlaneWidth / 2, 0 + workPlaneHeight / 2, workSpaceHeight);
+		v = Vector3(0 - workPlaneWidth / 2, 0 + workPlaneHeight / 2, 1);
+		v = postCorrectionTotalMatrix * v;
+		v.z = workSpaceHeight;
 		v = convertToEquipletCoordinate(v);
 		instructionData["move"]["x"] = v.x;
 		instructionData["move"]["y"] = v.y;
@@ -592,11 +594,13 @@ namespace part_locator_node {
 		
 		moverInterface.setInstruction("4", equipletStep.toJSON());
 		REXOS_INFO("Press enter when ready");
-		cin.get();
 		cin.ignore();
+		cin.get();
 		
 		REXOS_INFO("Moving to top right corner");
-		v = Vector3(0 + workPlaneWidth / 2, 0 + workPlaneHeight / 2, workSpaceHeight);
+		v = Vector3(0 + workPlaneWidth / 2, 0 + workPlaneHeight / 2, 1);
+		v = postCorrectionTotalMatrix * v;
+		v.z = workSpaceHeight;
 		v = convertToEquipletCoordinate(v);
 		instructionData["move"]["x"] = v.x;
 		instructionData["move"]["y"] = v.y;
@@ -605,11 +609,13 @@ namespace part_locator_node {
 		
 		moverInterface.setInstruction("5", equipletStep.toJSON());
 		REXOS_INFO("Press enter when ready");
-		cin.get();
 		cin.ignore();
+		cin.get();
 		
 		REXOS_INFO("Moving to bottom right corner");
-		v = Vector3(0 - workPlaneWidth / 2, 0 - workPlaneHeight / 2, workSpaceHeight);
+		v = Vector3(0 + workPlaneWidth / 2, 0 - workPlaneHeight / 2, 1);
+		v = postCorrectionTotalMatrix * v;
+		v.z = workSpaceHeight;
 		v = convertToEquipletCoordinate(v);
 		instructionData["move"]["x"] = v.x;
 		instructionData["move"]["y"] = v.y;
@@ -617,9 +623,14 @@ namespace part_locator_node {
 		equipletStep.setInstructionData(instructionData);
 			
 		moverInterface.setInstruction("6", equipletStep.toJSON());
+		REXOS_INFO("Press enter when ready");
+		cin.ignore();
+		cin.get();
 		
 		REXOS_INFO("Moving origin");
-		v = Vector3(0, 0, workSpaceHeight);
+		v = Vector3(0, 0, 1);
+		v = postCorrectionTotalMatrix * v;
+		v.z = workSpaceHeight;
 		v = convertToEquipletCoordinate(v);
 		instructionData["move"]["x"] = v.x;
 		instructionData["move"]["y"] = v.y;
@@ -629,8 +640,8 @@ namespace part_locator_node {
 		moverInterface.setInstruction("7", equipletStep.toJSON());
 		
 		REXOS_INFO("Press enter when ready");
-		cin.get();
 		cin.ignore();
+		cin.get();
 		
 		return true;
 	}

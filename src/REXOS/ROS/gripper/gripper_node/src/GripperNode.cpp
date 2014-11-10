@@ -80,12 +80,14 @@ void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPt
 	
 	Json::Value instructionData = equipletStep.getInstructionData();
 	if (instructionData.isMember("activate") == true){
-		gripper->activate();	
+		gripper->activate();
+		ros::Duration(0.1).sleep();
 		setInstructionActionServer.setSucceeded(result);	
 		std::cout << "Gripper activated" << std::endl;
 		return;
 	} else if (instructionData.isMember("deactivate") == true){
 		gripper->deactivate();
+		ros::Duration(0.1).sleep();
 		setInstructionActionServer.setSucceeded(result);	
 		std::cout << "Gripper deactivated" << std::endl;
 		return;			
