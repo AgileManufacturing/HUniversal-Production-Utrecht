@@ -93,7 +93,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
 			
 			try {
-				Thread.sleep(200);
+				Thread.sleep(0);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
