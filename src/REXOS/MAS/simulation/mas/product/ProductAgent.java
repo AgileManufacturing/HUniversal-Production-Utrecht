@@ -98,8 +98,8 @@ public class ProductAgent extends Agent {
 
 	@Override
 	public String toString() {
-		return String.format("Product: %s [state=%s, created=%s, position=%s, current step=%s, product steps=%s, path=%s]", getLocalName(), state, getCreated(), position, (productionPath.size() > 0 ? productionPath.peek()
-				: "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productSteps.toArray()));
+		return String.format("Product: %s [state=%s, \tcreated=%s, \tposition=%s, \tcurrent step=%s, \tproduct steps=%s, \tpath=%s]", getLocalName(), state, getCreated(), position, (productionPath.size() > 0 ? productionPath.peek()
+				: "ERROR"), Arrays.toString(productSteps.toArray()), Arrays.toString(productionPath.toArray()));
 	}
 
 	/**

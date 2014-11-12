@@ -71,19 +71,19 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 				System.err.printf("PA:%s %s\n", getLocalName(), e.getMessage());
 				state = ProductState.ERROR;
 				simulation.notifyProductCreationFailed(getLocalName());
-				simulation.log("products", getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
+				simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
 			} catch (SchedulingException e) {
 				System.err.printf("PA:%s failed to schedule product\n", getLocalName());
 				System.err.printf("PA:%s %s\n", getLocalName(), e.getMessage());
 				state = ProductState.ERROR;
 				simulation.notifyProductCreationFailed(getLocalName());
-				simulation.log("products", getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
+				simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
 			}
 		} else {
 			System.err.printf("PA:%s Failed to receive correct arguments\n", getLocalName());
 			state = ProductState.ERROR;
 			simulation.notifyProductCreationFailed(getLocalName());
-			simulation.log("products", getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
+			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
 		}
 	}
 
@@ -182,7 +182,7 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 			state = ProductState.FINISHED;
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
-			simulation.log("products", getLocalName(), "PA:" + getLocalName() + " finished: " + history);
+			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " finished: " + history);
 		} else {
 			try {
 
@@ -196,7 +196,7 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 				state = ProductState.ERROR;
 				simulation.notifyProductOverdue(getLocalName());
 
-				simulation.log("products", getLocalName(), "PA:" + getLocalName() + " overdue: " + history + ", product steps " + productSteps);
+				simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " overdue: " + history + ", product steps " + productSteps);
 			}
 		}
 	}
@@ -219,7 +219,7 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
 		} else {
 			simulation.notifyProductCreationFailed(getLocalName());
-			simulation.log("products", getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
+			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " failed: " + productSteps);
 		}
 	}
 

@@ -7,6 +7,7 @@ import org.json.JSONException;
 import MAS.simulation.simulation.ISimulation;
 import MAS.simulation.util.Parser;
 import MAS.simulation.util.Position;
+import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
@@ -67,7 +68,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
-			simulation.log("products", getLocalName(), "PA:" + getLocalName() + " finished: " + history);
+			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " finished: " + history);
 		} else if (getProductState() == ProductState.TRAVELING) {
 			// notify the simulation that the product is traveling
 			simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());

@@ -1,8 +1,6 @@
 package MAS.simulation.mas.equiplet;
 
 import jade.core.AID;
-import jade.domain.DFService;
-import jade.domain.FIPAException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,15 +72,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 	@Override
 	public void kill() {
-		// try {
-		// // deregister equiplet by the df
-		// DFService.deregister(this);
-		// } catch (FIPAException e) {
-		// System.err.println("failed to deregister equiplet");
-		// e.printStackTrace();
-		// } finally {
 		super.doDelete();
-		// }
 	}
 
 	@Override
@@ -107,7 +97,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	@Override
 	public void reconfigureStart() {
 		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
-		reconfigure = true;
+		reconfiguring = true;
 		deregister();
 
 		if (state == EquipletState.IDLE && schedule.isEmpty()) {
@@ -124,16 +114,20 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		this.capabilities = capabilities;
 		System.out.printf("EA:%s reconfigure finished he has new capabilties %s \n", getLocalName(), capabilities);
 		if (schedule.isEmpty()) {
-			reconfigure = false;
+			reconfiguring = false;
 			for (Capability capability : capabilities) {
 				productionTimes.put(capability.getService(), capability.getDuration());
 			}
 			register();
 			state = EquipletState.IDLE;
 		} else {
-			System.err.printf("WHAA");
 			throw new IllegalArgumentException("Equiplet has not an empty schedule while being reconfigured");
 		}
+	}
+	
+	@Override
+	public String getExecutingProduct() {
+		return executing.getProductAgentName();
 	}
 
 	@Override
@@ -233,7 +227,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		for (Capability capability : capabilities) {
 			services.add(capability.getService());
 		}
-		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() + (reconfigure ? " reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
+		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() + (reconfiguring ? " reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
 		return new Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>(getLocalName(), getPosition(), services, info);
 	}
 
@@ -291,18 +285,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	protected synchronized void executeJob(Tick time, Job job) {
-		System.out.println(" Execute Job " + time + " job = " + job);
-		state = EquipletState.BUSY;
-		System.out.println(" Execute Job " + time + " job = " + job);
-		executing = job;
-
-		Tick latency = time.minus(executing.getStartTime());
+		Tick latency = time.minus(job.getStartTime());
 		scheduleLatency.put(time, latency);
-		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
-
-		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-		execute(executing);
+		super.executeJob(time, job);
 	}
 
 	@Override
@@ -361,7 +346,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 				// if (!schedule.isEmpty() && jobReady()) {
 				schedule.remove(ready);
 				executeJob(time, ready);
-			} else if (reconfigure && schedule.isEmpty()) {
+			} else if (reconfiguring && schedule.isEmpty()) {
 				state = EquipletState.RECONFIG;
 				simulation.notifyReconfigReady(getLocalName());
 			} else {
@@ -386,7 +371,6 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	public void notifyBreakdown(Tick time) {
 		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED || state == EquipletState.RECONFIG) {
-			System.err.printf("WHAA 1");
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
@@ -410,7 +394,6 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	public void notifyRepaired(Tick time) {
 		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED || state == EquipletState.RECONFIG) {
-			System.err.printf("WHAA 2");
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 		historyUpdate(time);
@@ -423,6 +406,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
 			Job ready = jobReady();
+			if (ready == null) {
+				throw new IllegalArgumentException("Well something went wrong, an equiplet can not be in state error ready (a prodcut has arrived while he was broken)");
+			}
 			schedule.remove(ready);
 			executeJob(time, ready);
 		} else if (isExecuting()) {
@@ -431,18 +417,11 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			timeRemaining = time.minus(timeBreakdown);
 			executing.updateDueTime(executing.getDue().add(timeRemaining));
 			System.out.printf("EA:%s is repaired at %s and continue with job %s. The equiplet was %s broken, which is still remaining.\n", getLocalName(), time, executing, timeRemaining);
-			// } else if (jobReady()) {
-			// when the equiplet was in the error state there became a job ready which arrived before the breakdown
-			// not sure if this could happen
-			// System.out.println("EQUIPLET ERROR? " + schedule);
-			// executeJob(time);
-			// System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 		} else {
 			Job ready = jobReady();
 			if (ready != null) {
 				// when the equiplet was in the error state there became a job ready which arrived before the breakdown
 				// not sure if this could happen
-				System.err.println("EQUIPLET ERROR? " + schedule);
 				executeJob(time, ready);
 				System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 			} else {

@@ -24,7 +24,7 @@ class Event implements Comparable<Event> {
 
 	/**
 	 * Create event
-	 * used for: START
+	 * used for: START, FINISHED
 	 * 
 	 * @param time
 	 * @param type
@@ -42,7 +42,7 @@ class Event implements Comparable<Event> {
 
 	/**
 	 * Create event
-	 * used for: FINISHED, BREAKDOWN and REPAIRED event
+	 * used for: BREAKDOWN, REPAIRED and RECONFIG event
 	 * 
 	 * @param time
 	 * @param type
@@ -64,7 +64,7 @@ class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int compareTo(Event event) {
-		return time.lessThan(event.getTime())  ? -1 : (time.greaterThan(event.getTime()) ? 1 : type == event.getType() ? -1 : type.compareTo(event.getType()));
+		return time.lessThan(event.getTime()) ? -1 : (time.greaterThan(event.getTime()) ? 1 : type == event.getType() ? -1 : type.compareTo(event.getType()));
 	}
 
 	public Tick getTime() {
@@ -87,7 +87,7 @@ class Event implements Comparable<Event> {
 	public String toString() {
 		if (type == EventType.PRODUCT || type == EventType.DONE) {
 			return String.format("Evt:[time=%s, type=%s]", time, type);
-		} else if (type == EventType.ARRIVED) {
+		} else if (type == EventType.ARRIVED || type == EventType.FINISHED) {
 			return String.format("Evt:[time=%s, type=%s, product=%s, equipet=%s]", time, type, product, equiplet);
 		} else { // if FINISHED or RECONFIG
 			return String.format("Evt:[time=%s, type=%s, equiplet=%s]", time, type, equiplet);

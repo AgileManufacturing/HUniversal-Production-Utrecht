@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -14,6 +15,14 @@ public class Util {
 		for (Entry<?, ?> item : map.entrySet()) {
 			buffer.append("\n" + item.getKey().toString() + " \t= ");
 			buffer.append(item.getValue());
+		}
+		return buffer.toString();
+	}
+	
+	public static String formatSet(Set<?> set) {
+		StringBuffer buffer = new StringBuffer();
+		for (Object obj : set) {
+			buffer.append("\n\t\t" + obj.toString());
 		}
 		return buffer.toString();
 	}
@@ -39,7 +48,7 @@ public class Util {
 	}
 
 	public static TreeMap<Tick, Double> movingAverage(TreeMap<Tick, Double> map, int period) {
-		TreeMap<Tick, Double> newMap = new TreeMap<Tick, Double>();
+		//TreeMap<Tick, Double> newMap = new TreeMap<Tick, Double>();
 		Queue<Double> window = new LinkedList<Double>();
 		double sum = 0.0;
 
@@ -52,8 +61,8 @@ public class Util {
 				sum -= window.remove();
 			}
 
-			newMap.put(entry.getKey(), sum / window.size());
+			map.put(entry.getKey(), sum / window.size());
 		}
-		return newMap;
+		return map;
 	}
 }

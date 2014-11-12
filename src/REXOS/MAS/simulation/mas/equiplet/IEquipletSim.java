@@ -47,4 +47,8 @@ public interface IEquipletSim {
 	void reconfigureFinished(List<Capability> capabilities);
 	
 	boolean isExecuting();
+	
+	String getExecutingProduct();
+	
+	String toFullString();
 }

@@ -10,7 +10,7 @@ public class Settings {
 	 * 3: the gui is used in combination with the debug information in the console
 	 * 4: all above with addition of scheduling information
 	 */
-	public static int VERBOSITY = 2;
+	public static int VERBOSITY = 0;
 
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
@@ -20,27 +20,40 @@ public class Settings {
 	/**
 	 * whether equiplets can breakdown
 	 */
-	public final static boolean BREAKDOWNS = true;
+	public final static boolean BREAKDOWNS = false;
 
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
 	 */
-	public static final double RECONFIGATION_TIME = 200;
+	public static final double RECONFIGATION_TIME = 500;
 
 	/**
 	 * the number of jobs an just arrives job can overtake in the queue
 	 */
 	public static final int QUEUE_JUMP = 0;
-	
+
 	/**
 	 * the maximun number of jobs in an equiplet queue, when there is no scheduling
 	 */
-	public static final int QUEUE_CAPACITY= 40;
+	public static final int QUEUE_CAPACITY = 40;
 
 	/**
 	 * Scheduling algorithm used by product agent to schedule his product step
 	 */
 	public final static SchedulingAlgorithm SCHEDULING = SchedulingAlgorithm.MATRIX;
+
+	/**
+	 * Warm-up period after which in multiple simulation runs the products statistics are being averaged
+	 */
+	public final static Tick WARMUP = new Tick(5000);
+
+	/**
+	 * Target of utilization of equiplet for depending the interarrival time of new products
+	 */
+	public static final double UTILIZATION = 0.80;
+
+	public static final int MEAN_PRODUCT_STEPS = 20;
+	public static final int MIN_PRODUCT_STEPS = 10;
 
 	/**
 	 * input and output locations of the simulation variables
@@ -58,5 +71,7 @@ public class Settings {
 	 * Communication time out, the time an agent wait when he is expecting a communication message until he continues
 	 */
 	public final static long COMMUNICATION_TIMEOUT = 5000;
+
+	public static final String PRODUCT_LOG = "products-log";
 
 }

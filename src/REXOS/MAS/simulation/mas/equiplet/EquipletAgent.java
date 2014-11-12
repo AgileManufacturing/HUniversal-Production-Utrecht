@@ -28,6 +28,7 @@ import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 import MAS.simulation.util.Tuple;
+import MAS.simulation.util.Util;
 
 public class EquipletAgent extends Agent {
 
@@ -43,7 +44,7 @@ public class EquipletAgent extends Agent {
 	// Equiplet state
 	protected TreeSet<Job> schedule;
 	protected EquipletState state;
-	protected boolean reconfigure;
+	protected boolean reconfiguring;
 	protected Job executing;
 	protected TreeSet<Job> history;
 	protected Map<String, Tick> productionTimes;
@@ -90,7 +91,7 @@ public class EquipletAgent extends Agent {
 		this.capabilities = capabilities;
 
 		this.state = EquipletState.IDLE;
-		this.reconfigure = false;
+		this.reconfiguring = false;
 		this.executing = null;
 		this.schedule = new TreeSet<>();
 		this.history = new TreeSet<>();
@@ -139,7 +140,9 @@ public class EquipletAgent extends Agent {
 	 */
 	@Override
 	protected void takeDown() {
-		deregister();
+		if (!reconfiguring) {
+			deregister();
+		}
 		System.out.printf("EA:%s terminating\n", getLocalName());
 	}
 
@@ -239,8 +242,6 @@ public class EquipletAgent extends Agent {
 			}
 		}
 		return null;
-		// return !schedule.isEmpty() && schedule.first().isReady() ? schedule.first() : null;
-		// return !schedule.isEmpty() && schedule.first().isReady();
 	}
 
 	/**
@@ -311,7 +312,7 @@ public class EquipletAgent extends Agent {
 		List<Pair<Tick, Tick>> available = new ArrayList<Pair<Tick, Tick>>();
 
 		// not availale when going to be reconfigured
-		if (reconfigure) {
+		if (reconfiguring) {
 			return available;
 		}
 
@@ -435,8 +436,8 @@ public class EquipletAgent extends Agent {
 	 */
 	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
 		// do not schedule a job when going to be reconfigured
-		if (reconfigure) {
-			throw new IllegalArgumentException("not able to schedule job when reconfiguring" );
+		if (reconfiguring) {
+			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
 			// return false;
 		}
 
@@ -467,10 +468,9 @@ public class EquipletAgent extends Agent {
 	 */
 	protected synchronized boolean schedule(AID product, List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests) {
 		// do not schedule a job when going to be reconfigured
-		if (reconfigure) {
-
-			throw new IllegalArgumentException("not able to schedule job when reconfiguring" );
-			//return false;
+		if (reconfiguring) {
+			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
+			// return false;
 		}
 
 		List<Job> possible = new ArrayList<Job>();
@@ -563,10 +563,16 @@ public class EquipletAgent extends Agent {
 
 	@Override
 	public String toString() {
-//		return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities,  (state == EquipletState.IDLE ? "null"
-//				: executing), schedule.size(), getWaiting(), history.size(), "schedule");
-		return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities,  (executing == null ? "null"
-				: executing), schedule.size(), getWaiting(), history.size(), "schedule");
+		// return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities, (state ==
+		// EquipletState.IDLE ? "null"
+		// : executing), schedule.size(), getWaiting(), history.size(), "schedule");
+		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d]", getLocalName(), state, capabilities, (executing == null ? "null"
+				: executing), schedule.size(), getWaiting(), history.size());
+	}
+
+	public String toFullString() {
+		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d] \n\thistory=%s \n\tschedule=%s", getLocalName(), state, capabilities, (executing == null ? "null"
+				: executing), schedule.size(), getWaiting(), history.size(), Util.formatSet(history), Util.formatSet(schedule));
 	}
 
 	/**
@@ -580,16 +586,15 @@ public class EquipletAgent extends Agent {
 	 *            to be executed
 	 */
 	protected synchronized void executeJob(Tick time, Job job) {
-		System.out.println(" Execute Job " + time + " job = " + job);
+		Tick latency = time.minus(job.getStartTime());
 		state = EquipletState.BUSY;
-		System.out.println(" Execute Job " + time + " job = " + job);
 		executing = job;
+		schedule.remove(job);
 
 		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
+		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
 
 		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-
 		execute(executing);
 	}
 
@@ -619,42 +624,53 @@ public class EquipletAgent extends Agent {
 		// check if the job arrived is the first in the schedule, than just execute.
 		// otherwise, if the first job is too late the arrived job is second, this results in that the already too late (first) job is
 		// if there are jobs between the first job and arrived job, swapping of jobs can take place if all deadlines are met.
-		Job ready = null;
-		int index = 0;
+
+		//
+		// Job ready = null;
+		// int index = 0;
+		// for (Job job : schedule) {
+		// if (job.getProductAgent().equals(product)) {
+		// job.setReady();
+		//
+		// // job can only be executed earlier than planned if equiplet is idle
+		// if (state == EquipletState.IDLE) {
+		// if (index == 0) {
+		// ready = schedule.pollFirst();
+		// } else if (index == 1) {
+		// // swapping jobs
+		// ready = job;
+		// schedule.remove(job);
+		// Job first = schedule.first();
+		//
+		// System.out.printf("EA:%s swapping job %s that is ready with %s\n", getLocalName(), ready, first);
+		// System.out.printf("EA:%s equiplet=%s\n", getLocalName(), this);
+		//
+		// // first.updateStartTime(time.add(job.getDuration()));
+		// first.updateStartTime(ready.getStartTime());
+		//
+		// System.out.printf("EA:%s equiplet=%s\n", getLocalName(), this);
+		// }
+		// }
+		//
+		// break;
+		// }
+		// index++;
+		// }
+
 		for (Job job : schedule) {
 			if (job.getProductAgent().equals(product)) {
 				job.setReady();
-
-				// job can only be executed earlier than planned if equiplet is idle
-				if (state == EquipletState.IDLE) {
-					if (index == 0) {
-						ready = schedule.pollFirst();
-					} else if (index == 1) {
-						// swapping jobs
-						ready = job;
-						schedule.remove(job);
-						Job first = schedule.first();
-
-						System.out.printf("EA:%s swapping job %s that is ready with %s\n", getLocalName(), ready, first);
-						System.out.printf("EA:%s equiplet=%s\n", getLocalName(), this);
-
-						// first.updateStartTime(time.add(job.getDuration()));
-						first.updateStartTime(ready.getStartTime());
-
-						System.out.printf("EA:%s equiplet=%s\n", getLocalName(), this);
-					}
-				}
-
 				break;
 			}
-			index++;
 		}
+
+		Job ready = jobReady();
 
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
 
 		// execute the first job in the schedule if the job is ready
-		if (state == EquipletState.IDLE && ready != null) { // && jobReady()) {
+		if (state == EquipletState.IDLE && ready != null) {
 			// begin with executing job that arrived
 			executeJob(time, ready);
 		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady() != null) {
@@ -674,26 +690,35 @@ public class EquipletAgent extends Agent {
 	 * @param product
 	 *            agent address
 	 */
-	protected void informProductProcessing(AID product, Tick time, int intdex) {
+	protected void informProductProcessing(AID product, Tick time, int index) {
+		// send product agent information about going to process product
+		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 		try {
-			// send product agent information about going to process product
-			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-			message.addReceiver(product);
-			message.setOntology(Ontology.GRID_ONTOLOGY);
-			message.setConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING);
-			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_PROCESSING + System.currentTimeMillis());
-			message.setContent(Parser.parseProductProcessing(time, intdex));
-			send(message);
+			message.setContent(Parser.parseProductProcessing(time, index));
+		} catch (JSONException e) {
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed with information [product=%s, time=%s, index=%d].\n", getLocalName(), executing.getProductAgentName(), product, time, index);
+			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
+			return;
+		}
 
-			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+		message.addReceiver(product);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING);
+		message.setReplyWith(Ontology.CONVERSATION_PRODUCT_PROCESSING + System.currentTimeMillis());
+		send(message);
 
+		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
+		ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+
+		try {
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product processing.\n", getLocalName());
 			}
 		} catch (JSONException e) {
-			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed.\n", getLocalName(), executing.getProductAgentName());
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed with information [product=%s, time=%s, index=%d].\n", getLocalName(), executing.getProductAgentName(), product, time, index);
 			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
+			System.err.printf("EA:%s reply received: %s\n", getLocalName(), reply);
+			throw new IllegalArgumentException("FUCK");
 		}
 	}
 
@@ -704,19 +729,28 @@ public class EquipletAgent extends Agent {
 	 *            agents address
 	 */
 	protected void informProductStepFinished(AID product, Tick time, int intdex) {
+		// send product agent information about going to process product
+		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+		message.addReceiver(product);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
+		message.setReplyWith(Ontology.CONVERSATION_PRODUCT_FINISHED + System.currentTimeMillis());
 		try {
-			// send product agent information about going to process product
-			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-			message.addReceiver(product);
-			message.setOntology(Ontology.GRID_ONTOLOGY);
-			message.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
-			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_FINISHED + System.currentTimeMillis());
 			message.setContent(Parser.parseProductFinished(time, intdex));
-			send(message);
 
-			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+		} catch (JSONException e) {
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName()
+					: "null"));
+			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
+			return;
+		}
 
+		send(message);
+
+		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
+		ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+
+		try {
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
 			}
@@ -724,6 +758,8 @@ public class EquipletAgent extends Agent {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName()
 					: "null"));
 			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
+			System.err.printf("EA:%s reply received: %s\n", getLocalName(), reply);
+			throw new IllegalArgumentException("FUCK");
 		}
 	}
 }

@@ -124,7 +124,7 @@ public class EquipletSimAgentDealWithItTemporyName extends EquipletSimAgent impl
 		System.out.printf("EA:%s schedule a job \n", getLocalName());
 		// do not schedule a job when going to be reconfigured
 		// check if the equiplet still capable
-		if (!isCapable(service, criteria) || reconfigure || productQueue.size() >= Settings.QUEUE_CAPACITY) {
+		if (!isCapable(service, criteria) || reconfiguring || productQueue.size() >= Settings.QUEUE_CAPACITY) {
 			return false;
 		}
 

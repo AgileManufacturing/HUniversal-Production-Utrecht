@@ -2,35 +2,46 @@ package MAS.simulation.simulation;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import MAS.simulation.config.DurationType;
 import MAS.simulation.config.IConfig;
+import MAS.simulation.mas.equiplet.Capability;
 import MAS.simulation.mas.product.ProductStep;
 import MAS.simulation.util.Pair;
+import MAS.simulation.util.Position;
 import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 
 class Stochastics {
 	private Random random;
 	private IConfig config;
+	private double meanProcessingTime;
 
 	Stochastics(IConfig config) {
 		random = new Random();
 		this.config = config;
+
+		int countCapability = 0;
+		double sumCapability = 0;
+		Map<String, Pair<Position, List<Capability>>> equipletsConfigurations = config.getEquipletsConfigurations();
+		for (Entry<String, Pair<Position, List<Capability>>> entry : equipletsConfigurations.entrySet()) {
+			for (Capability capability : entry.getValue().second) {
+				sumCapability += capability.getDuration().doubleValue();
+				countCapability++;
+			}
+		}
+
+		meanProcessingTime = sumCapability / countCapability;
 	}
 
-	int x = 0;
-
 	public Tick generateProductArrival(Tick time) {
-
-		if (time.greaterThan(6000)) {
-			double meanProcessingTime = 20;
-			int meanOperations = 20;
-			double utilization = 0.95;
+		if (time.greaterThan(Settings.WARMUP)) {
 			int equiplets = config.getEquipletsConfigurations().size();
 
-			double interarrival = (meanProcessingTime * meanOperations) / (utilization * equiplets);
+			double interarrival = (meanProcessingTime * Settings.MEAN_PRODUCT_STEPS) / (Settings.UTILIZATION * equiplets);
 			return new Tick(interarrival);
 		} else {
 			return new Tick(10);
@@ -42,6 +53,22 @@ class Stochastics {
 	}
 
 	public LinkedList<ProductStep> generateProductSteps() {
+		LinkedList<ProductStep> steps = new LinkedList<>();
+		List<ProductStep> productSteps = config.getProductSteps();
+
+		int b = 2 * Settings.MEAN_PRODUCT_STEPS - Settings.MIN_PRODUCT_STEPS;
+		double ps = uniform(Settings.MIN_PRODUCT_STEPS, b);
+
+		for (int i = 0; i < ps; i++) {
+			int x = random.nextInt(productSteps.size());
+			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
+		}
+		return steps;
+	}
+
+	@SuppressWarnings("unused")
+	private LinkedList<ProductStep> generateProductStepsTest() {
+
 		if (true) {
 			return generateProductStepsTest();
 			/*
@@ -63,7 +90,6 @@ class Stochastics {
 			 */
 		}
 
-		@SuppressWarnings("unused")
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 		int minProductSteps = 3;
@@ -79,18 +105,6 @@ class Stochastics {
 					break;
 				}
 			}
-		}
-		return steps;
-	}
-
-	private LinkedList<ProductStep> generateProductStepsTest() {
-		LinkedList<ProductStep> steps = new LinkedList<>();
-		List<ProductStep> productSteps = config.getProductSteps();
-
-		for (int i = 0; i < 20; i++) {
-			// int x = i % productSteps.size();
-			int x = random.nextInt(productSteps.size());
-			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
 		}
 		return steps;
 	}
@@ -135,6 +149,10 @@ class Stochastics {
 		default:
 			return time;
 		}
+	}
+
+	public double getMeanProcessingTime() {
+		return meanProcessingTime;
 	}
 
 	private double exp(double mean) {
@@ -185,12 +203,25 @@ class Stochastics {
 				}
 			}
 		}
-
 	}
 
 	protected double weibull(double A, double B) {
 		// F−1(u) = [−αln(1−u)]1/β 0 < u < 1.
 		double u = random.nextDouble();
 		return Math.pow(-A * Math.log(1 - u), 1 / B);
+	}
+
+	/**
+	 * mean = 1/2 ( a + b )
+	 * 
+	 * @param a
+	 *            minimal value
+	 * @param b
+	 *            maximal value
+	 * @return
+	 */
+	protected double uniform(double a, double b) {
+		double u = random.nextDouble();
+		return a + u * (b - a);
 	}
 }

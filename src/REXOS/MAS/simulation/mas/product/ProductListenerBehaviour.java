@@ -80,9 +80,10 @@ public class ProductListenerBehaviour extends Behaviour {
 			if (confirmation) {
 				product.onProductStepFinished(information.first);
 			} else {
-				System.err.printf("PA:%s received wrong product step index that is finished\n", myAgent.getLocalName());
-				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index that is processing " + product.getCurrentStep().getIndex() + "== "
-						+ information.second + "\n");
+
+				System.err.printf("PA:%s received wrong product step index that is processing\n", myAgent.getLocalName());
+				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index " + information.second + " that is processing which should be: "
+						+ product.getCurrentStep().getIndex() + "\n");
 			}
 
 			ACLMessage reply = message.createReply();
