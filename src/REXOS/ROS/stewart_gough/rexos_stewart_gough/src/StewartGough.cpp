@@ -259,27 +259,14 @@ namespace rexos_stewart_gough{
 				throw std::out_of_range("invalid angles"); 
 			}
 			for(int i = 0; i < 6; i++){
-				/*//Swap 2 and 3
-				if(i == 2){
-					rotations[i]->angle = effectorMove.angles[3];
-				} else if(i == 3){
-					rotations[i]->angle = effectorMove.angles[2];
-				} else
-				//Swap 0 and 1
-				if(i == 0){
-					rotations[i]->angle = effectorMove.angles[1];
-				} else if(i == 1){
-					rotations[i]->angle = effectorMove.angles[0];
-				}
-				*/
+				//Swap 4 and 5
 				if(i == 4){
 					rotations[i]->angle = effectorMove.angles[5];
 				} else if(i == 5){
 					rotations[i]->angle = effectorMove.angles[4];
 				} else {
 					rotations[i]->angle = effectorMove.angles[i];
-				}
-				
+				}				
 				REXOS_INFO_STREAM("Angle for motor: " << i << " = " << effectorMove.angles[i] << std::endl);
 			}
         } catch(std::out_of_range& ex){

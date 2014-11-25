@@ -1,10 +1,12 @@
 /**
  * @file KeyBoardControlNode.cpp
  * @brief Control the robot with the WASD UP and Down keys.
- * @date Created: 2012-10-05
+ * @date Created: 2014-11-05
  *
  * @author Dick van der Steen
  * @author Dennis Koole
+ * @author Tommas Bakker
+ * @author Peter Markotic
  *
  * @section LICENSE
  * License: newBSD
@@ -48,8 +50,8 @@
 using namespace keyboard_control_node;
 
 
-KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-	maxAcceleration(50.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
+KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+	maxAcceleration(5.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
 {
 	REXOS_INFO("Constructing");
 
@@ -81,6 +83,7 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string e
 			"K     Rorate to the back        RotateY++" << std::endl <<
 			"U     Rotate clockwise          RotateZ++" << std::endl <<
 			"O     Rotate counter clockwise  RotateZ--" << std::endl <<
+			"X     Run preprogrammed Demo" << std::endl <<
 			"Q     Quit program");
 }
 
@@ -110,6 +113,11 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 	
 	// Check which key was pressed.
 	switch(inputCharacter){
+		case KEYCODE_X:
+			REXOS_INFO("PRESSED X");
+			this->playRoutine();
+			REXOS_INFO("routuneplayed.asdasdjhbaskdjnsa");
+		break;
 		case KEYCODE_W:
 			REXOS_INFO("PRESSED W");
 			direction.y+= STEP;
@@ -218,6 +226,189 @@ void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double accelerati
 	}
 }
 
+void KeyBoardControlNode::playRoutine(){
+	REXOS_INFO("IN DE FUNCITE");
+	Vector3 direction;
+	double rotationX = 0, rotationY = 0, rotationZ = 0;
+	
+	while(true){
+		/*direction.z = 15;
+		REXOS_INFO("OMHOOG1");
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		REXOS_INFO("OMHOOG2");
+		ros::Duration(0.5).sleep();
+		REXOS_INFO("OMHOOG3");
+		
+		
+		direction.z = -30;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+	
+
+		direction.z = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		direction.z = 0;
+		
+		
+		direction.y = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+	
+		
+		direction.y = -30;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		
+		
+		direction.y = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		direction.y = 0;
+		
+		
+		direction.x = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		
+		
+		direction.x = -30;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+	
+		
+		direction.x = 15;
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(0.5).sleep();
+		direction.x = 0;
+		
+		//This is the above code but then in less rules
+		for(int i = 0; i < 9; ++i;){
+			int j = (((i * 5)%10) + 5);
+			
+			if(i < 3){
+				if(i % 2 == 0){
+					direction.z -= j;
+				} else direction.z += j;
+			} else if(i < 6){
+				if(i % 2 == 0){
+					direction.y -= j;
+				} else direction.y += j;
+			} else {
+				if(i % 2 == 0){
+					direction.x -= j;
+				} else direction.x += j;
+			}	
+			
+			writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+			ros::sleep(1000);
+			std::cin.peek() != EOF;
+		}*/
+		//C 2 north//
+
+		direction.y = 40;
+		direction.x = 0;
+
+		rotationX = 0.2;//0.2
+		rotationY = 0;
+
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();
+		
+		//2northeast//
+
+		direction.y = -(40 - 20 * std::sqrt(2));//1
+		direction.x = (20 * std::sqrt(2));
+		
+		rotationX = -0.1;//0.1	
+		rotationY = 0.1;//0.1
+
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();
+
+		//2east//
+		direction.y = -(20 * std::sqrt(2));//3
+                direction.x = (40 - 20 * std::sqrt(2));
+
+		rotationX = -0.1;//0
+		rotationY = 0.1;//0.2
+
+                writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+                ros::Duration(5).sleep();
+
+
+		//2southeast//
+		direction.y = -(20 * std::sqrt(2));//5 
+		direction.x = -(40 - 20 * std::sqrt(2));
+
+		rotationX = -0.1;//-0.1
+		rotationY = -0.1;//0.1
+
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();
+
+		//2south//
+                direction.y = -(40 - 20 * std::sqrt(2));//7
+		direction.x = -(20 * std::sqrt(2));
+
+		rotationX = -0.1;//-0.2	
+		rotationY = -0.1;//0
+
+                writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+                ros::Duration(5).sleep();
+		
+		//2southwest//	
+		direction.y = (40 - 20 * std::sqrt(2));//9
+		direction.x = -(20 * std::sqrt(2));
+
+		rotationX = 0.1;//-0.1
+		rotationY = -0.1;//-0.1
+
+                writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+                ros::Duration(5).sleep();
+
+		//2west//
+		direction.y = (20 * std::sqrt(2));//11
+                direction.x = -(40 - 20 * std::sqrt(2));
+		
+		rotationX = 0.1;//0
+		rotationY = -0.1;//-0.2
+		
+                writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+                ros::Duration(5).sleep();
+
+		//2northwest//
+		direction.y = (20 * std::sqrt(2));//13
+                direction.x = (40 - 20 * std::sqrt(2));
+		
+		rotationX = 0.1;//0.1	
+		rotationY = 0.1;//-0.1
+
+                writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+                ros::Duration(5).sleep();
+
+		//2north//
+		direction.y = (40 - 20 * std::sqrt(2));//15
+                direction.x = (20 * std::sqrt(2));
+
+		rotationX = 0.1;//0.2
+		rotationY = 0.1;//0	
+
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();
+
+		//2centre//
+		direction.y = -40;//17
+                direction.x = 0;
+
+		rotationX = -0.2;//0	
+		rotationY = 0;//0		
+
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();
+	} 
+}
+
 /**
 * Starting method for the KeyBoardControlNode.
 *
@@ -231,8 +422,8 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	KeyBoardControlNode keyBoardControlNode("10.0.1.66", "EQ2", 
-			rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
+	KeyBoardControlNode keyBoardControlNode("10.0.1.66", "EQ3", 
+			rexos_knowledge_database::ModuleIdentifier("HU", "six_axis_type_A", "1"));
 	keyBoardControlNode.run();
 	
 	return 0;
