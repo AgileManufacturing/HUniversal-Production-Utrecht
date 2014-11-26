@@ -68,9 +68,8 @@ public class SupplyAgent extends Agent{
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
 	private static String[] GC4x4MB_3 = new String[16];
+	
 	protected void setup(){	
-		
-		
 		lookUpTable[0]=-16.5;
 		lookUpTable[1]=16.5;
 		
@@ -142,19 +141,20 @@ public class SupplyAgent extends Agent{
 				try {
 					ACLMessage msg = receive();
 					if (msg!=null) {
-						System.out.println("PARTS AGENTS!!");
+						System.out.println("SA is now handling request: " + msg.getContent());
 						if (msg.getPerformative() == MessageType.SUPPLIER_REQUEST){
 							JSONObject partRequest = new JSONObject(new JSONTokener(msg.getContent()));
-							partRequest.getJSONObject("criteria").getJSONObject("target").remove("identifier");
-							partRequest.getJSONObject("criteria").getJSONObject("target").put("identifier", targetCrate);
-							JSONArray parts =findPart(partRequest.getJSONObject("criteria").getJSONObject("subjects").getString("color"));
+							partRequest.getJSONObject("target").remove("identifier");
+							partRequest.getJSONObject("target").put("identifier", targetCrate);
+							JSONArray parts =findPart(partRequest.getJSONObject("subjects").getString("color"));
 							
-							partRequest.getJSONObject("criteria").remove("subjects");
-							partRequest.getJSONObject("criteria").put("subjects", parts);
+							partRequest.remove("subjects");
+							partRequest.put("subjects", parts);
 							ACLMessage reply = msg.createReply();
 		                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
 		                    reply.setContent(partRequest.toString());
-		                    send(reply);   
+		                    send(reply);
+		                    System.out.println(this.myAgent.getLocalName() + " has replied to a message");
 						}
 						else {
 							System.out.println(	"FAILED PARTSAGENTS");
@@ -178,7 +178,7 @@ public class SupplyAgent extends Agent{
 				if(GC4x4MB_3[i].equals("red")){
 					subjectMove.put("x", (lookUpTable[(i*2)]));
 					subjectMove.put("y", (lookUpTable[(i*2)+1]));
-					subjectMove.put("z", "-26.5");					
+					subjectMove.put("z", "13.8");					
 					subject.put("move",subjectMove);
 					subject.put("identifier", "GC4x4MB_3");
 					subjects.put(subject);
@@ -193,7 +193,7 @@ public class SupplyAgent extends Agent{
 					subjectMove.put("identifier", "GC4x4MB_1");
 					subjectMove.put("x", (lookUpTable[(i*2)]));
 					subjectMove.put("y", (lookUpTable[(i*2)+1]));
-					subjectMove.put("z", "-26.5");
+					subjectMove.put("z", "13.8");
 					subject.put("move",subjectMove);
 					subject.put("identifier", "GC4x4MB_1");
 					subjects.put(subject);
@@ -208,7 +208,7 @@ public class SupplyAgent extends Agent{
 					subjectMove.put("identifier", "GC4x4MB_4");
 					subjectMove.put("x", (lookUpTable[(i*2)]));
 					subjectMove.put("y", (lookUpTable[(i*2)+1]));
-					subjectMove.put("z", "-26.5");
+					subjectMove.put("z", "13.8");
 					subject.put("move",subjectMove);
 					subject.put("identifier", "GC4x4MB_4");
 					subjects.put(subject);

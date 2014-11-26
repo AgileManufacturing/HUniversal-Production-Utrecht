@@ -2,7 +2,7 @@ package MAS.simulation.offline;
 
 import java.util.LinkedList;
 
-import MAS.simulation.util.Triple;
+import MAS.util.Triple;
 
 class Event implements Comparable<Event> {
 	private double time;

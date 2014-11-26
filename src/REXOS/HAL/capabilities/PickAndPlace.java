@@ -50,6 +50,7 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
+import MAS.equiplet.Job;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,18 +77,23 @@ public class PickAndPlace extends Capability {
 	 * @see Capability#translateProductStep(ProductStep)
 	 */
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException {
 		try {
-			JSONObject target = productStep.getCriteria().getJSONObject(ProductStep.TARGET);
-			JSONArray subjects = productStep.getCriteria().getJSONArray(ProductStep.SUBJECTS);
+			JSONObject target =  criteria.getJSONObject("target");
 			
-			if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) == false) {
-				String message = "Recieved a service (" + productStep.getService() + "which is not supported by this capability.";
+			//System.err.println("TEST1 " + target);
+			
+			JSONArray subjects = criteria.getJSONArray("subjects");
+			
+			//System.err.println("TEST2 " + subjects);
+			
+			if(service.equals(SERVICE_IDENTIFIER) == false) {
+				String message = "Recieved a service (" + service + "which is not supported by this capability.";
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);	
 			}
 			if(subjects.length() == 0) {
-				String message = "Recieved a product step which has no subjects: " + productStep;
+				String message = "Recieved a product step which has no subjects: " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
@@ -96,7 +102,7 @@ public class PickAndPlace extends Capability {
 			// pick
 			// We assume that the first subject is the subject to pick
 			JSONObject subject = subjects.getJSONObject(0);
-			JSONObject subjectMoveCommand = subject.getJSONObject("move");
+			JSONObject subjectMoveCommand = target.getJSONObject("move");
 			
 			JSONObject pickCommand = new JSONObject();
 			pickCommand.put("pick", JSONObject.NULL);
@@ -106,7 +112,7 @@ public class PickAndPlace extends Capability {
 			pickOriginPlacementParameters.put("identifier", subject.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, pickOriginPlacementParameters);
 			
-			CompositeStep pick = new CompositeStep(productStep, pickCommand, pickOriginPlacement);
+			CompositeStep pick = new CompositeStep(service, criteria, pickCommand, pickOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
 			
 			// place
@@ -120,7 +126,7 @@ public class PickAndPlace extends Capability {
 			placeOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, placeOriginPlacementParameters);
 			
-			CompositeStep place = new CompositeStep(productStep, placeCommand, placeOriginPlacement);
+			CompositeStep place = new CompositeStep(service,criteria, placeCommand, placeOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + place);
 			
 			// Translate to hardwareSteps

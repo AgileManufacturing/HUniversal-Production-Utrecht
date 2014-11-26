@@ -31,7 +31,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import MAS.simulation.offline.Simulation;
-import MAS.simulation.util.Triple;
+import MAS.util.Triple;
 
 public class StaticSimInterface {
 

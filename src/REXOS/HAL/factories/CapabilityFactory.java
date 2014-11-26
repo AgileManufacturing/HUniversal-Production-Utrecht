@@ -153,10 +153,10 @@ public class CapabilityFactory extends Factory<String, Capability>{
 	 * @return
 	 * @throws Exception
 	 */
-	public ArrayList<Capability> getCapabilitiesForService(Service service) {
+	public ArrayList<Capability> getCapabilitiesForService(String service) {
 		ArrayList<Capability> capabilities = new ArrayList<Capability>();
 		
-		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypesForServiceType, service.getName(), hal.getEquipletName());
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypesForServiceType, service, hal.getEquipletName());
 		for (Row row : rows) {
 			String capabilityName = (String) row.get("name");
 			capabilities.add(this.getSomethingByIdentifier(capabilityName));

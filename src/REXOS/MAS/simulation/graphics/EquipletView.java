@@ -23,6 +23,7 @@ public class EquipletView extends JPanel {
 		map.put("error_ready", new Color(0x640000));
 		map.put("error_finished", new Color(0x640000));
 		map.put("error_repaired", new Color(0x006400));
+		map.put("reconfig", Color.MAGENTA);
 		COLORS = Collections.unmodifiableMap(map);
 	}
 

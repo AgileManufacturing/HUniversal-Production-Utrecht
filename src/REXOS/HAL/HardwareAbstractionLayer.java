@@ -22,6 +22,7 @@ import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
+import MAS.equiplet.Job;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,8 +77,8 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will attempt to translate the product step provided. This is a asynchronous call.
 	 * Once the translation has finished, the onTranslationFinished of the HardwareAbstractionLayerListener will be called.
 	 */
-	public void translateProductStep(ProductStep productStep){
-		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
+	public void translateProductStep(String serv, JSONObject crit){
+		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, serv, crit, capabilityFactory);
 		translationProcess.start();
 	}
 	/**

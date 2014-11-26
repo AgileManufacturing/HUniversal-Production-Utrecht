@@ -14,20 +14,23 @@ import jade.wrapper.ContainerController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import MAS.simulation.mas.TrafficManager;
-import MAS.simulation.mas.equiplet.Capability;
+import MAS.equiplet.Capability;
+import MAS.grid_server.TrafficManager;
+import MAS.product.ProductStep;
 import MAS.simulation.mas.equiplet.EquipletSimAgent;
 import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
 import MAS.simulation.mas.product.ProductAgentSim;
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
+import MAS.util.Position;
+import MAS.util.Settings;
+import MAS.util.Tick;
 
 public class SimulationAgent extends Agent implements ISimControl {
 
@@ -36,24 +39,25 @@ public class SimulationAgent extends Agent implements ISimControl {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Simulation simulation;
-	private int verbosity;
 
 	/**
 	 * Setup the simulation agent
 	 */
 	public void setup() {
 		try {
-			verbosity = Integer.parseInt(getProperty("verbosity", "1"));
+			int verbosity = Integer.parseInt(getProperty("verbosity", "1"));
 			System.out.println("Simulation: verbosity is set on " + verbosity);
+			Settings.VERBOSITY = verbosity;
 		} catch (NumberFormatException e) {
 			System.err.println("Simulation: parsing error verbosity");
 		}
-
-		simulation = new Simulation(this, verbosity > 1);
+		setOutput();
+		simulation = new Simulation(this);
+		simulation.init();
 		addBehaviour(new SimulationBehaviour());
 
 		// no use of gui, so start direct the simulation
-		if (verbosity < 2) {
+		if (Settings.VERBOSITY < 2) {
 			simulation.start();
 		}
 
@@ -74,7 +78,11 @@ public class SimulationAgent extends Agent implements ISimControl {
 			while (!simulation.isFinished()) {
 				simulation.handleEvent();
 			}
-			takeDown();
+
+			// take down the whole simulation when the gui is not used
+			if (Settings.VERBOSITY < 1) {
+				takeDown();
+			}
 		}
 
 		@Override
@@ -110,7 +118,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 	public IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception {
 		try {
 			// Create and start the agent
-			EquipletSimAgent equiplet = new EquipletSimAgent(position, capabilities);
+			EquipletSimAgent equiplet = new EquipletSimAgent(simulation, position, capabilities);
 
 			ContainerController cc = getContainerController();
 			AgentController ac = cc.acceptNewAgent(name, equiplet);
@@ -159,7 +167,6 @@ public class SimulationAgent extends Agent implements ISimControl {
 		} catch (ControllerException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
@@ -177,6 +184,23 @@ public class SimulationAgent extends Agent implements ISimControl {
 			System.err.printf("Simulation: ERROR: traffic agent %s creation was not possible.\n", Settings.TRAFFIC_AGENT);
 			e1.printStackTrace();
 			throw new Exception("Failed to create agent");
+		}
+	}
+
+	private void setOutput() {
+		if (Settings.VERBOSITY  <= 2) {
+			System.setOut(new DummyPrint());
+		}
+	}
+
+	public class DummyPrint extends PrintStream {
+		public DummyPrint() {
+			super(new OutputStream() {
+				@Override
+				public void write(int b) throws IOException {
+					
+				}
+			});
 		}
 	}
 }

@@ -43,7 +43,8 @@ import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import util.configuration.ServerConfigurations;
-import MAS.equiplet.equiplet_agent.EquipletAgent;
+import MAS.equiplet.EquipletAgent;
+import MAS.util.Position;
 
 public class EQSpawnClass extends Agent {
 	/**
@@ -77,11 +78,11 @@ public class EQSpawnClass extends Agent {
 		profile.setParameter(Profile.MAIN_HOST,MAIN_HOST);
 		profile.setParameter(Profile.MAIN_PORT,MAIN_PORT);
 		profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME);
-		
 		jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
 		Agent agent = new EquipletAgent();
 		agent.setArguments(args);
-		AgentController ac = container.acceptNewAgent( "EquipletAgent"+date.getTime(), agent);
+		//TODO Method of acquiring an equiplet name has to be implemented, currently hardcoded
+		AgentController ac = container.acceptNewAgent("EQ2", agent);
 		ac.start();		
 		
 	}

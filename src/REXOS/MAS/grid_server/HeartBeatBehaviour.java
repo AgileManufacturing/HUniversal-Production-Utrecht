@@ -47,6 +47,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import MAS.agents.data_classes.MessageType;
+import MAS.util.Ontology;
 
 public class HeartBeatBehaviour extends TickerBehaviour {
 	/**
@@ -62,6 +63,7 @@ public class HeartBeatBehaviour extends TickerBehaviour {
 
 	@Override
 	protected void onTick() {
+		
 		DFAgentDescription dfd = new DFAgentDescription();
 		
 		try {
@@ -69,9 +71,9 @@ public class HeartBeatBehaviour extends TickerBehaviour {
 			equipletAgents = DFService.search(a, dfd);
 			for(int i =0; i < equipletAgents.length; i++){
 				AID aid = equipletAgents[i].getName();
+				//System.out.println("MA: " + myAgent.getLocalName() + " has sent message to " + aid.getLocalName());
 				sendMessage(MessageType.PULSE_UPDATE, myAgent.getAID(), aid, pulseMessage, "meta");
 			}
-			//System.out.println(equipletAgents.length + " size of found EA");
 		}catch (FIPAException e) {
 			System.out.println("DF Search Error");
 			e.printStackTrace();
@@ -84,6 +86,7 @@ public class HeartBeatBehaviour extends TickerBehaviour {
 		message.addReceiver(receiver);
 		message.setLanguage(language);
 		message.setContent(content);
+		message.setConversationId(Ontology.CONVERSATION_HEARTBEAT);
 		myAgent.send(message);
 	}
 }

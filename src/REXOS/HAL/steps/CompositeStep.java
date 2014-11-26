@@ -4,6 +4,7 @@ import generic.ProductStep;
 import HAL.Capability;
 import HAL.Module;
 import HAL.exceptions.ModuleTranslatingException;
+import MAS.equiplet.Job;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,21 +20,27 @@ import util.log.Logger;
  *
  */
 public class CompositeStep implements Cloneable {
-	private ProductStep productStep;
+	private String service;
+	private JSONObject criteria;
 	private JSONObject command;
 	private OriginPlacement originPlacement;
 	
 	public static final String IDENTIFIER = "identifier";
 	public static final String RELATIVE_TO = "relativeTo";
 	
-	public CompositeStep(ProductStep productStep, JSONObject command, OriginPlacement originPlacement){
+	public CompositeStep(String service, JSONObject criteria, JSONObject command, OriginPlacement originPlacement){
 		this.command = command;
 		this.originPlacement = originPlacement;
-		this.productStep = productStep;
+		this.service = service;
+		this.criteria = criteria;
 	}
 	
-	public ProductStep getProductStep(){
-		return this.productStep;
+	public String getService(){
+		return service;
+	}
+
+	public JSONObject getCriteria(){
+		return this.criteria;
 	}
 	public JSONObject getCommand(){
 		return this.command;
@@ -62,7 +69,7 @@ public class CompositeStep implements Cloneable {
 	}
 	public CompositeStep clone() {
 		try {
-			return new CompositeStep(productStep, new JSONObject(command.toString()), originPlacement.clone());
+			return new CompositeStep(service, criteria, new JSONObject(command.toString()), originPlacement.clone());
 		} catch (JSONException ex) {
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
 			return null;

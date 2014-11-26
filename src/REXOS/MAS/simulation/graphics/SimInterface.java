@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,14 +27,15 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
-import MAS.simulation.util.Tuple;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Triple;
+import MAS.util.Tuple;
 
 public class SimInterface {
 
@@ -215,8 +217,12 @@ public class SimInterface {
 				} else if (index == tabbedPane.indexOfComponent(productStatisticsScroll)) {
 					// Product Statistics
 					Map<String, Map<Tick, Double>> stats = simulation.getProductStatistics();
+					Map<String, Map<? extends Number, ? extends Number>> stats2 = new HashMap<String, Map<? extends Number, ? extends Number>>();
+					Map<? extends Number, ? extends Number> throughput = simulation.getThroughput();
+					stats2.put("Throughput", throughput);
+
 					productStatistics.removeAll();
-					productStatistics.add(Chart.createChart("Product Statistics", "Products", stats));
+					productStatistics.add(Chart.createChart("Product Statistics", "Products", "Time", stats, stats2));
 
 				} else if (index == tabbedPane.indexOfComponent(equipletStatisticsScroll)) {
 					// Equiplet Statistics
@@ -236,8 +242,7 @@ public class SimInterface {
 		gbl_optionsPanel.columnWidths = new int[] { 70, 0 };
 		gbl_optionsPanel.rowHeights = new int[] { 15, 25, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 462, 0, 0, 0, 0, 0, 0 };
 		gbl_optionsPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
-				0.0, Double.MIN_VALUE };
+		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		optionsPanel.setLayout(gbl_optionsPanel);
 
 		btnStart = new JButton("Start");
@@ -520,15 +525,21 @@ public class SimInterface {
 		gridView.update(equiplets);
 	}
 
-	public void update(Tick time, String event, int products, int productCount, int totalSteps, int traveling, List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, double throughput) {
-		NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
-		nf.setMaximumFractionDigits(1);
+	public void update(final Tick time, final String event, final int products, final int productCount, final int totalSteps, final int traveling, final List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, final double throughput) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
 
-		lblTime.setText(nf.format(time));
-		lblEvent.setText(event);
-		lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
-		lblTraveling.setText(String.format("%d", traveling));
-		lblThroughput.setText(String.format("%.2f", throughput));
-		gridView.update(equipletStates);
+				NumberFormat nf = NumberFormat.getInstance(Locale.GERMAN);
+				nf.setMaximumFractionDigits(1);
+
+				lblTime.setText(nf.format(time));
+				lblEvent.setText(event);
+				lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
+				lblTraveling.setText(String.format("%d", traveling));
+				lblThroughput.setText(String.format("%.2f", throughput));
+				gridView.update(equipletStates);
+			}
+		});
 	}
 }

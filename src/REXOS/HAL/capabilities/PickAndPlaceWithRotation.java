@@ -30,7 +30,7 @@
  *          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  *          LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *          OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ **//*
 
 package HAL.capabilities;
 
@@ -55,26 +55,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
+*//**
  * Pick and place capability class that translate with rotation.
  * 
  *
- */
+ *//*
 public class PickAndPlaceWithRotation extends Capability {
 	public final static String SERVICE_IDENTIFIER = "place";
 	
-	/**
+	*//**
 	 * 
 	 * @param moduleFactory
-	 */
+	 *//*
 	public PickAndPlaceWithRotation(ModuleFactory moduleFactory) {
 		super(moduleFactory, "PickAndPlaceWithRotation");
 	}
 
-	/**
+	*//**
 	 * @throws ModuleTranslatingException 
 	 * @see Capability#translateProductStep(ProductStep)
-	 */
+	 *//*
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
 		try {
@@ -140,4 +140,4 @@ public class PickAndPlaceWithRotation extends Capability {
 			throw new CapabilityException("Unable to translate due to illegally formatted JSON", ex);
 		}
 	}
-}
+}*/

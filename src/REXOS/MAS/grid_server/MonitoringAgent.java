@@ -127,7 +127,7 @@ public class MonitoringAgent extends Agent{
 			// TODO Auto-generated method stub
 			System.out.println("THE ERROR WAS: " + ex);
 			System.out.println("" + mws.getResourceDescriptor());
-			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("Are you sure you enabled the WebSocketServer?");
 			
 		}		
 	}

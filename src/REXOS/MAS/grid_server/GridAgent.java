@@ -38,21 +38,35 @@
  **/
 package MAS.grid_server;
 
-import MAS.product.product_agent.ProductAgent;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import MAS.product.ProductAgent;
+import MAS.product.ProductStep;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.AMSService;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
+import MAS.util.Parser;
+import MAS.util.Position;
+import MAS.util.Settings;
+import MAS.util.Tick;
 
 public class GridAgent extends Agent{
 	private static final long serialVersionUID = -720095833750151495L;
 	
 	private long productAgentCounter =0;
-	protected void setup(){	
+	protected void setup(){
+		spawnTrafficAgent();
 		addBehaviour(new CyclicBehaviour()
 		{ 				
 			/**
@@ -63,24 +77,56 @@ public class GridAgent extends Agent{
 			public void action() {
 				ACLMessage msg = receive();
                 if (msg!=null) {
-                	System.out.println("New Msg");
-    				ContainerController cc = getContainerController();
+                	System.out.println("New Msg: " + msg.getContent());
     				String name="ProductAgent-"+productAgentCounter;
-					AgentController ac;
 					//This will confirm that the sent pong was received
 					if(msg.getContent().equals("Pong")){
 						System.out.println(getName() + ": Pong was succesfully received from "+ msg.getSender());
 					}
 					else{
 						try {
-							Object[] arguments = new Object[1];
-							arguments[0]=msg.getContent();
-							ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
-		    				ac.start();
-		    				confirmCreation();
+							JSONObject json = new JSONObject(msg.getContent());
+			                if (json.has("productSteps")) {
+			                    JSONArray jsonSteps = json.getJSONArray("productSteps");
+			                    LinkedList<ProductStep> steps = new LinkedList<ProductStep>();
+			                    for (int i = 0; i < jsonSteps.length(); i++) {
+			                        JSONObject jsonStep = jsonSteps.getJSONObject(i);
+			                        if (jsonStep.has("service") && jsonStep.has("criteria")) {
+			                            JSONObject jsonCriteria = jsonStep.getJSONObject("criteria");
+
+			                            if (jsonCriteria.has("subjects") && jsonCriteria.has("target")) {
+			                                JSONObject jsonTarget = jsonCriteria.getJSONObject("target");
+			                                JSONObject jsonSubjects = jsonCriteria.getJSONObject("subjects");
+
+			                                HashMap<String, Object> criteria = new HashMap<>();
+			                                criteria.put("target", jsonTarget);
+			                                criteria.put("subjects", jsonSubjects);
+
+			                                String service = jsonStep.getString("service");
+			                                ProductStep step = new ProductStep(i, service, criteria);
+			                                steps.add(step);
+			                            } else {
+			                                System.err.println("FAAL no target or subject in criteria of product step");
+			                            }
+			                        } else {
+			                            System.err.println("FAAL no service or criteria in product step");
+			                        }
+			                    }
+
+			                    // TODO position is not (0,0), this is the position from which the product starts in the grid.
+			                    // TODO deadline is set + 1000 seconds from now
+			                    Object[] args = new Object[] { Parser.parseProductConfiguration(steps, new Position(0, 0), new Tick().add(1000000)) };
+			                    
+			                    ContainerController cc = getContainerController();
+			                    AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), args);
+			                    ac.start();
+			                } else {
+			                    System.out.println("FAAL no product steps in arguments for creating a product agent");
+			                }
+		    				//confirmCreation();
 		    				productAgentCounter++;
 	
-						} catch (StaleProxyException e) {
+						} catch (StaleProxyException | JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -91,6 +137,20 @@ public class GridAgent extends Agent{
 			}		
 		});		
 		
+	}
+	private void spawnTrafficAgent() {
+		Map<String, Position> aapkip = new HashMap<String, Position>();
+        AgentController ac;
+		try {
+			TrafficManager trafficAgent = new TrafficManager(aapkip);
+
+			ContainerController cc = getContainerController();
+			ac = cc.acceptNewAgent(Settings.TRAFFIC_AGENT, trafficAgent);
+			ac.start();
+		} catch (StaleProxyException e) {
+			System.err.println(this.getLocalName() + ": spawnTrafficAgent fails");
+		}
+        
 	}
 	@Override
 	protected void takeDown(){

@@ -1,6 +1,8 @@
 package MAS.simulation.mas.equiplet;
 
 import jade.core.AID;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,11 +11,16 @@ import java.util.Map;
 
 import org.json.JSONException;
 
-import MAS.simulation.util.Parser;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
-import MAS.simulation.util.Tuple;
+import MAS.equiplet.Capability;
+import MAS.equiplet.EquipletAgent;
+import MAS.equiplet.EquipletState;
+import MAS.equiplet.Job;
+import MAS.simulation.simulation.ISimulation;
+import MAS.util.Parser;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Triple;
+import MAS.util.Tuple;
 
 public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
@@ -34,8 +41,10 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 	// Simulation performances
 	/**
-	 * statistics Statistics contains the time the equiplet is in one of the states <BUSY, IDLE, ERROR>
-	 * The states ERROR_READY and ERROR_FINISHED are counted as ERROR and ERROR_REPAIRED as BUSY
+	 * statistics Statistics contains the time the equiplet is in one of the
+	 * states <BUSY, IDLE, ERROR>
+	 * The states ERROR_READY and ERROR_FINISHED are counted as ERROR and
+	 * ERROR_REPAIRED as BUSY
 	 */
 	private Triple<Tick, Tick, Tick> statistics;
 
@@ -46,11 +55,14 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	private Tick lastStatisticsUpdate;
 
 	/**
-	 * scheduleLatency A list of differences between the time and the time scheduled
+	 * scheduleLatency A list of differences between the time and the time
+	 * scheduled
 	 */
 	private Map<Tick, Tick> scheduleLatency;
 
-	public EquipletSimAgent(Position position, List<Capability> capabilities) {
+	private ISimulation simulation;
+
+	public EquipletSimAgent(ISimulation simulation, Position position, List<Capability> capabilities) {
 		try {
 			Object[] args = new Object[] { Parser.parseEquipletConfiguration(position, capabilities) };
 			setArguments(args);
@@ -58,9 +70,23 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
 		}
 
+		this.simulation = simulation;
 		lastStatisticsUpdate = new Tick(0);
 		statistics = new Triple<Tick, Tick, Tick>(new Tick(0), new Tick(0), new Tick(0));
 		scheduleLatency = new HashMap<Tick, Tick>();
+	}
+
+	@Override
+	public void kill() {
+		try {
+			// deregister equiplet by the df
+			DFService.deregister(this);
+		} catch (FIPAException e) {
+			System.err.println("failed to deregister equiplet");
+			e.printStackTrace();
+		} finally {
+			super.doDelete();
+		}
 	}
 
 	@Override
@@ -71,6 +97,41 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	@Override
 	public EquipletState getEquipletState() {
 		return state;
+	}
+
+	@Override
+	public List<Capability> getCapabilities() {
+		return capabilities;
+	}
+
+	/**
+	 * 
+	 * @param capabilities
+	 */
+	@Override
+	public void reconfigureStart(List<Capability> capabilities) {
+		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
+		reconfigure = true;
+		deregister();
+		this.capabilities = capabilities;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void reconfigureFinished() {
+		System.out.printf("EA:%s reconfigure finished he has new capabilties %s \n", getLocalName(), capabilities);
+		if (schedule.isEmpty()) {
+			reconfigure = false;
+			for (Capability capability : capabilities) {
+				productionTimes.put(capability.getService(), capability.getDuration());
+			}
+			register();
+			state = EquipletState.IDLE;
+		} else {
+			throw new IllegalArgumentException("Equiplet has not an empty schedule while being reconfigured");
+		}
 	}
 
 	@Override
@@ -97,8 +158,10 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * Get the complete schedule of the equiplet, the job which are executed, executing and to be executed
-	 * The schedule contains a list of jobs with the start and end time and the product agent for whom the job is (to be) executed
+	 * Get the complete schedule of the equiplet, the job which are executed,
+	 * executing and to be executed
+	 * The schedule contains a list of jobs with the start and end time and the
+	 * product agent for whom the job is (to be) executed
 	 * 
 	 * @return a list of jobs
 	 */
@@ -157,7 +220,8 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * Information for updating the gui Tuple < name of equiplet, position, services, Tuple < state, waiting, scheduled, executed > >
+	 * Information for updating the gui Tuple < name of equiplet, position,
+	 * services, Tuple < state, waiting, scheduled, executed > >
 	 * 
 	 * @return information
 	 */
@@ -167,7 +231,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		for (Capability capability : capabilities) {
 			services.add(capability.getService());
 		}
-		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString(), getWaiting(), getScheduled(), getExecuted());
+		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() + (reconfigure ? " reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
 		return new Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>(getLocalName(), getPosition(), services, info);
 	}
 
@@ -180,7 +244,8 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * Update the statistics This method should be called before each state change
+	 * Update the statistics This method should be called before each state
+	 * change
 	 * 
 	 * @param time
 	 */
@@ -219,20 +284,20 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * 
 	 * @param start
 	 *            time of the job
+	 * @param job
+	 *            to be executed
 	 */
 	@Override
-	protected void executeJob(Tick time) {
+	protected synchronized void executeJob(Tick time, Job job) {
 		state = EquipletState.BUSY;
-		executing = schedule.pollFirst();
+		executing = job;
 
 		Tick latency = time.minus(executing.getStartTime());
 		scheduleLatency.put(time, latency);
-
 		executing.updateStartTime(time);
 		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
 
-		informProductProcessing(executing.getProductAgent());
-
+		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
 		execute(executing);
 	}
 
@@ -284,9 +349,19 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			System.out.printf("EA:%s finished with job: %s\n", getLocalName(), executing);
 
 			AID finishedProduct = executing.getProductAgent();
+			int index = executing.getIndex();
 
-			if (!schedule.isEmpty() && jobReady()) {
-				executeJob(time);
+			Job ready = jobReady();
+			if (ready != null) {
+				// if (!schedule.isEmpty() && jobReady()) {
+				schedule.remove(ready);
+				executeJob(time, ready);
+			} else if (reconfigure && schedule.isEmpty()) {
+				state = EquipletState.RECONFIG;
+				if (simulation == null) {
+					throw new IllegalArgumentException("FUCK sim");
+				}
+				simulation.notifyReconfigReady(getLocalName());
 			} else {
 				state = EquipletState.IDLE;
 				executing = null;
@@ -295,7 +370,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			// note that the inform processing is done before inform finished
 			// this is because the simulation can delete the product agent (if chosen to do so for performance improvement)
 			// therefore there is no guarantee that informing the product is a blocking as the acknowledge is send before notifying the simulation
-			informProductStepFinished(finishedProduct);
+			informProductStepFinished(finishedProduct, time, index);
 		} else {
 			throw new IllegalArgumentException("EQUIPLET: notify job finished not given in correct state: " + state);
 		}
@@ -309,7 +384,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            of the breakdown
 	 */
 	public void notifyBreakdown(Tick time) {
-		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED) {
+		if (state == EquipletState.ERROR || state == EquipletState.ERROR_READY || state == EquipletState.ERROR_FINISHED || state == EquipletState.RECONFIG) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 
@@ -332,7 +407,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 *            of repair
 	 */
 	public void notifyRepaired(Tick time) {
-		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED) {
+		if (state == EquipletState.IDLE || state == EquipletState.BUSY || state == EquipletState.ERROR_REPAIRED || state == EquipletState.RECONFIG) {
 			throw new IllegalArgumentException("EQUIPLET: notify breakdown not given in correct state: " + state);
 		}
 		historyUpdate(time);
@@ -344,7 +419,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			System.out.printf("EA:%s is repaired at %s and continue with job %s, with %s time remaining.\n", getLocalName(), time, executing, timeRemaining);
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
-			executeJob(time);
+			Job ready = jobReady();
+			schedule.remove(ready);
+			executeJob(time, ready);
 		} else if (isExecuting()) {
 			// the equiplet is executing a job and is repaired, but waits until a job finished event is received
 			state = EquipletState.ERROR_REPAIRED;

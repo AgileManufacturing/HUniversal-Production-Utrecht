@@ -1,6 +1,6 @@
 package MAS.simulation.simulation;
 
-import MAS.simulation.util.Tick;
+import MAS.util.Tick;
 
 class Event implements Comparable<Event> {
 
@@ -89,7 +89,7 @@ class Event implements Comparable<Event> {
 			return String.format("Evt:[time=%s, type=%s]", time, type);
 		} else if (type == EventType.ARRIVED) {
 			return String.format("Evt:[time=%s, type=%s, product=%s, equipet=%s]", time, type, product, equiplet);
-		} else {
+		} else { // if FINISHED or RECONFIG
 			return String.format("Evt:[time=%s, type=%s, equiplet=%s]", time, type, equiplet);
 		}
 	}

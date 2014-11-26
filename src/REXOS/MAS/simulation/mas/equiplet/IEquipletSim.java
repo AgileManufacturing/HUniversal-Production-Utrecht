@@ -3,16 +3,20 @@ package MAS.simulation.mas.equiplet;
 import java.util.List;
 import java.util.Map;
 
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
-import MAS.simulation.util.Tuple;
+import MAS.equiplet.Capability;
+import MAS.equiplet.EquipletState;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Triple;
+import MAS.util.Tuple;
 
 public interface IEquipletSim {
 
 	Position getPosition();
 
 	EquipletState getEquipletState();
+
+	List<Capability> getCapabilities();
 
 	double load(Tick time, Tick window);
 
@@ -37,4 +41,10 @@ public interface IEquipletSim {
 	Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>> getUpdateState();
 
 	Map<Tick, Tick> getLatency();
+
+	void kill();
+
+	void reconfigureStart(List<Capability> services);
+
+	void reconfigureFinished();
 }

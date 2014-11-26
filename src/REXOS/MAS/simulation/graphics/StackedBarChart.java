@@ -20,7 +20,7 @@ import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.ApplicationFrame;
 
-import MAS.simulation.util.Triple;
+import MAS.util.Triple;
 
 public class StackedBarChart extends ApplicationFrame {
 

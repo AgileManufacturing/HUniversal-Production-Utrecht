@@ -4,6 +4,8 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -12,16 +14,19 @@ import HAL.exceptions.CapabilityException;
 import HAL.factories.CapabilityFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
+import MAS.equiplet.Job;
 
 /**
  * The thread that manages the translation of ProductSteps.
  * Although translation usually does not take very long, complex cases may take some milliseconds. This will jam the {@link EquipletAgent} which is considered to be undesirable.
  * @author Bas Voskuijlen
+ * @author Niek Arends
  *
  */
 public class TranslationProcess implements Runnable{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
-	private ProductStep productStep;
+	private String service;
+	private JSONObject criteria;
 	private CapabilityFactory capabilityFactory;
 	/**
 	 * Constructs the TranslationProcess but does NOT start it.
@@ -29,9 +34,10 @@ public class TranslationProcess implements Runnable{
 	 * @param productStep
 	 * @param capabilityFactory
 	 */
-	public TranslationProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, ProductStep productStep, CapabilityFactory capabilityFactory){
+	public TranslationProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, String service, JSONObject criteria, CapabilityFactory capabilityFactory){
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
-		this.productStep = productStep;
+		this.service = service;
+		this.criteria = criteria;
 		this.capabilityFactory = capabilityFactory;
 	}
 	
@@ -41,35 +47,35 @@ public class TranslationProcess implements Runnable{
 	 */
 	@Override
 	public void run() {
-		Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Translation process started with productStep: " + productStep);
+		Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Translation process started with productStep: " + service + criteria);
 		
-		ArrayList<Capability> capabilities = capabilityFactory.getCapabilitiesForService(productStep.getService());
+		ArrayList<Capability> capabilities = capabilityFactory.getCapabilitiesForService(this.service);
 		
 		if (capabilities.size() == 0) {
-			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.ERROR, "This equiplet has no capabilities for the service in product step: " + productStep + 
+			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.ERROR, "This equiplet has no capabilities for the service in product step: " + service + criteria + 
 					". This should never happen as the equiplet should know which services are supported.");
-			hardwareAbstractionLayerListener.onTranslationFailed(productStep);
+			hardwareAbstractionLayerListener.onTranslationFailed(service, criteria);
 		} else {
 			ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 			
 			for (int i = 0; i < capabilities.size(); i++) {
 				try{
 					ArrayList<HardwareStep> translatedSteps = new ArrayList<HardwareStep>();
-					translatedSteps = capabilities.get(i).translateProductStep(productStep);
+					translatedSteps = capabilities.get(i).translateProductStep(service, criteria);
 					
 					for (int j = 0; j < translatedSteps.size(); j++){
 						// a translated hardware step from a module might be null if it is a place holder, we skip these place holders
 						if (translatedSteps.get(j) != null) hardwareSteps.add(translatedSteps.get(j));
 					}
-					hardwareAbstractionLayerListener.onTranslationFinished(productStep, hardwareSteps);
+					hardwareAbstractionLayerListener.onTranslationFinished(service , hardwareSteps);
 					return;
 				} catch (CapabilityException ex) {
 					Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Capability " + capabilities.get(i).getName() + 
-							" failed to translate product step: " + productStep, ex);
+							" failed to translate product step: " + service + criteria, ex);
 				}
 			}
-			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, "No capability was able to translated product step: " + productStep);
-			hardwareAbstractionLayerListener.onTranslationFailed(productStep);
+			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, "No capability was able to translated product step: " + service + criteria);
+			hardwareAbstractionLayerListener.onTranslationFailed(service, criteria);
 		}
 	}
 

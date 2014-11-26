@@ -38,6 +38,7 @@
  **/
 package MAS.grid_server;
 
+import MAS.util.Settings;
 import jade.core.Agent;
 
 
@@ -47,7 +48,7 @@ public class GridServer extends Agent {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	public static void main(String[] args) {
 		//-gui -port 1234 -platform-id Platform2 -agents "Grid:agents.GridAgent;PartsAgent:agents.PartsAgent; MonitoringAgent:agents.MonitoringAgent"
 		String [] argu = new String[2];
@@ -55,5 +56,4 @@ public class GridServer extends Agent {
 		argu[1] = "Grid:MAS.grid_server.GridAgent;SupplyAgent:MAS.grid_server.SupplyAgent; MonitoringAgent:MAS.grid_server.MonitoringAgent"; 
 		jade.Boot.main(argu);
 	}
-
 }

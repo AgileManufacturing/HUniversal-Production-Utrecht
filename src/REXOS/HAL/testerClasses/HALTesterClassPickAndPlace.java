@@ -2,10 +2,13 @@ package HAL.testerClasses;
 
 import generic.ProductStep;
 import generic.Service;
+import jade.core.AID;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -18,6 +21,8 @@ import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
+import MAS.equiplet.Job;
+import MAS.util.Tick;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,7 +36,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static JSONObject criteria2 = new JSONObject();
 	boolean state = false;
 	
-	static final String baseDir = "/home/t/Desktop/";
+	static final String baseDir = "C:/git/HUniversal-Production-Utrecht/";
 	
 	// delta robot
 	static String moduleA_01 = "{"
@@ -304,6 +309,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		
 		Logger.log(LogSection.NONE, LogLevel.DEBUG, "Starting");
 		
 		hal = new HardwareAbstractionLayer(htc);
@@ -470,22 +476,25 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		
 		criteria2.put("target",target2);
 		criteria2.put("subjects", subjects2);	
-		
-		hal.translateProductStep(
-				new ProductStep(1, criteria1, new Service("place")));		
+		System.out.println("Done Adding Modules");
+	/*	Map<String, Object> crit = new HashMap<String, Object>();
+		crit.put("target",target1);
+		crit.put("subjects", subjects1);*/
+		//hal.translateProductStep(
+		//		new Job(1, "place", "", crit , new Tick(1), new Tick(1), new Tick(1)));
 
 	}
 	
-	@Override
-	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
+	/*@Override
+	public void onTranslationFinished(Job job, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hal.executeHardwareSteps(hardwareSteps);
-	}
+	}*/
 
-	@Override
-	public void onTranslationFailed(ProductStep productStep) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
-	}
+	//@Override
+	//public void onTranslationFailed(/*Job job*/) {
+		//Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", job);
+	//}
 	
 	@Override
 	public void onProcessStatusChanged(HardwareStepStatus status, 
@@ -509,17 +518,18 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		return "EQ2";
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
 		if(state){
 			state = false;
-			hal.translateProductStep(
-					new ProductStep(1 , criteria1, new Service("place")));	
+			//hal.translateProductStep(
+		//			new Job(1, "place", "Product-Agent-0", null , new Tick(1), new Tick(1), new Tick(1)));
 		}else{
 			state = true;
-			hal.translateProductStep(
-					new ProductStep(1, criteria2, new Service("place")));
+		//	hal.translateProductStep(
+		//			new Job(1, "place", "Product-Agent-0", null , new Tick(1), new Tick(1), new Tick(1)));
 		}
 	}
 
@@ -547,6 +557,19 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	public void onReloadEquiplet(String state){
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
 
+	}
+
+	@Override
+	public void onTranslationFinished(String service,
+			ArrayList<HardwareStep> hardwareSteps) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTranslationFailed(String service, JSONObject criteria) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

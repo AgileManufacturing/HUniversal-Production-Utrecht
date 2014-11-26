@@ -1,4 +1,4 @@
-package HAL.capabilities;
+/*package HAL.capabilities;
 
 import generic.ProductStep;
 
@@ -19,24 +19,24 @@ import HAL.steps.OriginPlacementType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
+*//**
  * 
  * @author Aristides Ayala Mendoza
  *
- */
+ *//*
 public class Draw extends Capability {	
 	public final static String SERVICE_IDENTIFIER = "draw";
-	/**
+	*//**
 	 * 
 	 * @param moduleFactory
-	 */
+	 *//*
 	public Draw(ModuleFactory moduleFactory) {
 		super(moduleFactory, "Draw");
 	}
 
-	/**
+	*//**
 	 * @see Capability#translateProductStep(ProductStep)
-	 */
+	 *//*
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
 		try {
@@ -81,3 +81,4 @@ public class Draw extends Capability {
 	}
 
 }
+*/

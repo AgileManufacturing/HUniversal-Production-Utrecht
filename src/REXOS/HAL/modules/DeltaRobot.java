@@ -87,7 +87,7 @@ public class DeltaRobot extends ModuleActor {
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 		}
 		
-		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(), compositeStep.getCommand(), compositeStep.getOriginPlacement()));
+		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getService(), compositeStep.getCriteria(), compositeStep.getCommand(), compositeStep.getOriginPlacement()));
 		if (hStep != null){
 			translatedHardwareSteps.addAll(hStep);
 		}

@@ -4,10 +4,14 @@ import java.util.LinkedList;
 
 import org.json.JSONException;
 
+import MAS.product.ProductAgent;
+import MAS.product.ProductState;
+import MAS.product.ProductStep;
+import MAS.product.ProductionStep;
 import MAS.simulation.simulation.ISimulation;
-import MAS.simulation.util.Parser;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
+import MAS.util.Parser;
+import MAS.util.Position;
+import MAS.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
 
@@ -16,6 +20,8 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	 */
 	private static final long serialVersionUID = 1L;
 	private ISimulation simulation;
+
+	// TODO created has become a Tick, so maybe it is not needed to store here, but let the real agent handle the tick, or describe way this is here
 	private Tick created;
 
 	public ProductAgentSim(ISimulation simulation, LinkedList<ProductStep> productSteps, Position position, Tick time, Tick deadline) {
@@ -23,11 +29,18 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			Object[] args = new Object[] { Parser.parseProductConfiguration(productSteps, position, deadline) };
 			setArguments(args);
 		} catch (JSONException e) {
-			System.err.printf("EA: failed to create equiplet: %s.\n", e.getMessage());
+			System.err.printf("PA: failed to create product: %s.\n", e.getMessage());
 		}
 
 		this.simulation = simulation;
 		this.created = time;
+	}
+
+	@Override
+	public void kill() {
+		// TODO handle properly, let the equiplet know that I been killed
+		System.out.printf("PA:%s terminating\n", getLocalName());
+		doDelete();
 	}
 
 	@Override
@@ -43,6 +56,11 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	public Tick getCreated() {
 		return created;
+	}
+
+	@Override
+	public Tick getDeadline() {
+		return super.getDeadline();
 	}
 
 	@Override
@@ -64,7 +82,8 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		super.onProductProcessing();
 
 		// notify the simulation that processing begins
-		simulation.notifyProductProcessing(getLocalName(), getCurrentStep().getEquipletName(), getCurrentStep().getService());
+		ProductionStep step = getCurrentStep();
+		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
 	}
 
 	@Override

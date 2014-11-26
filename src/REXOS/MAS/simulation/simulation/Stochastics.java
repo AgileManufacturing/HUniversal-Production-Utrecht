@@ -4,11 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import MAS.product.ProductStep;
 import MAS.simulation.config.DurationType;
 import MAS.simulation.config.IConfig;
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Tick;
+import MAS.util.Pair;
+import MAS.util.Settings;
+import MAS.util.Tick;
 
 class Stochastics {
 	private Random random;
@@ -21,18 +22,18 @@ class Stochastics {
 
 	int x = 0;
 
-	public Tick generateProductArrival() {
-		return time(config.getProductArrival());
-		/*
-		 * if (x < 15) {
-		 * x++;
-		 * return 100;
-		 * } else {
-		 * return 10000000;
-		 * }
-		 */
-		// return 10; // TODO too deterministic
-		// return time(config.getProductArrival());
+	public Tick generateProductArrival(Tick time) {
+		if (time.greaterThan(6000)) {
+			double meanProcessingTime = 20;
+			int meanOperations = config.getProductSteps().size() * 2;
+			double utilization = 0.95;
+			int equiplets = config.getEquipletsConfigurations().size();
+
+			double interarrival = (meanProcessingTime * meanOperations) / (utilization * equiplets);
+			return new Tick(interarrival);
+		} else {
+			return time(config.getProductArrival());
+		}
 	}
 
 	public Tick generateDeadline() {
@@ -42,20 +43,23 @@ class Stochastics {
 	public LinkedList<ProductStep> generateProductSteps() {
 		if (true) {
 			return generateProductStepsTest();
-/*
-			LinkedList<ProductStep> steps = new LinkedList<>();
-			List<ProductStep> productSteps = config.getProductSteps();
-
-			int minProductSteps = 3;
-			int avgProductSteps = productSteps.size();
-			int n = minProductSteps + random.nextInt(avgProductSteps - minProductSteps);
-			for (int i = 0; i < n; i++) {
-				ProductStep step = productSteps.get(random.nextInt(productSteps.size()));
-				steps.add(new ProductStep(i, step.getService(), step.getCriteria()));
-			}
-
-			return steps;
-			*/
+			/*
+			 * LinkedList<ProductStep> steps = new LinkedList<>();
+			 * List<ProductStep> productSteps = config.getProductSteps();
+			 * 
+			 * int minProductSteps = 3;
+			 * int avgProductSteps = productSteps.size();
+			 * int n = minProductSteps + random.nextInt(avgProductSteps -
+			 * minProductSteps);
+			 * for (int i = 0; i < n; i++) {
+			 * ProductStep step =
+			 * productSteps.get(random.nextInt(productSteps.size()));
+			 * steps.add(new ProductStep(i, step.getService(),
+			 * step.getCriteria()));
+			 * }
+			 * 
+			 * return steps;
+			 */
 		}
 
 		@SuppressWarnings("unused")
@@ -82,7 +86,8 @@ class Stochastics {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < productSteps.size() * 2; i++) {
+			// int x = i % productSteps.size();
 			int x = random.nextInt(productSteps.size());
 			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
 		}
@@ -109,10 +114,17 @@ class Stochastics {
 		return time(data.first, data.second);
 	}
 
+	public Tick generateReconfigTime() {
+		return new Tick(Settings.RECONFIGATION_TIME);
+	}
+
 	private Tick time(Tick time, DurationType type) {
+		if (!Settings.STOCHASTICS) {
+			return time;
+		}
 		switch (type) {
 		case EXP:
-			// return exp(time);
+			return new Tick(exp(time.doubleValue()));
 		case WEIBULL:
 			// return weibull(1, time);
 		case GAMMA:

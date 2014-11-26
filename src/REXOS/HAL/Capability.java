@@ -5,6 +5,7 @@ import generic.ProductStep;
 import java.util.ArrayList;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -15,6 +16,7 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
+import MAS.equiplet.Job;
 
 /**
  * 
@@ -49,7 +51,7 @@ public abstract class Capability {
 	 * @return
 	 * @throws CapabilityException
 	 */
-	abstract public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException;
+	abstract public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException;
 	
 	protected ArrayList<HardwareStep> translateCompositeStep(ArrayList<ModuleActor> modules, CompositeStep compositeStep) throws CapabilityException, JSONException {
 		ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
