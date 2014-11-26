@@ -91,10 +91,9 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		if(status == HardwareStepStatus.DONE){
 			HardwareStep hardwareStep = currentStep;
 			hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
-			System.out.println("onProcessStateChanged: " + hardwareStep);
-				
+			
 			try {
-				Thread.sleep(200);
+				Thread.sleep(0);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

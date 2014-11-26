@@ -32,41 +32,51 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "rexos_logger/rexos_logger.h"
-
+#include <rexos_logger/rexos_logger.h>
 #include <rexos_knowledge_database/ModuleType.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
 	class Module : public ModuleType {
 	private:
-		ModuleIdentifier moduleIdentifier;
+		rexos_datatypes::ModuleIdentifier moduleIdentifier;
 		std::unique_ptr<sql::Connection> connection;
 	public:
-		Module(ModuleIdentifier moduleIdentifier);
+		Module(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		
-		ModuleIdentifier getModuleIdentifier();
+		rexos_datatypes::ModuleIdentifier getModuleIdentifier();
 		
+	public:
 		std::string getModuleProperties();
+	protected:
 		void setModuleProperties(std::string jsonProperties);
+	public:
 		Module* getParentModule();
-		std::vector<ModuleIdentifier> getChildModulesIdentifiers();
+	public:
+		std::vector<rexos_datatypes::ModuleIdentifier> getChildModulesIdentifiers();
 		
+	public:
 		int getMountPointX();
+	protected:
 		void setMountPointX(int mountPointX);
+	public:
 		int getMountPointY();
+	protected:
 		void setMountPointY(int mountPointY);
 		
+	public:
 		std::string getCalibrationDataForModuleOnly();
 		std::string getCalibrationDataForModuleAndChilds();
-		std::string getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers);
+		std::string getCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
+	protected:
 		void setCalibrationDataForModuleOnly(std::string properties);
 		void setCalibrationDataForModuleAndChilds(std::string properties);
-		void setCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers, std::string properties);
+		void setCalibrationDataForModuleAndOtherModules(
+				std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers, std::string properties);
 	private:
-		int getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers);
+		int getCalibrationGroupForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
 		
 	};
 }

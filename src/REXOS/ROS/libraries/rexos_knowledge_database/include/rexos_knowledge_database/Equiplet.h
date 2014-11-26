@@ -32,7 +32,7 @@
 #include <string>
 #include <memory>
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include "mysql_connection.h"
 
@@ -45,8 +45,8 @@ namespace rexos_knowledge_database {
 		int getMointPointsY();
 		double getMointPointDistanceX();
 		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
 	private:
 		std::string name;
 		std::unique_ptr<sql::Connection> connection;

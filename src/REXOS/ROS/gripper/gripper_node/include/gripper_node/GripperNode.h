@@ -36,29 +36,19 @@
 #include "iostream"
 #include <rexos_gripper/Gripper.h>
 #include <rexos_gripper/Observer.h>
-#include <rexos_statemachine/ModuleStateMachine.h>
-#include <rexos_statemachine/Transitions.h>
+#include <rexos_module/ActorModule.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include <rexos_knowledge_database/Module.h>
-#include "equiplet_node/RegisterModule.h"
-#include "rexos_logger/rexos_logger.h"
-
-#include <actionlib/server/simple_action_server.h>
-#include <rexos_statemachine/SetInstructionAction.h>
+#include <rexos_logger/rexos_logger.h>
 
 #include <jsoncpp/json/value.h>
 
-/**
- * Gripper node that provides services to control the gripper valve
- **/
-typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
-
-class GripperNode : public rexos_statemachine::ModuleStateMachine, 
-	public rexos_knowledge_database::Module, 
+class GripperNode : public rexos_module::ActorModule, 
 	Observer {
 	
 public:
 
-	GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+	GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	virtual ~GripperNode();
 
 	virtual bool transitionInitialize();
@@ -71,7 +61,7 @@ public:
 	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
 
-	void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
+	virtual void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal);
 	
 private:
 	/**
@@ -79,10 +69,7 @@ private:
 	 * Connection to the IO modbus
 	 **/
 	modbus_t* modbusContext;
-
-
-	SetInstructionActionServer setInstructionActionServer;
-
+	
 	/**
 	 * @var InputOutput::OutputDevices::Gripper* gripper
 	 * The gripper device

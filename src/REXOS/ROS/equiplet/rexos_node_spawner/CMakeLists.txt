@@ -4,7 +4,7 @@ project(rexos_node_spawner)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_knowledge_database rexos_logger)
+find_package(catkin REQUIRED COMPONENTS rexos_knowledge_database rexos_logger rexos_datatypes)
 find_package(Boost REQUIRED)
 find_package(LIBZIP REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -19,7 +19,7 @@ endif (PKG_CONFIG_FOUND)
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES rexos_node_spawner rexos_logger
-CATKIN_DEPENDS rexos_knowledge_database rexos_logger
+CATKIN_DEPENDS rexos_knowledge_database rexos_logger rexos_datatypes
 DEPENDS Boost LIBZIP)
 
 MESSAGE("${LIBZIP_LIBRARIES}")

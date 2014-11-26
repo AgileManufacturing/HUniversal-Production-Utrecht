@@ -59,11 +59,11 @@ NodeSpawnerNode::~NodeSpawnerNode(){
 }
 
 bool NodeSpawnerNode::spawnNode(spawnNode::Request &request, spawnNode::Response &response) {
-	rexos_knowledge_database::ModuleIdentifier identifier(request.manufacturer, request.typeNumber, request.serialNumber);
+	rexos_datatypes::ModuleIdentifier identifier(request.manufacturer, request.typeNumber, request.serialNumber);
 	NodeSpawner::spawnNode(identifier);
 	return true;
 }
-std::vector<rexos_knowledge_database::ModuleIdentifier> NodeSpawnerNode::getModuleIdentifiersOfAttachedModules() {
+std::vector<rexos_datatypes::ModuleIdentifier> NodeSpawnerNode::getModuleIdentifiersOfAttachedModules() {
 	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
 	return equiplet.getModuleIdentifiersOfAttachedModules();
 }

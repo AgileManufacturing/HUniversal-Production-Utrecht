@@ -30,8 +30,9 @@
 
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
+#include <rexos_datatypes/EquipletStep.h>
 #include <boost/bind.hpp>
-
+#include <rexos_datatypes/EquipletStep.h>
 #include <jsoncpp/json/reader.h>
 
 
@@ -39,16 +40,9 @@
 #define NODE_NAME "GripperNode"
 // @endcond
 
-GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
-		rexos_knowledge_database::Module(moduleIdentifier),
-		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
-		setInstructionActionServer(
-				nodeHandle, 
-				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
-				boost::bind(&GripperNode::onSetInstruction, this, _1), 
-				false) {
+GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
+		rexos_module::ActorModule(equipletName, moduleIdentifier) {
 	REXOS_INFO("GripperNode Constructor entering...");
-	REXOS_INFO("1");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
 	std::string typeProperties = this->getModuleTypeProperties();
@@ -65,7 +59,6 @@ GripperNode::GripperNode(std::string equipletName, rexos_knowledge_database::Mod
 	}
 	
 	gripper = new rexos_gripper::Gripper(jsonNode);
-	setInstructionActionServer.start();
 }
 
 GripperNode::~GripperNode() {
@@ -75,35 +68,34 @@ GripperNode::~GripperNode() {
 	delete modbus;
 }
 
-void GripperNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
+void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
 	REXOS_INFO_STREAM("handling hardwareStep: " << goal->json);
 	Json::Reader reader;
-	Json::Value instructionDataNode;
-	reader.parse(goal->json, instructionDataNode);
+	Json::Value equipletStepNode;
+	reader.parse(goal->json, equipletStepNode);
+	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 	
-	rexos_statemachine::SetInstructionResult result;
+	rexos_module::SetInstructionResult result;
 	result.OID = goal->OID;
 	
-	//if(strcmp(nodeName, "command") == 0) {
-	
-		if (instructionDataNode.isMember("activate") == true){
-			gripper->activate();	
-			setInstructionActionServer.setSucceeded(result);	
-			std::cout << "Gripper activated" << std::endl;
-			return;
-		}
-		
-		else if (instructionDataNode.isMember("deactivate") == true){
-			gripper->deactivate();
-			setInstructionActionServer.setSucceeded(result);	
-			std::cout << "Gripper deactivated" << std::endl;
-			return;			
-		}
+	Json::Value instructionData = equipletStep.getInstructionData();
+	if (instructionData.isMember("activate") == true){
+		gripper->activate();
+		ros::Duration(0.1).sleep();
+		setInstructionActionServer.setSucceeded(result);	
+		std::cout << "Gripper activated" << std::endl;
+		return;
+	} else if (instructionData.isMember("deactivate") == true){
+		gripper->deactivate();
+		ros::Duration(0.1).sleep();
+		setInstructionActionServer.setSucceeded(result);	
+		std::cout << "Gripper deactivated" << std::endl;
+		return;			
+	}
 	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
 	setInstructionActionServer.setAborted(result);
 }
-
 
 /**
  * A wrapper for the gripper error handler so that we can use a member function
@@ -205,7 +197,7 @@ int main(int argc, char** argv) {
 	}
 	
 	std::string equipletName = argv[1];
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
 	
 	REXOS_INFO("Creating GripperNode");
 

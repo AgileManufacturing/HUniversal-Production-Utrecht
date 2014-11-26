@@ -9,24 +9,22 @@
 #define MODULEREGISTRY_H_
 
 #include <ros/ros.h>
-#include "rexos_logger/rexos_logger.h"
 
 #include <equiplet_node/RegisterModule.h>
-
-#include <equiplet_node/ModuleProxy.h>
-
-#include "equiplet_node/ModuleRegistryListener.h"
-
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <equiplet_node/ModuleRegistryListener.h>
+#include <rexos_module/ModuleProxy.h>
+#include <rexos_module/ModuleProxyListener.h>
 #include <rexos_knowledge_database/Equiplet.h>
-#include <rexos_knowledge_database/RequiredMutation.h>
-#include <rexos_knowledge_database/SupportedMutation.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_datatypes/RequiredMutation.h>
+#include <rexos_datatypes/SupportedMutation.h>
+#include <rexos_logger/rexos_logger.h>
 
 namespace equiplet_node {
 
 class EquipletNode;
 
-class ModuleRegistry : public equiplet_node::ModuleProxyListener {
+class ModuleRegistry : public rexos_module::ModuleProxyListener {
 public:
 	ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl = NULL);
 	virtual ~ModuleRegistry();
@@ -35,21 +33,23 @@ public:
 
 	void setNewRegistrationsAllowed(bool allowed);
 
-	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
-
-	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
-
-	void onHardwareStepCompleted(ModuleProxy* moduleProxy, std::string id, bool completed);
+	void onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::State newState, rexos_statemachine::State previousState);
+	void onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
+	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed);
+	void onModuleDied(rexos_module::ModuleProxy* moduleProxy);
+	void onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
+			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase);
+	void spawnNode(rexos_module::ModuleProxy* moduleProxy);
 	
-	void onModuleDied(ModuleProxy* moduleProxy);
+	std::vector<rexos_module::ModuleProxy*> getRegisteredModules();
+
+	rexos_module::ModuleProxy* getModule(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	
-	void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
-			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
-			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase);
-
-	std::vector<ModuleProxy*> getRegisteredModules();
-
-	ModuleProxy* getModule(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+	/**
+	 * [reloadModules - WIP LARS]
+	 */
+ 	void reloadModules();
 
 private:
 	bool onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res);
@@ -62,7 +62,7 @@ private:
 	bool newRegistrationsAllowed;
 	std::string equipletName;
 
-	std::vector<ModuleProxy*> registeredModules;
+	std::vector<rexos_module::ModuleProxy*> registeredModules;
 };
 
 } /* namespace equiplet_node */

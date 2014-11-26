@@ -1,5 +1,6 @@
 package HAL;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +27,7 @@ public class ModuleTypeIdentifier {
 			return true;
 		if (obj == null)
 			return false;
-		if (obj instanceof ModuleTypeIdentifier)
+		if ((obj instanceof ModuleTypeIdentifier) == false)
 			return false;
 		ModuleTypeIdentifier other = (ModuleTypeIdentifier) obj;
 		if (manufacturer == null) {
@@ -42,6 +43,11 @@ public class ModuleTypeIdentifier {
 		return true;
 	}
 
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(manufacturer).append(typeNumber).toHashCode();
+	}
+	
 	public String getManufacturer(){
 		return this.manufacturer;
 	}

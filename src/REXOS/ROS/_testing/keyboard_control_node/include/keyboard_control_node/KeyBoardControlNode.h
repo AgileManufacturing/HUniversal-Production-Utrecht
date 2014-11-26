@@ -1,10 +1,12 @@
 /**
  * @file KeyBoardControlNode.h
  * @brief An ROS node for controlling the delta robot with the keyboard
- * @date Created: 2012-10-12
+ * @date Created: 2014-11-12
  *
  * @author ??
  * @author Alexander Streng
+ * @author Tommas Bakker
+ * @author Peter Markotic
  *
  * @section LICENSE
  * License: newBSD
@@ -33,7 +35,7 @@
 
 #include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include "rexos_logger/rexos_logger.h"
 #include <vectors/Vectors.h>
 
@@ -42,19 +44,21 @@ namespace keyboard_control_node {
 	class KeyBoardControlNode 
 	{
 	public:
-		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		~KeyBoardControlNode();
 		void run();
 		
 	private:
 		void readInputFromKeyBoard(int inputCharacter);
 		void writeToBlackBoard(Vector3 direction, double acceleration, double rotationX, double rotationY, double rotationZ);
+		void playRoutine();
 		
 		/**
 		 * @var double maxAcceleration
 		 * The maxAcceleration of the effector in millimeters per second.
 		 **/
 		double maxAcceleration;
+		static const char KEYCODE_X = 0x78;
 		static const char KEYCODE_W = 0x77;
 		static const char KEYCODE_S = 0x73;
 		static const char KEYCODE_A = 0x61;
@@ -79,7 +83,7 @@ namespace keyboard_control_node {
 		 * @var double step
 		 * The size in millimeters per movement.
 		 **/
-		static constexpr double STEP = 1.0;
+		static constexpr double STEP = 10.0;
 		static constexpr double STEP_ANGLE = 0.1;
 
 		/**
@@ -88,7 +92,7 @@ namespace keyboard_control_node {
 		struct termios oldTerminalSettings, newTerminalSettings;
 		Blackboard::BlackboardCppClient* equipletStepBlackboardClient;
 		bool exitProgram;
-		rexos_knowledge_database::ModuleIdentifier identifier;
+		rexos_datatypes::ModuleIdentifier identifier;
 		std::string equipletName;
 	};
 

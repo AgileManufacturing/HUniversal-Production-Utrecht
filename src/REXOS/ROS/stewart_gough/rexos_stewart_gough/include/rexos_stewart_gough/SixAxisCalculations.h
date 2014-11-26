@@ -23,16 +23,17 @@ class SixAxisCalculations {
 			double angles[6];
 		};
 
-		SixAxisCalculations(double upperArmLength = 100.00, double lowerArmLength = 300.00, 
-				double motorAxisToCenterDistance = 101.30, double effectorJointtoCenterDistance = 43.14, 
-				double maxJointAngle = 0.46):
+		SixAxisCalculations(double upperArmLength, double lowerArmLength, 
+				double motorAxisToCenterDistance, double effectorJointtoCenterDistance, 
+				double effectorJointOffset, double motorJointOffset,
+				double maxJointAngle):
 			upperArmLength(upperArmLength),
 			lowerArmLength(lowerArmLength),
 			baseRadius(motorAxisToCenterDistance),
 			effectorRadius(effectorJointtoCenterDistance),
 			maxJointAngle(maxJointAngle),
-			effectorJointOffset(35.0),
-			motorJointOffset(35.0)
+			effectorJointOffset(effectorJointOffset),
+			motorJointOffset(motorJointOffset)
 			{
 		}
 

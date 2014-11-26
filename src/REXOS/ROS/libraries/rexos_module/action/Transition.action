@@ -1,0 +1,5 @@
+string[] gainedSupportedMutations
+RequiredMutation[] requiredMutationsRequiredForNextPhase
+---
+CandidateModules[] candidates
+---

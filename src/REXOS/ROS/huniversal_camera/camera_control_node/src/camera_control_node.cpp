@@ -48,16 +48,15 @@
 #include <string>
 #include <iostream>
 
-CameraControlNode::CameraControlNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
+CameraControlNode::CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
+		rexos_module::Module::Module(equipletName, moduleIdentifier), 
 		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::INCREASE_EXPOSURE)),
 		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::DECREASE_EXPOSURE)),
 		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(				vision_node_services::AUTO_WHITE_BALANCE)),
 		fishEyeCorrectionClient(			nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::FISH_EYE_CORRECTION)),
 		enableCameraClient(				nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::ENABLE_CAMERA)),
 		getCorrectionMatricesClient(		nodeHandle.serviceClient<vision_node::getCorrectionMatrices>(		vision_node_services::GET_CORRECTION_MATRICES)),
-		calibrateLensClient(				nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS)),
-		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false),
-		rexos_knowledge_database::Module(moduleIdentifier)
+		calibrateLensClient(				nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS))
 {
 }
 
@@ -160,7 +159,7 @@ bool CameraControlNode::transitionDeinitialize() {
 bool CameraControlNode::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	std::vector<rexos_knowledge_database::ModuleIdentifier> children = this->getChildModulesIdentifiers();
+	std::vector<rexos_datatypes::ModuleIdentifier> children = this->getChildModulesIdentifiers();
 	if(children.size() != 1){
 		REXOS_ERROR_STREAM("CameraControlNode::transitionSetup: Expected 1 child module (the lens), got " << children.size());
 		return false;
@@ -242,7 +241,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	std::string equipletName = argv[1];
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
 	
 	CameraControlNode node(equipletName, moduleIdentifier);
 	
@@ -254,3 +253,4 @@ int main(int argc, char* argv[]) {
 	node.run();
 	return 0;
 }
+

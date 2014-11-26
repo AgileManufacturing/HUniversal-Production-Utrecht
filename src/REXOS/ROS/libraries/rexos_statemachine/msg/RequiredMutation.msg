@@ -1,2 +1,0 @@
-string mutation
-bool isOptional

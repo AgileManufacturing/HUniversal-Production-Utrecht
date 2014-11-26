@@ -48,16 +48,9 @@
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier) :
-		rexos_knowledge_database::Module(moduleIdentifier),
-		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, true),
-		rexos_coordinates::Module(this),
+stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
+		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier),
 		stewartGough(NULL),
-		setInstructionActionServer(
-				nodeHandle, 
-				equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/set_instruction", 
-				boost::bind(&stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction, this, _1), 
-				false),
 		lastX(0.0),
 		lastY(0.0),
 		lastZ(0.0){
@@ -83,12 +76,6 @@ stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipl
 		
 	// Create a stewart gough robot
 	stewartGough = new rexos_stewart_gough::StewartGough(jsonNode);
-
-	setInstructionActionServer.start();
-
-	ROS_INFO_STREAM("StewartGoughNode initialized. Advertising actionserver on " << 
-			moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() << 
-			"/set_instruction");
 }
 
 
@@ -98,14 +85,14 @@ stewartGoughNodeNamespace::StewartGoughNode::~StewartGoughNode() {
 }
 
 
-void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal){
+void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
 	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
 	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
 	
-	rexos_statemachine::SetInstructionResult result;
+	rexos_module::SetInstructionResult result;
 	result.OID = goal->OID;
 	
 	rexos_stewart_gough::StewartGoughLocation origin;
@@ -266,41 +253,6 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_goug
 	
 }
 
-
-
-
-
-
-
-/**
- * Function that moves the stewart int that is relative to the current. 
- *
- * @param x destination relative x-coordinate
- * @param y destination relative y-coordinate
- * @param z destination relative z-coordinate
- * @param maxAcceleration maximum acceleration
- * 
- * @return false if the path is illegal, true if the motion is executed succesfully.
- **/
- 
- /*
-bool stewartGoughNodeNamespace::StewartGoughNode::moveToRelativePoint(double x, double y, double z, double maxAcceleration){
-	rexos_datatypes::Point3D<double> oldLocation(stewartGough->getEffectorLocation());
-	rexos_datatypes::Point3D<double> newLocation(x,y,z);
-	newLocation += oldLocation;
-	try {
-		REXOS_INFO("Moving to: (%f, %f, %f) maxAcceleration=%f", x, y, z, maxAcceleration);
-		stewartGough->moveTo(newLocation, maxAcceleration);
-		return true;
-	} catch(std::out_of_range& ex){
-		return false;
-	}
-	
-}
-*/
-
-
-
 bool stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(){
 	REXOS_INFO("Initialize transition called");
 	return true;
@@ -369,32 +321,34 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  **/
 int main(int argc, char **argv){
 	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
-				0, 0, 
+				50, 50, 
+				20, 20,
 				0.46);
-//	rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -200 * std::sqrt(2)), 0, 0, 0.0);
-	rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), 0, 0, 0.0);
-	rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
 	
-	REXOS_INFO_STREAM(movement.moveTo.location);
-	REXOS_INFO_STREAM(movement.moveTo.rotationX);
-	REXOS_INFO_STREAM(movement.moveTo.rotationY);
-	REXOS_INFO_STREAM(movement.moveTo.rotationZ);
-	REXOS_INFO_STREAM(movement.validMove);
-	REXOS_INFO_STREAM("----------");
-	REXOS_INFO_STREAM(movement.angles[0]);
-	REXOS_INFO_STREAM(movement.angles[1]);
-	REXOS_INFO_STREAM(movement.angles[2]);
-	REXOS_INFO_STREAM(movement.angles[3]);
-	REXOS_INFO_STREAM(movement.angles[4]);
-	REXOS_INFO_STREAM(movement.angles[5]);
-	REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
-	REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
-	
-	
+	{
+		rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), rexos_utilities::degreesToRadians(45), 0, 0.0);
+		rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
+		REXOS_INFO_STREAM("----------");
+		REXOS_INFO_STREAM(movement.validMove);
+		REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
+	}
+	{
+		rexos_stewart_gough::StewartGoughLocation location(Vector3(0, 0, -360), rexos_utilities::degreesToRadians(45), 0, 0.0);
+		rexos_stewart_gough::SixAxisCalculations::EffectorMove movement = sc.getMotorAngles(location);
+		REXOS_INFO_STREAM("----------");
+		REXOS_INFO_STREAM(movement.validMove);
+		REXOS_INFO_STREAM(movement.angles[0] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[1] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[2] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
+		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
+	}
 	
 	ros::init(argc, argv, NODE_NAME);
 	
@@ -404,7 +358,7 @@ int main(int argc, char **argv){
 	}
 	
 	std::string equipletName = argv[1];
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
 	
 	REXOS_INFO("Creating StewartGoughNode");
 	stewartGoughNodeNamespace::StewartGoughNode drn(equipletName, moduleIdentifier);

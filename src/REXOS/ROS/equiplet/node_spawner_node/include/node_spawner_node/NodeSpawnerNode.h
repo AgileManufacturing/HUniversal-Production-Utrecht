@@ -52,7 +52,7 @@ public:
 
 private:
 	bool spawnNode(spawnNode::Request &request, spawnNode::Response &response);
-	std::vector<rexos_knowledge_database::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+	std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
 	/**
 	 * @var int equipletId
 	 * The id of the equiplet

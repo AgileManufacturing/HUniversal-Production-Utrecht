@@ -2,7 +2,7 @@
 
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/scada/mongoose.h>
-#include "rexos_logger/rexos_logger.h"
+#include <rexos_logger/rexos_logger.h>
 
 
 #define SCADA_DEFAULT_DOCUMENT_ROOT "./src/REXOS/www/equiplet_scada/"

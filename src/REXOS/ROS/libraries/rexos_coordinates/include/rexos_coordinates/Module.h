@@ -27,8 +27,7 @@
  *
  **/
 
-#ifndef MODULE_H
-#define MODULE_H
+#pragma once
 
 #include <vectors/Vectors.h>
 #include <rexos_knowledge_database/Module.h>
@@ -77,4 +76,3 @@ namespace rexos_coordinates {
 		void updateTranslationVectors();
 	};
 }
-#endif /* RECTIFYIMAGE_H */

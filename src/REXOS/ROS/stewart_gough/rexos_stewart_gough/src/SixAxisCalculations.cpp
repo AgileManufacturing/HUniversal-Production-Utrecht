@@ -401,6 +401,10 @@ double SixAxisCalculations::getAngleForGroup(int jointIndex) {
 }
 
 Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA, Vector2 pointB, double radiusB) {
+	ROS_INFO_STREAM("---pointA: " << pointA);
+	ROS_INFO_STREAM("---radiusA: " << radiusA);
+	ROS_INFO_STREAM("---pointB: " << pointB);
+	ROS_INFO_STREAM("---radiusB: " << radiusB);
 	Vector2 deltaAB = pointB - pointA;
 	//Determine the straight-Line distance between the centers.
 	double distance = pointA.distance(pointB);
@@ -414,8 +418,10 @@ Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA
 	}
 	
 	// Determine the distance from point A to the intersection line
-	// TODO bug here? should be (std::pow(distance, 2) - std::pow(radiusA, 2) + std::pow(radiusB, 2) + ) / (2.0 * distance)
-	double intersectionLineDistance = (std::pow(radiusA, 2) - std::pow(radiusB, 2) + std::pow(distance, 2)) / (2.0 * distance);
+	double intersectionLineDistance = (std::pow(distance, 2) - std::pow(radiusB, 2) + std::pow(radiusA, 2)) / (2 * distance);
+	ROS_INFO_STREAM("--deltaAB: " << deltaAB);
+	ROS_INFO_STREAM("--distance: " << distance);
+	ROS_INFO_STREAM("--intersectionLineDistance: " << intersectionLineDistance);
 	
 	// Determine the coordinates of the intersection point of the intersection line and the line AB
 	Vector2 interSectionLineOnLineAB = pointA + (deltaAB * intersectionLineDistance / distance);
@@ -431,11 +437,14 @@ Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA
 	// Determine the absolute intersection points.
 	Vector2 intersectionPointA = interSectionLineOnLineAB + (intersectionLine);
 	Vector2 intersectionPointB = interSectionLineOnLineAB + (-intersectionLine);
+	ROS_INFO_STREAM("--intersectionPointA: " << intersectionPointA);
+	ROS_INFO_STREAM("--intersectionPointB: " << intersectionPointB);
 	
-	return intersectionPointA;
+	return intersectionPointB;
 }
 
-Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, double groupAngle) {
+Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, 
+		JointPositionInGroup jointPosition, double groupAngle) {
 	Vector3 offsetVector(0, -effectorRadius, 0);
 	if(jointPosition == JointPositionInGroup::left) {
 		offsetVector.x -= effectorJointOffset;
@@ -451,11 +460,13 @@ Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRo
 	rotationMatrix.rotateX(preRotatedEffectorLocation.rotationX);
 	rotationMatrix.rotateY(preRotatedEffectorLocation.rotationY);
 	rotationMatrix.rotateZ(preRotatedEffectorLocation.rotationZ);
+	REXOS_ERROR_STREAM("realEffectorJointPosition: " << 
+			preRotatedEffectorLocation.location + rotationMatrix * offsetVector);
 	// rotate back to the original position of the effector group
 	rotationMatrix.rotateZ(-groupAngle);
 	
 	Vector3 rotatedOffsetVector = rotationMatrix * offsetVector;
-	REXOS_ERROR_STREAM(rotatedOffsetVector);
+	REXOS_ERROR_STREAM("rotatedOffsetVector: " << rotatedOffsetVector);
 	return preRotatedEffectorLocation.location + rotatedOffsetVector;
 }
 
@@ -506,15 +517,24 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	double innerCircleRadius = std::sqrt(std::pow(lowerArmLength, 2) - std::pow(deltaX, 2));
 	ROS_INFO_STREAM("innerCircleRadius: " << innerCircleRadius);
 	
-	Vector2 upperArmLowerArmIntersectionPoint = getIntersectionPoint(Vector2(0, 0), upperArmLength, 
+	Vector2 upperArmLowerArmIntersectionPoint = getIntersectionPoint(
+			Vector2(motorAxisPosition.y, motorAxisPosition.z), upperArmLength, 
 			Vector2(effectorJointPosition.y, effectorJointPosition.z), innerCircleRadius);
 	ROS_INFO_STREAM("upperArmLowerArmIntersectionPoint: " << upperArmLowerArmIntersectionPoint);
 	
+	Vector2 relativeUpperArmLowerArmIntersectionPoint = Vector2(
+			upperArmLowerArmIntersectionPoint.x - motorAxisPosition.y, 
+			upperArmLowerArmIntersectionPoint.y - motorAxisPosition.z);
+	ROS_INFO_STREAM("relativeUpperArmLowerArmIntersectionPoint: " << relativeUpperArmLowerArmIntersectionPoint);
+	
 	// Determine the angle for the motor
-	return std::atan2(upperArmLowerArmIntersectionPoint.y, upperArmLowerArmIntersectionPoint.x);
+	double rotationAngle = std::atan2(relativeUpperArmLowerArmIntersectionPoint.y, relativeUpperArmLowerArmIntersectionPoint.x);
+	double motorRotationAngle = rexos_utilities::degreesToRadians(180) + rotationAngle;
+	return motorRotationAngle;
 }
 
 SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(StewartGoughLocation moveTo) {
+	ROS_WARN_STREAM("moveTo: " << moveTo);
 	EffectorMove result;
 
 	result.moveTo = moveTo;
@@ -522,6 +542,7 @@ SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(StewartGou
 
 	for(int i = 0; i < 6; i++) {
 		result.angles[i] = getMotorAngle(moveTo, i);
+		ROS_INFO_STREAM("Angle " << (double) i << ": " << result.angles[i]);
 		if(std::isnan(result.angles[i])) {
 			result.validMove = false;
 			break;
@@ -576,6 +597,5 @@ bool SixAxisCalculations::checkPath(StewartGoughLocation from, StewartGoughLocat
 			}
 		}
         return true;
-
 }
 }

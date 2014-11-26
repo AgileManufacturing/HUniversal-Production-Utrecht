@@ -31,25 +31,21 @@
 #pragma once
 
 #include <ros/ros.h>
-#include "rexos_logger/rexos_logger.h"
 
 #include <string>
 #include <vector>
 
 #include <rexos_statemachine/StateMachine.h>
 #include <rexos_statemachine/Listener.h>
-
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
-
 #include <equiplet_node/ModuleRegistry.h>
-#include <equiplet_node/ModuleProxy.h>
-
 #include <equiplet_node/scada/EquipletScada.h>
-
-#include <rexos_knowledge_database/RequiredMutation.h>
-#include <rexos_knowledge_database/SupportedMutation.h>
-#include <rexos_knowledge_database/TransitionPhase.h>
+#include <rexos_module/ModuleProxy.h>
+#include <rexos_datatypes/RequiredMutation.h>
+#include <rexos_datatypes/SupportedMutation.h>
+#include <rexos_datatypes/TransitionPhase.h>
+#include <rexos_logger/rexos_logger.h>
 
 namespace equiplet_node{
 
@@ -66,15 +62,14 @@ protected:
 	virtual void onStateChanged(rexos_statemachine::State state);
 	virtual void onModeChanged(rexos_statemachine::Mode mode);
 
-	void onModuleStateChanged(ModuleProxy* moduleProxy,rexos_statemachine::State newState, rexos_statemachine::State previousState);
-
-	void onModuleModeChanged(ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
-
-	void onModuleDied(ModuleProxy* moduleProxy);
+	void onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::State newState, rexos_statemachine::State previousState);
+	void onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
+	void onModuleDied(rexos_module::ModuleProxy* moduleProxy);
 	
-	void onModuleTransitionPhaseCompleted(ModuleProxy* moduleProxy, 
-			std::vector<rexos_knowledge_database::SupportedMutation> gainedSupportedMutations, 
-			std::vector<rexos_knowledge_database::RequiredMutation> requiredMutationsRequiredForNextPhase);
+	void onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
+			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
+			std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase);
+	void spawnNode(rexos_module::ModuleProxy* moduleProxy);
 private:
 	bool allModulesInDesiredState(rexos_statemachine::State desiredState);
 
@@ -96,11 +91,11 @@ private:
 	boost::condition_variable condit;
 	boost::mutex mutexit;
 private:
-	std::vector<std::vector<rexos_knowledge_database::TransitionPhase>> calculateOrderOfCalibrationSteps();
-	bool areAllRequiredMutationsAvailiable(std::vector<rexos_knowledge_database::RequiredMutation> requiredMutations, 
-			std::vector<rexos_knowledge_database::SupportedMutation> supportedMutations);
-	std::vector<rexos_knowledge_database::SupportedMutation>* currenntlySupportedMutations;
-	std::map<ModuleProxy*, std::vector<rexos_knowledge_database::RequiredMutation>>* pendingTransitionPhases;
+	std::vector<std::vector<rexos_datatypes::TransitionPhase>> calculateOrderOfCalibrationSteps();
+	bool areAllRequiredMutationsAvailiable(std::vector<rexos_datatypes::RequiredMutation> requiredMutations, 
+			std::map<rexos_datatypes::SupportedMutation, std::vector<rexos_module::ModuleProxy*>> supportedMutations);
+	std::map<rexos_datatypes::SupportedMutation, std::vector<rexos_module::ModuleProxy*>>* currentlySupportedMutations;
+	std::map<rexos_module::ModuleProxy*, std::vector<rexos_datatypes::RequiredMutation>>* pendingTransitionPhases;
 };
 
 }

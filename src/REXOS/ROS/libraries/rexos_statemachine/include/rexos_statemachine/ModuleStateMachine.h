@@ -2,23 +2,22 @@
 
 #include <ros/ros.h>
 
-#include <rexos_bond/Bond.h>
-
 #include <rexos_statemachine/StateMachine.h>
 #include <rexos_statemachine/Listener.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include "rexos_logger/rexos_logger.h"
 
 namespace rexos_statemachine{
 
-class ModuleStateMachine : public StateMachine, public rexos_bond::BondListener {
+class ModuleStateMachine : public StateMachine {
+private:
 	std::string equipletName;
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
+	rexos_datatypes::ModuleIdentifier moduleIdentifier;
 
 	ros::ServiceClient changeStateNotificationClient;
 	ros::ServiceClient changeModeNotificationClient;
 public:
-	ModuleStateMachine(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, bool actorModule);
+	ModuleStateMachine(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool actorModule);
 	~ModuleStateMachine();
 protected:
 	virtual void onStateChanged(rexos_statemachine::State state);
@@ -27,15 +26,6 @@ protected:
 	void setInError();
 
 	bool actorModule;
-	TransitionActionClient transitionActionClient;
-
-private:
-	/**
-	 * The bond to bind the module with the equiplet
-	 **/
-	rexos_bond::Bond* bond;
-protected:
-	virtual void onBondCallback(rexos_bond::Bond* bond, Event event);
 };
 
 }

@@ -47,7 +47,7 @@ namespace rexos_node_spawner {
 	{
 		
 	}
-	void NodeSpawner::spawnNode(rexos_knowledge_database::ModuleIdentifier moduleIdentifier) {
+	void NodeSpawner::spawnNode(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
 		REXOS_INFO("Spawning new node");
 		int pid = fork();
 		if(pid == 0) {

@@ -6,16 +6,14 @@
 
 using namespace rexos_statemachine;
 
-ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier, bool actorModule) : 
+ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool actorModule) : 
 		StateMachine(equipletName + "/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber(),
 			{rexos_statemachine::MODE_NORMAL, 
 			rexos_statemachine::MODE_SERVICE, 
 			actorModule ? rexos_statemachine::MODE_CRITICAL_ERROR : rexos_statemachine::MODE_ERROR,
 			rexos_statemachine::MODE_E_STOP}
 		), 
-		equipletName(equipletName), moduleIdentifier(moduleIdentifier), actorModule(actorModule), bond(NULL),
-		transitionActionClient(nodeHandle, equipletName + 
-			"/" + moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber() + "/transition") 
+		equipletName(equipletName), moduleIdentifier(moduleIdentifier), actorModule(actorModule)
 		{
 	std::string moduleNamespaceName = moduleIdentifier.getManufacturer() + "/" + moduleIdentifier.getTypeNumber() + "/" + moduleIdentifier.getSerialNumber();
 	std::string equipletNamespaceName = equipletName;
@@ -34,14 +32,9 @@ ModuleStateMachine::ModuleStateMachine(std::string equipletName, rexos_knowledge
 
 	changeStateNotificationClient = nodeHandle.serviceClient<rexos_statemachine::StateUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/state_update");
 	changeModeNotificationClient = nodeHandle.serviceClient<rexos_statemachine::ModeUpdate>(equipletNamespaceName + "/" + moduleNamespaceName + "/mode_update");
-	
-	REXOS_INFO_STREAM("binding A on " << (equipletNamespaceName + "/bond")<< " id " << moduleNamespaceName);
-	bond = new rexos_bond::Bond(equipletNamespaceName + "/bond", moduleNamespaceName, this);
-	bond->start();
 }
 
 ModuleStateMachine::~ModuleStateMachine(){
-	delete bond;
 }
 
 void ModuleStateMachine::onStateChanged(rexos_statemachine::State state) {
@@ -65,12 +58,4 @@ void ModuleStateMachine::setInError() {
 		changeMode(rexos_statemachine::MODE_CRITICAL_ERROR);
 	else
 		changeMode(rexos_statemachine::MODE_ERROR);
-}
-void ModuleStateMachine::onBondCallback(rexos_bond::Bond* bond, Event event){
-	if(event == FORMED) {
-		REXOS_INFO("Bond has been formed");
-	} else {
-		REXOS_WARN("Bond has been broken, initiate gracefull shutdown");
-		// TODO: implement gracefull shutdown
-	}
 }

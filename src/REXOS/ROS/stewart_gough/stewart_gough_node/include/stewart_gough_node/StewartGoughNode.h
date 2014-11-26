@@ -39,27 +39,15 @@
 #include <rexos_stewart_gough/StewartGoughLocation.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_statemachine/ModuleStateMachine.h>
-#include <rexos_statemachine/Transitions.h>
-#include <rexos_coordinates/Module.h>
-#include <rexos_knowledge_database/Module.h>
-#include "equiplet_node/RegisterModule.h"
-
-#include <actionlib/server/simple_action_server.h>
-#include <rexos_statemachine/SetInstructionAction.h>
+#include <rexos_module/ActorModule.h>
 
 #include <jsoncpp/json/value.h>
 
 namespace stewartGoughNodeNamespace{
-
-	typedef actionlib::SimpleActionServer<rexos_statemachine::SetInstructionAction> SetInstructionActionServer;
-
 	/**
 	 * the DeltaRobotNode which is a ModuleStateMachine
 	**/
-	class StewartGoughNode : public rexos_statemachine::ModuleStateMachine, 
-			public rexos_knowledge_database::Module, 
-			public rexos_coordinates::Module{
+	class StewartGoughNode : public rexos_module::ActorModule {
 	protected:
 		rexos_motor::StepperMotorProperties* stepperMotorProperties;
 		rexos_stewart_gough::StewartGoughMeasures* stewartGoughMeasures;
@@ -71,7 +59,7 @@ namespace stewartGoughNodeNamespace{
 		
 		
 	public:
-		StewartGoughNode(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+		StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		virtual ~StewartGoughNode();
 		
 		virtual bool transitionInitialize();
@@ -80,23 +68,17 @@ namespace stewartGoughNodeNamespace{
 		virtual bool transitionShutdown();
 		virtual bool transitionStart();
 		virtual bool transitionStop();
-			
+		
 		// Main functions to be called from the services
 		bool calibrate();
 		bool moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration);
 		
-		void onSetInstruction(const rexos_statemachine::SetInstructionGoalConstPtr &goal);
+		void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal);
 
 	private:
 		float lastX;
 		float lastY;
 		float lastZ;
-		/**
-		 * @var ros::NodeHandle node
-		 * The nodeHandle used by ros services and topics
-		 **/
-		ros::NodeHandle nodeHandle;
-		SetInstructionActionServer setInstructionActionServer;
 		/**
 		 * @var DeltaRobot::DeltaRobot * deltaRobot
 		 * the deltaRobot

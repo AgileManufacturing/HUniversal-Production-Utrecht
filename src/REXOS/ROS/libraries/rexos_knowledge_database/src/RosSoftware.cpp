@@ -5,7 +5,7 @@
 #include <cppconn/prepared_statement.h>
 
 namespace rexos_knowledge_database {
-	RosSoftware::RosSoftware(ModuleIdentifier moduleIdentifier) {
+	RosSoftware::RosSoftware(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\

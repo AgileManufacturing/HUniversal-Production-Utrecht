@@ -89,7 +89,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return mointPointDistanceY;
 	}
-	std::vector<ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {
+	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
@@ -98,9 +98,9 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		
-		std::vector<ModuleIdentifier> moduleIdentifiersOfAttachedModules;
+		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiersOfAttachedModules;
 		while(result->next()) {
-			ModuleIdentifier identifier = ModuleIdentifier(
+			rexos_datatypes::ModuleIdentifier identifier(
 					result->getString("manufacturer"), result->getString("typeNumber"), result->getString("serialNumber"));
 			moduleIdentifiersOfAttachedModules.push_back(identifier);
 		}
@@ -109,7 +109,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
 	}
-	std::vector<ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
+	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \
 		FROM Module \
@@ -121,9 +121,9 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		
-		std::vector<ModuleIdentifier> moduleIdentifiersOfAttachedModules;
+		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiersOfAttachedModules;
 		while(result->next()) {
-			ModuleIdentifier identifier = ModuleIdentifier(
+			rexos_datatypes::ModuleIdentifier identifier(
 					result->getString("manufacturer"), result->getString("typeNumber"), result->getString("serialNumber"));
 			moduleIdentifiersOfAttachedModules.push_back(identifier);
 		}

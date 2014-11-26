@@ -1,8 +1,0 @@
-# Define the goal
-string json
-string OID
----
-# Define the result
-string OID
----
-# Define a feedback message

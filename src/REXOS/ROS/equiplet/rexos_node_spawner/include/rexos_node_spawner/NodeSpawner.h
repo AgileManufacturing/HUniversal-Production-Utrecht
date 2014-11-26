@@ -29,17 +29,17 @@
  **/
 
 #pragma once
-#include <rexos_knowledge_database/RosSoftware.h>
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
+#include <rexos_knowledge_database/RosSoftware.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include "rexos_logger/rexos_logger.h"
 
 namespace rexos_node_spawner{
 	class NodeSpawner{
 	protected:
 		NodeSpawner(std::string equipletName);
-		void spawnNode(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
+		void spawnNode(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		void spawnEquipletNode();
 	private:
 		std::string equipletName;

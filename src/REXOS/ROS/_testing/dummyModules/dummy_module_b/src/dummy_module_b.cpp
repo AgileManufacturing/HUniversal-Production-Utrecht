@@ -31,12 +31,9 @@
 #include "dummy_module_b/dummy_module_b.h"
 #include <actionlib/client/simple_action_client.h>
 
-
-
-DummyModuleB::DummyModuleB(std::string equipletName, rexos_knowledge_database::ModuleIdentifier moduleIdentifier):
+DummyModuleB::DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
 		equipletName(equipletName),
-		rexos_knowledge_database::Module(moduleIdentifier),
-		rexos_statemachine::ModuleStateMachine(equipletName, moduleIdentifier, false)
+		rexos_module::Module(equipletName, moduleIdentifier)
 {
 }
 
@@ -59,9 +56,9 @@ bool DummyModuleB::transitionDeinitialize() {
 bool DummyModuleB::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	rexos_statemachine::TransitionGoal goal;
-	std::vector<rexos_statemachine::RequiredMutation> requiredMutations;
-	rexos_statemachine::RequiredMutation requiredMutation;
+	rexos_module::TransitionGoal goal;
+	std::vector<rexos_module::RequiredMutation> requiredMutations;
+	rexos_module::RequiredMutation requiredMutation;
 	requiredMutation.mutation = "move";
 	requiredMutation.isOptional = false;
 	requiredMutations.push_back(requiredMutation);
@@ -93,7 +90,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	std::string equipletName = argv[1];
-	rexos_knowledge_database::ModuleIdentifier moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(argv[2], argv[3], argv[4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
 
 	REXOS_INFO("Creating DummyModuleB");
 	ros::init(argc, argv, std::string("dummy_module_b") + moduleIdentifier.getManufacturer() + "_" + 

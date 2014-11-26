@@ -54,11 +54,11 @@ namespace rexos_datatypes{
         this->id = id;    
     }
 
-    rexos_knowledge_database::ModuleIdentifier EquipletStep::getModuleIdentifier(){
+    rexos_datatypes::ModuleIdentifier EquipletStep::getModuleIdentifier(){
         return this->moduleIdentifier;
     }
 
-    void EquipletStep::setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
+    void EquipletStep::setModuleIdentifier(rexos_datatypes::ModuleIdentifier moduleIdentifier){
         this->moduleIdentifier = moduleIdentifier;
     }
 
@@ -66,7 +66,7 @@ namespace rexos_datatypes{
 		std::string manufacturer = n["manufacturer"].asString();
 		std::string typeNumber = n["typeNumber"].asString();
 		std::string serialNumber = n["serialNumber"].asString();
-       this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+       this->moduleIdentifier = rexos_datatypes::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
 	 }
 
     Json::Value EquipletStep::getInstructionData(){
@@ -93,6 +93,14 @@ namespace rexos_datatypes{
         this->status = status;
     }
 
+    std::string EquipletStep::getReloadEquiplet(){
+        return this->reloadEquiplet;
+    }
+
+    void EquipletStep::setReloadEquiplet(std::string RE){
+        this->reloadEquiplet = RE;
+    }
+
     EquipletStep::~EquipletStep() {
         //std::cout << "Delete Equipletstep called." std::endl;
     }
@@ -102,6 +110,7 @@ namespace rexos_datatypes{
 		setInstructionData(n["instructionData"]);
 		setOriginPlacement(OriginPlacement(n["originPlacement"]));
 		setStatus(n["status"].asString());
+        setReloadEquiplet(n["reloadEquiplet"].asString());
     }
 
     Json::Value EquipletStep::toJSON(){
@@ -110,6 +119,7 @@ namespace rexos_datatypes{
 		output["instructionData"] = instructionData;
 		output["originPlacement"] = originPlacement.toJSON();
 		output["status"] = status;
+        output["reloadEquiplet"] = reloadEquiplet;
 		return output;
     }
 }

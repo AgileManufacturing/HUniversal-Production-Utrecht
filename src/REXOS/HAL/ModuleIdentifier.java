@@ -1,5 +1,6 @@
 package HAL;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,7 +26,7 @@ public class ModuleIdentifier extends ModuleTypeIdentifier{
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if ((obj instanceof ModuleIdentifier) == false)
 			return false;
 		ModuleIdentifier other = (ModuleIdentifier) obj;
 		if (super.equals(obj) == false) {
@@ -37,6 +38,11 @@ public class ModuleIdentifier extends ModuleTypeIdentifier{
 		} else if (!serialNumber.equals(other.serialNumber))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().appendSuper(super.hashCode()).append(serialNumber).toHashCode();
 	}
 
 	public String getSerialNumber(){

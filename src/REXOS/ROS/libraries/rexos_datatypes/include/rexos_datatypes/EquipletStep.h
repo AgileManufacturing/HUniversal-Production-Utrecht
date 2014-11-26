@@ -8,9 +8,8 @@
 #define	EQUIPLETSTEP_H
 
 #include <string.h>
-#include "rexos_datatypes/OriginPlacement.h"
-
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/OriginPlacement.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include <jsoncpp/json/value.h>
 
@@ -25,9 +24,10 @@ namespace rexos_datatypes{
         std::string getId();
         void setId(std::string id);
 
-        rexos_knowledge_database::ModuleIdentifier getModuleIdentifier();
-		 void setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
-		 void setModuleIdentifier(const Json::Value & n);
+        rexos_datatypes::ModuleIdentifier getModuleIdentifier();
+        
+        void setModuleIdentifier(rexos_datatypes::ModuleIdentifier moduleIdentifier);
+        void setModuleIdentifier(const Json::Value & n);
 
         OriginPlacement getOriginPlacement();
         void setOriginPlacement(OriginPlacement originPlacement);
@@ -38,14 +38,26 @@ namespace rexos_datatypes{
         std::string getStatus();
         void setStatus(std::string status);
 
+        /**
+         * [getReloadEquiplet - WIP LARS]
+         * @return [description]
+         */
+        std::string getReloadEquiplet();
+        /**
+         * [setReloadEquiplet - WIP LARS]
+         * @param status [description]
+         */
+        void setReloadEquiplet(std::string status);
+
         Json::Value toJSON();
     private:
 		std::string id;
-		rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
+		rexos_datatypes::ModuleIdentifier moduleIdentifier;
 		Json::Value instructionData;
 		OriginPlacement originPlacement;
 		// TODO enum
 		std::string status;
+        std::string reloadEquiplet;
 		void setValues(const Json::Value & n);
     };
 }
