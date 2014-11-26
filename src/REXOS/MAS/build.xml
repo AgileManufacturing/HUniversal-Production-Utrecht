@@ -9,13 +9,19 @@
    		<ant antfile="build.xml" target="all" dir="web_socket_server" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 	
-	<target name="simulation" depends="jars">
+	<target name="simulation" depends="jars, util">
    		<ant antfile="build.xml" target="all" dir="simulation" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	</target>
+	
+	<target name="util" depends="jars">
+   		<ant antfile="build.xml" target="all" dir="util" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 	
 	<target name="jars">
 		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
 	</target>
+
+
 	<target name="simjar">
         <mkdir dir="build/jar"/>
         <jar destfile="build/simulation.jar" basedir="../../../build/REXOS/MAS/simulation/">

@@ -1,7 +1,5 @@
 package HAL;
 
-import generic.ProductStep;
-
 import java.util.ArrayList;
 
 import org.json.JSONException;
@@ -16,7 +14,6 @@ import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import MAS.equiplet.Job;
 
 /**
  * 

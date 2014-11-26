@@ -1,16 +1,13 @@
 package HAL.testerClasses;
 
-import generic.ProductStep;
-import generic.Service;
-import jade.core.AID;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -21,12 +18,6 @@ import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
-import MAS.equiplet.Job;
-import MAS.util.Tick;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListener {
 	static HALTesterClassPickAndPlace htc = new HALTesterClassPickAndPlace();
@@ -37,7 +28,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	boolean state = false;
 	
 	static final String baseDir = "/home/t/Desktop/";
-static final String baseDir = "C:/git/HUniversal-Production-Utrecht/";
+	//static final String baseDir = "C:/git/HUniversal-Production-Utrecht/";
 	
 	// delta robot
 	static String moduleA_01 = "{"

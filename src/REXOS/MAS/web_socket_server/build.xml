@@ -1,4 +1,4 @@
-<project name="MAS" default="all">
+<project name="web_socket_server" default="all">
 	<import file="../build.xml"/>
 
 	<target name="all" depends="jars">

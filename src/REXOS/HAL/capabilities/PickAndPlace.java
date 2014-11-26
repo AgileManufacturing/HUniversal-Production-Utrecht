@@ -38,6 +38,10 @@ import generic.ProductStep;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -50,11 +54,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
-import MAS.equiplet.Job;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Pick and place capability class that translate

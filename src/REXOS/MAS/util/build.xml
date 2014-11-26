@@ -1,0 +1,12 @@
+<project name="util" default="all">
+	<import file="../build.xml"/>
+
+	<target name="all" depends="">
+		<buildjava dir="${basedir}"/>
+	</target>
+	
+	<target name="clean">
+		 <cleanjava dir="${basedir}"/>
+	</target>
+
+</project>

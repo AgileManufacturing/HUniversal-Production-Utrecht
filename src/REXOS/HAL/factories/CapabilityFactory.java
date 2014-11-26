@@ -1,7 +1,5 @@
 package HAL.factories;
 
-import generic.Service;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 

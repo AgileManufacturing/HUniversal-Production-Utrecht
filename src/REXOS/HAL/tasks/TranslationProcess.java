@@ -14,7 +14,6 @@ import HAL.exceptions.CapabilityException;
 import HAL.factories.CapabilityFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-import MAS.equiplet.Job;
 
 /**
  * The thread that manages the translation of ProductSteps.

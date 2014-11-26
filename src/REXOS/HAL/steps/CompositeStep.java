@@ -1,17 +1,14 @@
 package HAL.steps;
 
-import generic.ProductStep;
-import HAL.Capability;
-import HAL.Module;
-import HAL.exceptions.ModuleTranslatingException;
-import MAS.equiplet.Job;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
+import HAL.Capability;
+import HAL.Module;
+import HAL.exceptions.ModuleTranslatingException;
 
 /**
  * A CompositeStep is a step composed of multiple abstract {@link HardwareStep}s.

@@ -1,9 +1,11 @@
 package HAL;
 
-import generic.ProductStep;
 import generic.Service;
 
 import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
@@ -22,10 +24,6 @@ import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
-import MAS.equiplet.Job;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 /**
  * The main interface of the HAL for the equiplet agent. This class manages the factories and the blackboard handler.
  * 
