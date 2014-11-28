@@ -4,8 +4,8 @@
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>96</x>
-      <y>392</y>
+      <x>192</x>
+      <y>632</y>
       <w>144</w>
       <h>88</h>
     </coordinates>
@@ -18,8 +18,8 @@ entry/schedule()
   <element>
     <type>com.umlet.element.custom.InitialState</type>
     <coordinates>
-      <x>8</x>
-      <y>432</y>
+      <x>104</x>
+      <y>672</y>
       <w>16</w>
       <h>16</h>
     </coordinates>
@@ -29,8 +29,8 @@ entry/schedule()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>0</x>
-      <y>400</y>
+      <x>96</x>
+      <y>640</y>
       <w>112</w>
       <h>56</h>
     </coordinates>
@@ -41,8 +41,8 @@ Product()</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>656</x>
-      <y>392</y>
+      <x>808</x>
+      <y>632</y>
       <w>144</w>
       <h>88</h>
     </coordinates>
@@ -55,8 +55,8 @@ Product()</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>392</x>
-      <y>392</y>
+      <x>488</x>
+      <y>632</y>
       <w>144</w>
       <h>88</h>
     </coordinates>
@@ -70,8 +70,8 @@ informEquiplet();
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>552</x>
-      <y>504</y>
+      <x>688</x>
+      <y>744</y>
       <w>72</w>
       <h>32</h>
     </coordinates>
@@ -81,8 +81,8 @@ informEquiplet();
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>288</x>
-      <y>504</y>
+      <x>384</x>
+      <y>744</y>
       <w>72</w>
       <h>32</h>
     </coordinates>
@@ -92,20 +92,20 @@ informEquiplet();
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>72</x>
-      <y>456</y>
-      <w>232</w>
+      <x>176</x>
+      <y>696</y>
+      <w>224</w>
       <h>80</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [productionPath == null]</panel_attributes>
-    <additional_attributes>216;64;96;64;96;24</additional_attributes>
+    <additional_attributes>208;64;88;64;88;24</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>296</x>
-      <y>512</y>
+      <x>392</x>
+      <y>752</y>
       <w>168</w>
       <h>72</h>
     </coordinates>
@@ -115,8 +115,8 @@ informEquiplet();
   <element>
     <type>com.umlet.element.custom.FinalState</type>
     <coordinates>
-      <x>448</x>
-      <y>560</y>
+      <x>544</x>
+      <y>800</y>
       <w>16</w>
       <h>16</h>
     </coordinates>
@@ -127,55 +127,43 @@ informEquiplet();
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>608</x>
-      <y>312</y>
-      <w>210</w>
-      <h>96</h>
+      <y>504</y>
+      <w>356</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyProductProcessing()</panel_attributes>
-    <additional_attributes>120;80;120;40;24;40</additional_attributes>
+    <additional_attributes>272;128;272;40;24;40</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>440</x>
-      <y>512</y>
-      <w>160</w>
+      <x>536</x>
+      <y>752</y>
+      <w>200</w>
       <h>72</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>24;56;144;56;144;24</additional_attributes>
+    <additional_attributes>24;56;184;56;184;24</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>600</x>
-      <y>456</y>
-      <w>226</w>
+      <x>736</x>
+      <y>696</y>
+      <w>234</w>
       <h>98</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyProductStepFinished()/
 [productionPath.isEmpty()]</panel_attributes>
-    <additional_attributes>24;64;128;64;128;24</additional_attributes>
+    <additional_attributes>24;64;144;64;144;24</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>512</x>
-      <y>400</y>
-      <w>160</w>
-      <h>56</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-getNextEquipet()</panel_attributes>
-    <additional_attributes>24;40;144;40</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>216</x>
-      <y>400</y>
+      <x>312</x>
+      <y>640</y>
       <w>192</w>
       <h>56</h>
     </coordinates>
@@ -184,26 +172,53 @@ notifyProductProcessing()</panel_attributes>
     <additional_attributes>176;40;24;40</additional_attributes>
   </element>
   <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>480</x>
+      <y>560</y>
+      <w>152</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyProductArrived()</panel_attributes>
+    <additional_attributes>80;24;80;72</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>608</x>
+      <y>640</y>
+      <w>216</w>
+      <h>74</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyProductStepFinished()/
+[productionPath.isEmpty()]</panel_attributes>
+    <additional_attributes>24;40;200;40</additional_attributes>
+  </element>
+  <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>560</x>
-      <y>336</y>
-      <w>72</w>
-      <h>32</h>
+      <x>488</x>
+      <y>496</y>
+      <w>144</w>
+      <h>88</h>
     </coordinates>
-    <panel_attributes>Waiting</panel_attributes>
+    <panel_attributes>Waiting
+--
+entry/notifyShoudlStarted()</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>376</x>
-      <y>312</y>
-      <w>200</w>
-      <h>96</h>
+      <x>184</x>
+      <y>504</y>
+      <w>320</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-notifyProductArrived()</panel_attributes>
-    <additional_attributes>184;40;88;40;88;80</additional_attributes>
+onProductStarted()</panel_attributes>
+    <additional_attributes>72;128;72;40;304;40</additional_attributes>
   </element>
 </diagram>

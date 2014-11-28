@@ -34,9 +34,24 @@ class Stochastics {
 			}
 		}
 
+		// calculate the average production time for all equiplet for product interarrival time generation
 		meanProcessingTime = sumCapability / countCapability;
 	}
 
+	/**
+	 * @return the mean processing time of equiplets
+	 */
+	public double getMeanProcessingTime() {
+		return meanProcessingTime;
+	}
+
+	/**
+	 * Generate the time a new product will arrive
+	 * 
+	 * @param current
+	 *            time
+	 * @return interarrival time of product
+	 */
 	public Tick generateProductArrival(Tick time) {
 		if (time.greaterThan(Settings.WARMUP)) {
 			int equiplets = config.getEquipletsConfigurations().size();
@@ -48,11 +63,62 @@ class Stochastics {
 		}
 	}
 
+	/**
+	 * Generate product deadline
+	 * The distribution correspond to the given distribution in the simulation configurations
+	 * 
+	 * @return product deadline
+	 */
 	public Tick generateDeadline() {
 		return time(config.getProductDeadline());
 	}
 
+	/**
+	 * Generate the product steps for a new product
+	 * 
+	 * @return a list of product steps
+	 */
 	public LinkedList<ProductStep> generateProductSteps() {
+		boolean eenSetting = true;
+		if (eenSetting) {
+			return generateProductStepsRandom();
+		} else if (!eenSetting) {
+			return generateProductStepsUniformAmount();
+		} else {
+			return generateProductStepsTest();
+		}
+	}
+
+	/**
+	 * Generate the product steps with MEAN_PRODUCT_STEPS steps
+	 * 
+	 * @return a list of product steps
+	 */
+	private LinkedList<ProductStep> generateProductStepsRandom() {
+		LinkedList<ProductStep> steps = new LinkedList<>();
+		List<ProductStep> productSteps = config.getProductSteps();
+
+		int b = 2 * Settings.MEAN_PRODUCT_STEPS - Settings.MIN_PRODUCT_STEPS;
+		double ps = uniform(Settings.MIN_PRODUCT_STEPS, b);
+
+//		for (int i = 0; i < productSteps.size(); i++) {
+//			steps.add(new ProductStep(i, productSteps.get(i).getService(), productSteps.get(i).getCriteria()));
+//		}
+		
+		for (int i = 0; i < ps; i++) {
+			int x = random.nextInt(productSteps.size());
+			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
+		}
+		return steps;
+	}
+
+	/**
+	 * Generate the product steps
+	 * The number of product steps has a uniform distribution with a mean of MEAN_PRODUCT_STEPS and a minimum of MIN_PRODUCT_STEPS
+	 * 
+	 * @return a list of product steps
+	 */
+	private LinkedList<ProductStep> generateProductStepsUniformAmount() {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 
@@ -66,30 +132,13 @@ class Stochastics {
 		return steps;
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * Generate the product steps
+	 * Test function
+	 * 
+	 * @return a list of product steps
+	 */
 	private LinkedList<ProductStep> generateProductStepsTest() {
-
-		if (true) {
-			return generateProductStepsTest();
-			/*
-			 * LinkedList<ProductStep> steps = new LinkedList<>();
-			 * List<ProductStep> productSteps = config.getProductSteps();
-			 * 
-			 * int minProductSteps = 3;
-			 * int avgProductSteps = productSteps.size();
-			 * int n = minProductSteps + random.nextInt(avgProductSteps -
-			 * minProductSteps);
-			 * for (int i = 0; i < n; i++) {
-			 * ProductStep step =
-			 * productSteps.get(random.nextInt(productSteps.size()));
-			 * steps.add(new ProductStep(i, step.getService(),
-			 * step.getCriteria()));
-			 * }
-			 * 
-			 * return steps;
-			 */
-		}
-
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
 		int minProductSteps = 3;
@@ -109,14 +158,36 @@ class Stochastics {
 		return steps;
 	}
 
+	/**
+	 * Generate the travel time for a number of squares in the grid
+	 * 
+	 * @param travelSquares
+	 * @return travel time
+	 */
 	public Tick generateTravelTime(int travelSquares) {
 		return time(config.getTravelTime()).multiply(travelSquares);
 	}
 
+	/**
+	 * Generate the production time of a job
+	 * 
+	 * @param equiplet
+	 *            performing the job
+	 * @param service
+	 *            of the job
+	 * @return production time
+	 */
 	public Tick generateProductionTime(String equiplet, String service) {
 		return time(config.equipletProductionTime(equiplet, service));
 	}
 
+	/**
+	 * Generate the breakdown time
+	 * 
+	 * @param equiplet
+	 *            that will breakdown
+	 * @return time between the next breakdown
+	 */
 	public Tick generateBreakdownTime(String equiplet) {
 		return time(config.equipletBreakdownTime(equiplet));
 	}
@@ -125,12 +196,17 @@ class Stochastics {
 		return time(config.equipletRepaireTime(equiplet));
 	}
 
-	private Tick time(Pair<Tick, DurationType> data) {
-		return time(data.first, data.second);
-	}
-
+	/**
+	 * Generate the time it takes to reconfigure an equiplet
+	 * 
+	 * @return
+	 */
 	public Tick generateReconfigTime() {
 		return new Tick(Settings.RECONFIGATION_TIME);
+	}
+
+	private Tick time(Pair<Tick, DurationType> data) {
+		return time(data.first, data.second);
 	}
 
 	private Tick time(Tick time, DurationType type) {
@@ -151,15 +227,22 @@ class Stochastics {
 		}
 	}
 
-	public double getMeanProcessingTime() {
-		return meanProcessingTime;
-	}
-
+	/**
+	 * 
+	 * @param mean
+	 * @return a random variable with exponential distribution
+	 */
 	private double exp(double mean) {
 		double u = random.nextDouble();
 		return -mean * Math.log(1 - u);
 	}
 
+	/**
+	 * 
+	 * @param a
+	 * @param b
+	 * @return random variable with a gamma distribution
+	 */
 	protected double gamma(double a, double b) {
 		// assert( b > 0. && c > 0. );
 		double A = 1.0 / Math.sqrt(2 * b - 1);
@@ -218,7 +301,7 @@ class Stochastics {
 	 *            minimal value
 	 * @param b
 	 *            maximal value
-	 * @return
+	 * @return a random variable with a uniform distribution
 	 */
 	protected double uniform(double a, double b) {
 		double u = random.nextDouble();

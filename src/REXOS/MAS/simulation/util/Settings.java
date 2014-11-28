@@ -25,7 +25,12 @@ public class Settings {
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
 	 */
-	public static final double RECONFIGATION_TIME = 500;
+	public static final double RECONFIGATION_TIME = 0;
+	
+	/**
+	 * time needs to elapse before checking if equiplets need to be reconfigured
+	 */
+	public static final Tick RECONFIG_CHECK = new Tick(10000);
 
 	/**
 	 * the number of jobs an just arrives job can overtake in the queue
@@ -43,9 +48,13 @@ public class Settings {
 	public final static SchedulingAlgorithm SCHEDULING = SchedulingAlgorithm.MATRIX;
 
 	/**
+	 * Reshedule when start time of product step is not met
+	 */
+	public static boolean RESCHEDULE = true;
+	/**
 	 * Warm-up period after which in multiple simulation runs the products statistics are being averaged
 	 */
-	public final static Tick WARMUP = new Tick(5000);
+	public final static Tick WARMUP = new Tick(3000);
 
 	/**
 	 * Target of utilization of equiplet for depending the interarrival time of new products

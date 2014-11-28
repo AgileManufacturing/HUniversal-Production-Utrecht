@@ -66,7 +66,7 @@ public class Tick extends Number implements Comparable<Tick> {
 		Tick tick = (Tick) obj;
 		return dTime.doubleValue() == tick.doubleValue();
 	}
-	
+
 	@Override
 	public double doubleValue() {
 		return dTime;

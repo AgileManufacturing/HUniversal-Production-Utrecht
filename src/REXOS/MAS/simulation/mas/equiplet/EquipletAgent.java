@@ -11,7 +11,10 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -237,7 +240,7 @@ public class EquipletAgent extends Agent {
 				return job;
 			}
 			counter++;
-			if (counter >= Settings.QUEUE_JUMP) {
+			if (counter > Settings.QUEUE_JUMP) {
 				break;
 			}
 		}
@@ -318,7 +321,13 @@ public class EquipletAgent extends Agent {
 
 		Tick start = time;
 		if (isExecuting()) {
-			start = start.max(executing.getDue());
+			// when executing add 10% of the duration to the time to prevent reschedules in the same timeslot
+			start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
+		}
+
+		if (state == EquipletState.ERROR || state == EquipletState.ERROR_FINISHED) {
+			// when broken down add the largest time slot to now to prevent product plan there product steps to close
+			start = start.max(time.add(Collections.max(productionTimes.values())));
 		}
 
 		if (schedule.isEmpty()) {
@@ -398,7 +407,11 @@ public class EquipletAgent extends Agent {
 	 * @return load of the equiplet
 	 */
 	protected synchronized double loadHistory(Tick time, Tick window) {
-		Tick sum = new Tick(1); // dirty fix
+		Tick sum = new Tick(0);
+
+		if (isExecuting()) {
+			sum = executing.getDue().min(time.add(window)).minus(executing.getStartTime().max(time));
+		}
 
 		Iterator<Job> iterator = history.descendingIterator();
 		while (iterator.hasNext()) {
@@ -408,7 +421,7 @@ public class EquipletAgent extends Agent {
 				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
 			} else if (job.getDue().lessThan(time)) {
 				// the jobs are outside the scope of the load window
-				// break;
+				break;
 			}
 		}
 
@@ -416,6 +429,55 @@ public class EquipletAgent extends Agent {
 		sum = new Tick(Math.round(sum.doubleValue() * 100000000) / 100000000);
 
 		return 1 - sum.div(window).doubleValue();
+	}
+
+	/**
+	 * calculate the load of the history of the equiplet from a certain time
+	 * with a window
+	 * 
+	 * @param time
+	 *            from which the load needs to be calculated
+	 * @param window
+	 *            of the load
+	 * @return load of the equiplet
+	 */
+	protected synchronized double loadHistory1(Tick time, Tick window) {
+		// Tick sum = new Tick(1); // dirty fix
+		double sum = 0.0d;
+		double t = time.doubleValue();
+		double w = t + window.doubleValue();
+
+		if (isExecuting()) {
+			sum += time.doubleValue() - executing.getStartTime().doubleValue();
+		}
+
+		Iterator<Job> iterator = history.descendingIterator();
+		while (iterator.hasNext()) {
+			Job job = iterator.next();
+			double start = job.getStartTime().doubleValue();
+			double due = job.getDue().doubleValue();
+
+			System.out.println("in " + start + " >= " + t + " && " + start + " <= " + w + " || " + due + " > " + t + " && " + due + " <= " + w);
+			if (start >= t && start <= w || due > t && due <= w) {
+				// if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
+				// && job.getDue().lessOrEqualThan(time.add(window))) {
+				// sum += job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)).doubleValue();
+				// } else if (job.getDue().lessThan(time)) {
+				sum += Math.min(due, w) - Math.max(start, t);
+				System.out.println("sum " + Math.min(due, w) + " - " + Math.max(start, t) + "= " + (Math.min(due, w) - Math.max(start, t)) + " = " + sum);
+			} else if (due < t) {
+				// the jobs are outside the scope of the load window
+				break;
+			}
+		}
+
+		// double precision error, dirty fix, can use BigDecimal although performance
+
+		System.out.println("sum " + sum);
+		sum = sum * 100000000.0 / 100000000.0;
+		System.out.println("sum 1 - " + sum + " / " + window.doubleValue() + " = " + (1 - sum / window.doubleValue()));
+
+		return 1 - sum / window.doubleValue();
 	}
 
 	/**
@@ -563,9 +625,6 @@ public class EquipletAgent extends Agent {
 
 	@Override
 	public String toString() {
-		// return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities, (state ==
-		// EquipletState.IDLE ? "null"
-		// : executing), schedule.size(), getWaiting(), history.size(), "schedule");
 		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d]", getLocalName(), state, capabilities, (executing == null ? "null"
 				: executing), schedule.size(), getWaiting(), history.size());
 	}
@@ -657,14 +716,19 @@ public class EquipletAgent extends Agent {
 		// index++;
 		// }
 
+		Job arrived = null;
 		for (Job job : schedule) {
 			if (job.getProductAgent().equals(product)) {
 				job.setReady();
+				arrived = job;
 				break;
 			}
 		}
 
-		Job ready = jobReady();
+		// start with the job that arrived exactly on time
+		Job ready = arrived.getStartTime().equals(time) && Settings.RESCHEDULE ? arrived : jobReady();
+
+		System.out.println("ready=" + ready + " in " + schedule);
 
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
@@ -673,13 +737,30 @@ public class EquipletAgent extends Agent {
 		if (state == EquipletState.IDLE && ready != null) {
 			// begin with executing job that arrived
 			executeJob(time, ready);
-		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady() != null) {
+		} else if (state == EquipletState.ERROR && !isExecuting() && ready != null && !Settings.RESCHEDULE) {
 			// Equiplet is still broken, but as soon as this is repaired it will execute the first job in the schedule
 			System.out.printf("EA:%s product %s going to be executed after repair\n", getLocalName(), product.getLocalName());
 			state = EquipletState.ERROR_READY;
 		} else {
 			System.out.printf("EA:%s product %s is added to waiting products\n", getLocalName(), product);
 		}
+	}
+
+	/**
+	 * remove all the job for a product in the schedule
+	 * 
+	 * @param product
+	 *            agent
+	 * @return successfulness of removing jobs
+	 */
+	public synchronized boolean releaseTimeSlopts(AID product) {
+		Collection<Job> jobs = new HashSet<>();
+		for (Job job : schedule) {
+			if (job.getProductAgent().equals(product)) {
+				jobs.add(job);
+			}
+		}
+		return schedule.removeAll(jobs);
 	}
 
 	/**

@@ -3,6 +3,7 @@ package MAS.simulation.mas.product;
 import jade.core.AID;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class Scheduling {
 		this.serviceOptions = options;
 		this.equipletInfo = equipletInfo;
 		this.travelTimes = travelTimes;
-
+		
 		if (Settings.VERBOSITY > 3) {
 			System.out.println("product steps: " + productSteps);
 			System.out.println("service options: " + Util.formatArray(serviceOptions));
@@ -522,7 +523,7 @@ public class Scheduling {
 			for (int column = 0; column < productSteps.size(); column++) {
 
 				// check if the equiplet is capable to execute the product step
-				if (serviceOptions.get(column).containsKey(equiplet)) {
+				if (serviceOptions.get(productSteps.get(column).getIndex()).containsKey(equiplet)) {
 					// set the first item in the sequence.
 					if (firstInSequence < 0) {
 						firstInSequence = column;
@@ -582,7 +583,7 @@ public class Scheduling {
 			// private Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions;
 			if (highestRow >= 0) {
 				AID equiplet = equiplets.get(highestRow);
-				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(column).get(equiplet);
+				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(productSteps.get(column).getIndex()).get(equiplet);
 				List<Pair<Tick, Tick>> availableTimeSlots = option.second;
 
 				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0)

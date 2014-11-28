@@ -38,7 +38,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 		// Listen only possible incoming conversation ids, note that otherwise the simulation would jam as the listener receives messages that else where is waited upon
 		// MessageTemplate template = MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
 		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
-		MessageTemplate template = MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE)));
+		MessageTemplate template = MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE))));
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
@@ -47,6 +47,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 			case ACLMessage.INFORM:
 				if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
 					handleProductArrived(msg);
+				} else if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_RELEASE)) {
+					handleProductRelease(msg);
 				}
 				break;
 			// Request of other agent to get information to schedule a job
@@ -93,7 +95,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			reply.setPerformative(ACLMessage.PROPOSE);
 			equiplet.send(reply);
 
-			System.out.printf("EA:%s send reply to %s : %s\n", equiplet.getLocalName(), message.getSender().getLocalName(), "" );//reply.getContent());
+			System.out.printf("EA:%s send reply to %s : %s\n", equiplet.getLocalName(), message.getSender().getLocalName(), reply.getContent());
 
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to parse can execute()\n", equiplet.getLocalName());
@@ -132,6 +134,26 @@ public class EquipletListenerBehaviour extends Behaviour {
 			equiplet.send(reply);
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to parse product arrived.\n", equiplet.getLocalName());
+			System.err.printf("EA:%s %s", equiplet.getLocalName(), e.getMessage());
+		}
+	}
+
+	private void handleProductRelease(ACLMessage message) {
+		try {
+			if (equiplet.releaseTimeSlopts(message.getSender())) {
+				// send can reply
+				ACLMessage reply = message.createReply();
+				reply.setContent(Parser.parseConfirmation(true));
+				reply.setPerformative(ACLMessage.CONFIRM);
+				equiplet.send(reply);
+			} else {
+				ACLMessage reply = message.createReply();
+				reply.setContent(Parser.parseConfirmation(false));
+				reply.setPerformative(ACLMessage.DISCONFIRM);
+				equiplet.send(reply);
+			}
+		} catch (JSONException e) {
+			System.err.printf("EA:%s failed to parse product release time slots.\n", equiplet.getLocalName());
 			System.err.printf("EA:%s %s", equiplet.getLocalName(), e.getMessage());
 		}
 	}

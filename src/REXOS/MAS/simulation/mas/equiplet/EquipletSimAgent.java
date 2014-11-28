@@ -110,7 +110,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * 
 	 */
 	@Override
-	public void reconfigureFinished(List<Capability> capabilities) {
+	public void notifyReconfigured(List<Capability> capabilities) {
 		this.capabilities = capabilities;
 		System.out.printf("EA:%s reconfigure finished he has new capabilties %s \n", getLocalName(), capabilities);
 		if (schedule.isEmpty()) {
@@ -430,7 +430,5 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 				state = EquipletState.IDLE;
 			}
 		}
-
-		updateSchedule();
 	}
 }

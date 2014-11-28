@@ -212,7 +212,7 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 	}
 
 	@Override
-	protected void schedulingFinished(boolean succeeded) {
+	protected void schedulingFinished(Tick time, boolean succeeded) {
 		System.out.println("scheduling finished");
 		// let the simulation know that the creation of product agent failed
 		if (succeeded) {
@@ -324,5 +324,10 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 		} else {
 			throw new SchedulingException("failed to find capable equiplet with enough room, while number of suited equiplets " + suitedEquiplets.size() + " ");
 		}
+	}
+
+	@Override
+	public void onProductStarted(Tick time, int index) {
+		// do nothing?
 	}
 }

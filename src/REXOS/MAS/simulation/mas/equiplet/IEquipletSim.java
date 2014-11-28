@@ -44,7 +44,7 @@ public interface IEquipletSim {
 
 	void reconfigureStart();
 
-	void reconfigureFinished(List<Capability> capabilities);
+	void notifyReconfigured(List<Capability> capabilities);
 	
 	boolean isExecuting();
 	

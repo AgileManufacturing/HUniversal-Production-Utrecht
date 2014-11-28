@@ -33,6 +33,10 @@ class EquipletTest extends EquipletAgent {
 		return schedule.add(job);
 	}
 
+	protected boolean executed(Job job) {
+		return history.add(job);
+	}
+
 	@Override
 	public boolean isCapable(String service, Map<String, Object> criteria) {
 		return pTimes.containsKey(service);

@@ -18,6 +18,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.management.RuntimeErrorException;
+
 import MAS.simulation.config.Config;
 import MAS.simulation.config.Configuration;
 import MAS.simulation.config.Configuration.ConfigException;
@@ -46,6 +48,7 @@ public class Simulation implements ISimulation, IControl {
 	private static final String STATS_WAITING = "Waiting";
 	private static final String STATS_BUSY = "Processing";
 	private static final String STATS_FINISHED = "Finished";
+	private static final String STATS_RESCHEDULED = "Rescheduled";
 	private static final String STATS_FAILED_CREATION = "Failed to schedule";
 	private static final String STATS_FAILED_DEADLINE = "Failed to meet the deadline";
 	private static final String STATS_SYSTEM = "In system";
@@ -83,7 +86,6 @@ public class Simulation implements ISimulation, IControl {
 
 	private Tick timeReconfig;
 	private double reconfigThreshold;
-	private Tick timeReconfigThing;
 	// private boolean reconfiguration;
 	private Tuple<String, String, Tick, Pair<List<Capability>, List<Capability>>> reconfiguring;
 	// reconfigured :: equiplet, < time of reconfig start, reconfig finished, with new capabilities of equiplet >
@@ -156,6 +158,7 @@ public class Simulation implements ISimulation, IControl {
 		productStatistics.put(STATS_WAITING, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_BUSY, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_FINISHED, new TreeMap<Tick, Double>(initStats));
+		productStatistics.put(STATS_RESCHEDULED, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_FAILED_CREATION, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_FAILED_DEADLINE, new TreeMap<Tick, Double>(initStats));
 		productStatistics.put(STATS_SYSTEM, new TreeMap<Tick, Double>(initStats));
@@ -205,7 +208,7 @@ public class Simulation implements ISimulation, IControl {
 		// reconfiguration variables
 		timeReconfig = new Tick(0);
 		reconfigThreshold = 1.10;
-		timeReconfigThing = new Tick(3000);
+
 		// reconfiguration = false;
 		reconfiguring = null;
 		reconfigured = new HashMap<>();
@@ -238,7 +241,7 @@ public class Simulation implements ISimulation, IControl {
 					step--;
 				}
 
-				if (time.doubleValue() % 10000 == 1) {
+				if (Math.round(time.doubleValue() % 10000) == 0) {
 					System.err.println("Simulation: [run=" + run + ", time=" + time + " : " + Math.round(time.div(run_length).doubleValue() * 100) + "%]");
 				}
 
@@ -269,6 +272,9 @@ public class Simulation implements ISimulation, IControl {
 				case REPAIRED:
 					repairedEvent(e.getEquiplet());
 					break;
+				case STARTED:
+					startedEvent(e.getProduct(), e.getIndex());
+					break;
 				case RECONFIG:
 					reconfigEvent(e.getEquiplet());
 					break;
@@ -290,9 +296,9 @@ public class Simulation implements ISimulation, IControl {
 					update(e);
 				}
 
-				// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-				// System.out.println("EQ: " + equiplet.getValue());
-				// }
+				//for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+				//	System.out.println("EQ: " + equiplet.getValue().toString() + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+				//}
 
 				// validate();
 
@@ -308,10 +314,10 @@ public class Simulation implements ISimulation, IControl {
 	}
 
 	/**
-	 * Validate the event stack to verify the simulation
+	 * The function could be used to programmatically verify the simulation
 	 */
 	@SuppressWarnings("unused")
-	private void validate() {
+	private void verification() {
 		// if an equiplet is busy, there need to be a finished event in the event stack
 		List<String> busyEquiplets = new ArrayList<String>();
 
@@ -387,20 +393,24 @@ public class Simulation implements ISimulation, IControl {
 		double sumLoadHistory = 0.0;
 		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
 			double load = 1 - entry.getValue().load(time, LOAD_WINDOW);
-			double loadHistory = 1 - entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
 			equipletLoads.get(entry.getKey()).put(time, load);
-			equipletLoadHistory.get(entry.getKey()).put(time, loadHistory);
-
 			sumLoad += load;
-			sumLoadHistory += loadHistory;
+
+			if (time.greaterThan(LOAD_WINDOW)) {
+				double loadHistory = 1 - entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
+				equipletLoadHistory.get(entry.getKey()).put(time, loadHistory);
+				sumLoadHistory += loadHistory;
+			}
 		}
 		equipletLoads.get(STATS_LOAD_AVG).put(time, sumLoad / equiplets.size());
-		equipletLoadHistory.get(STATS_LOAD_AVG_HISTORY).put(time, sumLoadHistory / equiplets.size());
+		if (time.greaterThan(LOAD_WINDOW)) {
+			equipletLoadHistory.get(STATS_LOAD_AVG_HISTORY).put(time, sumLoadHistory / equiplets.size());
+		}
 	}
 
 	private void reconfiguration() {
-		if (time.minus(timeReconfig).greaterOrEqualThan(timeReconfigThing) && reconfiguring == null) {
-			System.out.println("CHECKPOINT MIKE");
+		if (time.minus(timeReconfig).greaterOrEqualThan(Settings.RECONFIG_CHECK) && reconfiguring == null) {
+			// System.out.println("CHECKPOINT MIKE");
 			Map<Capability, List<Pair<String, Double>>> serviceLoads = new HashMap<Capability, List<Pair<String, Double>>>();
 
 			for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
@@ -451,8 +461,8 @@ public class Simulation implements ISimulation, IControl {
 				}
 			}
 
-			System.err.printf("Simulation: check service loads %s\n", Util.formatArray(serviceLoads));
-			System.err.printf("Simulation: equiplet reconfigure: [low=%s, high=%s]\n", lowest, highest);
+//			System.err.printf("Simulation: check service loads %s\n", Util.formatArray(serviceLoads));
+//			System.err.printf("Simulation: equiplet reconfigure: [low=%s, high=%s]\n", lowest, highest);
 
 			// if need to be reconfigured, then reconfig
 			if (lowest.first != null && highest.first != null) {
@@ -469,15 +479,8 @@ public class Simulation implements ISimulation, IControl {
 							+ fromCapabilties + ", to=" + toCapabilities + "(" + highest.first + ")]");
 				}
 			}
-			timeReconfig = time.add(timeReconfigThing);
+			timeReconfig = time;
 		}
-	}
-
-	@Override
-	public void notifyReconfigReady(String equipletName) {
-		Tick reconfigTime = stochastics.generateReconfigTime();
-		eventStack.add(new Event(time.add(reconfigTime), EventType.RECONFIG, equipletName));
-		System.out.printf("Simulation: schedule RECONFIG event for equiplet %s over %s\n", time, equipletName, reconfigTime);
 	}
 
 	/**
@@ -527,7 +530,7 @@ public class Simulation implements ISimulation, IControl {
 		}
 
 		// wait for confirmation creation of product agent
-		System.out.println("CHECKPOINT BETA");
+		// System.out.println("CHECKPOINT BETA");
 	}
 
 	/**
@@ -548,7 +551,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		System.out.println("CHECKPOINT CHARLIE");
+		// System.out.println("CHECKPOINT CHARLIE");
 	}
 
 	/**
@@ -585,7 +588,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		System.out.println("CHECKPOINT FOXTROT");
+		// System.out.println("CHECKPOINT FOXTROT");
 	}
 
 	/**
@@ -615,7 +618,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		System.out.println("CHECKPOINT JULIETT");
+		// System.out.println("CHECKPOINT JULIETT");
 	}
 
 	/**
@@ -653,14 +656,41 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		System.out.println("CHECKPOINT KILO");
+		// System.out.println("CHECKPOINT KILO");
+	}
+
+	private void startedEvent(String productName, int index) {
+
+		try {
+
+			// check if the product not terminated in the mean time i.e. finished before the started event occurs
+			if (products.containsKey(productName)) {
+				IProductSim productAgent = products.get(productName);
+				System.out.println("Simulation: started event for product " + productName);
+				productAgent.onProductStarted(time, index);
+			} else {
+				synchronized (this) {
+					lock.unlock();
+				}
+			}
+		} catch (IllegalArgumentException e) {
+
+			for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+				System.out.println("EQ: " + equiplet.getValue());
+				List<Triple<String, Tick, Tick>> schedule = equiplet.getValue().getSchedule();
+
+				System.out.println("EQ: scheduled: " + schedule.get(schedule.size() - 1));
+			}
+			throw e;
+		}
+		// System.out.println("CHECKPOINT OSCAR");
 	}
 
 	private void reconfigEvent(String equipletName) {
-		System.err.println("Simulation: reconfiged event for equiplet " + equipletName);
+		System.out.println("Simulation: reconfiged event for equiplet " + equipletName);
 
 		// set next reconfiguration check time
-		timeReconfig = time.add(timeReconfigThing);
+		timeReconfig = time;
 
 		IEquipletSim equiplet = equiplets.get(equipletName);
 
@@ -670,7 +700,7 @@ public class Simulation implements ISimulation, IControl {
 		List<Capability> oldCapabilties = reconfiguring.fourth.first;
 		List<Capability> newCapabilities = reconfiguring.fourth.second;
 
-		equiplet.reconfigureFinished(newCapabilities);
+		equiplet.notifyReconfigured(newCapabilities);
 
 		reconfigured.put(equipletName, new Tuple<String, Tick, Tick, String>(equipletConfig, reconfigStart, time, oldCapabilties + "-> " + newCapabilities));
 		reconfiguring = null;
@@ -690,7 +720,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		System.out.println("CHECKPOINT LIMA");
+		// System.out.println("CHECKPOINT LIMA");
 
 		// calculate statistics of a run
 		TreeMap<Tick, Double> pFinished = productStatistics.get(STATS_FINISHED);
@@ -792,7 +822,7 @@ public class Simulation implements ISimulation, IControl {
 		eventStack.add(new Event(time.add(arrivalTime), EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %s + %s\n", time, arrivalTime);
 
-		System.out.println("CHECKPOINT GOLF");
+		// System.out.println("CHECKPOINT GOLF");
 
 		// continue with simulation
 		synchronized (this) {
@@ -826,7 +856,7 @@ public class Simulation implements ISimulation, IControl {
 		Tick travelTime = stochastics.generateTravelTime(travelSquares);
 
 		eventStack.add(new Event(time.add(travelTime), EventType.ARRIVED, productName, equipletName));
-		System.out.printf("Simulation: schedule event ARRIVED %s + %s, %s, %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
+		System.out.printf("Simulation: schedule event ARRIVED %s + %s, from %s at %s to %s at %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
 
 		// traveling++;
 		updateProductStats(STATS_TRAVEL, +1);
@@ -840,11 +870,11 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		System.out.println("CHECKPOINT ALPHA");
+		// System.out.println("CHECKPOINT ALPHA");
 	}
 
 	/**
-	 * Product notifies that his deadline is not met.
+	 * Product notifies that he is not going to meet the deadline.
 	 * 
 	 * @param productName
 	 *            name of the product
@@ -852,6 +882,10 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public void notifyProductOverdue(String productName) {
 		System.out.printf("Simulation: product agent %s not completed within deadline\n", productName);
+		/*
+		 * The question is whether or not the product should continue with producing or he should just quit and die.
+		 * For now, the product will just continue and when he is finished the statistics will be updated.
+		 */
 
 		// updateProductStats(STATS_FAILED_DEADLINE, +1);
 		// updateProductStats(STATS_SYSTEM, -1);
@@ -863,7 +897,7 @@ public class Simulation implements ISimulation, IControl {
 		//
 		// simulation.killAgent(productName);
 
-		System.out.println("CHECKPOINT NOVEMBER");
+		// // System.out.println("CHECKPOINT NOVEMBER");
 	}
 
 	/**
@@ -906,7 +940,7 @@ public class Simulation implements ISimulation, IControl {
 		}
 
 		// unblock simulation when notifying job finished
-		System.out.println("CHECKPOINT ECHO");
+		// System.out.println("CHECKPOINT ECHO");
 	}
 
 	/**
@@ -935,11 +969,62 @@ public class Simulation implements ISimulation, IControl {
 		Tick travelTime = stochastics.generateTravelTime(travelSquares);
 
 		eventStack.add(new Event(time.add(travelTime), EventType.ARRIVED, productName, equipletName));
-		System.out.printf("Simulation: schedule event ARRIVED %s + %s, %s, %s\n", time, travelTime, productName, equipletName);
+		System.out.printf("Simulation: schedule event ARRIVED %s + %s, from %s at %s to %s at %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
 
 		// unblock simulation when notifying job finished
-		// changeReady(true);
-		System.out.println("CHECKPOINT HOTEL");
+		// System.out.println("CHECKPOINT HOTEL");
+	}
+
+	@Override
+	public void notifyProductShouldStart(String productName, Tick start, int index) {
+		if (Settings.RESCHEDULE) {
+			eventStack.add(new Event(start, EventType.STARTED, productName, index));
+			System.out.printf("Simulation: schedule STARTED event for product %s at %s with prodcut step %d \n", productName, start, index);
+		}
+	}
+	
+	@Override
+	public void notifyProductRescheduled(boolean rescheduled) {
+		// System.out.println("CHECKPOINT Papa");
+		synchronized (this) {
+			lock.unlock();
+		}
+	}
+	
+
+	@Override
+	public void notifyProductRescheduled(String productName, String equipletName, boolean rescheduled) {
+		if (rescheduled) {
+			updateProductStats(STATS_RESCHEDULED, +1);
+			
+			
+			IProductSim productAgent = products.get(productName);
+			Position startPosition = productAgent.getPosition();
+
+			IEquipletSim equipletAgent = equiplets.get(equipletName);
+			Position nextPosition = equipletAgent.getPosition();
+
+			// schedule ARRIVED time + travelTime, equiplet, product
+			int travelSquares = Math.abs(startPosition.getX() - nextPosition.getX()) + Math.abs(startPosition.getY() - nextPosition.getY());
+			Tick travelTime = stochastics.generateTravelTime(travelSquares);
+
+			eventStack.add(new Event(time.add(travelTime), EventType.ARRIVED, productName, equipletName));
+			System.out.printf("Simulation: schedule event ARRIVED %s + %s, from %s at %s to %s at %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
+
+			// traveling++;
+			updateProductStats(STATS_TRAVEL, +1);
+			
+		}
+
+		// System.out.println("CHECKPOINT Papa");
+
+		if (!rescheduled) {
+			throw new IllegalArgumentException("Wait What?!");
+		}
+
+		synchronized (this) {
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -967,7 +1052,14 @@ public class Simulation implements ISimulation, IControl {
 			updateProductStats(STATS_FAILED_DEADLINE, +1);
 		}
 
-		System.out.println("CHECKPOINT INDIA");
+		// System.out.println("CHECKPOINT INDIA");
+	}
+
+	@Override
+	public void notifyReconfigReady(String equipletName) {
+		Tick reconfigTime = stochastics.generateReconfigTime();
+		eventStack.add(new Event(time.add(reconfigTime), EventType.RECONFIG, equipletName));
+		System.out.printf("Simulation: schedule RECONFIG event for equiplet %s over %s\n", time, equipletName, reconfigTime);
 	}
 
 	@Override
@@ -1063,6 +1155,31 @@ public class Simulation implements ISimulation, IControl {
 		writer.printf("Communication timeout: %s\n", Settings.COMMUNICATION_TIMEOUT);
 		writer.printf("Configuration:\n%s\n", config);
 		writer.println();
+		writer.close();
+	}
+
+	public <M extends Map<Tick, T>, T extends Number> void saveCSVStats(String path, String title, String yLabel, Map<String, M> data) throws FileNotFoundException {
+		File file = new File(path + title + ".csv");
+		PrintWriter writer = new PrintWriter(file);
+
+		TreeMap<Tick, String> lines = new TreeMap<Tick, String>();
+		lines.put(new Tick(-1), "");
+		for (Entry<String, M> entry : data.entrySet()) {
+
+			lines.put(new Tick(-1), lines.get(new Tick(-1)).concat(";" + entry.getKey()));
+			for (Entry<Tick, T> tick : entry.getValue().entrySet()) {
+
+				if (!lines.containsKey(tick.getKey())) {
+					lines.put(tick.getKey(), "");
+				}
+				lines.put(tick.getKey(), lines.get(tick.getKey()).concat(";" + tick.getValue()));
+			}
+		}
+
+		for (Entry<Tick, String> line : lines.entrySet()) {
+			writer.println(line.getKey() + line.getValue());
+		}
+
 		writer.close();
 	}
 
@@ -1195,6 +1312,14 @@ public class Simulation implements ISimulation, IControl {
 		Chart.save(path, "Equiplet Loads", "Equiplets", mvAVGLoad);
 		Chart.save(path, "Equiplet Load Histories", "Equiplets", mvAVGLoadHistory);
 
+		try {
+			saveCSVStats(path, "Equiplet Loads", "Equiplets", mvAVGLoad);
+			saveCSVStats(path, "Equiplet Load Histories", "Equiplets", mvAVGLoadHistory);
+			saveCSVStats(path, "Product Statistics", "Products", productStatistics);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
 		HashMap<String, Map<Tick, Tick>> map = new HashMap<>();
 		map.put("Throughput", throughput);
 		Chart.save(path, "Product Throuhput", "Prodcuts", map);
@@ -1258,6 +1383,11 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public Map<String, Map<Tick, Double>> getEquipletStatistics() {
 		return new HashMap<String, Map<Tick, Double>>(equipletLoads);
+	}
+
+	@Override
+	public Map<String, Map<Tick, Double>> getEquipletLoadHistories() {
+		return new HashMap<String, Map<Tick, Double>>(equipletLoadHistory);
 	}
 
 	@Override

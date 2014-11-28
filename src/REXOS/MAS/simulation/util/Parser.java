@@ -514,10 +514,14 @@ public class Parser extends ParserPrimitives {
 		// return json.toString();
 	}
 
-	/**
-	 * 
+	public static String parseProductRelease(Tick time) throws JSONException {
+		return parseTick(time).toString();
+	}
 
-	 */
+	public static Tick parseProductRelease(String source) throws JSONException {
+		return parseTick(new JSONObject(source));
+	}
+
 	/**
 	 * parse product step index of a product
 	 * this can be used for an equiplet informing a product that he start with processing of a product step or is finished with the product step

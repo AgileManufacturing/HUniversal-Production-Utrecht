@@ -165,11 +165,12 @@ public class Chart {
 	 *            <name [<name, start, end>]
 	 * @return chart
 	 */
-	public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
+	public static <M extends Map<Tick, T>, T extends Number> JPanel createChart(String title, String yLabel, Map<String, M> data) {
+	// public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-		for (Entry<String, Map<Tick, Double>> entry : data.entrySet()) {
+		for (Entry<String, M> entry : data.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
-			for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
+			for (Entry<Tick, T> point : entry.getValue().entrySet()) {
 				series.add(point.getKey().doubleValue(), point.getValue());
 			}
 			dataset.addSeries(series);

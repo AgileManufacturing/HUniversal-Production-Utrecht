@@ -1,11 +1,13 @@
 package MAS.simulation.simulation;
 
+import MAS.simulation.util.Tick;
+
 public interface ISimulation {
 
 	void notifyProductCreated(String productName, String equipletName);
 
 	void notifyProductCreationFailed(String productName);
-	
+
 	void notifyProductOverdue(String productName);
 
 	void notifyProductTraveling(String productName, String equipletName);
@@ -14,8 +16,15 @@ public interface ISimulation {
 
 	void notifyProductFinished(String productName);
 
+	void notifyProductShouldStart(String productName, Tick start, int index);
+
+	void notifyProductRescheduled(String productName, String equipletName, boolean succeeded);
+
+	void notifyProductRescheduled(boolean succeeded);
+
 	void notifyReconfigReady(String equipletName);
 
 	void log(String info, String agent, String message);
+
 
 }

@@ -43,6 +43,11 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	public void onProductArrived(Tick time) {
 		super.onProductArrived(time);
+
+		// getStart() could be due - processing time.
+		// or the start from ((ps + 1) - (travel time ps to ps + 1) + (ps processing time))
+		ProductionStep step = getCurrentStep();
+		simulation.notifyProductShouldStart(getLocalName(), step.getStart(), step.getIndex());
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	protected void onProductStepFinished(Tick time) {
 		super.onProductStepFinished(time);
-		
+
 		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
@@ -85,15 +90,38 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
 	}
 
+	int retry = 0;
 	@Override
-	protected void schedulingFinished(boolean succeeded) {
-		System.out.println("scheduling finished");
+	protected void schedulingFinished(Tick time, boolean succeeded) {
+		System.out.printf("PA:%s scheduling finished %b. \n", getLocalName(), succeeded);
 		// let the simulation know that the creation of product agent failed
-		if (succeeded) {
+		if (reschedule && succeeded) {
+			reschedule = false;
+			simulation.notifyProductRescheduled(getLocalName(), getCurrentStep().getEquipletName(), succeeded);
+		} else if (reschedule) {
+//			throw new IllegalArgumentException("FUCK");
+			// retry++;
+			// reschedule with new deadline
+			Tick deadline = getDeadline().add(getDeadline().minus(getCreated()).multiply(++retry));
+			System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
+			reschedule(time, deadline);
+		} else if (succeeded) {
 			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
 		} else {
 			simulation.notifyProductCreationFailed(getLocalName());
 		}
+	}
 
+	@Override
+	public void onProductStarted(Tick time, int index) {
+		if (getCurrentStep().getIndex() == index && (state == ProductState.ERROR || state == ProductState.SCHEDULING || state == ProductState.TRAVELING)) {
+			// throw new IllegalArgumentException("on product started event given in wrong state " + getProductState() + "");
+		} else {
+			super.onProductStarted(time, index);
+		}
+
+		if (!reschedule) {
+			simulation.notifyProductRescheduled(false);
+		}
 	}
 }

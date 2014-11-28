@@ -36,4 +36,6 @@ public interface IControl {
 
 	Map<? extends Number, ? extends Number> getThroughput();
 
+	Map<String, Map<Tick, Double>> getEquipletLoadHistories();
+
 }

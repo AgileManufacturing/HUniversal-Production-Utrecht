@@ -36,6 +36,7 @@ import MAS.simulation.util.Position;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 import MAS.simulation.util.Tuple;
+import MAS.simulation.util.Util;
 
 public class SimInterface {
 
@@ -156,6 +157,13 @@ public class SimInterface {
 		equipletStatisticsScroll.setViewportView(equipletStatistics);
 		tabbedPane.addTab("Equiplet Statistics", null, equipletStatisticsScroll, null);
 
+		final JPanel equipletLoadHistories = new JPanel();
+		equipletLoadHistories.setLayout(new BoxLayout(equipletLoadHistories, BoxLayout.Y_AXIS));
+
+		final JScrollPane equipletLoadHistoriesScroll = new JScrollPane();
+		equipletLoadHistoriesScroll.setViewportView(equipletLoadHistories);
+		tabbedPane.addTab("Equiplet Load Histories", null, equipletLoadHistoriesScroll, null);
+
 		ChangeListener changeListener = new ChangeListener() {
 			public void stateChanged(ChangeEvent changeEvent) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
@@ -223,15 +231,19 @@ public class SimInterface {
 
 					productStatistics.removeAll();
 					productStatistics.add(Chart.createChart("Product Statistics", "Products", "Time", stats, stats2));
-
 				} else if (index == tabbedPane.indexOfComponent(equipletStatisticsScroll)) {
 					// Equiplet Statistics
 					Map<String, Map<Tick, Double>> stats = simulation.getEquipletStatistics();
 					equipletStatistics.removeAll();
-					equipletStatistics.add(Chart.createChart("Equiplet Statistics", "Equiplets", stats));
-
+					equipletStatistics.add(Chart.createChart("Equiplet Load Statistics", "Equiplets", stats));
+				}else if (index == tabbedPane.indexOfComponent(equipletLoadHistoriesScroll)) {
+					// Equiplet Statistics
+					Map<String, Map<Tick, Double>> stats = simulation.getEquipletLoadHistories();
+					equipletLoadHistories.removeAll();
+					equipletLoadHistories.add(Chart.createChart("Equiplet Load Histories", "Equiplets", stats));
+					System.out.println(Util.formatArray(stats));
 				}
-				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
+				System.err.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 			}
 		};
 		tabbedPane.addChangeListener(changeListener);
