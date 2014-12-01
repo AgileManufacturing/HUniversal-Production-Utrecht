@@ -5,8 +5,8 @@ import HAL.ModuleIdentifier;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 
-public class Workplane extends Module {
-	public Workplane(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) {
+public class DummyModuleA extends Module {
+	public DummyModuleA(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) {
 		super(moduleIdentifier, moduleFactory, moduleListener);
 	}
 }
