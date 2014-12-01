@@ -69,14 +69,14 @@ namespace rexos_module {
 		REXOS_INFO("Recieved a goal call");
 		std::vector<rexos_datatypes::SupportedMutation> supportedMutations;
 		for(int i = 0; i < goal->gainedSupportedMutations.size(); i++) {
-			rexos_datatypes::SupportedMutation supportedMutation(
-					goal->gainedSupportedMutations.at(i));
+			rexos_datatypes::SupportedMutation supportedMutation(goal->gainedSupportedMutations.at(i));
 			supportedMutations.push_back(supportedMutation);
 		}
 		std::vector<rexos_datatypes::RequiredMutation> requiredMutations;
 		for(int i = 0; i < goal->requiredMutationsRequiredForNextPhase.size(); i++) {
 			rexos_datatypes::RequiredMutation requiredMutation(
-					goal->requiredMutationsRequiredForNextPhase.at(i).mutation, goal->requiredMutationsRequiredForNextPhase.at(i).isOptional);
+					goal->requiredMutationsRequiredForNextPhase.at(i).mutation, 
+					goal->requiredMutationsRequiredForNextPhase.at(i).isOptional);
 			requiredMutations.push_back(requiredMutation);
 		}
 		moduleProxyListener->onModuleTransitionPhaseCompleted(this, supportedMutations, requiredMutations);

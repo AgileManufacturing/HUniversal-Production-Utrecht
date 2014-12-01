@@ -17,6 +17,7 @@ import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
 import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.listeners.BlackboardProcessListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
@@ -31,7 +32,7 @@ import org.json.JSONObject;
  * @author Lars Veenendaal
  * 
  */
-public abstract class ModuleActor extends Module {
+public abstract class ModuleActor extends Module implements BlackboardProcessListener {
 	protected static final String MODULE_COMMAND = "module_command";
 	protected static final String APPROACH = "approach";
 	protected static final String DESTINATION = "destination";
@@ -65,6 +66,7 @@ public abstract class ModuleActor extends Module {
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
+		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardProcessListener(this);
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
@@ -154,22 +156,6 @@ public abstract class ModuleActor extends Module {
 	 * @throws JSONException 
 	 */
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException;
-	/**
-	 * This method will forward the changed MAST module state to the {@link ModuleListener}
-	 * Do not call this method!
-	 */
-	@Override
-	public void onModuleStateChanged(String state){
-		moduleListener.onModuleStateChanged(state, this);
-	}
-	/**
-	 * This method will forward the changed MAST module mode to the {@link ModuleListener}
-	 * Do not call this method!
-	 */
-	@Override
-	public void onModuleModeChanged(String mode){
-		moduleListener.onModuleModeChanged(mode, this);
-	}
 	
 	/**
 	 * Returns -1 if not found.
@@ -225,7 +211,6 @@ public abstract class ModuleActor extends Module {
 	
 
 
-	@Override
 	public void onProcessStatusChanged(HardwareStepStatus status, String hardwareStepSerialId) {
 		if(processListener != null) {
 			// the listener might reset the processListener, and therefore the listener must be set before calling the listener
