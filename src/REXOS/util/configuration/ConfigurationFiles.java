@@ -15,5 +15,4 @@ public enum ConfigurationFiles {
 	public String getFileName(){
 		return this.fileName;
 	}
-
 }

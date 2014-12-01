@@ -1,11 +1,10 @@
-<project name="equiplet_agent" default="all">
-
+<project name="product" default="all">
 	<import file="../build.xml"/>
 
-	<target name="all"> 
-		<buildjava dir="${basedir}"/>  
+	<target name="all" depends="">
+		<buildjava dir="${basedir}"/>
 	</target>
-
+	
 	<target name="clean">
 		 <cleanjava dir="${basedir}"/>
 	</target>

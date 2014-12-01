@@ -1,7 +1,7 @@
 <project name="MAS" default="all">
 	<import file="../build.xml"/>
 
-	<target name="all" depends="web_socket_server, simulation, jars">
+	<target name="all" depends="web_socket_server, simulation, equiplet, jars">
 		<buildjava dir="${basedir}"/>
 	</target>
 	
@@ -13,12 +13,22 @@
    		<ant antfile="build.xml" target="all" dir="simulation" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 	
-	<target name="util" depends="jars">
+	<target name="util" depends="jars, equiplet">
    		<ant antfile="build.xml" target="all" dir="util" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+		<ant antfile="build.xml" target="all" dir="product" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+		<ant antfile="build.xml" target="all" dir="equiplet" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 	
 	<target name="jars">
 		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
+	</target>
+
+	<target name="product" depends="jars, util">
+   		<ant antfile="build.xml" target="all" dir="product" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	</target>
+
+	<target name="equiplet" depends="jars">
+   		<ant antfile="build.xml" target="all" dir="equiplet" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
 

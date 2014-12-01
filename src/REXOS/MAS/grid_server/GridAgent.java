@@ -162,7 +162,7 @@ public class GridAgent extends Agent{
      * 
      **/
 	public void confirmCreation() {
-		AID r = new AID ("ProductAgent-" + productAgentCounter + "@145.89.166.82:1099/JADE", AID.ISGUID);
+		AID r = new AID ("ProductAgent-" + productAgentCounter + "@10.0.1.228:1099/JADE", AID.ISGUID);
 		ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
 		aclMessage.addReceiver(r);
 		aclMessage.setContent("Ping");

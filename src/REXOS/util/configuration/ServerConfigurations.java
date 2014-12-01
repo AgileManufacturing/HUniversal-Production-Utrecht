@@ -45,11 +45,11 @@ import java.net.UnknownHostException;
 public class ServerConfigurations {
 	public static final String WSS_URI = "ws://127.0.0.1:8887";
 	public static final String WSS_PORT = "8887";
-	public static final String GS_IP = "10.0.1.231";
+	public static final String GS_IP = "10.0.1.228";
 	public static final String GS_PORT = "1099";
 	public static final String AGENT_ADDRESS = GS_IP+":"+GS_PORT+"/JADE";
 	public static final String GS_NAME = "Grid@"+AGENT_ADDRESS;
-	public static final String GS_ADDRESS = "http://10.0.1.231:1099";
+	public static final String GS_ADDRESS = "http://10.0.1.228:1099";
 	
 	private static String getHostName() {
 		try {
