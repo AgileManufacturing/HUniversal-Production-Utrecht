@@ -2,6 +2,9 @@
 #include "rexos_utilities/Utilities.h"
 #include "rexos_utilities/Utilities.h"
 #include <matrices/Matrices.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 
 namespace rexos_stewart_gough {
 /*double SixAxisCalculations::calculateAB(Point3D enginePosition, Point3D jointPosition){
@@ -527,7 +530,7 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	
 	// Determine the angle for the motor
 	double rotationAngle = std::atan2(relativeUpperArmLowerArmIntersectionPoint.y, relativeUpperArmLowerArmIntersectionPoint.x);
-	double motorRotationAngle = rexos_utilities::degreesToRadians(180) + rotationAngle;
+	double motorRotationAngle = fmod((rexos_utilities::degreesToRadians(180) + rotationAngle + M_PI), (2 * M_PI)) - M_PI;
 	return motorRotationAngle;
 }
 
