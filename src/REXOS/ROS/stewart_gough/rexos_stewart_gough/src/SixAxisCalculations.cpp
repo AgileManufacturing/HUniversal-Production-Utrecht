@@ -529,8 +529,8 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	ROS_INFO_STREAM("relativeUpperArmLowerArmIntersectionPoint: " << relativeUpperArmLowerArmIntersectionPoint);
 	
 	// Determine the angle for the motor
-	double rotationAngle = std::atan2(relativeUpperArmLowerArmIntersectionPoint.y, relativeUpperArmLowerArmIntersectionPoint.x);
-	double motorRotationAngle = fmod((rexos_utilities::degreesToRadians(180) + rotationAngle + M_PI), (2 * M_PI)) - M_PI;
+	// The x and y value are multiplied by -1 to invert the coordinate system for the axis, this because the origin of the unit circle is on the other side (rotated by 180 degrees).
+	double motorRotationAngle = std::atan2(-relativeUpperArmLowerArmIntersectionPoint.y, -relativeUpperArmLowerArmIntersectionPoint.x);
 	return motorRotationAngle;
 }
 
@@ -601,3 +601,4 @@ bool SixAxisCalculations::checkPath(StewartGoughLocation from, StewartGoughLocat
 
 }
 }
+
