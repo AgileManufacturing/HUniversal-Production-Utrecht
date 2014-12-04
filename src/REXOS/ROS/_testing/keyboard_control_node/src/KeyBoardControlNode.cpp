@@ -230,56 +230,56 @@ void KeyBoardControlNode::playRoutine(){
 	REXOS_INFO("IN DE FUNCITE");
 	Vector3 direction;
 	double rotationX = 0, rotationY = 0, rotationZ = 0;
-	
+
 	while(true){
 		/*direction.z = 15;
 		REXOS_INFO("OMHOOG1");
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		REXOS_INFO("OMHOOG2");
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 		REXOS_INFO("OMHOOG3");
 		
 		
 		direction.z = -30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 	
 
 		direction.z = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 		direction.z = 0;
 		
 		
 		direction.y = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 	
 		
 		direction.y = -30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 		
 		
 		direction.y = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 		direction.y = 0;
 		
 		
 		direction.x = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 		
 		
 		direction.x = -30;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 	
 		
 		direction.x = 15;
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
-		ros::Duration(0.5).sleep();
+		ros::Duration(5).sleep();
 		direction.x = 0;
 		
 		//This is the above code but then in less rules
@@ -304,13 +304,13 @@ void KeyBoardControlNode::playRoutine(){
 			ros::sleep(1000);
 			std::cin.peek() != EOF;
 		}*/
-		//C 2 north//
-
+		//~~C 2 north~~//
 		direction.y = 40;
 		direction.x = 0;
 
-		rotationX = 0.2;//0.2
-		rotationY = 0;
+		rotationX = 0.3;//0.2
+		rotationY = 0;//0
+		rotationZ = 0;
 
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(5).sleep();
@@ -320,8 +320,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = -(40 - 20 * std::sqrt(2));//1
 		direction.x = (20 * std::sqrt(2));
 		
-		rotationX = -0.1;//0.1	
-		rotationY = 0.1;//0.1
+		rotationX = -0.15;//0.1	
+		rotationY = -0.15;//-0.1
 
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(5).sleep();
@@ -330,8 +330,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = -(20 * std::sqrt(2));//3
                 direction.x = (40 - 20 * std::sqrt(2));
 
-		rotationX = -0.1;//0
-		rotationY = 0.1;//0.2
+		rotationX = -0.15;//0
+		rotationY = -0.15;//-0.2
 
                 writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
                 ros::Duration(5).sleep();
@@ -341,8 +341,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = -(20 * std::sqrt(2));//5 
 		direction.x = -(40 - 20 * std::sqrt(2));
 
-		rotationX = -0.1;//-0.1
-		rotationY = -0.1;//0.1
+		rotationX = -0.15;//-0.1
+		rotationY = 0.15;//-0.1
 
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(5).sleep();
@@ -351,8 +351,8 @@ void KeyBoardControlNode::playRoutine(){
                 direction.y = -(40 - 20 * std::sqrt(2));//7
 		direction.x = -(20 * std::sqrt(2));
 
-		rotationX = -0.1;//-0.2	
-		rotationY = -0.1;//0
+		rotationX = -0.15;//-0.2	
+		rotationY = 0.15;//0
 
                 writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
                 ros::Duration(5).sleep();
@@ -361,8 +361,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = (40 - 20 * std::sqrt(2));//9
 		direction.x = -(20 * std::sqrt(2));
 
-		rotationX = 0.1;//-0.1
-		rotationY = -0.1;//-0.1
+		rotationX = 0.15;//-0.1
+		rotationY = 0.15;//0.1
 
                 writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
                 ros::Duration(5).sleep();
@@ -371,8 +371,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = (20 * std::sqrt(2));//11
                 direction.x = -(40 - 20 * std::sqrt(2));
 		
-		rotationX = 0.1;//0
-		rotationY = -0.1;//-0.2
+		rotationX = 0.15;//0
+		rotationY = 0.15;//0.2
 		
                 writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
                 ros::Duration(5).sleep();
@@ -381,8 +381,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = (20 * std::sqrt(2));//13
                 direction.x = (40 - 20 * std::sqrt(2));
 		
-		rotationX = 0.1;//0.1	
-		rotationY = 0.1;//-0.1
+		rotationX = 0.15;//0.1	
+		rotationY = -0.15;//0.1
 
                 writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
                 ros::Duration(5).sleep();
@@ -391,8 +391,8 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = (40 - 20 * std::sqrt(2));//15
                 direction.x = (20 * std::sqrt(2));
 
-		rotationX = 0.1;//0.2
-		rotationY = 0.1;//0	
+		rotationX = 0.15;//0.2
+		rotationY = -0.15;//0	
 
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(5).sleep();
@@ -401,11 +401,30 @@ void KeyBoardControlNode::playRoutine(){
 		direction.y = -40;//17
                 direction.x = 0;
 
-		rotationX = -0.2;//0	
+		rotationX = -0.3;//0	
 		rotationY = 0;//0		
 
 		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
 		ros::Duration(5).sleep();
+		
+		//~~Z-Rotation~~//
+		direction.y = 0;
+                direction.x = 0;
+
+		rotationX = 0;//0	
+		rotationY = 0;//0
+
+		rotationZ = 0.3;//0.3
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);	
+		ros::Duration(5).sleep();
+
+		rotationZ = -0.6;//0.3
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();
+
+		rotationZ = 0.3;//0
+		writeToBlackBoard(direction, maxAcceleration, rotationX, rotationY, rotationZ);
+		ros::Duration(5).sleep();	
 	} 
 }
 
@@ -422,8 +441,7 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	KeyBoardControlNode keyBoardControlNode("10.0.1.66", "EQ3", 
-			rexos_datatypes::ModuleIdentifier("HU", "six_axis_type_A", "1"));
+	KeyBoardControlNode keyBoardControlNode("127.0.0.1", "EQ3", rexos_datatypes::ModuleIdentifier("HU", "six_axis_type_A", "1"));
 	keyBoardControlNode.run();
 	
 	return 0;
