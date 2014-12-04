@@ -3,6 +3,7 @@
  *
  *  Created on: Jun 14, 2013
  *      Author: joris
+ *      Author: Lars Veenendaal
  */
 
 #ifndef MODULEREGISTRY_H_
@@ -47,7 +48,8 @@ public:
 	rexos_module::ModuleProxy* getModule(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	
 	/**
-	 * [reloadModules - WIP LARS]
+	 * [reloadModules]
+	 * This method checks wether the equiplet should remove or add modules to or from itself.
 	 */
  	void reloadModules();
 

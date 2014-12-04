@@ -7,7 +7,7 @@
 
 namespace rexos_knowledge_database{
 	Equiplet::Equiplet(std::string name) :
-				name(name)
+		name(name)
 	{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}
@@ -31,6 +31,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return mointPointsX;
 	}
+
 	int Equiplet::getMointPointsY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT mointPointsY \
@@ -70,6 +71,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return mointPointDistanceX;
 	}
+
 	double Equiplet::getMointPointDistanceY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT mointPoinstDistanceY \
@@ -89,6 +91,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return mointPointDistanceY;
 	}
+
 	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
@@ -109,6 +112,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
 	}
+
 	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \
@@ -131,5 +135,24 @@ namespace rexos_knowledge_database{
 		delete result;
 		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
+	}
+
+	std::string Equiplet::checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber){
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT count(*) \
+		FROM Module WHERE manufacturer = ? AND \
+			typeNumber = ? AND \
+			serialNumber = ? AND \
+			Module.equiplet = ?");
+		preparedStmt->setString(1, manufacturer);
+		preparedStmt->setString(2, typeNumber);
+		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(4, name);
+
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		result->next();
+
+		
+		return result->getString("count(*)");
 	}
 }

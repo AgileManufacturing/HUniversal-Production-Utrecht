@@ -4,6 +4,7 @@
  * @date Created: 2012-01-??  TODO: Date
  *
  * @author Tommas Bakker
+ * #author Lars Veenendaal
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -48,6 +49,7 @@ namespace rexos_module {
 		public rexos_statemachine::StateMachineController {
 	public:
 		ModuleProxy(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleProxyListener* moduleProxyListener);
+		~ModuleProxy();
 		
 		void changeState(rexos_statemachine::State state);
 		void changeMode(rexos_statemachine::Mode mode);

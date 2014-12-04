@@ -11,6 +11,12 @@ namespace rexos_module {
 	{
 		
 	}
+	ModuleProxy::~ModuleProxy() {
+		if(bond != NULL) {
+			bond->breakBond();
+			bond->waitUntilBroken(ros::Duration(5));
+		}
+	}
 	void ModuleProxy::changeState(rexos_statemachine::State state) {
 		if(state == rexos_statemachine::State::STATE_SAFE && getCurrentState() == rexos_statemachine::State::STATE_OFFLINE) {
 			if(connectedWithNode == false) {
