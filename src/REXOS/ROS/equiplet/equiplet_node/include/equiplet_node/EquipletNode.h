@@ -111,9 +111,10 @@ private:
 	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
 	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
 
+	ros::NodeHandle nh;
+
 	equiplet_node::scada::EquipletScada scada;
 
-	ros::NodeHandle nh;
 };
 
 }
