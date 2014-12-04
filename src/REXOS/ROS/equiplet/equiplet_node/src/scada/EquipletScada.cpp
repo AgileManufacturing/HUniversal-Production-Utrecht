@@ -37,7 +37,10 @@ static const char *ajax_reply_start_failed =
 
 EquipletScada::EquipletScada(EquipletNode* equiplet, ModuleRegistry* moduleRegistry, int port) :
 		moduleRegistry(moduleRegistry),
-		equiplet(equiplet){
+		equiplet(equiplet),
+		humanInteractionActionServer(equiplet->getNodeHandle(), equiplet->getEquipletName() + "/humanInteraction", 
+			boost::bind(&EquipletScada::onHumanInteractionAction, this, _1), false),
+		humanInteractionFormJson(""){
 
 	const char *mongooseOptions[] = {
 			"listening_ports", std::to_string(port).c_str(),
@@ -50,6 +53,7 @@ EquipletScada::EquipletScada(EquipletNode* equiplet, ModuleRegistry* moduleRegis
 	mongooseCallbacks.begin_request = &EquipletScada::__mongooseBeginRequestCallback;
 
 	mongooseContext = mg_start(&mongooseCallbacks, this, mongooseOptions);
+	humanInteractionActionServer.start();
 }
 
 EquipletScada::~EquipletScada() {
@@ -74,6 +78,10 @@ int EquipletScada::mongooseBeginRequestCallback(mg_connection* connection) {
 		mongooseProcessChangeEquipletMode(connection, request_info);
 	} else if (strcmp(request_info->uri, "/remote/changeEquipletState") == 0) {
 		mongooseProcessChangeEquipletState(connection, request_info);
+	} else if (strcmp(request_info->uri, "/remote/humanInteractionGet") == 0) {
+		mongooseProcessHumanInteractionGet(connection, request_info);
+	} else if (strcmp(request_info->uri, "/remote/humanInteractionSubmit") == 0) {
+		mongooseProcessHumanInteractionResult(connection, request_info);
 	} else {
 		processed = 0;
 	}
@@ -178,6 +186,23 @@ void EquipletScada::mongooseProcessChangeEquipletState(mg_connection* conn, mg_r
 	mg_printf(conn, "%s", ajax_reply_start_failed);
 }
 
+void EquipletScada::mongooseProcessHumanInteractionResult(mg_connection* conn, mg_request_info* request_info) {
+	char humanInteractionResult[10024];
+	const char* query = request_info->query_string;
+	const size_t query_len = strlen(query);
+
+	mg_get_var(query, query_len, "result", humanInteractionResult, sizeof(humanInteractionResult));
+	
+	humanInteractionMutex.lock();
+	humanInteractionResultJson = humanInteractionResult;
+	humanInteractionMutex.unlock();
+	
+	humanInteractionActionCondition.notify_one();
+	
+	mg_printf(conn, "%s", ajax_reply_start_success);
+	
+	return;
+}
 void EquipletScada::mongooseProcessEquipletInfo(mg_connection* conn, mg_request_info* request_info) {
 	const char* state = rexos_statemachine::state_txt[equiplet->getCurrentState()];
 	const char* mode = rexos_statemachine::mode_txt[equiplet->getCurrentMode()];
@@ -220,5 +245,36 @@ void EquipletScada::mongooseProcessModuleInfo(mg_connection* conn, mg_request_in
 	mg_printf(conn, "%s", writer.write(jsonObject).c_str());
 }
 
+void EquipletScada::mongooseProcessHumanInteractionGet(mg_connection* conn, mg_request_info* request_info) {
+	mg_printf(conn, "%s", ajax_reply_start_success);
+
+	humanInteractionMutex.lock();
+	std::string message = humanInteractionFormJson;
+	ROS_INFO_STREAM("interaction get" << message);
+	humanInteractionFormJson = "";
+	humanInteractionMutex.unlock();
+	
+	mg_printf(conn, "%s", message.c_str());
+}
+void EquipletScada::onHumanInteractionAction(const HumanInteractionGoalConstPtr& goal) {
+	ROS_ERROR("human interaction goal recieved");
+	humanInteractionMutex.lock();
+	humanInteractionFormJson = goal->humanInteractionFormJson;
+	humanInteractionMutex.unlock();
+	ROS_INFO("human interaction a");
+	
+	boost::unique_lock<boost::mutex> lock(humanInteractionActionMutex);
+	humanInteractionActionCondition.wait(lock);
+	
+	ROS_INFO("human interaction b");
+	humanInteractionMutex.lock();
+	std::string resultJson = humanInteractionResultJson;
+	HumanInteractionResult result;
+	result.humanInteractionResult = resultJson;
+	humanInteractionMutex.unlock();
+	
+	ROS_INFO("human interaction c");
+	humanInteractionActionServer.setSucceeded(result);
+}
 } /* namespace equiplet_node */
 } /* namespace scada */

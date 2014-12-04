@@ -51,6 +51,7 @@ using namespace equiplet_node;
  * @param id The unique identifier of the Equiplet
  **/
 EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules) :
+		nh(),
 		equipletName(equipletName),
 		EquipletStateMachine(equipletName),
 		equipletStepBlackboardClient(NULL),
