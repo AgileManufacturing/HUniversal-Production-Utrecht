@@ -4,6 +4,7 @@
  * @date Created: 2012-01-??  TODO: Date
  *
  * @author Tommas Bakker
+ * @author Lars Veenendaal
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -47,6 +48,7 @@ namespace rexos_knowledge_database {
 		double getMointPointDistanceY();
 		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
 		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+		std::string checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber);
 	private:
 		std::string name;
 		std::unique_ptr<sql::Connection> connection;

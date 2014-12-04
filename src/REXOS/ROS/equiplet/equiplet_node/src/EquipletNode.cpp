@@ -5,6 +5,7 @@
  *
  * @author Dennis Koole
  * @author Alexander Streng
+ * @author Lars Veenendaal
  *
  * @section LICENSE
  * License: newBSD
@@ -149,6 +150,11 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		}else if(step.getReloadEquiplet() == "RELOAD_ALL_MODULES"){
 			REXOS_INFO_STREAM("HAL > ReloadEquiplet: " << jsonString);
 			//reloadModules
+		//	rexos_module::ModuleProxy *prox = 
+		// moduleRegistry.getModule(step.getModuleIdentifier());
+			moduleRegistry.reloadModules();
+		//	prox->reloadModules();
+			//ROS_INFO("%s ", step.getModuleIdentifier());
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {reloadEquiplet: \"RELOADING_COMPLETED\"} } ");
 		}
 	} else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet) {

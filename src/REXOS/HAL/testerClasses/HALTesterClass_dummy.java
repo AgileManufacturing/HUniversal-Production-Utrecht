@@ -24,14 +24,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class HALTesterClass implements HardwareAbstractionLayerListener {
+public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 	static HALTesterClass htc = new HALTesterClass();
 	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "/home/t/Desktop/"; 		// <-- Tommas
-	//static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
+	//static final String baseDir = "/home/t/Desktop/"; 		// <-- Tommas
+	static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
 	//static final String baseDir = "/home/peter/lib/";
 	
 	// dummy module A
@@ -144,17 +144,24 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		JSONObject b = new JSONObject(new JSONTokener(moduleB));
 		
 		
-		//hal.insertModule(a, a);
-		//hal.insertModule(b, b);
+		hal.insertModule(a, a);
+		hal.insertModule(b, b);
 		
-		
-		
+		hal.sendReloadEquiplet();
+		Thread.sleep(5000);
 		//hal.translateProductStep(new ProductStep(1, criteria, new Service("place")));
 		// Sending reloadEquiplet command to Blackboard
 		// UNTESTED W.I.P (Lars Veenendaal)]
-		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_A", "1"));
-		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_B", "1"));
+		
 		hal.sendReloadEquiplet();
+		Thread.sleep(5000);
+		System.out.println("reload gelukt.");
+		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_A", "1"));
+		Thread.sleep(10000);
+		//hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_B", "1"));
+		System.out.println("verwijderen gelukt.");
+		hal.sendReloadEquiplet();
+		System.out.println("reload 2 gelukt.");
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
 		hal.translateProductStep(productStep);*/
@@ -193,8 +200,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public String getEquipletName() {
 		// TODO hardcoded!!!!!!
-		
-		return "EQ2";
+		return "EQ3";
 	}
 
 	@Override

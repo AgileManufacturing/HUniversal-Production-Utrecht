@@ -20,6 +20,7 @@ import HAL.libraries.blackboard_client.data_classes.MongoOperation;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
 import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.BlackboardModuleListener;
+import HAL.listeners.BlackboardProcessListener;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
 import org.json.JSONObject;
@@ -39,6 +40,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 
 	private ArrayList<BlackboardModuleListener> moduleSubscribers;
 	private ArrayList<BlackboardEquipletListener> equipletSubscribers;
+	private ArrayList<BlackboardProcessListener> processSubscribers;
 	
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
@@ -60,7 +62,8 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
 		moduleSubscribers = new ArrayList<BlackboardModuleListener>();
 		equipletSubscribers = new ArrayList<BlackboardEquipletListener>();
-			
+		processSubscribers = new ArrayList<BlackboardProcessListener>();
+		
 		try {
 			stateSubscription = new FieldUpdateSubscription("state", this);
 			stateSubscription.addOperation(MongoUpdateLogOperation.SET);
@@ -118,7 +121,14 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		equipletSubscribers.add(blackboardListener);
 	}
 	
-
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void addBlackboardProcessListener(BlackboardProcessListener blackboardListener){
+		processSubscribers.add(blackboardListener);
+	}
+	
 	/**
 	 * 
 	 * @param blackboardListener
@@ -135,8 +145,15 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		moduleSubscribers.remove(blackboardListener);
 	}
 	
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void removeBlackboardProcessListener(BlackboardProcessListener blackboardListener){
+		processSubscribers.remove(blackboardListener);
+	}
 	
-
+	
 	/**
 	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
 	 */
@@ -168,7 +185,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 						String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
 						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
 						
-						for(BlackboardModuleListener listener: moduleSubscribers) {
+						for(BlackboardProcessListener listener: processSubscribers) {
 							listener.onProcessStatusChanged(HardwareStepStatus.valueOf(status), id); 
 						}
 					}

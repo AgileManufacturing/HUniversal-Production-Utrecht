@@ -26,13 +26,13 @@ bool DummyModuleA::transitionDeinitialize() {
 bool DummyModuleA::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	ros::Duration(5.0).sleep();
+	/*ros::Duration(5.0).sleep();
 	
 	rexos_module::TransitionGoal goal;
 	goal.gainedSupportedMutations.push_back("move");
 	
 	transitionActionClient.sendGoal(goal);
-	REXOS_INFO("done");
+	REXOS_INFO("done");*/
 	return true;
 }
 bool DummyModuleA::transitionShutdown(){

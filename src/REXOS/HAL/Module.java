@@ -110,4 +110,22 @@ public abstract class Module implements BlackboardModuleListener {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/**
+	 * This method will forward the changed MAST module state to the {@link ModuleListener}
+	 * Do not call this method!
+	 */
+	@Override
+	public void onModuleStateChanged(String state){
+		moduleListener.onModuleStateChanged(state, this);
+	}
+	/**
+	 * This method will forward the changed MAST module mode to the {@link ModuleListener}
+	 * Do not call this method!
+	 */
+	@Override
+	public void onModuleModeChanged(String mode){
+		moduleListener.onModuleModeChanged(mode, this);
+	}
+	
 }

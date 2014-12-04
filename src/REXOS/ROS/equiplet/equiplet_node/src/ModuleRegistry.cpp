@@ -3,6 +3,7 @@
  *
  *  Created on: Jun 14, 2013
  *      Author: joris
+ *      Author: Lars Veenendaal
  */
 
 #include <equiplet_node/ModuleRegistry.h>
@@ -11,7 +12,8 @@
 
 namespace equiplet_node {
 
-ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
+ModuleRegistry::ModuleRegistry(
+	std::string equipletName, ModuleRegistryListener* mrl) :
 		newRegistrationsAllowed(false),
 		equipletName(equipletName),
 		moduleRegistryListener(mrl)
@@ -31,23 +33,42 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 }
 
 void ModuleRegistry::reloadModules(){
-	// THIS SLAMS THE MODULES IN SAFE STATE
-	for(rexos_module::ModuleProxy* proxy : registeredModules){
-		proxy->changeState(rexos_statemachine::State::STATE_SAFE);
-		// IF NOT IN DATABASE SWITCH STATE OFFLINE
-		// REMOVE AFTERWARDS
+	// 
+	// Checks if a new modules is actually in the knowledge database. 
+	// If then register the new found modules.
+	// 
+	REXOS_INFO("ModuleRegistry: Module registering");
+	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
+	std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+	for(auto it = identifiers.begin(); it < identifiers.end(); it++) {
+
+		if(this->getModule(*it) == NULL){
+			// ADD new module if not already added.
+			REXOS_INFO("Registering new module.");
+			rexos_module::ModuleProxy* proxy = new rexos_module::ModuleProxy(equipletName, *it, this);
+			registeredModules.push_back(proxy);
+			proxy->changeState(rexos_statemachine::State::STATE_SAFE);
+		}
 	}
 
-	//getModuleIdentifier
-	// std::vector<rexos_knowledge_database::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
-	
-	// for(std::vector<rexos_knowledge_database::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
-	// 	ModuleProxy* proxy = new ModuleProxy(
-	// 		equipletName,
-	// 		rexos_knowledge_database::ModuleIdentifier(it->getManufacturer(), it->getTypeNumber(), it->getSerialNumber()),
-	// 		this);
-	// }
-
+	// 
+	// Check wether there is a registered module that is not known in the database.
+	// Then shutdown the modules thats not found in the knowledge database.
+	// And delete them and break there bond.
+	// 
+	auto track = registeredModules.begin();
+	while (track != registeredModules.end()) {
+		rexos_module::ModuleProxy* proxy = *track;
+		std::string x = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier().getManufacturer().c_str(), proxy->getModuleIdentifier().getTypeNumber().c_str(), proxy->getModuleIdentifier().getSerialNumber().c_str());
+	    if(x == "0"){
+			proxy->changeState(rexos_statemachine::State::STATE_OFFLINE);
+			delete proxy;
+	        track = registeredModules.erase(track);
+	    }
+	    else {
+	        ++track;
+	    }
+	}
 }
 
 ModuleRegistry::~ModuleRegistry() {
@@ -77,7 +98,10 @@ rexos_module::ModuleProxy* ModuleRegistry::getModule(rexos_datatypes::ModuleIden
 	return NULL;
 }
 
-bool ModuleRegistry::onRegisterServiceModuleCallback(RegisterModule::Request &req, RegisterModule::Response &res) {
+bool ModuleRegistry::onRegisterServiceModuleCallback(
+	RegisterModule::Request &req, 
+	RegisterModule::Response &res) 
+{
 	REXOS_INFO("ModuleRegistry: Module %s %s %s registering", req.manufacturer.c_str(), req.typeNumber.c_str(), req.serialNumber.c_str());
 	
 	if(!newRegistrationsAllowed) {
@@ -131,9 +155,11 @@ void ModuleRegistry::onModuleDied(rexos_module::ModuleProxy* moduleProxy){
 	}
 }
 
-void ModuleRegistry::onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
-		std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
-		std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase) {
+void ModuleRegistry::onModuleTransitionPhaseCompleted(
+	rexos_module::ModuleProxy* moduleProxy, 
+	std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
+	std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase) 
+{
 	moduleRegistryListener->onModuleTransitionPhaseCompleted(moduleProxy, gainedSupportedMutations, requiredMutationsRequiredForNextPhase);
 }
 void ModuleRegistry::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
