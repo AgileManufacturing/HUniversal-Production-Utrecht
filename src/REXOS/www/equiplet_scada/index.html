@@ -91,7 +91,7 @@
 						"bottomRightX" : $("#bottomRightX").val() ,
 						"bottomRightY" : $("#bottomRightY").val()}
 						$.ajax({
-							url : 'remote/humanInteractionResult',
+							url : 'remote/humanInteractionSubmit',
 							data : { "result" : myJSONObject}
 							});
 							return false;
@@ -138,7 +138,7 @@ $( "#dialog-form" ).dialog({
         
    $.ajax({
      type: "POST",
-     url: "http://127.0.0.1:8888/CI_testing/index.php/welcome/remotehumanInteractionGet",
+     url: "remote/humanInteractionSubmit",
      data: { result: myJSONObject
       },success: function(data ) {
        console.log(data);

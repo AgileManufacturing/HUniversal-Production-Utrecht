@@ -1,5 +1,7 @@
 #include "dummy_module_a/dummy_module_a.h"
 #include <actionlib/client/simple_action_client.h>
+#include <equiplet_node/HumanInteractionAction.h>
+
 
 DummyModuleA::DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
 		equipletName(equipletName),
@@ -26,13 +28,25 @@ bool DummyModuleA::transitionDeinitialize() {
 bool DummyModuleA::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	/*ros::Duration(5.0).sleep();
+	ros::Duration(5.0).sleep();
 	
 	rexos_module::TransitionGoal goal;
 	goal.gainedSupportedMutations.push_back("move");
 	
 	transitionActionClient.sendGoal(goal);
-	REXOS_INFO("done");*/
+	
+	actionlib::SimpleActionClient<equiplet_node::HumanInteractionAction> humanInteraction(nodeHandle, equipletName + "/humanInteraction/");
+	//REXOS_INFO_STREAM("client started at " << (equipletName + "/humanInteraction/"));
+	
+	equiplet_node::HumanInteractionGoal humanInteractionGoal;
+	humanInteractionGoal.humanInteractionFormJson = "{ \"a\" : 1 }";
+	REXOS_INFO_STREAM(humanInteraction.isServerConnected());
+	humanInteraction.waitForServer();
+	REXOS_INFO("sending data");
+	humanInteraction.sendGoal(humanInteractionGoal);
+	humanInteraction.waitForResult();
+	
+	REXOS_INFO("done");
 	return true;
 }
 bool DummyModuleA::transitionShutdown(){

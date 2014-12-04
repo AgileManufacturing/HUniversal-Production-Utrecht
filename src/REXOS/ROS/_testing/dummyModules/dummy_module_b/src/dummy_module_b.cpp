@@ -29,7 +29,6 @@
 #include "ros/ros.h"
 
 #include "dummy_module_b/dummy_module_b.h"
-#include <actionlib/client/simple_action_client.h>
 
 DummyModuleB::DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
 		equipletName(equipletName),
@@ -56,7 +55,7 @@ bool DummyModuleB::transitionDeinitialize() {
 bool DummyModuleB::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	/*rexos_module::TransitionGoal goal;
+	rexos_module::TransitionGoal goal;
 	std::vector<rexos_module::RequiredMutation> requiredMutations;
 	rexos_module::RequiredMutation requiredMutation;
 	requiredMutation.mutation = "move";
@@ -67,7 +66,7 @@ bool DummyModuleB::transitionSetup(){
 	transitionActionClient.sendGoal(goal);
 	transitionActionClient.waitForResult();
 	
-	REXOS_INFO("Continuing calibration");*/
+	REXOS_INFO("Continuing calibration");
 	return true;
 }
 bool DummyModuleB::transitionShutdown(){

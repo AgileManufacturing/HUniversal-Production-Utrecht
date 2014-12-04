@@ -38,7 +38,7 @@ static const char *ajax_reply_start_failed =
 EquipletScada::EquipletScada(EquipletNode* equiplet, ModuleRegistry* moduleRegistry, int port) :
 		moduleRegistry(moduleRegistry),
 		equiplet(equiplet),
-		humanInteractionActionServer(equiplet->getNodeHandle(), equiplet->getEquipletName() + "/humanInteraction", 
+		humanInteractionActionServer(equiplet->getNodeHandle(), equiplet->getEquipletName() + "/humanInteraction/", 
 			boost::bind(&EquipletScada::onHumanInteractionAction, this, _1), false),
 		humanInteractionFormJson(""){
 
@@ -54,6 +54,7 @@ EquipletScada::EquipletScada(EquipletNode* equiplet, ModuleRegistry* moduleRegis
 
 	mongooseContext = mg_start(&mongooseCallbacks, this, mongooseOptions);
 	humanInteractionActionServer.start();
+	REXOS_INFO_STREAM("humanInteractionActionServer has been started at " << (equiplet->getEquipletName() + "/humanInteraction/"));
 }
 
 EquipletScada::~EquipletScada() {
@@ -250,7 +251,7 @@ void EquipletScada::mongooseProcessHumanInteractionGet(mg_connection* conn, mg_r
 
 	humanInteractionMutex.lock();
 	std::string message = humanInteractionFormJson;
-	ROS_INFO_STREAM("interaction get" << message);
+	ROS_DEBUG_STREAM("human interaction get " << message);
 	humanInteractionFormJson = "";
 	humanInteractionMutex.unlock();
 	
@@ -261,20 +262,20 @@ void EquipletScada::onHumanInteractionAction(const HumanInteractionGoalConstPtr&
 	humanInteractionMutex.lock();
 	humanInteractionFormJson = goal->humanInteractionFormJson;
 	humanInteractionMutex.unlock();
-	ROS_INFO("human interaction a");
+	ROS_INFO("human interaction: waiting for result");
 	
 	boost::unique_lock<boost::mutex> lock(humanInteractionActionMutex);
 	humanInteractionActionCondition.wait(lock);
 	
-	ROS_INFO("human interaction b");
+	ROS_INFO("human interaction  acquiring result");
 	humanInteractionMutex.lock();
 	std::string resultJson = humanInteractionResultJson;
 	HumanInteractionResult result;
 	result.humanInteractionResult = resultJson;
 	humanInteractionMutex.unlock();
 	
-	ROS_INFO("human interaction c");
 	humanInteractionActionServer.setSucceeded(result);
+	ROS_INFO("human interaction sent result");
 }
 } /* namespace equiplet_node */
 } /* namespace scada */

@@ -3,13 +3,13 @@ project(dummy_module_a)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_module rexos_logger)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_module rexos_logger equiplet_node)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES rexos_logger
-CATKIN_DEPENDS message_runtime roscpp std_msgs rexos_module rexos_logger
+CATKIN_DEPENDS message_runtime roscpp std_msgs rexos_module rexos_logger equiplet_node
 DEPENDS )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
