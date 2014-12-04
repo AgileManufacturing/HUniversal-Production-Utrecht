@@ -1,5 +1,6 @@
 package MAS.product;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -8,7 +9,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import MAS.agents.data_classes.MessageType;
 import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
@@ -54,11 +57,52 @@ public class ProductAgent extends Agent {
 		this.position = startPosition;
 		this.productSteps = productSteps;
 		this.productionPath = new LinkedList<>();
-
+		
 		this.deadline = deadline;
-		this.state = ProductState.SCHEDULING;
-
+		this.state = ProductState.SCHEDULING;	
+		
+		for (ProductStep productStep : productSteps) {
+			//replace the criteria in each productstep by the actual identifiers of crates and objects
+			productStep.setCriteria(findIdentifiersAndSubjects(productStep.getCriteriaasJSON())); 
+		}
+		
 		System.out.printf("PA:%s initialize [created=%s, pos=%s, product steps=%s, deadline=%s]\n", getLocalName(), getCreated(), position, productSteps, deadline);
+	}
+	
+	
+	/**
+	 * This method makes a call to the SupplyAgent. It sends the criteria to it. In turn the SupplyAgent returns the
+	 * criteria targets and subjects with actual targets and subjects (crate codes and coordinates). 
+	 */
+	//TODO Only works with the pick and place actions (the supply agent has to be completely rewritten in order to make it compatible)
+	private JSONObject findIdentifiersAndSubjects(JSONObject criteria) {
+		if(criteria.length() == 0) {
+			return criteria;
+		}
+		else {
+			AID suppliesagent = new AID();
+			suppliesagent.setLocalName("SupplyAgent");
+			//suppliesagent.addAddresses(ServerConfigurations.GS_ADDRESS);
+			
+			ACLMessage outgoingmessage = new ACLMessage(MessageType.SUPPLIER_REQUEST);
+			outgoingmessage.addReceiver(suppliesagent);
+			outgoingmessage.setContent(criteria.toString());
+			outgoingmessage.setSender(this.getAID());
+			outgoingmessage.setLanguage("meta");
+			this.send(outgoingmessage); 
+			
+			System.out.println(this.getLocalName() + " has sent message to " + suppliesagent.getLocalName());
+			ACLMessage incomingmessage = blockingReceive();
+			try {
+				JSONObject returnvalue = new JSONObject(incomingmessage.getContent());
+				return returnvalue;
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return criteria;
+		}
+		
 	}
 
 	protected Tick getCreated() {
@@ -125,8 +169,8 @@ public class ProductAgent extends Agent {
 			
 			// receive reply
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-			ACLMessage reply = blockingReceive(template);
-			System.out.println("PA: Received confirm on onproductArrived");
+			ACLMessage reply = blockingReceive(template, 1000);
+			System.out.println("PA:" + this.getLocalName() +  " Received confirm on onproductArrived");
 			if (!Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("PA:%s failed to receive confirmation.\n", getLocalName());
 			}
@@ -142,18 +186,13 @@ public class ProductAgent extends Agent {
 
 		if (productionPath.isEmpty()) {
 			state = ProductState.FINISHED;
+			System.out.println(this.getLocalName() + " is done with all steps");
 		} else {
 			state = ProductState.TRAVELING;
-		}
-		System.out.println("Step is done");
-		
-		if(productionPath.size() == 0) {
-			//TODO what does a product have to do after this happens?
-			System.out.println(this.getLocalName() + " is done with all steps");
-		}else {
 			onProductArrived(new Tick(1));
 		}
 	}
+
 
 	protected void onProductProcessing() {
 		state = ProductState.PROCESSING;

@@ -65,12 +65,11 @@ public class ProductListenerBehaviour extends Behaviour {
 				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index " + information.second
 						+ " that is processing which should be: " + product.getCurrentStep().getIndex() + "\n");
 			}
-
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(confirmation));
+			System.out.println(" PA" + this.myAgent + "has received: " + message);
 			myAgent.send(reply);
-			System.out.println("ASD");
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse product processing information\n", myAgent.getLocalName());
 			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
@@ -83,6 +82,11 @@ public class ProductListenerBehaviour extends Behaviour {
 
 			Pair<Tick, Integer> information = Parser.parseProductFinished(message.getContent());
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
+			ACLMessage reply = message.createReply();
+			reply.setPerformative(ACLMessage.CONFIRM);
+			reply.setContent(Parser.parseConfirmation(confirmation));
+			myAgent.send(reply);
+			
 			if (confirmation) {
 				product.onProductStepFinished();
 			} else {
@@ -91,10 +95,7 @@ public class ProductListenerBehaviour extends Behaviour {
 						+ product.getCurrentStep().getIndex() + "== " + information.second + "\n");
 			}
 
-			ACLMessage reply = message.createReply();
-			reply.setPerformative(ACLMessage.CONFIRM);
-			reply.setContent(Parser.parseConfirmation(confirmation));
-			myAgent.send(reply);
+			
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse product step finished information\n", myAgent.getLocalName());
 			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());

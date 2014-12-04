@@ -714,17 +714,21 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_PROCESSING + System.currentTimeMillis());
 			message.setContent(Parser.parseProductProcessing(time, intdex));
 			send(message);
-
+			System.out.println(intdex);
+			
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product processing.\n", getLocalName());
+			}else if (reply != null){
+				System.out.println("EA:" + this.getLocalName() + " Received confirmation of product processing ");
 			}
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed.\n", getLocalName(), executing.getProductAgentName());
 			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
 		}
+		
 	}
 
 	/**
@@ -744,13 +748,15 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			message.setContent(Parser.parseProductFinished(time, intdex));
 			send(message);
 			
-			//TODO This makes the equiplet agent deaf for messages coming from the Monitoring agent (this might need to be solved)
+			//TODO This might make the equiplet agent deaf for messages coming from the Monitoring agent (this might need to be solved)
 			
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
+			}else if (reply.getPerformative() == ACLMessage.CONFIRM){
+				executing = null;
 			}
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName() : "null"));

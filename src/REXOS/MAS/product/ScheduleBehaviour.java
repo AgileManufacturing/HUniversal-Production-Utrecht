@@ -56,20 +56,20 @@ public class ScheduleBehaviour extends Behaviour {
 	public void action() {
 		try {
 
-			System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
+			//System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
 			HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = searchSuitedEquiplets(productSteps);
 
-			System.out.printf(System.currentTimeMillis() + "\tPA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
+			//System.out.printf(System.currentTimeMillis() + "\tPA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
 
 			Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>> capableEquiplets = capableEquiplets(suitedEquiplets);
 			Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options = capableEquiplets.second;
 			Map<AID, Pair<Double, Position>> equipletInfo = capableEquiplets.first;
 
-			System.out.printf(System.currentTimeMillis() + "\tPA:%s filter the capable equiplets %s\n", myAgent.getLocalName(), equipletInfo.keySet());
+			//System.out.printf(System.currentTimeMillis() + "\tPA:%s filter the capable equiplets %s\n", myAgent.getLocalName(), equipletInfo.keySet());
 
 			Map<Pair<Position, Position>, Tick> travelTimes = retrieveTravelTimes(myproductagent.getPosition(), options, equipletInfo);
 
-			System.out.printf(System.currentTimeMillis() + "\tPA:%s retrieved travel times %s\n", myAgent.getLocalName(), travelTimes);
+			//System.out.printf(System.currentTimeMillis() + "\tPA:%s retrieved travel times %s\n", myAgent.getLocalName(), travelTimes);
 
 			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), myproductagent.getCreated(), myproductagent.getDeadline(), myproductagent.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
@@ -80,7 +80,7 @@ public class ScheduleBehaviour extends Behaviour {
 
 				schedule(productionPath, myproductagent.getDeadline());
 
-				System.out.printf(System.currentTimeMillis() + "\tPA1:%s scheduled equiplets.\n", myAgent.getLocalName());
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 				
 				myproductagent.schedulingFinished(true, productionPath);
 			} else {
@@ -130,14 +130,6 @@ public class ScheduleBehaviour extends Behaviour {
 		Map<String, List<AID>> searchedServices = new HashMap<>();
 		HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = new HashMap<>();
 		for (ProductStep productStep : productSteps) {
-			
-			//In the line of code below the identifiers and subjects that come from the WIMP are translated into 
-			//a subject and target that an equiplet can understand. This currently only works for the pick and place 
-			//action.
-			//TODO this has to happen in another place in the code since this only works for the current wimp.
-			
-			productStep.setCriteria(findIdentifiersandSubjects(productStep.getCriteriaasJSON())); 
-
 			if (!searchedServices.containsKey(productStep.getService())) {
 				try {
 					// Build the description used as template for the search
@@ -178,38 +170,6 @@ public class ScheduleBehaviour extends Behaviour {
 		return suitedEquiplets;
 	}
 
-	private JSONObject findIdentifiersandSubjects(JSONObject criteria) {
-		if(criteria.length() == 0) {
-			System.out.println("test");
-			return criteria;
-			
-		}
-		else {
-			System.out.println("test2");
-			AID suppliesagent = new AID();
-			suppliesagent.setLocalName("SupplyAgent");
-			//suppliesagent.addAddresses(ServerConfigurations.GS_ADDRESS);
-			
-			ACLMessage outgoingmessage = new ACLMessage(MessageType.SUPPLIER_REQUEST);
-			outgoingmessage.addReceiver(suppliesagent);
-			outgoingmessage.setContent(criteria.toString());
-			outgoingmessage.setSender(this.myAgent.getAID());
-			outgoingmessage.setLanguage("meta");
-			this.myAgent.send(outgoingmessage); 
-			
-			System.out.println(this.myAgent.getLocalName() + " has sent message to " + suppliesagent.getLocalName());
-			ACLMessage incomingmessage = myAgent.blockingReceive();
-			try {
-				JSONObject returnvalue = new JSONObject(incomingmessage.getContent());
-				return returnvalue;
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return criteria;
-		}
-		
-	}
 
 	/**
 	 * filter incapable equiplets out of the suited equiplet list

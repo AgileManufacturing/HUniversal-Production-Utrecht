@@ -48,7 +48,11 @@ public class ProductStep {
 			System.out.println("Setting criteria failed");
 		}
 	}
-	
+
+	//The code below was pulled from stackoverflow:
+	//Licence: Creative Commons License
+	//source: http://stackoverflow.com/questions/21720759/jsonobject-to-map
+	//User: Vikas Gupta
 	public static Map jsonToMap(JSONObject json) throws JSONException {
         Map<String, Object> retMap = new HashMap<String, Object>();
 
@@ -58,6 +62,10 @@ public class ProductStep {
         return retMap;
     }
 
+	//The code below was pulled from stackoverflow:
+	//Licence: Creative Commons License
+	//source: http://stackoverflow.com/questions/21720759/jsonobject-to-map
+	//User: Vikas Gupta	
     public static Map toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<String, Object>();
 
@@ -77,7 +85,11 @@ public class ProductStep {
         }
         return map;
     }
-
+    
+	//The code below was pulled from stackoverflow:
+	//Licence: Creative Commons License
+	//source: http://stackoverflow.com/questions/21720759/jsonobject-to-map
+	//User: Vikas Gupta	
     public static List toList(JSONArray array) throws JSONException {
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < array.length(); i++) {
