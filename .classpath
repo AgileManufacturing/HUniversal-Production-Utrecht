@@ -12,9 +12,5 @@
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/java-json.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/jcommon-1.0.21.jar"/>
-	<classpathentry kind="lib" path="src/REXOS/external_libraries/javaGD.jar"/>
-	<classpathentry kind="lib" path="src/REXOS/external_libraries/JRI.jar"/>
-	<classpathentry kind="lib" path="src/REXOS/external_libraries/JRIEngine.jar"/>
-	<classpathentry kind="lib" path="src/REXOS/external_libraries/REngine.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
