@@ -10,7 +10,7 @@ public class Settings {
 	 * 3: the gui is used in combination with the debug information in the console
 	 * 4: all above with addition of scheduling information
 	 */
-	public static int VERBOSITY = 0;
+	public static int VERBOSITY = 3;
 
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.

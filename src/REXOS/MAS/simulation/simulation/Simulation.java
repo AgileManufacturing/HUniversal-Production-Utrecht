@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -296,9 +297,10 @@ public class Simulation implements ISimulation, IControl {
 					update(e);
 				}
 
-				//for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-				//	System.out.println("EQ: " + equiplet.getValue().toString() + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
-				//}
+				// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+				// System.out.println("EQ: " + equiplet.getValue().toString() + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) :
+				// ""));
+				// }
 
 				// validate();
 
@@ -461,8 +463,8 @@ public class Simulation implements ISimulation, IControl {
 				}
 			}
 
-//			System.err.printf("Simulation: check service loads %s\n", Util.formatArray(serviceLoads));
-//			System.err.printf("Simulation: equiplet reconfigure: [low=%s, high=%s]\n", lowest, highest);
+			// System.err.printf("Simulation: check service loads %s\n", Util.formatArray(serviceLoads));
+			// System.err.printf("Simulation: equiplet reconfigure: [low=%s, high=%s]\n", lowest, highest);
 
 			// if need to be reconfigured, then reconfig
 			if (lowest.first != null && highest.first != null) {
@@ -780,7 +782,7 @@ public class Simulation implements ISimulation, IControl {
 			product.getValue().kill();
 		}
 
-//		simulation.killAgent(Settings.TRAFFIC_AGENT);
+		// simulation.killAgent(Settings.TRAFFIC_AGENT);
 
 		// TODO check if needed to wait until messages are received and all is taken down / killed
 		simulation.delay(1000);
@@ -980,7 +982,7 @@ public class Simulation implements ISimulation, IControl {
 			System.out.printf("Simulation: schedule STARTED event for product %s at %s with prodcut step %d \n", productName, start, index);
 		}
 	}
-	
+
 	@Override
 	public void notifyProductRescheduled(boolean rescheduled) {
 		// System.out.println("CHECKPOINT Papa");
@@ -988,14 +990,12 @@ public class Simulation implements ISimulation, IControl {
 			lock.unlock();
 		}
 	}
-	
 
 	@Override
 	public void notifyProductRescheduled(String productName, String equipletName, boolean rescheduled) {
 		if (rescheduled) {
 			updateProductStats(STATS_RESCHEDULED, +1);
-			
-			
+
 			IProductSim productAgent = products.get(productName);
 			Position startPosition = productAgent.getPosition();
 
@@ -1011,7 +1011,7 @@ public class Simulation implements ISimulation, IControl {
 
 			// traveling++;
 			updateProductStats(STATS_TRAVEL, +1);
-			
+
 		}
 
 		// System.out.println("CHECKPOINT Papa");
@@ -1159,25 +1159,75 @@ public class Simulation implements ISimulation, IControl {
 		File file = new File(path + title + ".csv");
 		PrintWriter writer = new PrintWriter(file);
 
-		TreeMap<Tick, String> lines = new TreeMap<Tick, String>();
-		lines.put(new Tick(-1), "");
+		TreeSet<Tick> ticks = new TreeSet<>();
+
 		for (Entry<String, M> entry : data.entrySet()) {
-
-			lines.put(new Tick(-1), lines.get(new Tick(-1)).concat(";" + entry.getKey()));
 			for (Entry<Tick, T> tick : entry.getValue().entrySet()) {
-
-				if (!lines.containsKey(tick.getKey())) {
-					lines.put(tick.getKey(), "");
-				}
-				lines.put(tick.getKey(), lines.get(tick.getKey()).concat(";" + tick.getValue()));
+				ticks.add(new Tick(Math.round(tick.getKey().doubleValue())));
 			}
 		}
+		
+		if (!ticks.isEmpty()) {
 
-		for (Entry<Tick, String> line : lines.entrySet()) {
-			writer.println(line.getKey() + line.getValue());
+			Map<String, M> lastValues = new HashMap<>();
+			TreeMap<String, String> lines = new TreeMap<>();
+
+			lines.put("", "");
+			for (Entry<String, M> entry : data.entrySet()) {
+				int lastValue = 0;
+
+				// print header
+				lines.put("", lines.get("").concat(";" + entry.getKey()));
+				
+				// print values per tick of statistic
+				Map<Tick, T> statsData = entry.getValue();
+				Iterator<Tick> dataIterator = statsData.keySet().iterator();
+				Iterator<Tick> tickIterator = ticks.iterator();
+
+				if (statsData.isEmpty()) {
+					break;
+				}
+				
+				Tick lastTick = tickIterator.next();
+				Tick time = dataIterator.next();
+				
+				while (tickIterator.hasNext()) {
+					Tick tick = tickIterator.next();
+					double value = 0d;
+					int counter = 0;
+
+					
+					while (dataIterator.hasNext()) {
+						if (time.greaterOrEqualThan(lastTick) && time.lessThan(tick)) {
+							value += statsData.get(time).doubleValue();
+							counter++;
+							time = dataIterator.next();
+						} else {
+							break;
+						}
+					}
+
+					if (!lines.containsKey(tick.toString())) {
+						lines.put(tick.toString(), "");
+					}
+
+					int v = counter > 0 ? (int) Math.round(value / counter) : lastValues == null ? 0 : lastValue;
+					String s = lines.get(tick.toString()).concat(";" + String.valueOf(v));
+					lines.put(tick.toString(), s);
+
+					lastValue = v;
+					lastTick = tick;
+				}
+			}
+
+			for (Entry<String, String> line : lines.entrySet()) {
+				writer.println(line.getKey() + line.getValue());
+			}
+
+			writer.close();
+		} else {
+			System.err.println("Simulation: no ticks in data to save :" + data);
 		}
-
-		writer.close();
 	}
 
 	@Override
