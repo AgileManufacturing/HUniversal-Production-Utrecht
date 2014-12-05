@@ -33,7 +33,6 @@
 
 #include <rexos_module/Module.h>
 #include <rexos_module/SetInstructionAction.h>
-#include <rexos_bond/BondListener.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 

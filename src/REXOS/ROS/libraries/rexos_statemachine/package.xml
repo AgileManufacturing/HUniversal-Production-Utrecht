@@ -18,8 +18,6 @@
 	<run_depend>actionlib_msgs</run_depend>
 	<build_depend>roscpp</build_depend>
 	<run_depend>roscpp</run_depend>
-	<build_depend>rexos_bond</build_depend>
-	<run_depend>rexos_bond</run_depend>
 	<build_depend>rexos_knowledge_database</build_depend>
 	<run_depend>rexos_knowledge_database</run_depend>
 	<run_depend>rexos_logger</run_depend>

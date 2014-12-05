@@ -36,8 +36,7 @@
 #include <rexos_module/ModuleProxyListener.h>
 #include <rexos_module/TransitionAction.h>
 #include <rexos_module/CandidateModules.h>
-#include <rexos_bond/BondListener.h>
-#include <rexos_bond/Bond.h>
+#include <bondcpp/bond.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include <rexos_statemachine/StateMachineController.h>
 
@@ -45,7 +44,6 @@ namespace rexos_module {
 	typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
 	
 	class ModuleProxy : public ModuleInterface,
-		public rexos_bond::BondListener,
 		public rexos_statemachine::StateMachineController {
 	public:
 		ModuleProxy(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleProxyListener* moduleProxyListener);
@@ -58,7 +56,9 @@ namespace rexos_module {
 	protected:
 		void onStateChange(rexos_statemachine::State newState, rexos_statemachine::State previousState);
 		void onModeChange(rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
-		void onBondCallback(rexos_bond::Bond* bond, Event event);
+		
+		void onBondBrokenCallback();
+		void onBondFormedCallback();
 	private:
 		void onModuleTransitionGoalCallback(const rexos_module::TransitionGoalConstPtr& goal);
 	private:
@@ -67,7 +67,7 @@ namespace rexos_module {
 		/**
 		 * The bond to bind the module with the equiplet
 		 **/
-		rexos_bond::Bond* bond;
+		bond::Bond* bond;
 		
 		/**
 		 * Indicates if the proxy has connected with the actual module node

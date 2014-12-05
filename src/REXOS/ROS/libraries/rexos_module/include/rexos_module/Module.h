@@ -31,17 +31,15 @@
 
 #include <rexos_module/AbstractModule.h>
 #include <rexos_module/TransitionAction.h>
-#include <rexos_bond/BondListener.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
-#include <rexos_bond/Bond.h>
+#include <bondcpp/bond.h>
 
 namespace rexos_module {
 	typedef actionlib::SimpleActionClient<rexos_module::TransitionAction> TransitionActionClient;
 	class ActorModule;
 	
 	class Module : public rexos_module::AbstractModule,
-		public rexos_bond::BondListener,
 		public rexos_statemachine::ModuleStateMachine {
 	protected:
 		Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
@@ -51,14 +49,15 @@ namespace rexos_module {
 		 * Method used for constructor delegation, as this is not supported by c++ < c++11
 		 **/
 		void init();
-		virtual void onBondCallback(rexos_bond::Bond* bond, Event event);
+		virtual void onBondBrokenCallback();
+		virtual void onBondFormedCallback();
 	protected:
 		TransitionActionClient transitionActionClient;
 	private:
 		/**
 		 * The bond to bind the module with the equiplet
 		 **/
-		rexos_bond::Bond* bond;
+		bond::Bond* bond;
 		
 	};
 }

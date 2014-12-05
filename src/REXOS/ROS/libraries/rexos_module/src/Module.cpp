@@ -20,17 +20,18 @@ namespace rexos_module {
 		std::string moduleNamespaceName = identifier.getManufacturer() + "/" + identifier.getTypeNumber() + "/" + identifier.getSerialNumber();
 		
 		REXOS_INFO_STREAM("binding A on " << (AbstractModule::equipletName + "/bond")<< " id " << moduleNamespaceName);
-		bond = new rexos_bond::Bond(AbstractModule::equipletName + "/bond", moduleNamespaceName, this);
+		bond = new bond::Bond(AbstractModule::equipletName + "/bond", moduleNamespaceName, 
+				boost::bind(&Module::onBondBrokenCallback, this), 
+				boost::bind(&Module::onBondFormedCallback, this));
 		bond->start();
 	}
 	
-	void Module::onBondCallback(rexos_bond::Bond* bond, Event event) {
-		if(event == FORMED) {
-			REXOS_INFO("Bond has been formed");
-		} else {
-			REXOS_WARN("Bond has been broken, initiate gracefull shutdown");
-			setInError();
-			changeState(rexos_statemachine::STATE_OFFLINE);
-		}
+	void Module::onBondBrokenCallback() {
+		REXOS_WARN("Bond has been broken, initiate gracefull shutdown");
+		setInError();
+		changeState(rexos_statemachine::STATE_OFFLINE);
+	}
+	void Module::onBondFormedCallback() {
+		REXOS_INFO("Bond has been formed");
 	}
 }

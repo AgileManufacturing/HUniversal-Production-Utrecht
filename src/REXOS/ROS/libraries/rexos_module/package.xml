@@ -10,6 +10,8 @@
 	<author email="koenbraham@gmail.com">KBraham</author>
 	<buildtool_depend>catkin</buildtool_depend>
 	
+	<build_depend>bondcpp</build_depend>
+	<run_depend>bondcpp</run_depend>
 	<build_depend>rexos_logger</build_depend>
 	<run_depend>rexos_logger</run_depend>
 	<build_depend>rexos_datatypes</build_depend>
@@ -18,8 +20,6 @@
 	<run_depend>rexos_knowledge_database</run_depend>
 	<build_depend>rexos_coordinates</build_depend>
 	<run_depend>rexos_coordinates</run_depend>
-	<build_depend>rexos_bond</build_depend>
-	<run_depend>rexos_bond</run_depend>
 	<build_depend>rexos_statemachine</build_depend>
 	<run_depend>rexos_statemachine</run_depend>
 	

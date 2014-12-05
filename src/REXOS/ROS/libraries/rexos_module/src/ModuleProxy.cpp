@@ -48,7 +48,9 @@ namespace rexos_module {
 		std::string moduleNamespaceName = identifier.getManufacturer() + "/" + identifier.getTypeNumber() + "/" + identifier.getSerialNumber();
 		
 		REXOS_INFO_STREAM("binding B on " << (equipletName + "/bond")<< " id " << moduleNamespaceName);
-		bond = new rexos_bond::Bond(equipletName + "/bond", moduleNamespaceName, this);
+		bond = new bond::Bond(equipletName + "/bond", moduleNamespaceName, 
+				boost::bind(&ModuleProxy::onBondBrokenCallback, this), 
+				boost::bind(&ModuleProxy::onBondFormedCallback, this));
 		bond->start();
 	}
 	
@@ -58,19 +60,20 @@ namespace rexos_module {
 	void ModuleProxy::onModeChange(rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode) {
 		moduleProxyListener->onModuleModeChanged(this, newMode, previousMode);
 	}
-	void ModuleProxy::onBondCallback(rexos_bond::Bond* bond, Event event) {
-		if(event == FORMED) {
-			REXOS_INFO("Bond has been formed");
-			connectedWithNode = true;
-			nodeStartupCondition.notify_one();
-		} else {
-			REXOS_WARN("Bond has been broken");
-			moduleProxyListener->onModuleDied(this);
-			connectedWithNode = false;
-			delete bond;
-			bond = NULL;
-		}
+	
+	void ModuleProxy::onBondBrokenCallback() {
+		REXOS_WARN("Bond has been broken");
+		moduleProxyListener->onModuleDied(this);
+		connectedWithNode = false;
+		delete bond;
+		bond = NULL;
 	}
+	void ModuleProxy::onBondFormedCallback() {
+		REXOS_INFO("Bond has been formed");
+		connectedWithNode = true;
+		nodeStartupCondition.notify_one();
+	}
+	
 	void ModuleProxy::onModuleTransitionGoalCallback(const rexos_module::TransitionGoalConstPtr& goal) {
 		REXOS_INFO("Recieved a goal call");
 		std::vector<rexos_datatypes::SupportedMutation> supportedMutations;
