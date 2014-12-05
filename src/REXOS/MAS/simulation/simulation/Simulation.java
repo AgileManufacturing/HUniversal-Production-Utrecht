@@ -780,7 +780,7 @@ public class Simulation implements ISimulation, IControl {
 			product.getValue().kill();
 		}
 
-		simulation.killAgent(Settings.TRAFFIC_AGENT);
+//		simulation.killAgent(Settings.TRAFFIC_AGENT);
 
 		// TODO check if needed to wait until messages are received and all is taken down / killed
 		simulation.delay(1000);
@@ -814,8 +814,6 @@ public class Simulation implements ISimulation, IControl {
 		IProductSim productAgent = products.get(productName);
 		productAgent.kill();
 		products.remove(productName);
-
-		simulation.killAgent(productName);
 
 		// schedule next product arrival
 		Tick arrivalTime = stochastics.generateProductArrival(time);
@@ -1043,7 +1041,6 @@ public class Simulation implements ISimulation, IControl {
 
 		// Product is finished
 		IProductSim productAgent = products.get(productName);
-		productAgent.kill();
 		products.remove(productName);
 		throughput.put(time, time.minus(productAgent.getCreated()));
 

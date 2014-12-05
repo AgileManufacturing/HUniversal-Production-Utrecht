@@ -53,7 +53,7 @@ class Stochastics {
 	 * @return interarrival time of product
 	 */
 	public Tick generateProductArrival(Tick time) {
-		if (time.greaterThan(Settings.WARMUP)) {
+	if (time.greaterThan(Settings.WARMUP)) {
 			int equiplets = config.getEquipletsConfigurations().size();
 
 			double interarrival = (meanProcessingTime * Settings.MEAN_PRODUCT_STEPS) / (Settings.UTILIZATION * equiplets);
@@ -79,10 +79,9 @@ class Stochastics {
 	 * @return a list of product steps
 	 */
 	public LinkedList<ProductStep> generateProductSteps() {
-		boolean eenSetting = true;
-		if (eenSetting) {
+		if (Settings.CONSTANT_NUMBER_OF_PRODUCT_STEPS) {
 			return generateProductStepsRandom();
-		} else if (!eenSetting) {
+		} else if (!Settings.CONSTANT_NUMBER_OF_PRODUCT_STEPS) {
 			return generateProductStepsUniformAmount();
 		} else {
 			return generateProductStepsTest();
@@ -97,15 +96,8 @@ class Stochastics {
 	private LinkedList<ProductStep> generateProductStepsRandom() {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
-
-		int b = 2 * Settings.MEAN_PRODUCT_STEPS - Settings.MIN_PRODUCT_STEPS;
-		double ps = uniform(Settings.MIN_PRODUCT_STEPS, b);
-
-//		for (int i = 0; i < productSteps.size(); i++) {
-//			steps.add(new ProductStep(i, productSteps.get(i).getService(), productSteps.get(i).getCriteria()));
-//		}
 		
-		for (int i = 0; i < ps; i++) {
+		for (int i = 0; i < Settings.MEAN_PRODUCT_STEPS ; i++) {
 			int x = random.nextInt(productSteps.size());
 			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
 		}

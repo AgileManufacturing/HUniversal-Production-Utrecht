@@ -1,6 +1,6 @@
 package MAS.simulation.mas.product;
 
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -11,7 +11,7 @@ import MAS.simulation.util.Pair;
 import MAS.simulation.util.Parser;
 import MAS.simulation.util.Tick;
 
-public class ProductListenerBehaviour extends Behaviour {
+public class ProductListenerBehaviour extends CyclicBehaviour {
 
 	/**
 	 * 
@@ -43,11 +43,6 @@ public class ProductListenerBehaviour extends Behaviour {
 				break;
 			}
 		}
-	}
-
-	@Override
-	public boolean done() {
-		return false;
 	}
 
 	private void handleProductStepProcessing(ACLMessage message) {

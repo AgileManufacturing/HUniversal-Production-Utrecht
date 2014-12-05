@@ -24,14 +24,14 @@
 
 
 // This text will be stored with each diagram;  use it for notes.</help_text>
-  <zoom_level>11</zoom_level>
+  <zoom_level>9</zoom_level>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>242</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
+      <x>198</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
     </coordinates>
     <panel_attributes>_:Product_</panel_attributes>
     <additional_attributes/>
@@ -39,32 +39,32 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>264</x>
-      <y>110</y>
-      <w>54</w>
-      <h>164</h>
+      <x>216</x>
+      <y>216</y>
+      <w>44</w>
+      <h>134</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;143</additional_attributes>
+    <additional_attributes>27;27;27;117</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>693</x>
-      <y>110</y>
-      <w>54</w>
-      <h>131</h>
+      <x>567</x>
+      <y>216</y>
+      <w>44</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;110</additional_attributes>
+    <additional_attributes>27;27;27;90</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>671</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
+      <x>549</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
     </coordinates>
     <panel_attributes>_:DF_</panel_attributes>
     <additional_attributes/>
@@ -72,10 +72,10 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>990</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
+      <x>810</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
     </coordinates>
     <panel_attributes>_:Equiplet_</panel_attributes>
     <additional_attributes/>
@@ -83,21 +83,21 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1012</x>
-      <y>110</y>
-      <w>54</w>
-      <h>87</h>
+      <x>828</x>
+      <y>216</y>
+      <w>44</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;66</additional_attributes>
+    <additional_attributes>27;27;27;54</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>286</x>
-      <y>253</y>
-      <w>22</w>
-      <h>682</h>
+      <x>234</x>
+      <y>333</y>
+      <w>18</w>
+      <h>558</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -105,10 +105,10 @@
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1034</x>
-      <y>176</y>
-      <w>22</w>
-      <h>759</h>
+      <x>846</x>
+      <y>270</y>
+      <w>18</w>
+      <h>621</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -116,62 +116,62 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>77</x>
-      <y>198</y>
-      <w>230</w>
-      <h>77</h>
+      <x>63</x>
+      <y>288</y>
+      <w>188</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
 PRODUCT event</panel_attributes>
-    <additional_attributes>209;55;33;55</additional_attributes>
+    <additional_attributes>171;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>264</y>
-      <w>461</w>
-      <h>102</h>
+      <x>225</x>
+      <y>342</y>
+      <w>377</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 DFService.search
 REQUEST : { type = SERVICE_TYPE, name = service }
 </panel_attributes>
-    <additional_attributes>440;55;33;55</additional_attributes>
+    <additional_attributes>360;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>319</y>
-      <w>461</w>
-      <h>102</h>
+      <x>225</x>
+      <y>387</y>
+      <w>377</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;
 serach : reply
 INFORM : DFDescription[ ] </panel_attributes>
-    <additional_attributes>33;55;440;55</additional_attributes>
+    <additional_attributes>27;45;360;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>385</y>
-      <w>780</w>
-      <h>102</h>
+      <x>225</x>
+      <y>441</y>
+      <w>638</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;
 can-execute
 QUERY_REF : { time = created, deadline = deadline, product steps = [ index, service, criteria ] }</panel_attributes>
-    <additional_attributes>759;55;33;55</additional_attributes>
+    <additional_attributes>621;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
       <x>0</x>
-      <y>198</y>
-      <w>1331</w>
-      <h>693</h>
+      <y>288</y>
+      <w>1089</w>
+      <h>567</h>
     </coordinates>
     <panel_attributes>product enters grid</panel_attributes>
     <additional_attributes/>
@@ -179,10 +179,10 @@ QUERY_REF : { time = created, deadline = deadline, product steps = [ index, serv
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1617</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
+      <x>1323</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
     </coordinates>
     <panel_attributes>_:Product_</panel_attributes>
     <additional_attributes/>
@@ -190,32 +190,32 @@ QUERY_REF : { time = created, deadline = deadline, product steps = [ index, serv
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1639</x>
-      <y>110</y>
-      <w>54</w>
-      <h>87</h>
+      <x>1341</x>
+      <y>216</y>
+      <w>44</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;66</additional_attributes>
+    <additional_attributes>27;27;27;54</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2035</x>
-      <y>110</y>
-      <w>54</w>
-      <h>87</h>
+      <x>1665</x>
+      <y>216</y>
+      <w>44</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;66</additional_attributes>
+    <additional_attributes>27;27;27;54</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2013</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
+      <x>1647</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
     </coordinates>
     <panel_attributes>_:Equiplet_</panel_attributes>
     <additional_attributes/>
@@ -223,10 +223,197 @@ QUERY_REF : { time = created, deadline = deadline, product steps = [ index, serv
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1661</x>
-      <y>176</y>
-      <w>22</w>
-      <h>385</h>
+      <x>1359</x>
+      <y>270</y>
+      <w>18</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1620</x>
+      <y>513</y>
+      <w>36</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>27;-225;27;-225</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.InteractionFrame</type>
+    <coordinates>
+      <x>1161</x>
+      <y>288</y>
+      <w>603</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>product arrived by equiplet event</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1197</x>
+      <y>306</y>
+      <w>179</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+ARRIVED event</panel_attributes>
+    <additional_attributes>162;45;27;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1350</x>
+      <y>324</y>
+      <w>350</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+product-arrived
+INFORM : { time, product step index }
+</panel_attributes>
+    <additional_attributes>333;45;27;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>2043</x>
+      <y>216</y>
+      <w>36</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>27;27;27;54</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>2025</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>_:Equiplet_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>2322</x>
+      <y>216</y>
+      <w>90</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>_:Product_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>2340</x>
+      <y>216</y>
+      <w>36</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>27;27;27;54</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.SeqObjectActive</type>
+    <coordinates>
+      <x>2061</x>
+      <y>270</y>
+      <w>18</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>1881</x>
+      <y>297</y>
+      <w>189</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+FINISHED event</panel_attributes>
+    <additional_attributes>180;45;27;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>2052</x>
+      <y>324</y>
+      <w>315</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+product-finished
+INFORM : { time, product step index }
+</panel_attributes>
+    <additional_attributes>306;45;27;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>2052</x>
+      <y>477</y>
+      <w>315</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+product-finished : reply
+CONFIRM : { confirmation = true }
+</panel_attributes>
+    <additional_attributes>27;45;306;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.InteractionFrame</type>
+    <coordinates>
+      <x>1863</x>
+      <y>405</y>
+      <w>540</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>job is ready for execution</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.SeqObjectActive</type>
+    <coordinates>
+      <x>1683</x>
+      <y>270</y>
+      <w>18</w>
+      <h>324</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.SeqObjectActive</type>
+    <coordinates>
+      <x>2358</x>
+      <y>270</y>
+      <w>18</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.SeqObjectActive</type>
+    <coordinates>
+      <x>585</x>
+      <y>306</y>
+      <w>18</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -235,233 +422,46 @@ QUERY_REF : { time = created, deadline = deadline, product steps = [ index, serv
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>1980</x>
-      <y>473</y>
-      <w>44</w>
-      <h>55</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;-275;33;-275</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.InteractionFrame</type>
-    <coordinates>
-      <x>1419</x>
-      <y>198</y>
-      <w>737</w>
-      <h>330</h>
-    </coordinates>
-    <panel_attributes>product arrived by equiplet event</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1463</x>
-      <y>220</y>
-      <w>219</w>
-      <h>77</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
-ARRIVED event</panel_attributes>
-    <additional_attributes>198;55;33;55</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>1650</x>
-      <y>242</y>
-      <w>428</w>
-      <h>102</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-product-arrived
-INFORM : { time, product step index }
-</panel_attributes>
-    <additional_attributes>407;55;33;55</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2497</x>
-      <y>110</y>
-      <w>54</w>
-      <h>87</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;66</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>2475</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
-    </coordinates>
-    <panel_attributes>_:Equiplet_</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Class</type>
-    <coordinates>
-      <x>2838</x>
-      <y>110</y>
-      <w>110</w>
-      <h>33</h>
-    </coordinates>
-    <panel_attributes>_:Product_</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2860</x>
-      <y>110</y>
-      <w>54</w>
-      <h>87</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;66</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.SeqObjectActive</type>
-    <coordinates>
-      <x>2519</x>
-      <y>176</y>
-      <w>22</w>
-      <h>385</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2299</x>
-      <y>209</y>
-      <w>241</w>
-      <h>77</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
-FINISHED event</panel_attributes>
-    <additional_attributes>220;55;33;55</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2508</x>
-      <y>242</y>
-      <w>395</w>
-      <h>102</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-product-finished
-INFORM : { time, product step index }
-</panel_attributes>
-    <additional_attributes>374;55;33;55</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2508</x>
-      <y>429</y>
-      <w>395</w>
-      <h>102</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-product-finished : reply
-CONFIRM : { confirmation = true }
-</panel_attributes>
-    <additional_attributes>33;55;374;55</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.InteractionFrame</type>
-    <coordinates>
-      <x>2277</x>
-      <y>341</y>
-      <w>660</w>
-      <h>110</h>
-    </coordinates>
-    <panel_attributes>job is ready for execution</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.SeqObjectActive</type>
-    <coordinates>
-      <x>2057</x>
-      <y>176</y>
-      <w>22</w>
-      <h>396</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.SeqObjectActive</type>
-    <coordinates>
-      <x>2882</x>
-      <y>176</y>
-      <w>22</w>
-      <h>385</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.custom.SeqObjectActive</type>
-    <coordinates>
-      <x>715</x>
-      <y>220</y>
-      <w>22</w>
-      <h>176</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2420</x>
-      <y>660</y>
-      <w>220</w>
-      <h>77</h>
+      <y>666</y>
+      <w>180</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-
 generateProductionTime()
 </panel_attributes>
-    <additional_attributes>99;-99;99;-99</additional_attributes>
+    <additional_attributes>81;-81;81;-81</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2497</x>
-      <y>759</y>
-      <w>55</w>
-      <h>44</h>
+      <x>2043</x>
+      <y>747</y>
+      <w>45</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 </panel_attributes>
-    <additional_attributes>22;-198;22;-198</additional_attributes>
+    <additional_attributes>18;-162;18;-162</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2332</x>
-      <y>627</y>
-      <w>385</w>
-      <h>77</h>
+      <x>1908</x>
+      <y>639</y>
+      <w>315</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.
 notifyProductProcessing( product, equiplet, service )</panel_attributes>
-    <additional_attributes>187;-66;187;-66</additional_attributes>
+    <additional_attributes>153;-54;153;-54</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>77</x>
-      <y>660</y>
-      <w>1188</w>
-      <h>165</h>
+      <x>63</x>
+      <y>666</y>
+      <w>972</w>
+      <h>135</h>
     </coordinates>
     <panel_attributes>production path found</panel_attributes>
     <additional_attributes/>
@@ -469,10 +469,10 @@ notifyProductProcessing( product, equiplet, service )</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>33</x>
-      <y>286</y>
-      <w>1265</w>
-      <h>572</h>
+      <x>27</x>
+      <y>360</y>
+      <w>1035</w>
+      <h>468</h>
     </coordinates>
     <panel_attributes>for each product step</panel_attributes>
     <additional_attributes/>
@@ -480,51 +480,51 @@ notifyProductProcessing( product, equiplet, service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>440</y>
-      <w>780</w>
-      <h>102</h>
+      <x>225</x>
+      <y>486</y>
+      <w>638</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 can-execute : reply
 PROPOSE : { answer = [ index, duration, possibilities = [ from, until ] ], load, position }</panel_attributes>
-    <additional_attributes>33;55;759;55</additional_attributes>
+    <additional_attributes>27;45;621;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2508</x>
-      <y>363</y>
-      <w>395</w>
-      <h>102</h>
+      <x>2052</x>
+      <y>423</y>
+      <w>315</w>
+      <h>81</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 product-processing : reply
 CONFIRM : { confirmation = true }
 </panel_attributes>
-    <additional_attributes>374;55;33;55</additional_attributes>
+    <additional_attributes>306;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2508</x>
-      <y>319</y>
-      <w>395</w>
-      <h>102</h>
+      <x>2052</x>
+      <y>387</y>
+      <w>315</w>
+      <h>81</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 product-processing
 INFORM : { time, product step index }
 </panel_attributes>
-    <additional_attributes>33;55;374;55</additional_attributes>
+    <additional_attributes>27;45;306;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>2244</x>
-      <y>198</y>
-      <w>715</w>
-      <h>330</h>
+      <x>1836</x>
+      <y>288</y>
+      <w>585</w>
+      <h>270</h>
     </coordinates>
     <panel_attributes>equiplet finished event</panel_attributes>
     <additional_attributes/>
@@ -532,10 +532,10 @@ INFORM : { time, product step index }
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>1452</x>
-      <y>341</y>
-      <w>660</w>
-      <h>110</h>
+      <x>1188</x>
+      <y>405</y>
+      <w>540</w>
+      <h>90</h>
     </coordinates>
     <panel_attributes>job is ready for execution</panel_attributes>
     <additional_attributes/>
@@ -543,79 +543,79 @@ INFORM : { time, product step index }
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1650</x>
-      <y>363</y>
-      <w>428</w>
-      <h>102</h>
+      <x>1350</x>
+      <y>423</y>
+      <w>350</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 product-processing : reply
 CONFIRM : { confirmation = true }
 </panel_attributes>
-    <additional_attributes>407;55;33;55</additional_attributes>
+    <additional_attributes>333;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1650</x>
-      <y>319</y>
-      <w>428</w>
-      <h>102</h>
+      <x>1350</x>
+      <y>387</y>
+      <w>350</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 product-processing
 INFORM : { time, product step index }
 </panel_attributes>
-    <additional_attributes>33;55;407;55</additional_attributes>
+    <additional_attributes>27;45;333;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1650</x>
-      <y>429</y>
-      <w>428</w>
-      <h>102</h>
+      <x>1350</x>
+      <y>477</y>
+      <w>350</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-product-processing : reply
+product-arrived : reply
 CONFIRM : { confirmation = true }
 </panel_attributes>
-    <additional_attributes>33;55;407;55</additional_attributes>
+    <additional_attributes>27;45;333;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>638</y>
-      <w>780</w>
-      <h>102</h>
+      <x>225</x>
+      <y>648</y>
+      <w>638</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;
 schedule
 REQUEST : { service, criteria, time, deadline }</panel_attributes>
-    <additional_attributes>759;55;33;55</additional_attributes>
+    <additional_attributes>621;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>704</y>
-      <w>780</w>
-      <h>116</h>
+      <x>225</x>
+      <y>702</y>
+      <w>638</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=&lt;
 schedule : reply
 CONFIRM : { confirmation = true } OR
 DISCONFIRM : { confirmation = false }</panel_attributes>
-    <additional_attributes>33;55;759;55</additional_attributes>
+    <additional_attributes>27;45;621;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1155</x>
-      <y>110</y>
-      <w>121</w>
-      <h>33</h>
+      <x>945</x>
+      <y>216</y>
+      <w>99</w>
+      <h>27</h>
     </coordinates>
     <panel_attributes>_:TrafficManager_</panel_attributes>
     <additional_attributes/>
@@ -623,21 +623,21 @@ DISCONFIRM : { confirmation = false }</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1188</x>
-      <y>110</y>
-      <w>54</w>
-      <h>87</h>
+      <x>972</x>
+      <y>216</y>
+      <w>44</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>33;33;33;66</additional_attributes>
+    <additional_attributes>27;27;27;54</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1210</x>
-      <y>176</y>
-      <w>22</w>
-      <h>759</h>
+      <x>990</x>
+      <y>270</y>
+      <w>18</w>
+      <h>621</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -645,27 +645,27 @@ DISCONFIRM : { confirmation = false }</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>506</y>
-      <w>956</w>
-      <h>102</h>
+      <x>225</x>
+      <y>540</y>
+      <w>782</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;
 travel-time
 QUERY_REF : { [ from :: position, to :: position ] }</panel_attributes>
-    <additional_attributes>935;55;33;55</additional_attributes>
+    <additional_attributes>765;45;27;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>275</x>
-      <y>561</y>
-      <w>956</w>
-      <h>102</h>
+      <x>225</x>
+      <y>585</y>
+      <w>782</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 travel-time : reply
 INFORM : { [ from, to, time ] }</panel_attributes>
-    <additional_attributes>33;55;935;55</additional_attributes>
+    <additional_attributes>27;45;765;45</additional_attributes>
   </element>
 </diagram>

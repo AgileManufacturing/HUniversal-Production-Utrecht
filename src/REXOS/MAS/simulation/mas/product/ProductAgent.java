@@ -34,6 +34,7 @@ public class ProductAgent extends Agent {
 	protected ProductState state;
 	protected boolean reschedule;
 
+	private ScheduleBehaviour scheduleBehaviour;
 	private ProductListenerBehaviour listenerBehaviour;
 
 	public void setup() {
@@ -46,9 +47,11 @@ public class ProductAgent extends Agent {
 				this.history = new ArrayList<>();
 				this.reschedule = false;
 
+				scheduleBehaviour = new ScheduleBehaviour(this, productSteps);
 				listenerBehaviour = new ProductListenerBehaviour(this);
-				addBehaviour(new ScheduleBehaviour(this, productSteps));
+				addBehaviour(scheduleBehaviour);
 				addBehaviour(listenerBehaviour);
+				
 
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to parse the arguments\n", getLocalName());
@@ -122,14 +125,32 @@ public class ProductAgent extends Agent {
 		for (ProductionStep step : productionPath) {
 			steps.add(step.getProductStep());
 		}
-		System.out.printf("PA:%s start schedule behaviour at %s.\n", getLocalName(), time);
-		final ScheduleBehaviour scheduleBehaviour = new ScheduleBehaviour(this, steps, time, deadline);
+//		System.out.printf("PA:%s start schedule behaviour at %s.\n", getLocalName(), time);
+//		scheduleBehaviour.reschedule(steps, time, deadline);
+//		
+//		System.out.println("schedule "  +scheduleBehaviour.getExecutionState());
+//		System.out.println("schedule "  +listenerBehaviour.getExecutionState());
+//		
+//		scheduleBehaviour.restart();
+//		System.out.println("schedule "  +scheduleBehaviour.getExecutionState());
+//		
+		scheduleBehaviour = new ScheduleBehaviour(this, steps);
+		scheduleBehaviour.reschedule(steps, time, deadline);
+		addBehaviour(scheduleBehaviour);
+		
+		// wake up behaviours ... the bad way I think
+		ACLMessage msg = new ACLMessage(ACLMessage.UNKNOWN);
+		msg.addReceiver(getAID());
+		send(msg);
+		//System.out.println("schedule "  +scheduleBehaviour.);
+		
+//		final ScheduleBehaviour scheduleBehaviour = new ScheduleBehaviour(this, steps, time, deadline);
 
 //		addBehaviour(scheduleBehaviour);
 		//TODO !!!!!!
 
 		// fock this shit, this is not how it should work
-		scheduleBehaviour.action();
+//		scheduleBehaviour.action();
 	}
 
 	/**

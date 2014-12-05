@@ -11,7 +11,6 @@ import jade.domain.JADEAgentManagement.ShutdownPlatform;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
-import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
 import java.io.IOException;
@@ -178,18 +177,18 @@ public class SimulationAgent extends Agent implements ISimControl {
 			throw new Exception("Failed to create agent");
 		}
 	}
-
-	@Override
-	public void killAgent(String name) {
-		// kill the agent
-		ContainerController cc = getContainerController();
-		try {
-			AgentController agent = cc.getAgent(name);
-			agent.kill();
-		} catch (ControllerException e) {
-			e.printStackTrace();
-		}
-	}
+//
+//	@Override
+//	public void killAgent(String name) {
+//		// kill the agent
+//		ContainerController cc = getContainerController();
+//		try {
+//			AgentController agent = cc.getAgent(name);
+//			agent.kill();
+//		} catch (ControllerException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	@Override
 	public void createTrafficAgent(Map<String, Position> equiplets) throws Exception {

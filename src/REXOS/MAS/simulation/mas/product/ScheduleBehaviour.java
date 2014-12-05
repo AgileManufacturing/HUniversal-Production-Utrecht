@@ -1,7 +1,7 @@
 package MAS.simulation.mas.product;
 
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -29,7 +29,7 @@ import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 
-public class ScheduleBehaviour extends Behaviour {
+public class ScheduleBehaviour extends OneShotBehaviour  {
 
 	/**
 	 * 
@@ -39,7 +39,8 @@ public class ScheduleBehaviour extends Behaviour {
 	private LinkedList<ProductStep> productSteps;
 	private Tick time;
 	private Tick deadline;
-	private boolean done;
+	private boolean reschedule;
+	private boolean finished;
 
 	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps) {
 		super(product);
@@ -47,16 +48,25 @@ public class ScheduleBehaviour extends Behaviour {
 		this.productSteps = productSteps;
 		this.time = null;
 		this.deadline = product.getDeadline();
-		this.done = false;
+		this.reschedule = false;
+		this.finished = false;
 	}
+//
+//	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) {
+//		super(product);
+//		this.product = product;
+//		this.productSteps = productSteps;
+//		this.time = time;
+//		this.deadline = deadline;
+//		this.finished = false;
+//	}
 
-	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) {
-		super(product);
-		this.product = product;
-		this.productSteps = productSteps;
+	public void reschedule(LinkedList<ProductStep> steps, Tick time, Tick deadline) {
+		this.productSteps = steps;
 		this.time = time;
 		this.deadline = deadline;
-		this.done = false;
+		this.reschedule = true;
+		this.finished = false;
 	}
 
 	@Override
@@ -109,20 +119,21 @@ public class ScheduleBehaviour extends Behaviour {
 				product.schedulingFinished(time, true, productionPath);
 			}
 
-			done = true;
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
 
+			finished = true;
 		} catch (SchedulingException e) {
 			System.out.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
 			product.schedulingFinished(time, false);
 		}
 	}
 
-	@Override
-	public boolean done() {
-		return done;
-	}
-
+//
+//	@Override
+//	public boolean done() {
+//		return finished;
+//	}
+//	
 	/**
 	 * search for suited equiplet
 	 * ask the DF if there are equiplets that have registered service needed for production of the product

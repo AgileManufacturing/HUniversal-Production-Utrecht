@@ -61,7 +61,10 @@ public class Settings {
 	 */
 	public static final double UTILIZATION = 0.80;
 
+	public static final boolean CONSTANT_NUMBER_OF_PRODUCT_STEPS = true;
+	
 	public static final int MEAN_PRODUCT_STEPS = 20;
+	
 	public static final int MIN_PRODUCT_STEPS = 10;
 
 	/**
@@ -82,5 +85,6 @@ public class Settings {
 	public final static long COMMUNICATION_TIMEOUT = 5000;
 
 	public static final String PRODUCT_LOG = "products-log";
+
 
 }

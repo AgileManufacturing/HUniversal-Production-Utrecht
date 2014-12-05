@@ -728,8 +728,6 @@ public class EquipletAgent extends Agent {
 		// start with the job that arrived exactly on time
 		Job ready = arrived.getStartTime().equals(time) && Settings.RESCHEDULE ? arrived : jobReady();
 
-		System.out.println("ready=" + ready + " in " + schedule);
-
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
 
@@ -788,6 +786,8 @@ public class EquipletAgent extends Agent {
 		message.setReplyWith(Ontology.CONVERSATION_PRODUCT_PROCESSING + System.currentTimeMillis());
 		send(message);
 
+		System.out.printf("EA:%s send message to inform product step processing: %s\n", getLocalName(), message.getContent());
+		
 		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 		ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 

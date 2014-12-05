@@ -46,8 +46,10 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 
 		// getStart() could be due - processing time.
 		// or the start from ((ps + 1) - (travel time ps to ps + 1) + (ps processing time))
-		ProductionStep step = getCurrentStep();
-		simulation.notifyProductShouldStart(getLocalName(), step.getStart(), step.getIndex());
+		if (state == ProductState.WAITING) {
+			ProductionStep step = getCurrentStep();
+			simulation.notifyProductShouldStart(getLocalName(), step.getStart(), step.getIndex());
+		}
 	}
 
 	@Override
@@ -74,6 +76,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
 			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " finished: " + history);
+			doDelete();
 		} else if (getProductState() == ProductState.TRAVELING) {
 			// notify the simulation that the product is traveling
 			simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
@@ -109,6 +112,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
 		} else {
 			simulation.notifyProductCreationFailed(getLocalName());
+			doDelete();
 		}
 	}
 
