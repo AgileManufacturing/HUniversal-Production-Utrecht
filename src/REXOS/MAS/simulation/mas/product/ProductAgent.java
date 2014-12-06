@@ -137,12 +137,12 @@ public class ProductAgent extends Agent {
 		scheduleBehaviour = new ScheduleBehaviour(this, steps);
 		scheduleBehaviour.reschedule(steps, time, deadline);
 		addBehaviour(scheduleBehaviour);
-		
-		// wake up behaviours ... the bad way I think
-		ACLMessage msg = new ACLMessage(ACLMessage.UNKNOWN);
-		msg.addReceiver(getAID());
-		send(msg);
-		//System.out.println("schedule "  +scheduleBehaviour.);
+//		
+//		// wake up behaviours ... the bad way I think
+//		ACLMessage msg = new ACLMessage(ACLMessage.UNKNOWN);
+//		msg.addReceiver(getAID());
+//		// send(msg);
+//		System.out.println("schedule "  +scheduleBehaviour.getExecutionState());
 		
 //		final ScheduleBehaviour scheduleBehaviour = new ScheduleBehaviour(this, steps, time, deadline);
 

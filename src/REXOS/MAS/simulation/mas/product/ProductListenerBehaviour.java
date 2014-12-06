@@ -26,7 +26,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 	@Override
 	public void action() {
 		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED)), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED));
-		ACLMessage msg = myAgent.blockingReceive(template);
+		ACLMessage msg = myAgent.receive(template);
 		if (msg != null) {
 			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
@@ -43,6 +43,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 				break;
 			}
 		}
+		block();
 	}
 
 	private void handleProductStepProcessing(ACLMessage message) {

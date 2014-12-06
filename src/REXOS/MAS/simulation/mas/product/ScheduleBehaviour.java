@@ -29,7 +29,7 @@ import MAS.simulation.util.Settings;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 
-public class ScheduleBehaviour extends OneShotBehaviour  {
+public class ScheduleBehaviour extends OneShotBehaviour {
 
 	/**
 	 * 
@@ -39,8 +39,6 @@ public class ScheduleBehaviour extends OneShotBehaviour  {
 	private LinkedList<ProductStep> productSteps;
 	private Tick time;
 	private Tick deadline;
-	private boolean reschedule;
-	private boolean finished;
 
 	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps) {
 		super(product);
@@ -48,25 +46,12 @@ public class ScheduleBehaviour extends OneShotBehaviour  {
 		this.productSteps = productSteps;
 		this.time = null;
 		this.deadline = product.getDeadline();
-		this.reschedule = false;
-		this.finished = false;
 	}
-//
-//	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) {
-//		super(product);
-//		this.product = product;
-//		this.productSteps = productSteps;
-//		this.time = time;
-//		this.deadline = deadline;
-//		this.finished = false;
-//	}
 
 	public void reschedule(LinkedList<ProductStep> steps, Tick time, Tick deadline) {
 		this.productSteps = steps;
 		this.time = time;
 		this.deadline = deadline;
-		this.reschedule = true;
-		this.finished = false;
 	}
 
 	@Override
@@ -120,20 +105,20 @@ public class ScheduleBehaviour extends OneShotBehaviour  {
 			}
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
-
-			finished = true;
+			//
+			// finished = true;
 		} catch (SchedulingException e) {
 			System.out.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
 			product.schedulingFinished(time, false);
 		}
 	}
 
-//
-//	@Override
-//	public boolean done() {
-//		return finished;
-//	}
-//	
+	//
+	// @Override
+	// public boolean done() {
+	// return finished;
+	// }
+	//
 	/**
 	 * search for suited equiplet
 	 * ask the DF if there are equiplets that have registered service needed for production of the product
@@ -303,9 +288,9 @@ public class ScheduleBehaviour extends OneShotBehaviour  {
 			if (!options.containsKey(index - 1)) {
 				throw new SchedulingException("failed to find product step in options, i.e. there isn't a equiplet capable to execute the product step: " + productSteps.get(i - 1));
 			}
-			
-//			System.out.println("[i=" + i + ", index=" + index + ", ps=" +productSteps.get(i) + ", options=" + options.get(i) + "]");
-//			System.out.println("[i=" + i + ", index=" + index + ", ps=" +productSteps.get(i) + ", options=" + options.get(i) + "]");
+
+			// System.out.println("[i=" + i + ", index=" + index + ", ps=" +productSteps.get(i) + ", options=" + options.get(i) + "]");
+			// System.out.println("[i=" + i + ", index=" + index + ", ps=" +productSteps.get(i) + ", options=" + options.get(i) + "]");
 
 			// map the possibilities for a product step to the next possibilities for the product step;
 			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> previousPossibilities = options.get(index - 1);

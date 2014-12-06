@@ -19,8 +19,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.management.RuntimeErrorException;
-
 import MAS.simulation.config.Config;
 import MAS.simulation.config.Configuration;
 import MAS.simulation.config.Configuration.ConfigException;
@@ -234,7 +232,6 @@ public class Simulation implements ISimulation, IControl {
 		// reconfigured.put("E9", new Tuple<String, Tick, Tick, String>("E1", new Tick(0), time, "E9" + "-> " +"E1"));
 	}
 
-	@SuppressWarnings("unused")
 	public void handleEvent() {
 		try {
 			while (running || step > 0) {
@@ -995,6 +992,7 @@ public class Simulation implements ISimulation, IControl {
 	public void notifyProductRescheduled(String productName, String equipletName, boolean rescheduled) {
 		if (rescheduled) {
 			updateProductStats(STATS_RESCHEDULED, +1);
+			updateProductStats(STATS_WAITING, -1);
 
 			IProductSim productAgent = products.get(productName);
 			Position startPosition = productAgent.getPosition();
@@ -1142,13 +1140,14 @@ public class Simulation implements ISimulation, IControl {
 		writer.println("Simulation: " + new SimpleDateFormat("dd MM yyyy 'at' HH:mm:ss").format(new Date()));
 		writer.printf("Scheduling: %s\n", Settings.SCHEDULING);
 		writer.printf("Stochastics: %s\n", Settings.STOCHASTICS);
+		writer.printf("Reschedule: %s\n", Settings.RESCHEDULE);
 		writer.printf("Breakdowns: %s\n", Settings.BREAKDOWNS);
 		writer.printf("Queue jump: %s\n", Settings.QUEUE_JUMP);
+		writer.printf("Reconfiguration time: %s\n", Settings.RECONFIGATION_TIME);
 		writer.printf("Warm-up period: %s\n", Settings.WARMUP);
 		writer.printf("Product generation: (%.0f * %d) / (%.2f * %d) = %.2f\n", stochastics.getMeanProcessingTime(), Settings.MEAN_PRODUCT_STEPS, Settings.UTILIZATION, config.getEquipletsConfigurations().size(), (stochastics.getMeanProcessingTime() * Settings.MEAN_PRODUCT_STEPS)
 				/ (Settings.UTILIZATION * config.getEquipletsConfigurations().size()));
 		writer.printf("Verbosity: %d\n", Settings.VERBOSITY);
-		writer.printf("Reconfiguration time: %s\n", Settings.RECONFIGATION_TIME);
 		writer.printf("Communication timeout: %s\n", Settings.COMMUNICATION_TIMEOUT);
 		writer.printf("Configuration:\n%s\n", config);
 		writer.println();
@@ -1166,19 +1165,20 @@ public class Simulation implements ISimulation, IControl {
 				ticks.add(new Tick(Math.round(tick.getKey().doubleValue())));
 			}
 		}
-		
+
 		if (!ticks.isEmpty()) {
+			Tick header = new Tick(-1);
 
 			Map<String, M> lastValues = new HashMap<>();
-			TreeMap<String, String> lines = new TreeMap<>();
+			TreeMap<Tick, String> lines = new TreeMap<>();
 
-			lines.put("", "");
+			lines.put(header, "");
 			for (Entry<String, M> entry : data.entrySet()) {
 				int lastValue = 0;
 
 				// print header
-				lines.put("", lines.get("").concat(";" + entry.getKey()));
-				
+				lines.put(header, lines.get(header).concat(";" + entry.getKey()));
+
 				// print values per tick of statistic
 				Map<Tick, T> statsData = entry.getValue();
 				Iterator<Tick> dataIterator = statsData.keySet().iterator();
@@ -1187,16 +1187,15 @@ public class Simulation implements ISimulation, IControl {
 				if (statsData.isEmpty()) {
 					break;
 				}
-				
+
 				Tick lastTick = tickIterator.next();
 				Tick time = dataIterator.next();
-				
+
 				while (tickIterator.hasNext()) {
 					Tick tick = tickIterator.next();
 					double value = 0d;
 					int counter = 0;
 
-					
 					while (dataIterator.hasNext()) {
 						if (time.greaterOrEqualThan(lastTick) && time.lessThan(tick)) {
 							value += statsData.get(time).doubleValue();
@@ -1207,21 +1206,25 @@ public class Simulation implements ISimulation, IControl {
 						}
 					}
 
-					if (!lines.containsKey(tick.toString())) {
-						lines.put(tick.toString(), "");
+					if (!lines.containsKey(tick)) {
+						lines.put(tick, "");
 					}
 
 					int v = counter > 0 ? (int) Math.round(value / counter) : lastValues == null ? 0 : lastValue;
-					String s = lines.get(tick.toString()).concat(";" + String.valueOf(v));
-					lines.put(tick.toString(), s);
+					String s = lines.get(tick).concat(";" + String.valueOf(v));
+					lines.put(tick, s);
 
 					lastValue = v;
 					lastTick = tick;
 				}
 			}
 
-			for (Entry<String, String> line : lines.entrySet()) {
-				writer.println(line.getKey() + line.getValue());
+			for (Entry<Tick, String> line : lines.entrySet()) {
+				if (line.getKey().lessThan(0)) {
+					writer.println(line.getValue());
+				} else {
+					writer.println(line.getKey().toString() + line.getValue());
+				}
 			}
 
 			writer.close();

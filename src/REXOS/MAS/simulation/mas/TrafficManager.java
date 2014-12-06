@@ -8,11 +8,8 @@ import jade.lang.acl.MessageTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.json.JSONException;
-
-import com.mongodb.util.Hash;
 
 import MAS.simulation.config.Config;
 import MAS.simulation.util.Ontology;
