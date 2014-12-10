@@ -122,6 +122,11 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * handle the information from a product agent that he is arrived by the equiplet
+	 * 
+	 * @param message
+	 */
 	private void handleProductArrived(ACLMessage message) {
 		try {
 			Pair<Tick, Integer> information = Parser.parseProductArrived(message.getContent());
@@ -138,6 +143,11 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * handle the request of a product agent to release the scheduled time slots
+	 * 
+	 * @param message
+	 */
 	private void handleProductRelease(ACLMessage message) {
 		try {
 			if (equiplet.releaseTimeSlopts(message.getSender())) {
@@ -158,6 +168,11 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * handle the request for current information of an equiplet
+	 * 
+	 * @param message
+	 */
 	private void handleInformationRequest(ACLMessage message) {
 		try {
 			JSONObject json = new JSONObject();

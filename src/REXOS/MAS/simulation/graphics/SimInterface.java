@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -224,7 +225,7 @@ public class SimInterface {
 					// }
 				} else if (index == tabbedPane.indexOfComponent(productStatisticsScroll)) {
 					// Product Statistics
-					Map<String, Map<Tick, Double>> stats = simulation.getProductStatistics();
+					Map<String, TreeMap<Tick, Integer>> stats = simulation.getProductStatistics();
 					Map<String, Map<? extends Number, ? extends Number>> stats2 = new HashMap<String, Map<? extends Number, ? extends Number>>();
 					Map<? extends Number, ? extends Number> throughput = simulation.getThroughput();
 					stats2.put("Throughput", throughput);
@@ -233,12 +234,12 @@ public class SimInterface {
 					productStatistics.add(Chart.createChart("Product Statistics", "Products", "Time", stats, stats2));
 				} else if (index == tabbedPane.indexOfComponent(equipletStatisticsScroll)) {
 					// Equiplet Statistics
-					Map<String, Map<Tick, Double>> stats = simulation.getEquipletStatistics();
+					Map<String, Map<Tick, Float>> stats = simulation.getEquipletStatistics();
 					equipletStatistics.removeAll();
 					equipletStatistics.add(Chart.createChart("Equiplet Load Statistics", "Equiplets", stats));
 				}else if (index == tabbedPane.indexOfComponent(equipletLoadHistoriesScroll)) {
 					// Equiplet Statistics
-					Map<String, Map<Tick, Double>> stats = simulation.getEquipletLoadHistories();
+					Map<String, Map<Tick, Float>> stats = simulation.getEquipletLoadHistories();
 					equipletLoadHistories.removeAll();
 					equipletLoadHistories.add(Chart.createChart("Equiplet Load Histories", "Equiplets", stats));
 					System.out.println(Util.formatArray(stats));

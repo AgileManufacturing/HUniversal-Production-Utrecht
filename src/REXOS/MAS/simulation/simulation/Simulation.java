@@ -3,6 +3,7 @@ package MAS.simulation.simulation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -94,14 +96,14 @@ public class Simulation implements ISimulation, IControl {
 	private int totalSteps;
 
 	private HashMap<Tick, Tick> throughput;
-	private Map<String, TreeMap<Tick, Double>> productStatistics;
-	private Map<String, TreeMap<Tick, Double>> equipletLoads;
-	private Map<String, TreeMap<Tick, Double>> equipletLoadHistory;
+	private Map<String, TreeMap<Tick, Integer>> productStatistics;
+	private Map<String, TreeMap<Tick, Float>> equipletLoads;
+	private Map<String, TreeMap<Tick, Float>> equipletLoadHistory;
 	private Map<String, TreeMap<String, String>> debugInfo;
 
-	// statistics per run with <created products,completed, failed, throughput>
+	// statistics per run with <created products,completed, failed, throughput, equiplet load>
 	private String outputFolder;
-	private Map<Integer, Pair<Tuple<Integer, Integer, Integer, Double>, Double>> runStats;
+	private Map<Integer, Pair<Tuple<Integer, Integer, Integer, Float>, Float>> runStats;
 
 	public Simulation(ISimControl simulation) {
 		this.simulation = simulation;
@@ -112,7 +114,7 @@ public class Simulation implements ISimulation, IControl {
 		running = false;
 		step = 0;
 		run = 1;
-		runStats = new HashMap<Integer, Pair<Tuple<Integer, Integer, Integer, Double>, Double>>();
+		runStats = new HashMap<Integer, Pair<Tuple<Integer, Integer, Integer, Float>, Float>>();
 
 		try {
 			Config con = Config.read();
@@ -146,26 +148,26 @@ public class Simulation implements ISimulation, IControl {
 		totalSteps = 0;
 		productCount = 0;
 		throughput = new HashMap<Tick, Tick>();
-		productStatistics = new HashMap<String, TreeMap<Tick, Double>>();
-		equipletLoads = new HashMap<String, TreeMap<Tick, Double>>();
-		equipletLoadHistory = new HashMap<String, TreeMap<Tick, Double>>();
+		productStatistics = new HashMap<String, TreeMap<Tick, Integer>>();
+		equipletLoads = new HashMap<String, TreeMap<Tick, Float>>();
+		equipletLoadHistory = new HashMap<String, TreeMap<Tick, Float>>();
 
-		TreeMap<Tick, Double> initStats = new TreeMap<Tick, Double>();
-		initStats.put(time, 0d);
+		TreeMap<Tick, Integer> initStats = new TreeMap<Tick, Integer>();
+		initStats.put(time, 0);
 
-		productStatistics.put(STATS_TRAVEL, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_WAITING, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_BUSY, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_FINISHED, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_RESCHEDULED, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_FAILED_CREATION, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_FAILED_DEADLINE, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_SYSTEM, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_PHYSICAL, new TreeMap<Tick, Double>(initStats));
-		productStatistics.put(STATS_BROKEN, new TreeMap<Tick, Double>(initStats));
+		productStatistics.put(STATS_TRAVEL, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_WAITING, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_BUSY, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_FINISHED, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_RESCHEDULED, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_FAILED_CREATION, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_FAILED_DEADLINE, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_SYSTEM, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_PHYSICAL, new TreeMap<Tick, Integer>(initStats));
+		productStatistics.put(STATS_BROKEN, new TreeMap<Tick, Integer>(initStats));
 
-		equipletLoads.put(STATS_LOAD_AVG, new TreeMap<Tick, Double>());
-		equipletLoadHistory.put(STATS_LOAD_AVG_HISTORY, new TreeMap<Tick, Double>());
+		equipletLoads.put(STATS_LOAD_AVG, new TreeMap<Tick, Float>());
+		equipletLoadHistory.put(STATS_LOAD_AVG_HISTORY, new TreeMap<Tick, Float>());
 		debugInfo = new HashMap<>();
 
 		products = new HashMap<>();
@@ -185,8 +187,8 @@ public class Simulation implements ISimulation, IControl {
 				IEquipletSim equiplet = simulation.createEquiplet(equipletName, position, capabilities);
 				equiplets.put(equipletName, equiplet);
 
-				equipletLoads.put(equipletName, new TreeMap<Tick, Double>());
-				equipletLoadHistory.put(equipletName, new TreeMap<Tick, Double>());
+				equipletLoads.put(equipletName, new TreeMap<Tick, Float>());
+				equipletLoadHistory.put(equipletName, new TreeMap<Tick, Float>());
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -240,7 +242,8 @@ public class Simulation implements ISimulation, IControl {
 				}
 
 				if (Math.round(time.doubleValue() % 10000) == 0) {
-					System.err.println("Simulation: [run=" + run + ", time=" + time + " : " + Math.round(time.div(run_length).doubleValue() * 100) + "%]");
+					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, new Locale("en", "EN"));
+					System.err.println("Simulation: [run=" + run + ", time=" + time + " : " + Math.round(time.div(run_length).doubleValue() * 100) + "%] " + df.format(new Date()));
 				}
 
 				// wait if needed to continue with the next event
@@ -249,6 +252,10 @@ public class Simulation implements ISimulation, IControl {
 				// System.out.println("Simulation: continue");
 
 				Event e = eventStack.pollFirst();
+				
+				if (time.greaterThan(e.getTime())) {
+					throw new IllegalArgumentException("Damn time=" + time+ " == " + e);
+				}
 				time = e.getTime();
 
 				System.out.println("\n-----\nSimulation: event=" + e + " : " + eventStack);
@@ -294,12 +301,12 @@ public class Simulation implements ISimulation, IControl {
 					update(e);
 				}
 
-				// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-				// System.out.println("EQ: " + equiplet.getValue().toString() + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) :
-				// ""));
-				// }
+				for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+					System.out.println("EQ: " + equiplet.getValue().toString()
+							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+				}
 
-				// validate();
+				verification();
 
 				// wait a certain time
 				if (delay > 0) {
@@ -317,6 +324,24 @@ public class Simulation implements ISimulation, IControl {
 	 */
 	@SuppressWarnings("unused")
 	private void verification() {
+
+		int busy = 0;
+		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY) {
+				busy++;
+			}
+		}
+
+		if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
+			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
+			throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
+		}
+
+		if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
+			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
+			throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
+		}
+
 		// if an equiplet is busy, there need to be a finished event in the event stack
 		List<String> busyEquiplets = new ArrayList<String>();
 
@@ -378,8 +403,9 @@ public class Simulation implements ISimulation, IControl {
 	 * @param add
 	 *            the addition of the statistic
 	 */
-	private void updateProductStats(String type, double add) {
-		double lastValue = productStatistics.get(type).lastEntry().getValue();
+	private void updateProductStats(String type, int add) {
+		int lastValue = productStatistics.get(type).lastEntry().getValue();
+		System.out.println("UPDATE " + time + " : " + type + " = " + lastValue + " + " + add);
 		productStatistics.get(type).put(time, lastValue + add);
 	}
 
@@ -388,16 +414,16 @@ public class Simulation implements ISimulation, IControl {
 	 * TODO throw not an illegal argument exception
 	 */
 	private void calculateEquipletLoad() {
-		double sumLoad = 0.0;
-		double sumLoadHistory = 0.0;
+		float sumLoad = 0f;
+		float sumLoadHistory = 0f;
 		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
-			double load = 1 - entry.getValue().load(time, LOAD_WINDOW);
-			equipletLoads.get(entry.getKey()).put(time, load);
+			Double load = 1 - entry.getValue().load(time, LOAD_WINDOW);
+			equipletLoads.get(entry.getKey()).put(time, load.floatValue());
 			sumLoad += load;
 
 			if (time.greaterThan(LOAD_WINDOW)) {
-				double loadHistory = 1 - entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
-				equipletLoadHistory.get(entry.getKey()).put(time, loadHistory);
+				Double loadHistory = 1 - entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
+				equipletLoadHistory.get(entry.getKey()).put(time, loadHistory.floatValue());
 				sumLoadHistory += loadHistory;
 			}
 		}
@@ -409,7 +435,7 @@ public class Simulation implements ISimulation, IControl {
 
 	private void reconfiguration() {
 		if (time.minus(timeReconfig).greaterOrEqualThan(Settings.RECONFIG_CHECK) && reconfiguring == null) {
-			// System.out.println("CHECKPOINT MIKE");
+			System.out.println("CHECKPOINT MIKE");
 			Map<Capability, List<Pair<String, Double>>> serviceLoads = new HashMap<Capability, List<Pair<String, Double>>>();
 
 			for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
@@ -529,7 +555,7 @@ public class Simulation implements ISimulation, IControl {
 		}
 
 		// wait for confirmation creation of product agent
-		// System.out.println("CHECKPOINT BETA");
+		System.out.println("CHECKPOINT BETA");
 	}
 
 	/**
@@ -550,7 +576,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		// System.out.println("CHECKPOINT CHARLIE");
+		System.out.println("CHECKPOINT CHARLIE");
 	}
 
 	/**
@@ -587,7 +613,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		// System.out.println("CHECKPOINT FOXTROT");
+		System.out.println("CHECKPOINT FOXTROT");
 	}
 
 	/**
@@ -617,7 +643,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		// System.out.println("CHECKPOINT JULIETT");
+		System.out.println("CHECKPOINT JULIETT");
 	}
 
 	/**
@@ -655,13 +681,11 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		// System.out.println("CHECKPOINT KILO");
+		System.out.println("CHECKPOINT KILO");
 	}
 
 	private void startedEvent(String productName, int index) {
-
 		try {
-
 			// check if the product not terminated in the mean time i.e. finished before the started event occurs
 			if (products.containsKey(productName)) {
 				IProductSim productAgent = products.get(productName);
@@ -673,7 +697,6 @@ public class Simulation implements ISimulation, IControl {
 				}
 			}
 		} catch (IllegalArgumentException e) {
-
 			for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
 				System.out.println("EQ: " + equiplet.getValue());
 				List<Triple<String, Tick, Tick>> schedule = equiplet.getValue().getSchedule();
@@ -682,7 +705,7 @@ public class Simulation implements ISimulation, IControl {
 			}
 			throw e;
 		}
-		// System.out.println("CHECKPOINT OSCAR");
+		System.out.println("CHECKPOINT OSCAR");
 	}
 
 	private void reconfigEvent(String equipletName) {
@@ -719,20 +742,20 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		// System.out.println("CHECKPOINT LIMA");
+		System.out.println("CHECKPOINT LIMA");
 
 		// calculate statistics of a run
-		TreeMap<Tick, Double> pFinished = productStatistics.get(STATS_FINISHED);
-		Double sFinished = pFinished.get(pFinished.headMap(Settings.WARMUP).lastKey());
-		Double productsFinished = pFinished.lastEntry().getValue() - sFinished;
+		TreeMap<Tick, Integer> pFinished = productStatistics.get(STATS_FINISHED);
+		int sFinished = pFinished.get(pFinished.headMap(Settings.WARMUP).lastKey());
+		int productsFinished = pFinished.lastEntry().getValue() - sFinished;
 
-		TreeMap<Tick, Double> pFailed = productStatistics.get(STATS_FAILED_CREATION);
-		Double sFailed = pFailed.get(pFailed.headMap(Settings.WARMUP).lastKey());
-		Double productsFailed = pFailed.lastEntry().getValue() - sFailed;
+		TreeMap<Tick, Integer> pFailed = productStatistics.get(STATS_FAILED_CREATION);
+		int sFailed = pFailed.get(pFailed.headMap(Settings.WARMUP).lastKey());
+		int productsFailed = pFailed.lastEntry().getValue() - sFailed;
 
-		TreeMap<Tick, Double> pOverdue = productStatistics.get(STATS_FAILED_DEADLINE);
-		Double sOverdue = pOverdue.get(pOverdue.headMap(Settings.WARMUP).lastKey());
-		Double productsOverdue = pOverdue.lastEntry().getValue() - sOverdue;
+		TreeMap<Tick, Integer> pOverdue = productStatistics.get(STATS_FAILED_DEADLINE);
+		int sOverdue = pOverdue.get(pOverdue.headMap(Settings.WARMUP).lastKey());
+		int productsOverdue = pOverdue.lastEntry().getValue() - sOverdue;
 
 		double sumThroughput = 0;
 		int countThroughput = 0;
@@ -743,13 +766,13 @@ public class Simulation implements ISimulation, IControl {
 			}
 		}
 
-		double avgThroughput = sumThroughput / countThroughput;
+		float avgThroughput = (float) (sumThroughput / countThroughput);
 
 		double sumLoad = 0;
 		double countLoad = 0;
 
-		for (Entry<String, TreeMap<Tick, Double>> entry : equipletLoadHistory.entrySet()) {
-			for (Entry<Tick, Double> time : entry.getValue().entrySet()) {
+		for (Entry<String, TreeMap<Tick, Float>> entry : equipletLoadHistory.entrySet()) {
+			for (Entry<Tick, Float> time : entry.getValue().entrySet()) {
 				if (time.getKey().greaterOrEqualThan(Settings.WARMUP)) {
 					double eLoad = time.getValue();
 					double l = sumLoad + time.getValue();
@@ -762,11 +785,11 @@ public class Simulation implements ISimulation, IControl {
 				}
 			}
 		}
-		double avgLoad = sumLoad / countLoad;
+		float avgLoad = (float) (sumLoad / countLoad);
 
-		runStats.put(run, new Pair<>(new Tuple<Integer, Integer, Integer, Double>(productsFinished.intValue(), productsFailed.intValue(), productsOverdue.intValue(), avgThroughput), avgLoad));
+		runStats.put(run, new Pair<>(new Tuple<Integer, Integer, Integer, Float>(productsFinished, productsFailed, productsOverdue, avgThroughput), avgLoad));
 
-		System.err.printf("Simlation: run finished stats=[finished=%.1f, failed=%.1f, overdue=%.1f, throughput=%.2f, load=%.4f]\n", productsFinished, productsFailed, productsOverdue, avgThroughput, avgLoad);
+		System.err.printf("Simlation: run finished stats=[finished=%.d, failed=%.d, overdue=%.d, throughput=%.2f, load=%.4f]\n", productsFinished, productsFailed, productsOverdue, avgThroughput, avgLoad);
 
 		saveStatistics();
 
@@ -819,12 +842,11 @@ public class Simulation implements ISimulation, IControl {
 		eventStack.add(new Event(time.add(arrivalTime), EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %s + %s\n", time, arrivalTime);
 
-		// System.out.println("CHECKPOINT GOLF");
-
 		// continue with simulation
 		synchronized (this) {
 			lock.unlock();
 		}
+		System.out.println("CHECKPOINT GOLF");
 	}
 
 	/**
@@ -867,7 +889,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
-		// System.out.println("CHECKPOINT ALPHA");
+		System.out.println("CHECKPOINT ALPHA");
 	}
 
 	/**
@@ -894,7 +916,7 @@ public class Simulation implements ISimulation, IControl {
 		//
 		// simulation.killAgent(productName);
 
-		// // System.out.println("CHECKPOINT NOVEMBER");
+		System.out.println("CHECKPOINT NOVEMBER");
 	}
 
 	/**
@@ -937,7 +959,7 @@ public class Simulation implements ISimulation, IControl {
 		}
 
 		// unblock simulation when notifying job finished
-		// System.out.println("CHECKPOINT ECHO");
+		System.out.println("CHECKPOINT ECHO");
 	}
 
 	/**
@@ -969,23 +991,25 @@ public class Simulation implements ISimulation, IControl {
 		System.out.printf("Simulation: schedule event ARRIVED %s + %s, from %s at %s to %s at %s\n", time, travelTime, productName, productAgent.getPosition(), equipletName, equipletAgent.getPosition());
 
 		// unblock simulation when notifying job finished
-		// System.out.println("CHECKPOINT HOTEL");
+		System.out.println("CHECKPOINT HOTEL");
 	}
 
 	@Override
 	public void notifyProductShouldStart(String productName, Tick start, int index) {
 		if (Settings.RESCHEDULE) {
-			eventStack.add(new Event(start, EventType.STARTED, productName, index));
+			eventStack.add(new Event(start.max(time), EventType.STARTED, productName, index));
 			System.out.printf("Simulation: schedule STARTED event for product %s at %s with prodcut step %d \n", productName, start, index);
 		}
+		System.out.println("CHECKPOINT ROMEO");
 	}
 
 	@Override
 	public void notifyProductRescheduled(boolean rescheduled) {
-		// System.out.println("CHECKPOINT Papa");
+		// product has started already so rescheduling is not needed, continue with the simulation
 		synchronized (this) {
 			lock.unlock();
 		}
+		System.out.println("CHECKPOINT PAPA");
 	}
 
 	@Override
@@ -1012,8 +1036,6 @@ public class Simulation implements ISimulation, IControl {
 
 		}
 
-		// System.out.println("CHECKPOINT Papa");
-
 		if (!rescheduled) {
 			throw new IllegalArgumentException("Wait What?!");
 		}
@@ -1021,6 +1043,7 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
+		System.out.println("CHECKPOINT QUEBEC");
 	}
 
 	/**
@@ -1047,7 +1070,7 @@ public class Simulation implements ISimulation, IControl {
 			updateProductStats(STATS_FAILED_DEADLINE, +1);
 		}
 
-		// System.out.println("CHECKPOINT INDIA");
+		System.out.println("CHECKPOINT INDIA");
 	}
 
 	@Override
@@ -1055,6 +1078,7 @@ public class Simulation implements ISimulation, IControl {
 		Tick reconfigTime = stochastics.generateReconfigTime();
 		eventStack.add(new Event(time.add(reconfigTime), EventType.RECONFIG, equipletName));
 		System.out.printf("Simulation: schedule RECONFIG event for equiplet %s over %s\n", time, equipletName, reconfigTime);
+		System.out.println("CHECKPOINT SIERRA");
 	}
 
 	@Override
@@ -1115,8 +1139,8 @@ public class Simulation implements ISimulation, IControl {
 			writer.println("run;finished;failed;overdue;throughput;load;");
 			Tuple<Integer, Integer, Integer, Double> sumPStats = new Tuple<Integer, Integer, Integer, Double>(0, 0, 0, 0d);
 			double sumEStats = 0;
-			for (Entry<Integer, Pair<Tuple<Integer, Integer, Integer, Double>, Double>> entry : runStats.entrySet()) {
-				Pair<Tuple<Integer, Integer, Integer, Double>, Double> stats = entry.getValue();
+			for (Entry<Integer, Pair<Tuple<Integer, Integer, Integer, Float>, Float>> entry : runStats.entrySet()) {
+				Pair<Tuple<Integer, Integer, Integer, Float>, Float> stats = entry.getValue();
 				writer.printf("%d;%d;%d;%d;%.2f;%.4f;\n", entry.getKey(), stats.first.first, stats.first.second, stats.first.third, stats.first.fourth, stats.second);
 				sumPStats.first += stats.first.first;
 				sumPStats.second += stats.first.second;
@@ -1174,7 +1198,7 @@ public class Simulation implements ISimulation, IControl {
 
 			lines.put(header, "");
 			for (Entry<String, M> entry : data.entrySet()) {
-				int lastValue = 0;
+				double lastValue = 0;
 
 				// print header
 				lines.put(header, lines.get(header).concat(";" + entry.getKey()));
@@ -1210,7 +1234,7 @@ public class Simulation implements ISimulation, IControl {
 						lines.put(tick, "");
 					}
 
-					int v = counter > 0 ? (int) Math.round(value / counter) : lastValues == null ? 0 : lastValue;
+					double v = counter > 0 ? value / counter : lastValues == null ? 0 : lastValue;
 					String s = lines.get(tick).concat(";" + String.valueOf(v));
 					lines.put(tick, s);
 
@@ -1349,12 +1373,12 @@ public class Simulation implements ISimulation, IControl {
 			e.printStackTrace();
 		}
 
-		HashMap<String, TreeMap<Tick, Double>> mvAVGLoad = new HashMap<String, TreeMap<Tick, Double>>();
-		for (Entry<String, TreeMap<Tick, Double>> entry : equipletLoads.entrySet()) {
+		HashMap<String, TreeMap<Tick, Float>> mvAVGLoad = new HashMap<String, TreeMap<Tick, Float>>();
+		for (Entry<String, TreeMap<Tick, Float>> entry : equipletLoads.entrySet()) {
 			mvAVGLoad.put(entry.getKey(), Util.movingAverage(entry.getValue(), 1000));
 		}
-		HashMap<String, TreeMap<Tick, Double>> mvAVGLoadHistory = new HashMap<String, TreeMap<Tick, Double>>();
-		for (Entry<String, TreeMap<Tick, Double>> entry : equipletLoadHistory.entrySet()) {
+		HashMap<String, TreeMap<Tick, Float>> mvAVGLoadHistory = new HashMap<String, TreeMap<Tick, Float>>();
+		for (Entry<String, TreeMap<Tick, Float>> entry : equipletLoadHistory.entrySet()) {
 			mvAVGLoadHistory.put(entry.getKey(), Util.movingAverage(entry.getValue(), 1000));
 		}
 
@@ -1424,20 +1448,20 @@ public class Simulation implements ISimulation, IControl {
 	}
 
 	@Override
-	public Map<String, Map<Tick, Double>> getProductStatistics() {
-		Map<String, Map<Tick, Double>> stats = new HashMap<String, Map<Tick, Double>>(productStatistics);
-		// / stats.remove(STATS_FINISHED);
-		return stats;
+	public Map<String, TreeMap<Tick, Integer>> getProductStatistics() {
+		// Map<String, Map<Tick, Double>> stats = new HashMap<String, Map<Tick, >>(productStatistics);
+		// stats.remove(STATS_FINISHED);
+		return productStatistics;
 	}
 
 	@Override
-	public Map<String, Map<Tick, Double>> getEquipletStatistics() {
-		return new HashMap<String, Map<Tick, Double>>(equipletLoads);
+	public Map<String, Map<Tick, Float>> getEquipletStatistics() {
+		return new HashMap<String, Map<Tick, Float>>(equipletLoads);
 	}
 
 	@Override
-	public Map<String, Map<Tick, Double>> getEquipletLoadHistories() {
-		return new HashMap<String, Map<Tick, Double>>(equipletLoadHistory);
+	public Map<String, Map<Tick, Float>> getEquipletLoadHistories() {
+		return new HashMap<String, Map<Tick, Float>>(equipletLoadHistory);
 	}
 
 	@Override

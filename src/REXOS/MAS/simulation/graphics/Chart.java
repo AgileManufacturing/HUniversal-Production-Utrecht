@@ -134,7 +134,7 @@ public class Chart {
 
 		return chart;
 	}
-	
+
 	public static <M extends Map<Tick, T>, T extends Number> void save(String path, String title, String yLabel, Map<String, M> data) {
 		try {
 			File file = new File(path + title.replace(" ", "_") + ".png");
@@ -166,7 +166,7 @@ public class Chart {
 	 * @return chart
 	 */
 	public static <M extends Map<Tick, T>, T extends Number> JPanel createChart(String title, String yLabel, Map<String, M> data) {
-	// public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
+		// public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		for (Entry<String, M> entry : data.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
@@ -186,15 +186,15 @@ public class Chart {
 	 * 
 	 * @param title
 	 * @param yLabel
-	 * @param data1
+	 * @param stats
 	 * @param data2
 	 * @return
 	 */
-	public static Component createChart(String title, String yLabel1, String yLabel2, Map<String, Map<Tick, Double>> data1, Map<String, Map<? extends Number, ? extends Number>> data2) {
+	public static <M extends Map<Tick, T>, T extends Number> Component createChart(String title, String yLabel1, String yLabel2, Map<String, M> stats, Map<String, Map<? extends Number, ? extends Number>> data2) {
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-		for (Entry<String, Map<Tick, Double>> entry : data1.entrySet()) {
+		for (Entry<String, M> entry : stats.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
-			for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
+			for (Entry<? extends Number, ? extends Number> point : entry.getValue().entrySet()) {
 				series.add(point.getKey().doubleValue(), point.getValue());
 			}
 			dataset.addSeries(series);

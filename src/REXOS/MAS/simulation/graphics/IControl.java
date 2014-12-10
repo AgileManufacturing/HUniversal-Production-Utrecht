@@ -2,6 +2,7 @@ package MAS.simulation.graphics;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
@@ -30,12 +31,12 @@ public interface IControl {
 
 	Map<String, Map<Tick, Tick>> getEquipletLatency();
 
-	Map<String, Map<Tick, Double>> getProductStatistics();
-
-	Map<String, Map<Tick, Double>> getEquipletStatistics();
+	Map<String, TreeMap<Tick, Integer>> getProductStatistics();
 
 	Map<? extends Number, ? extends Number> getThroughput();
 
-	Map<String, Map<Tick, Double>> getEquipletLoadHistories();
+	Map<String, Map<Tick, Float>> getEquipletStatistics();
+
+	Map<String, Map<Tick, Float>> getEquipletLoadHistories();
 
 }

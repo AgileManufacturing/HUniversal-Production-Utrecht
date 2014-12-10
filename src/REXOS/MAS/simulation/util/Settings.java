@@ -15,7 +15,7 @@ public class Settings {
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = false;
+	public final static boolean STOCHASTICS = true;
 
 	/**
 	 * whether equiplets can breakdown
@@ -25,12 +25,12 @@ public class Settings {
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
 	 */
-	public static final double RECONFIGATION_TIME = 0;
+	public static final double RECONFIGATION_TIME = 300;
 	
 	/**
 	 * time needs to elapse before checking if equiplets need to be reconfigured
 	 */
-	public static final Tick RECONFIG_CHECK = new Tick(10000);
+	public static final Tick RECONFIG_CHECK = new Tick(3000);
 
 	/**
 	 * the number of jobs an just arrives job can overtake in the queue
@@ -74,6 +74,11 @@ public class Settings {
 	public final static String SIMULATION_EQUIPLET_CONFIG = "simulation/equiplets.csv";
 	public final static String SIMULATION_OUTPUT = "simulation/output";
 
+	/**
+	 * keep track of the equiplet history while the equiplet agent is alive
+	 * this could lead to heavy memory use
+	 */
+	public final static boolean KEEP_FULL_EQUIPLET_HISORY = false;
 	/**
 	 * name of the traffic controller agent
 	 */

@@ -96,7 +96,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	public void reconfigureStart() {
-		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
+		System.out.printf("EA:%s reconfigure with capabilities %s \n", getLocalName(), this.capabilities);
 		reconfiguring = true;
 		deregister();
 
@@ -124,7 +124,25 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			throw new IllegalArgumentException("Equiplet has not an empty schedule while being reconfigured");
 		}
 	}
-	
+
+	/**
+	 * remove all the job for a product in the schedule
+	 * when the equiplet need to be reconfigured, inform the simulation when his schedule is empty
+	 * 
+	 * @param product
+	 *            agent
+	 * @return successfulness of removing jobs
+	 */
+	@Override
+	public synchronized boolean releaseTimeSlopts(AID product) {
+		boolean success = super.releaseTimeSlopts(product);
+		if (reconfiguring && schedule.isEmpty()) {
+			state = EquipletState.RECONFIG;
+			simulation.notifyReconfigReady(getLocalName());
+		}
+		return success;
+	}
+
 	@Override
 	public String getExecutingProduct() {
 		return executing.getProductAgentName();
@@ -340,7 +358,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			AID finishedProduct = executing.getProductAgent();
 			int index = executing.getIndex();
 			executing = null;
-			
+
 			Job ready = jobReady();
 			if (ready != null) {
 				// if (!schedule.isEmpty() && jobReady()) {

@@ -18,7 +18,7 @@ public class Util {
 		}
 		return buffer.toString();
 	}
-	
+
 	public static String formatSet(Set<?> set) {
 		StringBuffer buffer = new StringBuffer();
 		for (Object obj : set) {
@@ -47,16 +47,16 @@ public class Util {
 		return buffer.toString();
 	}
 
-	public static TreeMap<Tick, Double> movingAverage(TreeMap<Tick, Double> map, int period) {
-		//TreeMap<Tick, Double> newMap = new TreeMap<Tick, Double>();
-		Queue<Double> window = new LinkedList<Double>();
-		double sum = 0.0;
+	public static TreeMap<Tick, Float> movingAverage(TreeMap<Tick, Float> map, int period) {
+		// TreeMap<Tick, Double> newMap = new TreeMap<Tick, Double>();
+		Queue<Float> window = new LinkedList<>();
+		float sum = 0f;
 
 		assert period > 0 : "Period must be a positive integer";
-		
-		for (Entry<Tick, Double> entry : map.entrySet()) {
+
+		for (Entry<Tick, Float> entry : map.entrySet()) {
 			sum += entry.getValue();
-			window.add(entry.getValue());
+			window.add(entry.getValue().floatValue());
 			if (window.size() > period) {
 				sum -= window.remove();
 			}
