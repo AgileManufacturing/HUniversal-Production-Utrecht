@@ -402,9 +402,9 @@ namespace rexos_knowledge_database{
 		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		for(int i = 0; i < moduleIdentifiers.size(); i++){
-				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
-				preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
-				preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
+			preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
+			preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
+			preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
 			preparedStmt->executeQuery();
 		}
 		delete preparedStmt;

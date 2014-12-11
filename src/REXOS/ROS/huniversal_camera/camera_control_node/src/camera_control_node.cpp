@@ -155,7 +155,6 @@ bool CameraControlNode::transitionDeinitialize() {
 	return true;
 }
 
-
 bool CameraControlNode::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
