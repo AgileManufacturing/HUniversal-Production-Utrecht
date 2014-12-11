@@ -4,6 +4,7 @@
  * @date Created: 2012-01-??  TODO: Date
  *
  * @author Tommas Bakker
+ * @author Lars Veenendaal
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
