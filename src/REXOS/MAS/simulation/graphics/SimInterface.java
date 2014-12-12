@@ -37,7 +37,6 @@ import MAS.simulation.util.Position;
 import MAS.simulation.util.Tick;
 import MAS.simulation.util.Triple;
 import MAS.simulation.util.Tuple;
-import MAS.simulation.util.Util;
 
 public class SimInterface {
 
@@ -51,7 +50,7 @@ public class SimInterface {
 	private JLabel lblBusy;
 	private JLabel lblTraveling;
 	private JLabel lblProducts;
-	private JLabel lblThroughput;
+	private JLabel lblProductionTimes;
 	private JButton btnStart;
 	private JLabel lblEvent;
 
@@ -227,8 +226,8 @@ public class SimInterface {
 					// Product Statistics
 					Map<String, TreeMap<Tick, Integer>> stats = simulation.getProductStatistics();
 					Map<String, Map<? extends Number, ? extends Number>> stats2 = new HashMap<String, Map<? extends Number, ? extends Number>>();
-					Map<? extends Number, ? extends Number> throughput = simulation.getThroughput();
-					stats2.put("Throughput", throughput);
+					Map<? extends Number, ? extends Number> productionTimes = simulation.getProductionTimes();
+					stats2.put("Production Times", productionTimes);
 
 					productStatistics.removeAll();
 					productStatistics.add(Chart.createChart("Product Statistics", "Products", "Time", stats, stats2));
@@ -237,12 +236,12 @@ public class SimInterface {
 					Map<String, Map<Tick, Float>> stats = simulation.getEquipletStatistics();
 					equipletStatistics.removeAll();
 					equipletStatistics.add(Chart.createChart("Equiplet Load Statistics", "Equiplets", stats));
-				}else if (index == tabbedPane.indexOfComponent(equipletLoadHistoriesScroll)) {
+				} else if (index == tabbedPane.indexOfComponent(equipletLoadHistoriesScroll)) {
 					// Equiplet Statistics
 					Map<String, Map<Tick, Float>> stats = simulation.getEquipletLoadHistories();
 					equipletLoadHistories.removeAll();
 					equipletLoadHistories.add(Chart.createChart("Equiplet Load Histories", "Equiplets", stats));
-					System.out.println(Util.formatArray(stats));
+					// System.out.println(Util.formatArray(stats));
 				}
 				System.err.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 			}
@@ -255,7 +254,8 @@ public class SimInterface {
 		gbl_optionsPanel.columnWidths = new int[] { 70, 0 };
 		gbl_optionsPanel.rowHeights = new int[] { 15, 25, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 462, 0, 0, 0, 0, 0, 0 };
 		gbl_optionsPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_optionsPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+				0.0, Double.MIN_VALUE };
 		optionsPanel.setLayout(gbl_optionsPanel);
 
 		btnStart = new JButton("Start");
@@ -407,19 +407,19 @@ public class SimInterface {
 		gbc_lblBusy.gridy = 17;
 		optionsPanel.add(lblBusy, gbc_lblBusy);
 
-		JLabel lblThroughputText = new JLabel("Avg throughput");
-		GridBagConstraints gbc_lblThroughputText = new GridBagConstraints();
-		gbc_lblThroughputText.insets = new Insets(0, 0, 5, 0);
-		gbc_lblThroughputText.gridx = 0;
-		gbc_lblThroughputText.gridy = 18;
-		optionsPanel.add(lblThroughputText, gbc_lblThroughputText);
+		JLabel lblProductionTimesText = new JLabel("Avg Production Times");
+		GridBagConstraints gbc_lblProductionTimesText = new GridBagConstraints();
+		gbc_lblProductionTimesText.insets = new Insets(0, 0, 5, 0);
+		gbc_lblProductionTimesText.gridx = 0;
+		gbc_lblProductionTimesText.gridy = 18;
+		optionsPanel.add(lblProductionTimesText, gbc_lblProductionTimesText);
 
-		lblThroughput = new JLabel("");
-		GridBagConstraints gbc_lblThroughput = new GridBagConstraints();
-		gbc_lblThroughput.insets = new Insets(0, 0, 5, 0);
-		gbc_lblThroughput.gridx = 0;
-		gbc_lblThroughput.gridy = 19;
-		optionsPanel.add(lblThroughput, gbc_lblThroughput);
+		lblProductionTimes = new JLabel("");
+		GridBagConstraints gbc_lblProductionTimes = new GridBagConstraints();
+		gbc_lblProductionTimes.insets = new Insets(0, 0, 5, 0);
+		gbc_lblProductionTimes.gridx = 0;
+		gbc_lblProductionTimes.gridy = 19;
+		optionsPanel.add(lblProductionTimes, gbc_lblProductionTimes);
 
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
@@ -500,7 +500,7 @@ public class SimInterface {
 	}
 
 	@Deprecated
-	public void update(double time, String event, int products, int productCount, int totalSteps, int traveling, List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, double waitingTime, List<Double> busy, double throughput) {
+	public void update(double time, String event, int products, int productCount, int totalSteps, int traveling, List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, double waitingTime, List<Double> busy, double productionTimes) {
 		String[] busyValues = new String[busy.size()];
 		for (int i = 0; i < busy.size(); i++) {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
@@ -515,12 +515,12 @@ public class SimInterface {
 		lblTraveling.setText(String.format("%d", traveling));
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));
 		lblBusy.setText(Arrays.toString(busyValues));
-		lblThroughput.setText(String.format("%.2f", throughput));
+		lblProductionTimes.setText(String.format("%.2f", productionTimes));
 		gridView.update(equipletStates);
 	}
 
 	@Deprecated
-	public void update(double time, int products, int productCount, int totalSteps, Map<String, Pair<Position, Tuple<String, Integer, Integer, Integer>>> equiplets, double waitingTime, List<Double> busy, double throughput) {
+	public void update(double time, int products, int productCount, int totalSteps, Map<String, Pair<Position, Tuple<String, Integer, Integer, Integer>>> equiplets, double waitingTime, List<Double> busy, double productionTimes) {
 		String[] busyValues = new String[busy.size()];
 		for (int i = 0; i < busy.size(); i++) {
 			busyValues[i] = String.format("%.0f%%", busy.get(i));
@@ -534,11 +534,11 @@ public class SimInterface {
 		lblTraveling.setText(String.format("%d", 0));
 		lblWaitingTime.setText(String.format("%.2f", waitingTime));
 		lblBusy.setText(Arrays.toString(busyValues));
-		lblThroughput.setText(String.format("%.2f", throughput));
+		lblProductionTimes.setText(String.format("%.2f", productionTimes));
 		gridView.update(equiplets);
 	}
 
-	public void update(final Tick time, final String event, final int products, final int productCount, final int totalSteps, final int traveling, final List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, final double throughput) {
+	public void update(final Tick time, final String event, final int products, final int productCount, final int totalSteps, final int traveling, final List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates, final double productionTimes) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -550,7 +550,7 @@ public class SimInterface {
 				lblEvent.setText(event);
 				lblProducts.setText(String.format("%d (%d) (%d)", products, productCount, totalSteps));
 				lblTraveling.setText(String.format("%d", traveling));
-				lblThroughput.setText(String.format("%.2f", throughput));
+				lblProductionTimes.setText(String.format("%.2f", productionTimes));
 				gridView.update(equipletStates);
 			}
 		});

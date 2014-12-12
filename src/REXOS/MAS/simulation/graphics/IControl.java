@@ -33,7 +33,7 @@ public interface IControl {
 
 	Map<String, TreeMap<Tick, Integer>> getProductStatistics();
 
-	Map<? extends Number, ? extends Number> getThroughput();
+	Map<? extends Number, ? extends Number> getProductionTimes();
 
 	Map<String, Map<Tick, Float>> getEquipletStatistics();
 

@@ -19,7 +19,7 @@ public interface ISimControl {
 	
 	IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception;
 
-//	void killAgent(String name);
+	void killAgent(String name);
 
 	void createTrafficAgent(Map<String, Position> equipletPositions) throws Exception;
 

@@ -95,13 +95,13 @@ public class Simulation implements ISimulation, IControl {
 	// Performance
 	private int totalSteps;
 
-	private HashMap<Tick, Tick> throughput;
+	private HashMap<Tick, Tick> productionTimes;
 	private Map<String, TreeMap<Tick, Integer>> productStatistics;
 	private Map<String, TreeMap<Tick, Float>> equipletLoads;
 	private Map<String, TreeMap<Tick, Float>> equipletLoadHistory;
 	private Map<String, TreeMap<String, String>> debugInfo;
 
-	// statistics per run with <created products,completed, failed, throughput, equiplet load>
+	// statistics per run with <created products,completed, failed, production times, equiplet load>
 	private String outputFolder;
 	private Map<Integer, Pair<Tuple<Integer, Integer, Integer, Float>, Float>> runStats;
 
@@ -147,7 +147,7 @@ public class Simulation implements ISimulation, IControl {
 
 		totalSteps = 0;
 		productCount = 0;
-		throughput = new HashMap<Tick, Tick>();
+		productionTimes = new HashMap<Tick, Tick>();
 		productStatistics = new HashMap<String, TreeMap<Tick, Integer>>();
 		equipletLoads = new HashMap<String, TreeMap<Tick, Float>>();
 		equipletLoadHistory = new HashMap<String, TreeMap<Tick, Float>>();
@@ -234,6 +234,9 @@ public class Simulation implements ISimulation, IControl {
 		// reconfigured.put("E9", new Tuple<String, Tick, Tick, String>("E1", new Tick(0), time, "E9" + "-> " +"E1"));
 	}
 
+	/**
+	 * handle an simulation event
+	 */
 	public void handleEvent() {
 		try {
 			while (running || step > 0) {
@@ -252,9 +255,9 @@ public class Simulation implements ISimulation, IControl {
 				// System.out.println("Simulation: continue");
 
 				Event e = eventStack.pollFirst();
-				
+
 				if (time.greaterThan(e.getTime())) {
-					throw new IllegalArgumentException("Damn time=" + time+ " == " + e);
+					throw new IllegalArgumentException("Damn time=" + time + " == " + e);
 				}
 				time = e.getTime();
 
@@ -327,7 +330,8 @@ public class Simulation implements ISimulation, IControl {
 
 		int busy = 0;
 		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY) {
+			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
+					|| (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
 				busy++;
 			}
 		}
@@ -425,6 +429,8 @@ public class Simulation implements ISimulation, IControl {
 				Double loadHistory = 1 - entry.getValue().loadHistory(time.minus(LOAD_WINDOW), LOAD_WINDOW);
 				equipletLoadHistory.get(entry.getKey()).put(time, loadHistory.floatValue());
 				sumLoadHistory += loadHistory;
+
+				System.out.println("EA " + entry.getKey() + " = " + loadHistory);
 			}
 		}
 		equipletLoads.get(STATS_LOAD_AVG).put(time, sumLoad / equiplets.size());
@@ -521,13 +527,13 @@ public class Simulation implements ISimulation, IControl {
 			equipletStates.add(equiplet.getValue().getUpdateState());
 		}
 
-		double sumThroughput = 0.0;
-		for (Entry<Tick, Tick> entry : throughput.entrySet()) {
-			sumThroughput += entry.getValue().doubleValue();
+		double sumProductionTime = 0.0;
+		for (Entry<Tick, Tick> entry : productionTimes.entrySet()) {
+			sumProductionTime += entry.getValue().doubleValue();
 		}
-		double avgThroughput = sumThroughput / throughput.size();
+		double avgProductionTimes = sumProductionTime / productionTimes.size();
 
-		gui.update(time, e.getEquiplet() + ":" + e.getType(), products.size(), productCount, totalSteps, productStatistics.get(STATS_TRAVEL).lastEntry().getValue().intValue(), equipletStates, avgThroughput);
+		gui.update(time, e.getEquiplet() + ":" + e.getType(), products.size(), productCount, totalSteps, productStatistics.get(STATS_TRAVEL).lastEntry().getValue().intValue(), equipletStates, avgProductionTimes);
 	}
 
 	/**
@@ -684,6 +690,14 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT KILO");
 	}
 
+	/**
+	 * event that signals that a product agent would check whether his product step is started
+	 * 
+	 * @param productName
+	 *            name of product
+	 * @param index
+	 *            of the product step that should has started with processing
+	 */
 	private void startedEvent(String productName, int index) {
 		try {
 			// check if the product not terminated in the mean time i.e. finished before the started event occurs
@@ -708,6 +722,13 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT OSCAR");
 	}
 
+	/**
+	 * event that signals the reconfiguration finished of an equiplet
+	 * the capabilities changes of the equiplet and he registers by the df after which he becomes available for product agents.
+	 * 
+	 * @param equipletName
+	 *            name of the equiplet
+	 */
 	private void reconfigEvent(String equipletName) {
 		System.out.println("Simulation: reconfiged event for equiplet " + equipletName);
 
@@ -757,16 +778,16 @@ public class Simulation implements ISimulation, IControl {
 		int sOverdue = pOverdue.get(pOverdue.headMap(Settings.WARMUP).lastKey());
 		int productsOverdue = pOverdue.lastEntry().getValue() - sOverdue;
 
-		double sumThroughput = 0;
-		int countThroughput = 0;
-		for (Entry<Tick, Tick> entry : throughput.entrySet()) {
+		double sumProductionTimes = 0;
+		int countProductionTimes = 0;
+		for (Entry<Tick, Tick> entry : productionTimes.entrySet()) {
 			if (entry.getKey().greaterOrEqualThan(Settings.WARMUP)) {
-				sumThroughput += entry.getValue().doubleValue();
-				countThroughput++;
+				sumProductionTimes += entry.getValue().doubleValue();
+				countProductionTimes++;
 			}
 		}
 
-		float avgThroughput = (float) (sumThroughput / countThroughput);
+		float avgProductionTimes = (float) (sumProductionTimes / countProductionTimes);
 
 		double sumLoad = 0;
 		double countLoad = 0;
@@ -787,9 +808,9 @@ public class Simulation implements ISimulation, IControl {
 		}
 		float avgLoad = (float) (sumLoad / countLoad);
 
-		runStats.put(run, new Pair<>(new Tuple<Integer, Integer, Integer, Float>(productsFinished, productsFailed, productsOverdue, avgThroughput), avgLoad));
+		runStats.put(run, new Pair<>(new Tuple<Integer, Integer, Integer, Float>(productsFinished, productsFailed, productsOverdue, avgProductionTimes), avgLoad));
 
-		System.err.printf("Simlation: run finished stats=[finished=%.d, failed=%.d, overdue=%.d, throughput=%.2f, load=%.4f]\n", productsFinished, productsFailed, productsOverdue, avgThroughput, avgLoad);
+		System.err.printf("Simlation: run finished stats=[finished=%d, failed=%d, overdue=%d, production times=%.2f, load=%.4f]\n", productsFinished, productsFailed, productsOverdue, avgProductionTimes, avgLoad);
 
 		saveStatistics();
 
@@ -802,7 +823,7 @@ public class Simulation implements ISimulation, IControl {
 			product.getValue().kill();
 		}
 
-		// simulation.killAgent(Settings.TRAFFIC_AGENT);
+		simulation.killAgent(Settings.TRAFFIC_AGENT);
 
 		// TODO check if needed to wait until messages are received and all is taken down / killed
 		simulation.delay(1000);
@@ -994,7 +1015,9 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT HOTEL");
 	}
 
-	@Override
+	/**
+	 * when a product arrives at an equiplet, he (probably) sets a timer that goes off on the last moment a product steps could start affecting the next product step
+	 */
 	public void notifyProductShouldStart(String productName, Tick start, int index) {
 		if (Settings.RESCHEDULE) {
 			eventStack.add(new Event(start.max(time), EventType.STARTED, productName, index));
@@ -1003,6 +1026,9 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT ROMEO");
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public void notifyProductRescheduled(boolean rescheduled) {
 		// product has started already so rescheduling is not needed, continue with the simulation
@@ -1063,7 +1089,7 @@ public class Simulation implements ISimulation, IControl {
 		// Product is finished
 		IProductSim productAgent = products.get(productName);
 		products.remove(productName);
-		throughput.put(time, time.minus(productAgent.getCreated()));
+		productionTimes.put(time, time.minus(productAgent.getCreated()));
 
 		Tick deadline = productAgent.getDeadline();
 		if (time.greaterThan(deadline)) {
@@ -1081,6 +1107,9 @@ public class Simulation implements ISimulation, IControl {
 		System.out.println("CHECKPOINT SIERRA");
 	}
 
+	/**
+	 * log function available for agents that want to log certain information during the simulation
+	 */
 	@Override
 	public void log(String info, String agent, String message) {
 		if (debugInfo.containsKey(info)) {
@@ -1100,6 +1129,9 @@ public class Simulation implements ISimulation, IControl {
 		return finished;
 	}
 
+	/**
+	 * handle one event
+	 */
 	@Override
 	public synchronized void step() {
 		step++;
@@ -1127,6 +1159,9 @@ public class Simulation implements ISimulation, IControl {
 		this.delay = Math.max(1, delay);
 	}
 
+	/**
+	 * save the statistics of one simulation run
+	 */
 	private void saveRunsStatistics() {
 		String path = outputFolder;
 
@@ -1136,7 +1171,7 @@ public class Simulation implements ISimulation, IControl {
 			saveConfig(configFile);
 
 			PrintWriter writer = new PrintWriter(statFile);
-			writer.println("run;finished;failed;overdue;throughput;load;");
+			writer.println("run;finished;failed;overdue;production time;load;");
 			Tuple<Integer, Integer, Integer, Double> sumPStats = new Tuple<Integer, Integer, Integer, Double>(0, 0, 0, 0d);
 			double sumEStats = 0;
 			for (Entry<Integer, Pair<Tuple<Integer, Integer, Integer, Float>, Float>> entry : runStats.entrySet()) {
@@ -1159,6 +1194,13 @@ public class Simulation implements ISimulation, IControl {
 		}
 	}
 
+	/**
+	 * save the configurations of a simulation run
+	 * 
+	 * @param configFile
+	 *            to save the configurations in
+	 * @throws FileNotFoundException
+	 */
 	private void saveConfig(File configFile) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(configFile);
 		writer.println("Simulation: " + new SimpleDateFormat("dd MM yyyy 'at' HH:mm:ss").format(new Date()));
@@ -1178,7 +1220,19 @@ public class Simulation implements ISimulation, IControl {
 		writer.close();
 	}
 
-	public <M extends Map<Tick, T>, T extends Number> void saveCSVStats(String path, String title, String yLabel, Map<String, M> data) throws FileNotFoundException {
+	/**
+	 * save statistics into a comma separated values file. these are time based statistics
+	 * with the files graph could be reproduced
+	 * 
+	 * @param path
+	 *            of the file to save
+	 * @param title
+	 *            or name of the file
+	 * @param data
+	 *            a map of statistic name with a map of values per time
+	 * @throws FileNotFoundException
+	 */
+	public <M extends Map<Tick, T>, T extends Number> void saveCSVStats(String path, String title, Map<String, M> data) throws FileNotFoundException {
 		File file = new File(path + title + ".csv");
 		PrintWriter writer = new PrintWriter(file);
 
@@ -1387,16 +1441,16 @@ public class Simulation implements ISimulation, IControl {
 		Chart.save(path, "Equiplet Load Histories", "Equiplets", mvAVGLoadHistory);
 
 		try {
-			saveCSVStats(path, "Equiplet Loads", "Equiplets", mvAVGLoad);
-			saveCSVStats(path, "Equiplet Load Histories", "Equiplets", mvAVGLoadHistory);
-			saveCSVStats(path, "Product Statistics", "Products", productStatistics);
+			saveCSVStats(path, "Equiplet Loads", mvAVGLoad);
+			saveCSVStats(path, "Equiplet Load Histories", mvAVGLoadHistory);
+			saveCSVStats(path, "Product Statistics", productStatistics);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 
 		HashMap<String, Map<Tick, Tick>> map = new HashMap<>();
-		map.put("Throughput", throughput);
-		Chart.save(path, "Product Throuhput", "Prodcuts", map);
+		map.put("ProductionTime", productionTimes);
+		Chart.save(path, "Production Time", "Prodcuts", map);
 
 		Map<String, Map<Tick, Tick>> latency = getEquipletLatency();
 		Chart.save(path, "Equiplet Latency", "Latency", latency);
@@ -1449,9 +1503,9 @@ public class Simulation implements ISimulation, IControl {
 
 	@Override
 	public Map<String, TreeMap<Tick, Integer>> getProductStatistics() {
-		// Map<String, Map<Tick, Double>> stats = new HashMap<String, Map<Tick, >>(productStatistics);
-		// stats.remove(STATS_FINISHED);
-		return productStatistics;
+		Map<String, TreeMap<Tick, Integer>> stats = new HashMap<>(productStatistics);
+		stats.remove(STATS_RESCHEDULED);
+		return stats;
 	}
 
 	@Override
@@ -1465,7 +1519,7 @@ public class Simulation implements ISimulation, IControl {
 	}
 
 	@Override
-	public Map<Tick, Tick> getThroughput() {
-		return throughput;
+	public Map<Tick, Tick> getProductionTimes() {
+		return productionTimes;
 	}
 }

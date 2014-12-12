@@ -48,9 +48,7 @@ public class ScheduleBehaviour extends OneShotBehaviour {
 		this.deadline = product.getDeadline();
 	}
 
-	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> steps, Tick time, Tick deadline) {
-		super(product);
-		this.product = product;
+	public void reschedule(LinkedList<ProductStep> steps, Tick time, Tick deadline) {
 		this.productSteps = steps;
 		this.time = time;
 		this.deadline = deadline;
@@ -107,13 +105,20 @@ public class ScheduleBehaviour extends OneShotBehaviour {
 			}
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
-
+			//
+			// finished = true;
 		} catch (SchedulingException e) {
 			System.out.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
 			product.schedulingFinished(time, false);
 		}
 	}
 
+	//
+	// @Override
+	// public boolean done() {
+	// return finished;
+	// }
+	//
 	/**
 	 * search for suited equiplet
 	 * ask the DF if there are equiplets that have registered service needed for production of the product

@@ -96,7 +96,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	public void reconfigureStart() {
-		System.out.printf("EA:%s reconfigure with capabilities %s \n", getLocalName(), this.capabilities);
+		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
 		reconfiguring = true;
 		deregister();
 
@@ -136,7 +136,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	@Override
 	public synchronized boolean releaseTimeSlopts(AID product) {
 		boolean success = super.releaseTimeSlopts(product);
-		if (reconfiguring && schedule.isEmpty()) {
+		if (reconfiguring && state == EquipletState.IDLE && schedule.isEmpty()) {
 			state = EquipletState.RECONFIG;
 			simulation.notifyReconfigReady(getLocalName());
 		}
