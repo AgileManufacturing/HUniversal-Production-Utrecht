@@ -620,10 +620,10 @@ public class Simulation implements ISimulation, IControl {
 			// notify the equiplet his job is finished (without any more delay)
 			equipletAgent.notifyJobFinished(time);
 		}
-
 		synchronized (this) {
 			lock.unlock();
 		}
+		
 		// System.out.println("CHECKPOINT FOXTROT");
 	}
 
@@ -809,6 +809,7 @@ public class Simulation implements ISimulation, IControl {
 
 		// schedule next product arrival
 		Tick arrivalTime = stochastics.generateProductArrival(time);
+		//Add next product creation to event-stack
 		eventStack.add(new Event(time.add(arrivalTime), EventType.PRODUCT));
 		System.out.printf("Simulation: schedule event PRODUCT %s + %s\n", time, arrivalTime);
 

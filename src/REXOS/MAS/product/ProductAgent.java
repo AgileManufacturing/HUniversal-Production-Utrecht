@@ -137,7 +137,7 @@ public class ProductAgent extends Agent {
 		//TODO Currently there is no travel time for a product.
 		//Once a product is done scheduling it immediately arrives at an equiplet.
 		else{
-			onProductArrived(new Tick(1));
+			onProductArrived(new Tick());
 		}
 	}
 
@@ -165,18 +165,18 @@ public class ProductAgent extends Agent {
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_ARRIVED + System.currentTimeMillis());
 			message.setContent(Parser.parseProductArrived(time, productionStep.getIndex()));
 			send(message);
-			System.out.println("PA: waiting on onproductArrived reply");
+			System.out.println("PA:"+ this.getLocalName() + " waiting on confirm onproductArrived reply from " + productionStep.getEquiplet().getLocalName() + " for indexstep " + productionStep.getIndex());
 			
 			// receive reply
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-			ACLMessage reply = blockingReceive(template, 1000);
-			System.out.println("PA:" + this.getLocalName() +  " Received confirm on onproductArrived");
+			ACLMessage reply = blockingReceive(template);
+			System.out.println("PA:" + this.getLocalName() +  " Received confirm on onproductArrived from " + reply.getSender().getLocalName() + " for indexstep " + productionStep.getIndex());
 			if (!Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("PA:%s failed to receive confirmation.\n", getLocalName());
 			}
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to construct message to equiplet %s for informing product arrived.\n", getLocalName(), productionPath.peek().getEquipletName());
-			System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
+			System.err.printf("PA:%s %s ", getLocalName(), e.getMessage());
 		}
 	}
 
@@ -189,7 +189,7 @@ public class ProductAgent extends Agent {
 			System.out.println(this.getLocalName() + " is done with all steps");
 		} else {
 			state = ProductState.TRAVELING;
-			onProductArrived(new Tick(1));
+			//onProductArrived(new Tick());
 		}
 	}
 

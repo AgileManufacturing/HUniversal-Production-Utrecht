@@ -39,7 +39,6 @@
 package MAS.grid_server;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -139,10 +138,10 @@ public class GridAgent extends Agent{
 		
 	}
 	private void spawnTrafficAgent() {
-		Map<String, Position> aapkip = new HashMap<String, Position>();
+		Map<String, Position> temp = new HashMap<String, Position>();
         AgentController ac;
 		try {
-			TrafficManager trafficAgent = new TrafficManager(aapkip);
+			TrafficManager trafficAgent = new TrafficManager(temp);
 
 			ContainerController cc = getContainerController();
 			ac = cc.acceptNewAgent(Settings.TRAFFIC_AGENT, trafficAgent);

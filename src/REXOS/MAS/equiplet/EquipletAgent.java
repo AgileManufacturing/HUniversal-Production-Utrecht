@@ -714,7 +714,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_PROCESSING + System.currentTimeMillis());
 			message.setContent(Parser.parseProductProcessing(time, intdex));
 			send(message);
-			System.out.println(intdex);
 			
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
@@ -722,7 +721,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product processing.\n", getLocalName());
 			}else if (reply != null){
-				System.out.println("EA:" + this.getLocalName() + " Received confirmation of product processing ");
+				System.out.println("EA:" + this.getLocalName() + " Received confirmation of product processing of product " + reply.getSender().getLocalName());
 			}
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed.\n", getLocalName(), executing.getProductAgentName());
@@ -756,6 +755,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
 			}else if (reply.getPerformative() == ACLMessage.CONFIRM){
+				this.state = EquipletState.IDLE;
 				executing = null;
 			}
 		} catch (JSONException e) {
@@ -855,7 +855,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 	
 	public void getServices(){
-	
+	 
 	}
 	
 	public EquipletState getEquipletStatus(){

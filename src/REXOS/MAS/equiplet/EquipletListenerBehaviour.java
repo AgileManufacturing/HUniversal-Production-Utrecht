@@ -172,7 +172,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			reply.setContent(Parser.parseConfirmation(true));
 			reply.setPerformative(ACLMessage.CONFIRM);
 			equiplet.send(reply);
-			System.out.println("EA: Reply to onproductArrived sent");
+			System.out.println("EA:"+this.myAgent.getLocalName() +  " Reply to onproductArrived sent to " + message.getSender());
 			
 			equiplet.notifyProductArrived(message.getSender(), information.first);			
 		} catch (JSONException e) {
