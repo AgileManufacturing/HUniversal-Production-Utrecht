@@ -41,42 +41,28 @@
 
 namespace rexos_knowledge_database {
 	class Module : public ModuleType {
-	private:
-		rexos_datatypes::ModuleIdentifier moduleIdentifier;
-		std::unique_ptr<sql::Connection> connection;
+		
 	public:
 		Module(rexos_datatypes::ModuleIdentifier moduleIdentifier);
-		
 		rexos_datatypes::ModuleIdentifier getModuleIdentifier();
-		
-	public:
 		std::string getModuleProperties();
-	protected:
-		void setModuleProperties(std::string jsonProperties);
-	public:
 		Module* getParentModule();
-	public:
 		std::vector<rexos_datatypes::ModuleIdentifier> getChildModulesIdentifiers();
-		
-	public:
 		int getMountPointX();
-	protected:
-		void setMountPointX(int mountPointX);
-	public:
 		int getMountPointY();
-	protected:
-		void setMountPointY(int mountPointY);
-		
-	public:
 		std::string getCalibrationDataForModuleOnly();
 		std::string getCalibrationDataForModuleAndChilds();
 		std::string getCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
 	protected:
 		void setCalibrationDataForModuleOnly(std::string properties);
 		void setCalibrationDataForModuleAndChilds(std::string properties);
-		void setCalibrationDataForModuleAndOtherModules(
-				std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers, std::string properties);
+		void setCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers, std::string properties);
+		void setModuleProperties(std::string jsonProperties);
+		void setMountPointX(int mountPointX);
+		void setMountPointY(int mountPointY);
 	private:
+		rexos_datatypes::ModuleIdentifier moduleIdentifier;
+		std::unique_ptr<sql::Connection> connection;
 		int getCalibrationGroupForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
 		
 	};

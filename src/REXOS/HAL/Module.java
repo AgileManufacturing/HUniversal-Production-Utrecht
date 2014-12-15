@@ -9,6 +9,9 @@ import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
+import HAL.ModuleIdentifier;
+import java.util.Vector;
+import java.util.Iterator;
 /**
  * Abstract representation of a module in the HAL.
  * @author Bas Voskuijlen
@@ -112,6 +115,41 @@ public abstract class Module implements BlackboardModuleListener {
 		"		AND typeNumber = ? " +
 		"		AND serialNumber = ?);";
 
+	private static final String GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_TEMP_TABLE = 
+		"CREATE TEMPORARY TABLE otherModules( " +
+		"manufacturer char(200) NOT NULL, " +
+		"typeNumber char(200) NOT NULL, " +
+		"serialNumber char(200) NOT NULL);";
+
+	private static final String GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_STORE_THE_MODULES = 
+		"INSERT INTO otherModules(manufacturer, typeNumber, serialNumber) VALUES ( ?. ?. ? );";
+	private static final String GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_ACTUAL_QUERY = 
+		"SELECT id " +
+		"FROM ModuleCalibration " +
+		"JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id " +
+		"WHERE manufacturer = ? AND " +
+		"typeNumber = ? AND " +
+		"serialNumber = ? AND " +
+		"( " +
+		"	SELECT count(*) " +
+		"	FROM ModuleCalibrationModuleSet AS inListGroup " +
+		"	JOIN otherModules ON " +
+		"		inListGroup.manufacturer = otherModules.manufacturer AND " +
+		"		inListGroup.typeKnowledgeExceptionNumber = otherModules.typeNumber AND " +
+		"		inListGroup.serialNumber = otherModules.serialNumber " +
+		"	WHERE ModuleCalibrationModuleSet.ModuleCalibration = inListGroup.ModuleCalibration " +
+		") = ? AND " +
+		"( " +
+		"	SELECT count(*) " +
+		"	FROM ModuleCalibrationModuleSet AS listGroup " +
+		"	WHERE ModuleCalibrationModuleSet.ModuleCalibration = listGroup.ModuleCalibration AND ( " +
+		"		listGroup.manufacturer != ModuleCalibrationModuleSet.manufacturer OR " +
+		"		listGroup.typeNumber != ModuleCalibrationModuleSet.typeNumber OR " +
+		"		listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber " +
+		"	) " +
+		") = ?;";
+	private static final String GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_DROP_TABLE = 
+		"DROP TEMPORARY TABLE otherModules;";
 
 	/**
 	 * Constructs a new Module and subscribes to the blackboardHandler.
@@ -271,23 +309,6 @@ public abstract class Module implements BlackboardModuleListener {
 		return 0;
 	}
 
-	public void setMountPointX(int mountPointX){
-		knowledgeDBClient.executeSelectQuery(	
-			SET_MOUNT_POINT_X, 
-			mountPointX,
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(), 
-			moduleIdentifier.getSerialNumber());
-	} 
-	public void setMountPointY(int mountPointY){
-		knowledgeDBClient.executeSelectQuery(	
-			SET_MOUNT_POINT_Y, 
-			mountPointY,
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(), 
-			moduleIdentifier.getSerialNumber());
-	}
-
 	public String getCalibrationDataForModuleOnly() {
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
 			GET_CALIBRATION_DATA_FOR_MODULE_ONLY,
@@ -306,7 +327,6 @@ public abstract class Module implements BlackboardModuleListener {
 	public String getCalibrationDataForModuleAndChilds() {
 		System.out.println("getCalibrationDataForModuleAndChilds a1");
 		Vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
-		// Is dit nog nodig? LARS System.out.println("getCalibrationDataForModuleAndChilds a2, vector size = " + childs.size());
 		String returnValue = getCalibrationDataForModuleAndOtherModules(childs);
 		System.out.println(returnValue);
 		return returnValue;
@@ -325,30 +345,27 @@ public abstract class Module implements BlackboardModuleListener {
 		Vector<ModuleIdentifier> childModules = null;
 		if (resultSet.length != 0){
 			// get all the childs
-			//while(result->next()){
-			//	rexos_datatypes::ModuleIdentifier identifier(
-			//		result->getString("manufacturer"),
-			//		result->getString("typeNumber"),
-			///		result->getString("serialNumber")
-			//	);
-			//	childModules.push_back(identifier);
-			//}
+			int i = 0;
+			while(resultSet.length >= i){
+				ModuleIdentifier indentifier = new ModuleIdentifier(
+					resultSet[i].get("Manufacturer").toString(),
+					resultSet[i].get("typeNumber").toString(),
+					resultSet[i].get("serialNumber").toString()
+				);
+				childModules.add(indentifier);
+				//childModules.push_back(indentifier);
+				i++;
+			}
 		}
 		return childModules;
 	}
 
 
 	public String getCalibrationDataForModuleAndOtherModules(Vector<ModuleIdentifier> moduleIdentifiers) {
-		System.out.println("getCalibrationDataForModuleAndOtherModules b1" );
 
 		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 		String query = "SELECT properties FROM ModuleCalibration WHERE id = ?;";
-		System.out.println("getCalibrationDataForModuleAndOtherModules b2, SQL query = " + query);
-
-		//System.out.println("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
-
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(query, calibrationId);
-
 
 		if(resultSet.length != 1){
 			System.out.println("Unable to find calibration entry");
@@ -357,16 +374,147 @@ public abstract class Module implements BlackboardModuleListener {
 		return (String) resultSet[0].get("properties");
 	}
 
-	private int getCalibrationGroupForModuleAndOtherModules(
-			Vector<ModuleIdentifier> moduleIdentifiers) {
-		// TODO Auto-generated method stub
-		return 0;
+	private int getCalibrationGroupForModuleAndOtherModules(Vector<ModuleIdentifier> moduleIdentifiers) {
+
+		// create a temp table for storing the modules
+		knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_TEMP_TABLE);
+
+		// Store the modules
+		Iterator itr = moduleIdentifiers.iterator();
+		while(itr.hasNext()){
+			knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_STORE_THE_MODULES,
+				((ModuleTypeIdentifier) itr).getManufacturer(),
+				((ModuleTypeIdentifier) itr).getTypeNumber(),
+				((ModuleIdentifier) itr).getSerialNumber());
+			itr.next();
+		}
+
+		// preform the actual query
+		Row[] resultSet = knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_ACTUAL_QUERY,
+			moduleIdentifier.getManufacturer(),
+			moduleIdentifier.getTypeNumber(),
+			moduleIdentifier.getSerialNumber(),
+			moduleIdentifiers.size(),
+			moduleIdentifiers.size());
+
+		if (resultSet.length != 0){
+			System.out.println("result...");
+			// delete the temp table for storing the modules
+			knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_DROP_TABLE);
+			throw new KnowledgeException("Unable to find calibration entry for only this module and other modules");
+		}
+		knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_DROP_TABLE);
+
+		return (int)resultSet[0].get("id");
 	}
 
-	private int getCalibrationGroupForModuleAndOtherModules(ModuleIdentifier moduleIdentifiers) {
-		// TODO Auto-generated method stub
-		return 0;
+	// FIX DEZE!
+
+	protected void setCalibrationDataForModuleOnly(String properties){
+		
+		Vector<ModuleIdentifier> emptyList = null;
+		try{
+			int calibrationId = getCalibrationGroupForModuleAndOtherModules(emptyList);
+
+			knowledgeDBClient.executeUpdateQuery(
+				"UPDATE ModuleCalibration " + 
+				"SET properties = ? " + 
+				"WHERE id = ?;",
+			properties,
+			calibrationId);
+
+		}catch(KnowledgeException ex){
+
+			knowledgeDBClient.executeSelectQuery(
+				"INSERT INTO ModuleCalibrationModuleSet (properties) " + 
+				"VALUES (?);",
+				properties); 
+
+			knowledgeDBClient.executeSelectQuery(
+				"INSERT INTO ModuleCalibration (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
+				"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+				moduleIdentifier.getManufacturer(),
+				moduleIdentifier.getTypeNumber(),
+				moduleIdentifier.getSerialNumber());
+
+		}
+
 	}
 
+	protected	void setCalibrationDataForModuleAndChilds(String properties){
+		Vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
+		setCalibrationDataForModuleAndOtherModules(childs, properties);
+	}
+
+	protected	void setCalibrationDataForModuleAndOtherModules(Vector<ModuleIdentifier> moduleIdentifiers, String properties){
+		try{
+			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
+			
+			// update existing entry
+			 
+			knowledgeDBClient.executeSelectQuery(
+				"UPDATE ModuleCalibration " +
+				"SET properties = ? " + 
+				"WHERE id = ?;",
+				properties,
+				calibrationId);
+
+		} catch (KnowledgeException ex) {
+			// create a new entry
+			 
+			knowledgeDBClient.executeSelectQuery(
+				"INSERT INTO ModuleCalibration (properties) " +
+				"VALUES (?);",
+				properties); 
+			
+			knowledgeDBClient.executeSelectQuery(
+				"INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
+				"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+				 moduleIdentifier.getManufacturer(),
+				 moduleIdentifier.getTypeNumber(),
+				 moduleIdentifier.getSerialNumber());
+			
+			//for(int i = 0; i < moduleIdentifiers.size(); i++){
+			Iterator itr = moduleIdentifiers.iterator();
+			while(itr.hasNext()){
+			knowledgeDBClient.executeSelectQuery(
+				"INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
+				"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+				((ModuleTypeIdentifier) itr).getManufacturer(),
+				((ModuleTypeIdentifier) itr).getTypeNumber(),
+				((ModuleIdentifier) itr).getSerialNumber());
+				itr.next();
+			}
+		}
+	}
+
+	protected	void setModuleProperties(String jsonProperties){
+		knowledgeDBClient.executeUpdateQuery(
+			"UPDATE Module " +
+			"SET moduleProperties = ? " +
+			"WHERE manufacturer = ? AND " +
+			"typeNumber = ? AND " +
+			"serialNumber = ?;",
+			jsonProperties,
+			moduleIdentifier.getManufacturer(),
+			moduleIdentifier.getTypeNumber(),
+			moduleIdentifier.getSerialNumber());
+	}
+
+	protected	void setMountPointX(int mountPointX){
+		knowledgeDBClient.executeSelectQuery(	
+			SET_MOUNT_POINT_X,
+			moduleIdentifier.getManufacturer(), 
+			moduleIdentifier.getTypeNumber(),
+			moduleIdentifier.getSerialNumber());
+	}
+
+	protected	void setMountPointY(int mountPointY){
+		knowledgeDBClient.executeSelectQuery(	
+			SET_MOUNT_POINT_Y,
+			moduleIdentifier.getManufacturer(), 
+			moduleIdentifier.getTypeNumber(),
+			moduleIdentifier.getSerialNumber());
+	}
 
 }
