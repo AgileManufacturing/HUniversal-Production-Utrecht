@@ -68,7 +68,6 @@ public class ProductListenerBehaviour extends Behaviour {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(confirmation));
-			System.out.println(" PA" + this.myAgent + "has received: " + message);
 			myAgent.send(reply);
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse product processing information\n", myAgent.getLocalName());
@@ -80,7 +79,6 @@ public class ProductListenerBehaviour extends Behaviour {
 		try {
 			
 			Pair<Tick, Integer> information = Parser.parseProductFinished(message.getContent());
-			System.out.println("nr1: " + product.getCurrentStep().getIndex() + " nr2: " + information.second);
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);
