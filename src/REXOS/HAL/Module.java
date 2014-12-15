@@ -150,6 +150,32 @@ public abstract class Module implements BlackboardModuleListener {
 		") = ?;";
 	private static final String GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_DROP_TABLE = 
 		"DROP TEMPORARY TABLE otherModules;";
+	private static final String SET_CALIBRATION_DATA_FOR_MODULE_ONLY_UPDATE_MODULECALIBRATION =
+		"UPDATE ModuleCalibration " + 
+		"SET properties = ? " + 
+		"WHERE id = ?;";
+	private static final String SET_CALIBRATION_DATA_FOR_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET =
+		"INSERT INTO ModuleCalibrationModuleSet (properties) " + 
+		"VALUES (?);";
+	private static final String SET_CALIBRATION_DATA_FOR_MODULE_INSERT_MODULE_CALIBRATION =
+		"INSERT INTO ModuleCalibration (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
+		"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+	private static final String SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_UPDATE_MODULE_CALIBRATION =
+		"UPDATE ModuleCalibration " +
+		"SET properties = ? " + 
+		"WHERE id = ?;";
+	private static final String SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION =
+		"INSERT INTO ModuleCalibration (properties) " +
+		"VALUES (?);";
+	private static final String SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET =
+		"INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
+		"VALUES (LAST_INSERT_ID(), ?, ?, ?);";
+	private static final String SET_MODULE_PROTERTIES = 
+		"UPDATE Module " +
+		"SET moduleProperties = ? " +
+		"WHERE manufacturer = ? AND " +
+		"typeNumber = ? AND " +
+		"serialNumber = ?;";
 
 	/**
 	 * Constructs a new Module and subscribes to the blackboardHandler.
@@ -240,48 +266,6 @@ public abstract class Module implements BlackboardModuleListener {
 	public void onModuleModeChanged(String mode){
 		moduleListener.onModuleModeChanged(mode, this);
 	}
-
-	/*
-	
-	11 - 12 - 14 - ROS -> HAL Additions
-
-	std::string Module::getModuleProperties(){
-	void Module::setModuleProperties(std::string jsonProperties) {
-	std::vector<rexos_datatypes::ModuleIdentifier> Module::getChildModulesIdentifiers() {
-
-	// UPDATE
-	private static final String updateRosSoftware =
-			"UPDATE RosSoftware \n" + 
-			"SET buildNumber =? AND \n" + 
-			"command = ? AND \n" + 
-			"zipFile = ?;";
-	public void updateRosSoftware(JSONObject rosSoftware) throws JSONException {
-		byte[] zipFile = Base64.decodeBase64(rosSoftware.getString("zipFile").getBytes());
-		int buildNumber = getBuildNumber(rosSoftware);
-		String command = getCommand(rosSoftware);
-		
-		knowledgeDBClient.executeUpdateQuery(updateRosSoftware, buildNumber, command, zipFile);
-	}
-
-
-
-
-	// INSERT
-	private static final String addRosSoftware =
-			"INSERT INTO RosSoftware \n" + 
-			"(buildNumber, command, zipFile) \n" + 
-			"VALUES(?, ?, ?);";
-
-	public static RosSoftware insertRosSoftware(JSONObject rosSoftware, KnowledgeDBClient knowledgeDBClient) throws JSONException {
-		byte[] zipFile = Base64.decodeBase64(rosSoftware.getString("rosFile").getBytes());
-		int buildNumber = getBuildNumber(rosSoftware);
-		String command = getCommand(rosSoftware);
-		
-		int id = knowledgeDBClient.executeUpdateQuery(addRosSoftware, 
-				buildNumber, command, zipFile);
-		return new RosSoftware(id, buildNumber, command, knowledgeDBClient);
-	}
-	 */
 
 	public int getMountPointX(){
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
@@ -417,22 +401,18 @@ public abstract class Module implements BlackboardModuleListener {
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(emptyList);
 
 			knowledgeDBClient.executeUpdateQuery(
-				"UPDATE ModuleCalibration " + 
-				"SET properties = ? " + 
-				"WHERE id = ?;",
+			SET_CALIBRATION_DATA_FOR_MODULE_ONLY_UPDATE_MODULECALIBRATION,
 			properties,
 			calibrationId);
 
 		}catch(KnowledgeException ex){
 
 			knowledgeDBClient.executeSelectQuery(
-				"INSERT INTO ModuleCalibrationModuleSet (properties) " + 
-				"VALUES (?);",
+				SET_CALIBRATION_DATA_FOR_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET,
 				properties); 
 
 			knowledgeDBClient.executeSelectQuery(
-				"INSERT INTO ModuleCalibration (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
-				"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+				SET_CALIBRATION_DATA_FOR_MODULE_INSERT_MODULE_CALIBRATION,
 				moduleIdentifier.getManufacturer(),
 				moduleIdentifier.getTypeNumber(),
 				moduleIdentifier.getSerialNumber());
@@ -451,11 +431,8 @@ public abstract class Module implements BlackboardModuleListener {
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 			
 			// update existing entry
-			 
 			knowledgeDBClient.executeSelectQuery(
-				"UPDATE ModuleCalibration " +
-				"SET properties = ? " + 
-				"WHERE id = ?;",
+				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_UPDATE_MODULE_CALIBRATION,
 				properties,
 				calibrationId);
 
@@ -463,23 +440,20 @@ public abstract class Module implements BlackboardModuleListener {
 			// create a new entry
 			 
 			knowledgeDBClient.executeSelectQuery(
-				"INSERT INTO ModuleCalibration (properties) " +
-				"VALUES (?);",
+				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION,
 				properties); 
 			
 			knowledgeDBClient.executeSelectQuery(
-				"INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
-				"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
-				 moduleIdentifier.getManufacturer(),
-				 moduleIdentifier.getTypeNumber(),
-				 moduleIdentifier.getSerialNumber());
+				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET,
+				moduleIdentifier.getManufacturer(),
+				moduleIdentifier.getTypeNumber(),
+				moduleIdentifier.getSerialNumber());
 			
 			//for(int i = 0; i < moduleIdentifiers.size(); i++){
 			Iterator itr = moduleIdentifiers.iterator();
 			while(itr.hasNext()){
 			knowledgeDBClient.executeSelectQuery(
-				"INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
-				"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET,
 				((ModuleTypeIdentifier) itr).getManufacturer(),
 				((ModuleTypeIdentifier) itr).getTypeNumber(),
 				((ModuleIdentifier) itr).getSerialNumber());
@@ -490,11 +464,7 @@ public abstract class Module implements BlackboardModuleListener {
 
 	protected	void setModuleProperties(String jsonProperties){
 		knowledgeDBClient.executeUpdateQuery(
-			"UPDATE Module " +
-			"SET moduleProperties = ? " +
-			"WHERE manufacturer = ? AND " +
-			"typeNumber = ? AND " +
-			"serialNumber = ?;",
+			SET_MODULE_PROTERTIES,
 			jsonProperties,
 			moduleIdentifier.getManufacturer(),
 			moduleIdentifier.getTypeNumber(),
