@@ -616,7 +616,7 @@ public class Simulation implements ISimulation, IControl {
 			System.out.printf("Simulation: reschedule event FINISHED after breakdown and equiplet is repaired %s + %s, %s\n", time, remainingTime, equipletName);
 		} else {
 			updateProductStats(STATS_BUSY, -1);
-
+			
 			// notify the equiplet his job is finished (without any more delay)
 			equipletAgent.notifyJobFinished(time);
 		}

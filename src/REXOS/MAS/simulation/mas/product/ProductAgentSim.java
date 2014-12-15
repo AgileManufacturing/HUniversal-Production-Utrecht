@@ -66,15 +66,20 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	protected void onProductStepFinished() {
 		super.onProductStepFinished();
-
+		
 		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
 		} else if (getProductState() == ProductState.TRAVELING) {
-			// notify the simulation that the product is traveling
-			simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
+			// notify the simulation that the product is traveling			
 		}
+	}
+	
+	@Override
+	protected void travelToNextEquiplet() {
+		//Do Nothing
+		simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
 	}
 
 	@Override

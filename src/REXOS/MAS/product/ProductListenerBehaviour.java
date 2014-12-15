@@ -78,7 +78,7 @@ public class ProductListenerBehaviour extends Behaviour {
 
 	private void handleProductStepFinished(ACLMessage message) {
 		try {
-
+			
 			Pair<Tick, Integer> information = Parser.parseProductFinished(message.getContent());
 			System.out.println("nr1: " + product.getCurrentStep().getIndex() + " nr2: " + information.second);
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
@@ -100,7 +100,7 @@ public class ProductListenerBehaviour extends Behaviour {
 			System.err.printf("PA:%s failed to parse product step finished information\n", myAgent.getLocalName());
 			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
 		}
-		product.onProductStepFinished();
+		//product.onProductStepFinished();
 	}
 
 	private void handleProductStepDelayed(ACLMessage message) {

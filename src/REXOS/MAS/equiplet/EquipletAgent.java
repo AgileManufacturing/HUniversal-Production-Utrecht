@@ -755,8 +755,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
 			}else if (reply.getPerformative() == ACLMessage.CONFIRM){
-				this.state = EquipletState.IDLE;
-				executing = null;
+				//this.state = EquipletState.IDLE;
+				//executing = null;
 			}
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName() : "null"));

@@ -14,4 +14,5 @@ public interface IProductSim {
 	Tick getDeadline();
 
 	void kill();
+
 }

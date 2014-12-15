@@ -182,17 +182,22 @@ public class ProductAgent extends Agent {
 
 	protected void onProductStepFinished() {
 		// remove the first production step as this is finished
-		productionPath.pop();
+		productionPath.removeFirst();
 
 		if (productionPath.isEmpty()) {
 			state = ProductState.FINISHED;
 			System.out.println(this.getLocalName() + " is done with all steps");
 		} else {
 			state = ProductState.TRAVELING;
-			//onProductArrived(new Tick());
+			//Hier zit fout waarschijnlijk
+			travelToNextEquiplet();
 		}
 	}
 
+
+	protected void travelToNextEquiplet() {
+		onProductArrived(new Tick());		
+	}
 
 	protected void onProductProcessing() {
 		state = ProductState.PROCESSING;
