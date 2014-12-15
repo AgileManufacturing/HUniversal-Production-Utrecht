@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import MAS.simulation.mas.equiplet.Capability;
-import MAS.simulation.mas.equiplet.EquipletAgent;
-import MAS.simulation.mas.equiplet.Job;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Tuple;
+import MAS.equiplet.Capability;
+import MAS.equiplet.EquipletAgent;
+import MAS.equiplet.Job;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Tuple;
 
 class EquipletTest extends EquipletAgent {
 	private static final long serialVersionUID = 1L;

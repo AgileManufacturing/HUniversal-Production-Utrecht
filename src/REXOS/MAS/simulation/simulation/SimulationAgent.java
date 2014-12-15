@@ -21,19 +21,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import MAS.simulation.mas.TrafficManager;
-import MAS.simulation.mas.equiplet.Capability;
+import MAS.equiplet.Capability;
+import MAS.grid_server.TrafficManager;
+import MAS.product.ProductStep;
 import MAS.simulation.mas.equiplet.EquipletSimAgent;
 import MAS.simulation.mas.equiplet.EquipletSimAgentDealWithItTemporyName;
 import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
 import MAS.simulation.mas.product.ProductAgentSim;
 import MAS.simulation.mas.product.ProductAgentSimDealWithIt;
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.SchedulingAlgorithm;
 import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
+import MAS.util.Position;
+import MAS.util.SchedulingAlgorithm;
+import MAS.util.MasConfiguration;
+import MAS.util.Tick;
 
 public class SimulationAgent extends Agent implements ISimControl {
 
@@ -48,9 +49,9 @@ public class SimulationAgent extends Agent implements ISimControl {
 	 */
 	public void setup() {
 		try {
-			int verbosity = Integer.parseInt(getProperty("verbosity", String.valueOf(Settings.VERBOSITY)));
+			int verbosity = Integer.parseInt(getProperty("verbosity", String.valueOf(MasConfiguration.VERBOSITY)));
 			System.out.println("Simulation: verbosity is set on " + verbosity);
-			Settings.VERBOSITY = verbosity;
+			MasConfiguration.VERBOSITY = verbosity;
 		} catch (NumberFormatException e) {
 			System.err.println("Simulation: parsing error verbosity");
 		}
@@ -60,7 +61,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 		addBehaviour(new SimulationBehaviour());
 
 		// no use of gui, so start direct the simulation
-		if (Settings.VERBOSITY < 2) {
+		if (MasConfiguration.VERBOSITY < 2) {
 			simulation.start();
 		}
 	}
@@ -82,7 +83,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 			}
 
 			// take down the whole simulation when the gui is not used
-			if (Settings.VERBOSITY < 1) {
+			if (MasConfiguration.VERBOSITY < 1) {
 				doDelete();
 			}
 		}
@@ -120,7 +121,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 	public IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception {
 		try {
 			// Create and start the agent
-			if (Settings.SCHEDULING == SchedulingAlgorithm.NONE) {
+			if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.NONE) {
 				EquipletSimAgentDealWithItTemporyName equiplet = new EquipletSimAgentDealWithItTemporyName(simulation, position, capabilities);
 
 				ContainerController cc = getContainerController();
@@ -155,7 +156,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 			System.out.println("Simulation: create product");
 
 			// Create and start the agent
-			if (Settings.SCHEDULING == SchedulingAlgorithm.NONE) {
+			if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.NONE) {
 				ProductAgentSimDealWithIt productAgent = new ProductAgentSimDealWithIt(simulation, productSteps, position, time, deadline);
 
 				ContainerController cc = getContainerController();
@@ -200,17 +201,17 @@ public class SimulationAgent extends Agent implements ISimControl {
 			TrafficManager trafficAgent = new TrafficManager(equiplets);
 
 			ContainerController cc = getContainerController();
-			AgentController ac = cc.acceptNewAgent(Settings.TRAFFIC_AGENT, trafficAgent);
+			AgentController ac = cc.acceptNewAgent(MasConfiguration.TRAFFIC_AGENT, trafficAgent);
 			ac.start();
 		} catch (StaleProxyException e1) {
-			System.err.printf("Simulation: ERROR: traffic agent %s creation was not possible.\n", Settings.TRAFFIC_AGENT);
+			System.err.printf("Simulation: ERROR: traffic agent %s creation was not possible.\n", MasConfiguration.TRAFFIC_AGENT);
 			e1.printStackTrace();
 			throw new Exception("Failed to create agent");
 		}
 	}
 
 	private void setOutput() {
-		if (Settings.VERBOSITY <= 2) {
+		if (MasConfiguration.VERBOSITY <= 2) {
 			System.setOut(new DummyPrint());
 		}
 	}

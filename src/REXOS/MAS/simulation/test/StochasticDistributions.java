@@ -3,6 +3,7 @@ package MAS.simulation.test;
 import org.junit.Test;
 
 import MAS.simulation.util.Settings;
+import MAS.util.MasConfiguration;
 
 public class StochasticDistributions {
 

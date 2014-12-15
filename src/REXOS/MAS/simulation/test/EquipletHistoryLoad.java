@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import MAS.simulation.mas.equiplet.Job;
-import MAS.simulation.util.Tick;
+import MAS.equiplet.Job;
+import MAS.util.Tick;
 
 public class EquipletHistoryLoad {
 

@@ -43,7 +43,7 @@ import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import util.configuration.ServerConfigurations;
-import MAS.equiplet.equiplet_agent.EquipletAgent;
+import MAS.equiplet.EquipletAgent;
 
 public class EQSpawnClass extends Agent {
 	/**

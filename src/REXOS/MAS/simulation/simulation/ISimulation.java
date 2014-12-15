@@ -1,6 +1,6 @@
 package MAS.simulation.simulation;
 
-import MAS.simulation.util.Tick;
+import MAS.util.Tick;
 
 public interface ISimulation {
 

@@ -19,7 +19,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import MAS.simulation.mas.product.Product;
+import MAS.product.Product;
 
 public class ProductView extends JPanel implements TreeSelectionListener {
 

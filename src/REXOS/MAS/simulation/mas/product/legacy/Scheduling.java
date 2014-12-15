@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.json.JSONException;
 
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.mas.product.ProductionStep;
-import MAS.simulation.util.Ontology;
-import MAS.simulation.util.Parser;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Tuple;
+import MAS.product.ProductStep;
+import MAS.product.ProductionStep;
+import MAS.util.Ontology;
+import MAS.util.Parser;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Tuple;
 
 public class Scheduling {
 

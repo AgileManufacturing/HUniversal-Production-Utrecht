@@ -38,7 +38,7 @@
  **/
 package MAS.grid_server;
 
-import MAS.product.product_agent.ProductAgent;
+import MAS.product.ProductAgent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;

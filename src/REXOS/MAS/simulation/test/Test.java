@@ -15,17 +15,17 @@ import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.RefineryUtilities;
 
+import MAS.equiplet.Job;
+import MAS.product.Graph;
+import MAS.product.Node;
+import MAS.product.Product;
+import MAS.product.ProductStep;
+import MAS.product.ProductionStep;
 import MAS.simulation.graphics.GanttChart;
-import MAS.simulation.mas.equiplet.Job;
-import MAS.simulation.mas.product.Graph;
-import MAS.simulation.mas.product.Node;
-import MAS.simulation.mas.product.Product;
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.mas.product.ProductionStep;
 import MAS.simulation.simulation.Grid;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Tick;
 
 class Test {
 	public class Entry implements Comparable<Entry> {
