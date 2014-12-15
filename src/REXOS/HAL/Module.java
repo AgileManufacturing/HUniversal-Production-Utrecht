@@ -159,7 +159,7 @@ public abstract class Module implements BlackboardModuleListener {
 		"VALUES (?);";
 	private static final String SET_CALIBRATION_DATA_FOR_MODULE_INSERT_MODULE_CALIBRATION =
 		"INSERT INTO ModuleCalibration (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
-		"VALUES (LAST_INSERT_ID(), ?, ?, ?);",
+		"VALUES (LAST_INSERT_ID(), ?, ?, ?);";
 	private static final String SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_UPDATE_MODULE_CALIBRATION =
 		"UPDATE ModuleCalibration " +
 		"SET properties = ? " + 
