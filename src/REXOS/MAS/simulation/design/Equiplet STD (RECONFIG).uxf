@@ -24,30 +24,31 @@
 
 
 // This text will be stored with each diagram;  use it for notes.</help_text>
-  <zoom_level>9</zoom_level>
+  <zoom_level>12</zoom_level>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>576</x>
-      <y>756</y>
-      <w>188</w>
-      <h>129</h>
+      <x>612</x>
+      <y>816</y>
+      <w>252</w>
+      <h>188</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
  
 notifyProductArrived()
 notifyJobFinished()
 notifyBreakdown()
-notifyRepaired()</panel_attributes>
-    <additional_attributes>171;45;27;45</additional_attributes>
+notifyRepaired()
+notifyReconfigured()</panel_attributes>
+    <additional_attributes>228;60;36;60</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>864</x>
-      <y>396</y>
-      <w>234</w>
-      <h>99</h>
+      <x>1152</x>
+      <y>360</y>
+      <w>312</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>ERROR
 --
@@ -59,10 +60,10 @@ kutjre</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>792</x>
-      <y>234</y>
-      <w>225</w>
-      <h>99</h>
+      <x>1044</x>
+      <y>144</y>
+      <w>300</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>ERROR_FINISHED
 --
@@ -73,10 +74,10 @@ timeRemaining = time - timeBreakdown;</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>450</x>
-      <y>585</y>
-      <w>234</w>
-      <h>99</h>
+      <x>636</x>
+      <y>600</y>
+      <w>312</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>ERROR_REPAIRED
 --
@@ -87,10 +88,10 @@ timeRemaining = time - timeBreakdown;</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>324</x>
-      <y>234</y>
-      <w>234</w>
-      <h>99</h>
+      <x>456</x>
+      <y>144</y>
+      <w>312</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>ERROR_READY
 --
@@ -101,10 +102,10 @@ entry/state = ERROR_READY
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>549</x>
-      <y>396</y>
-      <w>234</w>
-      <h>99</h>
+      <x>732</x>
+      <y>360</y>
+      <w>312</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>BUSY
 --
@@ -120,10 +121,10 @@ informProductProcessing();
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>207</x>
-      <y>396</y>
-      <w>234</w>
-      <h>99</h>
+      <x>24</x>
+      <y>576</y>
+      <w>312</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>IDLE
 --
@@ -134,47 +135,47 @@ entry/state = IDLE
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>342</x>
-      <y>468</y>
-      <w>269</w>
-      <h>102</h>
+      <x>300</x>
+      <y>420</y>
+      <w>456</w>
+      <h>240</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyProductArrived(time) / 
 [jobReady()]</panel_attributes>
-    <additional_attributes>252;27;252;63;27;63;27;27</additional_attributes>
+    <additional_attributes>432;36;240;36;240;216;36;216</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>252</x>
-      <y>468</y>
-      <w>809</w>
-      <h>297</h>
+      <x>84</x>
+      <y>456</y>
+      <w>1332</w>
+      <h>372</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyBreakdown()</panel_attributes>
-    <additional_attributes>792;27;792;279;27;279;27;27</additional_attributes>
+    <additional_attributes>1308;36;1308;348;36;348;36;252</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>720</x>
-      <y>468</y>
-      <w>215</w>
-      <h>81</h>
+      <x>960</x>
+      <y>456</y>
+      <w>300</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyBreakdown(time)</panel_attributes>
-    <additional_attributes>198;27;198;63;27;63;27;27</additional_attributes>
+    <additional_attributes>276;36;276;84;36;84;36;36</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.Decision</type>
     <coordinates>
-      <x>468</x>
-      <y>351</y>
-      <w>36</w>
-      <h>36</h>
+      <x>576</x>
+      <y>288</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -182,119 +183,107 @@ notifyBreakdown(time)</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>477</x>
-      <y>324</y>
-      <w>203</w>
-      <h>89</h>
+      <x>588</x>
+      <y>252</y>
+      <w>306</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyJobFinished(time)</panel_attributes>
-    <additional_attributes>27;45;117;45;117;72</additional_attributes>
+    <additional_attributes>36;60;192;60;192;108</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>324</x>
-      <y>324</y>
-      <w>161</w>
-      <h>89</h>
+      <x>48</x>
+      <y>252</y>
+      <w>552</w>
+      <h>348</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [else]</panel_attributes>
-    <additional_attributes>45;72;45;45;144;45</additional_attributes>
+    <additional_attributes>60;324;60;60;528;60</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>423</x>
-      <y>360</y>
-      <w>143</w>
-      <h>108</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-[jobReady()]</panel_attributes>
-    <additional_attributes>126;90;63;90;63;27</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>828</x>
-      <y>306</y>
-      <w>176</w>
-      <h>107</h>
+      <x>1116</x>
+      <y>240</y>
+      <w>234</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyJobFinished(time)</panel_attributes>
-    <additional_attributes>90;27;90;90</additional_attributes>
+    <additional_attributes>120;36;120;120</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>657</x>
-      <y>162</y>
-      <w>477</w>
-      <h>251</h>
+      <x>876</x>
+      <y>48</y>
+      <w>636</w>
+      <h>336</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyProductArrived(time) /
 [!isExecuting()]</panel_attributes>
-    <additional_attributes>27;45;387;45;387;234</additional_attributes>
+    <additional_attributes>36;60;516;60;516;312</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>531</x>
-      <y>261</y>
-      <w>214</w>
-      <h>152</h>
+      <x>732</x>
+      <y>180</y>
+      <w>250</w>
+      <h>204</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyRepaired(time)</panel_attributes>
-    <additional_attributes>135;135;135;45;27;45</additional_attributes>
+    <additional_attributes>144;180;144;60;36;60</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>846</x>
-      <y>468</y>
-      <w>187</w>
-      <h>162</h>
+      <x>1128</x>
+      <y>456</y>
+      <w>250</w>
+      <h>216</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyRepaired(time)</panel_attributes>
-    <additional_attributes>27;144;108;144;108;27</additional_attributes>
+    <additional_attributes>36;192;144;192;144;36</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>648</x>
-      <y>243</y>
-      <w>161</w>
-      <h>170</h>
+      <x>852</x>
+      <y>156</y>
+      <w>216</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyRepaired(time)</panel_attributes>
-    <additional_attributes>81;153;81;45;144;45</additional_attributes>
+    <additional_attributes>108;204;108;60;192;60</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>513</x>
-      <y>468</y>
-      <w>175</w>
-      <h>134</h>
+      <x>708</x>
+      <y>456</y>
+      <w>234</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyJobFinished(time)</panel_attributes>
-    <additional_attributes>135;27;135;99;54;99;54;117</additional_attributes>
+    <additional_attributes>156;36;156;96;84;96;84;144</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.Decision</type>
     <coordinates>
-      <x>648</x>
-      <y>189</y>
-      <w>36</w>
-      <h>36</h>
+      <x>864</x>
+      <y>84</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -302,34 +291,34 @@ notifyJobFinished(time)</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>531</x>
-      <y>198</y>
-      <w>188</w>
-      <h>81</h>
+      <x>732</x>
+      <y>96</y>
+      <w>228</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [jobReady()]</panel_attributes>
-    <additional_attributes>27;63;135;63;135;27</additional_attributes>
+    <additional_attributes>36;84;156;84;156;36</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>234</x>
-      <y>162</y>
-      <w>431</w>
-      <h>251</h>
+      <x>0</x>
+      <y>48</y>
+      <w>888</w>
+      <h>552</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [else]</panel_attributes>
-    <additional_attributes>45;234;45;45;414;45</additional_attributes>
+    <additional_attributes>60;528;60;60;864;60</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.Decision</type>
     <coordinates>
-      <x>837</x>
-      <y>594</y>
-      <w>36</w>
-      <h>36</h>
+      <x>1116</x>
+      <y>624</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -337,50 +326,112 @@ notifyJobFinished(time)</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>657</x>
-      <y>567</y>
-      <w>197</w>
-      <h>63</h>
+      <x>912</x>
+      <y>588</y>
+      <w>228</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [isExecuting()]</panel_attributes>
-    <additional_attributes>27;45;180;45</additional_attributes>
+    <additional_attributes>36;60;204;60</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>675</x>
-      <y>468</y>
-      <w>197</w>
-      <h>143</h>
+      <x>900</x>
+      <y>456</y>
+      <w>264</w>
+      <h>192</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [jobReady()]</panel_attributes>
-    <additional_attributes>27;27;27;99;180;99;180;126</additional_attributes>
+    <additional_attributes>36;36;36;132;240;132;240;168</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>297</x>
-      <y>468</y>
-      <w>575</w>
-      <h>261</h>
+      <x>144</x>
+      <y>636</y>
+      <w>1020</w>
+      <h>156</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 [else]</panel_attributes>
-    <additional_attributes>27;27;27;243;558;243;558;162</additional_attributes>
+    <additional_attributes>36;72;36;132;996;132;996;36</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>657</x>
-      <y>468</y>
-      <w>436</w>
-      <h>219</h>
+      <x>912</x>
+      <y>456</y>
+      <w>570</w>
+      <h>280</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 notifyBreakdown(time)/
 time = time - timeRemaining</panel_attributes>
-    <additional_attributes>342;27;342;180;27;180</additional_attributes>
+    <additional_attributes>444;36;444;228;36;228</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.State</type>
+    <coordinates>
+      <x>132</x>
+      <y>360</y>
+      <w>312</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>RECONFIG
+--
+entry/state = RECONFIG
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>528</x>
+      <y>288</y>
+      <w>228</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+[jobReady()]</panel_attributes>
+    <additional_attributes>204;96;84;96;84;36</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>408</x>
+      <y>288</y>
+      <w>336</w>
+      <h>156</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+[reconfiguring &amp;&amp; schedule.isEmpty()]</panel_attributes>
+    <additional_attributes>36;132;180;132;180;36</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>300</x>
+      <y>456</y>
+      <w>194</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+reconfigureStart()</panel_attributes>
+    <additional_attributes>108;36;108;156;36;156</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>108</x>
+      <y>456</y>
+      <w>214</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+notifyReconfigured()</panel_attributes>
+    <additional_attributes>108;120;108;36</additional_attributes>
   </element>
 </diagram>

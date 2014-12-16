@@ -12,7 +12,10 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +32,15 @@ import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import MAS.product.ProductStep;
+import MAS.util.Ontology;
+import MAS.util.Pair;
+import MAS.util.Parser;
 import MAS.util.Position;
-import MAS.util.Settings;
+import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 import MAS.util.Triple;
 import MAS.util.Tuple;
+import MAS.util.Util;
 import MAS.util.Ontology;
 import MAS.util.Pair;
 import MAS.util.Parser;
@@ -53,7 +60,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	// Equiplet state
 	protected TreeSet<Job> schedule;
 	protected EquipletState state;
-	protected boolean reconfigure;
+	protected boolean reconfiguring;
 	protected Job executing;
 	protected TreeSet<Job> history;
 	protected Map<String, Tick> productionTimes;
@@ -171,11 +178,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	/**
 	 * Euiplet agent clean-up operations
-	 * Commented out, otherwise the EQ agent wont properly deregister on death
 	 */
 	@Override
 	protected void takeDown() {
-	System.out.printf("EA:%s terminating\n", getLocalName());
+		if (!reconfiguring) {
+			deregister();
+		}
+		System.out.printf("EA:%s terminating\n", getLocalName());
 	}
 
 	/**
@@ -195,7 +204,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	/**
 	 * @return whether the equiplet is executing a job
 	 */
-	protected boolean isExecuting() {
+	public boolean isExecuting() {
 		return executing != null;
 	}
 
@@ -256,8 +265,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	/**
 	 * Checks whether a job is ready for execution
 	 * TODO check not only the first in the schedule but also after if job can
-	 * be executed earlier than
 	 * planned, which increases complexity
+	 * be executed earlier than planned, which increases complexity
 	 * 
 	 * @return if there is job ready for executing
 	 */
@@ -270,20 +279,17 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				return job;
 			}
 			counter++;
-			if (counter >= Settings.QUEUE_JUMP) {
+			if (counter > MasConfiguration.QUEUE_JUMP) {
 				break;
 			}
 		}
 		return null;
-		// return !schedule.isEmpty() && schedule.first().isReady() ? schedule.first() : null;
-		// return !schedule.isEmpty() && schedule.first().isReady();
 	}
 
 	/**
 	 * check whether the equiplet can execute a list of product steps within a
 	 * time frame
-	 * this returns the list of services that can be performed @see
-	 * {@code isCapable}, with the estimate duration of the service and a list
+	 * this returns the list of services that can be performed @see {@code isCapable}, with the estimate duration of the service and a list
 	 * of possible time frames
 	 * the time frame is a list of times from which the equiplet is free until
 	 * the equiplet busy again where the deadline is the time till when is
@@ -314,8 +320,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	/**
-	 * check whether the equiplet is capable to perform a service with certain
-	 * criteria
+	 * check whether the equiplet is capable to perform a service with certain criteria
 	 * 
 	 * @param service
 	 * @param criteria
@@ -333,8 +338,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	/**
-	 * the first possible time there is enough room in the schedule to perform a
-	 * service
+	 * the first possible time there is enough room in the schedule to perform a service
 	 * load = 1 - Sr / Sw
 	 * 
 	 * @param time
@@ -348,13 +352,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		List<Pair<Tick, Tick>> available = new ArrayList<Pair<Tick, Tick>>();
 
 		// not availale when going to be reconfigured
-		if (reconfigure) {
+		if (reconfiguring) {
 			return available;
 		}
 
 		Tick start = time;
 		if (isExecuting()) {
-			start = start.max(executing.getDue());
+			// when executing add 10% of the duration to the time to prevent reschedules in the same timeslot
+			start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
+		}
+
+		if (state == EquipletState.ERROR || state == EquipletState.ERROR_FINISHED) {
+			// when broken down add the largest time slot to now to prevent product plan there product steps to close
+			start = start.max(time.add(Collections.max(productionTimes.values())));
 		}
 
 		if (schedule.isEmpty()) {
@@ -435,6 +445,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected synchronized double loadHistory(Tick time, Tick window) {
 		Tick sum = new Tick(0);
 
+		if (isExecuting()) {
+			sum = executing.getDue().min(time.add(window)).minus(executing.getStartTime().max(time));
+		}
+
 		Iterator<Job> iterator = history.descendingIterator();
 		while (iterator.hasNext()) {
 			Job job = iterator.next();
@@ -442,7 +456,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
 			} else if (job.getDue().lessThan(time)) {
 				// the jobs are outside the scope of the load window
-				// break;
+				break;
 			}
 		}
 
@@ -450,6 +464,89 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		sum = new Tick(Math.round(sum.doubleValue() * 100000000) / 100000000);
 
 		return 1 - sum.div(window).doubleValue();
+	}
+
+	/**
+	 * calculate the load of the history of the equiplet from a certain time
+	 * with a window
+	 * 
+	 * @param time
+	 *            from which the load needs to be calculated
+	 * @param window
+	 *            of the load
+	 * @return load of the equiplet
+	 */
+	protected synchronized double loadHistory1(Tick time, Tick window) {
+		// Tick sum = new Tick(1); // dirty fix
+		double sum = 0.0d;
+		double t = time.doubleValue();
+		double w = t + window.doubleValue();
+
+		if (isExecuting()) {
+			sum += time.doubleValue() - executing.getStartTime().doubleValue();
+		}
+
+		Iterator<Job> iterator = history.descendingIterator();
+		while (iterator.hasNext()) {
+			Job job = iterator.next();
+			double start = job.getStartTime().doubleValue();
+			double due = job.getDue().doubleValue();
+
+			System.out.println("in " + start + " >= " + t + " && " + start + " <= " + w + " || " + due + " > " + t + " && " + due + " <= " + w);
+			if (start >= t && start <= w || due > t && due <= w) {
+				// if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
+				// && job.getDue().lessOrEqualThan(time.add(window))) {
+				// sum += job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)).doubleValue();
+				// } else if (job.getDue().lessThan(time)) {
+				sum += Math.min(due, w) - Math.max(start, t);
+				System.out.println("sum " + Math.min(due, w) + " - " + Math.max(start, t) + "= " + (Math.min(due, w) - Math.max(start, t)) + " = " + sum);
+			} else if (due < t) {
+				// the jobs are outside the scope of the load window
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Register the equiplet services by the Directory Facilitator Agent
+	 */
+	private void register() {
+		DFAgentDescription dfAgentDescription = new DFAgentDescription();
+		dfAgentDescription.setName(getAID());
+		for (Capability capability : capabilities) {
+			ServiceDescription serviceDescription = new ServiceDescription();
+			serviceDescription.setName(capability.getService());
+			serviceDescription.setType(Ontology.SERVICE_SEARCH_TYPE);
+			serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
+			serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+			dfAgentDescription.addServices(serviceDescription);
+		}
+		try {
+			DFService.register(this, dfAgentDescription);
+		} catch (FIPAException fe) {
+			System.err.printf("EA:%s Failed to register services\n", getLocalName());
+			fe.printStackTrace();
+		}
+	}
+
+	/**
+	 * Euiplet agent clean-up operations
+	 */
+	@Override
+	protected void takeDown() {
+		System.out.printf("EA:%s terminating\n", getLocalName());
+	}
+
+	/**
+		}
+
+		// double precision error, dirty fix, can use BigDecimal although performance
+
+		System.out.println("sum " + sum);
+		sum = sum * 100000000.0 / 100000000.0;
+		System.out.println("sum 1 - " + sum + " / " + window.doubleValue() + " = " + (1 - sum / window.doubleValue()));
+
+		return 1 - sum / window.doubleValue();
 	}
 
 	/**
@@ -470,8 +567,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
 		// do not schedule a job when going to be reconfigured
-		if (reconfigure) {
-			return false;
+		if (reconfiguring) {
+			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
+			// return false;
 		}
 
 		Tick duration = estimateService(service);
@@ -501,8 +599,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	protected synchronized boolean schedule(AID product, List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests) {
 		// do not schedule a job when going to be reconfigured
-		if (reconfigure) {
-			return false;
+		if (reconfiguring) {
+			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
+			// return false;
 		}
 
 		List<Job> possible = new ArrayList<Job>();
@@ -595,7 +694,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public String toString() {
-		return String.format("%s:[state=%s, capabilities=%s, executing=%s, scheduled=%d, waiting=%d, history=%d, schedule=%s]", getLocalName(), state, capabilities, (state == EquipletState.IDLE ? "null" : executing), schedule.size(), getWaiting(), history.size(), "schedule");
+		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d]", getLocalName(), state, capabilities, (executing == null ? "null"
+				: executing), schedule.size(), getWaiting(), history.size());
+	}
+
+	public String toFullString() {
+		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d] \n\thistory=%s \n\tschedule=%s", getLocalName(), state, capabilities, (executing == null ? "null"
+				: executing), schedule.size(), getWaiting(), history.size(), Util.formatSet(history), Util.formatSet(schedule));
 	}
 
 	/**
@@ -608,15 +713,16 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @param job
 	 *            to be executed
 	 */
-	protected void executeJob(Tick time, Job job) {
+	protected synchronized void executeJob(Tick time, Job job) {
+		Tick latency = time.minus(job.getStartTime());
 		state = EquipletState.BUSY;
 		executing = job;
+		schedule.remove(job);
 
 		executing.updateStartTime(time);
-		System.out.printf("EA:%s starts at %s with executing job: %s\n", getLocalName(), time, executing);
+		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
 
 		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
-
 		execute(executing);
 	}
 
@@ -653,6 +759,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		for (Job job : schedule) {
 			if (job.getProductAgent().equals(product)) {
 				job.setReady();
+				arrived = job;
 
 				// job can only be executed earlier than planned if equiplet is idle
 				if (state == EquipletState.IDLE) {
@@ -679,21 +786,41 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			index++;
 		}
 
+		// start with the job that arrived exactly on time
+		Job ready = arrived.getStartTime().equals(time) && MasConfiguration.RESCHEDULE ? arrived : jobReady();
+
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
 
 		// execute the first job in the schedule if the job is ready
-		if (state == EquipletState.IDLE && ready != null) { // && jobReady()) {
+		if (state == EquipletState.IDLE && ready != null) {
 			// begin with executing job that arrived
 			
 			executeJob(time, ready);
-		} else if (state == EquipletState.ERROR && !isExecuting() && jobReady() != null) {
+		} else if (state == EquipletState.ERROR && !isExecuting() && ready != null && !MasConfiguration.RESCHEDULE) {
 			// Equiplet is still broken, but as soon as this is repaired it will execute the first job in the schedule
 			System.out.printf("EA:%s product %s going to be executed after repair\n", getLocalName(), product.getLocalName());
 			state = EquipletState.ERROR_READY;
 		} else {
 			System.out.printf("EA:%s product %s is added to waiting products\n", getLocalName(), product);
 		}
+	}
+
+	/**
+	 * remove all the job for a product in the schedule
+	 * 
+	 * @param product
+	 *            agent
+	 * @return successfulness of removing jobs
+	 */
+	public synchronized boolean releaseTimeSlopts(AID product) {
+		Collection<Job> jobs = new HashSet<>();
+		for (Job job : schedule) {
+			if (job.getProductAgent().equals(product)) {
+				jobs.add(job);
+			}
+		}
+		return schedule.removeAll(jobs);
 	}
 
 	/**
@@ -715,9 +842,12 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			message.setContent(Parser.parseProductProcessing(time, intdex));
 			send(message);
 			
-			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+		System.out.printf("EA:%s send message to inform product step processing: %s\n", getLocalName(), message.getContent());
+		
+		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
+		ACLMessage reply = blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
 
+		try {
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product processing.\n", getLocalName());
 			}else if (reply != null){
@@ -726,6 +856,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed.\n", getLocalName(), executing.getProductAgentName());
 			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
+			System.err.printf("EA:%s reply received: %s\n", getLocalName(), reply);
+			throw new IllegalArgumentException("FUCK");
 		}
 		
 	}
@@ -737,21 +869,30 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 *            agents address
 	 */
 	protected void informProductStepFinished(AID product, Tick time, int intdex) {
+		// send product agent information about going to process product
+		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+		message.addReceiver(product);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
+		message.setReplyWith(Ontology.CONVERSATION_PRODUCT_FINISHED + System.currentTimeMillis());
 		try {
-			// send product agent information about going to process product
-			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-			message.addReceiver(product);
-			message.setOntology(Ontology.GRID_ONTOLOGY);
-			message.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
-			message.setReplyWith(Ontology.CONVERSATION_PRODUCT_FINISHED + System.currentTimeMillis());
 			message.setContent(Parser.parseProductFinished(time, intdex));
-			send(message);
 			
 			//TODO This might make the equiplet agent deaf for messages coming from the Monitoring agent (this might need to be solved)
 			
-			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-			ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 
+		} catch (JSONException e) {
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName()
+					: "null"));
+			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
+			return;
+		}
+
+		send(message);
+		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
+		ACLMessage reply = blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
+
+		try {
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product %s his product step finished. %s\n", getLocalName(), product, reply);
 			}else if (reply.getPerformative() == ACLMessage.CONFIRM){
@@ -759,29 +900,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				//executing = null;
 			}
 		} catch (JSONException e) {
-			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName() : "null"));
+			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product step is finished.\n", getLocalName(), (executing != null ? executing.getProductAgentName()
+					: "null"));
 			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
-		}
-	}
-
-	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status,
-			Module module, HardwareStep hardwareStep) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onExecutionFinished() {	
-		JSONObject something = new JSONObject();
-		
-		try {
-			something.put("index", executing.getIndex());
-			//TODO what is this value?
-			something.put("time", 3);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.printf("EA:%s reply received: %s\n", getLocalName(), reply);
+			throw new IllegalArgumentException("FUCK");
 		}
 		
 		AID productagent = new AID();

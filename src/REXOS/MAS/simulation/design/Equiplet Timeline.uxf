@@ -24,497 +24,497 @@
 
 
 // This text will be stored with each diagram;  use it for notes.</help_text>
-  <zoom_level>7</zoom_level>
+  <zoom_level>9</zoom_level>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>119</x>
-      <y>21</y>
-      <w>198</w>
-      <h>49</h>
+      <x>144</x>
+      <y>0</y>
+      <w>262</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>timeRemaining = time - timeBreakdown</panel_attributes>
-    <additional_attributes>42;35;168;35</additional_attributes>
+    <additional_attributes>54;45;216;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>378</x>
-      <y>21</y>
-      <w>160</w>
-      <h>49</h>
+      <x>477</x>
+      <y>0</y>
+      <w>206</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>timeRemaining</panel_attributes>
-    <additional_attributes>21;35;147;35</additional_attributes>
+    <additional_attributes>27;45;189;45</additional_attributes>
   </element>
   <group>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>182</x>
-        <y>434</y>
-        <w>118</w>
-        <h>34</h>
+        <x>225</x>
+        <y>531</y>
+        <w>152</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=ERROR</panel_attributes>
-      <additional_attributes>21;21;105;21</additional_attributes>
+      <additional_attributes>27;27;135;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>147</x>
-        <y>434</y>
-        <w>76</w>
-        <h>34</h>
+        <x>180</x>
+        <y>531</y>
+        <w>98</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&lt;</panel_attributes>
-      <additional_attributes>21;21;63;21</additional_attributes>
+      <additional_attributes>27;27;81;27</additional_attributes>
     </element>
   </group>
   <group>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>126</x>
-        <y>210</y>
-        <w>55</w>
-        <h>34</h>
+        <x>153</x>
+        <y>243</y>
+        <w>71</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>21;21;42;21</additional_attributes>
+      <additional_attributes>27;27;54;27</additional_attributes>
+    </element>
+    <element>
+      <type>com.umlet.element.Relation</type>
+      <coordinates>
+        <x>72</x>
+        <y>243</y>
+        <w>125</w>
+        <h>44</h>
+      </coordinates>
+      <panel_attributes>lt=&gt;
+q1=BUSY</panel_attributes>
+      <additional_attributes>108;27;27;27</additional_attributes>
+    </element>
+  </group>
+  <group>
+    <element>
+      <type>com.umlet.element.Relation</type>
+      <coordinates>
+        <x>144</x>
+        <y>45</y>
+        <w>71</w>
+        <h>44</h>
+      </coordinates>
+      <panel_attributes>lt=&gt;</panel_attributes>
+      <additional_attributes>27;27;54;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
         <x>63</x>
-        <y>210</y>
-        <w>97</w>
-        <h>34</h>
+        <y>45</y>
+        <w>125</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=BUSY</panel_attributes>
-      <additional_attributes>84;21;21;21</additional_attributes>
-    </element>
-  </group>
-  <group>
-    <element>
-      <type>com.umlet.element.Relation</type>
-      <coordinates>
-        <x>119</x>
-        <y>56</y>
-        <w>55</w>
-        <h>34</h>
-      </coordinates>
-      <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>21;21;42;21</additional_attributes>
-    </element>
-    <element>
-      <type>com.umlet.element.Relation</type>
-      <coordinates>
-        <x>56</x>
-        <y>56</y>
-        <w>97</w>
-        <h>34</h>
-      </coordinates>
-      <panel_attributes>lt=&gt;
-q1=BUSY</panel_attributes>
-      <additional_attributes>84;21;21;21</additional_attributes>
+      <additional_attributes>108;27;27;27</additional_attributes>
     </element>
   </group>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>49</x>
-      <y>70</y>
-      <w>63</w>
-      <h>90</h>
+      <x>45</x>
+      <y>63</y>
+      <w>92</w>
+      <h>116</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 START</panel_attributes>
-    <additional_attributes>35;77;35;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>112</x>
-      <y>70</y>
-      <w>91</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-BREAKDOWN</panel_attributes>
-    <additional_attributes>49;77;49;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>56</x>
-      <y>126</y>
-      <w>517</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>21;21;504;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>245</x>
-      <y>70</y>
-      <w>82</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-FINISHED</panel_attributes>
-    <additional_attributes>42;77;42;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>343</x>
-      <y>70</y>
-      <w>86</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-REPAIRED</panel_attributes>
-    <additional_attributes>49;77;49;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>490</x>
-      <y>70</y>
-      <w>82</w>
-      <h>90</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-FINISHED</panel_attributes>
-    <additional_attributes>42;77;42;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>119</x>
-      <y>175</y>
-      <w>198</w>
-      <h>49</h>
-    </coordinates>
-    <panel_attributes>timeRemaining = timeBreakdown - time</panel_attributes>
-    <additional_attributes>49;35;161;35</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>392</x>
-      <y>175</y>
-      <w>153</w>
-      <h>49</h>
-    </coordinates>
-    <panel_attributes>timeRemaining</panel_attributes>
-    <additional_attributes>21;35;140;35</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>140</x>
-      <y>56</y>
-      <w>69</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;</panel_attributes>
-    <additional_attributes>21;21;56;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>175</x>
-      <y>56</y>
-      <w>125</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-q1=ERROR</panel_attributes>
-    <additional_attributes>21;21;112;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>364</x>
-      <y>56</y>
-      <w>48</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;35;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>266</x>
-      <y>56</y>
-      <w>132</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-q1=ERROR_FINISH</panel_attributes>
-    <additional_attributes>119;21;21;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>378</x>
-      <y>56</y>
-      <w>125</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-q1=BUSY</panel_attributes>
-    <additional_attributes>112;21;21;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>469</x>
-      <y>56</y>
-      <w>76</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;63;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>49</x>
-      <y>504</y>
-      <w>531</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>21;21;518;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>119</x>
-      <y>455</y>
-      <w>91</w>
-      <h>83</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-BREAKDOWN</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>238</x>
-      <y>455</y>
-      <w>86</w>
-      <h>83</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-REPAIRED</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
-  </element>
-  <group>
-    <element>
-      <type>com.umlet.element.Relation</type>
-      <coordinates>
-        <x>266</x>
-        <y>434</y>
-        <w>132</w>
-        <h>34</h>
-      </coordinates>
-      <panel_attributes>lt=&lt;</panel_attributes>
-      <additional_attributes>21;21;119;21</additional_attributes>
-    </element>
-    <element>
-      <type>com.umlet.element.Relation</type>
-      <coordinates>
-        <x>364</x>
-        <y>434</y>
-        <w>174</w>
-        <h>34</h>
-      </coordinates>
-      <panel_attributes>lt=&gt;
-q1=IDLE</panel_attributes>
-      <additional_attributes>21;21;161;21</additional_attributes>
-    </element>
-  </group>
-  <group>
-    <element>
-      <type>com.umlet.element.Relation</type>
-      <coordinates>
-        <x>126</x>
-        <y>434</y>
-        <w>55</w>
-        <h>34</h>
-      </coordinates>
-      <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>21;21;42;21</additional_attributes>
-    </element>
-    <element>
-      <type>com.umlet.element.Relation</type>
-      <coordinates>
-        <x>63</x>
-        <y>434</y>
-        <w>97</w>
-        <h>34</h>
-      </coordinates>
-      <panel_attributes>lt=&gt;
-q1=IDLE</panel_attributes>
-      <additional_attributes>84;21;21;21</additional_attributes>
-    </element>
-  </group>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>168</x>
-      <y>329</y>
-      <w>111</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-q1=ERROR</panel_attributes>
-    <additional_attributes>21;21;98;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>147</x>
-      <y>329</y>
-      <w>76</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;</panel_attributes>
-    <additional_attributes>21;21;63;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>49</x>
-      <y>392</y>
-      <w>531</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes>21;21;427;21;518;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>119</x>
-      <y>343</y>
-      <w>91</w>
-      <h>83</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-BREAKDOWN</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>350</x>
-      <y>343</y>
-      <w>86</w>
-      <h>83</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-REPAIRED</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>378</x>
-      <y>329</y>
-      <w>76</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;</panel_attributes>
-    <additional_attributes>21;21;63;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>420</x>
-      <y>329</y>
-      <w>118</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-q1=BUSY</panel_attributes>
-    <additional_attributes>21;21;105;21</additional_attributes>
+    <additional_attributes>54;99;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>126</x>
-      <y>329</y>
-      <w>55</w>
-      <h>34</h>
+      <y>63</y>
+      <w>130</w>
+      <h>116</h>
     </coordinates>
-    <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;42;21</additional_attributes>
+    <panel_attributes>lt=&lt;.
+BREAKDOWN</panel_attributes>
+    <additional_attributes>72;99;72;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>63</x>
-      <y>329</y>
-      <w>97</w>
-      <h>34</h>
+      <y>135</y>
+      <w>665</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>27;27;648;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>306</x>
+      <y>63</y>
+      <w>99</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+FINISHED</panel_attributes>
+    <additional_attributes>54;99;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>441</x>
+      <y>63</y>
+      <w>112</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+REPAIRED</panel_attributes>
+    <additional_attributes>63;99;63;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>621</x>
+      <y>63</y>
+      <w>99</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+FINISHED</panel_attributes>
+    <additional_attributes>54;99;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>144</x>
+      <y>198</y>
+      <w>262</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>timeRemaining = timeBreakdown - time</panel_attributes>
+    <additional_attributes>63;45;207;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>495</x>
+      <y>198</y>
+      <w>197</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>timeRemaining</panel_attributes>
+    <additional_attributes>27;45;180;45</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>171</x>
+      <y>45</y>
+      <w>89</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;</panel_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>216</x>
+      <y>45</y>
+      <w>161</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=ERROR</panel_attributes>
+    <additional_attributes>27;27;144;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>459</x>
+      <y>45</y>
+      <w>62</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;45;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>333</x>
+      <y>45</y>
+      <w>170</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=ERROR_FINISH</panel_attributes>
+    <additional_attributes>153;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>477</x>
+      <y>45</y>
+      <w>161</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=BUSY</panel_attributes>
+    <additional_attributes>144;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>594</x>
+      <y>45</y>
+      <w>98</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;81;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>54</x>
+      <y>621</y>
+      <w>683</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>27;27;666;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>135</x>
+      <y>558</y>
+      <w>130</w>
+      <h>107</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+BREAKDOWN</panel_attributes>
+    <additional_attributes>72;90;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>297</x>
+      <y>558</y>
+      <w>112</w>
+      <h>107</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+REPAIRED</panel_attributes>
+    <additional_attributes>63;90;63;27</additional_attributes>
+  </element>
+  <group>
+    <element>
+      <type>com.umlet.element.Relation</type>
+      <coordinates>
+        <x>333</x>
+        <y>531</y>
+        <w>170</w>
+        <h>44</h>
+      </coordinates>
+      <panel_attributes>lt=&lt;</panel_attributes>
+      <additional_attributes>27;27;153;27</additional_attributes>
+    </element>
+    <element>
+      <type>com.umlet.element.Relation</type>
+      <coordinates>
+        <x>459</x>
+        <y>531</y>
+        <w>224</w>
+        <h>44</h>
+      </coordinates>
+      <panel_attributes>lt=&gt;
+q1=IDLE</panel_attributes>
+      <additional_attributes>27;27;207;27</additional_attributes>
+    </element>
+  </group>
+  <group>
+    <element>
+      <type>com.umlet.element.Relation</type>
+      <coordinates>
+        <x>153</x>
+        <y>531</y>
+        <w>71</w>
+        <h>44</h>
+      </coordinates>
+      <panel_attributes>lt=&gt;</panel_attributes>
+      <additional_attributes>27;27;54;27</additional_attributes>
+    </element>
+    <element>
+      <type>com.umlet.element.Relation</type>
+      <coordinates>
+        <x>72</x>
+        <y>531</y>
+        <w>125</w>
+        <h>44</h>
+      </coordinates>
+      <panel_attributes>lt=&gt;
+q1=IDLE</panel_attributes>
+      <additional_attributes>108;27;27;27</additional_attributes>
+    </element>
+  </group>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>207</x>
+      <y>396</y>
+      <w>143</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=ERROR</panel_attributes>
+    <additional_attributes>27;27;126;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>180</x>
+      <y>396</y>
+      <w>98</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;</panel_attributes>
+    <additional_attributes>27;27;81;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>54</x>
+      <y>477</y>
+      <w>683</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>27;27;549;27;666;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>135</x>
+      <y>414</y>
+      <w>130</w>
+      <h>107</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+BREAKDOWN</panel_attributes>
+    <additional_attributes>72;90;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>441</x>
+      <y>414</y>
+      <w>112</w>
+      <h>107</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+REPAIRED</panel_attributes>
+    <additional_attributes>63;90;63;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>477</x>
+      <y>396</y>
+      <w>98</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;</panel_attributes>
+    <additional_attributes>27;27;81;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>531</x>
+      <y>396</y>
+      <w>152</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=BUSY</panel_attributes>
+    <additional_attributes>27;27;135;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>153</x>
+      <y>396</y>
+      <w>71</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>72</x>
+      <y>396</y>
+      <w>125</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=IDLE</panel_attributes>
-    <additional_attributes>84;21;21;21</additional_attributes>
+    <additional_attributes>108;27;27;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>224</x>
-      <y>343</y>
-      <w>80</w>
-      <h>83</h>
+      <x>279</x>
+      <y>414</y>
+      <w>106</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 ARRIVED</panel_attributes>
-    <additional_attributes>42;70;42;21</additional_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>266</x>
-      <y>329</y>
-      <w>146</w>
-      <h>34</h>
+      <x>333</x>
+      <y>396</y>
+      <w>188</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR_READY</panel_attributes>
-    <additional_attributes>21;21;77;21;133;21</additional_attributes>
+    <additional_attributes>27;27;99;27;171;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>245</x>
-      <y>329</y>
-      <w>62</w>
-      <h>34</h>
+      <x>306</x>
+      <y>396</y>
+      <w>80</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&lt;</panel_attributes>
-    <additional_attributes>21;21;49;21</additional_attributes>
+    <additional_attributes>27;27;63;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>630</x>
-      <y>70</y>
-      <w>63</w>
-      <h>28</h>
+      <x>801</x>
+      <y>63</y>
+      <w>81</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>IDLE</panel_attributes>
     <additional_attributes/>
@@ -522,10 +522,10 @@ q1=ERROR_READY</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>784</x>
-      <y>70</y>
-      <w>63</w>
-      <h>28</h>
+      <x>999</x>
+      <y>63</y>
+      <w>81</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>ERROR</panel_attributes>
     <additional_attributes/>
@@ -533,10 +533,10 @@ q1=ERROR_READY</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>707</x>
-      <y>70</y>
-      <w>63</w>
-      <h>28</h>
+      <x>900</x>
+      <y>63</y>
+      <w>81</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>BUSY</panel_attributes>
     <additional_attributes/>
@@ -544,10 +544,10 @@ q1=ERROR_READY</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>609</x>
-      <y>140</y>
-      <w>98</w>
-      <h>28</h>
+      <x>774</x>
+      <y>153</y>
+      <w>126</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>ERROR_REPAIRED</panel_attributes>
     <additional_attributes/>
@@ -555,10 +555,10 @@ q1=ERROR_READY</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>714</x>
-      <y>140</y>
-      <w>98</w>
-      <h>28</h>
+      <x>909</x>
+      <y>153</y>
+      <w>126</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>ERROR_READY</panel_attributes>
     <additional_attributes/>
@@ -566,10 +566,10 @@ q1=ERROR_READY</panel_attributes>
   <element>
     <type>com.umlet.element.custom.State</type>
     <coordinates>
-      <x>819</x>
-      <y>140</y>
-      <w>98</w>
-      <h>28</h>
+      <x>1044</x>
+      <y>153</y>
+      <w>126</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>ERROR_FINISHED</panel_attributes>
     <additional_attributes/>
@@ -577,706 +577,962 @@ q1=ERROR_READY</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>644</x>
-      <y>77</y>
-      <w>97</w>
-      <h>76</h>
+      <x>819</x>
+      <y>72</y>
+      <w>125</w>
+      <h>98</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>84;21;21;63</additional_attributes>
+    <additional_attributes>108;27;27;81</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>742</x>
-      <y>77</y>
-      <w>83</w>
-      <h>76</h>
+      <x>945</x>
+      <y>72</y>
+      <w>107</w>
+      <h>98</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>70;21;21;63</additional_attributes>
+    <additional_attributes>90;27;27;81</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>798</x>
-      <y>77</y>
-      <w>83</w>
-      <h>76</h>
+      <x>1017</x>
+      <y>72</y>
+      <w>107</w>
+      <h>98</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>21;21;70;63</additional_attributes>
+    <additional_attributes>27;27;90;81</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>476</x>
-      <y>210</y>
-      <w>69</w>
-      <h>34</h>
+      <x>603</x>
+      <y>243</y>
+      <w>89</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;56;21</additional_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>392</x>
-      <y>210</y>
-      <w>118</w>
-      <h>34</h>
+      <x>495</x>
+      <y>243</y>
+      <w>152</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=BUSY</panel_attributes>
-    <additional_attributes>105;21;21;21</additional_attributes>
+    <additional_attributes>135;27;27;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>378</x>
-      <y>210</y>
-      <w>48</w>
-      <h>34</h>
+      <x>477</x>
+      <y>243</y>
+      <w>62</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;35;21</additional_attributes>
+    <additional_attributes>27;27;45;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>259</x>
-      <y>210</y>
-      <w>153</w>
-      <h>34</h>
+      <x>324</x>
+      <y>243</y>
+      <w>197</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR_REPAIRED</panel_attributes>
-    <additional_attributes>140;21;21;21</additional_attributes>
+    <additional_attributes>180;27;27;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>49</x>
-      <y>280</y>
-      <w>531</w>
-      <h>34</h>
+      <x>54</x>
+      <y>333</y>
+      <w>683</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes/>
-    <additional_attributes>21;21;518;21</additional_attributes>
+    <additional_attributes>27;27;666;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>49</x>
-      <y>231</y>
-      <w>63</w>
-      <h>83</h>
+      <x>45</x>
+      <y>270</y>
+      <w>92</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 START</panel_attributes>
-    <additional_attributes>35;70;35;21</additional_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>119</x>
-      <y>231</y>
-      <w>91</w>
-      <h>83</h>
+      <x>135</x>
+      <y>270</y>
+      <w>130</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 BREAKDOWN</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
+    <additional_attributes>72;90;72;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>231</x>
-      <y>231</y>
-      <w>86</w>
-      <h>83</h>
+      <x>288</x>
+      <y>270</y>
+      <w>112</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 REPAIRED</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
+    <additional_attributes>63;90;63;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>371</x>
-      <y>231</y>
-      <w>82</w>
-      <h>83</h>
+      <x>468</x>
+      <y>270</y>
+      <w>99</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 FINISHED</panel_attributes>
-    <additional_attributes>42;70;42;21</additional_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>490</x>
-      <y>231</y>
-      <w>82</w>
-      <h>83</h>
+      <x>621</x>
+      <y>270</y>
+      <w>99</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 FINISHED</panel_attributes>
-    <additional_attributes>42;70;42;21</additional_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>182</x>
-      <y>210</y>
-      <w>111</w>
-      <h>34</h>
+      <x>225</x>
+      <y>243</y>
+      <w>143</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR</panel_attributes>
-    <additional_attributes>21;21;98;21</additional_attributes>
+    <additional_attributes>27;27;126;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>147</x>
-      <y>210</y>
-      <w>69</w>
-      <h>34</h>
+      <x>180</x>
+      <y>243</y>
+      <w>89</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&lt;</panel_attributes>
-    <additional_attributes>21;21;56;21</additional_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>98</x>
-      <y>728</y>
-      <w>198</w>
-      <h>49</h>
+      <x>117</x>
+      <y>909</y>
+      <w>262</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>timeRemaining = timeBreakdown - time</panel_attributes>
-    <additional_attributes>63;35;147;35</additional_attributes>
+    <additional_attributes>81;45;189;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>581</x>
-      <y>728</y>
-      <w>209</w>
-      <h>49</h>
+      <x>738</x>
+      <y>909</y>
+      <w>269</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>timeRemaining</panel_attributes>
-    <additional_attributes>21;35;196;35</additional_attributes>
+    <additional_attributes>27;45;252;45</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>427</x>
-      <y>756</y>
-      <w>55</w>
-      <h>34</h>
+      <x>540</x>
+      <y>945</y>
+      <w>71</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;42;21</additional_attributes>
+    <additional_attributes>27;27;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>357</x>
-      <y>756</y>
-      <w>104</w>
-      <h>34</h>
+      <x>450</x>
+      <y>945</y>
+      <w>134</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR</panel_attributes>
-    <additional_attributes>91;21;21;21</additional_attributes>
+    <additional_attributes>117;27;27;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>343</x>
-      <y>756</y>
-      <w>48</w>
-      <h>34</h>
+      <x>432</x>
+      <y>945</y>
+      <w>62</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;35;21</additional_attributes>
+    <additional_attributes>27;27;45;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>224</x>
-      <y>756</y>
-      <w>153</w>
-      <h>34</h>
+      <x>279</x>
+      <y>945</y>
+      <w>197</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR_REPAIRED</panel_attributes>
-    <additional_attributes>140;21;21;21</additional_attributes>
+    <additional_attributes>180;27;27;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>42</x>
-      <y>826</y>
-      <w>755</w>
-      <h>34</h>
+      <x>45</x>
+      <y>1035</y>
+      <w>971</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes/>
-    <additional_attributes>21;21;742;21</additional_attributes>
+    <additional_attributes>27;27;954;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>42</x>
-      <y>777</y>
-      <w>63</w>
-      <h>83</h>
+      <x>36</x>
+      <y>972</y>
+      <w>92</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 START</panel_attributes>
-    <additional_attributes>35;70;35;21</additional_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>112</x>
-      <y>777</y>
-      <w>91</w>
-      <h>83</h>
+      <x>126</x>
+      <y>972</y>
+      <w>130</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 BREAKDOWN</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
+    <additional_attributes>72;90;72;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>196</x>
-      <y>777</y>
-      <w>86</w>
-      <h>83</h>
+      <x>243</x>
+      <y>972</y>
+      <w>112</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 REPAIRED</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
+    <additional_attributes>63;90;63;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>329</x>
-      <y>777</y>
-      <w>91</w>
-      <h>83</h>
+      <x>405</x>
+      <y>972</y>
+      <w>130</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 BREAKDOWN</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
+    <additional_attributes>72;90;72;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>553</x>
-      <y>777</y>
-      <w>86</w>
-      <h>83</h>
+      <x>702</x>
+      <y>972</y>
+      <w>112</w>
+      <h>107</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 REPAIRED</panel_attributes>
-    <additional_attributes>49;70;49;21</additional_attributes>
+    <additional_attributes>63;90;63;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>154</x>
-      <y>756</y>
-      <w>104</w>
-      <h>34</h>
+      <x>189</x>
+      <y>945</y>
+      <w>134</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR</panel_attributes>
-    <additional_attributes>21;21;91;21</additional_attributes>
+    <additional_attributes>27;27;117;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>140</x>
-      <y>756</y>
-      <w>48</w>
-      <h>34</h>
+      <x>171</x>
+      <y>945</y>
+      <w>62</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&lt;</panel_attributes>
-    <additional_attributes>21;21;35;21</additional_attributes>
+    <additional_attributes>27;27;45;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>273</x>
-      <y>707</y>
-      <w>198</w>
-      <h>55</h>
+      <x>342</x>
+      <y>882</y>
+      <w>262</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>timeBreakdown = time - timeRemaining</panel_attributes>
-    <additional_attributes>105;42;105;28</additional_attributes>
+    <additional_attributes>135;54;135;36</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>56</x>
-      <y>707</y>
-      <w>198</w>
-      <h>55</h>
+      <x>63</x>
+      <y>882</y>
+      <w>262</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>timeBreakdown = time - timeRemaining</panel_attributes>
-    <additional_attributes>105;42;105;28</additional_attributes>
+    <additional_attributes>135;54;135;36</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>720</x>
+      <y>945</y>
+      <w>62</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;45;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>540</x>
+      <y>972</y>
+      <w>99</w>
+      <h>107</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+FINISHED</panel_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>828</x>
+      <y>945</y>
+      <w>179</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=BUSY</panel_attributes>
+    <additional_attributes>27;27;162;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>738</x>
+      <y>945</y>
+      <w>134</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>117;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>936</x>
+      <y>972</y>
+      <w>99</w>
+      <h>107</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+FINISHED</panel_attributes>
+    <additional_attributes>54;90;54;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>567</x>
-      <y>756</y>
-      <w>48</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>21;21;35;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>427</x>
-      <y>777</y>
-      <w>82</w>
-      <h>83</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-FINISHED</panel_attributes>
-    <additional_attributes>42;70;42;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>651</x>
-      <y>756</y>
-      <w>139</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;
-q1=BUSY</panel_attributes>
-    <additional_attributes>21;21;126;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>581</x>
-      <y>756</y>
-      <w>104</w>
-      <h>34</h>
-    </coordinates>
-    <panel_attributes>lt=&gt;</panel_attributes>
-    <additional_attributes>91;21;21;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>735</x>
-      <y>777</y>
-      <w>82</w>
-      <h>83</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;.
-FINISHED</panel_attributes>
-    <additional_attributes>42;70;42;21</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>448</x>
-      <y>756</y>
-      <w>153</w>
-      <h>34</h>
+      <y>945</y>
+      <w>197</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&gt;
 q1=ERROR_FINISHED</panel_attributes>
-    <additional_attributes>140;21;21;21</additional_attributes>
+    <additional_attributes>180;27;27;27</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>497</x>
-      <y>707</y>
-      <w>198</w>
-      <h>55</h>
+      <x>630</x>
+      <y>882</y>
+      <w>262</w>
+      <h>71</h>
     </coordinates>
     <panel_attributes>timeRemaining = time - timeBreakdown</panel_attributes>
-    <additional_attributes>105;42;105;28</additional_attributes>
+    <additional_attributes>135;54;135;36</additional_attributes>
   </element>
   <group>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>105</x>
-        <y>567</y>
-        <w>198</w>
-        <h>49</h>
+        <x>126</x>
+        <y>702</y>
+        <w>262</w>
+        <h>63</h>
       </coordinates>
       <panel_attributes>timeRemaining = timeBreakdown - time</panel_attributes>
-      <additional_attributes>63;35;147;35</additional_attributes>
+      <additional_attributes>81;45;189;45</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>588</x>
-        <y>560</y>
-        <w>209</w>
-        <h>49</h>
+        <x>747</x>
+        <y>693</y>
+        <w>269</w>
+        <h>63</h>
       </coordinates>
       <panel_attributes>timeRemaining</panel_attributes>
-      <additional_attributes>21;35;196;35</additional_attributes>
+      <additional_attributes>27;45;252;45</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>434</x>
-        <y>595</y>
-        <w>55</w>
-        <h>34</h>
+        <x>549</x>
+        <y>738</y>
+        <w>71</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>21;21;42;21</additional_attributes>
+      <additional_attributes>27;27;54;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>364</x>
-        <y>595</y>
-        <w>104</w>
-        <h>34</h>
+        <x>459</x>
+        <y>738</y>
+        <w>134</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=ERROR</panel_attributes>
-      <additional_attributes>91;21;21;21</additional_attributes>
+      <additional_attributes>117;27;27;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>350</x>
-        <y>595</y>
-        <w>48</w>
-        <h>34</h>
+        <x>441</x>
+        <y>738</y>
+        <w>62</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>21;21;35;21</additional_attributes>
+      <additional_attributes>27;27;45;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>231</x>
-        <y>595</y>
-        <w>153</w>
-        <h>34</h>
+        <x>288</x>
+        <y>738</y>
+        <w>197</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=ERROR_REPAIRED</panel_attributes>
-      <additional_attributes>140;21;21;21</additional_attributes>
+      <additional_attributes>180;27;27;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>49</x>
-        <y>665</y>
-        <w>755</w>
-        <h>34</h>
+        <x>54</x>
+        <y>828</y>
+        <w>971</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes/>
-      <additional_attributes>21;21;742;21</additional_attributes>
+      <additional_attributes>27;27;954;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>49</x>
-        <y>616</y>
-        <w>63</w>
-        <h>83</h>
+        <x>45</x>
+        <y>765</y>
+        <w>92</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 START</panel_attributes>
-      <additional_attributes>35;70;35;21</additional_attributes>
+      <additional_attributes>54;90;54;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>119</x>
-        <y>616</y>
-        <w>91</w>
-        <h>83</h>
+        <x>135</x>
+        <y>765</y>
+        <w>130</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 BREAKDOWN</panel_attributes>
-      <additional_attributes>49;70;49;21</additional_attributes>
+      <additional_attributes>72;90;72;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>203</x>
-        <y>616</y>
-        <w>86</w>
-        <h>83</h>
+        <x>252</x>
+        <y>765</y>
+        <w>112</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 REPAIRED</panel_attributes>
-      <additional_attributes>49;70;49;21</additional_attributes>
+      <additional_attributes>63;90;63;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>336</x>
-        <y>616</y>
-        <w>91</w>
-        <h>83</h>
+        <x>414</x>
+        <y>765</y>
+        <w>130</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 BREAKDOWN</panel_attributes>
-      <additional_attributes>49;70;49;21</additional_attributes>
+      <additional_attributes>72;90;72;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>427</x>
-        <y>616</y>
-        <w>86</w>
-        <h>83</h>
+        <x>540</x>
+        <y>765</y>
+        <w>112</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 REPAIRED</panel_attributes>
-      <additional_attributes>49;70;49;21</additional_attributes>
+      <additional_attributes>63;90;63;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>161</x>
-        <y>595</y>
-        <w>104</w>
-        <h>34</h>
+        <x>198</x>
+        <y>738</y>
+        <w>134</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=ERROR</panel_attributes>
-      <additional_attributes>21;21;91;21</additional_attributes>
+      <additional_attributes>27;27;117;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>147</x>
-        <y>595</y>
-        <w>48</w>
-        <h>34</h>
+        <x>180</x>
+        <y>738</y>
+        <w>62</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&lt;</panel_attributes>
-      <additional_attributes>21;21;35;21</additional_attributes>
+      <additional_attributes>27;27;45;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>280</x>
-        <y>546</y>
-        <w>198</w>
-        <h>55</h>
+        <x>351</x>
+        <y>675</y>
+        <w>262</w>
+        <h>71</h>
       </coordinates>
       <panel_attributes>timeBreakdown = time - timeRemaining</panel_attributes>
-      <additional_attributes>105;42;105;28</additional_attributes>
+      <additional_attributes>135;54;135;36</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>63</x>
-        <y>546</y>
-        <w>198</w>
-        <h>55</h>
+        <x>72</x>
+        <y>675</y>
+        <w>262</w>
+        <h>71</h>
       </coordinates>
       <panel_attributes>timeBreakdown = time - timeRemaining</panel_attributes>
-      <additional_attributes>105;42;105;28</additional_attributes>
+      <additional_attributes>135;54;135;36</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>455</x>
-        <y>595</y>
-        <w>153</w>
-        <h>34</h>
+        <x>576</x>
+        <y>738</y>
+        <w>197</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=ERROR_REPAIRED</panel_attributes>
-      <additional_attributes>140;21;21;21</additional_attributes>
+      <additional_attributes>180;27;27;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>574</x>
-        <y>595</y>
-        <w>48</w>
-        <h>34</h>
+        <x>729</x>
+        <y>738</y>
+        <w>62</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>21;21;35;21</additional_attributes>
+      <additional_attributes>27;27;45;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>567</x>
-        <y>616</y>
-        <w>82</w>
-        <h>83</h>
+        <x>720</x>
+        <y>765</y>
+        <w>99</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 FINISHED</panel_attributes>
-      <additional_attributes>42;70;42;21</additional_attributes>
+      <additional_attributes>54;90;54;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>658</x>
-        <y>595</y>
-        <w>139</w>
-        <h>34</h>
+        <x>837</x>
+        <y>738</y>
+        <w>179</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;
 q1=BUSY</panel_attributes>
-      <additional_attributes>21;21;126;21</additional_attributes>
+      <additional_attributes>27;27;162;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>588</x>
-        <y>595</y>
-        <w>104</w>
-        <h>34</h>
+        <x>747</x>
+        <y>738</y>
+        <w>134</w>
+        <h>44</h>
       </coordinates>
       <panel_attributes>lt=&gt;</panel_attributes>
-      <additional_attributes>91;21;21;21</additional_attributes>
+      <additional_attributes>117;27;27;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>742</x>
-        <y>616</y>
-        <w>82</w>
-        <h>83</h>
+        <x>945</x>
+        <y>765</y>
+        <w>99</w>
+        <h>107</h>
       </coordinates>
       <panel_attributes>lt=&lt;.
 FINISHED</panel_attributes>
-      <additional_attributes>42;70;42;21</additional_attributes>
+      <additional_attributes>54;90;54;27</additional_attributes>
     </element>
     <element>
       <type>com.umlet.element.Relation</type>
       <coordinates>
-        <x>371</x>
-        <y>567</y>
-        <w>198</w>
-        <h>55</h>
+        <x>468</x>
+        <y>702</y>
+        <w>262</w>
+        <h>71</h>
       </coordinates>
       <panel_attributes>timeRemaining = time - timeBreakdown</panel_attributes>
-      <additional_attributes>105;42;105;28</additional_attributes>
+      <additional_attributes>135;54;135;36</additional_attributes>
     </element>
   </group>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>54</x>
+      <y>1143</y>
+      <w>125</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=IDLE</panel_attributes>
+    <additional_attributes>108;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>135</x>
+      <y>1143</y>
+      <w>71</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>117</x>
+      <y>1161</y>
+      <w>130</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+reconfiguration</panel_attributes>
+    <additional_attributes>72;99;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>54</x>
+      <y>1233</y>
+      <w>485</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>27;27;468;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>288</x>
+      <y>1161</y>
+      <w>114</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+RECONFIG</panel_attributes>
+    <additional_attributes>63;99;63;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>423</x>
+      <y>1161</y>
+      <w>112</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+REPAIRED</panel_attributes>
+    <additional_attributes>63;99;63;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>162</x>
+      <y>1143</y>
+      <w>89</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;</panel_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>207</x>
+      <y>1143</y>
+      <w>161</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=RECONFIG</panel_attributes>
+    <additional_attributes>27;27;144;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>414</x>
+      <y>1143</y>
+      <w>89</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>324</x>
+      <y>1143</y>
+      <w>134</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=IDLE</panel_attributes>
+    <additional_attributes>117;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>36</x>
+      <y>1161</y>
+      <w>92</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+START</panel_attributes>
+    <additional_attributes>54;99;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>54</x>
+      <y>1296</y>
+      <w>125</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=BUSY</panel_attributes>
+    <additional_attributes>108;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>135</x>
+      <y>1296</y>
+      <w>71</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>135</x>
+      <y>1314</y>
+      <w>99</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+FINISHED</panel_attributes>
+    <additional_attributes>54;99;54;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>54</x>
+      <y>1386</y>
+      <w>485</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>27;27;468;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>288</x>
+      <y>1314</y>
+      <w>114</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+RECONFIG</panel_attributes>
+    <additional_attributes>63;99;63;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>423</x>
+      <y>1314</y>
+      <w>112</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+REPAIRED</panel_attributes>
+    <additional_attributes>63;99;63;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>162</x>
+      <y>1296</y>
+      <w>89</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;</panel_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>207</x>
+      <y>1296</y>
+      <w>161</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=RECONFIG</panel_attributes>
+    <additional_attributes>27;27;36;27;144;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>414</x>
+      <y>1296</y>
+      <w>89</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;</panel_attributes>
+    <additional_attributes>27;27;72;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>324</x>
+      <y>1296</y>
+      <w>134</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&gt;
+q1=IDLE</panel_attributes>
+    <additional_attributes>117;27;27;27</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>36</x>
+      <y>1314</y>
+      <w>92</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+START</panel_attributes>
+    <additional_attributes>54;99;54;27</additional_attributes>
+  </element>
 </diagram>

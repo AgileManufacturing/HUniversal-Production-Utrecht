@@ -26,6 +26,11 @@ public class TrafficManager extends Agent {
 	private static final long serialVersionUID = 1L;
 	private Map<String, Position> equiplets;
 	private Tick travelTime;
+	
+	public TrafficManager() {
+		this.equiplets = new HashMap<String, Position>();
+		this.travelTime = new Tick();
+	}
 
 	public TrafficManager(Map<String, Position> equiplets) {
 		this.equiplets = equiplets;
@@ -60,7 +65,7 @@ public class TrafficManager extends Agent {
 
 	private Tick caclulateTravelTime(Position a, Position b) {
 		int travelSquares = Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
-		return travelTime.times(travelSquares);
+		return travelTime.multiply(travelSquares);
 	}
 
 	class TraficListenerBehaviour extends CyclicBehaviour {

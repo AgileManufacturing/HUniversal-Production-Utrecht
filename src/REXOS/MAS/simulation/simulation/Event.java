@@ -8,6 +8,7 @@ class Event implements Comparable<Event> {
 	private EventType type;
 	private String product;
 	private String equiplet;
+	private int index;
 
 	/**
 	 * Create event
@@ -24,7 +25,7 @@ class Event implements Comparable<Event> {
 
 	/**
 	 * Create event
-	 * used for: START
+	 * used for: START, FINISHED
 	 * 
 	 * @param time
 	 * @param type
@@ -42,7 +43,7 @@ class Event implements Comparable<Event> {
 
 	/**
 	 * Create event
-	 * used for: FINISHED, BREAKDOWN and REPAIRED event
+	 * used for: BREAKDOWN, REPAIRED and RECONFIG event
 	 * 
 	 * @param time
 	 * @param type
@@ -56,6 +57,24 @@ class Event implements Comparable<Event> {
 	}
 
 	/**
+	 * Create event
+	 * used for: STARTED
+	 * 
+	 * @param time
+	 * @param type
+	 * @param product
+	 *            name
+	 * @param index
+	 *            of product step
+	 */
+	public Event(Tick time, EventType type, String product, int index) {
+		this.time = time;
+		this.type = type;
+		this.product = product;
+		this.index = index;
+	}
+
+	/**
 	 * Implement comparable so events can be compared with each other on
 	 * basis of there time and type
 	 * Events are compared with time and second when equal with type
@@ -64,7 +83,7 @@ class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int compareTo(Event event) {
-		return time.lessThan(event.getTime())  ? -1 : (time.greaterThan(event.getTime()) ? 1 : type == event.getType() ? -1 : type.compareTo(event.getType()));
+		return time.lessThan(event.getTime()) ? -1 : (time.greaterThan(event.getTime()) ? 1 : type == event.getType() ? -1 : type.compareTo(event.getType()));
 	}
 
 	public Tick getTime() {
@@ -83,12 +102,18 @@ class Event implements Comparable<Event> {
 		return equiplet;
 	}
 
+	public int getIndex() {
+		return index;
+	}
+
 	@Override
 	public String toString() {
 		if (type == EventType.PRODUCT || type == EventType.DONE) {
 			return String.format("Evt:[time=%s, type=%s]", time, type);
-		} else if (type == EventType.ARRIVED) {
+		} else if (type == EventType.ARRIVED || type == EventType.FINISHED) {
 			return String.format("Evt:[time=%s, type=%s, product=%s, equipet=%s]", time, type, product, equiplet);
+		} else if (type == EventType.STARTED) {
+			return String.format("Evt:[time=%s, type=%s, product=%s, index=%d]", time, type, product, index);
 		} else { // if FINISHED or RECONFIG
 			return String.format("Evt:[time=%s, type=%s, equiplet=%s]", time, type, equiplet);
 		}

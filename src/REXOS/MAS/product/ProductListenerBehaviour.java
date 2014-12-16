@@ -1,6 +1,6 @@
 package MAS.product;
 
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -11,7 +11,7 @@ import MAS.util.Pair;
 import MAS.util.Parser;
 import MAS.util.Tick;
 
-public class ProductListenerBehaviour extends Behaviour {
+public class ProductListenerBehaviour extends CyclicBehaviour {
 
 	/**
 	 * 
@@ -31,8 +31,7 @@ public class ProductListenerBehaviour extends Behaviour {
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED));
 		ACLMessage msg = myAgent.blockingReceive(template);
 		if (msg != null) {
-			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg
-					.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
+			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
 			case ACLMessage.INFORM:
 				if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_PROCESSING)) {
@@ -49,17 +48,12 @@ public class ProductListenerBehaviour extends Behaviour {
 		}
 	}
 
-	@Override
-	public boolean done() {
-		return false;
-	}
-
 	private void handleProductStepProcessing(ACLMessage message) {
 		try {
 			Pair<Tick, Integer> information = Parser.parseProductProcessing(message.getContent());
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
 			if (confirmation) {
-				product.onProductProcessing();
+				product.onProductProcessing(information.first);
 			} else {
 				System.err.printf("PA:%s received wrong product step index that is processing\n", myAgent.getLocalName());
 				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index " + information.second + " from " + message.getSender().getLocalName()
@@ -77,7 +71,6 @@ public class ProductListenerBehaviour extends Behaviour {
 
 	private void handleProductStepFinished(ACLMessage message) {
 		try {
-			
 			Pair<Tick, Integer> information = Parser.parseProductFinished(message.getContent());
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
 			ACLMessage reply = message.createReply();
@@ -86,7 +79,7 @@ public class ProductListenerBehaviour extends Behaviour {
 			myAgent.send(reply);
 			
 			if (confirmation) {
-				product.onProductStepFinished();
+				product.onProductStepFinished(information.first);
 			} else {
 				System.err.printf("PA:%s received wrong product step index that is finished\n", myAgent.getLocalName());
 				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index that is processing "
@@ -98,7 +91,6 @@ public class ProductListenerBehaviour extends Behaviour {
 			System.err.printf("PA:%s failed to parse product step finished information\n", myAgent.getLocalName());
 			System.err.printf("PA:%s %s", myAgent.getLocalName(), e.getMessage());
 		}
-		//product.onProductStepFinished();
 	}
 
 	private void handleProductStepDelayed(ACLMessage message) {

@@ -9,8 +9,10 @@ import MAS.product.ProductState;
 import MAS.product.ProductStep;
 import MAS.product.ProductionStep;
 import MAS.simulation.simulation.ISimulation;
+import MAS.simulation.util.Settings;
 import MAS.util.Parser;
 import MAS.util.Position;
+import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
@@ -46,6 +48,13 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	public void onProductArrived(Tick time) {
 		super.onProductArrived(time);
+
+		// getStart() could be due - processing time.
+		// or the start from ((ps + 1) - (travel time ps to ps + 1) + (ps processing time))
+		if (state == ProductState.WAITING) {
+			ProductionStep step = getCurrentStep();
+			simulation.notifyProductShouldStart(getLocalName(), step.getStart(), step.getIndex());
+		}
 	}
 
 	@Override
@@ -64,13 +73,15 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	}
 
 	@Override
-	protected void onProductStepFinished() {
-		super.onProductStepFinished();
+	protected void onProductStepFinished(Tick time) {
+		super.onProductStepFinished(time);
 		
 		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
+			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " finished: " + history);
+			doDelete();
 		} else if (getProductState() == ProductState.TRAVELING) {
 			// notify the simulation that the product is traveling			
 		}
@@ -83,23 +94,48 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	}
 
 	@Override
-	protected void onProductProcessing() {
-		super.onProductProcessing();
+	protected void onProductProcessing(Tick time) {
+		super.onProductProcessing(time);
 
 		// notify the simulation that processing begins
 		ProductionStep step = getCurrentStep();
+		step.updateStart(time);
 		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
 	}
 
+	int retry = 0;
 	@Override
-	protected void schedulingFinished(boolean succeeded) {
-		System.out.println("scheduling finished");
+	protected void schedulingFinished(Tick time, boolean succeeded) {
+		System.out.printf("PA:%s scheduling finished %b. \n", getLocalName(), succeeded);
 		// let the simulation know that the creation of product agent failed
-		if (succeeded) {
+		if (reschedule && succeeded) {
+			reschedule = false;
+			simulation.notifyProductRescheduled(getLocalName(), getCurrentStep().getEquipletName(), succeeded);
+		} else if (reschedule) {
+//			throw new IllegalArgumentException("FUCK");
+			// retry++;
+			// reschedule with new deadline
+			Tick deadline = getDeadline().add(getDeadline().minus(getCreated()).multiply(++retry));
+			System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
+			reschedule(time, deadline);
+		} else if (succeeded) {
 			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
 		} else {
 			simulation.notifyProductCreationFailed(getLocalName());
+			doDelete();
+		}
+	}
+
+	@Override
+	public void onProductStarted(Tick time, int index) {
+		if (getCurrentStep().getIndex() == index && (state == ProductState.ERROR || state == ProductState.SCHEDULING || state == ProductState.TRAVELING)) {
+			// throw new IllegalArgumentException("on product started event given in wrong state " + getProductState() + "");
+		} else {
+			super.onProductStarted(time, index);
 		}
 
+		if (!reschedule) {
+			simulation.notifyProductRescheduled(false);
+		}
 	}
 }

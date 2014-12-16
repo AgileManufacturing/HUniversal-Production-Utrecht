@@ -11,14 +11,16 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 import MAS.util.Pair;
-import MAS.util.Settings;
+import MAS.util.MasConfiguration;
 
 public class Graph<V extends Node> {
 
 	private HashMap<V, HashMap<V, Double>> graph;
+	private int arcs;
 
 	public Graph() {
 		this.graph = new HashMap<V, HashMap<V, Double>>();
+		this.arcs = 0;
 	}
 
 	/**
@@ -48,6 +50,7 @@ public class Graph<V extends Node> {
 		} else {
 			graph.get(from).put(to, cost);
 		}
+		System.err.println("Graph [node=" + graph.size() + ", arcs=" + ++arcs + "]");
 
 		return added;
 	}
@@ -100,7 +103,7 @@ public class Graph<V extends Node> {
 			HashMap<V, Double> neighbors = graph.get(node);
 			processed.add(node);
 
-			if (Settings.VERBOSITY > 3) {
+			if (MasConfiguration.VERBOSITY > 3) {
 				System.out.println("process node: " + node + " with neighbors " + neighbors);
 			}
 
@@ -111,13 +114,13 @@ public class Graph<V extends Node> {
 				double cost = p.second + neighbor.getValue();
 				paths.add(new Pair<LinkedList<V>, Double>(newSubPath, cost));
 
-				if (Settings.VERBOSITY > 3) {
+				if (MasConfiguration.VERBOSITY > 3) {
 					System.out.println("newPath:  [neighbor=" + neighbor.getKey() + ", to=" + to + ", cost=" + cost + ", score " + score + ", path=" + newSubPath + "]");
 				}
 
 				// Check whether the path is the best and should be returned
 				if (neighbor.getKey().equals(to) && cost > score) {
-					if (Settings.VERBOSITY > 3) {
+					if (MasConfiguration.VERBOSITY > 3) {
 						System.out.println("WIN path:  [to=" + to + ", cost=" + cost + ", path " + newSubPath + ", score " + score + "]");
 					}
 					score = cost;
@@ -127,7 +130,7 @@ public class Graph<V extends Node> {
 			}
 		}
 
-		if (Settings.VERBOSITY > 3) {
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.println("Optimum path score=" + score + " of path=" + path);
 		}
 		return path;

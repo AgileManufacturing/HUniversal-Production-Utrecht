@@ -14,10 +14,12 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
+<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="${workspace_loc:/HUniversal-Production-Utrecht/simulation/log.txt}"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui -verbosity 3   -agents    &quot;Simulation:MAS.simulation.simulation.SimulationAgent;snif:jade.tools.sniffer.Sniffer;&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms1024m&#13;&#10;-Xmx4096m&#13;&#10;-Djava.library.path=&quot;C:\Program Files\R\R-3.0.2\library\rJava\jri;C:\Program Files\R\R-3.0.2\library\rJava\jri\x64&quot;"/>
 </launchConfiguration>

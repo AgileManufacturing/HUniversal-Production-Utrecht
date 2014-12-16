@@ -1,10 +1,11 @@
-<project name="product" default="all">
+<project name="product_agent" default="build" basedir=".">
+
 	<import file="../build.xml"/>
 
-	<target name="all" depends="">
-		<buildjava dir="${basedir}"/>
+	<target name="build"> 
+		<buildjava dir="${basedir}"/>  
 	</target>
-	
+
 	<target name="clean">
 		 <cleanjava dir="${basedir}"/>
 	</target>

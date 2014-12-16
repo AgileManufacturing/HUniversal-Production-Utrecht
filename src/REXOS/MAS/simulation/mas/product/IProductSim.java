@@ -7,6 +7,8 @@ public interface IProductSim {
 
 	void onProductArrived(Tick time);
 
+	void onProductStarted(Tick time, int index);
+
 	Position getPosition();
 
 	Tick getCreated();

@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 import MAS.util.Pair;
 import MAS.util.Position;
-import MAS.util.Settings;
+import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 import MAS.util.Tuple;
 import MAS.util.Util;
@@ -25,7 +25,7 @@ public class Scheduling {
 	private Position position;
 	private List<ProductStep> productSteps;
 
-	// service options :: Map < product step index, [ options :: <Equiplet, Triple < estimate duration of service, [ possibilities :: < from time, until time > ] > > ] >
+	// service options :: Map < product step index, [ options :: <Equiplet, Pair < estimate duration of service, [ possibilities :: < from time, until time > ] > > ] >
 	private Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> serviceOptions;
 
 	// equiplet info :: list of equiplet with the load and position of the equiplet
@@ -42,8 +42,8 @@ public class Scheduling {
 		this.serviceOptions = options;
 		this.equipletInfo = equipletInfo;
 		this.travelTimes = travelTimes;
-
-		if (Settings.VERBOSITY > 3) {
+		
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.println("product steps: " + productSteps);
 			System.out.println("service options: " + Util.formatArray(serviceOptions));
 			System.out.println("equiplet info: " + Util.formatArray(equipletInfo));
@@ -77,7 +77,7 @@ public class Scheduling {
 		}
 
 		// all option should be explored
-		if (Settings.VERBOSITY > 3) {
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.println("Scheduling: found path with possible best score: " + loadPath + " comparing=" + loadPath.equals(optimumPath) + ", can fail=" + shitCanFail);
 		}
 
@@ -101,7 +101,7 @@ public class Scheduling {
 		graph.add(source);
 		graph.add(sink);
 
-		if (Settings.VERBOSITY > 3) {
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.printf("\nPA:%s calculate best path \ninfo: \t %s\noptions: \t%s\n", agent, Util.formatArray(equipletInfo), Util.formatArray(serviceOptions));
 		}
 
@@ -112,7 +112,7 @@ public class Scheduling {
 		for (ProductStep step : productSteps) {
 			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(step.getIndex());
 
-			if (Settings.VERBOSITY > 3) {
+			if (MasConfiguration.VERBOSITY > 3) {
 				System.out.printf("\nPA:%s construct scheduling graph, step=%s, from nodes=%s, with options=%s.\n\n", agent, step, lastNodes, Util.formatArray(options));
 			}
 
@@ -180,7 +180,7 @@ public class Scheduling {
 							equipletNodes.add(nextNode);
 						}
 
-						if (Settings.VERBOSITY > 3) {
+						if (MasConfiguration.VERBOSITY > 3) {
 							// System.out.printf("Add to graph: (%s) -- %.6f --> (%s) [cost=(1 - %s / %s)], arrival=%s]\n", node, cost, nextNode, firstPossibility, window,
 							// arrival);
 						}
@@ -212,7 +212,7 @@ public class Scheduling {
 			throw new SchedulingException("failed to find path int nodes=" + graph + " - " + path);
 		}
 
-		if (Settings.VERBOSITY > 3) {
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.println("the last equiplet nodes to be processed: " + lastNodes);
 			System.out.println("Graph: " + graph);
 		}
@@ -295,7 +295,7 @@ public class Scheduling {
 			throw new SchedulingException("failed to find path int nodes=" + graph + " - " + optimumPath);
 		}
 
-		if (Settings.VERBOSITY > 3) {
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.println("the last equiplet nodes to be processed: " + lastNodes);
 			System.out.println("\nGraph pretty: " + graph.prettyPrint(source));
 			System.out.println("Graph: " + graph);
@@ -332,8 +332,9 @@ public class Scheduling {
 		return calculatePath(new Score() {
 			@Override
 			double score(Tick possibility, double load) {
-				Tick window = deadline.minus(time);
-				return 1 - possibility.minus(time).doubleValue() / window.doubleValue();
+				return deadline.minus(possibility).doubleValue() / deadline.minus(time).doubleValue();
+//				Tick window = deadline.minus(time);
+//				return 1 - possibility.minus(time).doubleValue() / window.doubleValue();
 			}
 
 		}, 1000);
@@ -407,7 +408,7 @@ public class Scheduling {
 		}
 
 		while (!paths.isEmpty()) {
-			if (Settings.VERBOSITY > 3) {
+			if (MasConfiguration.VERBOSITY > 3) {
 				// //System.out.println(" PATHS =" + Util.formatPairList(paths));
 				System.out.println(" PATHS =" + paths.size());
 			}
@@ -452,7 +453,7 @@ public class Scheduling {
 					}
 
 					Node nextNode = new Node(equiplet, firstPossibility, duration, index);
-					if (Settings.VERBOSITY > 3) {
+					if (MasConfiguration.VERBOSITY > 3) {
 						System.out.println(" add to path [last in path=" + node + ", nextNode=" + nextNode + " + in path=" + path + "]");
 					}
 
@@ -521,7 +522,7 @@ public class Scheduling {
 			for (int column = 0; column < productSteps.size(); column++) {
 
 				// check if the equiplet is capable to execute the product step
-				if (serviceOptions.get(column).containsKey(equiplet)) {
+				if (serviceOptions.get(productSteps.get(column).getIndex()).containsKey(equiplet)) {
 					// set the first item in the sequence.
 					if (firstInSequence < 0) {
 						firstInSequence = column;
@@ -560,7 +561,7 @@ public class Scheduling {
 			}
 		}
 
-		if (Settings.VERBOSITY > 3) {
+		if (MasConfiguration.VERBOSITY > 3) {
 			System.out.println("Scheduling Matrix: step " + productSteps + " \n" + Util.formatMatrix(matrix));
 		}
 
@@ -581,7 +582,7 @@ public class Scheduling {
 			// private Map<Integer, Map<AID, Pair<Double, List<Pair<Double, Double>>>>> serviceOptions;
 			if (highestRow >= 0) {
 				AID equiplet = equiplets.get(highestRow);
-				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(column).get(equiplet);
+				Pair<Tick, List<Pair<Tick, Tick>>> option = serviceOptions.get(productSteps.get(column).getIndex()).get(equiplet);
 				List<Pair<Tick, Tick>> availableTimeSlots = option.second;
 
 				Tick travelTime = previousStep.first.equals(equipletInfo.get(equiplet).second) ? new Tick(0)
@@ -596,7 +597,7 @@ public class Scheduling {
 					}
 				}
 
-				if (Settings.VERBOSITY > 3) {
+				if (MasConfiguration.VERBOSITY > 3) {
 					System.out.println("for equiplet " + equiplet.getLocalName() + "(" + productSteps.get(column).getService() + ") \tscoring=" + highScore
 							+ " , can arrive at (pre=" + previousStep.second + " + " + travelTime + ")=" + arrival + ", duration=" + duration + ", available time:"
 							+ availableTimeSlots + ", so first possibility=" + firstPossibility);

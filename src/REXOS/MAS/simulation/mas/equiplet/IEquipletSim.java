@@ -44,7 +44,13 @@ public interface IEquipletSim {
 
 	void kill();
 
-	void reconfigureStart(List<Capability> services);
+	void reconfigureStart();
 
-	void reconfigureFinished();
+	void notifyReconfigured(List<Capability> capabilities);
+	
+	boolean isExecuting();
+	
+	String getExecutingProduct();
+	
+	String toFullString();
 }

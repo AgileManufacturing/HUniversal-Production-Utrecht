@@ -78,15 +78,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 	@Override
 	public void kill() {
-		try {
-			// deregister equiplet by the df
-			DFService.deregister(this);
-		} catch (FIPAException e) {
-			System.err.println("failed to deregister equiplet");
-			e.printStackTrace();
-		} finally {
-			super.doDelete();
-		}
+		super.doDelete();
 	}
 
 	@Override
@@ -109,21 +101,26 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 * @param capabilities
 	 */
 	@Override
-	public void reconfigureStart(List<Capability> capabilities) {
+	public void reconfigureStart() {
 		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
-		reconfigure = true;
+		reconfiguring = true;
 		deregister();
-		this.capabilities = capabilities;
+
+		if (state == EquipletState.IDLE && schedule.isEmpty()) {
+			state = EquipletState.RECONFIG;
+			simulation.notifyReconfigReady(getLocalName());
+		}
 	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void reconfigureFinished() {
+	public void notifyReconfigured(List<Capability> capabilities) {
+		this.capabilities = capabilities;
 		System.out.printf("EA:%s reconfigure finished he has new capabilties %s \n", getLocalName(), capabilities);
 		if (schedule.isEmpty()) {
-			reconfigure = false;
+			reconfiguring = false;
 			for (Capability capability : capabilities) {
 				productionTimes.put(capability.getService(), capability.getDuration());
 			}
@@ -132,6 +129,29 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} else {
 			throw new IllegalArgumentException("Equiplet has not an empty schedule while being reconfigured");
 		}
+	}
+
+	/**
+	 * remove all the job for a product in the schedule
+	 * when the equiplet need to be reconfigured, inform the simulation when his schedule is empty
+	 * 
+	 * @param product
+	 *            agent
+	 * @return successfulness of removing jobs
+	 */
+	@Override
+	public synchronized boolean releaseTimeSlopts(AID product) {
+		boolean success = super.releaseTimeSlopts(product);
+		if (reconfiguring && state == EquipletState.IDLE && schedule.isEmpty()) {
+			state = EquipletState.RECONFIG;
+			simulation.notifyReconfigReady(getLocalName());
+		}
+		return success;
+	}
+
+	@Override
+	public String getExecutingProduct() {
+		return executing.getProductAgentName();
 	}
 
 	@Override
@@ -231,7 +251,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		for (Capability capability : capabilities) {
 			services.add(capability.getService());
 		}
-		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() + (reconfigure ? " reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
+		Tuple<String, Integer, Integer, Integer> info = new Tuple<String, Integer, Integer, Integer>(getEquipletState().toString() + (reconfiguring ? " reconfiguring" : ""), getWaiting(), getScheduled(), getExecuted());
 		return new Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>(getLocalName(), getPosition(), services, info);
 	}
 
@@ -289,6 +309,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	protected synchronized void executeJob(Tick time, Job job) {
+		Tick latency = time.minus(job.getStartTime());
 		state = EquipletState.BUSY;
 		executing = job;
 
@@ -350,21 +371,18 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 
 			AID finishedProduct = executing.getProductAgent();
 			int index = executing.getIndex();
+			executing = null;
 
 			Job ready = jobReady();
 			if (ready != null) {
 				// if (!schedule.isEmpty() && jobReady()) {
 				schedule.remove(ready);
 				executeJob(time, ready);
-			} else if (reconfigure && schedule.isEmpty()) {
+			} else if (reconfiguring && schedule.isEmpty()) {
 				state = EquipletState.RECONFIG;
-				if (simulation == null) {
-					throw new IllegalArgumentException("FUCK sim");
-				}
 				simulation.notifyReconfigReady(getLocalName());
 			} else {
 				state = EquipletState.IDLE;
-				executing = null;
 			}
 
 			// note that the inform processing is done before inform finished
@@ -420,6 +438,9 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
 			Job ready = jobReady();
+			if (ready == null) {
+				throw new IllegalArgumentException("Well something went wrong, an equiplet can not be in state error ready (a prodcut has arrived while he was broken)");
+			}
 			schedule.remove(ready);
 			executeJob(time, ready);
 		} else if (isExecuting()) {
@@ -428,18 +449,18 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			timeRemaining = time.minus(timeBreakdown);
 			executing.updateDueTime(executing.getDue().add(timeRemaining));
 			System.out.printf("EA:%s is repaired at %s and continue with job %s. The equiplet was %s broken, which is still remaining.\n", getLocalName(), time, executing, timeRemaining);
-			// } else if (jobReady()) {
-			// when the equiplet was in the error state there became a job ready which arrived before the breakdown
-			// not sure if this could happen
-			// System.out.println("EQUIPLET ERROR? " + schedule);
-			// executeJob(time);
-			// System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
 		} else {
-			// the equiplet has nothing to do and goes into IDLE state
-			System.out.printf("EA:%s is repaired at %s \n", getLocalName(), time);
-			state = EquipletState.IDLE;
+			Job ready = jobReady();
+			if (ready != null) {
+				// when the equiplet was in the error state there became a job ready which arrived before the breakdown
+				// not sure if this could happen
+				executeJob(time, ready);
+				System.out.printf("EA:%s is repaired at %s and detect that a job has became ready: %s \n", getLocalName(), time, executing);
+			} else {
+				// the equiplet has nothing to do and goes into IDLE state
+				System.out.printf("EA:%s is repaired at %s \n", getLocalName(), time);
+				state = EquipletState.IDLE;
+			}
 		}
-
-		updateSchedule();
 	}
 }

@@ -1,7 +1,7 @@
 package MAS.product;
 
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -31,32 +31,42 @@ import MAS.util.Pair;
 import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.SchedulingAlgorithm;
-import MAS.util.Settings;
+import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 import MAS.util.Triple;
 
-public class ScheduleBehaviour extends Behaviour {
+public class ScheduleBehaviour extends OneShotBehaviour {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private ProductAgent myproductagent;
+	private ProductAgent product;
 	private LinkedList<ProductStep> productSteps;
-	private boolean done;
+	private Tick time;
+	private Tick deadline;
 
 	public ScheduleBehaviour(ProductAgent product, LinkedList<ProductStep> productSteps) {
 		super(product);
-		this.myproductagent = product;
+		this.product = product;
 		this.productSteps = productSteps;
-		done = false;
+		this.time = null;
+		this.deadline = product.getDeadline();
+	}
+
+	public void reschedule(LinkedList<ProductStep> steps, Tick time, Tick deadline) {
+		this.productSteps = steps;
+		this.time = time;
+		this.deadline = deadline;
 	}
 
 	@Override
 	public void action() {
-		try {
+		// when time is not specified, use product creation time
+		time = time == null ? product.getCreated() : time;
 
-			//System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour, product steps: %s\n", myAgent.getLocalName(), productSteps);
+		try {
+			System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour at %s, product steps: %s\n", myAgent.getLocalName(), time, productSteps);
 			HashMap<AID, LinkedList<ProductStep>> suitedEquiplets = searchSuitedEquiplets(productSteps);
 
 			//System.out.printf(System.currentTimeMillis() + "\tPA:%s find the following suited equiplets %s\n", myAgent.getLocalName(), suitedEquiplets);
@@ -67,22 +77,22 @@ public class ScheduleBehaviour extends Behaviour {
 
 			//System.out.printf(System.currentTimeMillis() + "\tPA:%s filter the capable equiplets %s\n", myAgent.getLocalName(), equipletInfo.keySet());
 
-			Map<Pair<Position, Position>, Tick> travelTimes = retrieveTravelTimes(myproductagent.getPosition(), options, equipletInfo);
+			Map<Pair<Position, Position>, Tick> travelTimes = retrieveTravelTimes(product.getPosition(), options, equipletInfo);
 
 			//System.out.printf(System.currentTimeMillis() + "\tPA:%s retrieved travel times %s\n", myAgent.getLocalName(), travelTimes);
 
-			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), myproductagent.getCreated(), myproductagent.getDeadline(), myproductagent.getPosition(), productSteps, options, equipletInfo, travelTimes);
+			Scheduling scheduling = new Scheduling(myAgent.getLocalName(), time, deadline, product.getPosition(), productSteps, options, equipletInfo, travelTimes);
 
-			if (Settings.SCHEDULING == SchedulingAlgorithm.MATRIX) {
+			if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.MATRIX) {
 				LinkedList<ProductionStep> productionPath = scheduling.calculateMatrixPath();
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), productionPath);
 
-				schedule(productionPath, myproductagent.getDeadline());
+				schedule(productionPath, deadline);
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
-				
-				myproductagent.schedulingFinished(true, productionPath);
+
+				product.schedulingFinished(time, true, productionPath);
 			} else {
 				LinkedList<Node> nodes;
 				if (Settings.SCHEDULING == SchedulingAlgorithm.EDD) {
@@ -92,28 +102,38 @@ public class ScheduleBehaviour extends Behaviour {
 				} else {
 					nodes = scheduling.calculateSuprimePath();
 				}
+			} else {
+				LinkedList<Node> nodes;
+				if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.EDD) {
+					nodes = scheduling.calculateEDDPath();
+				} else if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.LOAD) {
+					nodes = scheduling.calculateLoadPath();
+				} else {
+					nodes = scheduling.calculateSuprimePath();
+				}
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s path calculated %s\n", myAgent.getLocalName(), nodes);
 
-				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, myproductagent.getDeadline());
-				System.out.printf(System.currentTimeMillis() + "\tPA2:%s scheduled equiplets.\n", myAgent.getLocalName());
-				myproductagent.schedulingFinished(true, productionPath);
+				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, deadline);
+				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
+				product.schedulingFinished(time, true, productionPath);
 			}
 
-			done = true;
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
-
+			//
+			// finished = true;
 		} catch (SchedulingException e) {
-			System.err.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
-			myproductagent.schedulingFinished(false);
+			System.out.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
+			product.schedulingFinished(time, false);
 		}
 	}
 
-	@Override
-	public boolean done() {
-		return done;
-	}
-
+	//
+	// @Override
+	// public boolean done() {
+	// return finished;
+	// }
+	//
 	/**
 	 * search for suited equiplet
 	 * ask the DF if there are equiplets that have registered service needed for production of the product
@@ -197,7 +217,7 @@ public class ScheduleBehaviour extends Behaviour {
 				message.setOntology(Ontology.GRID_ONTOLOGY);
 				message.setConversationId(Ontology.CONVERSATION_CAN_EXECUTE);
 				message.setReplyWith(replyConversation);
-				message.setContent(Parser.parseCanExecute(myproductagent.getCreated(), myproductagent.getDeadline(), entry.getValue()));
+				message.setContent(Parser.parseCanExecute(time, deadline, entry.getValue()));
 				myAgent.send(message);
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to construct message to equiplet for asking can execute %s.\n", myAgent.getLocalName(), entry.getValue());
@@ -219,13 +239,13 @@ public class ScheduleBehaviour extends Behaviour {
 		// receives the answers of the equiplets, whether they can execute the product steps
 		int counter = 0;
 		while (counter < suitedEquiplets.size()) {
-			ACLMessage msg = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+			ACLMessage msg = myAgent.blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
 
 			// the equiplet is able to perform the product step and propose possibilities for executing the product step
 			if (msg != null && msg.getPerformative() == ACLMessage.PROPOSE) {
 				counter++;
 
-				System.out.printf("PA:%s can execute reply received from %s : %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getContent());
+				System.out.printf("PA:%s can execute reply received from %s : %s.\n", myAgent.getLocalName(), msg.getSender().getLocalName(), "");// msg.getContent());
 				try {
 					// Triple < List of product steps, load, position >
 					Triple<List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position> answer = Parser.parseCanExecuteAnswer(msg.getContent());
@@ -254,6 +274,18 @@ public class ScheduleBehaviour extends Behaviour {
 		return new Pair<Map<AID, Pair<Double, Position>>, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>>>(equipletInfo, serviceOptions);
 	}
 
+	/**
+	 * retrieve the travel times from equiplet to equiplet by the traffic manager agent
+	 * 
+	 * @param position
+	 *            of the product
+	 * @param options
+	 *            for executing a product step, for each product step a list of possible equiplets with estimate of duration and available times
+	 * @param equipletInfo
+	 *            information of the equiplet, load and position
+	 * @return
+	 * @throws SchedulingException
+	 */
 	private Map<Pair<Position, Position>, Tick> retrieveTravelTimes(Position position, Map<Integer, Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>>> options, Map<AID, Pair<Double, Position>> equipletInfo)
 			throws SchedulingException {
 		// the routes of equiplet to equiplet for which the time is needed for scheduling
@@ -263,16 +295,22 @@ public class ScheduleBehaviour extends Behaviour {
 		// this creates a list of the edges the complete multipartite graph
 		for (int i = productSteps.size() - 1; i > 0; i--) {
 			// check if the product step is executable by one of the equiplets
-			if (!options.containsKey(i)) {
+			// note that at first there is no difference between the index of the product steps (i.e. productStep.get(i)) and the index of the product step (i.e.
+			// productStep.get(i).getIndex()), when rescheduling the index do not match anymore
+			int index = productSteps.get(i).getIndex();
+			if (!options.containsKey(index)) {
 				throw new SchedulingException("failed to find product step in options, i.e. there isn't a equiplet capable to execute the product step: " + productSteps.get(i));
 			}
-			if (!options.containsKey(i - 1)) {
+			if (!options.containsKey(index - 1)) {
 				throw new SchedulingException("failed to find product step in options, i.e. there isn't a equiplet capable to execute the product step: " + productSteps.get(i - 1));
 			}
 
+			// System.out.println("[i=" + i + ", index=" + index + ", ps=" +productSteps.get(i) + ", options=" + options.get(i) + "]");
+			// System.out.println("[i=" + i + ", index=" + index + ", ps=" +productSteps.get(i) + ", options=" + options.get(i) + "]");
+
 			// map the possibilities for a product step to the next possibilities for the product step;
-			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> previousPossibilities = options.get(i - 1);
-			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> nextPossibilities = options.get(i);
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> previousPossibilities = options.get(index - 1);
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> nextPossibilities = options.get(index);
 
 			for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> previousEquiplet : previousPossibilities.entrySet()) {
 				for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> nextEquiplet : nextPossibilities.entrySet()) {
@@ -287,8 +325,9 @@ public class ScheduleBehaviour extends Behaviour {
 		}
 
 		// add routes from the current product position to the position of the possible equiplet for the first product step
-		if (options.containsKey(0)) {
-			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> possibilities = options.get(0);
+		int firstIndex = productSteps.get(0).getIndex();
+		if (options.containsKey(firstIndex)) {
+			Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> possibilities = options.get(firstIndex);
 			for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> equiplet : possibilities.entrySet()) {
 				routes.add(new Pair<>(position, equipletInfo.get(equiplet.getKey()).second));
 			}
@@ -296,7 +335,7 @@ public class ScheduleBehaviour extends Behaviour {
 			throw new SchedulingException("failed to find product step in options, i.e. there isn't a equiplet capable to execute the product step: " + productSteps.get(0));
 		}
 
-		AID trafficAgent = new AID(Settings.TRAFFIC_AGENT, AID.ISLOCALNAME);
+		AID trafficAgent = new AID(MasConfiguration.TRAFFIC_AGENT, AID.ISLOCALNAME);
 		String replyConversation = Ontology.CONVERSATION_TRAVEL_TIME + System.currentTimeMillis();
 		try {
 			ACLMessage message = new ACLMessage(ACLMessage.QUERY_REF);
@@ -307,7 +346,7 @@ public class ScheduleBehaviour extends Behaviour {
 			message.setContent(Parser.parseTravelTimeRequest(routes));
 			myAgent.send(message);
 		} catch (JSONException e) {
-			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), Settings.TRAFFIC_AGENT);
+			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), MasConfiguration.TRAFFIC_AGENT);
 			System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
 			throw new SchedulingException("failed retrieve travel times:" + e.getMessage());
 		}
@@ -318,7 +357,7 @@ public class ScheduleBehaviour extends Behaviour {
 		try {
 			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchSender(trafficAgent), MessageTemplate.MatchInReplyTo(replyConversation));
 
-			ACLMessage reply = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+			ACLMessage reply = myAgent.blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
 			if (reply != null) {
 				Map<Pair<Position, Position>, Tick> travelTimes = Parser.parseTravelTimes(reply.getContent());
 
@@ -329,7 +368,7 @@ public class ScheduleBehaviour extends Behaviour {
 				throw new SchedulingException("failed to receive travel times, message == null");
 			}
 		} catch (JSONException e) {
-			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), Settings.TRAFFIC_AGENT);
+			System.err.printf("PA:%s failed to construct message to the travel agent: %s for asking the travel time: %s\n", myAgent.getLocalName(), MasConfiguration.TRAFFIC_AGENT);
 			System.err.printf("PA:%s %s\n", myAgent.getLocalName(), e.getMessage());
 			throw new SchedulingException("failed retrieve travel times:" + e.getMessage());
 		}
@@ -363,6 +402,16 @@ public class ScheduleBehaviour extends Behaviour {
 		return path;
 	}
 
+	/**
+	 * Schedule a list of production steps.
+	 * This will grouped by equiplets and requested to be executed
+	 * 
+	 * @param path
+	 *            of production steps
+	 * @param deadline
+	 *            of the product
+	 * @throws SchedulingException
+	 */
 	private void schedule(LinkedList<ProductionStep> path, Tick deadline) throws SchedulingException {
 		// construct send list grouped by equiplet
 		HashMap<AID, ArrayList<ProductionStep>> sendList = new HashMap<>();
@@ -376,6 +425,15 @@ public class ScheduleBehaviour extends Behaviour {
 		schedule(sendList, deadline);
 	}
 
+	/**
+	 * Schedule a list of production steps grouped by equiplets
+	 * 
+	 * @param sendList
+	 *            map of equiplets with the product step to schedule
+	 * @param deadline
+	 *            of the product
+	 * @throws SchedulingException
+	 */
 	private void schedule(HashMap<AID, ArrayList<ProductionStep>> sendList, Tick deadline) throws SchedulingException {
 		String replyConversation = Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis();
 		int sendCounter = 0;
@@ -398,7 +456,7 @@ public class ScheduleBehaviour extends Behaviour {
 		}
 		MessageTemplate template = MessageTemplate.MatchInReplyTo(replyConversation);
 		while (sendCounter > 0) { // All agent have to answer
-			ACLMessage msg = myAgent.blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+			ACLMessage msg = myAgent.blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
 			if (msg != null && msg.getPerformative() == ACLMessage.CONFIRM) {
 				sendCounter--;
 			} else if (msg != null && msg.getPerformative() == ACLMessage.DISCONFIRM) {

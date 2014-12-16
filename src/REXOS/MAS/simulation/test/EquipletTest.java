@@ -1,7 +1,12 @@
 package MAS.simulation.test;
 
+import jade.core.AID;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import MAS.equiplet.Capability;
 import MAS.equiplet.EquipletAgent;
@@ -9,9 +14,11 @@ import MAS.equiplet.Job;
 import MAS.util.Pair;
 import MAS.util.Position;
 import MAS.util.Tick;
+import MAS.util.Tuple;
 
 class EquipletTest extends EquipletAgent {
 	private static final long serialVersionUID = 1L;
+	private Map<String, Tick> pTimes = new HashMap<String, Tick>();
 
 	public EquipletTest() {
 		init(new Position(-1, -1), new ArrayList<Capability>());
@@ -24,6 +31,30 @@ class EquipletTest extends EquipletAgent {
 
 	protected boolean schedule(Job job) {
 		return schedule.add(job);
+	}
+
+	protected boolean executed(Job job) {
+		return history.add(job);
+	}
+
+	@Override
+	public boolean isCapable(String service, Map<String, Object> criteria) {
+		return pTimes.containsKey(service);
+	}
+
+	@Override
+	public Tick estimateService(String service) {
+		return pTimes.get(service);
+	}
+
+	protected boolean schedule(Tick start, Tick duration) {
+		String uuid = UUID.randomUUID().toString();
+		pTimes.put(uuid, duration);
+
+		List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests = new ArrayList<>();
+		requests.add(new Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>(0, new Pair<Tick, Tick>(start, start.add(duration)), uuid, new HashMap<String, Object>()));
+
+		return super.schedule(new AID("Test Equiplet", AID.ISGUID), requests);
 	}
 
 	@Override

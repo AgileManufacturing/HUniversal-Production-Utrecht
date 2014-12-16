@@ -81,8 +81,7 @@ public class EQSpawnClass extends Agent {
 		jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
 		Agent agent = new EquipletAgent();
 		agent.setArguments(args);
-		//TODO Method of acquiring an equiplet name has to be implemented, currently hardcoded
-		AgentController ac = container.acceptNewAgent("EQ2", agent);
+		AgentController ac = container.acceptNewAgent( "EquipletAgent"+date.getTime(), agent);
 		ac.start();		
 		
 	}

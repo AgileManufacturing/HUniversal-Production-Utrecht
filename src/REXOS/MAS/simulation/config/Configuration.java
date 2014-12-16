@@ -18,7 +18,7 @@ import MAS.equiplet.Capability;
 import MAS.product.ProductStep;
 import MAS.util.Pair;
 import MAS.util.Position;
-import MAS.util.Settings;
+import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 
 public class Configuration implements IConfig {

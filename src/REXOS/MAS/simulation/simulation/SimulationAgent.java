@@ -25,11 +25,15 @@ import MAS.equiplet.Capability;
 import MAS.grid_server.TrafficManager;
 import MAS.product.ProductStep;
 import MAS.simulation.mas.equiplet.EquipletSimAgent;
+import MAS.simulation.mas.equiplet.EquipletSimAgentDealWithItTemporyName;
 import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
 import MAS.simulation.mas.product.ProductAgentSim;
+import MAS.simulation.mas.product.ProductAgentSimDealWithIt;
+import MAS.simulation.util.Settings;
 import MAS.util.Position;
-import MAS.util.Settings;
+import MAS.util.SchedulingAlgorithm;
+import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 
 public class SimulationAgent extends Agent implements ISimControl {
@@ -45,9 +49,9 @@ public class SimulationAgent extends Agent implements ISimControl {
 	 */
 	public void setup() {
 		try {
-			int verbosity = Integer.parseInt(getProperty("verbosity", "1"));
+			int verbosity = Integer.parseInt(getProperty("verbosity", String.valueOf(MasConfiguration.VERBOSITY)));
 			System.out.println("Simulation: verbosity is set on " + verbosity);
-			Settings.VERBOSITY = verbosity;
+			MasConfiguration.VERBOSITY = verbosity;
 		} catch (NumberFormatException e) {
 			System.err.println("Simulation: parsing error verbosity");
 		}
@@ -57,10 +61,9 @@ public class SimulationAgent extends Agent implements ISimControl {
 		addBehaviour(new SimulationBehaviour());
 
 		// no use of gui, so start direct the simulation
-		if (Settings.VERBOSITY < 2) {
+		if (MasConfiguration.VERBOSITY < 2) {
 			simulation.start();
 		}
-
 	}
 
 	/**
@@ -80,8 +83,8 @@ public class SimulationAgent extends Agent implements ISimControl {
 			}
 
 			// take down the whole simulation when the gui is not used
-			if (Settings.VERBOSITY < 1) {
-				takeDown();
+			if (MasConfiguration.VERBOSITY < 1) {
+				doDelete();
 			}
 		}
 
@@ -118,13 +121,23 @@ public class SimulationAgent extends Agent implements ISimControl {
 	public IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception {
 		try {
 			// Create and start the agent
-			EquipletSimAgent equiplet = new EquipletSimAgent(simulation, position, capabilities);
+			if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.NONE) {
+				EquipletSimAgentDealWithItTemporyName equiplet = new EquipletSimAgentDealWithItTemporyName(simulation, position, capabilities);
 
-			ContainerController cc = getContainerController();
-			AgentController ac = cc.acceptNewAgent(name, equiplet);
-			ac.start();
+				ContainerController cc = getContainerController();
+				AgentController ac = cc.acceptNewAgent(name, equiplet);
+				ac.start();
 
-			return equiplet;
+				return equiplet;
+			} else {
+				EquipletSimAgent equiplet = new EquipletSimAgent(simulation, position, capabilities);
+
+				ContainerController cc = getContainerController();
+				AgentController ac = cc.acceptNewAgent(name, equiplet);
+				ac.start();
+
+				return equiplet;
+			}
 		} catch (StaleProxyException e) {
 			System.err.printf("Simulation: ERROR: equiplet agent %s creation was not possible.\n", name);
 			e.printStackTrace();
@@ -141,15 +154,25 @@ public class SimulationAgent extends Agent implements ISimControl {
 	public IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) throws Exception {
 		try {
 			System.out.println("Simulation: create product");
+
 			// Create and start the agent
-			ProductAgentSim productAgent = new ProductAgentSim(simulation, productSteps, position, time, deadline);
+			if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.NONE) {
+				ProductAgentSimDealWithIt productAgent = new ProductAgentSimDealWithIt(simulation, productSteps, position, time, deadline);
 
-			ContainerController cc = getContainerController();
-			AgentController ac = cc.acceptNewAgent(name, productAgent);
-			ac.start();
+				ContainerController cc = getContainerController();
+				AgentController ac = cc.acceptNewAgent(name, productAgent);
+				ac.start();
 
-			return productAgent;
+				return productAgent;
+			} else {
+				ProductAgentSim productAgent = new ProductAgentSim(simulation, productSteps, position, time, deadline);
 
+				ContainerController cc = getContainerController();
+				AgentController ac = cc.acceptNewAgent(name, productAgent);
+				ac.start();
+
+				return productAgent;
+			}
 		} catch (StaleProxyException e1) {
 			System.err.printf("Simulation: ERROR: product agent %s creation was not possible.\n", name);
 			e1.printStackTrace();
@@ -178,27 +201,30 @@ public class SimulationAgent extends Agent implements ISimControl {
 			TrafficManager trafficAgent = new TrafficManager(equiplets);
 
 			ContainerController cc = getContainerController();
-			AgentController ac = cc.acceptNewAgent(Settings.TRAFFIC_AGENT, trafficAgent);
+			AgentController ac = cc.acceptNewAgent(MasConfiguration.TRAFFIC_AGENT, trafficAgent);
 			ac.start();
 		} catch (StaleProxyException e1) {
-			System.err.printf("Simulation: ERROR: traffic agent %s creation was not possible.\n", Settings.TRAFFIC_AGENT);
+			System.err.printf("Simulation: ERROR: traffic agent %s creation was not possible.\n", MasConfiguration.TRAFFIC_AGENT);
 			e1.printStackTrace();
 			throw new Exception("Failed to create agent");
 		}
 	}
 
 	private void setOutput() {
-		if (Settings.VERBOSITY  <= 2) {
+		if (MasConfiguration.VERBOSITY <= 2) {
 			System.setOut(new DummyPrint());
 		}
 	}
 
+	/**
+	 * because correct logging takes to much time to investigate a good way to log in a distributed system
+	 */
 	public class DummyPrint extends PrintStream {
 		public DummyPrint() {
 			super(new OutputStream() {
 				@Override
 				public void write(int b) throws IOException {
-					
+
 				}
 			});
 		}

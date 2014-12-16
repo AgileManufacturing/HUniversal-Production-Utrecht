@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -186,11 +185,12 @@ public class Chart {
 	 *            <name [<name, start, end>]
 	 * @return chart
 	 */
-	public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
+	public static <M extends Map<Tick, T>, T extends Number> JPanel createChart(String title, String yLabel, Map<String, M> data) {
+	// public static JPanel createChart(String title, String yLabel, Map<String, Map<Tick, Double>> data) {
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-		for (Entry<String, Map<Tick, Double>> entry : data.entrySet()) {
+		for (Entry<String, M> entry : data.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
-			for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
+			for (Entry<Tick, T> point : entry.getValue().entrySet()) {
 				series.add(point.getKey().doubleValue(), point.getValue());
 			}
 			dataset.addSeries(series);
@@ -207,14 +207,14 @@ public class Chart {
 	 * @param title
 	 * @param yLabel
 	 * @param data1
-	 * @param data2
+	 * @param data
 	 * @return
 	 */
-	public static Component createChart(String title, String yLabel1, String yLabel2, Map<String, Map<Tick, Double>> data1, Map<String, Map<? extends Number, ? extends Number>> data2) {
+	public static <M extends Map<Tick, T>, T extends Number> Component createChart(String title, String yLabel1, String yLabel2, Map<String, M> stats, Map<String, Map<? extends Number, ? extends Number>> data) {
 		final XYSeriesCollection dataset = new XYSeriesCollection();
-		for (Entry<String, Map<Tick, Double>> entry : data1.entrySet()) {
+		for (Entry<String, M> entry : stats.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
-			for (Entry<Tick, Double> point : entry.getValue().entrySet()) {
+			for (Entry<Tick, T> point : entry.getValue().entrySet()) {
 				series.add(point.getKey().doubleValue(), point.getValue());
 			}
 			dataset.addSeries(series);
@@ -224,7 +224,7 @@ public class Chart {
 
 		// second axis
 		final XYSeriesCollection dataset2 = new XYSeriesCollection();
-		for (Entry<String, Map<? extends Number, ? extends Number>> entry : data2.entrySet()) {
+		for (Entry<String, Map<? extends Number, ? extends Number>> entry : data.entrySet()) {
 			final XYSeries series = new XYSeries(entry.getKey());
 			for (Entry<? extends Number, ? extends Number> point : entry.getValue().entrySet()) {
 				series.add(point.getKey().doubleValue(), point.getValue());

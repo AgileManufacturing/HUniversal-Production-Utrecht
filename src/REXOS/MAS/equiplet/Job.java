@@ -5,22 +5,12 @@ import jade.core.AID;
 import java.util.HashMap;
 import java.util.Map;
 
-import MAS.util.Parser;
-
-import org.json.*;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import MAS.util.Tick;
 
 public class Job implements Comparable<Job> {
 
-	public static final String TARGET = "target";
-	public static final String SUBJECTS = "subjects";
-
-	public static final String CRITERIA = "criteria";
-	public static final String SERVICE = "service";
-	public static final String ID = "id";	
-	
 	private boolean dummy;
 	private AID product;
 	private String productName;
@@ -130,9 +120,8 @@ public class Job implements Comparable<Job> {
 		return service;
 	}
 
-	public JSONObject getCriteria() {
-		JSONObject json = new JSONObject(criteria);
-		return json;
+	public Map<String, Object> getCriteria() {
+		return criteria;
 	}
 
 	public Tick getStartTime() {

@@ -1,8 +1,8 @@
-<project name="equiplet_agent" default="all">
+<project name="equiplet_agent" default="build" basedir=".">
 
 	<import file="../build.xml"/>
 
-	<target name="all"> 
+	<target name="build"> 
 		<buildjava dir="${basedir}"/>  
 	</target>
 
