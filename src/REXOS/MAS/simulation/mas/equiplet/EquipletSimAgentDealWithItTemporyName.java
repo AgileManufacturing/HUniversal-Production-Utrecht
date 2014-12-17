@@ -8,12 +8,16 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import MAS.equiplet.Capability;
+import MAS.equiplet.EquipletState;
+import MAS.equiplet.Job;
 import MAS.simulation.simulation.ISimulation;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
 import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Tuple;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.MASConfiguration;
+import MAS.util.Tick;
+import MAS.util.Tuple;
 
 public class EquipletSimAgentDealWithItTemporyName extends EquipletSimAgent implements IEquipletSim {
 

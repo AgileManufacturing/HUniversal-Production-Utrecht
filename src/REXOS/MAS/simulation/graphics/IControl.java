@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
+import MAS.util.Tick;
+import MAS.util.Triple;
 
 public interface IControl {
 

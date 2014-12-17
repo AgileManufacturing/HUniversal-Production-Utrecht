@@ -9,12 +9,16 @@ import java.util.Map;
 
 import org.json.JSONException;
 
+import MAS.equiplet.Capability;
+import MAS.equiplet.EquipletAgent;
+import MAS.equiplet.EquipletState;
+import MAS.equiplet.Job;
 import MAS.simulation.simulation.ISimulation;
-import MAS.simulation.util.Parser;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
-import MAS.simulation.util.Tuple;
+import MAS.util.Parser;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Triple;
+import MAS.util.Tuple;
 
 public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 

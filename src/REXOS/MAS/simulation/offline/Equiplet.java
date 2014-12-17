@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Triple;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Triple;
 
 class Equiplet {
 	private String name;

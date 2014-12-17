@@ -1,7 +1,7 @@
 package MAS.simulation.mas.product;
 
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
+import MAS.util.Position;
+import MAS.util.Tick;
 
 public interface IProductSim {
 

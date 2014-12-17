@@ -14,12 +14,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import MAS.simulation.mas.equiplet.Capability;
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
+import MAS.equiplet.Capability;
+import MAS.product.ProductStep;
 import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.MASConfiguration;
+import MAS.util.Tick;
 
 public class Configuration implements IConfig {
 

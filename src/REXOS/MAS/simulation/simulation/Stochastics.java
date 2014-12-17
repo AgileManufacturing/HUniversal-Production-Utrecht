@@ -6,14 +6,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import MAS.equiplet.Capability;
+import MAS.product.ProductStep;
 import MAS.simulation.config.DurationType;
 import MAS.simulation.config.IConfig;
-import MAS.simulation.mas.equiplet.Capability;
-import MAS.simulation.mas.product.ProductStep;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
 import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Tick;
 
 class Stochastics {
 	private Random random;

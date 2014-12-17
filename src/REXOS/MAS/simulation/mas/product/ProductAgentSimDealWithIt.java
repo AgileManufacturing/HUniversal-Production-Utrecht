@@ -14,14 +14,21 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import MAS.product.ProductAgent;
+import MAS.product.ProductListenerBehaviour;
+import MAS.product.ProductState;
+import MAS.product.ProductStep;
+import MAS.product.ProductionStep;
+import MAS.product.SchedulingException;
 import MAS.simulation.simulation.ISimulation;
-import MAS.simulation.util.Ontology;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Parser;
-import MAS.simulation.util.Position;
 import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
+import MAS.util.Ontology;
+import MAS.util.Pair;
+import MAS.util.Parser;
+import MAS.util.Position;
+import MAS.util.MASConfiguration;
+import MAS.util.Tick;
+import MAS.util.Triple;
 
 public class ProductAgentSimDealWithIt extends ProductAgent implements IProductSim {
 
@@ -288,7 +295,7 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 
 		int counter = 0;
 		while (counter < suitedEquiplets.size()) {
-			ACLMessage msg = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
+			ACLMessage msg = blockingReceive(template, MASConfiguration.COMMUNICATION_TIMEOUT);
 
 			// the equiplet is able to perform the product step and propose possibilities for executing the product step
 			if (msg != null && msg.getPerformative() == ACLMessage.PROPOSE) {

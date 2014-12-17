@@ -21,6 +21,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import MAS.equiplet.Capability;
+import MAS.equiplet.EquipletState;
+import MAS.product.ProductStep;
 import MAS.simulation.config.Config;
 import MAS.simulation.config.Configuration;
 import MAS.simulation.config.Configuration.ConfigException;
@@ -28,19 +31,17 @@ import MAS.simulation.config.IConfig;
 import MAS.simulation.graphics.Chart;
 import MAS.simulation.graphics.IControl;
 import MAS.simulation.graphics.SimInterface;
-import MAS.simulation.mas.equiplet.Capability;
-import MAS.simulation.mas.equiplet.EquipletState;
 import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
-import MAS.simulation.mas.product.ProductStep;
+import MAS.util.Pair;
+import MAS.util.Position;
 import MAS.simulation.util.Lock;
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
 import MAS.simulation.util.Settings;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
-import MAS.simulation.util.Tuple;
-import MAS.simulation.util.Util;
+import MAS.util.MASConfiguration;
+import MAS.util.Tick;
+import MAS.util.Triple;
+import MAS.util.Tuple;
+import MAS.util.Util;
 
 public class Simulation implements ISimulation, IControl {
 
@@ -123,7 +124,7 @@ public class Simulation implements ISimulation, IControl {
 			System.out.println("Simulation: configuration: " + config);
 
 			stochastics = new Stochastics(config);
-			if (Settings.VERBOSITY > 1) {
+			if (MASConfiguration.VERBOSITY > 1) {
 				gui = SimInterface.create(this);
 			}
 
@@ -300,7 +301,7 @@ public class Simulation implements ISimulation, IControl {
 				}
 				calculateEquipletLoad();
 
-				if (Settings.VERBOSITY > 1) {
+				if (MASConfiguration.VERBOSITY > 1) {
 					update(e);
 				}
 
@@ -309,7 +310,9 @@ public class Simulation implements ISimulation, IControl {
 							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
 				}
 
-				verification();
+				if (Settings.VERIFICATION) {
+					verification();
+				}
 
 				// wait a certain time
 				if (delay > 0) {
@@ -823,14 +826,14 @@ public class Simulation implements ISimulation, IControl {
 			product.getValue().kill();
 		}
 
-		simulation.killAgent(Settings.TRAFFIC_AGENT);
+		simulation.killAgent(MASConfiguration.TRAFFIC_AGENT);
 
 		// TODO check if needed to wait until messages are received and all is taken down / killed
 		simulation.delay(2000);
 		System.gc();
 
 		// something is needed, there is a (although little) that some agent are not correctly started and therefore the simulation fails to run correctly without the possibility
-		// to check it. 
+		// to check it.
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
@@ -1028,7 +1031,7 @@ public class Simulation implements ISimulation, IControl {
 	 * when a product arrives at an equiplet, he (probably) sets a timer that goes off on the last moment a product steps could start affecting the next product step
 	 */
 	public void notifyProductShouldStart(String productName, Tick start, int index) {
-		if (Settings.RESCHEDULE) {
+		if (MASConfiguration.RESCHEDULE) {
 			eventStack.add(new Event(start.max(time), EventType.STARTED, productName, index));
 			System.out.printf("Simulation: schedule STARTED event for product %s at %s with prodcut step %d \n", productName, start, index);
 		}
@@ -1213,17 +1216,17 @@ public class Simulation implements ISimulation, IControl {
 	private void saveConfig(File configFile) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(configFile);
 		writer.println("Simulation: " + new SimpleDateFormat("dd MM yyyy 'at' HH:mm:ss").format(new Date()));
-		writer.printf("Scheduling: %s\n", Settings.SCHEDULING);
+		writer.printf("Scheduling: %s\n", MASConfiguration.SCHEDULING);
 		writer.printf("Stochastics: %s\n", Settings.STOCHASTICS);
-		writer.printf("Reschedule: %s\n", Settings.RESCHEDULE);
+		writer.printf("Reschedule: %s\n", MASConfiguration.RESCHEDULE);
 		writer.printf("Breakdowns: %s\n", Settings.BREAKDOWNS);
-		writer.printf("Queue jump: %s\n", Settings.QUEUE_JUMP);
+		writer.printf("Queue jump: %s\n", MASConfiguration.QUEUE_JUMP);
 		writer.printf("Reconfiguration time: %s\n", Settings.RECONFIGATION_TIME);
 		writer.printf("Warm-up period: %s\n", Settings.WARMUP);
 		writer.printf("Product generation: (%.0f * %d) / (%.2f * %d) = %.2f\n", stochastics.getMeanProcessingTime(), Settings.MEAN_PRODUCT_STEPS, Settings.UTILIZATION, config.getEquipletsConfigurations().size(), (stochastics.getMeanProcessingTime() * Settings.MEAN_PRODUCT_STEPS)
 				/ (Settings.UTILIZATION * config.getEquipletsConfigurations().size()));
-		writer.printf("Verbosity: %d\n", Settings.VERBOSITY);
-		writer.printf("Communication timeout: %s\n", Settings.COMMUNICATION_TIMEOUT);
+		writer.printf("Verbosity: %d\n", MASConfiguration.VERBOSITY);
+		writer.printf("Communication timeout: %s\n", MASConfiguration.COMMUNICATION_TIMEOUT);
 		writer.printf("Configuration:\n%s\n", config);
 		writer.println();
 		writer.close();

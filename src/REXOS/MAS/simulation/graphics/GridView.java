@@ -12,9 +12,9 @@ import java.util.Map.Entry;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tuple;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Tuple;
 
 public class GridView extends JPanel {
 

@@ -31,7 +31,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import MAS.simulation.util.Tick;
+import MAS.util.Tick;
 
 public class Chart {
 

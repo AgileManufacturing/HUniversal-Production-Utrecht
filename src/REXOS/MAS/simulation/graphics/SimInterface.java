@@ -32,11 +32,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import MAS.simulation.util.Pair;
-import MAS.simulation.util.Position;
-import MAS.simulation.util.Tick;
-import MAS.simulation.util.Triple;
-import MAS.simulation.util.Tuple;
+import MAS.util.Pair;
+import MAS.util.Position;
+import MAS.util.Tick;
+import MAS.util.Triple;
+import MAS.util.Tuple;
 
 public class SimInterface {
 
