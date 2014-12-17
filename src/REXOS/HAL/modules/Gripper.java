@@ -81,8 +81,7 @@ public class Gripper extends ModuleActor {
 
 		translatedHardwareSteps.addAll(forwardCompositeStep(compositeStep));
 		int placeholderId = getPlaceholderIndex(translatedHardwareSteps);
-		Logger.log(LogLevel.ERROR, "placeHolderId", placeholderId);
-
+		
 		// Set hardwareSteps
 		if (isPick || isPlace) {
 			HardwareStep harwareStep;

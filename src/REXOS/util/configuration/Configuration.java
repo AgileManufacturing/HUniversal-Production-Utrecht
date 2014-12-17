@@ -31,74 +31,57 @@
 package util.configuration;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class Configuration {
-	private static String propertiesFilePath = System.getenv("PROPERTIESPATH");
-	//private static String propertiesFilePath = "src/REXOS/util/configuration/";
+	private static final String defaultPropertyName = "default";
+	private static final String defaultPropertiesFilePath = "src/REXOS/util/configuration/settings.json";
 	
-	public static String getProperty(ConfigurationFiles file, String key)
-	{
-		if(file != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
-			return getProperty(file, key, null);
-		} else {
-			System.err.println("Need a equiplet name to read equiplet db properties");
-			return "";
-		}
-	}
+	protected static JSONObject configuration = null;;
 	
-	
-	public static String getProperty(ConfigurationFiles File, String key, String equipletName)
-	{
-		Properties p = new Properties();
-		try { 
-			switch(File)
-			{
-				case EQUIPLET_DB_PROPERTIES:
-					p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
-					return p.getProperty(equipletName + key);
-					
-				default:
-					if(File != null){
-						p.load(new FileInputStream(propertiesFilePath + File.getFileName()));
-						return p.getProperty(key);
-					}
-					System.out.println("Property file not known.");
-					break;
-			}
-		}catch(NullPointerException e) {
-			System.err.println("Property doesnt exist: " + key + " in file " + File.toString());
-		} catch (FileNotFoundException e) {
-			System.err.println(
-					"File doesnt exist: " + File.toString() + 
-					", using path: " + propertiesFilePath + 
-					", using working directory: " + System.getProperty("user.dir"));
-		} catch (IOException e) {
-			System.err.println(e);
-		}
-		return "";
-	}
-	
-	public static int getPropertyInt(ConfigurationFiles File, String key)
-	{
-		if(File != ConfigurationFiles.EQUIPLET_DB_PROPERTIES){
-			return getPropertyInt(File, key, null);
-		} else {
-			System.err.println("Need a equiplet name to read equiplet db properties");
-			return -1;
-		}
-	}
-	
-	public static int getPropertyInt(ConfigurationFiles File, String key, String EquipletName)
-	{
+	public static void initialize() {
+		String propertiesFilePath = new String();
 		try {
-			return Integer.parseInt(getProperty(File, key, EquipletName));
-		} catch(NumberFormatException e){
-			System.err.println("Cant parse integer in configurationfile: " + File.getFileName());
-			return -1;
+			if(System.getenv("PROPERTIESPATH") != null && System.getenv("PROPERTIESPATH").isEmpty() == false) {
+				propertiesFilePath = System.getenv("PROPERTIESPATH"); 
+			} else {
+				propertiesFilePath = defaultPropertiesFilePath;
+			}
+			FileInputStream fis = new FileInputStream(propertiesFilePath);
+			JSONTokener tokener = new JSONTokener(fis);
+			configuration = new JSONObject(tokener);
+		} catch (IOException | JSONException ex) {
+			System.err.println("Unable to load configuration file, using path " + propertiesFilePath);
+			ex.printStackTrace();
 		}
 	}
 	
+	public static Object getProperty(String path) {
+		return getProperty(path, null);
+	}
+	public static Object getProperty(String path, String equipletName) {
+		if(configuration == null) initialize();
+		JSONObject currentObject = configuration;
+		
+		String[] pathSegments = path.split("/");
+		try {
+			for (String pathSegment : pathSegments) {
+				currentObject = currentObject.getJSONObject(pathSegment);
+			}
+			
+			if(equipletName != null && currentObject.has(equipletName)) {
+				return currentObject.get(equipletName);
+			} else {
+				return currentObject.get(defaultPropertyName);
+			}
+		} catch (JSONException ex) {
+			System.err.println("Unable to retrieve property in configuration, using path " + path);
+			ex.printStackTrace();
+			return null;
+		}
+	}	
 }

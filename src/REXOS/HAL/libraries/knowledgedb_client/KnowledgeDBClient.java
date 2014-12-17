@@ -35,7 +35,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import util.configuration.Configuration;
-import util.configuration.ConfigurationFiles;
 
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.JDBC4PreparedStatement;
@@ -60,12 +59,12 @@ public class KnowledgeDBClient {
     public KnowledgeDBClient() throws KnowledgeException {
         try {
 
-            String url = "jdbc:mysql://" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "host") +
-            		":" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "port")
-                    + "/" + Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "db");
+            String url = "jdbc:mysql://" + (String) Configuration.getProperty("knowledgeDatabase/ip") +
+            		":" + (int) Configuration.getProperty("knowledgeDatabase/port")
+                    + "/" + (String) Configuration.getProperty("knowledgeDatabase/database");
             connection = (Connection) DriverManager.getConnection(url,
-            		Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "username"), 
-            		Configuration.getProperty(ConfigurationFiles.KNOWLEDGE_DB_PROPERTIES, "password"));
+            		(String) Configuration.getProperty("knowledgeDatabase/username"), 
+            		(String) Configuration.getProperty("knowledgeDatabase/password"));
         } catch (SQLException ex) {
             throw new KnowledgeException("Failed to connect to the knowledge server.", ex);
         }

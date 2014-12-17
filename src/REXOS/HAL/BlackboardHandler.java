@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import util.configuration.Configuration;
-import util.configuration.ConfigurationFiles;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -68,35 +67,35 @@ public class BlackboardHandler implements BlackboardSubscriber {
 			stateSubscription = new FieldUpdateSubscription("state", this);
 			stateSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			stateBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
-			stateBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
-			stateBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
+			stateBlackboardBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletState/ip/", equipletName));
+			stateBlackboardBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletState/databaseName/", equipletName));
+			stateBlackboardBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", equipletName));
 			stateBlackboardBBClient.subscribe(stateSubscription);
 			
 			
 			modeSubscription = new FieldUpdateSubscription("mode", this);
 			modeSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			modeBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
-			modeBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
-			modeBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
+			modeBlackboardBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletState/ip/", equipletName));
+			modeBlackboardBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletState/databaseName/", equipletName));
+			modeBlackboardBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", equipletName));
 			modeBlackboardBBClient.subscribe(modeSubscription);
 			
 			
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 		   
-			equipletStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", equipletName));
-			equipletStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", equipletName));
-			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletName));
+			equipletStepBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/hardwareSteps/ip/", equipletName));
+			equipletStepBBClient.setDatabase((String) Configuration.getProperty("rosInterface/hardwareSteps/databaseName/", equipletName));
+			equipletStepBBClient.setCollection((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName));
 			equipletStepBBClient.subscribe(statusSubscription);
 
 			reloadSubscription = new FieldUpdateSubscription("reload", this);
 			reloadSubscription.addOperation(MongoUpdateLogOperation.SET);
 
-			ReloadEquipletBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
-			ReloadEquipletBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
-			ReloadEquipletBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
+			ReloadEquipletBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletCommands/ip/", equipletName));
+			ReloadEquipletBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletCommands/databaseName/", equipletName));
+			ReloadEquipletBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
 			ReloadEquipletBBClient.subscribe(reloadSubscription);
 
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
