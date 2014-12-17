@@ -8,7 +8,7 @@ public class Settings {
 	 * whether the simulation need to verificate the simulation while running
 	 * this has major consequence on the running time of the simulation 
 	 */
-	public static final boolean VERIFICATION = false;
+	public static boolean VERIFICATION = true;
 	
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
@@ -23,7 +23,7 @@ public class Settings {
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
 	 */
-	public static final double RECONFIGATION_TIME = 300;
+	public static double RECONFIGATION_TIME = 0;
 
 	/**
 	 * time needs to elapse before checking if equiplets need to be reconfigured

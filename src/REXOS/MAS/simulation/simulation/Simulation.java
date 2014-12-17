@@ -33,11 +33,11 @@ import MAS.simulation.graphics.IControl;
 import MAS.simulation.graphics.SimInterface;
 import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
-import MAS.util.Pair;
-import MAS.util.Position;
 import MAS.simulation.util.Lock;
 import MAS.simulation.util.Settings;
 import MAS.util.MASConfiguration;
+import MAS.util.Pair;
+import MAS.util.Position;
 import MAS.util.Tick;
 import MAS.util.Triple;
 import MAS.util.Tuple;
@@ -328,7 +328,6 @@ public class Simulation implements ISimulation, IControl {
 	/**
 	 * The function could be used to programmatically verify the simulation
 	 */
-	@SuppressWarnings("unused")
 	private void verification() {
 
 		int busy = 0;

@@ -100,7 +100,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	 */
 	@Override
 	public void reconfigureStart() {
-		System.out.printf("EA:%s reconfigure with capabilities %s to new capabilties %s \n", getLocalName(), this.capabilities, capabilities);
+		System.out.printf("EA:%s reconfigure with capabilities %s \n", getLocalName(), capabilities);
 		reconfiguring = true;
 		deregister();
 

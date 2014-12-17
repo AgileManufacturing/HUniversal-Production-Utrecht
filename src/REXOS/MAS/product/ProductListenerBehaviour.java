@@ -46,6 +46,12 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 		block();
 	}
 
+	/**
+	 * handle the incoming information that an equiplet starts with processing the product steps
+	 * the information consist of the time the equiplet has started with the product step and the index of the product step for checking the correctness of the information
+	 * 
+	 * @param message
+	 */
 	private void handleProductStepProcessing(ACLMessage message) {
 		try {
 			Pair<Tick, Integer> information = Parser.parseProductProcessing(message.getContent());
@@ -68,6 +74,12 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 		}
 	}
 
+	/**
+	 * handle the incoming information that an equiplet has finished with a product steps
+	 * the information consist of the time the equiplet finished and the index of the product step
+	 * 
+	 * @param message
+	 */
 	private void handleProductStepFinished(ACLMessage message) {
 		try {
 
@@ -92,6 +104,12 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 		}
 	}
 
+	/**
+	 * handle the information that a scheduled product step will not start on the agreed time, but will be delayed.
+	 * this is not implemented, as there is chosen to let the product agent find out when it is not yet started on the agreed time and take the necessary actions
+	 * 
+	 * @param message
+	 */
 	private void handleProductStepDelayed(ACLMessage message) {
 		try {
 			Pair<Tick, Integer> information = Parser.parseProductDelayed(message.getContent());

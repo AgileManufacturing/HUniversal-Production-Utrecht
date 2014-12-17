@@ -435,6 +435,12 @@ public class EquipletAgent extends Agent {
 		return 1 - sum.div(window).doubleValue();
 	}
 
+	/**
+	 * remove unnecessary history to reduce memory usuage
+	 * 
+	 * @param time
+	 * @param window
+	 */
 	private void removeUnnecessaryHistory(Tick time, Tick window) {
 		Iterator<Job> iterator = history.iterator();
 		while (iterator.hasNext()) {

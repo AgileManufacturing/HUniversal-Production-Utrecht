@@ -98,7 +98,6 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
 	}
 
-	int retry = 0;
 	@Override
 	protected void schedulingFinished(Tick time, boolean succeeded) {
 		System.out.printf("PA:%s scheduling finished %b. \n", getLocalName(), succeeded);
@@ -107,12 +106,12 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			reschedule = false;
 			simulation.notifyProductRescheduled(getLocalName(), getCurrentStep().getEquipletName(), succeeded);
 		} else if (reschedule) {
-//			throw new IllegalArgumentException("FUCK");
-			// retry++;
-			// reschedule with new deadline
-			Tick deadline = getDeadline().add(getDeadline().minus(getCreated()).multiply(++retry));
-			System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
-			reschedule(time, deadline);
+			// Tick deadline = getDeadline().add(getDeadline().minus(getCreated()).multiply(++retry));
+			// System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
+			// reschedule(time, deadline);
+			System.out.println("product" + this);
+			throw new IllegalArgumentException("PA:" + getLocalName() + " failed to reschedule deadline=" + getDeadline().add(getDeadline().minus(getCreated())));
+			
 		} else if (succeeded) {
 			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
 		} else {

@@ -125,32 +125,9 @@ public class ProductAgent extends Agent {
 		for (ProductionStep step : productionPath) {
 			steps.add(step.getProductStep());
 		}
-//		System.out.printf("PA:%s start schedule behaviour at %s.\n", getLocalName(), time);
-//		scheduleBehaviour.reschedule(steps, time, deadline);
-//		
-//		System.out.println("schedule "  +scheduleBehaviour.getExecutionState());
-//		System.out.println("schedule "  +listenerBehaviour.getExecutionState());
-//		
-//		scheduleBehaviour.restart();
-//		System.out.println("schedule "  +scheduleBehaviour.getExecutionState());
-//		
-		scheduleBehaviour = new ScheduleBehaviour(this, steps);
-		scheduleBehaviour.reschedule(steps, time, deadline);
-		addBehaviour(scheduleBehaviour);
-//		
-//		// wake up behaviours ... the bad way I think
-//		ACLMessage msg = new ACLMessage(ACLMessage.UNKNOWN);
-//		msg.addReceiver(getAID());
-//		// send(msg);
-//		System.out.println("schedule "  +scheduleBehaviour.getExecutionState());
 		
-//		final ScheduleBehaviour scheduleBehaviour = new ScheduleBehaviour(this, steps, time, deadline);
-
-//		addBehaviour(scheduleBehaviour);
-		//TODO !!!!!!
-
-		// fock this shit, this is not how it should work
-//		scheduleBehaviour.action();
+		Tick newDeadline = time.add(deadline.minus(getCreated()));
+		addBehaviour(new ScheduleBehaviour(this, steps, time, newDeadline));
 	}
 
 	/**
