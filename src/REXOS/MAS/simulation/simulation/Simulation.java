@@ -826,7 +826,16 @@ public class Simulation implements ISimulation, IControl {
 		simulation.killAgent(Settings.TRAFFIC_AGENT);
 
 		// TODO check if needed to wait until messages are received and all is taken down / killed
-		simulation.delay(1000);
+		simulation.delay(2000);
+		System.gc();
+
+		// something is needed, there is a (although little) that some agent are not correctly started and therefore the simulation fails to run correctly without the possibility
+		// to check it. 
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		if (run == runs) {
 			finished = true;

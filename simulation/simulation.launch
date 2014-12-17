@@ -4,6 +4,8 @@
 <setAttribute key="name.schedenig.eclipse.grepconsole.EnabledIds"/>
 <setAttribute key="name.schedenig.eclipse.grepconsole.FilterDisabledIds"/>
 <setAttribute key="name.schedenig.eclipse.grepconsole.FilterEnabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.NotificationsDisabledIds"/>
+<setAttribute key="name.schedenig.eclipse.grepconsole.NotificationsEnabledIds"/>
 <setAttribute key="name.schedenig.eclipse.grepconsole.StatisticsDisabledIds"/>
 <setAttribute key="name.schedenig.eclipse.grepconsole.StatisticsEnabledIds"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
@@ -19,5 +21,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;Simulation:MAS.simulation.simulation.SimulationAgent;&quot; -local-port 1112"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms1024m&#13;&#10;-Xmx4096m&#13;&#10;-Djava.library.path=&quot;C:\Program Files\R\R-3.0.2\library\rJava\jri;C:\Program Files\R\R-3.0.2\library\rJava\jri\x64&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms1024m&#13;&#10;-Xmx7096m&#13;&#10;-Djava.library.path=&quot;C:\Program Files\R\R-3.0.2\library\rJava\jri;C:\Program Files\R\R-3.0.2\library\rJava\jri\x64&quot;"/>
 </launchConfiguration>

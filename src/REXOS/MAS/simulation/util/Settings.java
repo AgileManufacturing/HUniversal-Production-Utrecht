@@ -10,12 +10,12 @@ public class Settings {
 	 * 3: the gui is used in combination with the debug information in the console
 	 * 4: all above with addition of scheduling information
 	 */
-	public static int VERBOSITY = 3;
+	public static int VERBOSITY = 0;
 
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = true;
+	public final static boolean STOCHASTICS = false;
 
 	/**
 	 * whether equiplets can breakdown
@@ -40,7 +40,7 @@ public class Settings {
 	/**
 	 * the maximun number of jobs in an equiplet queue, when there is no scheduling
 	 */
-	public static final int QUEUE_CAPACITY = 40;
+	public static final int QUEUE_CAPACITY = 20;
 
 	/**
 	 * Scheduling algorithm used by product agent to schedule his product step
@@ -50,7 +50,7 @@ public class Settings {
 	/**
 	 * Reshedule when start time of product step is not met
 	 */
-	public static boolean RESCHEDULE = true;
+	public static boolean RESCHEDULE = false;
 	/**
 	 * Warm-up period after which in multiple simulation runs the products statistics are being averaged
 	 */

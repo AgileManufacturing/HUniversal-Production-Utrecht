@@ -425,10 +425,26 @@ public class EquipletAgent extends Agent {
 			}
 		}
 
+		if (!Settings.KEEP_FULL_EQUIPLET_HISORY) {
+			removeUnnecessaryHistory(time, window);
+		}
+
 		// double precision error, dirty fix, can use BigDecimal although performance
 		sum = new Tick(Math.round(sum.doubleValue() * 100000000) / 100000000);
 
 		return 1 - sum.div(window).doubleValue();
+	}
+
+	private void removeUnnecessaryHistory(Tick time, Tick window) {
+		Iterator<Job> iterator = history.iterator();
+		while (iterator.hasNext()) {
+			Job job = iterator.next();
+			if (job.getDue().lessThan(time.minus(window))) {
+				iterator.remove();
+			} else {
+				break;
+			}
+		}
 	}
 
 	/**
@@ -787,7 +803,7 @@ public class EquipletAgent extends Agent {
 		send(message);
 
 		System.out.printf("EA:%s send message to inform product step processing: %s\n", getLocalName(), message.getContent());
-		
+
 		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 		ACLMessage reply = blockingReceive(template, Settings.COMMUNICATION_TIMEOUT);
 
