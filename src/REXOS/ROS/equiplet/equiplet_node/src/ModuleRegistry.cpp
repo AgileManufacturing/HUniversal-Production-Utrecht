@@ -37,14 +37,14 @@ void ModuleRegistry::reloadModules(){
 	// Checks if a new modules is actually in the knowledge database. 
 	// If then register the new found modules.
 	// 
-	REXOS_INFO("ModuleRegistry: Module registering");
+	
 	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
 	std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
 	for(auto it = identifiers.begin(); it < identifiers.end(); it++) {
 
 		if(this->getModule(*it) == NULL){
 			// ADD new module if not already added.
-			REXOS_INFO("Registering new module.");
+			REXOS_INFO("Registering a new module.");
 			rexos_module::ModuleProxy* proxy = new rexos_module::ModuleProxy(equipletName, *it, this);
 			registeredModules.push_back(proxy);
 			proxy->changeState(rexos_statemachine::State::STATE_SAFE);
@@ -61,6 +61,7 @@ void ModuleRegistry::reloadModules(){
 		rexos_module::ModuleProxy* proxy = *track;
 		std::string x = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier().getManufacturer().c_str(), proxy->getModuleIdentifier().getTypeNumber().c_str(), proxy->getModuleIdentifier().getSerialNumber().c_str());
 	    if(x == "0"){
+	    	REXOS_INFO("Removing a old module.");
 			proxy->changeState(rexos_statemachine::State::STATE_OFFLINE);
 			delete proxy;
 	        track = registeredModules.erase(track);
@@ -69,6 +70,7 @@ void ModuleRegistry::reloadModules(){
 	        ++track;
 	    }
 	}
+	REXOS_INFO("reloadModules() Succesfull.");
 }
 
 ModuleRegistry::~ModuleRegistry() {

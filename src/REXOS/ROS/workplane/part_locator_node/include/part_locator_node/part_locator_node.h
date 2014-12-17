@@ -2,8 +2,9 @@
  * @file part_locator_node.cpp
  * @brief locates objects and rotates points.
  * @date Created: 2013-09-20
- *
- * @author Garik hakopian
+ * 
+ * @author Tommas Bakker
+ * @author Peter Markotic
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -40,6 +41,7 @@
 #include <matrices/Matrices.h>
 #include <vectors/Vectors.h>
 #include <rexos_module/Module.h>
+#include <rexos_module/ModuleInterface.h>
 #include <vision_node/QrCodes.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include <rexos_logger/rexos_logger.h>
@@ -56,12 +58,13 @@ namespace part_locator_node {
 		static const Vector2 EXPECTED_ITEM_DIRECTION;
 		static const int minCornerSamples;
 		static const int minItemSamples;
+		static const int workSpaceHeight;
 		std::string topLeftValue;
 		std::string topRightValue;
 		std::string bottomRightValue;
 		double workPlaneWidth;
 		double workPlaneHeight;
-		
+			
 		double actualWorkPlaneWidth;
 		double actualWorkPlaneHeight;
 		double topLeftOffsetX, topLeftOffsetY;
@@ -162,20 +165,46 @@ namespace part_locator_node {
 		void updateMatrices();
 		
 		/**
+		 * Makes the mover move to the demanded point.
+		 * @param the vector to move to
+		 * @param the harewarestepId of the hardwarestep
+		 * @param the interface for the mover
+		 **/
+		void MoveToPoint(Vector3 v, std::string hardwarestepId, rexos_module::ModuleInterface& moverInterface);
+		
+		/**
+		 * Manually calibrates the workplane.
+		 * @return true of false whether the callibration has succeeded or not
+		 **/
+		bool mannuallyCalibrate(rexos_datatypes::ModuleIdentifier moverIdentifier);
+		
+		/**
 		 * Calculates a new translation matrix which will match the origin of the workplane as seen on screen to the desired origin (at 0, 0).
 		 * @return The translation matrix
 		 **/
-		Matrix3 calculateOffsetMatrix();
+		Matrix3 calculateWorkPlaneOffsetMatrix();
 		/**
 		 * Calculates a new rotation matrix which will match the rotation of the workplane as seen on screen to the desired rotation.
 		 * @return The rotation matrix
 		 **/
-		Matrix3 calculateRotationMatrix();
+		Matrix3 calculateWorkPlaneRotationMatrix();
 		/**
 		 * Calculates a new translation matrix which will scale the workplane as seen on screen to the desired size.
 		 * @return The scale matrix
 		 **/
-		Matrix3 calculateScaleMatrix();
+		Matrix3 calculateWorkPlaneScaleMatrix();
+		/**
+		 * Calculates a new
+		 * @return The shear matrix
+		 **/
+		
+		Matrix3 calculateOffsetMatrix();
+		
+		Matrix3 calculateRotationMatrix(double rotationAngle);
+		
+		Matrix3 calculateShearMatrix(double shearFactor);
+		
+		Matrix3 calculateScaleMatrix(double scaleX, double scaleY);
 		
 		QrCode calculateSmoothPos(std::string name, QrCode lastPosition);
 		QrCode calculateSmoothPos(boost::circular_buffer<QrCode> buffer);

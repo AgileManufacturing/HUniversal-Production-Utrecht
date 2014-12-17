@@ -12,9 +12,9 @@ namespace rexos_knowledge_database{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}
 	
-	int Equiplet::getMointPointsX() {
+	int Equiplet::getMountPointsX() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPointsX \
+		SELECT mountPointsX \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -25,16 +25,16 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointsX = result->getInt("mointPointsX");
+		int mountPointsX = result->getInt("mountPointsX");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointsX;
+		return mountPointsX;
 	}
 
-	int Equiplet::getMointPointsY() {
+	int Equiplet::getMountPointsY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPointsY \
+		SELECT mountPointsY \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -45,16 +45,16 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointsY = result->getInt("mointPointsY");
+		int mountPointsY = result->getInt("mountPointsY");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointsY;
+		return mountPointsY;
 	}
 	
-	double Equiplet::getMointPointDistanceX() {
+	double Equiplet::getMountPointDistanceX() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPointsDistanceX \
+		SELECT mountPointsDistanceX \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -65,16 +65,16 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointDistanceX = result->getDouble("mointPointDistanceX");
+		int mountPointDistanceX = result->getDouble("mountPointDistanceX");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointDistanceX;
+		return mountPointDistanceX;
 	}
 
-	double Equiplet::getMointPointDistanceY() {
+	double Equiplet::getMountPointDistanceY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPoinstDistanceY \
+		SELECT mountPoinstDistanceY \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -85,11 +85,11 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointDistanceY = result->getDouble("mointPointDistanceY");
+		int mountPointDistanceY = result->getDouble("mountPointDistanceY");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointDistanceY;
+		return mountPointDistanceY;
 	}
 
 	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {

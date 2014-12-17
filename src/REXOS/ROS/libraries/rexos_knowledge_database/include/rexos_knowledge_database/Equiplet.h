@@ -42,10 +42,10 @@ namespace rexos_knowledge_database {
 	public:
 		Equiplet(std::string name);
 		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
+		int getMountPointsX();
+		int getMountPointsY();
+		double getMountPointDistanceX();
+		double getMountPointDistanceY();
 		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
 		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
 		std::string checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber);
