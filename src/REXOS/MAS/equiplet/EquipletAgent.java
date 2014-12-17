@@ -132,7 +132,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		this.capabilities = capabilities;
 
 		this.state = EquipletState.IDLE;
-		this.reconfigure = false;
+		this.reconfiguring = false;
 		this.executing = null;
 		this.schedule = new TreeSet<>();
 		this.history = new TreeSet<>();
@@ -505,40 +505,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				break;
 			}
 		}
-	}
-
-	/**
-	 * Register the equiplet services by the Directory Facilitator Agent
-	 */
-	private void register() {
-		DFAgentDescription dfAgentDescription = new DFAgentDescription();
-		dfAgentDescription.setName(getAID());
-		for (Capability capability : capabilities) {
-			ServiceDescription serviceDescription = new ServiceDescription();
-			serviceDescription.setName(capability.getService());
-			serviceDescription.setType(Ontology.SERVICE_SEARCH_TYPE);
-			serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
-			serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-			dfAgentDescription.addServices(serviceDescription);
-		}
-		try {
-			DFService.register(this, dfAgentDescription);
-		} catch (FIPAException fe) {
-			System.err.printf("EA:%s Failed to register services\n", getLocalName());
-			fe.printStackTrace();
-		}
-	}
-
-	/**
-	 * Euiplet agent clean-up operations
-	 */
-	@Override
-	protected void takeDown() {
-		System.out.printf("EA:%s terminating\n", getLocalName());
-	}
-
-	/**
-		}
 
 		// double precision error, dirty fix, can use BigDecimal although performance
 
@@ -548,6 +514,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 		return 1 - sum / window.doubleValue();
 	}
+
 
 	/**
 	 * Schedule a job
@@ -754,6 +721,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		// otherwise, if the first job is too late the arrived job is second, this results in that the already too late (first) job is
 		// if there are jobs between the first job and arrived job, swapping of jobs can take place if all deadlines are met.
 		Job ready = null;
+		Job arrived = null;
 		
 		int index = 0;
 		for (Job job : schedule) {
@@ -787,7 +755,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		}
 
 		// start with the job that arrived exactly on time
-		Job ready = arrived.getStartTime().equals(time) && MasConfiguration.RESCHEDULE ? arrived : jobReady();
+		ready = arrived.getStartTime().equals(time) && MasConfiguration.RESCHEDULE ? arrived : jobReady();
 
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
@@ -842,12 +810,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			message.setContent(Parser.parseProductProcessing(time, intdex));
 			send(message);
 			
-		System.out.printf("EA:%s send message to inform product step processing: %s\n", getLocalName(), message.getContent());
-		
-		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
-		ACLMessage reply = blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
+			System.out.printf("EA:%s send message to inform product step processing: %s\n", getLocalName(), message.getContent());		
+			MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
+			ACLMessage reply = blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
 
-		try {
 			if (reply == null || !Parser.parseConfirmation(reply.getContent())) {
 				System.err.printf("EA:%s failed to receive confirmation after inform product processing.\n", getLocalName());
 			}else if (reply != null){
@@ -855,8 +821,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			}
 		} catch (JSONException e) {
 			System.err.printf("EA:%s failed to construct confirmation message to product %s for informing product started to be processed.\n", getLocalName(), executing.getProductAgentName());
-			System.err.printf("EA:%s %s\n", getLocalName(), e.getMessage());
-			System.err.printf("EA:%s reply received: %s\n", getLocalName(), reply);
+			System.err.printf("EA:%s %s\n", this.getLocalName(), e.getMessage());
 			throw new IllegalArgumentException("FUCK");
 		}
 		
@@ -889,6 +854,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		}
 
 		send(message);
+		
 		MessageTemplate template = MessageTemplate.and(MessageTemplate.MatchConversationId(message.getConversationId()), MessageTemplate.MatchInReplyTo(message.getReplyWith()));
 		ACLMessage reply = blockingReceive(template, MasConfiguration.COMMUNICATION_TIMEOUT);
 
@@ -906,22 +872,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			System.err.printf("EA:%s reply received: %s\n", getLocalName(), reply);
 			throw new IllegalArgumentException("FUCK");
 		}
-		
-		AID productagent = new AID();
-		productagent.setLocalName(executing.getProductAgentName());
-		//TODO Hardcoded adress
-		productagent.addAddresses("10.0.1.231:1099");
-		
-		ACLMessage outgoingmessage = new ACLMessage(ACLMessage.INFORM);
-		outgoingmessage.addReceiver(productagent);
-		outgoingmessage.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
-		outgoingmessage.setSender(this.getAID());
-		outgoingmessage.setContent(something.toString());
-		this.send(outgoingmessage); 
-		System.out.println(this.getLocalName() + " sending executing finished message to " + executing.getProductAgent());
-		//TODO Return to IDLE state
-		this.state = EquipletState.IDLE;
 	}
+	
+
 
 	@Override
 	public void onExecutionFailed() {
@@ -983,6 +936,42 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	
 	public EquipletState getEquipletStatus(){
 		return state;
+	}
+
+	@Override
+	public void onProcessStatusChanged(HardwareStepStatus status,
+			Module module, HardwareStep hardwareStep) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onExecutionFinished() {
+		JSONObject something = new JSONObject();
+		
+		try {
+			something.put("index", executing.getIndex());
+			//TODO what is the value in the next line
+			something.put("time", 3);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		AID productagent = new AID();
+		productagent.setLocalName(executing.getProductAgentName());
+		//TODO Hardcoded adress
+		productagent.addAddresses("10.0.1.231:1099");
+		
+		ACLMessage outgoingmessage = new ACLMessage(ACLMessage.INFORM);
+		outgoingmessage.addReceiver(productagent);
+		outgoingmessage.setConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED);
+		outgoingmessage.setSender(this.getAID());
+		outgoingmessage.setContent(something.toString());
+		this.send(outgoingmessage); 
+		System.out.println(this.getLocalName() + " sending executing finished message to " + executing.getProductAgent());
+		//TODO Return to IDLE state
+		this.state = EquipletState.IDLE;		
 	}
 	
 }

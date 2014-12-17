@@ -39,6 +39,4 @@ public interface IControl {
 
 	Map<String, Map<Tick, Float>> getEquipletLoadHistories();
 
-	Map<? extends Number, ? extends Number> getThroughput();
-
 }

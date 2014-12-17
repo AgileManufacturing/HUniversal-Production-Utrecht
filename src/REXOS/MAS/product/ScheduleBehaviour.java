@@ -32,6 +32,7 @@ import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.SchedulingAlgorithm;
 import MAS.util.MasConfiguration;
+import MAS.util.Settings;
 import MAS.util.Tick;
 import MAS.util.Triple;
 
@@ -92,16 +93,7 @@ public class ScheduleBehaviour extends OneShotBehaviour {
 
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
 
-				product.schedulingFinished(time, true, productionPath);
-			} else {
-				LinkedList<Node> nodes;
-				if (Settings.SCHEDULING == SchedulingAlgorithm.EDD) {
-					nodes = scheduling.calculateEDDPath();
-				} else if (Settings.SCHEDULING == SchedulingAlgorithm.LOAD) {
-					nodes = scheduling.calculateLoadPath();
-				} else {
-					nodes = scheduling.calculateSuprimePath();
-				}
+				product.schedulingFinished(true, productionPath);
 			} else {
 				LinkedList<Node> nodes;
 				if (MasConfiguration.SCHEDULING == SchedulingAlgorithm.EDD) {
@@ -116,7 +108,7 @@ public class ScheduleBehaviour extends OneShotBehaviour {
 
 				LinkedList<ProductionStep> productionPath = schedule(nodes, productSteps, equipletInfo, deadline);
 				System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduled equiplets.\n", myAgent.getLocalName());
-				product.schedulingFinished(time, true, productionPath);
+				product.schedulingFinished(true, productionPath);
 			}
 
 			System.out.printf(System.currentTimeMillis() + "\tPA:%s scheduling done.\n", myAgent.getLocalName());
@@ -124,9 +116,11 @@ public class ScheduleBehaviour extends OneShotBehaviour {
 			// finished = true;
 		} catch (SchedulingException e) {
 			System.out.printf("PA:%s scheduling failed: %s\n", myAgent.getLocalName(), e.getMessage());
-			product.schedulingFinished(time, false);
+			product.schedulingFinished(new Tick(), false);
 		}
 	}
+
+	
 
 	//
 	// @Override

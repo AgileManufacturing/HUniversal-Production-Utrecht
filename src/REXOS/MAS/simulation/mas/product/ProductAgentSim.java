@@ -83,14 +83,15 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " finished: " + history);
 			doDelete();
 		} else if (getProductState() == ProductState.TRAVELING) {
-			// notify the simulation that the product is traveling			
+			// notify the simulation that the product is traveling	
+			simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
 		}
 	}
 	
 	@Override
 	protected void travelToNextEquiplet() {
 		//Do Nothing
-		simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
+		
 	}
 
 	@Override
@@ -128,6 +129,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 
 	@Override
 	public void onProductStarted(Tick time, int index) {
+		
 		if (getCurrentStep().getIndex() == index && (state == ProductState.ERROR || state == ProductState.SCHEDULING || state == ProductState.TRAVELING)) {
 			// throw new IllegalArgumentException("on product started event given in wrong state " + getProductState() + "");
 		} else {

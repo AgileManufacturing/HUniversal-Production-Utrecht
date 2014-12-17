@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import MAS.equiplet.Capability;
 import MAS.product.ProductStep;
+import MAS.simulation.util.Settings;
 import MAS.util.Pair;
 import MAS.util.Position;
 import MAS.util.MasConfiguration;

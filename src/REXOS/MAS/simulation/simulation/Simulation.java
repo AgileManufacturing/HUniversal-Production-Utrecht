@@ -35,8 +35,8 @@ import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
 import MAS.util.Pair;
 import MAS.util.Position;
-import MAS.simulation.util.Lock;
 import MAS.simulation.util.Settings;
+import MAS.util.Lock;
 import MAS.util.MasConfiguration;
 import MAS.util.Tick;
 import MAS.util.Triple;
@@ -331,8 +331,7 @@ public class Simulation implements ISimulation, IControl {
 
 		int busy = 0;
 		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
-					|| (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
+			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY || (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
 				busy++;
 			}
 		}

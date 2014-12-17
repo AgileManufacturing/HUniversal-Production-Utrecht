@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.json.JSONObject;
 
 import MAS.util.Tick;
 
@@ -120,8 +121,9 @@ public class Job implements Comparable<Job> {
 		return service;
 	}
 
-	public Map<String, Object> getCriteria() {
-		return criteria;
+	public JSONObject getCriteria() {
+		JSONObject json = new JSONObject(criteria);
+		return json;
 	}
 
 	public Tick getStartTime() {

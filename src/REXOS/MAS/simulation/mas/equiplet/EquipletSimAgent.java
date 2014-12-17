@@ -312,12 +312,10 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		Tick latency = time.minus(job.getStartTime());
 		state = EquipletState.BUSY;
 		executing = job;
-
-		Tick latency = time.minus(executing.getStartTime());
 		scheduleLatency.put(time, latency);
-		executing.updateStartTime(time);
+		
+		executing.updateStartTime(time);		
 		System.out.printf("EA:%s starts at %s (%s from scheduled time) with executing job: %s\n", getLocalName(), time, latency, executing);
-
 		informProductProcessing(executing.getProductAgent(), time, executing.getIndex());
 		execute(executing);
 	}

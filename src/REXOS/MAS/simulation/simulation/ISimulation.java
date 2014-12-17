@@ -8,8 +8,6 @@ public interface ISimulation {
 
 	void notifyProductCreated(String productName, String equipletName);
 
-	void notifyProductCreationFailed(String productName);
-
 	void notifyProductOverdue(String productName);
 
 	void notifyProductTraveling(String productName, String equipletName);

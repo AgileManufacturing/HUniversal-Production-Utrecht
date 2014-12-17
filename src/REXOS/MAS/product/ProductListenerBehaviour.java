@@ -29,7 +29,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 				MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING),
 						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED)),
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED));
-		ACLMessage msg = myAgent.blockingReceive(template);
+		ACLMessage msg = myAgent.receive(template);
 		if (msg != null) {
 			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
@@ -46,6 +46,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 				break;
 			}
 		}
+		block();
 	}
 
 	private void handleProductStepProcessing(ACLMessage message) {
@@ -53,7 +54,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 			Pair<Tick, Integer> information = Parser.parseProductProcessing(message.getContent());
 			boolean confirmation = product.getCurrentStep().getIndex() == information.second;
 			if (confirmation) {
-				product.onProductProcessing(information.first);
+				product.onProductProcessing(new Tick());
 			} else {
 				System.err.printf("PA:%s received wrong product step index that is processing\n", myAgent.getLocalName());
 				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index " + information.second + " from " + message.getSender().getLocalName()
@@ -82,8 +83,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 				product.onProductStepFinished(information.first);
 			} else {
 				System.err.printf("PA:%s received wrong product step index that is finished\n", myAgent.getLocalName());
-				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index that is processing "
-						+ product.getCurrentStep().getIndex() + "== " + information.second + "\n");
+				throw new RuntimeException("PA:" + myAgent.getLocalName() + " received wrong product step index that is processing " + product.getCurrentStep().getIndex() + "== " + information.second + "\n");
 			}
 
 			
