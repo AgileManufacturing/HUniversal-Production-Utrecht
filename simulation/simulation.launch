@@ -19,7 +19,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;Simulation:MAS.simulation.simulation.SimulationAgent;&quot; -local-port 1112"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;Simulation:MAS.simulation.simulation.SimulationAgent;&quot; -local-port 1111"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms1024m&#13;&#10;-Xmx7096m&#13;&#10;-Djava.library.path=&quot;C:\Program Files\R\R-3.0.2\library\rJava\jri;C:\Program Files\R\R-3.0.2\library\rJava\jri\x64&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms1024m&#13;&#10;-Xmx7096m"/>
 </launchConfiguration>
