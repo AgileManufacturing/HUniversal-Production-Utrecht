@@ -14,13 +14,17 @@ class SixAxisCalculations {
 		enum JointPositionInGroup {
 			left,
 			right
-		};
-	
+		};	
 	
 		struct EffectorMove {
 			StewartGoughLocation moveTo;
 			bool validMove;
 			double angles[6];
+		};
+		
+		struct ParameticEquation {
+			Vector3 vector1;
+			Vector3 vector2;
 		};
 
 		SixAxisCalculations(double upperArmLength, double lowerArmLength, 
@@ -85,7 +89,7 @@ class SixAxisCalculations {
 		Vector3 getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, double groupAngle);
 		Vector3 getMotorAxisPosition(JointPositionInGroup jointPosition);
 		double getMotorAngle(StewartGoughLocation effectorLocation, int motorIndex);
-		
+		bool checkJoints();
 		
 
         /*//Vector operations

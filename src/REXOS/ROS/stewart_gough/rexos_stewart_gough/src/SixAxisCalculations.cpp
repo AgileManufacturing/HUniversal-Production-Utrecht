@@ -600,6 +600,36 @@ bool SixAxisCalculations::checkPath(StewartGoughLocation from, StewartGoughLocat
 			}
 		}
         return true;
+}
 
+bool SixAxisCalculations::checkJoints(){
+	double screwheadRadius = 3.5;
+	double rodEndRadius = 3.5;
+	
+	Vector3 originCone(0, 0, 0); 
+	Vector3 midpointScrewhead(0, 0, 3);	
+	Vector3 midpointScrewEnd(-3, 0, 0);
+	
+	int amountOfPoints = 20;
+	
+	Vector3 points[amountOfPoints];
+	ParameticEquation equations[amountOfPoints];
+	
+	for(int i = 0; i < 360; i += (360/amountOfPoints)){
+		points[i/(360/amountOfPoints)].x = 3;
+		points[i/(360/amountOfPoints)].y = cos(i) * screwheadRadius;
+		points[i/(360/amountOfPoints)].z = sin(i) * screwheadRadius;
+		
+		equations[(360/amountOfPoints)].vector1 = points[i/(360/amountOfPoints)];
+		equations[(360/amountOfPoints)].vector2 = points[i/(360/amountOfPoints)] - midpointScrewEnd;
+		
+	
+	}
+	
+	//check for the position of the screw (let the screw rotate instead of the rod, this makes it easier for the math)
+	
+	//check wether the line is to far away from the midpoint of the rod
+	
+	return true;
 }
 }
