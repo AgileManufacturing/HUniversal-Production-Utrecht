@@ -7,396 +7,58 @@
 
 
 namespace rexos_stewart_gough {
-/*double SixAxisCalculations::calculateAB(Point3D enginePosition, Point3D jointPosition){
-	//double ac = sqrt(pow(enginePosition.x - jointPosition.x, 2) + pow(enginePosition.y - jointPosition.y, 2));
-
-
-
-	double ac = enginePosition.x - jointPosition.x; //TODO was x
-
-	//std::cout << "AC: " << ac << std::endl;
-
-	return sqrt(pow(lowerArmLength, 2) + pow(ac, 2));
+SixAxisCalculations::ArmJointAngles SixAxisCalculations::getArmJointAngles(Vector4 upperArmLowerArmJoint, Vector4 lowerArmEffectorJoint, Vector4 effectorJointAxis) {
+	// we know that the upper arm will remain straight
+	Vector4 upperArmJointAxis(1, 0, 0, 1);
+	
+	///////////////////////
+	// calulate the normal vector of the lower arm, pointing to the right-ish
+	///////////////////////
+	Vector4 lowerArmDirection = lowerArmEffectorJoint - upperArmLowerArmJoint;
+	REXOS_INFO_STREAM("lowerArmDirection: " << lowerArmDirection);
+	
+	Vector4 lowerArmNormal(-lowerArmDirection.z, 0, lowerArmDirection.x, 0);
+	lowerArmNormal.normalize();
+	REXOS_INFO_STREAM("lowerArmNormal: " << lowerArmNormal);
+	
+	///////////////////////
+	// calculate the "Z" rotation 
+	///////////////////////
+	double upperArmJointZAngle = std::atan2(upperArmJointAxis.y, upperArmJointAxis.x);
+	double effectorJointZAngle = std::atan2(effectorJointAxis.y, effectorJointAxis.x);
+	// assuming we can evenly destribued the Z rotation over the two joints
+	double angleZ = (effectorJointZAngle - upperArmJointZAngle) / 2;
+	REXOS_INFO_STREAM("angleZ: " << angleZ * 180 / 3.141592);
+	
+	double lowerArmYAngle = std::atan2(lowerArmNormal.z, lowerArmNormal.x);
+	REXOS_INFO_STREAM("lowerArmYAngle: " << lowerArmYAngle * 180 / 3.141592);
+	
+	///////////////////////
+	// calculate the "Y" rotation for the upperArmLowerArmJoint
+	///////////////////////
+	double upperArmJointAxisYAngle = std::atan2(upperArmJointAxis.z, upperArmJointAxis.x);
+	double upperArmJointYAngle = upperArmJointAxisYAngle - lowerArmYAngle;
+	
+	REXOS_INFO_STREAM("upperArmJointAxisYAngle: " << upperArmJointAxisYAngle * 180 / 3.141592);
+	REXOS_INFO_STREAM("upperArmJointYAngle: " << upperArmJointYAngle * 180 / 3.141592);
+	
+	///////////////////////
+	// calculate the "Y" rotation for the lowerArmLowerArmJoint
+	///////////////////////
+	double effectorJointAxisYAngle = std::atan2(effectorJointAxis.z, effectorJointAxis.x);
+	double effectorJointYAngle = effectorJointAxisYAngle - lowerArmYAngle;
+	
+	REXOS_INFO_STREAM("effectorJointAxisYAngle: " << effectorJointAxisYAngle * 180 / 3.141592);
+	REXOS_INFO_STREAM("effectorJointYAngle: " << effectorJointYAngle * 180 / 3.141592);
+	
+	ArmJointAngles output;
+	output.angleZ = angleZ;
+	output.effectorArmAngleY = effectorJointYAngle;
+	output.upperArmAngleY = upperArmJointYAngle;
+	
+	return output;
 }
-/*
-double SixAxisCalculations::getEffectorJointAngle(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double groupPositionOnCircle, double motorPositionOnCircle, double motorAngle){
-
-	//Step 1: determinate the two vectors and transalte them so their intersection lies on the origin
-	Point3D vectorEffector(	neighbourEffectorJointPosition.x - effectorJointPosition.x,
-							neighbourEffectorJointPosition.y - effectorJointPosition.y,
-							neighbourEffectorJointPosition.z - effectorJointPosition.z);
-
-	// The motors are positioned on the circle in a different angle than the effector joints.
-	// Get the right motor angles for the given effector joint angle.
-	double rad = DEGREES_TO_RADIANS(-groupPositionOnCircle);
-
-	//std::cout << "Angle: " << (-groupPositionOnCircle) << std::endl;
-
-
-
-
-
-
-
-	//Calculate the needed translation on the x axis
-	double xTrans = tan(DEGREES_TO_RADIANS((motorPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
-	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
-
-	double yTrans = cos(DEGREES_TO_RADIANS((motorPositionOnCircle -groupPositionOnCircle))) * motorAxisToCenterDistance;
-	//double xTrans = tan(motorPositionOnCircle -motorGroupPositionOnCircle) * motorAxisToCenterDistance;
-
-
-	//std::cout << "xTrans: " << xTrans << std::endl;
-	//std::cout << "yTrans: " << yTrans << std::endl;
-
-	double upperArmJointY = cos(motorAngle) * upperArmLength;
-	double upperArmJointZ = sin(motorAngle) * upperArmLength;
-	Point3D upperArmJointPosition(xTrans, upperArmJointY + yTrans, upperArmJointZ);
-
-
-	//std::cout << "upperArmJointPosition: " << upperArmJointPosition << std::endl;
-
-
-
-
-	//Identity
-	double matrixIdentity[] = MATRIX_IDENTITY_3X3;
-
-	//Rotation
-	double matrixRotation[3*3];
-	get3x3RotationMatrix(matrixRotation, rad);
-
-
-
-
-
-
-
-	//double matrixTransalation[3*3];
-	//get3x3TransalationMatrix(matrixTransalation, xTrans, -motorAxisToCenterDistance);
-
-
-	//Calculate the complete rotation and translation matrix, and create the point matrix
-	double matrixRotationAndIdentity[3*3];
-	getMultiplyMatrix(matrixRotationAndIdentity, matrixIdentity, 3, 3, matrixRotation, 3, 3);
-
-	//double calculationMatrix[3*3];
-	//getMultiplyMatrix(calculationMatrix, matrixTransalation, 3, 3, matrixRotationAndIdentity, 3, 3);
-
-	double rotatedPointMatrix[3*1];
-	get1x3PointMatrix(rotatedPointMatrix, upperArmJointPosition);
-
-
-
-	//Calculate the translated and rotated position of the 3d rotated point from step 1
-	double resultPoint[3*1];
-	getMultiplyMatrix(resultPoint, matrixRotationAndIdentity, 3, 3, rotatedPointMatrix, 3, 1);
-
-
-
-
-	Point3D rotatedUpperArmJointPosition(
-	resultPoint[GET_INDEX(0, 0, 1)] - effectorJointPosition.x,
-	resultPoint[GET_INDEX(1, 0, 1)] - effectorJointPosition.y,
-	upperArmJointPosition.z - effectorJointPosition.z);
-
-
-		//Point3D rotatedUpperArmJointPositionTemp(
-	//resultPoint[GET_INDEX(0, 0, 1)],
-	//resultPoint[GET_INDEX(1, 0, 1)],
-	//upperArmJointPosition.z);
-
-
-	//std::cout << "rotated UpperArmJoint pos: " << rotatedUpperArmJointPositionTemp << std::endl;
-
-	//std::cout << "neighbourEffectorJointPosition: " << neighbourEffectorJointPosition << std::endl;
-
-	//std::cout << "effectorJointPosition: " << effectorJointPosition << std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//double motorX = sin(rad) * motorAxisToCenterDistance;
-	//double motorY = cos(rad) * motorAxisToCenterDistance;
-
-	//Point3D vectorMotor(motorX - effectorJointPosition.x, motorY - effectorJointPosition.y, 0 - effectorJointPosition.z);
-
-	return getAngleBetween(rotatedUpperArmJointPosition, vectorEffector);
-}
-
-bool SixAxisCalculations::isValidPosition(Point3D effectorJointPosition, Point3D neighbourEffectorJointPosition, double motorAngle, double groupPositionOnCircle, double motorPositionOnCircle){
-	if(__isnan(motorAngle) == true){
-		return false;
-	}
-
-
-	double angle = abs(HALF_PI - getEffectorJointAngle(effectorJointPosition, neighbourEffectorJointPosition, groupPositionOnCircle, motorPositionOnCircle, motorAngle));
-	//std::cout << "Critical angle: " << RADIANS_TO_DEGREES(angle) << std::endl;
-	if(angle > maxJointAngle){
-		return false;
-	}
-	return true;
-}
-
-
-double SixAxisCalculations::getAngleForMotor(Point3D moveTo, double groupPositionOnCircle, double motorJointPositionOnCircle, double effectorJointPositionOnCircle, double rotationX, double rotationY, double rotationZ){
-	// The six-axis math in four steps
-	// 
-	// Step 1: Calculate the effector joint position for the given engine and based on the moveTo parameter which is the center of the effector.
-	// Step 2: 3d rotate the effector joint the given amount of degrees in the x, y and z plane around the center of the effector.
-	// Step 3: Translate the effector joint as if the engine would be at position 0, 0, 0.
-	// 		Step 3a: Rotate the joint (around the z axis) for the amount of degrees to motor would need to reach 0 degrees.
-	// 		Step 3b: Translate the joint the same amount the engine would need to reach x = 0.
-	// Step 4: Calculate the motor angle using inverse kinematics.
-
-
-
-	// Step 1: Effector joint position calculation
-
-	double xJoint, yJoint;
-
-	//Get the effector joint position based on the effector center and effector joint position on the circle
-	xJoint = sin(DEGREES_TO_RADIANS(effectorJointPositionOnCircle)) * effectorJointtoCenterDistance;
-	yJoint = cos(DEGREES_TO_RADIANS(effectorJointPositionOnCircle)) * effectorJointtoCenterDistance;
-
-
-
-	//xJoint = getXEffectorPositionForEngineRotation(degreesToRadians(effectorJointPositionOnCircle));
-	//yJoint = getYEffectorPositionForEngineRotation(degreesToRadians(effectorJointPositionOnCircle));
-
-
-	double xMotorPos, yMotorPos;
-
-	double radius = motorAxisToCenterDistance / cos(abs(groupPositionOnCircle - motorJointPositionOnCircle));
-
-	radius = motorAxisToCenterDistance;
-
-	xMotorPos = sin(DEGREES_TO_RADIANS(motorJointPositionOnCircle)) * radius;
-	yMotorPos = cos(DEGREES_TO_RADIANS(motorJointPositionOnCircle)) * radius;
-
-
-
-	//std::cout << "XJoint = (" << xJoint + moveTo.x << ", " << yJoint + moveTo.y << ", " << moveTo.z << ")" << std::endl;
-
-//std::cout << "motorX: " << xMotorPos << " motorY: " << yMotorPos << std::endl;
-
-
-	// Step 2: 3d rotation around the center of the effector in the x, y and z plane
-
-	//Rotation will be calculated as if the effector center is in the origin of the coordinate system (Relative)
-	Point3D moveToOrigin(xJoint, yJoint, 0);
-
-
-	/*
-
-	vector< vector<double> > matrixFull3DRotation = get4x4RotationMatrix(rotationX, rotationY, rotationZ);
-
-	vector< vector<double> > pointMatrix = get1x4PointMatrix(moveToOrigin);
-
-	vector< vector<double> > resultMatrix = multiplyMatrix(matrixFull3DRotation, 4, 4, pointMatrix, 4, 1);
-
-	*/
-
-	/*double matrixFull3DRotation[4*4];
-	get4x4RotationMatrix(matrixFull3DRotation, rotationX, rotationY, rotationZ);
-	double pointMatrix[4*1];
-	get1x4PointMatrix(pointMatrix, moveToOrigin);
-
-
-	double resultMatrix[4*1];
-	getMultiplyMatrix(resultMatrix, matrixFull3DRotation, 4, 4, pointMatrix, 4, 1);
-
-
-	//Construct the rotated point and transalate it to the real position in the coordinate system (Absolute)
-	Point3D rotatedPoint(resultMatrix[GET_INDEX(0, 0, 1)] + moveTo.x, resultMatrix[GET_INDEX(1, 0, 1)] + moveTo.y, resultMatrix[GET_INDEX(2, 0, 1)] + moveTo.z);
-
-	//std::cout << resultMatrix[GET_INDEX(0, 0, 1)] << std::endl;
-	//std::cout << resultMatrix[GET_INDEX(1, 0, 1)] << std::endl;
-	//std::cout << resultMatrix[GET_INDEX(2, 0, 1)] << std::endl;
-
-	//std::cout << "Rotated point: "<< rotatedPoint << std::endl;
-
-
-	//Ugly cache method, so 6 matrix 3d rotations can be skipped in the calculation of the safety angles
-	if(effectorJointPositionOnCircle == EFFECTOR_JOINT_A1_POS){
-		this->effectorJointPositionCache[0] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_A2_POS){
-		this->effectorJointPositionCache[1] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_B1_POS){
-		this->effectorJointPositionCache[2] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_B2_POS){
-		this->effectorJointPositionCache[3] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C1_POS){
-		this->effectorJointPositionCache[4] = rotatedPoint;
-	} else if(effectorJointPositionOnCircle == EFFECTOR_JOINT_C2_POS){
-		this->effectorJointPositionCache[5] = rotatedPoint;
-	}
-
-
-
-
-
-
-	// Step 3: Rotate around the z axis and translate the joint position as if the engine would be at position 0, 0, 0
-
-	//Prepare matrixes
-
-
-	/*
-	vector< vector<double> >  matrixIdentity = get3x3IdentityMatrix();
-	vector< vector<double> >  matrixRotation = get3x3RotationMatrix(degreesToRadians(groupPositionOnCircle));
-	 */
-
-	/*//double matrixIdentity[] = MATRIX_IDENTITY_3X3;
-	double matrixRotation[3*3];
-	get3x3RotationMatrix(matrixRotation, DEGREES_TO_RADIANS(groupPositionOnCircle));
-
-
-	//Point to rotate from the orgin
-		double rotatedPointMatrix[3*1];
-		get1x3PointMatrix(rotatedPointMatrix, rotatedPoint);
-
-
-		//Prepare transformation
-		double xTrans = tan(DEGREES_TO_RADIANS((groupPositionOnCircle - motorJointPositionOnCircle))) * motorAxisToCenterDistance;
-
-		double yTrans = -motorAxisToCenterDistance;
-
-
-
-		//Do matrix rotation
-		double resultPoint[3*1];
-		getMultiplyMatrix(resultPoint, matrixRotation, 3, 3, rotatedPointMatrix, 3, 1);
-
-
-		//Create result point and do transformation
-		SixAxisCalculations::Point3D moveToTransalated( resultPoint[GET_INDEX(0, 0, 1)] + xTrans, resultPoint[GET_INDEX(1, 0, 1)] + yTrans, rotatedPoint.z);
-
-		//std::cout << moveToTransalated << std::endl;
-
-
-
-
-
-		SixAxisCalculations::Point3D engine(0, 0, 0);
-
-	// Step 4: Inverse kinematics.
-
-		//std::cout << "moveToTransalated: " << moveToTransalated << std::endl;
-
-
-	Point3D circlePlaneVector(1, 0, 0);
-
-	Point3D sphereCenterVector(engine.x - moveToTransalated.x, engine.y - moveToTransalated.y, engine.z  - moveToTransalated.z);
-
-	double sphereRadius = lowerArmLength;
-
-	double dotProduct = (circlePlaneVector.x * (0 - sphereCenterVector.x)) +
-						(circlePlaneVector.y * (0 - sphereCenterVector.y)) +
-						(circlePlaneVector.z * (0 - sphereCenterVector.z));
-
-
-	//std::cout << "dot product: " << dotProduct << std::endl;
-	if(abs(dotProduct) > sphereRadius){
-		//std::cout << "No Intersection!" << std::endl;
-	} else {
-		//std::cout << "Intersection!" << std::endl;
-	}
-
-
-
-
-
-	double ab = calculateAB(engine,  moveToTransalated);
-
-
-
-	double ab_new = sqrt((lowerArmLength*lowerArmLength) - abs(dotProduct*dotProduct));
-
-	//std::cout << "AB new: " << ab_new << std::endl;
-	//std::cout << "AB: " << ab << std::endl;
-
-
-	double dotAbs = abs(dotProduct);
-
-	Point3D dotproductTimesPlaneVector(dotAbs * sphereCenterVector.x, dotAbs * sphereCenterVector.y, dotAbs *sphereCenterVector.z);
-
-	Point3D planeCircleCenter(engine.x, moveToTransalated.y, moveToTransalated.z);
-
-
-
-
-	//c_s + d*n.
-	double d_new = calculateCircleDistanceD(engine, planeCircleCenter);
-
-	double d = calculateCircleDistanceD(engine, moveToTransalated);
-
-	//std::cout << "circlePlane center: " << planeCircleCenter << std::endl;
-
-	//std::cout << "d new: " << d_new << std::endl;
-	//std::cout << "d: " << d << std::endl;
-
-
-	double xd = calculateCircleIntersectionX(d_new,  ab_new, upperArmLength);
-
-
-
-	Point3D intersection = getIntersectionPoint(0, 0, upperArmLength, planeCircleCenter.y, planeCircleCenter.z, ab_new);
-
-	if(intersection.x == -1){
-		//std::cout << "no intersection with circles" << std::endl;
-		return NAN;
-	} else {
-		//std::cout << "Intersection with circles!!" << std::endl;
-		//std::cout << "AT: " << intersection << std::endl;
-
-
-		Point3D vectorBase(0, 0 + 100, 0);
-
-
-
-		double angle1  = atan2( vectorBase.z*intersection.y - vectorBase.y*intersection.z, vectorBase.z*intersection.z + vectorBase.y*intersection.y );
-
-
-		//double angle = getAngleBetween(vectorBase, intersection);
-
-		//std::cout << "Angle: " << RADIANS_TO_DEGREES(angle) << std::endl;
-		//std::cout << "Angle1: " << RADIANS_TO_DEGREES(angle1) << std::endl;
-		return angle1;
-	}
-
-
-
-
-	//std::cout << "x: " << xd << std::endl;
-
-
-	double d2 = d - xd;
-
-	//return angle; //calculateAngle(xd);
-}*/
-
-
+	
 double SixAxisCalculations::getAngleForGroup(int jointIndex) {
 	// intentional int devision
 	int jointGroup = jointIndex / 2;
