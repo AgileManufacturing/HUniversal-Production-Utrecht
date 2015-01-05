@@ -235,7 +235,13 @@ public class ProductAgent extends Agent {
 			state = ProductState.FINISHED;
 		} else {
 			state = ProductState.TRAVELING;
+			performNextStep();
 		}
+	}
+	
+	protected void performNextStep() {
+		// fix, here need a transport unit or something be informed to travel to next equiplet.
+		onProductArrived(new Tick());
 	}
 
 	protected void onProductProcessing(Tick time) {

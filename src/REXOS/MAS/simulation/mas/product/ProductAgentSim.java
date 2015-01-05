@@ -12,7 +12,6 @@ import MAS.simulation.simulation.ISimulation;
 import MAS.simulation.util.Settings;
 import MAS.util.Parser;
 import MAS.util.Position;
-import MAS.util.MASConfiguration;
 import MAS.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
@@ -75,7 +74,10 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	protected void onProductStepFinished(Tick time) {
 		super.onProductStepFinished(time);
-
+	}
+	
+	@Override
+	protected void performNextStep() {
 		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
