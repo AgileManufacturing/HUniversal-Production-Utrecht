@@ -20,7 +20,6 @@ import MAS.product.ProductStep;
 import MAS.simulation.util.Settings;
 import MAS.util.Pair;
 import MAS.util.Position;
-import MAS.util.MASConfiguration;
 import MAS.util.Tick;
 
 /**

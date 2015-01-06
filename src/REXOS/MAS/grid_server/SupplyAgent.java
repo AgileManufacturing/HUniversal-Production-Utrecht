@@ -38,23 +38,25 @@
  **/
 package MAS.grid_server;
 
+import generic.Criteria;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import MAS.agents.data_classes.MessageType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import MAS.util.Ontology;
+
 /**
  * PartsAgent that communicates with ProductAgent to locate the needed parts.
  **/
-public class SupplyAgent extends Agent{
-	
+public class SupplyAgent extends Agent {
+
 	private static double[] lookUpTable = new double[32];
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final double maxStep = 16.5;
 	private static final double smallStep = 5.5;
@@ -62,162 +64,177 @@ public class SupplyAgent extends Agent{
 	private static final int PICK_PLACE_ROTATION_SERVICE_ID = 30;
 	private static final int PICK_PLACE__SERVICE_ID = 20;
 	private static final int DRAW_SERVICE_ID = 10;
-	private static final int APPROACH_OFFSET =75;
+	private static final int APPROACH_OFFSET = 75;
 	private boolean hasRotate = false;
-	
+
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
 	private static String[] GC4x4MB_3 = new String[16];
-	protected void setup(){	
-		
-		
-		lookUpTable[0]=-16.5;
-		lookUpTable[1]=16.5;
-		
-		lookUpTable[2]=-5.5;
-		lookUpTable[3]=16.5;
-		
-		lookUpTable[4]=5.5;
-		lookUpTable[5]=16.5;
-		
-		lookUpTable[6]=16.5;
-		lookUpTable[7]=16.5;
-		
-		lookUpTable[8]=-16.5;
-		lookUpTable[9]=5.5;
-		
-		lookUpTable[10]=-5.5;
-		lookUpTable[11]=5.5;
-		
-		lookUpTable[12]=5.5;
-		lookUpTable[13]=5.5;
-		
-		lookUpTable[14]=16.5;
-		lookUpTable[15]=5.5;
-		
-		lookUpTable[16]=-16.5;
-		lookUpTable[17]=-5.5;
-		
-		lookUpTable[18]=-5.5;
-		lookUpTable[19]=-5.5;
-		
-		lookUpTable[20]=5.5;
-		lookUpTable[21]=-5.5;
-		
-		lookUpTable[22]=16.5;
-		lookUpTable[23]=-5.5;
-		
-		lookUpTable[24]=-16.5;
-		lookUpTable[25]=-16.5;
-		
-		lookUpTable[26]=-5.5;
-		lookUpTable[27]=-16.5;
-		
-		lookUpTable[28]=5.5;
-		lookUpTable[29]=-16.5;
-		
-		lookUpTable[30]=16.5;
-		lookUpTable[31]=-16.5;
-		for(int i = 0; i < 16; i++){
-			GC4x4MB_1[i]="";
-			GC4x4MB_4[i]="";
-			GC4x4MB_3[i]="";
-		}
-		
-		for(int i = 0; i < 16; i++){
-			GC4x4MB_1[i]="blue";
-		}
-		
-		for(int i = 0; i < 6; i++){
-			GC4x4MB_4[i]="green";
-		}
-		
-		for(int i = 0; i < 12; i++){
-			GC4x4MB_3[i]="red";
-		}
-		addBehaviour(new CyclicBehaviour() {
-			private static final long serialVersionUID = 1L;
 
-			public void action() {
-				try {
-					ACLMessage msg = receive();
-					if (msg!=null) {
-						System.out.println("PARTS AGENTS!!");
-						if (msg.getPerformative() == MessageType.SUPPLIER_REQUEST){
-							JSONObject partRequest = new JSONObject(new JSONTokener(msg.getContent()));
-							partRequest.getJSONObject("criteria").getJSONObject("target").remove("identifier");
-							partRequest.getJSONObject("criteria").getJSONObject("target").put("identifier", targetCrate);
-							JSONArray parts =findPart(partRequest.getJSONObject("criteria").getJSONObject("subjects").getString("color"));
-							
-							partRequest.getJSONObject("criteria").remove("subjects");
-							partRequest.getJSONObject("criteria").put("subjects", parts);
-							ACLMessage reply = msg.createReply();
-		                    reply.setPerformative( MessageType.SUPPLIER_REQUEST_REPLY );
-		                    reply.setContent(partRequest.toString());
-		                    send(reply);   
-						}
-						else {
-							System.out.println(	"FAILED PARTSAGENTS");
-						}
-					}
-					block();
-				} catch (JSONException ex) {
-					ex.printStackTrace();
-				}
-			}  
-		});  
+	protected void setup() {
+
+		lookUpTable[0] = -16.5;
+		lookUpTable[1] = 16.5;
+
+		lookUpTable[2] = -5.5;
+		lookUpTable[3] = 16.5;
+
+		lookUpTable[4] = 5.5;
+		lookUpTable[5] = 16.5;
+
+		lookUpTable[6] = 16.5;
+		lookUpTable[7] = 16.5;
+
+		lookUpTable[8] = -16.5;
+		lookUpTable[9] = 5.5;
+
+		lookUpTable[10] = -5.5;
+		lookUpTable[11] = 5.5;
+
+		lookUpTable[12] = 5.5;
+		lookUpTable[13] = 5.5;
+
+		lookUpTable[14] = 16.5;
+		lookUpTable[15] = 5.5;
+
+		lookUpTable[16] = -16.5;
+		lookUpTable[17] = -5.5;
+
+		lookUpTable[18] = -5.5;
+		lookUpTable[19] = -5.5;
+
+		lookUpTable[20] = 5.5;
+		lookUpTable[21] = -5.5;
+
+		lookUpTable[22] = 16.5;
+		lookUpTable[23] = -5.5;
+
+		lookUpTable[24] = -16.5;
+		lookUpTable[25] = -16.5;
+
+		lookUpTable[26] = -5.5;
+		lookUpTable[27] = -16.5;
+
+		lookUpTable[28] = 5.5;
+		lookUpTable[29] = -16.5;
+
+		lookUpTable[30] = 16.5;
+		lookUpTable[31] = -16.5;
+		for (int i = 0; i < 16; i++) {
+			GC4x4MB_1[i] = "";
+			GC4x4MB_4[i] = "";
+			GC4x4MB_3[i] = "";
+		}
+
+		for (int i = 0; i < 16; i++) {
+			GC4x4MB_1[i] = "blue";
+		}
+
+		for (int i = 0; i < 6; i++) {
+			GC4x4MB_4[i] = "green";
+		}
+
+		for (int i = 0; i < 12; i++) {
+			GC4x4MB_3[i] = "red";
+		}
+
+		addBehaviour(new SupplyListenerBehaviour());
 	}
-	
-	private JSONArray findPart(String color) throws JSONException{
+
+	class SupplyListenerBehaviour extends CyclicBehaviour {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void action() {
+			try {
+				ACLMessage msg = blockingReceive();
+				if (msg != null) {
+					System.out.println(getLocalName() + " receives incomming request for information: "
+							+ msg.getContent());
+					switch (msg.getPerformative()) {
+					case ACLMessage.QUERY_REF:
+						if (msg.getConversationId().equals(Ontology.CONVERSATION_SUPPLY_REQUEST)) {
+							// just wrong (hard coded shit)
+							JSONObject partRequest = new JSONObject(new JSONTokener(msg.getContent()));
+							if (partRequest.has(Criteria.TARGET) && partRequest.has(Criteria.SUBJECTS)) {
+								partRequest.getJSONObject(Criteria.TARGET).remove("identifier");
+								partRequest.getJSONObject(Criteria.TARGET).put("identifier", targetCrate);
+								JSONArray parts = findPart(partRequest.getJSONObject(Criteria.SUBJECTS).getString("color"));
+
+								partRequest.remove(Criteria.SUBJECTS);
+								partRequest.put(Criteria.SUBJECTS, parts);
+								ACLMessage reply = msg.createReply();
+								reply.setPerformative(ACLMessage.INFORM_REF);
+								reply.setContent(partRequest.toString());
+								send(reply);
+							} else {
+								System.out.println(getLocalName() + " failed to receive correct message: "
+										+ Criteria.TARGET + " or " + Criteria.SUBJECTS + " not found");
+							}
+						} else {
+							System.out.println(getLocalName() + " failed to receive correct message");
+						}
+						break;
+					default:
+						break;
+					}
+				}
+			} catch (JSONException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	private JSONArray findPart(String color) throws JSONException {
 		JSONArray subjects = new JSONArray();
 		JSONObject subject = new JSONObject();
 		JSONObject subjectMove = new JSONObject();
-		
-		if(color.equals("red")){
-			for(int i =0; i < GC4x4MB_3.length; i++){
-				if(GC4x4MB_3[i].equals("red")){
-					subjectMove.put("x", (lookUpTable[(i*2)]));
-					subjectMove.put("y", (lookUpTable[(i*2)+1]));
-					subjectMove.put("z", "-26.5");					
-					subject.put("move",subjectMove);
+
+		if (color.equals("red")) {
+			for (int i = 0; i < GC4x4MB_3.length; i++) {
+				if (GC4x4MB_3[i].equals("red")) {
+					subjectMove.put("x", (lookUpTable[(i * 2)]));
+					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
+					subjectMove.put("z", "-26.5");
+					subject.put("move", subjectMove);
 					subject.put("identifier", "GC4x4MB_3");
 					subjects.put(subject);
-					GC4x4MB_3[i]="";
+					GC4x4MB_3[i] = "";
 					break;
 				}
-			}				
+			}
 
-		} else if(color.equals("blue")){
-			for(int i =0; i < GC4x4MB_1.length; i++){	
-				if(GC4x4MB_1[i].equals("blue")){
+		} else if (color.equals("blue")) {
+			for (int i = 0; i < GC4x4MB_1.length; i++) {
+				if (GC4x4MB_1[i].equals("blue")) {
 					subjectMove.put("identifier", "GC4x4MB_1");
-					subjectMove.put("x", (lookUpTable[(i*2)]));
-					subjectMove.put("y", (lookUpTable[(i*2)+1]));
+					subjectMove.put("x", (lookUpTable[(i * 2)]));
+					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
 					subjectMove.put("z", "-26.5");
-					subject.put("move",subjectMove);
+					subject.put("move", subjectMove);
 					subject.put("identifier", "GC4x4MB_1");
 					subjects.put(subject);
-					GC4x4MB_1[i]="";
+					GC4x4MB_1[i] = "";
 					break;
 				}
 			}
-			
-		} else if(color.equals("green")){
-			for(int i =0; i < GC4x4MB_4.length; i++){	
-				if(GC4x4MB_4[i].equals("green")){
+
+		} else if (color.equals("green")) {
+			for (int i = 0; i < GC4x4MB_4.length; i++) {
+				if (GC4x4MB_4[i].equals("green")) {
 					subjectMove.put("identifier", "GC4x4MB_4");
-					subjectMove.put("x", (lookUpTable[(i*2)]));
-					subjectMove.put("y", (lookUpTable[(i*2)+1]));
+					subjectMove.put("x", (lookUpTable[(i * 2)]));
+					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
 					subjectMove.put("z", "-26.5");
-					subject.put("move",subjectMove);
+					subject.put("move", subjectMove);
 					subject.put("identifier", "GC4x4MB_4");
 					subjects.put(subject);
-					GC4x4MB_4[i]="";
+					GC4x4MB_4[i] = "";
 					break;
 				}
 			}
-			
+
 		}
-		return subjects;		
+		return subjects;
 	}
 }

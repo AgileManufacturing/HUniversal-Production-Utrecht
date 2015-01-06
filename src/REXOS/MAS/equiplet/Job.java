@@ -2,10 +2,8 @@ package MAS.equiplet;
 
 import jade.core.AID;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.json.JSONObject;
 
 import MAS.util.Tick;
 
@@ -16,7 +14,7 @@ public class Job implements Comparable<Job> {
 	private String productName;
 	private int index;
 	private String service;
-	private Map<String, Object> criteria;
+	private JSONObject criteria;
 	private Tick start;
 	private Tick due;
 	private Tick deadline;
@@ -28,7 +26,7 @@ public class Job implements Comparable<Job> {
 		this.productName = "";
 		this.service = "";
 		this.index = -1;
-		this.criteria = new HashMap<String, Object>();
+		this.criteria = new JSONObject();
 		this.start = start;
 		this.due = deadline;
 		this.deadline = deadline;
@@ -36,7 +34,7 @@ public class Job implements Comparable<Job> {
 	}
 
 	@Deprecated
-	public Job(int index, String service, String product, Map<String, Object> criteria, Tick start, Tick due, Tick deadline) {
+	public Job(int index, String service, String product, JSONObject criteria, Tick start, Tick due, Tick deadline) {
 		this.dummy = false;
 		this.index = index;
 		this.service = service;
@@ -48,7 +46,7 @@ public class Job implements Comparable<Job> {
 		this.ready = false;
 	}
 
-	public Job(int index, AID product, String service, Map<String, Object> criteria, Tick start, Tick due, Tick deadline) {
+	public Job(int index, AID product, String service, JSONObject criteria, Tick start, Tick due, Tick deadline) {
 		this.dummy = false;
 		this.index = index;
 		this.service = service;
@@ -120,7 +118,7 @@ public class Job implements Comparable<Job> {
 		return service;
 	}
 
-	public Map<String, Object> getCriteria() {
+	public JSONObject getCriteria() {
 		return criteria;
 	}
 

@@ -38,62 +38,60 @@
  **/
 package MAS.web_socket_server;
 
-
 import jade.core.Profile;
 import jade.core.ProfileImpl;
+import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 import util.configuration.ServerConfigurations;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-
-public class CreateAgent {	
+public class CreateAgent {
 	/**
-	  * @var CONTAINER_NAME
-	  * The string holds the container name where in the EquipletAgent is being spawned.
-	  */
+	 * @var CONTAINER_NAME The string holds the container name where in the EquipletAgent is being spawned.
+	 */
 	private static final String CONTAINER_NAME = "ProductAgentSpawnerAgent";
 
-	
-	 /**
-	  * CreateAgent()
-	  * Spawns the ProductAgent on the server.
-	  * @throws ControllerException 
-	  */
-	public void createAgent(String args, int identifier){
-		java.util.Date date= new java.util.Date();
-		//Spawning EquipletAgent in the container that has the selected IP/Port
+	/**
+	 * CreateAgent() Spawns the ProductAgent on the server.
+	 * 
+	 * @throws ControllerException
+	 */
+	public void createAgent(String args, int identifier) {
+		Date date = new Date();
+		// Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
 		System.out.println("Creating agent");
-		
+
 		try {
 			Profile profile = new ProfileImpl();
-			
-			profile.setParameter(Profile.MAIN_HOST,ServerConfigurations.GS_IP);
-			profile.setParameter(Profile.MAIN_PORT,ServerConfigurations.GS_PORT);
-			profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME+date.getTime());
-			jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
+
+			profile.setParameter(Profile.MAIN_HOST, ServerConfigurations.GS_IP);
+			profile.setParameter(Profile.MAIN_PORT, ServerConfigurations.GS_PORT);
+			profile.setParameter(Profile.CONTAINER_NAME, CONTAINER_NAME + date.getTime());
+			AgentContainer container = runtime.createAgentContainer(profile);
+
 			ProductAgentSpawnerAgent agent = new ProductAgentSpawnerAgent();
 			agent.setProductSteps(args);
 			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-			try{		
-				AgentController ac = container.acceptNewAgent( container.getContainerName()+identifier, agent);
-				
-				ac.start();	
-				
+			try {
+				AgentController ac = container.acceptNewAgent(container.getContainerName() + identifier, agent);
+
+				ac.start();
+
 				mws.setCreated(true);
-			}
-			catch(ControllerException e){
+			} catch (ControllerException e) {
 				mws.setCreated(false);
 			}
 			mws.connect();
-		}
-		catch(Exception ex){
+		} catch (Exception ex) {
 			try {
 				MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 				mws.setCreated(false);
@@ -106,38 +104,46 @@ public class CreateAgent {
 			}
 		}
 	}
-	
+
 	private class MyWebsocket extends WebSocketClient {
 		boolean created = false;
-		
-		public void setCreated(boolean created){ this.created = created; }
-		
-		public MyWebsocket(URI serverURI) { super(serverURI); }
+
+		public void setCreated(boolean created) {
+			this.created = created;
+		}
+
+		public MyWebsocket(URI serverURI) {
+			super(serverURI);
+		}
 
 		@Override
-		public String getResourceDescriptor() { return null; }
+		public String getResourceDescriptor() {
+			return null;
+		}
 
 		@Override
 		public void onOpen(ServerHandshake handshakedata) {
 			// TODO Auto-generated method stub
 			System.out.println("onOpen");
-			if (created){
+			if (created) {
 				send("{\"receiver\":\"interface\", \"message\":\"Created product\", \"type\":\"success\"}");
-			}
-			else {
+			} else {
 				send("{\"receiver\":\"interface\", \"message\":\"Could not create product, connection error!!\", \"type\":\"danger\"}");
 			}
-			
+
 			close();
 		}
 
 		@Override
-		public void onMessage(String message) { }
+		public void onMessage(String message) {
+		}
 
 		@Override
-		public void onClose(int code, String reason, boolean remote) { }
+		public void onClose(int code, String reason, boolean remote) {
+		}
 
 		@Override
-		public void onError(Exception ex) { }		
+		public void onError(Exception ex) {
+		}
 	}
 }

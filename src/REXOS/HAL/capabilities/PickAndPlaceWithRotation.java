@@ -34,7 +34,7 @@
 
 package HAL.capabilities;
 
-import generic.ProductStep;
+import generic.Criteria;
 
 import java.util.ArrayList;
 
@@ -62,7 +62,7 @@ import org.json.JSONObject;
  */
 public class PickAndPlaceWithRotation extends Capability {
 	public final static String SERVICE_IDENTIFIER = "place";
-	
+
 	/**
 	 * 
 	 * @param moduleFactory
@@ -72,71 +72,72 @@ public class PickAndPlaceWithRotation extends Capability {
 	}
 
 	/**
-	 * @throws ModuleTranslatingException 
+	 * @throws ModuleTranslatingException
 	 * @see Capability#translateProductStep(ProductStep)
 	 */
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException {
 		try {
-			JSONObject target = productStep.getCriteria().getJSONObject(ProductStep.TARGET);
-			JSONArray subjects = productStep.getCriteria().getJSONArray(ProductStep.SUBJECTS);
-			
-			if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) == false) {
-				String message = "Recieved a service (" + productStep.getService() + "which is not supported by this capability.";
-				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
-				throw new IllegalArgumentException(message);	
-			}
-			if(subjects.length() == 0) {
-				String message = "Recieved a product step which has no subjects: " + productStep;
+			JSONObject target = criteria.getJSONObject(Criteria.TARGET);
+			JSONArray subjects = criteria.getJSONArray(Criteria.SUBJECTS);
+
+			if (service.equals(SERVICE_IDENTIFIER) == false) {
+				String message = "Recieved a service (" + service + "which is not supported by this capability.";
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
-			
-			
+			if (subjects.length() == 0) {
+				String message = "Recieved a product step which has no subjects: " + service + " with criteria "
+						+ criteria;
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
+				throw new IllegalArgumentException(message);
+			}
+
 			// pick
 			// We assume that the first subject is the subject to pick
 			JSONObject subject = subjects.getJSONObject(0);
 			JSONObject subjectMoveCommand = subject.getJSONObject("move");
 			JSONObject subjectRotateCommand = subject.getJSONObject("rotate");
-			
+
 			JSONObject pickCommand = new JSONObject();
 			pickCommand.put("pick", JSONObject.NULL);
 			pickCommand.put("move", subjectMoveCommand);
 			pickCommand.put("rotate", subjectRotateCommand);
-			
+
 			JSONObject pickOriginPlacementParameters = new JSONObject();
 			pickOriginPlacementParameters.put("identifier", subject.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, pickOriginPlacementParameters);
-			
-			CompositeStep pick = new CompositeStep(productStep, pickCommand, pickOriginPlacement);
+
+			CompositeStep pick = new CompositeStep(service, pickCommand, pickOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
-			
+
 			// place
 			JSONObject targetMoveCommand = target.getJSONObject("move");
 			JSONObject targetRotateCommand = target.getJSONObject("rotate");
-			
+
 			JSONObject placeCommand = new JSONObject();
 			placeCommand.put("place", JSONObject.NULL);
 			placeCommand.put("move", targetMoveCommand);
 			placeCommand.put("rotate", targetRotateCommand);
-			
+
 			JSONObject placeOriginPlacementParameters = new JSONObject();
 			placeOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, placeOriginPlacementParameters);
-			
-			CompositeStep place = new CompositeStep(productStep, placeCommand, placeOriginPlacement);
+
+			CompositeStep place = new CompositeStep(service, placeCommand, placeOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + place);
-					
+
 			// Translate to hardwareSteps
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 			ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
 			compositeSteps.add(pick);
 			compositeSteps.add(place);
-			
+
 			ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
-			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: "
+					+ hardwareSteps.toString());
 			return hardwareSteps;
-		} catch(JSONException ex) {
+		} catch (JSONException ex) {
 			throw new CapabilityException("Unable to translate due to illegally formatted JSON", ex);
 		}
 	}

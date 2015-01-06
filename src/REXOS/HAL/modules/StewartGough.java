@@ -3,6 +3,9 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
@@ -15,10 +18,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.steps.OriginPlacement;
-import HAL.steps.OriginPlacementType;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class StewartGough extends ModuleActor {
 	public final static double MAX_ACCELERATION = 4;
@@ -86,7 +85,7 @@ public class StewartGough extends ModuleActor {
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
 		}
 		
-		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getProductStep(), compositeStep.getCommand(), compositeStep.getOriginPlacement()));
+		ArrayList<HardwareStep> hStep = forwardCompositeStep(new CompositeStep(compositeStep.getService(), compositeStep.getCommand(), compositeStep.getOriginPlacement()));
 		if (hStep != null){
 			translatedHardwareSteps.addAll(hStep);
 		}

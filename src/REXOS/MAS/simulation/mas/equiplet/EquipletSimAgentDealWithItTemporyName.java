@@ -4,9 +4,10 @@ import jade.core.AID;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
+
+import org.json.JSONObject;
 
 import MAS.equiplet.Capability;
 import MAS.equiplet.EquipletState;
@@ -64,7 +65,7 @@ public class EquipletSimAgentDealWithItTemporyName extends EquipletSimAgent impl
 	}
 
 	@Override
-	protected synchronized boolean isCapable(String service, Map<String, Object> criteria) {
+	protected synchronized boolean isCapable(String service, JSONObject criteria) {
 		return productQueue.size() < Settings.QUEUE_CAPACITY && super.isCapable(service, criteria);
 	}
 
@@ -123,7 +124,7 @@ public class EquipletSimAgentDealWithItTemporyName extends EquipletSimAgent impl
 	 * @return if it succeeded to schedule the job
 	 */
 	@Override
-	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, Map<String, Object> criteria) {
+	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, JSONObject criteria) {
 		System.out.printf("EA:%s schedule a job \n", getLocalName());
 		// do not schedule a job when going to be reconfigured
 		// check if the equiplet still capable
@@ -150,15 +151,15 @@ public class EquipletSimAgentDealWithItTemporyName extends EquipletSimAgent impl
 	 * @return true if schedule succeeded
 	 */
 	@Override
-	protected synchronized boolean schedule(AID product, List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests) {
+	protected synchronized boolean schedule(AID product, List<Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>> requests) {
 		System.out.printf("EA:%s schedule multiple jobs\n", getLocalName());
 		boolean succeeded = true;
-		for (Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>> request : requests) {
+		for (Tuple<Integer, Pair<Tick, Tick>, String, JSONObject> request : requests) {
 			int index = request.first;
 			Tick start = request.second.first;
 			Tick deadline = request.second.second;
 			String service = request.third;
-			Map<String, Object> criteria = request.fourth;
+			JSONObject criteria = request.fourth;
 			succeeded &= schedule(product, index, start, deadline, service, criteria);
 		}
 
