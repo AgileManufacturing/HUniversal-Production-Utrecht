@@ -314,6 +314,11 @@ public class EquipletAgent extends Agent {
 	protected synchronized List<Pair<Tick, Tick>> available(Tick time, Tick duration, Tick deadline) {
 		List<Pair<Tick, Tick>> available = new ArrayList<Pair<Tick, Tick>>();
 
+		// when ever behind on schedule, the latency would otherwise keep increasing
+		Tick window = schedule.isEmpty() ? deadline : deadline.minus(time.minus(schedule.first().getStartTime()).max(0));
+		// System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
+		// " - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
+
 		// not availale when going to be reconfigured
 		if (reconfiguring) {
 			return available;
@@ -331,7 +336,7 @@ public class EquipletAgent extends Agent {
 		}
 
 		if (schedule.isEmpty()) {
-			available.add(new Pair<Tick, Tick>(start, deadline));
+			available.add(new Pair<Tick, Tick>(start, window));
 		} else {
 			Iterator<Job> it = schedule.iterator();
 			while (it.hasNext()) {
@@ -341,11 +346,11 @@ public class EquipletAgent extends Agent {
 
 					if (job.getStartTime().minus(start).greaterThan(duration)) {
 
-						if (job.getStartTime().lessThan(deadline)) {
+						if (job.getStartTime().lessThan(window)) {
 							available.add(new Pair<Tick, Tick>(start, job.getStartTime()));
 							start = job.getDue();
 						} else {
-							available.add(new Pair<Tick, Tick>(start, deadline));
+							available.add(new Pair<Tick, Tick>(start, window));
 							break;
 						}
 					} else {
@@ -355,8 +360,8 @@ public class EquipletAgent extends Agent {
 					start = job.getDue().max(start);
 				}
 
-				if (!it.hasNext() && start.lessThan(deadline)) {
-					available.add(new Pair<Tick, Tick>(start, deadline));
+				if (!it.hasNext() && start.lessThan(window)) {
+					available.add(new Pair<Tick, Tick>(start, window));
 				}
 			}
 		}
@@ -749,7 +754,7 @@ public class EquipletAgent extends Agent {
 
 		// start with the job that arrived exactly on time
 		Job ready = arrived.getStartTime().equals(time) && MASConfiguration.RESCHEDULE ? arrived : jobReady();
-
+		
 		// TODO combine the set ready loop above with the possibility to execute
 		// a job that is later in the schedule but can already be performed
 

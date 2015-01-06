@@ -15,7 +15,6 @@ import MAS.simulation.simulation.ISimulation;
 import MAS.simulation.util.Settings;
 import MAS.util.Pair;
 import MAS.util.Position;
-import MAS.util.MASConfiguration;
 import MAS.util.Tick;
 import MAS.util.Tuple;
 

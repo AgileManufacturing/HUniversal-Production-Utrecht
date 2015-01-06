@@ -12,7 +12,6 @@ import MAS.simulation.simulation.ISimulation;
 import MAS.simulation.util.Settings;
 import MAS.util.Parser;
 import MAS.util.Position;
-import MAS.util.MASConfiguration;
 import MAS.util.Tick;
 
 public class ProductAgentSim extends ProductAgent implements IProductSim {
@@ -110,8 +109,7 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 			// System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
 			// reschedule(time, deadline);
 			System.out.println("product" + this);
-			throw new IllegalArgumentException("PA:" + getLocalName() + " failed to reschedule deadline=" + getDeadline().add(getDeadline().minus(getCreated())));
-			
+			throw new IllegalArgumentException("PA:" + getLocalName() + " failed to reschedule deadline=" + getDeadline().add(getDeadline().minus(getCreated())));	
 		} else if (succeeded) {
 			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
 		} else {

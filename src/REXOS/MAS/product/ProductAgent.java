@@ -126,7 +126,7 @@ public class ProductAgent extends Agent {
 			steps.add(step.getProductStep());
 		}
 		
-		Tick newDeadline = time.add(deadline.minus(getCreated()));
+		Tick newDeadline = time.add(deadline.minus(getCreated()).multiply(2));
 		addBehaviour(new ScheduleBehaviour(this, steps, time, newDeadline));
 	}
 
