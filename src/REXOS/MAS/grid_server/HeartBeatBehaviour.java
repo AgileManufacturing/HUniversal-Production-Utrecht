@@ -38,7 +38,6 @@
  **/
 package MAS.grid_server;
 
-
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -46,44 +45,42 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
-import MAS.agents.data_classes.MessageType;
+import MAS.util.Ontology;
 
 public class HeartBeatBehaviour extends TickerBehaviour {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final String pulseMessage = "Update status";
-	Agent a;
-	public HeartBeatBehaviour(Agent a, long period) {
-		super(a, period);
-		this.a = a;
+
+	public HeartBeatBehaviour(Agent agent, long period) {
+		super(agent, period);
 	}
 
 	@Override
 	protected void onTick() {
 		DFAgentDescription dfd = new DFAgentDescription();
-		
+
 		try {
-			DFAgentDescription[] equipletAgents;
-			equipletAgents = DFService.search(a, dfd);
-			for(int i =0; i < equipletAgents.length; i++){
-				AID aid = equipletAgents[i].getName();
-				sendMessage(MessageType.PULSE_UPDATE, myAgent.getAID(), aid, pulseMessage, "meta");
+
+			DFAgentDescription[] equipletAgents = DFService.search(myAgent, dfd);
+			//System.out.println(myAgent.getLocalName() + " heartbeat behaviour requesting information of " + equipletAgents.length + " equiplets");
+			for (int i = 0; i < equipletAgents.length; i++) {
+				AID receiver = equipletAgents[i].getName();
+
+				// give a pulse to all the equiplets to update themselves
+				ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
+				message.addReceiver(receiver);
+				message.setOntology(Ontology.GRID_ONTOLOGY);
+				message.setConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST);
+				message.setReplyWith(Ontology.CONVERSATION_INFORMATION_REQUEST + System.currentTimeMillis());
+
+				myAgent.send(message);
 			}
-			//System.out.println(equipletAgents.length + " size of found EA");
-		}catch (FIPAException e) {
+		} catch (FIPAException e) {
 			System.out.println("DF Search Error");
 			e.printStackTrace();
 		}
-	}
-	
-	private void sendMessage(int messageType, AID sender, AID receiver, String content, String language){
-		ACLMessage message = new ACLMessage( messageType );
-		message.setSender(sender);
-		message.addReceiver(receiver);
-		message.setLanguage(language);
-		message.setContent(content);
-		myAgent.send(message);
 	}
 }

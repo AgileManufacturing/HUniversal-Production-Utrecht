@@ -38,51 +38,53 @@ package MAS;
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
+import java.util.Date;
+
 import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
+import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import util.configuration.ServerConfigurations;
 import MAS.equiplet.EquipletAgent;
 
 public class EQSpawnClass extends Agent {
 	/**
-	  * @var MAIN_HOST
-	  * The string has the IP of the server that is hosting the Grid Agent Container.
-	  */
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @var MAIN_HOST The string has the IP of the server that is hosting the Grid Agent Container.
+	 */
 	private static final String MAIN_HOST = ServerConfigurations.GS_IP;
-	
+
 	/**
-	  * @var MAIN_PORT
-	  * The string has the PORT of the server that is hosting the Grid Agent Container.
-	  */
+	 * @var MAIN_PORT The string has the PORT of the server that is hosting the Grid Agent Container.
+	 */
 	private static final String MAIN_PORT = ServerConfigurations.GS_PORT;
-	
+
 	/**
-	  * @var CONTAINER_NAME
-	  * The string holds the container name where in the EquipletAgent is being spawned.
-	  */
+	 * @var CONTAINER_NAME The string holds the container name where in the EquipletAgent is being spawned.
+	 */
 	private static final String CONTAINER_NAME = "EquipletAgent";
 
-	
-	 /**
-	  * main()
-	  * Spawns the EquipletAgent on the selected server.
-	  */
+	/**
+	 * main() Spawns the EquipletAgent on the selected server.
+	 */
 	public static void main(String[] args) throws Exception {
-		 java.util.Date date= new java.util.Date();
-		//Spanwing EquipletAgent in the container that has the selected IP/Port
+		Date date = new Date();
+		// Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
-		Profile profile = new ProfileImpl();		
-		profile.setParameter(Profile.MAIN_HOST,MAIN_HOST);
-		profile.setParameter(Profile.MAIN_PORT,MAIN_PORT);
-		profile.setParameter(Profile.CONTAINER_NAME,CONTAINER_NAME);
-		
-		jade.wrapper.AgentContainer container = runtime.createAgentContainer( profile );
-		Agent agent = new EquipletAgent();
-		agent.setArguments(args);
-		AgentController ac = container.acceptNewAgent( "EquipletAgent"+date.getTime(), agent);
-		ac.start();		
-		
+		Profile profile = new ProfileImpl();
+		profile.setParameter(Profile.MAIN_HOST, MAIN_HOST);
+		profile.setParameter(Profile.MAIN_PORT, MAIN_PORT);
+		profile.setParameter(Profile.CONTAINER_NAME, CONTAINER_NAME);
+
+		AgentContainer container = runtime.createAgentContainer(profile);
+
+		Object[] arguments = new Object[] { "hal" };
+		AgentController ac = container.createNewAgent("EQ2", EquipletAgent.class.getName(), arguments);
+		ac.start();
 	}
 }

@@ -1,8 +1,11 @@
 package HAL.capabilities;
 
-import generic.ProductStep;
+import generic.Criteria;
 
 import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -15,9 +18,7 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import MAS.product.ProductStep;
 
 /**
  * 
@@ -38,17 +39,17 @@ public class Draw extends Capability {
 	 * @see Capability#translateProductStep(ProductStep)
 	 */
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException {
 		try {
-			JSONObject target = productStep.getCriteria().getJSONObject(ProductStep.TARGET);
+			JSONObject target = criteria.getJSONObject(Criteria.TARGET);
 			
-			if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) == false) {
-				String message = "Recieved a service (" + productStep.getService() + "which is not supported by this capability.";
+			if(service.equals(SERVICE_IDENTIFIER) == false) {
+				String message = "Recieved a service (" + service + "which is not supported by this capability.";
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);	
 			}
 			if(target == null) {
-				String message = "Recieved a illegaly formatted product step: " + productStep;
+				String message = "Recieved a illegaly formatted product step: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
@@ -64,7 +65,7 @@ public class Draw extends Capability {
 			drawOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement drawOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, drawOriginPlacementParameters);
 			
-			CompositeStep draw = new CompositeStep(productStep, drawCommand, drawOriginPlacement);
+			CompositeStep draw = new CompositeStep(service, drawCommand, drawOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "draw: " + draw);
 					
 			// Translate to hardwareSteps

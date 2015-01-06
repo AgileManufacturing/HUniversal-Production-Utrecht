@@ -1,11 +1,13 @@
 package HAL.factories;
 
-import generic.Service;
-
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -22,10 +24,6 @@ import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * The CapabilityFactory is the factory for the {@link Capability}. 
@@ -251,13 +249,13 @@ public class CapabilityFactory extends Factory{
 	 * This method will all return all the services supported by this equiplet.
 	 * @return
 	 */
-	public ArrayList<Service> getAllSupportedServices() {
-		ArrayList<Service> services = new ArrayList<Service>();
+	public ArrayList<String> getAllSupportedServices() {
+		ArrayList<String> services = new ArrayList<String>();
 		
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedServiceTypes, hal.getEquipletName());
 		for (Row row : rows) {
 			String serviceName = (String) row.get("serviceType");
-			services.add(new Service(serviceName));
+			services.add(serviceName);
 		}
 		return services;
 	}
@@ -267,10 +265,10 @@ public class CapabilityFactory extends Factory{
 	 * @return
 	 * @throws Exception
 	 */
-	public ArrayList<Capability> getCapabilitiesForService(Service service) {
+	public ArrayList<Capability> getCapabilitiesForService(String service) {
 		ArrayList<Capability> capabilities = new ArrayList<Capability>();
 		
-		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypesForServiceType, service.getName(), hal.getEquipletName());
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getSupportedCapabilityTypesForServiceType, service, hal.getEquipletName());
 		for (Row row : rows) {
 			String capabilityName = (String) row.get("name");
 			try{

@@ -1,9 +1,9 @@
 package HAL;
 
-import generic.ProductStep;
-import generic.Service;
-
 import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
@@ -18,9 +18,6 @@ import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TranslationProcess;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 /**
  * The main interface of the HAL for the equiplet agent. This class manages the factories and the blackboard handler.
  * @author Bas Voskuijlen
@@ -67,8 +64,8 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will attempt to translate the product step provided. This is a asynchronous call.
 	 * Once the translation has finished, the onTranslationFinished of the HardwareAbstractionLayerListener will be called.
 	 */
-	public void translateProductStep(ProductStep productStep){
-		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, productStep, capabilityFactory);
+	public void translateProductStep(String service, JSONObject criteria){
+		TranslationProcess translationProcess = new TranslationProcess(this.hardwareAbstractionLayerListener, service, criteria, capabilityFactory);
 		translationProcess.start();
 	}
 	/**
@@ -124,7 +121,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will return all the (most likely) supported services
 	 * @return
 	 */
-	public ArrayList<Service> getSupportedServices() {
+	public ArrayList<String> getSupportedServices() {
 		return capabilityFactory.getAllSupportedServices();
 	}
 	

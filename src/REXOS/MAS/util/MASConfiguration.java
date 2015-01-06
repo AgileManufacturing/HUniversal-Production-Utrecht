@@ -32,10 +32,16 @@ public class MASConfiguration {
 	 * this could lead to heavy memory use
 	 */
 	public final static boolean KEEP_FULL_EQUIPLET_HISORY = false;
+	
 	/**
 	 * name of the traffic controller agent
 	 */
 	public final static String TRAFFIC_AGENT = "traffic-controller";
+	
+	/**
+	 * name of the traffic controller agent
+	 */
+	public final static String SUPPLY_AGENT = "supply-agent";
 
 	/**
 	 * Communication time out, the time an agent wait when he is expecting a communication message until he continues

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.JSONObject;
+
 import MAS.equiplet.Capability;
 import MAS.equiplet.EquipletAgent;
 import MAS.equiplet.Job;
@@ -38,7 +40,7 @@ class EquipletTest extends EquipletAgent {
 	}
 
 	@Override
-	public boolean isCapable(String service, Map<String, Object> criteria) {
+	public boolean isCapable(String service, JSONObject criteria) {
 		return pTimes.containsKey(service);
 	}
 
@@ -51,8 +53,8 @@ class EquipletTest extends EquipletAgent {
 		String uuid = UUID.randomUUID().toString();
 		pTimes.put(uuid, duration);
 
-		List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> requests = new ArrayList<>();
-		requests.add(new Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>(0, new Pair<Tick, Tick>(start, start.add(duration)), uuid, new HashMap<String, Object>()));
+		List<Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>> requests = new ArrayList<>();
+		requests.add(new Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>(0, new Pair<Tick, Tick>(start, start.add(duration)), uuid, new JSONObject()));
 
 		return super.schedule(new AID("Test Equiplet", AID.ISGUID), requests);
 	}

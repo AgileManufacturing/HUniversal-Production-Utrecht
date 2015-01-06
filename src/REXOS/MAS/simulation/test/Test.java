@@ -3,7 +3,6 @@ package MAS.simulation.test;
 import jade.core.AID;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.RefineryUtilities;
+import org.json.JSONObject;
 
 import MAS.equiplet.Job;
 import MAS.product.Graph;
@@ -73,10 +73,10 @@ class Test {
 
 	private void removeOutTreeSet() {
 		TreeSet<Job> map = new TreeSet<>();
-		
-		map.add(new Job(0, new AID("P0"), "service", new HashMap<String, Object>(), new Tick(1), new Tick(5),new Tick(20)));
-		map.add(new Job(1, new AID("P1"), "service", new HashMap<String, Object>(), new Tick(5), new Tick(10),new Tick(20)));
-		map.add(new Job(2, new AID("P2"), "service", new HashMap<String, Object>(), new Tick(15), new Tick(20),new Tick(20)));
+
+		map.add(new Job(0, new AID("P0"), "service", new JSONObject(), new Tick(1), new Tick(5), new Tick(20)));
+		map.add(new Job(1, new AID("P1"), "service", new JSONObject(), new Tick(5), new Tick(10), new Tick(20)));
+		map.add(new Job(2, new AID("P2"), "service", new JSONObject(), new Tick(15), new Tick(20), new Tick(20)));
 
 		Job nr2 = null;
 		int i = 0;
@@ -181,38 +181,26 @@ class Test {
 		// productSteps.add(new ProductStep(2, "glue", new HashMap<String, Object>()));
 
 		/*
-		 * Product p0 = new Product("P0", 0, productSteps, new Position(0,0));
-		 * System.out.println("P1: " + p0 + "\n");
+		 * Product p0 = new Product("P0", 0, productSteps, new Position(0,0)); System.out.println("P1: " + p0 + "\n");
 		 * 
-		 * Product p1 = new Product("P1", 0, productSteps, new Position(0,0));
-		 * System.out.println("P1: " + p1 + "\n");
+		 * Product p1 = new Product("P1", 0, productSteps, new Position(0,0)); System.out.println("P1: " + p1 + "\n");
 		 * 
-		 * Product p2 = new Product("P2", 10, productSteps, new Position(0,0));
-		 * System.out.println("P2: " + p2 + "\n");
+		 * Product p2 = new Product("P2", 10, productSteps, new Position(0,0)); System.out.println("P2: " + p2 + "\n");
 		 * 
-		 * Product p3 = new Product("P3", 20, productSteps, new Position(0,0));
-		 * System.out.println("P3: " + p3 + "\n");
+		 * Product p3 = new Product("P3", 20, productSteps, new Position(0,0)); System.out.println("P3: " + p3 + "\n");
 		 * 
-		 * Product p4 = new Product("P4", 30, productSteps, new Position(0,0));
-		 * System.out.println("P4: " + p4 + "\n");
+		 * Product p4 = new Product("P4", 30, productSteps, new Position(0,0)); System.out.println("P4: " + p4 + "\n");
 		 * 
-		 * Product p5 = new Product("P5", 40, productSteps, new Position(0,0));
-		 * System.out.println("P5: " + p5 + "\n");
+		 * Product p5 = new Product("P5", 40, productSteps, new Position(0,0)); System.out.println("P5: " + p5 + "\n");
 		 * 
 		 * 
-		 * ArrayList<Product> agents = new ArrayList<>();
-		 * agents.add(p1);
-		 * agents.add(p2);
-		 * agents.add(p3);
-		 * agents.add(p4);
-		 * agents.add(p5);
-		 * output(agents);
+		 * ArrayList<Product> agents = new ArrayList<>(); agents.add(p1); agents.add(p2); agents.add(p3);
+		 * agents.add(p4); agents.add(p5); output(agents);
 		 */
 	}
 
 	/**
-	 * This test whether the scheduling of a product fails when there are no
-	 * capable equiplets
+	 * This test whether the scheduling of a product fails when there are no capable equiplets
 	 */
 	@SuppressWarnings("unused")
 	public void productSchedulingFailed() {

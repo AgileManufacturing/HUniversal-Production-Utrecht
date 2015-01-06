@@ -34,9 +34,13 @@
 
 package HAL.capabilities;
 
-import generic.ProductStep;
+import generic.Criteria;
 
 import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -50,10 +54,7 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import MAS.product.ProductStep;
 
 /**
  * Pick and place capability class that translate
@@ -76,18 +77,18 @@ public class PickAndPlace extends Capability {
 	 * @see Capability#translateProductStep(ProductStep)
 	 */
 	@Override
-	public ArrayList<HardwareStep> translateProductStep(ProductStep productStep) throws CapabilityException {
+	public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException {
 		try {
-			JSONObject target = productStep.getCriteria().getJSONObject(ProductStep.TARGET);
-			JSONArray subjects = productStep.getCriteria().getJSONArray(ProductStep.SUBJECTS);
+			JSONObject target = criteria.getJSONObject(Criteria.TARGET);
+			JSONArray subjects = criteria.getJSONArray(Criteria.SUBJECTS);
 			
-			if(productStep.getService().getName().equals(SERVICE_IDENTIFIER) == false) {
-				String message = "Recieved a service (" + productStep.getService() + "which is not supported by this capability.";
+			if(service.equals(SERVICE_IDENTIFIER) == false) {
+				String message = "Recieved a service (" + service + "which is not supported by this capability.";
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);	
 			}
 			if(subjects.length() == 0) {
-				String message = "Recieved a product step which has no subjects: " + productStep;
+				String message = "Recieved a product step which has no subjects: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
@@ -106,7 +107,7 @@ public class PickAndPlace extends Capability {
 			pickOriginPlacementParameters.put("identifier", subject.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, pickOriginPlacementParameters);
 			
-			CompositeStep pick = new CompositeStep(productStep, pickCommand, pickOriginPlacement);
+			CompositeStep pick = new CompositeStep(service, pickCommand, pickOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
 			
 			// place
@@ -120,7 +121,7 @@ public class PickAndPlace extends Capability {
 			placeOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, placeOriginPlacementParameters);
 			
-			CompositeStep place = new CompositeStep(productStep, placeCommand, placeOriginPlacement);
+			CompositeStep place = new CompositeStep(service, placeCommand, placeOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + place);
 			
 			// Translate to hardwareSteps

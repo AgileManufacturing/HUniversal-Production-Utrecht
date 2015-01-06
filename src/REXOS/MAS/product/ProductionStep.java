@@ -2,7 +2,7 @@ package MAS.product;
 
 import jade.core.AID;
 
-import java.util.Map;
+import org.json.JSONObject;
 
 import MAS.util.Position;
 import MAS.util.Tick;
@@ -133,12 +133,13 @@ public class ProductionStep {
 	/**
 	 * @return the criteria of the product step
 	 */
-	public Map<String, Object> getCriteria() {
+	public JSONObject getCriteria() {
 		return productStep.getCriteria();
 	}
 
 	@Override
 	public String toString() {
-		return "PS(" + productStep.getService() + "," + getEquipletName() + ", " + getIndex() + ", from=" + time + ", until=" + time.add(duration) + ")";
+		return "PS(" + productStep.getService() + "," + getEquipletName() + ", " + getIndex() + ", from=" + time
+				+ ", until=" + time.add(duration) + ")";
 	}
 }

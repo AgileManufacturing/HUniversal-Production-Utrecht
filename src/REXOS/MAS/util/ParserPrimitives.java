@@ -159,7 +159,7 @@ public class ParserPrimitives {
 		JSONObject json = new JSONObject();
 		json.put("index", productStep.getIndex());
 		json.put("service", productStep.getService());
-		json.put("criteria", parseMap(productStep.getCriteria()));
+		json.put("criteria", productStep.getCriteria());
 		return json;
 	}
 
@@ -167,7 +167,7 @@ public class ParserPrimitives {
 		if (json.has("index") && json.has("service") && json.has("criteria")) {
 			int index = json.getInt("index");
 			String service = json.getString("service");
-			Map<String, Object> criteria = parseMap(json.getJSONArray("criteria"));
+			JSONObject criteria = json.getJSONObject("criteria");
 			return new ProductStep(index, service, criteria);
 		} else {
 			throw new JSONException("Parser: parsing product step failed to parse " + json);

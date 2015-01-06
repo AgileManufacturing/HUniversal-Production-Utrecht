@@ -1,14 +1,17 @@
 package HAL.listeners;
 
-import generic.ProductStep;
-
 import java.util.ArrayList;
+
+import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.steps.HardwareStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.testerClasses.HALTesterClass;
+import MAS.equiplet.EquipletAgent;
+import MAS.product.ProductAgent;
+import MAS.product.ProductStep;
 /**
  * A HardwareAbstractionLayerListener listens to events in the {@link HardwareAbstractionLayer}. This interface is usually implemented by the {@link EquipletAgent} or the {@link HALTesterClass}
  * @author Bas Voskuijlen
@@ -59,12 +62,12 @@ public interface HardwareAbstractionLayerListener {
 	 * @param productStep
 	 * @param hardwareStep
 	 */
-	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps);
+	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareSteps);
 	/**
 	 * This method is called when the translation of a {@link ProductStep} has failed.
 	 * @param productStep
 	 */
-	public void onTranslationFailed(ProductStep productStep);
+	public void onTranslationFailed(String service, JSONObject criteria);
 	
 	/**
 	 * This method is used by the HAL to retrieve the equiplet name
