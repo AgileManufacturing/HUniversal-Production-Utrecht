@@ -1,13 +1,13 @@
 package HAL.testerClasses;
 
-import generic.ProductStep;
-import generic.Service;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -17,10 +17,6 @@ import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HALTesterClass htc = new HALTesterClass();
@@ -423,8 +419,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		criteria.put("subjects", subjects);
 		
 		
-		hal.translateProductStep(
-				new ProductStep("1", criteria, new Service("place")));
+		hal.translateProductStep("place", criteria);
+		//		new ProductStep("1", criteria, new Service("place")));
 		
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
@@ -434,15 +430,15 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 	
 	@Override
-	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
+	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareStep) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
 		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
-	public void onTranslationFailed(ProductStep productStep) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
+	public void onTranslationFailed(String service, JSONObject criteria) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[] { service, criteria });
 	}
 
 	@Override

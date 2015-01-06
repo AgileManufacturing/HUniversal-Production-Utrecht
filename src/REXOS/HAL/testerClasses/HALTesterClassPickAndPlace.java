@@ -1,13 +1,13 @@
 package HAL.testerClasses;
 
-import generic.ProductStep;
-import generic.Service;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -17,10 +17,6 @@ import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListener {
 	static HALTesterClassPickAndPlace htc = new HALTesterClassPickAndPlace();
@@ -470,21 +466,21 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		criteria2.put("target",target2);
 		criteria2.put("subjects", subjects2);	
 		
-		hal.translateProductStep(
-				new ProductStep("1", criteria1, new Service("place")));		
+		hal.translateProductStep("place", criteria1);
+		//				new ProductStep("1", criteria1, new Service("place")));		
 
 	}
 	
 	@Override
-	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareStep) {
+	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareStep) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
 		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
-	public void onTranslationFailed(ProductStep productStep) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
+	public void onTranslationFailed(String service, JSONObject criteria) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[] { service, criteria });
 	}
 	
 	@Override
@@ -514,12 +510,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
 		if(state){
 			state = false;
-			hal.translateProductStep(
-					new ProductStep("1", criteria1, new Service("place")));	
+			hal.translateProductStep("place", criteria1);
+			//				new ProductStep("1", criteria1, new Service("place")));	
 		}else{
 			state = true;
-			hal.translateProductStep(
-					new ProductStep("1", criteria2, new Service("place")));
+			hal.translateProductStep("place", criteria2);
+			//				new ProductStep("1", criteria2, new Service("place")));
 		}
 	}
 

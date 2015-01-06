@@ -46,86 +46,101 @@ import jade.lang.acl.ACLMessage;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import util.configuration.ServerConfigurations;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-public class MonitoringAgent extends Agent{
-	/**
-	  * @var MyWebSocket
-	  * The connection towards the websocket server. 
-	  * MonitoringAgent is able to send messages towards the Webinterface using the SocketServer.
-	  */
-	MyWebsocket mws;
+import util.configuration.ServerConfigurations;
 
-	protected void setup(){	
+public class MonitoringAgent extends Agent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static final long MONITORING_INTERVAL = 10000;
+
+	/**
+	 * @var MyWebSocket The connection towards the websocket server. MonitoringAgent is able to send messages towards
+	 *      the Webinterface using the SocketServer.
+	 */
+	MyWebsocket webSocket;
+
+	protected void setup() {
 		try {
-			 mws= new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-			boolean connected = mws.connectBlocking();
+			webSocket = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
+			boolean connected = webSocket.connectBlocking();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("create exception2");
+			System.out.println(getLocalName() + " caught URISyntaxException: " + e.getMessage());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		addBehaviour(new HeartBeatBehaviour(this, 10000));
-		addBehaviour(new CyclicBehaviour()
-		{ 				
-			public void action() {
-				ACLMessage msg = receive();
-                if (msg!=null) {
-                	mws.send(msg.getContent());
-                 }
-                block();				
-			}		
-		});		
-	}
-	@Override
-	protected void takeDown(){
-		
-	}
-	
 
+		addBehaviour(new HeartBeatBehaviour(this, MONITORING_INTERVAL));
+		addBehaviour(new MonitorListener());
+		
+		System.out.println(getLocalName() + " start with monitoring");
+	}
+
+	class MonitorListener extends CyclicBehaviour {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void action() {
+			ACLMessage msg = receive();
+			if (msg != null) {
+				// pass the information to the web socket
+				webSocket.send(msg.getContent());
+			}
+			block();
+		}
+	}
+
+	@Override
+	protected void takeDown() {
+		System.out.println(getLocalName() + ": terminated");
+	}
 
 	private class MyWebsocket extends WebSocketClient {
 		public MyWebsocket(URI serverURI) {
 			super(serverURI);
-			// TODO Auto-generated constructor stub
 		}
-	
+
 		@Override
 		public String getResourceDescriptor() {
-			// TODO Auto-generated method stub
 			return null;
 		}
-	
+
 		@Override
 		public void onOpen(ServerHandshake handshakedata) {
-			// TODO Auto-generated method stub
-			System.out.println("onOpen");
-			//send("{\"receiver\":\"interface\", \"message\":\"Could not create product, connection error!!\", \"type\":\"danger\"}");
-			//close();
+			System.out.println(getLocalName() + ": websocket onOpen");
+			// send("{\"receiver\":\"interface\", \"message\":\"Could not create product, connection error!!\", \"type\":\"danger\"}");
+			// close();
 		}
-	
+
 		@Override
 		public void onMessage(String message) {
 			// TODO Auto-generated method stub
-			
+
 		}
-	
+
 		@Override
 		public void onClose(int code, String reason, boolean remote) {
 			// TODO Auto-generated method stub
-			System.out.println("onClose");
-			
+			System.out.println(getLocalName() + ": monitoring websocket onClose");
+
 		}
-	
+
 		@Override
 		public void onError(Exception ex) {
 			// TODO Auto-generated method stub
-			
-		}		
+
+		}
 	}
 }

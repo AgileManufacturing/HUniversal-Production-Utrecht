@@ -330,23 +330,24 @@ public class Simulation implements ISimulation, IControl {
 	 */
 	private void verification() {
 
-		int busy = 0;
-		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
-					|| (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
-				busy++;
-			}
-		}
-
-		if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
-			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
-			throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
-		}
-
-		if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
-			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
-			throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
-		}
+		// this doesn't work with breakdowns
+//		int busy = 0;
+//		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+//			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
+//					|| (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
+//				busy++;
+//			}
+//		}
+//
+//		if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
+//			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
+//			throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
+//		}
+//
+//		if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
+//			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
+//			throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
+//		}
 
 		// if an equiplet is busy, there need to be a finished event in the event stack
 		List<String> busyEquiplets = new ArrayList<String>();
@@ -411,7 +412,6 @@ public class Simulation implements ISimulation, IControl {
 	 */
 	private void updateProductStats(String type, int add) {
 		int lastValue = productStatistics.get(type).lastEntry().getValue();
-		System.out.println("UPDATE " + time + " : " + type + " = " + lastValue + " + " + add);
 		productStatistics.get(type).put(time, lastValue + add);
 	}
 
@@ -432,7 +432,7 @@ public class Simulation implements ISimulation, IControl {
 				equipletLoadHistory.get(entry.getKey()).put(time, loadHistory.floatValue());
 				sumLoadHistory += loadHistory;
 
-				System.out.println("EA " + entry.getKey() + " = " + loadHistory);
+				// System.out.println("EA " + entry.getKey() + " = " + loadHistory);
 			}
 		}
 		equipletLoads.get(STATS_LOAD_AVG).put(time, sumLoad / equiplets.size());
@@ -828,13 +828,13 @@ public class Simulation implements ISimulation, IControl {
 		simulation.killAgent(MASConfiguration.TRAFFIC_AGENT);
 
 		// TODO check if needed to wait until messages are received and all is taken down / killed
-		simulation.delay(2000);
+		simulation.delay(5000);
 		System.gc();
 
 		// something is needed, there is a (although little) that some agent are not correctly started and therefore the simulation fails to run correctly without the possibility
-		// to check it.
+		// to check it. happens when the simulation uses large amount of memory
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(15000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -1220,7 +1220,10 @@ public class Simulation implements ISimulation, IControl {
 		writer.printf("Reschedule: %s\n", MASConfiguration.RESCHEDULE);
 		writer.printf("Breakdowns: %s\n", Settings.BREAKDOWNS);
 		writer.printf("Queue jump: %s\n", MASConfiguration.QUEUE_JUMP);
+		writer.printf("Reconfiguration check: %s\n", Settings.RECONFIG_CHECK);
 		writer.printf("Reconfiguration time: %s\n", Settings.RECONFIGATION_TIME);
+		writer.printf("Reconfiguration threshold: %s\n", reconfigThreshold);
+		writer.printf("Travel square time: %s\n", config.getTravelTime());
 		writer.printf("Warm-up period: %s\n", Settings.WARMUP);
 		writer.printf("Product generation: (%.0f * %d) / (%.2f * %d) = %.2f\n", stochastics.getMeanProcessingTime(), Settings.MEAN_PRODUCT_STEPS, Settings.UTILIZATION, config.getEquipletsConfigurations().size(), (stochastics.getMeanProcessingTime() * Settings.MEAN_PRODUCT_STEPS)
 				/ (Settings.UTILIZATION * config.getEquipletsConfigurations().size()));

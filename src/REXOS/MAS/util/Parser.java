@@ -19,8 +19,8 @@ import MAS.product.ProductionStep;
 public class Parser extends ParserPrimitives {
 
 	/**
-	 * encode the equiplet configuration for starting an equiplet
-	 * the configuration of an equiplet consists of the needed parameters to start the equiplet agent
+	 * encode the equiplet configuration for starting an equiplet the configuration of an equiplet consists of the
+	 * needed parameters to start the equiplet agent
 	 * 
 	 * counterpart {@link #parseEquipletConfiguration(String) parseEquipletConfiguration}
 	 * 
@@ -31,7 +31,8 @@ public class Parser extends ParserPrimitives {
 	 * @return the configuration in json format
 	 * @throws JSONException
 	 */
-	public static String parseEquipletConfiguration(Position position, List<Capability> capabilities) throws JSONException {
+	public static String parseEquipletConfiguration(Position position, List<Capability> capabilities)
+			throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("position", parsePosition(position));
 		json.put("capabilities", parseCapabilties(capabilities));
@@ -39,8 +40,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * decode the equiplet configuration for starting an equiplet
-	 * the configuration of an equiplet consists of the needed parameters to start the equiplet agent
+	 * decode the equiplet configuration for starting an equiplet the configuration of an equiplet consists of the
+	 * needed parameters to start the equiplet agent
 	 * 
 	 * counterpart {@link #parseEquipletConfiguration(Position, List<Capability>) parseEquipletConfiguration}
 	 * 
@@ -61,8 +62,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * encode the product configuration for starting a product agent
-	 * the product configurations are the needed parameters to start a product agent
+	 * encode the product configuration for starting a product agent the product configurations are the needed
+	 * parameters to start a product agent
 	 * 
 	 * counterpart {@link #parseProductConfiguration(String) parseProductConfiguration}
 	 * 
@@ -73,7 +74,8 @@ public class Parser extends ParserPrimitives {
 	 * @return the configuration in json format
 	 * @throws JSONException
 	 */
-	public static String parseProductConfiguration(LinkedList<ProductStep> productSteps, Position startPosition, Tick deadline) throws JSONException {
+	public static String parseProductConfiguration(LinkedList<ProductStep> productSteps, Position startPosition,
+			Tick deadline) throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("productSteps", parseProductSteps(productSteps));
 		json.put("position", parsePosition(startPosition));
@@ -82,8 +84,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * decode the product configuration for starting a product agent
-	 * the product configurations are the needed parameters to start a product agent
+	 * decode the product configuration for starting a product agent the product configurations are the needed
+	 * parameters to start a product agent
 	 * 
 	 * counterpart {@link #parseProductConfiguration(LinkedList<ProductStep>, Position) parseProductConfiguration}
 	 * 
@@ -92,7 +94,8 @@ public class Parser extends ParserPrimitives {
 	 * @return a tuple of the configuration of the product
 	 * @throws JSONException
 	 */
-	public static Triple<LinkedList<ProductStep>, Position, Tick> parseProductConfiguration(String source) throws JSONException {
+	public static Triple<LinkedList<ProductStep>, Position, Tick> parseProductConfiguration(String source)
+			throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("productSteps") && json.has("position") && json.has("deadline")) {
 			LinkedList<ProductStep> productSteps = parseProductSteps(json.getJSONArray("productSteps"));
@@ -118,11 +121,22 @@ public class Parser extends ParserPrimitives {
 	 * @return json encoded data
 	 * @throws JSONException
 	 */
-	public static String parseCanExecute(Tick time, Tick deadline, LinkedList<ProductStep> productSteps) throws JSONException {
+	public static String parseCanExecute(Tick time, Tick deadline, LinkedList<ProductStep> productSteps)
+			throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put("time", parseTick(time));
 		json.put("deadline", parseTick(deadline));
-		json.put("productSteps", parseProductSteps(productSteps));
+
+		JSONArray steps = new JSONArray();
+		for (ProductStep productStep : productSteps) {
+			JSONObject step = new JSONObject();
+			step.put("index", productStep.getIndex());
+			step.put("service", productStep.getService());
+			step.put("criteria", productStep.getCriteria());
+			steps.put(step);
+		}
+		json.put("productSteps",steps);
+		
 		return json.toString();
 	}
 
@@ -136,27 +150,43 @@ public class Parser extends ParserPrimitives {
 	 * @return a tuple of the decoded data
 	 * @throws JSONException
 	 */
-	public static Triple<Tick, Tick, List<ProductStep>> parseCanExecute(String source) throws JSONException {
+	public static Triple<Tick, Tick, List<Triple<Integer, String, JSONObject>>> parseCanExecute(String source)
+			throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("time") && json.has("deadline") && json.has("productSteps")) {
 			Tick time = parseTick(json.getJSONObject("time"));
 			Tick deadline = parseTick(json.getJSONObject("deadline"));
-			List<ProductStep> productSteps = parseProductSteps(json.getJSONArray("productSteps"));
-
-			return new Triple<Tick, Tick, List<ProductStep>>(time, deadline, productSteps);
+			
+			List<Triple<Integer, String, JSONObject>> productSteps = new ArrayList<>(); 
+			JSONArray list =  json.getJSONArray("productSteps");
+			for (int i = 0; i < list.length(); i++) {
+				JSONObject item = list.getJSONObject(i);
+				if (item.has("index") && item.has("service") && item.has("criteria")) {
+					int index = item.getInt("index");
+					String service = item.getString("service");
+					JSONObject criteria = item.getJSONObject("criteria");
+					productSteps.add(new Triple<>(index, service, criteria));
+				} else {
+					throw new JSONException("Parser: parsing product step failed to parse " + json);
+				}
+			}
+			return new Triple<Tick, Tick, List<Triple<Integer, String, JSONObject>>>(time, deadline, productSteps);
 		}
 		throw new JSONException("Parser: parsing can execute failed to parse " + source);
 	}
 
 	/**
-	 * The answer whether an equiplet can execute a list of product steps i.e. a service with criteria is constructed of three variables: The load of the equiplet, the position of
-	 * the equiplet and the possibilities when a product step can be executed. The possibilities are a list for each service that can be executed, consisting of an index
-	 * corresponding to the index of the product step, an estimate of executing the service, a list of times from and until it is possible to schedule the service
+	 * The answer whether an equiplet can execute a list of product steps i.e. a service with criteria is constructed of
+	 * three variables: The load of the equiplet, the position of the equiplet and the possibilities when a product step
+	 * can be executed. The possibilities are a list for each service that can be executed, consisting of an index
+	 * corresponding to the index of the product step, an estimate of executing the service, a list of times from and
+	 * until it is possible to schedule the service
 	 * 
 	 * counterpart {@link #parseCanExecuteAnswer(String) parseCanExecuteAnswer}
 	 * 
 	 * @param answer
-	 *            List of services < index in production path, estimate production time, List of from and until time when possible>
+	 *            List of services < index in production path, estimate production time, List of from and until time
+	 *            when possible>
 	 * @param load
 	 *            of equiplet
 	 * @param position
@@ -165,7 +195,8 @@ public class Parser extends ParserPrimitives {
 	 * @throws JSONException
 	 *             when parsing failed
 	 */
-	public static String parseCanExecuteAnswer(List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> answer, Double load, Position position) throws JSONException {
+	public static String parseCanExecuteAnswer(List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>> answer, Double load,
+			Position position) throws JSONException {
 		JSONObject json = new JSONObject();
 
 		JSONArray list = new JSONArray();
@@ -191,18 +222,22 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * decode the answer whether an equiplet can execute a list of product steps i.e. a service with criteria is constructed of three variables: The load of the equiplet, the
-	 * position of the equiplet and the possibilities when a product step can be executed. The possibilities are a list for each service that can be executed, consisting of an
-	 * index corresponding to the index of the product step, an estimate of executing the service, a list of times from and until it is possible to schedule the service
+	 * decode the answer whether an equiplet can execute a list of product steps i.e. a service with criteria is
+	 * constructed of three variables: The load of the equiplet, the position of the equiplet and the possibilities when
+	 * a product step can be executed. The possibilities are a list for each service that can be executed, consisting of
+	 * an index corresponding to the index of the product step, an estimate of executing the service, a list of times
+	 * from and until it is possible to schedule the service
 	 * 
-	 * counterpart {@link #parseCanExecuteAnswer(List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position) parseCanExecuteAnswer}
+	 * counterpart {@link #parseCanExecuteAnswer(List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position)
+	 * parseCanExecuteAnswer}
 	 * 
 	 * @param source
 	 *            encoded data in json format
 	 * @return a tuple of the decoded data
 	 * @throws JSONException
 	 */
-	public static Triple<List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position> parseCanExecuteAnswer(String source) throws JSONException {
+	public static Triple<List<Triple<Integer, Tick, List<Pair<Tick, Tick>>>>, Double, Position> parseCanExecuteAnswer(
+			String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 
 		if (json.has("answer") && json.has("load") && json.has("position")) {
@@ -222,7 +257,8 @@ public class Parser extends ParserPrimitives {
 							Tick until = parseTick(option.getJSONObject("until"));
 							possibilities.add(new Pair<Tick, Tick>(from, until));
 						} else {
-							throw new JSONException("Parser: parsing can execute answer failed when parsing service " + option);
+							throw new JSONException("Parser: parsing can execute answer failed when parsing service "
+									+ option);
 						}
 					}
 
@@ -242,8 +278,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * encode a request to schedule a list of product steps by an equiplet
-	 * the data is list of [ product steps :: a tuple of < time, deadline, service, criteria > ]
+	 * encode a request to schedule a list of product steps by an equiplet the data is list of [ product steps :: a
+	 * tuple of < time, deadline, service, criteria > ]
 	 * 
 	 * counterpart {@link #parseScheduleRequest(String) parseScheduleRequest}
 	 * 
@@ -260,7 +296,7 @@ public class Parser extends ParserPrimitives {
 			JSONObject json = new JSONObject();
 			json.put("index", productionStep.getIndex());
 			json.put("service", productionStep.getService());
-			json.put("criteria", parseMap(productionStep.getCriteria()));
+			json.put("criteria", productionStep.getCriteria());
 			json.put("time", parseTick(productionStep.getStart()));
 			json.put("deadline", parseTick(deadline));
 			list.put(json);
@@ -269,8 +305,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * decode a request to schedule a list of product steps by an equiplet
-	 * the data is list of [ product steps :: a tuple of < index, < time, deadline >, service, criteria > ]
+	 * decode a request to schedule a list of product steps by an equiplet the data is list of [ product steps :: a
+	 * tuple of < index, < time, deadline >, service, criteria > ]
 	 * 
 	 * counterpart {@link #parseScheduleRequest(ArrayList<ProductionStep>, Tick) parseScheduleRequest}
 	 * 
@@ -278,19 +314,21 @@ public class Parser extends ParserPrimitives {
 	 * @return a tuple of decoded schedule data
 	 * @throws JSONException
 	 */
-	public static List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> parseScheduleRequest(String source) throws JSONException {
-		List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> result = new ArrayList<>();
+	public static List<Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>> parseScheduleRequest(String source)
+			throws JSONException {
+		List<Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>> result = new ArrayList<>();
 		JSONArray list = new JSONArray(source);
 		for (int i = 0; i < list.length(); i++) {
 			JSONObject json = list.getJSONObject(i);
-			if (json.has("index") && json.has("service") && json.has("criteria") && json.has("time") && json.has("deadline")) {
+			if (json.has("index") && json.has("service") && json.has("criteria") && json.has("time")
+					&& json.has("deadline")) {
 				int index = json.getInt("index");
 				Tick time = parseTick(json.getJSONObject("time"));
 				Tick deadline = parseTick(json.getJSONObject("deadline"));
 				String service = json.getString("service");
-				Map<String, Object> criteria = parseMap(json.getJSONArray("criteria"));
+				JSONObject criteria = json.getJSONObject("criteria");
 
-				result.add(new Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>(index, new Pair<Tick, Tick>(time, deadline), service, criteria));
+				result.add(new Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>(index, new Pair<Tick, Tick>(time, deadline), service, criteria));
 			} else {
 				throw new JSONException("Parser: parsing scheduling failed to parse " + source);
 			}
@@ -299,8 +337,7 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * parse confirmation
-	 * this can be used for acknowledgement for receiving a message
+	 * parse confirmation this can be used for acknowledgement for receiving a message
 	 * 
 	 * counterpart {@link #parseConfirmation(String) parseConfirmation}
 	 * 
@@ -315,8 +352,7 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * parse confirmation
-	 * this can be used for acknowledgement for receiving a message
+	 * parse confirmation this can be used for acknowledgement for receiving a message
 	 * 
 	 * counterpart {@link #parseConfirmation(boolean) parseConfirmation}
 	 * 
@@ -372,7 +408,8 @@ public class Parser extends ParserPrimitives {
 		// }
 	}
 
-	public static Pair<Position, List<Pair<String, String>>> parseTravelRouteRequest(String source) throws JSONException {
+	public static Pair<Position, List<Pair<String, String>>> parseTravelRouteRequest(String source)
+			throws JSONException {
 		List<Pair<String, String>> routes = new ArrayList<Pair<String, String>>();
 		JSONObject json = new JSONObject(source);
 		if (json.has("position") && json.has("routes")) {
@@ -394,7 +431,8 @@ public class Parser extends ParserPrimitives {
 		}
 	}
 
-	public static String parseTravelRouteRequest(Position position, List<Pair<String, String>> routes) throws JSONException {
+	public static String parseTravelRouteRequest(Position position, List<Pair<String, String>> routes)
+			throws JSONException {
 		JSONObject json = new JSONObject();
 		JSONArray list = new JSONArray();
 		for (Pair<String, String> route : routes) {
@@ -523,8 +561,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * parse product step index of a product
-	 * this can be used for an equiplet informing a product that he start with processing of a product step or is finished with the product step
+	 * parse product step index of a product this can be used for an equiplet informing a product that he start with
+	 * processing of a product step or is finished with the product step
 	 * 
 	 * counterpart {@link #parseProductIndex(String) parseProductIndex}
 	 * 
@@ -543,8 +581,8 @@ public class Parser extends ParserPrimitives {
 	}
 
 	/**
-	 * parse product step index of a product
-	 * this can be used for an equiplet informing a product that he start with processing of a product step or is finished with the product step
+	 * parse product step index of a product this can be used for an equiplet informing a product that he start with
+	 * processing of a product step or is finished with the product step
 	 * 
 	 * counterpart {@link #parseProductIndex(Tick, Integer) parseProductIndex}
 	 * 

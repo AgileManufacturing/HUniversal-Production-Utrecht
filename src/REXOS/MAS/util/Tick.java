@@ -148,6 +148,10 @@ public class Tick extends Number implements Comparable<Tick> {
 		return new Tick(Math.max(dTime, time.get(Double.class)));
 	}
 
+	public Tick max(double time) {
+		return new Tick(Math.max(dTime, time));
+	}
+
 	public Tick min(Tick time) {
 		return new Tick(Math.min(dTime, time.get(Double.class)));
 	}

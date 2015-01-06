@@ -366,7 +366,6 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 			Job ready = jobReady();
 			if (ready != null) {
 				// if (!schedule.isEmpty() && jobReady()) {
-				schedule.remove(ready);
 				executeJob(time, ready);
 			} else if (reconfiguring && schedule.isEmpty()) {
 				state = EquipletState.RECONFIG;
@@ -428,11 +427,20 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 		} else if (state == EquipletState.ERROR_READY) {
 			// in the time the equiplet was broken there is a product arrived that can be executed
 			Job ready = jobReady();
-			if (ready == null) {
-				throw new IllegalArgumentException("Well something went wrong, an equiplet can not be in state error ready (a prodcut has arrived while he was broken)");
+
+			if (ready != null) {
+				executeJob(time, ready);
+			}  else {			
+				System.out.printf("EA:%s the job that was ready although when queue jumping is on, job can schedule in front such that there is no job ready when repaired.\n", getLocalName());
+				state = EquipletState.IDLE;
 			}
-			schedule.remove(ready);
-			executeJob(time, ready);
+			
+//			if (MASConfiguration.QUEUE_JUMP < 1) {
+//				// if queue jumping is on, a job that was ready wouldn't be any more if there are job that arrive in the time it is broken.
+//				System.err.println("time=" + time + " ready=" + ready);
+//				System.err.println(toFullString());
+//				throw new IllegalArgumentException("Well something went wrong, an equiplet can not be in state error ready (a prodcut has arrived while he was broken)");
+//			}
 		} else if (isExecuting()) {
 			// the equiplet is executing a job and is repaired, but waits until a job finished event is received
 			state = EquipletState.ERROR_REPAIRED;

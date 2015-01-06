@@ -5,12 +5,10 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import MAS.product.ProductStep;
 import MAS.util.Ontology;
 import MAS.util.Pair;
 import MAS.util.Parser;
@@ -35,10 +33,13 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
-		// Listen only possible incoming conversation ids, note that otherwise the simulation would jam as the listener receives messages that else where is waited upon
-		// MessageTemplate template = MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
-		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
-		MessageTemplate template = MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE))));
+		// Listen only possible incoming conversation ids, note that otherwise the simulation would jam as the listener
+		// receives messages that else where is waited upon
+		// MessageTemplate template =
+		// MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
+		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
+		// MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
+		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE)))), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST));
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
@@ -77,7 +78,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	private void handleCanExecute(ACLMessage message) {
 		try {
 			// can the equiplet execute the Triple < from time, within deadline, the following product steps >
-			Triple<Tick, Tick, List<ProductStep>> question = Parser.parseCanExecute(message.getContent());
+			Triple<Tick, Tick, List<Triple<Integer, String, JSONObject>>> question = Parser.parseCanExecute(message.getContent());
 
 			Tick time = question.first;
 			Tick deadline = question.second;
@@ -106,7 +107,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	private void handleScheduling(ACLMessage message) {
 		try {
 			// scheduling info = List of product steps :: [< time, deadline, Service, Criteria >]
-			List<Tuple<Integer, Pair<Tick, Tick>, String, Map<String, Object>>> data = Parser.parseScheduleRequest(message.getContent());
+			List<Tuple<Integer, Pair<Tick, Tick>, String, JSONObject>> data = Parser.parseScheduleRequest(message.getContent());
 			boolean success = equiplet.schedule(message.getSender(), data);
 
 			// send can execute reply
@@ -121,7 +122,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			System.err.printf("EA:%s %s", equiplet.getLocalName(), e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * handle the information from a product agent that he is arrived by the equiplet
 	 * 
@@ -167,7 +168,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			System.err.printf("EA:%s %s", equiplet.getLocalName(), e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * handle the request for current information of an equiplet
 	 * 
@@ -175,20 +176,39 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 */
 	private void handleInformationRequest(ACLMessage message) {
 		try {
-			JSONObject json = new JSONObject();
-			json.append("state", equiplet.getEquipletState());
-			json.append("waiting", equiplet.getWaiting());
-			json.append("scheduled", equiplet.getScheduled());
-			json.append("executed", equiplet.getExecuted());
-			json.append("executing", equiplet.getExecuting());
+			// TODO Auto-generated method stub
+			JSONObject equipletUpdate = new JSONObject();
+			equipletUpdate.put("receiver", "interface");
+			equipletUpdate.put("subject", "update_equiplet");
+			equipletUpdate.put("id", equiplet.getLocalName());
+			equipletUpdate.put("services", equiplet.getCapabilities());
+
+			JSONObject status = new JSONObject();
+			status.put("type", "success");
+			status.put("content", "NORMAL");
+			equipletUpdate.put("status", status);
+
+			JSONObject mode = new JSONObject();
+			mode.put("type", "success");
+			mode.put("content", "NORMAL");
+			equipletUpdate.put("mode", mode);
+
+			JSONObject equipletDetails = new JSONObject();
+			equipletDetails.put("status", equiplet.getEquipletState());
+			equipletDetails.put("plannedSteps", equiplet.getWaiting());
+			equipletDetails.put("successfulSteps", equiplet.getExecuted());
+			equipletDetails.put("failedSteps", equiplet.getExecuted());
+
+			equipletUpdate.put("details", equipletDetails);
 
 			// send information reply
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.INFORM);
-			reply.setContent(json.toString());
-			equiplet.send(message);
+			reply.setContent(equipletUpdate.toString());
+			equiplet.send(reply);
+
 		} catch (JSONException e) {
-			// TODO failed to construct reply
+			System.err.println("EA: " + myAgent.getLocalName() + " something wrong with sending information update");
 		}
 	}
 }

@@ -12,4 +12,6 @@ public class Ontology {
 	public static final String CONVERSATION_PRODUCT_DELAYED = "product-delayed";
 	public static final String CONVERSATION_PRODUCT_RELEASE = "product-release";
 	public static final String CONVERSATION_TRAVEL_TIME = "travel-time";
+	public static final String CONVERSATION_INFORMATION_REQUEST = "information-request";
+	public static final String CONVERSATION_SUPPLY_REQUEST = "supply-request";
 }

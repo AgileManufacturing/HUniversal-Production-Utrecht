@@ -169,7 +169,7 @@ public abstract class ModuleActor extends Module {
 	protected CompositeStep adjustMoveWithDimensions(CompositeStep compositeStep, Vector3 offsetVector) throws JSONException{
 		JSONObject command = compositeStep.getCommand();
 		command = adjustMoveWithDimensions(command, offsetVector);
-		return new CompositeStep(compositeStep.getProductStep(), command, compositeStep.getOriginPlacement());
+		return new CompositeStep(compositeStep.getService(), command, compositeStep.getOriginPlacement());
 	}
 	protected JSONObject adjustMoveWithDimensions(JSONObject compositeCommand, Vector3 offsetVector) throws JSONException{
 		return adjustMoveWithDimensions(compositeCommand, offsetVector, new RotationAngles(0, 0, 0));

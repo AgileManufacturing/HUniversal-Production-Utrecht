@@ -1,6 +1,5 @@
 package HAL.steps;
 
-import generic.ProductStep;
 import HAL.Capability;
 import HAL.Module;
 import HAL.exceptions.ModuleTranslatingException;
@@ -19,21 +18,21 @@ import util.log.Logger;
  *
  */
 public class CompositeStep{
-	private ProductStep productStep;
+	private String service;
 	private JSONObject command;
 	private OriginPlacement originPlacement;
 	
 	public static final String IDENTIFIER = "identifier";
 	public static final String RELATIVE_TO = "relativeTo";
 	
-	public CompositeStep(ProductStep productStep, JSONObject command, OriginPlacement originPlacement){
+	public CompositeStep(String service, JSONObject command, OriginPlacement originPlacement){
 		this.command = command;
 		this.originPlacement = originPlacement;
-		this.productStep = productStep;
+		this.service = service;
 	}
 	
-	public ProductStep getProductStep(){
-		return this.productStep;
+	public String getService() {
+		return service;
 	}
 	public JSONObject getCommand(){
 		return this.command;

@@ -14,12 +14,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 import MAS.equiplet.Capability;
 import MAS.product.ProductStep;
 import MAS.simulation.util.Settings;
 import MAS.util.Pair;
 import MAS.util.Position;
-import MAS.util.MASConfiguration;
 import MAS.util.Tick;
 
 public class Configuration implements IConfig {
@@ -92,7 +93,7 @@ public class Configuration implements IConfig {
 		List<ProductStep> steps = new ArrayList<ProductStep>();
 		for (EquipletConfig equiplet : equipletConfig) {
 			for (CapabilityConfig capability : equiplet.getCapabilities()) {
-				steps.add(new ProductStep(counter++, capability.getName(), new HashMap<String, Object>()));
+				steps.add(new ProductStep(counter++, capability.getName(), new JSONObject()));
 			}
 		}
 

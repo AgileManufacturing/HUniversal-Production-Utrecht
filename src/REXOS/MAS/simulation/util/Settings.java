@@ -5,15 +5,15 @@ import MAS.util.Tick;
 public class Settings {
 
 	/**
-	 * whether the simulation need to verificate the simulation while running
+	 * whether the simulation need to verification the simulation while running
 	 * this has major consequence on the running time of the simulation 
 	 */
-	public static boolean VERIFICATION = true;
+	public static boolean VERIFICATION = false;
 	
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = false;
+	public final static boolean STOCHASTICS = true;
 
 	/**
 	 * whether equiplets can breakdown
@@ -23,18 +23,13 @@ public class Settings {
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
 	 */
-	public static double RECONFIGATION_TIME = 0;
+	public static double RECONFIGATION_TIME = 300;
 
 	/**
 	 * time needs to elapse before checking if equiplets need to be reconfigured
 	 */
 	public static final Tick RECONFIG_CHECK = new Tick(3000);
-
-	/**
-	 * the number of jobs an just arrives job can overtake in the queue
-	 */
-	public static final int QUEUE_JUMP = 0;
-
+	
 	/**
 	 * the maximun number of jobs in an equiplet queue, when there is no scheduling
 	 */
@@ -64,6 +59,4 @@ public class Settings {
 	public final static String SIMULATION_OUTPUT = "simulation/output";
 
 	public static final String PRODUCT_LOG = "products-log";
-
-
 }
