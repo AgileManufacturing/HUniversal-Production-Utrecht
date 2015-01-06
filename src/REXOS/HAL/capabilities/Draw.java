@@ -18,7 +18,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
-import MAS.product.ProductStep;
 
 /**
  * 
@@ -36,7 +35,7 @@ public class Draw extends Capability {
 	}
 
 	/**
-	 * @see Capability#translateProductStep(ProductStep)
+	 * @see Capability#translateProductStep(String, JSONObject)
 	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException {
@@ -49,7 +48,7 @@ public class Draw extends Capability {
 				throw new IllegalArgumentException(message);	
 			}
 			if(target == null) {
-				String message = "Recieved a illegaly formatted product step: " + service + " with criteria " + criteria;
+				String message = "Recieved a illegaly formatted job: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}

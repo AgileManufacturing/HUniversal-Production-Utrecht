@@ -38,6 +38,10 @@ import generic.Criteria;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -50,10 +54,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Pick and place capability class that translate with rotation.
@@ -73,7 +73,7 @@ public class PickAndPlaceWithRotation extends Capability {
 
 	/**
 	 * @throws ModuleTranslatingException
-	 * @see Capability#translateProductStep(ProductStep)
+	 * @see Capability#translateProductStep(String, JSONObject)
 	 */
 	@Override
 	public ArrayList<HardwareStep> translateProductStep(String service, JSONObject criteria) throws CapabilityException {
@@ -87,8 +87,7 @@ public class PickAndPlaceWithRotation extends Capability {
 				throw new IllegalArgumentException(message);
 			}
 			if (subjects.length() == 0) {
-				String message = "Recieved a product step which has no subjects: " + service + " with criteria "
-						+ criteria;
+				String message = "Recieved a job which has no subjects: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
@@ -134,8 +133,7 @@ public class PickAndPlaceWithRotation extends Capability {
 			compositeSteps.add(place);
 
 			ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
-			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: "
-					+ hardwareSteps.toString());
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
 			return hardwareSteps;
 		} catch (JSONException ex) {
 			throw new CapabilityException("Unable to translate due to illegally formatted JSON", ex);

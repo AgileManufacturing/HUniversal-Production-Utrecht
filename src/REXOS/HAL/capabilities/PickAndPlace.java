@@ -54,7 +54,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.OriginPlacement;
 import HAL.steps.OriginPlacementType;
-import MAS.product.ProductStep;
 
 /**
  * Pick and place capability class that translate
@@ -88,7 +87,7 @@ public class PickAndPlace extends Capability {
 				throw new IllegalArgumentException(message);	
 			}
 			if(subjects.length() == 0) {
-				String message = "Recieved a product step which has no subjects: " + service + " with criteria " + criteria;
+				String message = "Recieved a job which has no subjects: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
