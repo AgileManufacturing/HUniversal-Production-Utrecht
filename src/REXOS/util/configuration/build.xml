@@ -1,8 +1,12 @@
 <project name="configuration" default="all">
 	<import file="../build.xml"/>	
-
-	<target name="all">
+ 
+	<target name="all" depends="jars">
 		<buildjava dir="${basedir}"/>  
+	</target>
+
+	<target name="jars">
+		<antcall target="add-jar-to-classpath"><param name="jar" value="java-json.jar"/></antcall>
 	</target>
 
 	<target name="clean">
