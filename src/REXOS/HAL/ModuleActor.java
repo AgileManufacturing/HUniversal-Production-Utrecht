@@ -64,7 +64,7 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	 * @throws GeneralMongoException
 	 */
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
-			throws KnowledgeException, UnknownHostException, GeneralMongoException {
+			throws KnowledgeException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
 		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardProcessListener(this);
 	}

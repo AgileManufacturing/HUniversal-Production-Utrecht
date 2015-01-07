@@ -53,12 +53,14 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	
 	private String state = null;
 	private String mode = null;
+	private String equipletName;
 	
 	/**
 	 * @throws BlackboardUpdateException 
 	 * 
 	 */
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
+		this.equipletName = equipletName;
 		moduleSubscribers = new ArrayList<BlackboardModuleListener>();
 		equipletSubscribers = new ArrayList<BlackboardEquipletListener>();
 		processSubscribers = new ArrayList<BlackboardProcessListener>();
@@ -160,53 +162,50 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	public void onMessage(MongoOperation operation, OplogEntry entry) {
 		DBObject dbObject;
 		try{
-			switch (entry.getNamespace().split("\\.")[1]) {
-				case "equipletState":
-					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ state or mode changed");
-					dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
-					if(dbObject != null) {
-						if(dbObject.containsField("state")){
-							state = dbObject.get("state").toString();
-						}
-						if(dbObject.containsField("mode")){
-							mode = dbObject.get("mode").toString();
-						}	
-						for(BlackboardEquipletListener listener: equipletSubscribers){
-							listener.onEquipletStateChanged(state);
-							listener.onEquipletModeChanged(mode);
-						}
+			String collectionName = entry.getNamespace().split("\\.")[1];
+			if(collectionName.equals((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", equipletName))) { 
+				Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ state or mode changed");
+				dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null) {
+					if(dbObject.containsField("state")){
+						state = dbObject.get("state").toString();
 					}
-					break;
-				case "EquipletStepsBlackBoard":
-					dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
-					if(dbObject != null) {
-						String status = dbObject.get("status").toString();
-						String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
-						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
-						
-						for(BlackboardProcessListener listener: processSubscribers) {
-							listener.onProcessStatusChanged(HardwareStepStatus.valueOf(status), id); 
-						}
+					if(dbObject.containsField("mode")){
+						mode = dbObject.get("mode").toString();
+					}	
+					for(BlackboardEquipletListener listener: equipletSubscribers){
+						listener.onEquipletStateChanged(state);
+						listener.onEquipletModeChanged(mode);
 					}
-				    break;
+				}
+			} else if(collectionName.equals((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName))) {
+				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+				
+				if(dbObject != null) {
+					String status = dbObject.get("status").toString();
+					String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
+					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
+					
+					for(BlackboardProcessListener listener: processSubscribers) {
+						listener.onProcessStatusChanged(HardwareStepStatus.valueOf(status), id); 
+					}
+				}
+			} else if(collectionName.equals((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName))) {
 			    /**
 			     * ReloadEquiplet - W.I.P (Lars Veenendaal)
 			     */
-				case "ReloadEquiplet":
-					dbObject = ReloadEquipletBBClient.findDocumentById(entry.getTargetObjectId());
-					if(dbObject != null){
-						String status = dbObject.get("ReloadSucces").toString();
-						//String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
-						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "Reloading of the Equiplet has: " + status);
-						for(BlackboardEquipletListener listener: equipletSubscribers) {
-							listener.onReloadEquiplet(status); 
-						}
+				dbObject = ReloadEquipletBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null){
+					String status = dbObject.get("ReloadSucces").toString();
+					//String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
+					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "Reloading of the Equiplet has: " + status);
+					for(BlackboardEquipletListener listener: equipletSubscribers) {
+						listener.onReloadEquiplet(status); 
 					}
-				default:
-					break;
+				}
 			}
 		}catch(InvalidDBNamespaceException | GeneralMongoException ex) {
-			Logger.log(LogLevel.ERROR, "Unknown exception occured:", ex);
+			Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.ERROR, "Unknown exception occured:", ex);
 		}
 	}
 	

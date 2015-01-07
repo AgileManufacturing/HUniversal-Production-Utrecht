@@ -30,7 +30,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	// static final String baseDir = "/home/huniversal/demofolder/HUniversal-Production-Utrecht/";
 
 	// delta robot
-	static String moduleA_01 = "{" + "	\"manufacturer\":\"HU\"," + "	\"typeNumber\":\"delta_robot_type_B\"," + "	\"serialNumber\":\"1\"," + "	\"type\":{" + "		\"properties\":\"{"
+	static String moduleA_01 = "{"
+			+ "	\"manufacturer\":\"HU\"," + "	\"typeNumber\":\"delta_robot_type_B\"," + "	\"serialNumber\":\"1\"," + "	\"type\":{" + "		\"properties\":\"{"
 			+ "	\\\"midPointX\\\" : 75.0," + "	\\\"midPointY\\\" : -200.0," + "	\\\"midPointZ\\\" : -29.5," + "	\\\"deltaRobotMeasures\\\" : {" + "		\\\"baseRadius\\\" : 101.3,"
 			+ "		\\\"hipLength\\\" : 100.0," + "		\\\"effectorRadius\\\" : 46.19," + "		\\\"ankleLength\\\" : 300.0," + "		\\\"hipAnleMaxAngleDegrees\\\" : 22.0,"
 			+ "		\\\"motorFromZeroToTopAngleDegrees\\\" : 20.0," + "		\\\"boundaryBoxMinX\\\" : -200.0," + "		\\\"boundaryBoxMaxX\\\" : 200.0,"

@@ -1,9 +1,7 @@
 package HAL.modules;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import util.log.LogLevel;
 import util.log.Logger;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
@@ -25,7 +23,7 @@ public class DeltaRobot extends ModuleActor {
 	public final static double MAX_ACCELERATION = 50;
 	public final static String COMMAND_IDENTIFIER = "move";
 	
-	public DeltaRobot(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, UnknownHostException, GeneralMongoException {
+	public DeltaRobot(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) throws KnowledgeException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory, moduleListener);
 	}
 

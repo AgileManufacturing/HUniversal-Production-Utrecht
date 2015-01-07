@@ -3,7 +3,6 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import util.log.LogLevel;
 import util.log.Logger;
 import util.math.Vector3;
 import HAL.ModuleActor;

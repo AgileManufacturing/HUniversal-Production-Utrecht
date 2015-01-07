@@ -39,65 +39,152 @@ public class HALTesterClassPickAndPlace2 implements HardwareAbstractionLayerList
 	static final String baseDir = "/home/huniversal/demofolder/HUniversal-Production-Utrecht/";
 
 	// delta robot
-	static String moduleA_01 = "{" + "	\"manufacturer\":\"HU\"," + "	\"typeNumber\":\"delta_robot_type_B\"," + "	\"serialNumber\":\"1\"," + "	\"type\":{" + "		\"properties\":\"{"
-			+ "	\\\"midPointX\\\" : 75.0," + "	\\\"midPointY\\\" : -200.0," + "	\\\"midPointZ\\\" : -29.5," + "	\\\"deltaRobotMeasures\\\" : {" + "		\\\"baseRadius\\\" : 101.3,"
-			+ "		\\\"hipLength\\\" : 100.0," + "		\\\"effectorRadius\\\" : 46.19," + "		\\\"ankleLength\\\" : 300.0," + "		\\\"hipAnleMaxAngleDegrees\\\" : 22.0,"
-			+ "		\\\"motorFromZeroToTopAngleDegrees\\\" : 20.0," + "		\\\"boundaryBoxMinX\\\" : -200.0," + "		\\\"boundaryBoxMaxX\\\" : 200.0,"
-			+ "		\\\"boundaryBoxMinY\\\" : -200.0," + "		\\\"boundaryBoxMaxY\\\" : 200.0," + "		\\\"boundaryBoxMinZ\\\" : -450.0," + "		\\\"boundaryBoxMaxZ\\\" : -180.0" + "	},"
-			+ "	\\\"calibrationBigStepFactor\\\" : 20," + "	\\\"stepperMotorProperties\\\" : {" + "		\\\"motorMinAngleDegrees\\\" : -18.0,"
-			+ "		\\\"motorMaxAngleDegrees\\\" : 90.0," + "		\\\"microStepAngleDegrees\\\" : 0.036," + "		\\\"minAccelerationDegrees\\\" : 36,"
-			+ "		\\\"maxAccelerationDegrees\\\" : 36000," + "		\\\"minSpeedDegrees\\\" : 0.036," + "		\\\"maxSpeedDegrees\\\" : 18000" + "	}" + "}\"," + "		\"rosSoftware\":{"
-			+ "			\"buildNumber\":1," + "			\"rosFile\": \"";
-	static String moduleA_02 = "\"," + "			\"command\":\"rosrun delta_robot_node delta_robot_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" + "		},"
-			+ "		\"halSoftware\":{" + "			\"buildNumber\":1," + "			\"jarFile\": \"";
-	static String moduleA_03 = "\"," + "			\"className\":\"HAL.modules.DeltaRobot\"" + "		}," + "		\"supportedMutations\": [" + "			\"move\"" + "		]," + "		\"capabilities\":["
-			+ "			{" + "				\"name\":\"Draw\"," + "				\"treeNumber\":1," + "				\"halSoftware\":{" + "					\"buildNumber\":1," + "					\"jarFile\": \"";
-	static String moduleA_04 = "\"," + "					\"className\":\"HAL.capabilities.Draw\"" + "				}," + "				\"requiredMutationsTrees\":[" + "					{" + "						\"treeNumber\":1,"
-			+ "						\"mutations\":[" + "							\"move\", \"draw\"" + "						]" + "					}" + "				]," + "				\"services\":[" + "					\"draw\"" + "				]" + "			}," + "			{"
-			+ "				\"name\":\"PickAndPlace\"," + "				\"treeNumber\":1," + "				\"halSoftware\":{" + "					\"buildNumber\":1," + "					\"jarFile\": \"";
-	static String moduleA_05 = "\"," + "					\"className\":\"HAL.capabilities.PickAndPlace\"" + "				}," + "				\"requiredMutationsTrees\":[" + "					{"
-			+ "						\"treeNumber\":1," + "						\"mutations\":[" + "							\"move\", \"pick\", \"place\"" + "						]" + "					}" + "				]," + "				\"services\":["
-			+ "					\"place\"" + "				]" + "			}" + "		]" + "	}," + "	\"properties\":\"{" + "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\"," + "	\\\"modbusPort\\\" : 502" + "}\","
-			+ "	\"calibrationData\":[" + "		{" + "			\"date\":\"2014-01-01\"," + "			\"data\":\"aapkip\"," + "			\"moduleSet\":[" + "				{" + "					\"manufacturer\":\"manA\","
-			+ "					\"typeNumber\":\"typeA\"," + "					\"serialNumber\":\"serA\"" + "				}" + "			]" + "		}" + "	]," + "	\"attachedTo\":null," + "\"mountPointX\":3,"
+	static String moduleA_01 = "{" + "	\"manufacturer\":\"HU\","
+			+ "	\"typeNumber\":\"delta_robot_type_B\","
+			+ "	\"serialNumber\":\"1\"," + "	\"type\":{"
+			+ "		\"properties\":\"{" + "	\\\"midPointX\\\" : 75.0,"
+			+ "	\\\"midPointY\\\" : -200.0," + "	\\\"midPointZ\\\" : -29.5,"
+			+ "	\\\"deltaRobotMeasures\\\" : {"
+			+ "		\\\"baseRadius\\\" : 101.3," + "		\\\"hipLength\\\" : 100.0,"
+			+ "		\\\"effectorRadius\\\" : 46.19,"
+			+ "		\\\"ankleLength\\\" : 300.0,"
+			+ "		\\\"hipAnleMaxAngleDegrees\\\" : 22.0,"
+			+ "		\\\"motorFromZeroToTopAngleDegrees\\\" : 20.0,"
+			+ "		\\\"boundaryBoxMinX\\\" : -200.0,"
+			+ "		\\\"boundaryBoxMaxX\\\" : 200.0,"
+			+ "		\\\"boundaryBoxMinY\\\" : -200.0,"
+			+ "		\\\"boundaryBoxMaxY\\\" : 200.0,"
+			+ "		\\\"boundaryBoxMinZ\\\" : -450.0,"
+			+ "		\\\"boundaryBoxMaxZ\\\" : -180.0" + "	},"
+			+ "	\\\"calibrationBigStepFactor\\\" : 20,"
+			+ "	\\\"stepperMotorProperties\\\" : {"
+			+ "		\\\"motorMinAngleDegrees\\\" : -18.0,"
+			+ "		\\\"motorMaxAngleDegrees\\\" : 90.0,"
+			+ "		\\\"microStepAngleDegrees\\\" : 0.036,"
+			+ "		\\\"minAccelerationDegrees\\\" : 36,"
+			+ "		\\\"maxAccelerationDegrees\\\" : 36000,"
+			+ "		\\\"minSpeedDegrees\\\" : 0.036,"
+			+ "		\\\"maxSpeedDegrees\\\" : 18000" + "	}" + "}\","
+			+ "		\"rosSoftware\":{" + "			\"buildNumber\":1,"
+			+ "			\"rosFile\": \"";
+	static String moduleA_02 = "\","
+			+ "			\"command\":\"rosrun delta_robot_node delta_robot_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
+			+ "		}," + "		\"halSoftware\":{" + "			\"buildNumber\":1,"
+			+ "			\"jarFile\": \"";
+	static String moduleA_03 = "\","
+			+ "			\"className\":\"HAL.modules.DeltaRobot\"" + "		},"
+			+ "		\"supportedMutations\": [" + "			\"move\"" + "		],"
+			+ "		\"capabilities\":[" + "			{" + "				\"name\":\"Draw\","
+			+ "				\"treeNumber\":1," + "				\"halSoftware\":{"
+			+ "					\"buildNumber\":1," + "					\"jarFile\": \"";
+	static String moduleA_04 = "\","
+			+ "					\"className\":\"HAL.capabilities.Draw\"" + "				},"
+			+ "				\"requiredMutationsTrees\":[" + "					{"
+			+ "						\"treeNumber\":1," + "						\"mutations\":["
+			+ "							\"move\", \"draw\"" + "						]" + "					}" + "				],"
+			+ "				\"services\":[" + "					\"draw\"" + "				]" + "			},"
+			+ "			{" + "				\"name\":\"PickAndPlace\","
+			+ "				\"treeNumber\":1," + "				\"halSoftware\":{"
+			+ "					\"buildNumber\":1," + "					\"jarFile\": \"";
+	static String moduleA_05 = "\","
+			+ "					\"className\":\"HAL.capabilities.PickAndPlace\"" + "				},"
+			+ "				\"requiredMutationsTrees\":[" + "					{"
+			+ "						\"treeNumber\":1," + "						\"mutations\":["
+			+ "							\"move\", \"pick\", \"place\"" + "						]" + "					}"
+			+ "				]," + "				\"services\":[" + "					\"place\"" + "				]"
+			+ "			}" + "		]" + "	}," + "	\"properties\":\"{"
+			+ "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\","
+			+ "	\\\"modbusPort\\\" : 502" + "}\"," + "	\"calibrationData\":["
+			+ "		{" + "			\"date\":\"2014-01-01\"," + "			\"data\":\"aapkip\","
+			+ "			\"moduleSet\":[" + "				{"
+			+ "					\"manufacturer\":\"manA\","
+			+ "					\"typeNumber\":\"typeA\","
+			+ "					\"serialNumber\":\"serA\"" + "				}" + "			]" + "		}"
+			+ "	]," + "	\"attachedTo\":null," + "\"mountPointX\":3,"
 			+ "\"mountPointY\":1" + "}";
 	// pen
-	static String moduleB_01 = "{" + "	\"manufacturer\":\"HU\"," + "	\"typeNumber\":\"gripper_type_A\"," + "	\"serialNumber\":\"1\"," + "	\"type\":{" + "		\"properties\":\"{"
-			+ "	\\\"modbusAddress\\\" : 8001," + "	\\\"modbusDevicePin\\\" : 0," + " \\\"gripperSize\\\" : 31.00," + "	\\\"gripperEnabledMaxSeconds\\\" : 60,"
-			+ "	\\\"gripperEnabledWarningSeconds\\\" : 50," + "	\\\"gripperEnabledCooldownSeconds\\\" : 180," + "	\\\"watchdogInterval\\\" : 100" + "}\"," + "		\"rosSoftware\":{"
-			+ "			\"buildNumber\":1," + "			\"rosFile\": \"";
-	static String moduleB_02 = "\"," + "			\"command\":\"rosrun gripper_node gripper_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" + "		},"
-			+ "		\"halSoftware\":{" + "			\"buildNumber\":1," + "			\"jarFile\": \"";
-	static String moduleB_03 = "\"," + "			\"className\":\"HAL.modules.Gripper\"" + "		}," + "		\"supportedMutations\": [" + "			\"pick\", \"place\"" + "		],"
-			+ "		\"capabilities\":[" + "		]" + "	}," + "	\"properties\":\"{" + "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\"," + "	\\\"modbusPort\\\" : 502" + "}\","
-			+ "	\"calibrationData\":[" + "	]," + "	\"attachedTo\":{" + "		\"manufacturer\":\"HU\"," + "		\"typeNumber\":\"delta_robot_type_B\"," + "		\"serialNumber\":\"1\""
-			+ "	}," + "\"mountPointX\":null," + "\"mountPointY\":null" + "}";
+	static String moduleB_01 = "{" + "	\"manufacturer\":\"HU\","
+			+ "	\"typeNumber\":\"gripper_type_A\","
+			+ "	\"serialNumber\":\"1\"," + "	\"type\":{"
+			+ "		\"properties\":\"{" + "	\\\"modbusAddress\\\" : 8001,"
+			+ "	\\\"modbusDevicePin\\\" : 0," + " \\\"gripperSize\\\" : 31.00,"
+			+ "	\\\"gripperEnabledMaxSeconds\\\" : 60,"
+			+ "	\\\"gripperEnabledWarningSeconds\\\" : 50,"
+			+ "	\\\"gripperEnabledCooldownSeconds\\\" : 180,"
+			+ "	\\\"watchdogInterval\\\" : 100" + "}\","
+			+ "		\"rosSoftware\":{" + "			\"buildNumber\":1,"
+			+ "			\"rosFile\": \"";
+	static String moduleB_02 = "\","
+			+ "			\"command\":\"rosrun gripper_node gripper_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
+			+ "		}," + "		\"halSoftware\":{" + "			\"buildNumber\":1,"
+			+ "			\"jarFile\": \"";
+	static String moduleB_03 = "\","
+			+ "			\"className\":\"HAL.modules.Gripper\"" + "		},"
+			+ "		\"supportedMutations\": [" + "			\"pick\", \"place\"" + "		],"
+			+ "		\"capabilities\":[" + "		]" + "	}," + "	\"properties\":\"{"
+			+ "	\\\"modbusIp\\\" : \\\"192.168.0.22\\\","
+			+ "	\\\"modbusPort\\\" : 502" + "}\"," + "	\"calibrationData\":["
+			+ "	]," + "	\"attachedTo\":{" + "		\"manufacturer\":\"HU\","
+			+ "		\"typeNumber\":\"delta_robot_type_B\","
+			+ "		\"serialNumber\":\"1\"" + "	}," + "\"mountPointX\":null,"
+			+ "\"mountPointY\":null" + "}";
 	// camera
-	static String moduleC_01 = "{" + "	\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," + "	\"typeNumber\":\"DFK_22AUC03\"," + "	\"serialNumber\":\"1\"," + "	\"type\":{"
-			+ "		\"properties\":\"\"," + "		\"rosSoftware\":{" + "			\"buildNumber\":1," + "			\"rosFile\": \"";
+	static String moduleC_01 = "{"
+			+ "	\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
+			+ "	\"typeNumber\":\"DFK_22AUC03\"," + "	\"serialNumber\":\"1\","
+			+ "	\"type\":{" + "		\"properties\":\"\"," + "		\"rosSoftware\":{"
+			+ "			\"buildNumber\":1," + "			\"rosFile\": \"";
 	static String moduleC_02 = "\","
-			+ "			\"command\":\"roslaunch camera.launch equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" + "		},"
-			+ "		\"halSoftware\":{" + "			\"buildNumber\":1," + "			\"jarFile\": \"";
-	static String moduleC_03 = "\"," + "			\"className\":\"HAL.modules.Camera\"" + "		}," + "		\"supportedMutations\": [" + "		]," + "		\"capabilities\":[" + "		]" + "	},"
-			+ "	\"properties\":\"\"," + "	\"calibrationData\":[" + "	]," + "	\"attachedTo\":null," + "\"mountPointX\":3," + "\"mountPointY\":16" + "}";
+			+ "			\"command\":\"roslaunch camera.launch equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\""
+			+ "		}," + "		\"halSoftware\":{" + "			\"buildNumber\":1,"
+			+ "			\"jarFile\": \"";
+	static String moduleC_03 = "\","
+			+ "			\"className\":\"HAL.modules.Camera\"" + "		},"
+			+ "		\"supportedMutations\": [" + "		]," + "		\"capabilities\":["
+			+ "		]" + "	}," + "	\"properties\":\"\","
+			+ "	\"calibrationData\":[" + "	]," + "	\"attachedTo\":null,"
+			+ "\"mountPointX\":3," + "\"mountPointY\":16" + "}";
 	// lens
-	static String moduleD_01 = "{" + "	\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," + "	\"typeNumber\":\"Cheap_ass_lens\"," + "	\"serialNumber\":\"1\"," + "	\"type\":{"
-			+ "		\"properties\":\"\"," + "		\"rosSoftware\":null," + "		\"halSoftware\":{" + "			\"buildNumber\":1," + "			\"jarFile\": \"";
-	static String moduleD_02 = "\"," + "			\"className\":\"HAL.modules.Lens\"" + "		}," + "		\"supportedMutations\": [" + "		]," + "		\"capabilities\":[" + "		]" + "	},"
-			+ "	\"properties\":\"\"," + "	\"calibrationData\":[" + "	]," + "	\"attachedTo\":{" + "		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
-			+ "		\"typeNumber\":\"DFK_22AUC03\"," + "		\"serialNumber\":\"1\"" + "	}," + "\"mountPointX\":null," + "\"mountPointY\":null" + "}";
+	static String moduleD_01 = "{"
+			+ "	\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
+			+ "	\"typeNumber\":\"Cheap_ass_lens\","
+			+ "	\"serialNumber\":\"1\"," + "	\"type\":{"
+			+ "		\"properties\":\"\"," + "		\"rosSoftware\":null,"
+			+ "		\"halSoftware\":{" + "			\"buildNumber\":1,"
+			+ "			\"jarFile\": \"";
+	static String moduleD_02 = "\"," + "			\"className\":\"HAL.modules.Lens\""
+			+ "		}," + "		\"supportedMutations\": [" + "		],"
+			+ "		\"capabilities\":[" + "		]" + "	}," + "	\"properties\":\"\","
+			+ "	\"calibrationData\":[" + "	]," + "	\"attachedTo\":{"
+			+ "		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\","
+			+ "		\"typeNumber\":\"DFK_22AUC03\"," + "		\"serialNumber\":\"1\""
+			+ "	}," + "\"mountPointX\":null," + "\"mountPointY\":null" + "}";
 	// workplane
-	static String moduleE_01 = "{" + "     \"manufacturer\":\"HU\"," + "     \"typeNumber\":\"workplane_type_A\"," + "     \"serialNumber\":\"1\"," + "     \"type\":{"
-			+ "	     \"properties\":\"{" + "     \\\"midPointX\\\" : 175.0," + "     \\\"midPointY\\\" : -200.0," + "     \\\"midPointZ\\\" : 34.8,"
-			+ "     \\\"topLeftValue\\\" : \\\"_WP_TL\\\"," + "     \\\"topRightValue\\\" : \\\"_WP_TR\\\"," + "     \\\"bottomRightValue\\\" : \\\"_WP_BR\\\","
-			+ "     \\\"workPlaneWidth\\\" : 80.0," + "     \\\"workPlaneHeight\\\" : 80.0" + "}\"," + "	     \"rosSoftware\":{" + "		     \"buildNumber\":1,"
+	static String moduleE_01 = "{" + "     \"manufacturer\":\"HU\","
+			+ "     \"typeNumber\":\"workplane_type_A\","
+			+ "     \"serialNumber\":\"1\"," + "     \"type\":{"
+			+ "	     \"properties\":\"{" + "     \\\"midPointX\\\" : 175.0,"
+			+ "     \\\"midPointY\\\" : -200.0,"
+			+ "     \\\"midPointZ\\\" : 34.8,"
+			+ "     \\\"topLeftValue\\\" : \\\"_WP_TL\\\","
+			+ "     \\\"topRightValue\\\" : \\\"_WP_TR\\\","
+			+ "     \\\"bottomRightValue\\\" : \\\"_WP_BR\\\","
+			+ "     \\\"workPlaneWidth\\\" : 80.0,"
+			+ "     \\\"workPlaneHeight\\\" : 80.0" + "}\","
+			+ "	     \"rosSoftware\":{" + "		     \"buildNumber\":1,"
 			+ "		     \"rosFile\": \"";
-	static String moduleE_02 = "\"," + "		     \"command\":\"rosrun part_locator_node part_locator_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" + "	     },"
-			+ "	     \"halSoftware\":{" + "		     \"buildNumber\":1," + "		     \"jarFile\": \"";
-	static String moduleE_03 = "\"," + "		     \"className\":\"HAL.modules.Workplane\"" + "	     }," + "	     \"supportedMutations\": [" + "	     ]," + "	     \"capabilities\":["
-			+ "	     ]" + "     }," + "     \"properties\":\"\"," + "     \"calibrationData\":[" + "     ]," + "     \"attachedTo\":null," + "\"mountPointX\":1,"
+	static String moduleE_02 = "\","
+			+ "		     \"command\":\"rosrun part_locator_node part_locator_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
+			+ "	     }," + "	     \"halSoftware\":{"
+			+ "		     \"buildNumber\":1," + "		     \"jarFile\": \"";
+	static String moduleE_03 = "\","
+			+ "		     \"className\":\"HAL.modules.Workplane\"" + "	     },"
+			+ "	     \"supportedMutations\": [" + "	     ],"
+			+ "	     \"capabilities\":[" + "	     ]" + "     },"
+			+ "     \"properties\":\"\"," + "     \"calibrationData\":["
+			+ "     ]," + "     \"attachedTo\":null," + "\"mountPointX\":1,"
 			+ "\"mountPointY\":10" + "}";
-
+	
 	public static void executeDemoStep() {
 		if (direction == 1) {
 			id1 = "GC4x4MB_1";
