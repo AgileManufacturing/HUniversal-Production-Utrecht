@@ -30,13 +30,7 @@
 #ifndef TRANSITIONS_H
 #define TRANSITIONS_H
 
-#include <actionlib/server/simple_action_server.h>
-
-#include <rexos_statemachine/TransitionAction.h>
-
 namespace rexos_statemachine {
-
-typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
 
 class Transitions {
 public:

@@ -80,7 +80,7 @@ public class MonitoringAgent extends Agent {
 
 		addBehaviour(new HeartBeatBehaviour(this, MONITORING_INTERVAL));
 		addBehaviour(new MonitorListener());
-		
+
 		System.out.println(getLocalName() + " start with monitoring");
 	}
 
@@ -140,6 +140,9 @@ public class MonitoringAgent extends Agent {
 		@Override
 		public void onError(Exception ex) {
 			// TODO Auto-generated method stub
+			System.out.println(getLocalName() + ": an error occured: " + ex);
+			System.out.println("" + webSocket.getResourceDescriptor());
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
 		}
 	}

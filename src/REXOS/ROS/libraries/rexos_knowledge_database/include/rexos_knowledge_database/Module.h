@@ -4,6 +4,7 @@
  * @date Created: 2012-01-??  TODO: Date
  *
  * @author Tommas Bakker
+ * @author Lars Veenendaal
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -32,40 +33,37 @@
 #include <string>
 #include <vector>
 #include <memory>
-
+#include <rexos_logger/rexos_logger.h>
 #include <rexos_knowledge_database/ModuleType.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
 	class Module : public ModuleType {
-	private:
-		ModuleIdentifier moduleIdentifier;
-		std::unique_ptr<sql::Connection> connection;
+		
 	public:
-		Module(ModuleIdentifier moduleIdentifier);
-		
-		ModuleIdentifier getModuleIdentifier();
-		
+		Module(rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		rexos_datatypes::ModuleIdentifier getModuleIdentifier();
 		std::string getModuleProperties();
-		void setModuleProperties(std::string jsonProperties);
 		Module* getParentModule();
-		std::vector<ModuleIdentifier> getChildModulesIdentifiers();
-		
+		std::vector<rexos_datatypes::ModuleIdentifier> getChildModulesIdentifiers();
 		int getMountPointX();
-		void setMountPointX(int mountPointX);
 		int getMountPointY();
-		void setMountPointY(int mountPointY);
-		
 		std::string getCalibrationDataForModuleOnly();
 		std::string getCalibrationDataForModuleAndChilds();
-		std::string getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers);
+		std::string getCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
+	protected:
 		void setCalibrationDataForModuleOnly(std::string properties);
 		void setCalibrationDataForModuleAndChilds(std::string properties);
-		void setCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers, std::string properties);
+		void setCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers, std::string properties);
+		void setModuleProperties(std::string jsonProperties);
+		void setMountPointX(int mountPointX);
+		void setMountPointY(int mountPointY);
 	private:
-		int getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers);
+		rexos_datatypes::ModuleIdentifier moduleIdentifier;
+		std::unique_ptr<sql::Connection> connection;
+		int getCalibrationGroupForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
 		
 	};
 }

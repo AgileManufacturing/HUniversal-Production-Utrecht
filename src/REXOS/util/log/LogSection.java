@@ -13,6 +13,8 @@ public enum LogSection {
 		HAL_EXECUTION(HAL, "halexec"),
 		HAL_MODULES(HAL, "halMod"),
 		HAL_CAPABILITIES(HAL, "halCap"),
+		HAL_RECONFIG(HAL, "halReconf"),
+			HAL_RECONFIG_SQL(HAL_RECONFIG, "halReconfSql"),
 	MAS(null, "mas"),
 	MAS_EQUIPLET_AGENT(MAS, "masEqA"),
 	MAS_PRODUCT_AGENT(MAS, "masPA"),

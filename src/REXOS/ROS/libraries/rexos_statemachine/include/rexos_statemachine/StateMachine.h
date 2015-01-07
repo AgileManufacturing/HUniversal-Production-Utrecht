@@ -38,22 +38,20 @@
 #include "rexos_statemachine/State.h"
 #include "rexos_statemachine/Mode.h"
 #include "rexos_statemachine/Listener.h"
+#include "rexos_logger/rexos_logger.h"
 
 #include <actionlib/server/simple_action_server.h>
 #include <actionlib/client/simple_action_client.h>
 #include <rexos_statemachine/ChangeStateAction.h>
 #include <rexos_statemachine/ChangeModeAction.h>
-#include <rexos_statemachine/TransitionAction.h>
 
 namespace rexos_statemachine {
 
 typedef actionlib::SimpleActionServer<ChangeStateAction> ChangeStateActionServer;
 typedef actionlib::SimpleActionServer<ChangeModeAction> ChangeModeActionServer;
-typedef actionlib::SimpleActionServer<TransitionAction> TransitionActionServer;
 
 typedef actionlib::SimpleActionClient<ChangeStateAction> ChangeStateActionClient;
 typedef actionlib::SimpleActionClient<ChangeModeAction> ChangeModeActionClient;
-typedef actionlib::SimpleActionClient<TransitionAction> TransitionActionClient;
 
 class StateMachine: public rexos_statemachine::Transitions {
 public:

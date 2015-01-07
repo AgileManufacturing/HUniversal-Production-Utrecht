@@ -17,6 +17,7 @@ import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
 import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.listeners.BlackboardProcessListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
@@ -28,9 +29,10 @@ import org.json.JSONObject;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
- *
+ * @author Lars Veenendaal
+ * 
  */
-public abstract class ModuleActor extends Module {
+public abstract class ModuleActor extends Module implements BlackboardProcessListener {
 	protected static final String MODULE_COMMAND = "module_command";
 	protected static final String APPROACH = "approach";
 	protected static final String DESTINATION = "destination";
@@ -64,6 +66,7 @@ public abstract class ModuleActor extends Module {
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException, UnknownHostException, GeneralMongoException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
+		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardProcessListener(this);
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
@@ -82,6 +85,23 @@ public abstract class ModuleActor extends Module {
 			throw new RuntimeException("Executing invalid DBNamespace", ex);
 		} catch (GeneralMongoException ex) {
 			throw new RuntimeException("General mongo exception while trying to execute", ex);
+		}
+	}
+
+	/**
+	 * [executeReloadEquipletCommand This function fires a 'ReloadEquiplet' message.]
+	 */
+	protected void executeReloadEquipletCommand(){
+		try{
+			moduleFactory.getHAL().getBlackBoardHandler().postReloadEquiplet();
+		} catch (JSONException ex) {
+ 			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()");
+		} catch (InvalidJSONException ex) {
+			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()", ex);
+		} catch (InvalidDBNamespaceException ex) {
+			throw new RuntimeException("Executing invalid DBNamespace - executeReloadEquipletCommand()", ex);
+		} catch (GeneralMongoException ex) {
+			throw new RuntimeException("General mongo exception while trying to execute - executeReloadEquipletCommand()", ex);
 		}
 	}
 	
@@ -136,28 +156,14 @@ public abstract class ModuleActor extends Module {
 	 * @throws JSONException 
 	 */
 	abstract public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException;
-	/**
-	 * This method will forward the changed MAST module state to the {@link ModuleListener}
-	 * Do not call this method!
-	 */
-	public void onModuleStateChanged(String state){
-		moduleListener.onModuleStateChanged(state, this);
-	}
-	/**
-	 * This method will forward the changed MAST module mode to the {@link ModuleListener}
-	 * Do not call this method!
-	 */
-	public void onModuleModeChanged(String mode){
-		moduleListener.onModuleModeChanged(mode, this);
-	}
 	
 	/**
 	 * Returns -1 if not found.
 	 * 
 	 */
-	protected int getPlaceholderID(ArrayList<HardwareStep> hardwareSteps){
+	protected int getPlaceholderIndex(ArrayList<HardwareStep> hardwareSteps){
 		if (hardwareSteps != null){
-			for (int i=0;i<hardwareSteps.size();i++){
+			for (int i = 0; i < hardwareSteps.size(); i++){
 				if (hardwareSteps.get(i) == null){
 					return i;
 				}
@@ -180,9 +186,12 @@ public abstract class ModuleActor extends Module {
 		
 		JSONObject move = compositeCommand.getJSONObject(MOVE);
 		if (move != null){
-			double originalX = (double) move.remove(MOVE_X);
-			double originalY = (double) move.remove(MOVE_Y);
-			double originalZ = (double) move.remove(MOVE_Z);
+			double originalX = move.getDouble(MOVE_X);
+			move.remove(MOVE_X);
+			double originalY = move.getDouble(MOVE_Y);
+			move.remove(MOVE_Y);
+			double originalZ = move.getDouble(MOVE_Z);
+			move.remove(MOVE_Z);
 			
 			Matrix rotationMatrix = directionAngles.generateRotationMatrix();
 			
@@ -202,13 +211,14 @@ public abstract class ModuleActor extends Module {
 	
 
 
-	@Override
-	public void onProcessStatusChanged(String status) {
-		if(processListener != null){
-			processListener.onProcessStateChanged(status, 0, this);
+	public void onProcessStatusChanged(HardwareStepStatus status, String hardwareStepSerialId) {
+		if(processListener != null) {
+			// the listener might reset the processListener, and therefore the listener must be set before calling the listener
+			ProcessListener temp = processListener;
 			if(status.equals(HardwareStepStatus.DONE) || status.equals(HardwareStepStatus.FAILED)){
 				processListener = null;
 			}
+			temp.onProcessStatusChanged(status, hardwareStepSerialId, this);
 		}
 	}
 }

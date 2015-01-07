@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import util.configuration.Configuration;
-import util.configuration.ConfigurationFiles;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -20,28 +19,37 @@ import HAL.libraries.blackboard_client.data_classes.MongoOperation;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
 import HAL.listeners.BlackboardEquipletListener;
 import HAL.listeners.BlackboardModuleListener;
+import HAL.listeners.BlackboardProcessListener;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 
 import org.json.JSONObject;
+import org.json.JSONException;
+
 import com.mongodb.DBObject;
 
 
 /**
+ * A BlackBoardhandler handles message going to and coming back off blackboard.
  * 
  * @author Aristides Ayala Mendoza
- *
+ * @author Lars Veenendaal
+ * 
  */
 public class BlackboardHandler implements BlackboardSubscriber {
 
 	private ArrayList<BlackboardModuleListener> moduleSubscribers;
 	private ArrayList<BlackboardEquipletListener> equipletSubscribers;
+	private ArrayList<BlackboardProcessListener> processSubscribers;
 	
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
 	private BlackboardClient equipletStepBBClient;
+	private BlackboardClient ReloadEquipletBBClient;
 	
 	private FieldUpdateSubscription stateSubscription;
 	private FieldUpdateSubscription modeSubscription;
 	private FieldUpdateSubscription statusSubscription;
+	private FieldUpdateSubscription reloadSubscription;
 	
 	private String state = null;
 	private String mode = null;
@@ -53,33 +61,43 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
 		moduleSubscribers = new ArrayList<BlackboardModuleListener>();
 		equipletSubscribers = new ArrayList<BlackboardEquipletListener>();
-			
+		processSubscribers = new ArrayList<BlackboardProcessListener>();
+		
 		try {
 			stateSubscription = new FieldUpdateSubscription("state", this);
 			stateSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			stateBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
-			stateBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
-			stateBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
+			stateBlackboardBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletState/ip/", equipletName));
+			stateBlackboardBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletState/databaseName/", equipletName));
+			stateBlackboardBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", equipletName));
 			stateBlackboardBBClient.subscribe(stateSubscription);
 			
 			
 			modeSubscription = new FieldUpdateSubscription("mode", this);
 			modeSubscription.addOperation(MongoUpdateLogOperation.SET);
 			
-			modeBlackboardBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "collectiveDbIp"));
-			modeBlackboardBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "stateBlackBoardName"));
-			modeBlackboardBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.MONGO_DB_PROPERTIES, "equipletStateCollectionName"));
+			modeBlackboardBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletState/ip/", equipletName));
+			modeBlackboardBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletState/databaseName/", equipletName));
+			modeBlackboardBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", equipletName));
 			modeBlackboardBBClient.subscribe(modeSubscription);
 			
 			
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 		   
-			equipletStepBBClient = new BlackboardClient(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbIp", equipletName));
-			equipletStepBBClient.setDatabase(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "DbName", equipletName));
-			equipletStepBBClient.setCollection(Configuration.getProperty(ConfigurationFiles.EQUIPLET_DB_PROPERTIES, "EquipletStepsBlackBoardName", equipletName));
+			equipletStepBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/hardwareSteps/ip/", equipletName));
+			equipletStepBBClient.setDatabase((String) Configuration.getProperty("rosInterface/hardwareSteps/databaseName/", equipletName));
+			equipletStepBBClient.setCollection((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName));
 			equipletStepBBClient.subscribe(statusSubscription);
+
+			reloadSubscription = new FieldUpdateSubscription("reload", this);
+			reloadSubscription.addOperation(MongoUpdateLogOperation.SET);
+
+			ReloadEquipletBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletCommands/ip/", equipletName));
+			ReloadEquipletBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletCommands/databaseName/", equipletName));
+			ReloadEquipletBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
+			ReloadEquipletBBClient.subscribe(reloadSubscription);
+
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
 			throw new BlackboardUpdateException("Unable to initialize HAL.BlackBoardHandler", ex);
 		}
@@ -93,6 +111,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	public void addBlackboardModuleListener(BlackboardModuleListener blackboardListener){
 		moduleSubscribers.add(blackboardListener);
 	}
+
 	/**
 	 * 
 	 * @param blackboardListener
@@ -101,7 +120,14 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		equipletSubscribers.add(blackboardListener);
 	}
 	
-
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void addBlackboardProcessListener(BlackboardProcessListener blackboardListener){
+		processSubscribers.add(blackboardListener);
+	}
+	
 	/**
 	 * 
 	 * @param blackboardListener
@@ -109,6 +135,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	public void removeBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
 		equipletSubscribers.remove(blackboardListener);
 	}
+
 	/**
 	 * 
 	 * @param blackboardListener
@@ -117,8 +144,15 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		moduleSubscribers.remove(blackboardListener);
 	}
 	
+	/**
+	 * 
+	 * @param blackboardListener
+	 */
+	public void removeBlackboardProcessListener(BlackboardProcessListener blackboardListener){
+		processSubscribers.remove(blackboardListener);
+	}
 	
-
+	
 	/**
 	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
 	 */
@@ -147,13 +181,27 @@ public class BlackboardHandler implements BlackboardSubscriber {
 					dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
 					if(dbObject != null) {
 						String status = dbObject.get("status").toString();
-						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed");
+						String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
+						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
 						
-						for(BlackboardModuleListener listener: moduleSubscribers) {
-							listener.onProcessStatusChanged(status); 
+						for(BlackboardProcessListener listener: processSubscribers) {
+							listener.onProcessStatusChanged(HardwareStepStatus.valueOf(status), id); 
 						}
 					}
 				    break;
+			    /**
+			     * ReloadEquiplet - W.I.P (Lars Veenendaal)
+			     */
+				case "ReloadEquiplet":
+					dbObject = ReloadEquipletBBClient.findDocumentById(entry.getTargetObjectId());
+					if(dbObject != null){
+						String status = dbObject.get("ReloadSucces").toString();
+						//String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
+						Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "Reloading of the Equiplet has: " + status);
+						for(BlackboardEquipletListener listener: equipletSubscribers) {
+							listener.onReloadEquiplet(status); 
+						}
+					}
 				default:
 					break;
 			}
@@ -164,6 +212,18 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	
 	public void postHardwareStep(JSONObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		equipletStepBBClient.insertDocument(hardwareStep.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
+	}
+	
+	/**
+	 * [postReloadEquiplet - This method posts to blackboard that a equiplet has to reload. - UNTESTED W.I.P (Lars Veenendaal)]
+	 * @throws JSONException
+	 * @throws InvalidJSONException
+	 * @throws InvalidDBNamespaceException
+	 * @throws GeneralMongoException
+	 */
+	public void postReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		JSONObject reloadEQ = new JSONObject("{\"reloadEquiplet\":RELOAD_ALL_MODULES}");
+		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
 
 }

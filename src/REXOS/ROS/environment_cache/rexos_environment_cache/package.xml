@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+	<name>rexos_environment_cache</name>
+	<version>0.0.0</version>
+	<description>The environment_cache package</description>
+	<maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+	<license>newBSD</license>
+	<url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+	<author email="dickvandersteen@gmail.com">Dickvdsteen</author>
+	<author email="koenbraham@gmail.com">KBraham</author>
+	<buildtool_depend>catkin</buildtool_depend>
+	<run_depend>roscpp</run_depend>
+	<build_depend>roscpp</build_depend>
+	<run_depend>rexos_logger</run_depend>
+	<build_depend>rexos_logger</build_depend>
+	
+	<export>
+	<cpp cflags="-I${prefix}/include"/>
+	</export>
+</package>

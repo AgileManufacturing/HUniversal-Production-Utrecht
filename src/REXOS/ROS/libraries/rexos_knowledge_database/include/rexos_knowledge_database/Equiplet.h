@@ -4,6 +4,7 @@
  * @date Created: 2012-01-??  TODO: Date
  *
  * @author Tommas Bakker
+ * @author Lars Veenendaal
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -32,7 +33,7 @@
 #include <string>
 #include <memory>
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include "mysql_connection.h"
 
@@ -41,12 +42,13 @@ namespace rexos_knowledge_database {
 	public:
 		Equiplet(std::string name);
 		
-		int getMointPointsX();
-		int getMointPointsY();
-		double getMointPointDistanceX();
-		double getMointPointDistanceY();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
-		std::vector<ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+		int getMountPointsX();
+		int getMountPointsY();
+		double getMountPointDistanceX();
+		double getMountPointDistanceY();
+		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
+		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+		std::string checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber);
 	private:
 		std::string name;
 		std::unique_ptr<sql::Connection> connection;

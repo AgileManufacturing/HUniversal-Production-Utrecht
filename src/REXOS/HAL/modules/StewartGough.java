@@ -61,7 +61,7 @@ public class StewartGough extends ModuleActor {
 
 		JSONObject instructionData = new JSONObject();
 		instructionData.put(MOVE, commandMove);
-		instructionData.put(ROTATE, commandMove);
+		instructionData.put(ROTATE, commandRotate);
 		if (forceStraightLine){
 			//Straight line
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
@@ -70,7 +70,7 @@ public class StewartGough extends ModuleActor {
 			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
 			JSONObject approachInstructionData = new JSONObject();
 			approachInstructionData.put(MOVE, commandApproach);
-			approachInstructionData.put(ROTATE, commandMove);
+			approachInstructionData.put(ROTATE, commandRotate);
 			
 			//Entry point
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));

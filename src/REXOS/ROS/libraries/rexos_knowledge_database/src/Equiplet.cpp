@@ -7,14 +7,14 @@
 
 namespace rexos_knowledge_database{
 	Equiplet::Equiplet(std::string name) :
-				name(name)
+		name(name)
 	{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}
 	
-	int Equiplet::getMointPointsX() {
+	int Equiplet::getMountPointsX() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPointsX \
+		SELECT mountPointsX \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -25,15 +25,16 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointsX = result->getInt("mointPointsX");
+		int mountPointsX = result->getInt("mountPointsX");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointsX;
+		return mountPointsX;
 	}
-	int Equiplet::getMointPointsY() {
+
+	int Equiplet::getMountPointsY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPointsY \
+		SELECT mountPointsY \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -44,16 +45,16 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointsY = result->getInt("mointPointsY");
+		int mountPointsY = result->getInt("mountPointsY");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointsY;
+		return mountPointsY;
 	}
 	
-	double Equiplet::getMointPointDistanceX() {
+	double Equiplet::getMountPointDistanceX() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPointsDistanceX \
+		SELECT mountPointsDistanceX \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -64,15 +65,16 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointDistanceX = result->getDouble("mointPointDistanceX");
+		int mountPointDistanceX = result->getDouble("mountPointDistanceX");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointDistanceX;
+		return mountPointDistanceX;
 	}
-	double Equiplet::getMointPointDistanceY() {
+
+	double Equiplet::getMountPointDistanceY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mointPoinstDistanceY \
+		SELECT mountPoinstDistanceY \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -83,13 +85,14 @@ namespace rexos_knowledge_database{
 		}
 		// set the cursor at the first result
 		result->next();
-		int mointPointDistanceY = result->getDouble("mointPointDistanceY");
+		int mountPointDistanceY = result->getDouble("mountPointDistanceY");
 		
 		delete result;
 		delete preparedStmt;
-		return mointPointDistanceY;
+		return mountPointDistanceY;
 	}
-	std::vector<ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {
+
+	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
@@ -98,9 +101,9 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		
-		std::vector<ModuleIdentifier> moduleIdentifiersOfAttachedModules;
+		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiersOfAttachedModules;
 		while(result->next()) {
-			ModuleIdentifier identifier = ModuleIdentifier(
+			rexos_datatypes::ModuleIdentifier identifier(
 					result->getString("manufacturer"), result->getString("typeNumber"), result->getString("serialNumber"));
 			moduleIdentifiersOfAttachedModules.push_back(identifier);
 		}
@@ -109,7 +112,8 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
 	}
-	std::vector<ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
+
+	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \
 		FROM Module \
@@ -121,9 +125,9 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		
-		std::vector<ModuleIdentifier> moduleIdentifiersOfAttachedModules;
+		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiersOfAttachedModules;
 		while(result->next()) {
-			ModuleIdentifier identifier = ModuleIdentifier(
+			rexos_datatypes::ModuleIdentifier identifier(
 					result->getString("manufacturer"), result->getString("typeNumber"), result->getString("serialNumber"));
 			moduleIdentifiersOfAttachedModules.push_back(identifier);
 		}
@@ -131,5 +135,24 @@ namespace rexos_knowledge_database{
 		delete result;
 		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
+	}
+
+	std::string Equiplet::checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber){
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT count(*) \
+		FROM Module WHERE manufacturer = ? AND \
+			typeNumber = ? AND \
+			serialNumber = ? AND \
+			Module.equiplet = ?");
+		preparedStmt->setString(1, manufacturer);
+		preparedStmt->setString(2, typeNumber);
+		preparedStmt->setString(3, serialNumber);
+		preparedStmt->setString(4, name);
+
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		result->next();
+
+		
+		return result->getString("count(*)");
 	}
 }

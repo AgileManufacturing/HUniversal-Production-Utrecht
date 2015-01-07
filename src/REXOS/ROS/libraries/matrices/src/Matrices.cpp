@@ -18,7 +18,7 @@
 
 #include <cmath>
 #include <algorithm>
-#include "Matrices/Matrices.h"
+#include "matrices/Matrices.h"
 const float DEG2RAD = 3.141593f / 180;
 
 
@@ -446,15 +446,24 @@ Matrix4& Matrix4::scale(float x, float y, float z)
 // build a rotation matrix with given angle(degree) and rotation axis, then
 // multiply it with this object
 ///////////////////////////////////////////////////////////////////////////////
+Matrix4& Matrix4::rotateDegree(float angle, const Vector3& axis)
+{
+    return rotateDegree(angle, axis.x, axis.y, axis.z);
+}
+
 Matrix4& Matrix4::rotate(float angle, const Vector3& axis)
 {
     return rotate(angle, axis.x, axis.y, axis.z);
 }
 
+Matrix4& Matrix4::rotateDegree(float angle, float x, float y, float z)
+{
+	rotate(angle * DEG2RAD, x, y, z);
+}
 Matrix4& Matrix4::rotate(float angle, float x, float y, float z)
 {
-    float c = cosf(angle * DEG2RAD);    // cosine
-    float s = sinf(angle * DEG2RAD);    // sine
+    float c = cosf(angle);    // cosine
+    float s = sinf(angle);    // sine
     float xx = x * x;
     float xy = x * y;
     float xz = x * z;
@@ -487,10 +496,14 @@ Matrix4& Matrix4::rotate(float angle, float x, float y, float z)
     return *this;
 }
 
+Matrix4& Matrix4::rotateXDegree(float angle)
+{
+	rotateX(angle * DEG2RAD);
+}
 Matrix4& Matrix4::rotateX(float angle)
 {
-    float c = cosf(angle * DEG2RAD);
-    float s = sinf(angle * DEG2RAD);
+    float c = cosf(angle);
+    float s = sinf(angle);
     float m4 = m[4], m5 = m[5], m6 = m[6],  m7 = m[7],
           m8 = m[8], m9 = m[9], m10= m[10], m11= m[11];
 
@@ -506,10 +519,14 @@ Matrix4& Matrix4::rotateX(float angle)
     return *this;
 }
 
+Matrix4& Matrix4::rotateYDegree(float angle)
+{
+	rotateY(angle * DEG2RAD);
+}
 Matrix4& Matrix4::rotateY(float angle)
 {
-    float c = cosf(angle * DEG2RAD);
-    float s = sinf(angle * DEG2RAD);
+    float c = cosf(angle);
+    float s = sinf(angle);
     float m0 = m[0], m1 = m[1], m2 = m[2],  m3 = m[3],
           m8 = m[8], m9 = m[9], m10= m[10], m11= m[11];
 
@@ -525,10 +542,14 @@ Matrix4& Matrix4::rotateY(float angle)
     return *this;
 }
 
+Matrix4& Matrix4::rotateZDegree(float angle)
+{
+	rotateZ(angle * DEG2RAD);
+}
 Matrix4& Matrix4::rotateZ(float angle)
 {
-    float c = cosf(angle * DEG2RAD);
-    float s = sinf(angle * DEG2RAD);
+    float c = cosf(angle);
+    float s = sinf(angle);
     float m0 = m[0], m1 = m[1], m2 = m[2],  m3 = m[3],
           m4 = m[4], m5 = m[5], m6 = m[6],  m7 = m[7];
 

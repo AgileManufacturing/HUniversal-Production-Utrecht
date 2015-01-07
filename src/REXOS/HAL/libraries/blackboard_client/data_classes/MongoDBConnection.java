@@ -33,7 +33,9 @@ package HAL.libraries.blackboard_client.data_classes;
 import java.util.Hashtable;
 
 import util.configuration.Configuration;
-import util.configuration.ConfigurationFiles;
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
@@ -77,11 +79,12 @@ public class MongoDBConnection {
 	 **/
 	private MongoDBConnection(ServerAddress address) throws GeneralMongoException {
 		try {
-			//Logger.log(LogLevel.NOTIFICATION, "Starting a new mongoclient.");
+			Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "Starting a new mongoclient.");
 			
 			MongoOptions mongoOptions = new MongoOptions();
-			mongoOptions.connectionsPerHost = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "connectionsPerHost");
-			mongoOptions.threadsAllowedToBlockForConnectionMultiplier = Configuration.getPropertyInt(ConfigurationFiles.MONGO_DB_PROPERTIES, "threadsAllowedToBlockForConnectionMultiplier");
+			mongoOptions.connectionsPerHost = (int) Configuration.getProperty("rosInterface/connectionsPerHost");
+			mongoOptions.threadsAllowedToBlockForConnectionMultiplier = 
+					(int) Configuration.getProperty("rosInterface/threadsAllowedToBlockForConnectionMultiplier");
 			
 			mongoClient = new Mongo(address, mongoOptions);
 			mongoClient.setWriteConcern(WriteConcern.SAFE);

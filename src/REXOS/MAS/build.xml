@@ -16,7 +16,13 @@
 	<target name="jars">
 		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
 	</target>
-	
+	<target name="simjar">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/simulation.jar" basedir="../../../build/REXOS/MAS/simulation/">
+        </jar>
+    </target>
+
+
 	<target name="clean">
 		 <cleanjava dir="${basedir}"/>
 	</target>

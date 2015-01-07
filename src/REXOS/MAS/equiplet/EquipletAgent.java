@@ -29,6 +29,7 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 import MAS.util.MASConfiguration;
 import MAS.util.Ontology;
 import MAS.util.Pair;
@@ -930,9 +931,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onProcessStatusChanged(String status, Module module, HardwareStep hardwareStep) {
+	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
 		// TODO Auto-generated method stub
-
+		
 		// just wrong
 		// if(status == HardwareStepStatus.FAILED){
 		// equipletActive=false;
@@ -1013,5 +1014,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public String getEquipletName() {
 		return this.getLocalName();
+	}
+
+	@Override
+	public void onReloadEquiplet(String state) {
+		// TODO Auto-generated method stub
+		
 	}
 }

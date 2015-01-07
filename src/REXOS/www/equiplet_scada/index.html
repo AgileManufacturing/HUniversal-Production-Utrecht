@@ -9,6 +9,7 @@
 	var equipletInfo = {};
 	var moduleInfo = {};
 	var qrCorrection = {};
+						var myJSONObject = {};
 	
 	//Enable the equiplet mode buttons
 	$(document).ready(
@@ -79,8 +80,30 @@
 							return false;
 						});
 			});
+	$(document).ready(
+			function() {
+				$("#send").click(
+						function() {
+						myJSONObject = {"topLeftX" : $("#topLeftX").val() ,
+						"topLeftY" : $("#topLeftY").val() ,
+						"topRightX" : $("#topRightX").val() ,
+						"topRightY" : $("#topRightY").val() ,
+						"bottomRightX" : $("#bottomRightX").val() ,
+						"bottomRightY" : $("#bottomRightY").val()}
+						$.ajax({
+							url : 'remote/humanInteractionSubmit',
+							data : { "result" : myJSONObject}
+							});
+							return false;
+						});
+			});
 
 //Start humonInteraction polling
+	$(document).ready(
+			function() {
+				$( "#dialog-form" ).dialog();
+				$( "#dialog-form" ).dialog("close");
+			});
 	$(document).ready(
 			function() {
 				(function worker() {
@@ -88,11 +111,9 @@
 						dataType : "json",
 						url : 'remote/humanInteractionGet',
 						success : function(data) {
-							if(!data==""){
-			 						$( "#dialog" ).dialog();
-					  				console.log(data);
-					  				$( "#dialog-form" ).dialog( "open" );
-					  		}
+							console.log(data);
+							console.log("showing dialog");
+							$( "#dialog-form" ).dialog( "open" );
 						},
 						complete : function() {
 							setTimeout(worker, 5000);
@@ -107,7 +128,7 @@ $( "#dialog-form" ).dialog({
       width: 350,
       modal: true,
       buttons: {
-        "Create an account": function() {
+        "Submit values": function() {
         var myJSONObject = {"topLeftX" : $("#topLeftX").val() ,
         "topLeftY" : $("#topLeftY").val() ,
         "topRightX" : $("#topRightX").val() ,
@@ -115,17 +136,14 @@ $( "#dialog-form" ).dialog({
         "bottomRightX" : $("#bottomRightX").val() ,
         "bottomRightY" : $("#bottomRightY").val()}
         
-				(function worker() {
-					$.ajax({
-						dataType : "json",
-						url : 'remote/humanInteractionSubmit',
-						success : function() {							
-						},
-						complete : function() {
-							setTimeout(worker, 5000);
-						}
-					});
-				})();         
+   $.ajax({
+     type: "POST",
+     url: "remote/humanInteractionSubmit",
+     data: { result: myJSONObject
+      },success: function(data ) {
+       console.log(data);
+      }
+   });           
         },
         Cancel: function() {
           $( this ).dialog( "close" );
@@ -135,10 +153,6 @@ $( "#dialog-form" ).dialog({
       $( this ).dialog( "close" );
       }
     });
-
-
-
-
 
 	//Start equipletInfo polling
 	$(document).ready(
@@ -286,6 +300,7 @@ $( "#dialog-form" ).dialog({
     <input type="text" name="bottomRightY" id="bottomRightY" class="text ui-widget-content ui-corner-all" float="left">
   </fieldset>
   </form>
+  <button type="button" name="send" id="send">Click Me!</button>
 </div> 
 </body>
 </html>

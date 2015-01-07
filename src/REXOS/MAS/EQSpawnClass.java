@@ -38,13 +38,14 @@ package MAS;
  *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  *   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-import java.util.Date;
-
 import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
+
+import java.util.Date;
+
 import util.configuration.ServerConfigurations;
 import MAS.equiplet.EquipletAgent;
 

@@ -4,7 +4,8 @@
 
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/reader.h>
 
 #include <stdexcept>
 #include <cmath>
@@ -14,45 +15,45 @@ namespace rexos_coordinates{
 	Vector3 Module::convertToEquipletCoordinate(Vector3 moduleCoordinate){
 		return moduleCoordinate - moduleToEquiplet;
 	}
+	Vector4 Module::convertToEquipletCoordinate(Vector4 moduleCoordinate){
+		return moduleCoordinate - Vector4(moduleToEquiplet.x, moduleToEquiplet.y, moduleToEquiplet.z, 0);
+	}
 	Vector3 Module::convertToModuleCoordinate(Vector3 equipletCoordinate){
 		return equipletCoordinate - equipletToModule;
+	}
+	Vector4 Module::convertToModuleCoordinate(Vector4 equipletCoordinate){
+		return equipletCoordinate - Vector4(equipletToModule.x, equipletToModule.y, equipletToModule.z, 0);
 	}
 	Module::Module(rexos_knowledge_database::Module* module) :
 			module(module)
 	{
 		updateTranslationVectors();
-		ROS_INFO_STREAM("rexos_coordinates: Constructed module");
+		REXOS_INFO_STREAM("rexos_coordinates: Constructed module");
 	}
 	void Module::updateTranslationVectors() {
 		int mountPointX = module->getMountPointX();
 		int mountPointY = module->getMountPointY();
 		
 		std::string properties = module->getModuleTypeProperties();
-		JSONNode jsonNode = libjson::parse(properties);
+		Json::Reader reader;
+		Json::Value jsonNode;
+		bool parseSuccesfull = reader.parse(properties, jsonNode);
+		if(parseSuccesfull == false) throw std::runtime_error("module properties is not a valid json string");
 		
 		double midPointX = std::numeric_limits<double>::quiet_NaN();
 		double midPointY = std::numeric_limits<double>::quiet_NaN();
 		double midPointZ = std::numeric_limits<double>::quiet_NaN();
 		ROS_INFO_STREAM(properties);
 		//ROS_INFO_STREAM(jsonNode.write_formatted());
-		for(JSONNode::const_iterator it = jsonNode.begin(); it != jsonNode.end(); it++) {
-			if(it->name() == "midPointX"){
-				midPointX = it->as_float();
-				ROS_INFO("found midPointX");
-			} else if(it->name() == "midPointY"){
-				midPointY = it->as_float();
-				ROS_INFO("found midPointY");
-			} else if(it->name() == "midPointZ"){
-				midPointZ = it->as_float();
-				ROS_INFO("found midPointZ");
-			} else {
-				// some other property, ignore it
-			}
-		}
+		midPointX = jsonNode["midPointX"].asDouble();
+		midPointY = jsonNode["midPointY"].asDouble();
+		midPointZ = jsonNode["midPointZ"].asDouble();
+		
 		if(std::isnan(midPointX) || std::isnan(midPointY) || std::isnan(midPointZ)){
 			throw std::runtime_error("The properties do not contain the midPoints");
 		}
 		
+		// TODO hardcoded?
 		double mountPointsDistanceX = 50;
 		double mountPointsDistanceY = 50;
 		
@@ -62,7 +63,7 @@ namespace rexos_coordinates{
 		
 		this->equipletToModule = Vector3(offsetX, offsetY, offsetZ);
 		this->moduleToEquiplet = Vector3(-offsetX, -offsetY, -offsetZ);
-		ROS_INFO_STREAM("equipletToModule: " << equipletToModule);
-		ROS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
+		REXOS_INFO_STREAM("equipletToModule: " << equipletToModule);
+		REXOS_INFO_STREAM("moduleToEquiplet: " << moduleToEquiplet);
 	}
 }

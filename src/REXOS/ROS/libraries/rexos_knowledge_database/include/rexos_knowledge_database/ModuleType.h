@@ -33,24 +33,25 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <rexos_knowledge_database/ModuleTypeIdentifier.h>
-#include <rexos_knowledge_database/RequiredMutation.h>
-#include <rexos_knowledge_database/SupportedMutation.h>
-#include <rexos_knowledge_database/TransitionPhase.h>
+#include <rexos_datatypes/ModuleTypeIdentifier.h>
+#include <rexos_datatypes/RequiredMutation.h>
+#include <rexos_datatypes/SupportedMutation.h>
+#include <rexos_datatypes/TransitionPhase.h>
 
 #include "mysql_connection.h"
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_knowledge_database {
 	class ModuleType{
 	private:
-		ModuleTypeIdentifier moduleTypeIdentifier;
+		rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier;
 		std::unique_ptr<sql::Connection> connection;
 	public:
-		ModuleType(ModuleTypeIdentifier moduleTypeIdentifier);
+		ModuleType(rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier);
 		
 		std::string getModuleTypeProperties();
-		std::vector<TransitionPhase> getTransitionPhases();
-		std::map<int, std::vector<RequiredMutation>> getRequiredMutations();
-		std::map<int, std::vector<SupportedMutation>> getSupportedMutations();
+		std::vector<rexos_datatypes::TransitionPhase> getTransitionPhases();
+		std::map<int, std::vector<rexos_datatypes::RequiredMutation>> getRequiredMutations();
+		std::map<int, std::vector<rexos_datatypes::SupportedMutation>> getSupportedMutations();
 	};
 }

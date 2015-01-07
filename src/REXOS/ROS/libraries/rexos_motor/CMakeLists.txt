@@ -4,12 +4,12 @@ project(rexos_motor)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_modbus rexos_utilities rexos_datatypes )
+find_package(catkin REQUIRED COMPONENTS rexos_modbus rexos_utilities rexos_datatypes rexos_logger)
 
 
 
 ## Declare a catkin package
-catkin_package(INCLUDE_DIRS include LIBRARIES rexos_motor CATKIN_DEPENDS rexos_modbus   rexos_utilities rexos_datatypes )
+catkin_package(INCLUDE_DIRS include LIBRARIES rexos_motor rexos_logger CATKIN_DEPENDS rexos_modbus rexos_utilities rexos_datatypes rexos_logger)
 
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

@@ -60,7 +60,8 @@ public abstract class Capability {
 			ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 			try {
 				for (CompositeStep compositeStep : compositeSteps) {
-					hardwareSteps.addAll(moduleActor.translateCompositeStep(compositeStep));
+					CompositeStep compositeStepClone = compositeStep.clone();
+					hardwareSteps.addAll(moduleActor.translateCompositeStep(compositeStepClone));
 				}
 				return hardwareSteps;
 			} catch (ModuleTranslatingException ex) {
@@ -70,11 +71,10 @@ public abstract class Capability {
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, "The factory was unable to instantiate the module " + moduleActor.getModuleIdentifier() + 
 						" continuing with the next one", ex);
 			} catch (IllegalArgumentException ex) {
-				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, "A invalid argument exception was thrown by the module " + moduleActor.getModuleIdentifier() + 
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, "A illegal argument exception was thrown by the module " + moduleActor.getModuleIdentifier() + 
 						" continuing with the next one", ex);
 			}
 		}
 		throw new CapabilityException("No module tree was able to fully translate composite steps: " + compositeSteps);
 	}
-	
 }

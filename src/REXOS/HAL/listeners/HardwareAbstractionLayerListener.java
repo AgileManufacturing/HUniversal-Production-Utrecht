@@ -7,14 +7,13 @@ import org.json.JSONObject;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.tasks.ExecutionProcess;
 import HAL.testerClasses.HALTesterClass;
 import MAS.equiplet.EquipletAgent;
 
 /**
- * A HardwareAbstractionLayerListener listens to events in the {@link HardwareAbstractionLayer}. This interface is usually implemented by the {@link EquipletAgent} or the
- * {@link HALTesterClass}
- * 
+ * A HardwareAbstractionLayerListener listens to events in the {@link HardwareAbstractionLayer}. This interface is usually implemented by the {@link EquipletAgent} or the {@link HALTesterClass}
  * @author Bas Voskuijlen
  *
  */
@@ -26,8 +25,7 @@ public interface HardwareAbstractionLayerListener {
 	 * @param module
 	 * @param hardwareStep
 	 */
-	public void onProcessStatusChanged(String status, Module module, HardwareStep hardwareStep);
-
+	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep);
 	/**
 	 * This method is called when the execution of the {@link HardwareStep}s has finished (e.g. when a {@link ExecutionProcess} finishes)
 	 */
@@ -89,4 +87,10 @@ public interface HardwareAbstractionLayerListener {
 	 * @return
 	 */
 	public String getEquipletName();
+
+	/**
+	 * This method is called when the MAST mode of the equiplet is supposed to Reload
+	 * @param state
+	 */
+	public void onReloadEquiplet(String state);
 }

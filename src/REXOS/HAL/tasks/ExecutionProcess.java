@@ -12,6 +12,7 @@ import HAL.factories.ModuleFactory;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.HardwareStep.HardwareStepStatus;
 /**
  * The thread that manages the execution of hardware steps
  * @author Bas Voskuijlen
@@ -21,12 +22,9 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
 	//private ArrayList<HardwareStep> hardwareSteps;
 	private ModuleFactory moduleFactory;
-	private int count =0;
-	
 	
 	private HardwareStep currentStep = null;
 	private ArrayDeque<HardwareStep> toExecuteSteps = new ArrayDeque<HardwareStep>();
-	private String lastStatus = "NONE";
 	
 	/**
 	 * Constructs the ExecutionProcess but does NOT start it.
@@ -37,7 +35,6 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	public ExecutionProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, ArrayList<HardwareStep> hardwareSteps, ModuleFactory moduleFactory){
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		
-		this.toExecuteSteps.clear();
 		this.toExecuteSteps.addAll(hardwareSteps);
 		this.moduleFactory = moduleFactory;
 	}
@@ -53,20 +50,20 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 		try {
 			while(!toExecuteSteps.isEmpty()){
 				currentStep = toExecuteSteps.poll();
-				ModuleActor module = (ModuleActor) moduleFactory.getModuleByIdentifier(currentStep.getModuleIdentifier());
+				ModuleActor module;
+				module = (ModuleActor) moduleFactory.getSomethingByIdentifier(currentStep.getModuleIdentifier());
 				module.executeHardwareStep(this, currentStep);
 				Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "Wait for hardware step to finish: " + currentStep);
 				
 				this.wait();
 				
-				Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Hardware step finished with state: " + lastStatus + " " + currentStep);
+				Logger.log(LogSection.HAL_EXECUTION, LogLevel.INFORMATION, "Hardware step finished");
 			}
 			currentStep = null;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
 			hardwareAbstractionLayerListener.onExecutionFinished();
-			System.out.println("onExecutingFinished called!");
 		}
 	}
 	
@@ -76,10 +73,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	 * @throws  
 	 */
 	@Override
-	public synchronized void onProcessStateChanged(String status, long hardwareStepSerialId, Module module) {
-		Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "The status of hardwareStep identified by " + hardwareStepSerialId + " (being processed by module " + module + ") has changed to " + status);
-		
-		
+	public synchronized void onProcessStatusChanged(HardwareStepStatus status, String hardwareStepSerialId, Module module) {
 		//The onProcessStateChanged listener keeps listening even when there is no hardware step being executed,
 		//Check if we should ignore this state change.
 		if(currentStep == null){
@@ -87,63 +81,33 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			return;
 		}
 		
-		System.out.println("getModuleId 1: " + currentStep.getModuleIdentifier());
-		System.out.println("getModuleId 2: " + module.getModuleIdentifier());
-		
 		//The equals method is overriden in the ModuleIdentifier class, therefore the equals method works!
 		if(!currentStep.getModuleIdentifier().equals(module.getModuleIdentifier())){
 			System.out.println("Recieved a progressStateChange from another module, ignore this state change!");
 			return;
 		}
 		
-		
-		
 		//We have a hardware step to process and the module from the state change is the same as the one we are executing, proceed!
-		lastStatus = status;
-		
-		System.out.println("Count: " + count);
-		if(status.equals("DONE")){
-			count++;
+		if(status == HardwareStepStatus.DONE){
+			HardwareStep hardwareStep = currentStep;
+			hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
 			
-			//if (hardwareSteps.size() > 0){
-				HardwareStep hardwareStep = currentStep;
-				hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);
-				System.out.println("onProcessStateChanged: " + hardwareStep);
-				
-				//hardwareSteps.remove(0);
-				//TODO MONGO FIX.. REMOVE ALL MONGO REFERENCES AND CLASSES! IT'S ASS FUCKING SLOWWWWW..!
-				
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				    this.notify();
-			/*
+			try {
+				Thread.sleep(0);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			else {
-				System.out.println("Count for the Throw: "+count);
-				throw new RuntimeException("No more hardwareSteps while there should be at least one more");
-			}
-			*/
+		    this.notify();
 		}
-		else if(status.equals("FAILED")) {
+		else if(status == HardwareStepStatus.FAILED) {
 			Logger.log(LogSection.HAL_EXECUTION, LogLevel.ERROR, "Module is unable to execute hardwareStep");
 			hardwareAbstractionLayerListener.onExecutionFailed();
 		}
 		//If status is WAITING or IN_PROGRESS
 		else {
-			//if (hardwareSteps.size() > 0){
 				HardwareStep hardwareStep = currentStep;
 				hardwareAbstractionLayerListener.onProcessStatusChanged(status, module, hardwareStep);	
-			/*
-		}
-			else {
-				System.out.println("HarwareSteps Done");
-				//throw new RuntimeException("No more hardwareSteps while there should be at least one more");
-			}
-			*/
 		}
 	}
 	

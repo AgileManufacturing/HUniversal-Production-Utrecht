@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_gazebo)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp message_generation gazebo_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp message_generation gazebo_ros rexos_logger)
 find_package(gazebo REQUIRED)
 
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
-LIBRARIES rexos_gazebo
-CATKIN_DEPENDS roscpp
+LIBRARIES rexos_gazebo rexos_logger
+CATKIN_DEPENDS roscpp rexos_logger
 DEPENDS 
 gazebo_ros
 )

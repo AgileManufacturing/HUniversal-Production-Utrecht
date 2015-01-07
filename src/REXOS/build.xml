@@ -1,5 +1,11 @@
 <project name="REXOS" default="all" basedir=".">
-
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${repo-root}/src/REXOS/external_libraries/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
+	
+	
 	<!-- java source root -->
 	<property name="rexos-java-root" value="${basedir}"/>
 
@@ -33,13 +39,13 @@
    			<loadfile property="classpath" srcFile="${buildpath}/.export-classpath"/>
    			<mkdir dir="${buildpath}/${relative.dir}"/>
   
-			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}/${relative.dir}" classpath="${classpath}" encoding="ISO-8859-1">
+			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}" classpath="${classpath}" encoding="ISO-8859-1">
 				<compilerarg line="-Xlint:unchecked" />
 			</javac>
    			
-			<antcall target="add-path-to-classpath">
+			<!--<antcall target="add-path-to-classpath">
 				<param name="path" value="${buildpath}/${relative.dir}"/>
-			</antcall>
+			</antcall>-->
 		</sequential>
 	</macrodef>
 
@@ -97,6 +103,9 @@
 		<delete file ="${buildpath}/.export-classpath"/> 
  		<touch file ="${buildpath}/.export-classpath"/> 
 		<antcall target="allpackages"/>
+		<antcall target="add-path-to-classpath">
+			<param name="path" value="${buildpath}/"/>
+		</antcall>
 	</target>
 	
 	<!-- allpackages target, add the required targets to depends -->
@@ -180,19 +189,46 @@
 
 	<target name="Launch-HAL">
 		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="HAL.testerClasses.StewartGoughHALTesterClass" failonerror="true" fork="yes">
-			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
+		<java classname="HAL.testerClasses.HALTesterClassPickAndPlace" failonerror="true" fork="yes">
+			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/util/configuration/"/>
 			<classpath refid="java" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />
 			</classpath>
 		</java>
 	</target>
-
+	
+	<target name="Generate-JARs">
+		<foreach target="Generate-JAR" param="theFile">
+			<path id="modulesPathId">
+				<fileset dir="HAL/modules" casesensitive="yes">
+					<include name="**/*.java"/>
+				</fileset>
+			</path>
+		</foreach>
+		<foreach target="Generate-JAR" param="theFile">
+			<path id="capabilitiesPathId">
+				<fileset dir="HAL/capabilities" casesensitive="yes">
+					<include name="**/*.java"/>
+				</fileset>
+			</path>
+		</foreach>
+	</target>
+	
+	<target name="Generate-JAR">
+		<basename property="jar.filename" file="${theFile}" suffix=".java"/>
+		<dirname property="jar.basedir" file="${theFile}"/>
+		<jar destfile="${repo-root}/jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.java"/>
+	</target>
+	
 	<path id="java">
 		<pathelement location="${output}"/>
 		<fileset dir="external_libraries">
 		<include name="*.jar"/>
 		</fileset>
-	</path>	
+	</path>
+
+	<target name="emurex">
+    	<jar destfile="../../simulation/simulation.jar" basedir="../../build/REXOS/" includes="MAS/simulation/**" excludes="**/Test.class"/>
+	</target>
 </project>

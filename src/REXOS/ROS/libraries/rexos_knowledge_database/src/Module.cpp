@@ -1,7 +1,7 @@
 #include <rexos_knowledge_database/Module.h>
-#include <rexos_knowledge_database/ModuleIdentifier.h>
 #include <rexos_knowledge_database/KnowledgeDatabaseException.h>
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include <cppconn/resultset.h>
 #include <cppconn/prepared_statement.h>
@@ -9,7 +9,7 @@
 #include "ros/ros.h"
 
 namespace rexos_knowledge_database{
-	Module::Module(ModuleIdentifier moduleIdentifier) :
+	Module::Module(rexos_datatypes::ModuleIdentifier moduleIdentifier) :
 			ModuleType(moduleIdentifier), 
 			moduleIdentifier(moduleIdentifier)
 	{
@@ -30,12 +30,12 @@ namespace rexos_knowledge_database{
 			std::string message = "This module (" + moduleIdentifier.toString() + ") does not exist";
 			throw KnowledgeDatabaseException(message.c_str());
 		}
-		ROS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
+		REXOS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
 				" typeNumber=" << moduleIdentifier.getTypeNumber() << " serialNumber=" << moduleIdentifier.getSerialNumber());
 		
 		delete result;
 	}
-	ModuleIdentifier Module::getModuleIdentifier() {
+	rexos_datatypes::ModuleIdentifier Module::getModuleIdentifier() {
 		return moduleIdentifier;
 	}
 	std::string Module::getModuleProperties(){
@@ -61,7 +61,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return jsonProperties;
 	}
-	void Module::setModuleProperties(std::string jsonProperties){
+	void Module::setModuleProperties(std::string jsonProperties) {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		UPDATE Module \
 		SET moduleProperties = ? \
@@ -76,7 +76,7 @@ namespace rexos_knowledge_database{
 		preparedStmt->executeQuery();
 		delete preparedStmt;
 	}
-	Module* Module::getParentModule(){
+	Module* Module::getParentModule() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
@@ -108,7 +108,7 @@ namespace rexos_knowledge_database{
 		} else {
 			// set the cursor at the first result
 			result->next();
-			ModuleIdentifier identifier = ModuleIdentifier(
+			rexos_datatypes::ModuleIdentifier identifier(
 				result->getString("manufacturer"),
 				result->getString("typeNumber"),
 				result->getString("serialNumber")
@@ -118,7 +118,7 @@ namespace rexos_knowledge_database{
 			return new Module(identifier);
 		}
 	}
-	std::vector<ModuleIdentifier> Module::getChildModulesIdentifiers(){
+	std::vector<rexos_datatypes::ModuleIdentifier> Module::getChildModulesIdentifiers() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
@@ -141,11 +141,11 @@ namespace rexos_knowledge_database{
 		preparedStmt->setString(6, moduleIdentifier.getSerialNumber());
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
-		std::vector<ModuleIdentifier> childModules;
+		std::vector<rexos_datatypes::ModuleIdentifier> childModules;
 		if(result->rowsCount() != 0){
 			// get all the childs
 			while(result->next()){
-				ModuleIdentifier identifier = ModuleIdentifier(
+				rexos_datatypes::ModuleIdentifier identifier(
 					result->getString("manufacturer"),
 					result->getString("typeNumber"),
 					result->getString("serialNumber")
@@ -158,7 +158,7 @@ namespace rexos_knowledge_database{
 		return childModules;
 	}
 	
-	int Module::getMountPointX(){
+	int Module::getMountPointX() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT mountPointX \
 		FROM Module \
@@ -181,7 +181,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return mountPointX;
 	}
-	void Module::setMountPointX(int mountPointX){
+	void Module::setMountPointX(int mountPointX) {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		UPDATE Module \
 		SET mountPointY = ? \
@@ -196,7 +196,7 @@ namespace rexos_knowledge_database{
 		preparedStmt->executeQuery();
 		delete preparedStmt;
 	}
-	int Module::getMountPointY(){
+	int Module::getMountPointY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT mountPointY \
 		FROM Module \
@@ -219,7 +219,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return mountPointY;		
 	}
-	void Module::setMountPointY(int mountPointY){
+	void Module::setMountPointY(int mountPointY) {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		UPDATE Module \
 		SET mountPointY = ? \
@@ -235,7 +235,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 	}
 
-	std::string Module::getCalibrationDataForModuleOnly(){
+	std::string Module::getCalibrationDataForModuleOnly() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT properties \
 		FROM ModuleCalibration \
@@ -264,22 +264,22 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return properties;
 	}
-	std::string Module::getCalibrationDataForModuleAndChilds(){
-		ROS_INFO("getCalibrationDataForModuleAndChilds a1");
-		std::vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
-		ROS_INFO("getCalibrationDataForModuleAndChilds a2, vector size = %lu", childs.size());
+	std::string Module::getCalibrationDataForModuleAndChilds() {
+		REXOS_INFO("getCalibrationDataForModuleAndChilds a1");
+		std::vector<rexos_datatypes::ModuleIdentifier> childs = getChildModulesIdentifiers();
+		REXOS_INFO("getCalibrationDataForModuleAndChilds a2, vector size = %lu", childs.size());
 		std::string returnValue = getCalibrationDataForModuleAndOtherModules(childs);
-		ROS_INFO("%s", returnValue.c_str());
+		REXOS_INFO("%s", returnValue.c_str());
 		return returnValue;
 	}
-	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
-		ROS_INFO("getCalibrationDataForModuleAndOtherModules b1" );
+	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers) {
+		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b1" );
 		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 		std::string query = "SELECT properties FROM ModuleCalibration WHERE id = ?;";
-		ROS_INFO("getCalibrationDataForModuleAndOtherModules b2, SQL query = %s", query.c_str());
+		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b2, SQL query = %s", query.c_str());
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement(query);
 		preparedStmt->setInt(1, calibrationId);
-		ROS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
+		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find calibration entry");
@@ -291,10 +291,10 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 		return properties;
 	}
-	void Module::setCalibrationDataForModuleOnly(std::string properties){
+	void Module::setCalibrationDataForModuleOnly(std::string properties) {
 		sql::PreparedStatement* preparedStmt;
 		try{
-			std::vector<ModuleIdentifier> emptyList;
+			std::vector<rexos_datatypes::ModuleIdentifier> emptyList;
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(emptyList);
 			
 			// update existing entry
@@ -328,11 +328,12 @@ namespace rexos_knowledge_database{
 			delete preparedStmt;
 		}
 	}
-	void Module::setCalibrationDataForModuleAndChilds(std::string properties){
-		std::vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
+	void Module::setCalibrationDataForModuleAndChilds(std::string properties) {
+		std::vector<rexos_datatypes::ModuleIdentifier> childs = getChildModulesIdentifiers();
 		setCalibrationDataForModuleAndOtherModules(childs, properties);
 	}
-	void Module::setCalibrationDataForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers, std::string properties){
+	void Module::setCalibrationDataForModuleAndOtherModules(
+			std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers, std::string properties) {
 		sql::PreparedStatement* preparedStmt;
 		try{
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
@@ -376,9 +377,9 @@ namespace rexos_knowledge_database{
 	}
 	
 	
-	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<ModuleIdentifier> moduleIdentifiers){
+	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers) {
 		// create a temp table for storing the modules
-		ROS_INFO("getCalibrationGroupForModuleAndOtherModules c1");
+		REXOS_INFO("getCalibrationGroupForModuleAndOtherModules c1");
 		sql::PreparedStatement* preparedStmt;
 		std::string query = "\
 		CREATE TEMPORARY TABLE otherModules( \
@@ -386,7 +387,7 @@ namespace rexos_knowledge_database{
 			typeNumber char(200) NOT NULL, \
 			serialNumber char(200) NOT NULL \
 		);";
-		ROS_INFO("%s", query.c_str());
+		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		preparedStmt->executeQuery();
 		delete preparedStmt;
@@ -398,12 +399,12 @@ namespace rexos_knowledge_database{
 		) VALUES ( \
 			?, ?, ? \
 		);";
-		ROS_INFO("%s", query.c_str());
+		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		for(int i = 0; i < moduleIdentifiers.size(); i++){
-				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
-				preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
-				preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
+			preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
+			preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
+			preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
 			preparedStmt->executeQuery();
 		}
 		delete preparedStmt;
@@ -434,7 +435,7 @@ namespace rexos_knowledge_database{
 				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \
 			) \
 		) = ?;";
-		ROS_INFO("%s", query.c_str());
+		REXOS_INFO("%s", query.c_str());
 		preparedStmt = connection->prepareStatement(query);
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
@@ -444,7 +445,7 @@ namespace rexos_knowledge_database{
 
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			ROS_INFO("result...");
+			REXOS_INFO("result...");
 			// delete the temp table for storing the modules
 			preparedStmt = connection->prepareStatement("\
 			DROP TEMPORARY TABLE otherModules;");

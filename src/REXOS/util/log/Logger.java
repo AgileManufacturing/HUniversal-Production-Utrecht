@@ -283,13 +283,19 @@ public class Logger {
 			case ALERT:
 			case CRITICAL:
 			case ERROR:
-				System.err.println(serializedLogEntry);
+				System.out.println((char) 27 + "[31m" + serializedLogEntry + (char) 27 + "[0m");
 				break;
 			case WARNING:
+				System.out.println((char) 27 + "[33m" + serializedLogEntry + (char) 27 + "[0m");
+				break;
 			case NOTIFICATION:
+				System.out.println((char) 27 + "[33m" + serializedLogEntry + (char) 27 + "[0m");
+				break;
 			case INFORMATION:
+				System.out.println((char) 27 + "[30m" + serializedLogEntry + (char) 27 + "[0m");
+				break;
 			case DEBUG:
-				System.out.println(serializedLogEntry);
+				System.out.println((char) 27 + "[32m" + serializedLogEntry + (char) 27 + "[0m");
 				break;
 		}
 	}
@@ -306,15 +312,14 @@ public class Logger {
 					logFile.createNewFile();
 				} else if(eraseLogFileOnStartup == true) {
 					eraseLogFile();
-				} else if(seperateStartupInLogFile == true) {
-					logFileFileWriter = new FileWriter(logFile, true);
-					logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
+				}
+				logFileFileWriter = new FileWriter(logFile, true);
+				logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
+				if(seperateStartupInLogFile == true) {
 					logFileBufferedWriter.write(logFileSeperator);
-				} else {
-					logFileFileWriter = new FileWriter(logFile, true);
-					logFileBufferedWriter = new BufferedWriter(logFileFileWriter);
 				}
 			}
+			
 			logFileBufferedWriter.write(serializedLogEntry);
 			// mimic println by adding a new line at the end of every logEntry
 			logFileBufferedWriter.write("\n");

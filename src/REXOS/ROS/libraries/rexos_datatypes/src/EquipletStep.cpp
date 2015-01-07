@@ -31,77 +31,60 @@
 #include "rexos_datatypes/EquipletStep.h"
 #include "rexos_utilities/Utilities.h"
 
+#include <jsoncpp/json/writer.h>
+
 namespace rexos_datatypes{
 
-    EquipletStep::EquipletStep(JSONNode n) :
+    EquipletStep::EquipletStep() :
+			moduleIdentifier("", "", "") // shut up the complaining compiler. TODO: nicer solution
+	{
+    }
+
+    EquipletStep::EquipletStep(Json::Value n) :
 			moduleIdentifier("", "", "") // shut up the complaining compiler. TODO: nicer solution
 	{
 		setValues(n);
     }
 
     std::string EquipletStep::getId(){
-        return this->_id;
+        return this->id;
     }
 
     void EquipletStep::setId(std::string id){
-        this->_id = id;    
+        this->id = id;    
     }
 
-    std::string EquipletStep::getServiceStepID(){
-        return this->serviceStepID;
-    }
-
-    void EquipletStep::setServiceStepID(std::string serviceStepID){
-        this->serviceStepID = serviceStepID;
-    }
-
-    std::string EquipletStep::getNextStep(){
-        return this->nextStep;
-    }
-
-    void EquipletStep::setNextStep(std::string nextStep){
-        this->nextStep = nextStep;
-    }
-
-    rexos_knowledge_database::ModuleIdentifier EquipletStep::getModuleIdentifier(){
+    rexos_datatypes::ModuleIdentifier EquipletStep::getModuleIdentifier(){
         return this->moduleIdentifier;
     }
 
-    void EquipletStep::setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier){
+    void EquipletStep::setModuleIdentifier(rexos_datatypes::ModuleIdentifier moduleIdentifier){
         this->moduleIdentifier = moduleIdentifier;
     }
 
-    void EquipletStep::setModuleIdentifier(const JSONNode & n){
-		std::string manufacturer;
-		std::string typeNumber;
-		std::string serialNumber;
-		
-       //Iterate them nodes.
-       JSONNode::const_iterator i = n.begin();
-
-       while (i != n.end()){
-			const char * node_name = i -> name().c_str();
-			
-           if (strcmp(node_name, "manufacturer") == 0){
-               manufacturer = i -> as_string();
-           } else if (strcmp(node_name, "typeNumber") == 0){
-               typeNumber = i -> as_string();
-           } else if (strcmp(node_name, "serialNumber") == 0){
-               serialNumber = i -> as_string();
-           }
-		    i++;
-	   }
-       this->moduleIdentifier = rexos_knowledge_database::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+    void EquipletStep::setModuleIdentifier(const Json::Value & n){
+		std::string manufacturer = n["manufacturer"].asString();
+		std::string typeNumber = n["typeNumber"].asString();
+		std::string serialNumber = n["serialNumber"].asString();
+       this->moduleIdentifier = rexos_datatypes::ModuleIdentifier(manufacturer, typeNumber, serialNumber);
 	 }
 
-    InstructionData EquipletStep::getInstructionData(){
+    Json::Value EquipletStep::getInstructionData(){
         return this->instructionData;
     }
 
-    void EquipletStep::setInstructionData(InstructionData instructionData){
+    void EquipletStep::setInstructionData(Json::Value instructionData){
         this->instructionData = instructionData;
     }
-
+	
+    OriginPlacement EquipletStep::getOriginPlacement(){
+        return this->originPlacement;
+    }
+	
+    void EquipletStep::setOriginPlacement(OriginPlacement originPlacement){
+        this->originPlacement = originPlacement;
+    }
+	
     std::string EquipletStep::getStatus(){
         return this->status;
     }
@@ -110,88 +93,33 @@ namespace rexos_datatypes{
         this->status = status;
     }
 
-    std::map<std::string, std::string> EquipletStep::getStatusData(){
-        return this->statusData;
+    std::string EquipletStep::getReloadEquiplet(){
+        return this->reloadEquiplet;
     }
 
-    void EquipletStep::setStatusData(std::map<std::string, std::string> statusData){
-        this->statusData = statusData;
-    }
-
-    TimeData EquipletStep::getTimeData(){
-        return this->timeData;
-    }
-    
-    void EquipletStep::setTimeData(TimeData timeData){
-        this->timeData = timeData;
+    void EquipletStep::setReloadEquiplet(std::string RE){
+        this->reloadEquiplet = RE;
     }
 
     EquipletStep::~EquipletStep() {
         //std::cout << "Delete Equipletstep called." std::endl;
     }
 
-    JSONNode EquipletStep::getJsonNode(){
-        return this-> jsonNode;
-    }
-    
-    void EquipletStep::setValues(const JSONNode & n){
-        //Iterate them nodes.
-        JSONNode::const_iterator i = n.begin();
-
-        while (i != n.end()){
-            
-            const char * node_name = i -> name().c_str();
-            
-            if (strcmp(node_name, "serviceStepID") == 0){
-                setServiceStepID(i -> as_string());
-            }
-            else if (strcmp(node_name, "nextStep") == 0){
-                setNextStep(i -> as_string());
-            }
-            else if (strcmp(node_name, "moduleIdentifier") == 0){
-                setModuleIdentifier(i -> as_node());
-            }
-            else if (strcmp(node_name, "instructionData") == 0){
-                setInstructionData(InstructionData(*i));
-            }
-            else if (strcmp(node_name, "status") == 0){
-                setStatus(i -> as_string());
-            }
-            else if (strcmp(node_name, "statusData") == 0){
-                setStatusData(rexos_utilities::setMapFromNode(*i));
-            }
-            else if (strcmp(node_name, "timeData") == 0){
-                setTimeData(setTimeDataFromNode(*i));
-            }
-            ++i;
-        }        
+    void EquipletStep::setValues(const Json::Value & n){
+		setModuleIdentifier(n["moduleIdentifier"]);
+		setInstructionData(n["instructionData"]);
+		setOriginPlacement(OriginPlacement(n["originPlacement"]));
+		setStatus(n["status"].asString());
+        setReloadEquiplet(n["reloadEquiplet"].asString());
     }
 
-    std::string EquipletStep::toJSONString(){
-
-        std::stringstream ss;
-
-        ss << "{ ";
-        ss << "\"serviceStepID\" : \"" << this->serviceStepID << "\", ";
-        ss << "\"nextStep\" : \"" << this->nextStep << "\", ";
-        ss << "\"moduleIdentifier\" : " << this->moduleIdentifier.toString() << ", ";
-        ss << "\"instructionData\" : " << this->instructionData.toJSONString() << ", ";
-        ss << "\"status\" : \"" << this->status << "\" ";
-        ss << " } ";
-
-        return ss.str();
+    Json::Value EquipletStep::toJSON(){
+		Json::Value output;
+		output["moduleIdentifier"] = moduleIdentifier.toJSONObject();
+		output["instructionData"] = instructionData;
+		output["originPlacement"] = originPlacement.toJSON();
+		output["status"] = status;
+        output["reloadEquiplet"] = reloadEquiplet;
+		return output;
     }
-    
-    TimeData EquipletStep::setTimeDataFromNode(const JSONNode & n){
-        TimeData * timeData = new TimeData();
-        //For now its only 1 value. This might be more in the future
-        JSONNode::const_iterator i = n.begin();
-        
-        while (i != n.end()){
-            timeData->setDuration(i-> as_int());
-            i++;
-        }
-        return *timeData;
-    }
-   
 }

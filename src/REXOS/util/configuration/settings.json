@@ -1,0 +1,75 @@
+{
+    "rosInterface": {
+		"connectionsPerHost": {
+			"default": 50
+		},
+		"threadsAllowedToBlockForConnectionMultiplier": {
+			"default": 5
+		},
+        "hardwareSteps": {
+            "ip": {
+                "default": "127.0.0.1"
+            },
+            "databaseName": {
+                "default": "EQ",
+                "EQ1": "EQ1",
+                "EQ2": "EQ2",
+                "EQ3": "EQ3",
+                "EQ4": "EQ4",
+                "EQ5": "EQ5"
+            },
+            "blackboardName": {
+                "default": "HardwareStepsBlackBoard"
+            }
+        },
+        "equipletCommands": {
+            "ip": {
+                "default": "127.0.0.1"
+            },
+            "databaseName": {
+                "default": "EQ",
+                "EQ1": "EQ1",
+                "EQ2": "EQ2",
+                "EQ3": "EQ3",
+                "EQ4": "EQ4",
+                "EQ5": "EQ5"
+            },
+            "blackboardName": {
+                "default": "CommandsBlackboard"
+            }
+        },
+        "equipletState": {
+            "ip": {
+                "default": "127.0.0.1"
+            },
+            "databaseName": {
+                "default": "EQ",
+                "EQ1": "EQ1",
+                "EQ2": "EQ2",
+                "EQ3": "EQ3",
+                "EQ4": "EQ4",
+                "EQ5": "EQ5"
+            },
+            "blackboardName": {
+                "default": "StateBlackboard"
+            }
+        }
+    },
+    "knowledgeDatabase": {
+        "ip": {
+            "default": "127.0.0.1"
+        },
+        "port": {
+            "default": 3306
+        },
+        "username": {
+            "default": "rexos"
+        },
+        "password": {
+            "default": "soxer"
+        },
+        "database": {
+            "default": "equiplet"
+        }
+    }
+}

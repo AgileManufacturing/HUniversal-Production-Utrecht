@@ -3,6 +3,7 @@ package HAL.modules;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import util.log.LogLevel;
 import util.log.Logger;
 import HAL.ModuleActor;
 import HAL.ModuleIdentifier;
@@ -30,13 +31,13 @@ public class DeltaRobot extends ModuleActor {
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
-		Logger.log(compositeStep.toJSON().toString());
+		Logger.log("Delta robot is translating compositeStep: " + compositeStep.toJSON().toString());
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		JSONObject commandMove = compositeStep.popCommandIdentifier(COMMAND_IDENTIFIER);
 		
 		//Adjust for maxAcceleration
 		double maxAcceleration = MAX_ACCELERATION;
-		if (commandMove.get(ModuleActor.MAX_ACCELERATION) != null){
+		if (commandMove.has(ModuleActor.MAX_ACCELERATION) == true){
 			if (commandMove.getDouble(ModuleActor.MAX_ACCELERATION) < maxAcceleration){
 				//New maxAcceleration is set
 				maxAcceleration = (double) commandMove.remove(ModuleActor.MAX_ACCELERATION);
@@ -66,6 +67,10 @@ public class DeltaRobot extends ModuleActor {
 		} else {
 			//Approach
 			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
+			commandApproach.put(MOVE_X, commandApproach.getDouble(MOVE_X) + commandMove.getDouble(MOVE_X));
+			commandApproach.put(MOVE_Y, commandApproach.getDouble(MOVE_Y) + commandMove.getDouble(MOVE_Y));
+			commandApproach.put(MOVE_Z, commandApproach.getDouble(MOVE_Z) + commandMove.getDouble(MOVE_Z));
+			
 			JSONObject approachInstructionData = new JSONObject();
 			approachInstructionData.put(MOVE, commandApproach);
 			

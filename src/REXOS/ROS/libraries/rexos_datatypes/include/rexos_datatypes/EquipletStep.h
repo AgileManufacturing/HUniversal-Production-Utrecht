@@ -8,64 +8,57 @@
 #define	EQUIPLETSTEP_H
 
 #include <string.h>
-#include <iostream>
-#include <map>
-#include <utility>
-#include "rexos_datatypes/InstructionData.h"
-#include "rexos_datatypes/TimeData.h"
+#include <rexos_datatypes/OriginPlacement.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
-#include <rexos_knowledge_database/ModuleIdentifier.h>
-
-// GCC system header to suppress libjson warnings
-#pragma GCC system_header
-#include <libjson/libjson.h>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_datatypes{
     
     class EquipletStep {
     public:
-        EquipletStep(JSONNode n);
+        EquipletStep();
+        EquipletStep(Json::Value n);
         virtual ~EquipletStep();
 
         std::string getId();
         void setId(std::string id);
 
-        std::string getServiceStepID();
-        void setServiceStepID(std::string serviceStepID);
+        rexos_datatypes::ModuleIdentifier getModuleIdentifier();
+        
+        void setModuleIdentifier(rexos_datatypes::ModuleIdentifier moduleIdentifier);
+        void setModuleIdentifier(const Json::Value & n);
 
-        std::string getNextStep();
-        void setNextStep(std::string nextStep);
+        OriginPlacement getOriginPlacement();
+        void setOriginPlacement(OriginPlacement originPlacement);
 
-        rexos_knowledge_database::ModuleIdentifier getModuleIdentifier();
-		 void setModuleIdentifier(rexos_knowledge_database::ModuleIdentifier moduleIdentifier);
-		 void setModuleIdentifier(const JSONNode & n);
-
-        InstructionData getInstructionData();
-        void setInstructionData(InstructionData instructionData);
+        Json::Value getInstructionData();
+        void setInstructionData(Json::Value instructionData);
 
         std::string getStatus();
         void setStatus(std::string status);
 
-        std::map<std::string, std::string> getStatusData();
-        void setStatusData(map<std::string, std::string> statusData);
+        /**
+         * [getReloadEquiplet - WIP LARS]
+         * @return [description]
+         */
+        std::string getReloadEquiplet();
+        /**
+         * [setReloadEquiplet - WIP LARS]
+         * @param status [description]
+         */
+        void setReloadEquiplet(std::string status);
 
-        TimeData getTimeData();
-        void setTimeData(TimeData timeData);
-
-        JSONNode getJsonNode();
-        std::string toJSONString();
+        Json::Value toJSON();
     private:
-            JSONNode jsonNode;
-            std::string _id;
-            std::string serviceStepID;
-            std::string nextStep;
-            rexos_knowledge_database::ModuleIdentifier moduleIdentifier;
-            InstructionData instructionData;
-            std::string status;
-            std::map<std::string, std::string> statusData;
-            TimeData timeData;
-            void setValues(const JSONNode & n);
-            TimeData setTimeDataFromNode(const JSONNode & n);
+		std::string id;
+		rexos_datatypes::ModuleIdentifier moduleIdentifier;
+		Json::Value instructionData;
+		OriginPlacement originPlacement;
+		// TODO enum
+		std::string status;
+        std::string reloadEquiplet;
+		void setValues(const Json::Value & n);
     };
 }
 #endif	/* EQUIPLETSTEP_H */

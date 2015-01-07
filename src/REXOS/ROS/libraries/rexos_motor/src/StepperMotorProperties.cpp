@@ -46,43 +46,26 @@ namespace rexos_motor {
 	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
 	 **/
-	StepperMotorProperties::StepperMotorProperties(JSONNode properties) {
-		for(JSONNode::const_iterator it = properties.begin(); it != properties.end(); it++) {
-			if(it->name() == "motorMinAngleDegrees"){
-				motorMinAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
-			} else if(it->name() == "motorMaxAngleDegrees"){
-				motorMaxAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
-			
-			} else if(it->name() == "microStepAngleDegrees"){
-				microStepAngle = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found microStepAngle " << microStepAngle);
-			
-			} else if(it->name() == "minAccelerationDegrees"){
-				minAcceleration = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found minAcceleration " << minAcceleration);
-			} else if(it->name() == "maxAccelerationDegrees"){
-				maxAcceleration = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
-			
-			} else if(it->name() == "minSpeedDegrees"){
-				minSpeed = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found minSpeed " << minSpeed);
-			} else if(it->name() == "maxSpeedDegrees"){
-				maxSpeed = rexos_utilities::degreesToRadians(it->as_float());
-				ROS_INFO_STREAM("found maxSpeed " << maxSpeed);
-			} else {
-				// some other property, ignore it
-			}
-		}
+	StepperMotorProperties::StepperMotorProperties(Json::Value properties) {
+		motorMinAngle = rexos_utilities::degreesToRadians(properties["motorMinAngleDegrees"].asDouble());
+		REXOS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
+		
+		motorMaxAngle = rexos_utilities::degreesToRadians(properties["motorMaxAngleDegrees"].asDouble());
+		REXOS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
+		
+		microStepAngle = rexos_utilities::degreesToRadians(properties["microStepAngleDegrees"].asDouble());
+		REXOS_INFO_STREAM("found microStepAngle " << microStepAngle);
+		
+		minAcceleration = rexos_utilities::degreesToRadians(properties["minAccelerationDegrees"].asDouble());
+		REXOS_INFO_STREAM("found minAcceleration " << minAcceleration);
+		
+		maxAcceleration = rexos_utilities::degreesToRadians(properties["maxAccelerationDegrees"].asDouble());
+		REXOS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
+		
+		minSpeed = rexos_utilities::degreesToRadians(properties["minSpeedDegrees"].asDouble());
+		REXOS_INFO_STREAM("found minSpeed " << minSpeed);
+		
+		maxSpeed = rexos_utilities::degreesToRadians(properties["maxSpeedDegrees"].asDouble());
+		REXOS_INFO_STREAM("found maxSpeed " << maxSpeed);
 	}
-/*	JSONNode StepperMotorProperties::findJsonNode(JSONNode input, std::string name) {
-		for(JSONNode::const_iterator it = input.begin(); it != input.end(); it++) {
-			if(it->name() == name) {
-				return it->as_node();
-			}
-		}
-		throw std::runtime_error("JSONNode not found by name " + name + " in " input.write_formatted());
-	}*/
 }
