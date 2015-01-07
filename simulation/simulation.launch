@@ -9,17 +9,17 @@
 <setAttribute key="name.schedenig.eclipse.grepconsole.StatisticsDisabledIds"/>
 <setAttribute key="name.schedenig.eclipse.grepconsole.StatisticsEnabledIds"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/Merge-HUniversal-Production-Utrecht/src/REXOS/external_libraries/jade.jar"/>
+<listEntry value="/HUniversal-Production-Utrecht/src/REXOS/external_libraries/jade.jar"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="${workspace_loc:/Merge-HUniversal-Production-Utrecht/simulation/log.log}"/>
+<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="${workspace_loc:/HUniversal-Production-Utrecht/simulation/log.log}"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;Simulation:MAS.simulation.simulation.SimulationAgent;&quot; -local-port 1111"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Merge-HUniversal-Production-Utrecht"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms1024m&#13;&#10;-Xmx6496m"/>
 </launchConfiguration>
