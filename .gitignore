@@ -66,4 +66,5 @@ log.txt
 /bin
 
 simulation/output/
+simulation/log.log
 /bin
