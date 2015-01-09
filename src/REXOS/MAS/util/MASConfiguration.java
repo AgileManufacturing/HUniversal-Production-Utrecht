@@ -10,12 +10,12 @@ public class MASConfiguration {
 	 * 3: the gui is used in combination with the debug information in the console
 	 * 4: all above with addition of scheduling information
 	 */
-	public static int VERBOSITY = 3;
+	public static int VERBOSITY = 0;
 
 	/**
 	 * the number of jobs an just arrives job can overtake in the queue
 	 */
-	public static int QUEUE_JUMP = 0;
+	public static int QUEUE_JUMP = 5;
 
 	/**
 	 * Scheduling algorithm used by product agent to schedule his product step
@@ -25,7 +25,7 @@ public class MASConfiguration {
 	/**
 	 * Reshedule when start time of product step is not met
 	 */
-	public static boolean RESCHEDULE = true;
+	public static boolean RESCHEDULE = false;
 
 	/**
 	 * keep track of the equiplet history while the equiplet agent is alive

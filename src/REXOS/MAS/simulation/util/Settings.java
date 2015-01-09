@@ -8,7 +8,7 @@ public class Settings {
 	 * whether the simulation need to verification the simulation while running
 	 * this has major consequence on the running time of the simulation 
 	 */
-	public static boolean VERIFICATION = true;
+	public static boolean VERIFICATION = false;
 	
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.

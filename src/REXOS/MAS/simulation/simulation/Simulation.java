@@ -305,9 +305,13 @@ public class Simulation implements ISimulation, IControl {
 					update(e);
 				}
 
-				for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-					System.out.println("EQ: " + equiplet.getValue().toString()
-							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+				// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+				// System.out.println("EQ: " + equiplet.getValue().toString()
+				// + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+				// }
+
+				for (Entry<String, IProductSim> product : products.entrySet()) {
+					System.out.println("PQ: " + product.getValue().toString());
 				}
 
 				if (Settings.VERIFICATION) {
@@ -331,23 +335,23 @@ public class Simulation implements ISimulation, IControl {
 	private void verification() {
 
 		// this doesn't work with breakdowns
-//		int busy = 0;
-//		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-//			if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
-//					|| (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
-//				busy++;
-//			}
-//		}
-//
-//		if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
-//			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
-//			throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
-//		}
-//
-//		if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
-//			System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
-//			throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
-//		}
+		// int busy = 0;
+		// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+		// if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
+		// || (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
+		// busy++;
+		// }
+		// }
+		//
+		// if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
+		// System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
+		// throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
+		// }
+		//
+		// if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
+		// System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
+		// throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
+		// }
 
 		// if an equiplet is busy, there need to be a finished event in the event stack
 		List<String> busyEquiplets = new ArrayList<String>();
@@ -552,8 +556,7 @@ public class Simulation implements ISimulation, IControl {
 			Position startPosition = new Position(-1, -1);
 
 			Tick deadline = time.add(stochastics.generateDeadline());
-			IProductSim product = simulation.createProduct(productName, startPosition, productSteps, time, deadline);
-			products.put(productName, product);
+			products.put(productName, simulation.createProduct(productName, startPosition, productSteps, time, deadline));
 
 			// update statistics
 			totalSteps += productSteps.size();
@@ -987,7 +990,7 @@ public class Simulation implements ISimulation, IControl {
 			for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
 				System.out.println("EQ: " + equiplet.getValue());
 			}
-			throw new IllegalArgumentException("WHAA");
+			throw new IllegalArgumentException("nullpointer not possible");
 		}
 
 		// unblock simulation when notifying job finished

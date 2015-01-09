@@ -51,7 +51,6 @@ public class ProductAgent extends Agent {
 				listenerBehaviour = new ProductListenerBehaviour(this);
 				addBehaviour(scheduleBehaviour);
 				addBehaviour(listenerBehaviour);
-				
 
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to parse the arguments\n", getLocalName());
@@ -125,7 +124,7 @@ public class ProductAgent extends Agent {
 		for (ProductionStep step : productionPath) {
 			steps.add(step.getProductStep());
 		}
-		
+
 		Tick newDeadline = time.add(deadline.minus(getCreated()).multiply(2));
 		addBehaviour(new ScheduleBehaviour(this, steps, time, newDeadline));
 	}
@@ -184,6 +183,8 @@ public class ProductAgent extends Agent {
 	protected void schedulingFinished(Tick time, boolean succeeded) {
 		if (!succeeded) {
 			state = ProductState.ERROR;
+		} else {
+			performNextStep();
 		}
 	}
 
@@ -238,10 +239,11 @@ public class ProductAgent extends Agent {
 			performNextStep();
 		}
 	}
-	
+
 	protected void performNextStep() {
 		// fix, here need a transport unit or something be informed to travel to next equiplet.
-		onProductArrived(new Tick());
+		// onProductArrived(new Tick());
+		throw new RuntimeException("perforn next step");
 	}
 
 	protected void onProductProcessing(Tick time) {
@@ -268,7 +270,7 @@ public class ProductAgent extends Agent {
 	 */
 	protected void onProductStarted(Tick time, int index) {
 		Tick newDeadline = deadline.add(deadline.minus(getCreated()));
-		
+
 		System.out.printf("PA:%s on product started event [time=%s, index=%d, state=%s, deadline=%s, new deadline=%s, current step=%s, productionPath].\n", getLocalName(), time, index, state, deadline, newDeadline, getCurrentStep(), productionPath);
 		// Check if the equiplet is in the correct state, if Processing everything is correct.
 		// When product is waiting check whether the index of current product steps matches

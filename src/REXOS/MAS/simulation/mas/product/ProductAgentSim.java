@@ -74,20 +74,44 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 	@Override
 	protected void onProductStepFinished(Tick time) {
 		super.onProductStepFinished(time);
-	}
-	
-	@Override
-	protected void performNextStep() {
+
 		// After regular behaviour when a product step is finished, inform also the simulation
 		if (getProductState() == ProductState.FINISHED) {
 			// notify the simulation that the product is finished
 			simulation.notifyProductFinished(getLocalName());
 			simulation.log(Settings.PRODUCT_LOG, getLocalName(), "PA:" + getLocalName() + " finished: " + history);
 			doDelete();
-		} else if (getProductState() == ProductState.TRAVELING) {
-			// notify the simulation that the product is traveling
-			simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
 		}
+	}
+
+	@Override
+	protected void schedulingFinished(Tick time, boolean succeeded) {
+		System.out.printf("PA:%s scheduling finished %b. \n", getLocalName(), succeeded);
+		state = ProductState.TRAVELING;
+
+		// let the simulation know that the creation of product agent failed
+		if (reschedule && succeeded) {
+			reschedule = false;
+			simulation.notifyProductRescheduled(getLocalName(), getCurrentStep().getEquipletName(), succeeded);
+		} else if (reschedule) {
+			// Tick deadline = getDeadline().add(getDeadline().minus(getCreated()).multiply(++retry));
+			// System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
+			// reschedule(time, deadline);
+			System.out.println("product" + this);
+			throw new IllegalArgumentException("PA:" + getLocalName() + " failed to reschedule deadline=" + getDeadline().add(getDeadline().minus(getCreated())));
+		} else if (succeeded) {
+			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
+		} else {
+			simulation.notifyProductCreationFailed(getLocalName());
+			doDelete();
+		}
+	}
+
+	@Override
+	protected void performNextStep() {
+		// notify the simulation that the product is traveling
+		simulation.notifyProductTraveling(getLocalName(), getCurrentStep().getEquipletName());
+
 	}
 
 	@Override
@@ -98,27 +122,6 @@ public class ProductAgentSim extends ProductAgent implements IProductSim {
 		ProductionStep step = getCurrentStep();
 		step.updateStart(time);
 		simulation.notifyProductProcessing(getLocalName(), step.getEquipletName(), step.getService(), step.getIndex());
-	}
-
-	@Override
-	protected void schedulingFinished(Tick time, boolean succeeded) {
-		System.out.printf("PA:%s scheduling finished %b. \n", getLocalName(), succeeded);
-		// let the simulation know that the creation of product agent failed
-		if (reschedule && succeeded) {
-			reschedule = false;
-			simulation.notifyProductRescheduled(getLocalName(), getCurrentStep().getEquipletName(), succeeded);
-		} else if (reschedule) {
-			// Tick deadline = getDeadline().add(getDeadline().minus(getCreated()).multiply(++retry));
-			// System.out.printf("PA:%s try rescheduling again at %s with new deadline %s. \n", getLocalName(), time, deadline);
-			// reschedule(time, deadline);
-			System.out.println("product" + this);
-			throw new IllegalArgumentException("PA:" + getLocalName() + " failed to reschedule deadline=" + getDeadline().add(getDeadline().minus(getCreated())));	
-		} else if (succeeded) {
-			simulation.notifyProductCreated(getLocalName(), getCurrentStep().getEquipletName());
-		} else {
-			simulation.notifyProductCreationFailed(getLocalName());
-			doDelete();
-		}
 	}
 
 	@Override
