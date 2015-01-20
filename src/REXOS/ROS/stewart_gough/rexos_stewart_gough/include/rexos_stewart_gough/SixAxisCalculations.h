@@ -45,7 +45,12 @@ class SixAxisCalculations {
 			effectorJointOffset(effectorJointOffset),
 			motorJointOffset(motorJointOffset)
 			{
-				getArmJointAngles(Vector4(20, -50 - 100, 0, 1), Vector4(-23.81, -51.82, -264.14, 1), Vector4(-23.81 - -37.10, -51.82 - -46.98, -264.14 - -250.00, 1));
+				maxJointAngle = 15.0 * 3.141592 / 180;
+				sphereCircleRadius = std::sin(maxJointAngle);
+				REXOS_INFO_STREAM("sphereCircleRadius: " << sphereCircleRadius);
+	
+				//hasValidJointAngles(Vector4(20, -50 - 100, 0, 1), Vector4(-23.81, -51.82, -264.14, 1), Vector4(-23.81 - -37.10, -51.82 - -46.98, -264.14 - -250.00, 1));
+				//hasValidJointAngles(Vector4(20, -50 - 100, 0, 1), Vector4(20, -50 - 100, -200, 1), Vector4(1, 0, 0, 1));
 		}
 
 		EffectorMove getMotorAngles(StewartGoughLocation moveTo);
@@ -60,9 +65,12 @@ class SixAxisCalculations {
 		double effectorJointOffset;
 		double maxJointAngle;
 		
+		double sphereCircleRadius;
+		
 		static constexpr double numberOfGroups = 3;
 		
-		ArmJointAngles getArmJointAngles(Vector4 upperArmLowerArmJoint, Vector4 lowerArmEffectorJoint, Vector4 effectorJointAxis);
+		bool hasValidJointAngles(Vector3 upperArmLowerArmJoint, Vector3 lowerArmEffectorJoint, Vector3 effectorJointAxis);
+		double getRemainingZAngle(double yAngle);
 		double getAngleForGroup(int jointIndex);
 		Vector2 getIntersectionPoint(Vector2 pointA, double radiusA, Vector2 pointB, double radiusB);
 		Vector3 getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, double groupAngle);

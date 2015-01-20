@@ -7,14 +7,14 @@
 
 
 namespace rexos_stewart_gough {
-SixAxisCalculations::ArmJointAngles SixAxisCalculations::getArmJointAngles(Vector4 upperArmLowerArmJoint, Vector4 lowerArmEffectorJoint, Vector4 effectorJointAxis) {
+bool SixAxisCalculations::hasValidJointAngles(Vector3 upperArmLowerArmJoint, Vector3 lowerArmEffectorJoint, Vector3 effectorJointAxis) {
 	// we know that the upper arm will remain straight
-	Vector4 upperArmJointAxis(1, 0, 0, 1);
+	Vector3 upperArmJointAxis(1, 0, 0);
 	
 	///////////////////////
 	// calulate the normal vector of the lower arm, pointing to the right-ish
 	///////////////////////
-	Vector4 lowerArmDirection = lowerArmEffectorJoint - upperArmLowerArmJoint;
+	Vector3 lowerArmDirection = lowerArmEffectorJoint - upperArmLowerArmJoint;
 	REXOS_INFO_STREAM("lowerArmDirection: " << lowerArmDirection);
 	
 	Vector4 lowerArmNormal(-lowerArmDirection.z, 0, lowerArmDirection.x, 0);
@@ -42,6 +42,9 @@ SixAxisCalculations::ArmJointAngles SixAxisCalculations::getArmJointAngles(Vecto
 	REXOS_INFO_STREAM("upperArmJointAxisYAngle: " << upperArmJointAxisYAngle * 180 / 3.141592);
 	REXOS_INFO_STREAM("upperArmJointYAngle: " << upperArmJointYAngle * 180 / 3.141592);
 	
+	if(std::abs(upperArmJointYAngle) > maxJointAngle) {
+		return false;
+	}
 	///////////////////////
 	// calculate the "Y" rotation for the lowerArmLowerArmJoint
 	///////////////////////
@@ -51,12 +54,29 @@ SixAxisCalculations::ArmJointAngles SixAxisCalculations::getArmJointAngles(Vecto
 	REXOS_INFO_STREAM("effectorJointAxisYAngle: " << effectorJointAxisYAngle * 180 / 3.141592);
 	REXOS_INFO_STREAM("effectorJointYAngle: " << effectorJointYAngle * 180 / 3.141592);
 	
-	ArmJointAngles output;
-	output.angleZ = angleZ;
-	output.effectorArmAngleY = effectorJointYAngle;
-	output.upperArmAngleY = upperArmJointYAngle;
+	if(std::abs(effectorJointYAngle) > maxJointAngle) {
+		return false;
+	}
 	
-	return output;
+	
+	double remainingUpperArmJointZAngle = getRemainingZAngle(upperArmJointYAngle);
+	double remainingEffectorJointZAngle = getRemainingZAngle(effectorJointYAngle);
+	
+	if(remainingUpperArmJointZAngle + remainingEffectorJointZAngle >= angleZ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+double SixAxisCalculations::getRemainingZAngle(double yAngle) {
+	double yCoordinateInCircel = std::sin(yAngle) / sphereCircleRadius;
+	REXOS_INFO_STREAM("yCoordinateInCircel: " << yCoordinateInCircel);
+	
+	double remainingZ = std::sqrt(1 - std::pow(yCoordinateInCircel, 2));
+	double remainingZAngle = std::asin(remainingZ) / (90 * 3.141592 / 180) * maxJointAngle;
+	REXOS_INFO_STREAM("remainingZ: " << remainingZ);
+	REXOS_INFO_STREAM("remainingZAngle: " << remainingZAngle * 180 / 3.141592);
+	return remainingZAngle;
 }
 	
 double SixAxisCalculations::getAngleForGroup(int jointIndex) {
@@ -175,7 +195,7 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	ROS_INFO_STREAM("effectorJointPosition: " << effectorJointPosition);
 	
 	// Project the sphere comprising the possible positions of the lower arm on 
-	// the circle comprising the possible position of the upper arm
+	// the circle comprising the possible positions of the upper arm
 	// Determine the x distance between the motorAxisPosition and the effectorJointPosition
 	double deltaX = motorAxisPosition.x - effectorJointPosition.x;
 	ROS_INFO_STREAM("deltaX: " << deltaX);
@@ -195,7 +215,21 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	// Determine the angle for the motor
 	// The x and y value are multiplied by -1 to invert the coordinate system for the axis, this because the origin of the unit circle is on the other side (rotated by 180 degrees).
 	double motorRotationAngle = std::atan2(-relativeUpperArmLowerArmIntersectionPoint.y, -relativeUpperArmLowerArmIntersectionPoint.x);
-	return motorRotationAngle;
+	
+	Vector3 upperArmLowerArmJoint(motorAxisPosition.x, upperArmLowerArmIntersectionPoint.x, upperArmLowerArmIntersectionPoint.y);
+	REXOS_WARN_STREAM("upperArmLowerArmJoint" << upperArmLowerArmJoint);
+	Matrix4 rotationMatrix2;
+	rotationMatrix2.rotateX(preRotatedEffectorLocation.rotationX);
+	rotationMatrix2.rotateY(preRotatedEffectorLocation.rotationY);
+	rotationMatrix2.rotateZ(preRotatedEffectorLocation.rotationZ);
+	Vector3 effectorAxis = rotationMatrix * Vector3(1, 0, 0);
+	REXOS_WARN_STREAM("effectorAxis" << effectorAxis);
+	if(hasValidJointAngles(upperArmLowerArmJoint, effectorJointPosition, effectorAxis) == false) {
+		REXOS_ERROR("INvalid angle!!");
+		return std::nan("");
+	} else {
+		return motorRotationAngle;
+	}
 }
 
 SixAxisCalculations::EffectorMove SixAxisCalculations::getMotorAngles(StewartGoughLocation moveTo) {
