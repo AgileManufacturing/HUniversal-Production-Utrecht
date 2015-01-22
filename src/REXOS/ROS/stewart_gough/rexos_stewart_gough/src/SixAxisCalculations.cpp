@@ -219,10 +219,15 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	Vector3 upperArmLowerArmJoint(motorAxisPosition.x, upperArmLowerArmIntersectionPoint.x, upperArmLowerArmIntersectionPoint.y);
 	REXOS_WARN_STREAM("upperArmLowerArmJoint" << upperArmLowerArmJoint);
 	Matrix4 rotationMatrix2;
-	rotationMatrix2.rotateX(preRotatedEffectorLocation.rotationX);
-	rotationMatrix2.rotateY(preRotatedEffectorLocation.rotationY);
-	rotationMatrix2.rotateZ(preRotatedEffectorLocation.rotationZ);
-	Vector3 effectorAxis = rotationMatrix * Vector3(1, 0, 0);
+	rotationMatrix2.rotateZ(groupAngle);
+	rotationMatrix2.rotateX(effectorLocation.rotationX);
+	REXOS_WARN_STREAM("effectorLocation.rotationX" << effectorLocation.rotationX);
+	rotationMatrix2.rotateY(effectorLocation.rotationY);
+	REXOS_WARN_STREAM("effectorLocation.rotationY" << effectorLocation.rotationY);
+	rotationMatrix2.rotateZ(effectorLocation.rotationZ);
+	REXOS_WARN_STREAM("effectorLocation.rotationZ" << effectorLocation.rotationZ);
+	rotationMatrix2.rotateZ(-groupAngle);
+	Vector3 effectorAxis = rotationMatrix2 * Vector3(1, 0, 0);
 	REXOS_WARN_STREAM("effectorAxis" << effectorAxis);
 	if(hasValidJointAngles(upperArmLowerArmJoint, effectorJointPosition, effectorAxis) == false) {
 		REXOS_ERROR("INvalid angle!!");
