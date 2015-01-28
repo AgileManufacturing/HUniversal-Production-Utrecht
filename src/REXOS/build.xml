@@ -127,6 +127,10 @@
    		<ant antfile="build.xml" target="all" dir="generic" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
 	</target>
 
+	<target name="MASSIM" depends="allpackages">
+		<ant antfile="build.xml" target="simulation" dir="MAS" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
+	</target>
+
 	<!-- clean target, cleans rexos -->
 	<target name="clean">	
 		<delete file="${export-classpath-file}" />

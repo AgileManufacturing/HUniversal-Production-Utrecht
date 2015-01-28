@@ -1,8 +1,9 @@
 <project name="MAS" default="all">
 	<import file="../build.xml"/>
 
-	<target name="all" depends="web_socket_server, simulation, jars">
+	<target name="all" depends="web_socket_server, jars">
 		<buildjava dir="${basedir}"/>
+
 	</target>
 	
 	<target name="web_socket_server" depends="jars">
@@ -16,11 +17,12 @@
 	<target name="jars">
 		<antcall target="add-jar-to-classpath"><param name="jar" value="jade.jar"/></antcall>
 	</target>
+
 	<target name="simjar">
-        <mkdir dir="build/jar"/>
-        <jar destfile="build/simulation.jar" basedir="../../../build/REXOS/MAS/simulation/">
-        </jar>
-    </target>
+	        <mkdir dir="build/jar"/>
+        	<jar destfile="build/simulation.jar" basedir="../../../build/REXOS/MAS/simulation/">
+        	</jar>
+    	</target>
 
 
 	<target name="clean">
