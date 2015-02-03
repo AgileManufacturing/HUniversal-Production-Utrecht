@@ -5,7 +5,8 @@ namespace rexos_module {
 		setInstructionActionServer(AbstractModule::nodeHandle, 
 				equipletName + "/" + identifier.getManufacturer() + "/" + identifier.getTypeNumber() + "/" + identifier.getSerialNumber() + "/set_instruction", 
 				boost::bind(&ActorModule::onSetInstruction, this, _1), 
-				true)
+				false)
 	{
+		setInstructionActionServer.start();
 	}
 }

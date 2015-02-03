@@ -6,10 +6,10 @@ namespace rexos_module {
 			rexos_statemachine::StateMachineController(advertisementPath), 
 			moduleProxyListener(moduleProxyListener),
 			transitionActionServer(AbstractModule::nodeHandle, advertisementPath + "transition", 
-				boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), true),
+				boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), false),
 			bond(NULL)
 	{
-		
+		transitionActionServer.start();
 	}
 	ModuleProxy::~ModuleProxy() {
 		if(bond != NULL) {
