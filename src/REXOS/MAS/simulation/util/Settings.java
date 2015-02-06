@@ -23,7 +23,7 @@ public class Settings {
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
 	 */
-	public static double RECONFIGATION_TIME = 300;
+	public static double RECONFIGATION_TIME = 0;
 
 	/**
 	 * time needs to elapse before checking if equiplets need to be reconfigured
@@ -47,9 +47,14 @@ public class Settings {
 
 	public static final boolean CONSTANT_NUMBER_OF_PRODUCT_STEPS = true;
 
-	public static final int MEAN_PRODUCT_STEPS = 20;
+	public static final int MEAN_PRODUCT_STEPS = 4;
 
-	public static final int MIN_PRODUCT_STEPS = 10;
+	public static final int MIN_PRODUCT_STEPS = 4;
+
+	/**
+	 * Generate the product steps for a FAIM 2014 simulation run
+	 */
+	public static final boolean FAIM2014 = true;
 
 	/**
 	 * input and output locations of the simulation variables
@@ -59,4 +64,5 @@ public class Settings {
 	public final static String SIMULATION_OUTPUT = "simulation/output";
 
 	public static final String PRODUCT_LOG = "products-log";
+
 }

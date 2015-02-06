@@ -454,7 +454,7 @@ public class Scheduling {
 
 					Node nextNode = new Node(equiplet, firstPossibility, duration, index);
 					if (MASConfiguration.VERBOSITY > 3) {
-						System.out.println(" add to path [last in path=" + node + ", nextNode=" + nextNode + " + in path=" + path + "]");
+						// System.out.println(" add to path [last in path=" + node + ", nextNode=" + nextNode + " + in path=" + path + "]");
 					}
 
 					if (firstPossibility.greaterOrEqualThan(deadline)) {

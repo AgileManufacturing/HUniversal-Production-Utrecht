@@ -53,7 +53,7 @@ class Stochastics {
 	 * @return interarrival time of product
 	 */
 	public Tick generateProductArrival(Tick time) {
-	if (time.greaterThan(Settings.WARMUP)) {
+		if (time.greaterThan(Settings.WARMUP)) {
 			int equiplets = config.getEquipletsConfigurations().size();
 
 			double interarrival = (meanProcessingTime * Settings.MEAN_PRODUCT_STEPS) / (Settings.UTILIZATION * equiplets);
@@ -79,7 +79,9 @@ class Stochastics {
 	 * @return a list of product steps
 	 */
 	public LinkedList<ProductStep> generateProductSteps() {
-		if (Settings.CONSTANT_NUMBER_OF_PRODUCT_STEPS) {
+		if (Settings.FAIM2014) {
+			return generateProductStepsFAIM2014();
+		} else if (Settings.CONSTANT_NUMBER_OF_PRODUCT_STEPS) {
 			return generateProductStepsRandom();
 		} else if (!Settings.CONSTANT_NUMBER_OF_PRODUCT_STEPS) {
 			return generateProductStepsUniformAmount();
@@ -93,11 +95,44 @@ class Stochastics {
 	 * 
 	 * @return a list of product steps
 	 */
+	private LinkedList<ProductStep> generateProductStepsFAIM2014() {
+		LinkedList<ProductStep> steps = new LinkedList<>();
+		List<ProductStep> productSteps = config.getProductSteps();
+
+		int a = -1, b = -1, y = -1;
+		for (int i = 0; i < productSteps.size(); i++) {
+			if (productSteps.get(i).getService().equalsIgnoreCase("a")) {
+				a = i;
+			} else if (productSteps.get(i).getService().equalsIgnoreCase("b")) {
+				b = i;
+			} else if (productSteps.get(i).getService().equalsIgnoreCase("y")) {
+				y = i;
+			}
+		}
+
+		if (a >= 0 && a < productSteps.size() && b >= 0 && b < productSteps.size() && y >= 0 && y < productSteps.size()) {
+			steps.add(new ProductStep(0, productSteps.get(y).getService(), productSteps.get(y).getCriteria()));
+			steps.add(new ProductStep(1, productSteps.get(a).getService(), productSteps.get(a).getCriteria()));
+			steps.add(new ProductStep(2, productSteps.get(y).getService(), productSteps.get(y).getCriteria()));
+			steps.add(new ProductStep(3, productSteps.get(b).getService(), productSteps.get(b).getCriteria()));
+
+			return steps;
+		} else {
+			System.err.println("Config: failed to failed the FAIM 2014 capabilities in the simulation configurations.");
+			return new LinkedList<ProductStep>();
+		}
+	}
+
+	/**
+	 * Generate the product steps with MEAN_PRODUCT_STEPS steps
+	 * 
+	 * @return a list of product steps
+	 */
 	private LinkedList<ProductStep> generateProductStepsRandom() {
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		List<ProductStep> productSteps = config.getProductSteps();
-		
-		for (int i = 0; i < Settings.MEAN_PRODUCT_STEPS ; i++) {
+
+		for (int i = 0; i < Settings.MEAN_PRODUCT_STEPS; i++) {
 			int x = random.nextInt(productSteps.size());
 			steps.add(new ProductStep(i, productSteps.get(x).getService(), productSteps.get(x).getCriteria()));
 		}

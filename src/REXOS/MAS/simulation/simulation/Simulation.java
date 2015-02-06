@@ -309,10 +309,10 @@ public class Simulation implements ISimulation, IControl {
 				// System.out.println("EQ: " + equiplet.getValue().toString()
 				// + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
 				// }
-
-				for (Entry<String, IProductSim> product : products.entrySet()) {
-					System.out.println("PQ: " + product.getValue().toString());
-				}
+				//
+				// for (Entry<String, IProductSim> product : products.entrySet()) {
+				// System.out.println("PQ: " + product.getValue().toString());
+				// }
 
 				if (Settings.VERIFICATION) {
 					verification();
