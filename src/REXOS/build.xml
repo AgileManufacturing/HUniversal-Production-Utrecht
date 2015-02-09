@@ -1,11 +1,4 @@
 <project name="REXOS" default="all" basedir=".">
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-		<classpath>
-			<pathelement location="${repo-root}/src/REXOS/external_libraries/ant-contrib.jar" />
-		</classpath>
-	</taskdef>
-	
-	
 	<!-- java source root -->
 	<property name="rexos-java-root" value="${basedir}"/>
 
@@ -18,6 +11,13 @@
 	<!-- Add a reference to the global environment -->
 	<property environment="env"/>
 
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${repo-root}/src/REXOS/external_libraries/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
+	
+	
 	<!-- Macro for the following things:
 	- load current classpath
 	- echo the current building dir
@@ -202,27 +202,28 @@
 		</java>
 	</target>
 	
-	<target name="Generate-JARs">
+	<target name="Generate-JARs" depends="HAL">
 		<foreach target="Generate-JAR" param="theFile">
 			<path id="modulesPathId">
-				<fileset dir="HAL/modules" casesensitive="yes">
-					<include name="**/*.java"/>
+				<fileset dir="${repo-root}/build/REXOS/HAL/modules" casesensitive="yes">
+					<include name="**/*.class"/>
 				</fileset>
 			</path>
 		</foreach>
 		<foreach target="Generate-JAR" param="theFile">
 			<path id="capabilitiesPathId">
-				<fileset dir="HAL/capabilities" casesensitive="yes">
-					<include name="**/*.java"/>
+				<fileset dir="${repo-root}/build/REXOS/HAL/capabilities" casesensitive="yes">
+					<include name="**/*.class"/>
 				</fileset>
 			</path>
 		</foreach>
 	</target>
 	
 	<target name="Generate-JAR">
-		<basename property="jar.filename" file="${theFile}" suffix=".java"/>
-		<dirname property="jar.basedir" file="${theFile}"/>
-		<jar destfile="${repo-root}/jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.java"/>
+		<echo message="${theFile}"/>
+		<basename property="jar.filename" file="${theFile}" suffix=".class"/>
+		<dirname property="jar.basedir" file="${repo-root}/build/REXOS/HAL/"/>
+		<jar destfile="${repo-root}/jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.class"/>
 	</target>
 	
 	<path id="java">
