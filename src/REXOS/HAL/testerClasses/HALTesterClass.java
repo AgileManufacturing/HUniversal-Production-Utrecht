@@ -25,8 +25,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "/home/t/Desktop/"; 		// <-- Tommas
-	//static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
+	//static final String baseDir = "/home/t/Desktop/"; 		// <-- Tommas
+	static final String baseDir = "/home/cm-storm2/lib/"; 		// <-- Workmachine lars
 	//static final String baseDir = "/home/peter/lib/";
 	
 	// dummy module A
@@ -139,16 +139,19 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		JSONObject b = new JSONObject(new JSONTokener(moduleB));
 		
 		
-		//hal.insertModule(a, a);
-		//hal.insertModule(b, b);
+		hal.insertModule(a, a);
+		hal.insertModule(b, b);
 		
 		
 		
 		//hal.translateProductStep(new ProductStep(1, criteria, new Service("place")));
 		// Sending reloadEquiplet command to Blackboard
 		// UNTESTED W.I.P (Lars Veenendaal)]
+		Thread.sleep(5000);
 		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_A", "1"));
+		Thread.sleep(5000);
 		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_B", "1"));
+		Thread.sleep(5000);
 		hal.sendReloadEquiplet();
 		/*Service service = new Service("PickAndPlace");
 		ProductStep productStep = new ProductStep(0, null, service);
