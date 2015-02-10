@@ -15,7 +15,7 @@ public class MASConfiguration {
 	/**
 	 * the number of jobs an just arrives job can overtake in the queue
 	 */
-	public static int QUEUE_JUMP = 5;
+	public static int QUEUE_JUMP = 0;
 
 	/**
 	 * Scheduling algorithm used by product agent to schedule his product step
