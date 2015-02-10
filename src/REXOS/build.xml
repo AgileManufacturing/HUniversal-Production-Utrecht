@@ -234,6 +234,6 @@
 	</path>
 
 	<target name="emurex">
-    	<jar destfile="../../simulation/simulation.jar" basedir="../../build/REXOS/" includes="MAS/simulation/**" excludes="**/Test.class"/>
+    	<jar destfile="../../simulation/simulation.jar" basedir="../../build/REXOS/" includes="**" excludes="**/Test.class"/>
 	</target>
 </project>

@@ -30,6 +30,7 @@ import MAS.simulation.mas.equiplet.IEquipletSim;
 import MAS.simulation.mas.product.IProductSim;
 import MAS.simulation.mas.product.ProductAgentSim;
 import MAS.simulation.mas.product.ProductAgentSimDealWithIt;
+import MAS.simulation.util.Settings;
 import MAS.util.MASConfiguration;
 import MAS.util.Position;
 import MAS.util.SchedulingAlgorithm;
@@ -54,6 +55,18 @@ public class SimulationAgent extends Agent implements ISimControl {
 		} catch (NumberFormatException e) {
 			System.err.println("Simulation: parsing error verbosity");
 		}
+
+		String configFile = getProperty("config", String.valueOf(Settings.SIMULATION_CONFIG));
+		String equipletsFile = getProperty("equiplets", String.valueOf(Settings.SIMULATION_EQUIPLET_CONFIG));
+		String outputFile = getProperty("output", String.valueOf(Settings.SIMULATION_OUTPUT));
+
+		Settings.SIMULATION_CONFIG = configFile;
+		Settings.SIMULATION_EQUIPLET_CONFIG = equipletsFile;
+		Settings.SIMULATION_OUTPUT = outputFile;
+		System.err.println("Simulation: configuration are set on : [config="+  configFile + ", equiplets=" + equipletsFile + ", output="+ outputFile + "] ");
+
+
+
 		setOutput();
 		simulation = new Simulation(this);
 		simulation.init();

@@ -54,9 +54,9 @@ public class Settings {
 	/**
 	 * input and output locations of the simulation variables
 	 */
-	public final static String SIMULATION_CONFIG = "simulation/simulation.xml";
-	public final static String SIMULATION_EQUIPLET_CONFIG = "simulation/equiplets.csv";
-	public final static String SIMULATION_OUTPUT = "simulation/output";
+	public static String SIMULATION_CONFIG = "simulation/simulation.xml";
+	public static String SIMULATION_EQUIPLET_CONFIG = "simulation/equiplets.csv";
+	public static String SIMULATION_OUTPUT = "simulation/output";
 
 	public static final String PRODUCT_LOG = "products-log";
 }
