@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<runlength>1000000</runlength>
-	<runs>10</runs>
+	<runs>1</runs>
 	<travel type="normal">10</travel>
 	<products>
 		<arrival type="none">20</arrival>
