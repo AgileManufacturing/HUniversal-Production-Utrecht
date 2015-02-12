@@ -26,7 +26,7 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static JSONObject criteria;
 	static boolean insert = true;
 	
-	static final String baseDir = "/home/agileman/Desktop/";
+	static final String baseDir = "jars/";
 	static final String Aridir = "C:/users/Aristides/Desktop/Six Axis/";
 	static final String dir = baseDir;
 	
