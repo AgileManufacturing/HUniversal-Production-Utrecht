@@ -189,6 +189,7 @@ public class SupplyAgent extends Agent {
 		JSONArray subjects = new JSONArray();
 		JSONObject subject = new JSONObject();
 		JSONObject subjectMove = new JSONObject();
+		JSONObject subjectMoveApproach = new JSONObject();
 
 		if (color.equals("red")) {
 			for (int i = 0; i < GC4x4MB_3.length; i++) {
@@ -196,6 +197,10 @@ public class SupplyAgent extends Agent {
 					subjectMove.put("x", (lookUpTable[(i * 2)]));
 					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
 					subjectMove.put("z", "-26.5");
+					subjectMoveApproach.put("x", 0);
+					subjectMoveApproach.put("y", 0);
+					subjectMoveApproach.put("z", 20);
+					subjectMove.put("approach", subjectMoveApproach);
 					subject.put("move", subjectMove);
 					subject.put("identifier", "GC4x4MB_3");
 					subjects.put(subject);
@@ -211,6 +216,10 @@ public class SupplyAgent extends Agent {
 					subjectMove.put("x", (lookUpTable[(i * 2)]));
 					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
 					subjectMove.put("z", "-26.5");
+					subjectMoveApproach.put("x", 0);
+					subjectMoveApproach.put("y", 0);
+					subjectMoveApproach.put("z", 20);
+					subjectMove.put("approach", subjectMoveApproach);
 					subject.put("move", subjectMove);
 					subject.put("identifier", "GC4x4MB_1");
 					subjects.put(subject);
@@ -226,6 +235,10 @@ public class SupplyAgent extends Agent {
 					subjectMove.put("x", (lookUpTable[(i * 2)]));
 					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
 					subjectMove.put("z", "-26.5");
+					subjectMoveApproach.put("x", 0);
+					subjectMoveApproach.put("y", 0);
+					subjectMoveApproach.put("z", 20);
+					subjectMove.put("approach", subjectMoveApproach);
 					subject.put("move", subjectMove);
 					subject.put("identifier", "GC4x4MB_4");
 					subjects.put(subject);

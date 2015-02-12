@@ -58,6 +58,10 @@ public class CreateAgent {
 	 * @var CONTAINER_NAME The string holds the container name where in the EquipletAgent is being spawned.
 	 */
 	private static final String CONTAINER_NAME = "ProductAgentSpawnerAgent";
+	
+	public CreateAgent() {
+		System.out.println("CreateAgent constructor");
+	}
 
 	/**
 	 * CreateAgent() Spawns the ProductAgent on the server.
@@ -80,10 +84,12 @@ public class CreateAgent {
 
 			ProductAgentSpawnerAgent agent = new ProductAgentSpawnerAgent();
 			agent.setProductSteps(args);
+			
+			System.out.println("Create Agent trying to create an agent [agent=" + agent + ", container=" + container.getContainerName() + identifier + "]");
+			
 			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 			try {
 				AgentController ac = container.acceptNewAgent(container.getContainerName() + identifier, agent);
-
 				ac.start();
 
 				mws.setCreated(true);

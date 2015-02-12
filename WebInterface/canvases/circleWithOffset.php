@@ -92,9 +92,13 @@ class CirclewithoffsetCanvas extends Canvas {
 			}
 			var target = productStepHandler.getProperty("target");
 			target.move = {};
-			target.move.z = -26.5; //-26.5
 			target.move.x = tx;
-			target.move.y = ty;	
+			target.move.y = ty;
+			target.move.z = -26.5;
+			target.move.approach = {};
+			target.move.approach.x = 0;
+			target.move.approach.y = 0;
+			target.move.approach.z = 20;
 			console.log("tx:"+(tx)+",ty:"+ty);		
 			
 			productStepHandler.setProperty("target",target);

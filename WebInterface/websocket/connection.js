@@ -1,5 +1,5 @@
 //WebSocket variable
-var WEBSOCKET_URL = "ws://145.89.142.152:8887";
+var WEBSOCKET_URL = "ws://127.0.0.1:8887";
 var WEBSOCKET_RECEIVER = 'interface';
 var WEBSOCKET_SUBJECT_CONNECTION = 'connection';
 var ws;

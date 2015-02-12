@@ -11,7 +11,7 @@ public class ProductAgentSpawnerAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	 
 	private String productSteps;
-	 
+	
 	public void setProductSteps(String productSteps){
 		this.productSteps = productSteps;
 	}

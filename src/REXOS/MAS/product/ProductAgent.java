@@ -242,8 +242,8 @@ public class ProductAgent extends Agent {
 
 	protected void performNextStep() {
 		// fix, here need a transport unit or something be informed to travel to next equiplet.
-		// onProductArrived(new Tick());
-		throw new RuntimeException("perforn next step");
+		onProductArrived(new Tick());
+		// throw new RuntimeException("perforn next step");
 	}
 
 	protected void onProductProcessing(Tick time) {
