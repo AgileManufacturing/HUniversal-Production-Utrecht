@@ -90,7 +90,7 @@ void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPt
 		ros::Duration(0.1).sleep();
 		setInstructionActionServer.setSucceeded(result);	
 		std::cout << "Gripper deactivated" << std::endl;
-		return;			
+		return;
 	}
 	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
@@ -173,7 +173,7 @@ bool GripperNode::transitionStop() {
 //TODO: Implement the following methods, there must be a MAST functionallity implemented here when a certain event occurs. Like when the gripper is overheated,
 //the gripper should look for a save place to drop the current item.
 void GripperNode::notifyWarned(){
-	REXOS_INFO("GripperNode is Warned ");	
+	REXOS_INFO("GripperNode is Warned ");
 }
 	
 void GripperNode::notifyOverheated(){

@@ -87,25 +87,15 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 	REXOS_DEBUG("Subscribing to equipletCommands");
 	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	equipletCommandSubscriptionSet = new Blackboard::BasicOperationSubscription(Blackboard::UPDATE, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
 	sleep(1);
-	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscriptionSet);
 	subscriptions.push_back(equipletCommandSubscription);
-	subscriptions.push_back(equipletCommandSubscriptionSet);
 	sleep(1);
 
 	REXOS_DEBUG("Subscribing to equipletState");
 	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
 	sleep(1);
 
-	REXOS_DEBUG("Subscribing to DirectMoveStepsBlackBoard");
-	directMoveBlackBoardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "DirectMoveStepsBlackBoard");
-	directMoveSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	directMoveBlackBoardClient->subscribe(*directMoveSubscription);
-	subscriptions.push_back(directMoveSubscription);
-	sleep(1);
-	
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }
 
@@ -113,16 +103,16 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
  * Destructor for the EquipletNode
  **/
 EquipletNode::~EquipletNode(){
+	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
+		delete *iter;
+	}
+	subscriptions.clear();
+	
 	delete equipletStepBlackboardClient;
 	delete equipletStepBlackboardClient;
 	delete directMoveBlackBoardClient;
 	delete equipletCommandBlackboardClient;
 	delete equipletStateBlackboardClient;
-
-	for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
-		delete *iter;
-	}
-	subscriptions.clear();
 }
 
 /**
@@ -157,7 +147,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 			//ROS_INFO("%s ", step.getModuleIdentifier());
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {reloadEquiplet: \"RELOADING_COMPLETED\"} } ");
 		}
-	} else if(&subscription == equipletCommandSubscription || &subscription == equipletCommandSubscriptionSet) {
+	} else if(&subscription == equipletCommandSubscription) {
 		ROS_INFO("Received equiplet statemachine command");
 		
 		Json::Reader reader;
@@ -188,7 +178,13 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	if(originPlacement.getOriginPlacementType() == rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER) {
 		REXOS_DEBUG("Gathering information from the environment cache");
 		Json::Value result = callLookupHandler(originPlacement.getParameters());
-		originPlacement.setLookupResult(result);
+		if(result == Json::Value::null) {
+			// could not find anything in the lookup handler, failing hardware step
+			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
+			return;
+		} else {
+			originPlacement.setLookupResult(result);
+		}
 	}
 	step.setOriginPlacement(originPlacement);
 

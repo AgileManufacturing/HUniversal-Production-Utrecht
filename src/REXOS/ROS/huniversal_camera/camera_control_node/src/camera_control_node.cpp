@@ -53,7 +53,7 @@ CameraControlNode::CameraControlNode(std::string equipletName, rexos_datatypes::
 		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::INCREASE_EXPOSURE)),
 		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::DECREASE_EXPOSURE)),
 		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(				vision_node_services::AUTO_WHITE_BALANCE)),
-		fishEyeCorrectionClient(			nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::FISH_EYE_CORRECTION)),
+		fishEyeCorrectionClient(			nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::ENABLE_FISH_EYE_CORRECTOR)),
 		enableCameraClient(				nodeHandle.serviceClient<vision_node::enableComponent>(				vision_node_services::ENABLE_CAMERA)),
 		getCorrectionMatricesClient(		nodeHandle.serviceClient<vision_node::getCorrectionMatrices>(		vision_node_services::GET_CORRECTION_MATRICES)),
 		calibrateLensClient(				nodeHandle.serviceClient<camera_calibration_node::calibrateLens>(	camera_calibration_node_services::CALIBRATE_LENS))

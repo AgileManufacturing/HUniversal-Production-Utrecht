@@ -32,7 +32,7 @@
 
 DummyModuleB::DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
 		equipletName(equipletName),
-		rexos_module::Module(equipletName, moduleIdentifier)
+		rexos_module::ActorModule(equipletName, moduleIdentifier)
 {
 }
 
@@ -40,6 +40,15 @@ void DummyModuleB::run() {
 	REXOS_INFO("running");
 	ros::spin();
 }
+
+void DummyModuleB::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr& goal) {
+	REXOS_INFO("executing hardware step...");
+	ros::Duration d(5.0);
+	d.sleep();
+	REXOS_INFO("done with executing hardware step");
+	setInstructionActionServer.setSucceeded();
+}
+
 bool DummyModuleB::transitionInitialize() {
 	REXOS_INFO("Initialize transition called");
 	return true;
@@ -55,7 +64,7 @@ bool DummyModuleB::transitionDeinitialize() {
 bool DummyModuleB::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	rexos_module::TransitionGoal goal;
+	/*rexos_module::TransitionGoal goal;
 	std::vector<rexos_module::RequiredMutation> requiredMutations;
 	rexos_module::RequiredMutation requiredMutation;
 	requiredMutation.mutation = "move";
@@ -64,7 +73,7 @@ bool DummyModuleB::transitionSetup(){
 	goal.requiredMutationsRequiredForNextPhase = requiredMutations;
 	
 	transitionActionClient.sendGoal(goal);
-	transitionActionClient.waitForResult();
+	transitionActionClient.waitForResult();*/
 	
 	REXOS_INFO("Continuing calibration");
 	return true;

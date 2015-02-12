@@ -133,6 +133,7 @@ public class PickAndPlace extends Capability {
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
 			return hardwareSteps;
 		} catch(JSONException ex) {
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, "Unable to translate due to illegally formatted JSON", ex);
 			throw new CapabilityException("Unable to translate due to illegally formatted JSON", ex);
 		}
 	}

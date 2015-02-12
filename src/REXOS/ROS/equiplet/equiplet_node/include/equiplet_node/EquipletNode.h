@@ -106,7 +106,6 @@ private:
 
 	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
-	Blackboard::BlackboardSubscription* equipletCommandSubscriptionSet; 
 
 	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
 	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 

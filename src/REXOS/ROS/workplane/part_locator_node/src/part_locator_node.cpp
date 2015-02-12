@@ -526,7 +526,6 @@ namespace part_locator_node {
 		
 		Json::Value jsonNode;
 		std::vector<rexos_datatypes::ModuleIdentifier> modules;
-		modules.push_back(this->getModuleIdentifier());
 		modules.push_back(moverIdentifier);
 		try{
 			

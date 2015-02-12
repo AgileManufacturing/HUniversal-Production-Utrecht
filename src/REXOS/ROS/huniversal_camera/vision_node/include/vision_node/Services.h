@@ -35,7 +35,6 @@ namespace vision_node_services {
 	const std::string INCREASE_EXPOSURE = "increaseExposure";
 	const std::string DECREASE_EXPOSURE = "decreaseExposure";
 	const std::string AUTO_WHITE_BALANCE = "autoWhiteBalance";
-	const std::string FISH_EYE_CORRECTION = "fishEyeCorrection";
 	const std::string ENABLE_CAMERA = "enableCamera";
 	const std::string ENABLE_QR_CODE_READER = "enableQrCodeReader";
 	const std::string ENABLE_FISH_EYE_CORRECTOR = "enableFishEyeCorrector";

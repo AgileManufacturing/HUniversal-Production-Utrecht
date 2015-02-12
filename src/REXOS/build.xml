@@ -220,7 +220,6 @@
 	</target>
 	
 	<target name="Generate-JAR">
-		<echo message="${theFile}"/>
 		<basename property="jar.filename" file="${theFile}" suffix=".class"/>
 		<dirname property="jar.basedir" file="${repo-root}/build/REXOS/HAL/"/>
 		<jar destfile="${repo-root}/jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.class"/>

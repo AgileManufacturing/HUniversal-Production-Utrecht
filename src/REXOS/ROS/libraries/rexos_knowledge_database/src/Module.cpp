@@ -282,7 +282,7 @@ namespace rexos_knowledge_database{
 		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			throw std::runtime_error("Unable to find calibration entry");
+			throw KnowledgeDatabaseException("Unable to find calibration entry");
 		}
 		// set the cursor at the first result
 		result->next();

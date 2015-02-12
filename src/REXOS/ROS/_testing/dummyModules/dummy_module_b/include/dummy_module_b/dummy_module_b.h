@@ -31,18 +31,21 @@
 
 #include "ros/ros.h"
 
-#include <rexos_module/Module.h>
+#include <rexos_module/ActorModule.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include <rexos_logger/rexos_logger.h>
 
 
-class DummyModuleB : public rexos_module::Module {
+class DummyModuleB : public rexos_module::ActorModule {
 public:
 protected:
 	std::string equipletName;
 public:
 	DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	void run();
+	void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr& goal);
+
+	
 	
 	virtual bool transitionInitialize();
 	virtual bool transitionDeinitialize();
