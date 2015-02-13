@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-	<name>rexos_knowledge_database</name>
+	<name>rexos_configuration</name>
 	<version>0.0.0</version>
 	<description>Vectors</description>
 	<maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
@@ -9,15 +9,4 @@
 	<author email="dickvandersteen@gmail.com">Dickvdsteen</author>
 	<author email="koenbraham@gmail.com">KBraham</author>
 	<buildtool_depend>catkin</buildtool_depend>
-	
-	<build_depend>rexos_configuration</build_depend>
-	<run_depend>rexos_configuration</run_depend>
-	<build_depend>rexos_logger</build_depend>
-	<run_depend>rexos_logger</run_depend>
-	<build_depend>rexos_datatypes</build_depend>
-	<run_depend>rexos_datatypes</run_depend>
-	
-	<export>
-		<cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_utilities"/>
-	</export>
 </package>

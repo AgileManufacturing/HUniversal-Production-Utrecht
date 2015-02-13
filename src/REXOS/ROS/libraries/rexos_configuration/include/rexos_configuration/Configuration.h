@@ -1,13 +1,11 @@
 /**
- * @file EquipletNode.cpp
- * @brief Main for EquipletNode
- * @date Created: 2012-10-12
+ * @file Module.h
+ * @brief Coordinate system for communication between nodes
+ * @date Created: 2012-01-??  TODO: Date
  *
- * @author Joris Vergeer
+ * @author Tommas Bakker
  *
  * @section LICENSE
- * License: newBSD
- *
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -26,51 +24,33 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  **/
 
-#include <equiplet_node/EquipletNode.h>
+#pragma once
 
-static void show_usage(std::string name) {
-	REXOS_ERROR_STREAM("Usage: " << name << " <options(s)>\n" << "Options:\n"
-			<< "\t--help\t\tShow this help message\n"
-			<< "\t--blackboard\tIP address of the blackboard\n"
-			<< "\t--id\t\tID of this equiplet (default: 1)\n");
-}
+#include <jsoncpp/json/value.h>
 
-int main(int argc, char **argv) {
-	std::string blackboardIP;
-	bool spawnNodesForModules = false;
-	
-	for (int i = 0; i < argc; i++) {
-		std::string arg = argv[i];
-		if (arg == "--help") {
-			show_usage(argv[0]);
-			return 0;
-		} else if (arg == "--blackboard") {
-			if (i + 1 < argc) {
-				blackboardIP = argv[++i];
-			} else {
-				REXOS_ERROR("--blackboard requires one argument");
-				return -1;
-			}
-		} else if (arg == "--spawnNodes") {
-			spawnNodesForModules = true;
-		}
-	}
-	if(argc < 2) {
-		REXOS_ERROR("Usage: equiplet_node (--blackboard <ip-address>) (--spawnNodes) equipletName");
-		return -2;
-	}
-	
+#define DEFAULT_PROPERTY_NAME "default"
+#define DEFAULT_PROPERTIES_FILE_PATH "src/REXOS/util/configuration/settings.json"
 
-	// Set the name of the Equiplet
-	std::string equipletName = argv[argc - 1];
-
-	ros::init(argc, argv, equipletName);
-	equiplet_node::EquipletNode equipletNode(equipletName, blackboardIP, spawnNodesForModules);
-
-	ros::Rate poll_rate(10);
-	ros::spin();
-	
-	return 0;
+/**
+ * @brief this class provides a system to read a settings file and use it as a configuration.
+ */
+namespace rexos_configuration {
+	class Configuration {
+	private:
+		static Json::Value configuration;
+		
+	public:
+		/**
+		 * Get the specified value of the property specified by path
+		 */
+		static Json::Value getProperty(std::string path, std::string equipletName = DEFAULT_PROPERTY_NAME);
+	private:
+		/**
+		 * Initializes the configuration by reading the settings file
+		 */
+		 static void initialize();
+	};
 }

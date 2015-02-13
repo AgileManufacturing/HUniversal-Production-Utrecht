@@ -61,7 +61,7 @@ public class Configuration {
 	}
 	
 	public static Object getProperty(String path) {
-		return getProperty(path, null);
+		return getProperty(path, defaultPropertyName);
 	}
 	public static Object getProperty(String path, String equipletName) {
 		if(configuration == null) initialize();
@@ -73,7 +73,7 @@ public class Configuration {
 				currentObject = currentObject.getJSONObject(pathSegment);
 			}
 			
-			if(equipletName != null && currentObject.has(equipletName)) {
+			if(currentObject.has(equipletName)) {
 				return currentObject.get(equipletName);
 			} else {
 				return currentObject.get(defaultPropertyName);

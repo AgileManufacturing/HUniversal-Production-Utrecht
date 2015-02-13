@@ -9,11 +9,19 @@
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 
+#include <rexos_configuration/Configuration.h>
+
 namespace rexos_knowledge_database{
 	std::unique_ptr<sql::Connection> connect(){
 		sql::Driver* driver = get_driver_instance();
 		std::unique_ptr<sql::Connection> apConnection(
-			driver->connect(MYSQL_SERVER, MYSQL_USERNAME, MYSQL_PASSWORD)
+			driver->connect(
+					(
+						std::string("tcp://") + rexos_configuration::Configuration::getProperty("knowledgeDatabase/ip").asString() + 
+						std::string(":") + boost::lexical_cast<std::string>(rexos_configuration::Configuration::getProperty("knowledgeDatabase/port").asInt())
+					),
+					rexos_configuration::Configuration::getProperty("knowledgeDatabase/username").asString(), 
+					rexos_configuration::Configuration::getProperty("knowledgeDatabase/password").asString())
 		);
 		apConnection->setSchema(MYSQL_DATABASE);
 		return apConnection;

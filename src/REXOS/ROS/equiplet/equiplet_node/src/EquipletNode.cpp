@@ -37,6 +37,7 @@
 #include "rexos_blackboard_cpp_client/BasicOperationSubscription.h"
 #include "rexos_blackboard_cpp_client/OplogEntry.h"
 #include "rexos_utilities/Utilities.h"
+#include <rexos_configuration/Configuration.h>
 #include <rexos_knowledge_database/Equiplet.h>
 #include <node_spawner_node/spawnNode.h>
 #include <rexos_datatypes/OriginPlacement.h>
@@ -75,8 +76,14 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 			spanNodeClient.call(spawnNodeCall);
 		}
 	}
+	bool useCustomIp = false;
+	if(blackboardIp.length() != 0) useCustomIp = true;
+	
 	REXOS_DEBUG("Subscribing to EquipletStepsBlackBoard");
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "EquipletStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(
+			useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/databaseName", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
 	//equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	//equipletStepSubscription->addOperation(Blackboard::SET);
@@ -85,7 +92,10 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 	sleep(1);
 
 	REXOS_DEBUG("Subscribing to equipletCommands");
-	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_COMMANDS);
+	equipletCommandBlackboardClient = new Blackboard::BlackboardCppClient(
+			useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/equipletCommands/ip", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/equipletCommands/databaseName", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/equipletCommands/blackboardName", equipletName).asString());
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
 	sleep(1);
@@ -93,7 +103,10 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 	sleep(1);
 
 	REXOS_DEBUG("Subscribing to equipletState");
-	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, STATE_BLACKBOARD, COLLECTION_EQUIPLET_STATE);
+	equipletStateBlackboardClient = new Blackboard::BlackboardCppClient(
+			useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/equipletState/ip", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/equipletState/databaseName", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/equipletState/blackboardName", equipletName).asString());
 	sleep(1);
 
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);

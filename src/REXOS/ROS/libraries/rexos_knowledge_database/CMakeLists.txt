@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_knowledge_database)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_logger rexos_datatypes)
+find_package(catkin REQUIRED COMPONENTS rexos_configuration rexos_logger rexos_datatypes)
 find_package(MYSQLCONNECTORCPP)
 find_package(Jsoncpp)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include
-LIBRARIES rexos_knowledge_database rexos_datatypes
+LIBRARIES rexos_configuration rexos_knowledge_database rexos_datatypes
 CATKIN_DEPENDS rexos_logger
 DEPENDS MYSQLCONNECTORCPP Jsoncpp)
 

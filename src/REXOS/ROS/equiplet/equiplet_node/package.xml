@@ -11,6 +11,8 @@
 	<run_depend>roscpp</run_depend>
 	<build_depend>std_msgs</build_depend>
 	<run_depend>std_msgs</run_depend>
+	<build_depend>rexos_configuration</build_depend>
+	<run_depend>rexos_configuration</run_depend>
 	<build_depend>rexos_statemachine</build_depend>
 	<run_depend>rexos_statemachine</run_depend>
 	<build_depend>environment_cache</build_depend>
