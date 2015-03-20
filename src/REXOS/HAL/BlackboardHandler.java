@@ -224,9 +224,5 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		JSONObject reloadEQ = new JSONObject("{\"reloadEquiplet\":RELOAD_ALL_MODULES}");
 		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
-	
-	public void postShutdownEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException{
-		JSONObject shutdownEQ = new JSONObject("{'shutdownEquiplet':SHUTDOWN_ALL_MODULES}");
-		stateBlackboardBBClient.insertDocument(shutdownEQ.toString());
-	}
+
 }

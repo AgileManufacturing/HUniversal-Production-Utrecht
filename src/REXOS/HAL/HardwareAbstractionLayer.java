@@ -215,12 +215,4 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	public void sendReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		blackboardHandler.postReloadEquiplet();
 	}
-	
-	public void sendShutdownEquiplet(){
-		try{
-			blackboardHandler.postShutdownEquiplet();
-		}catch(Exception ex){
-			//discard any thrown JSON errors.
-		}
-	}
 }

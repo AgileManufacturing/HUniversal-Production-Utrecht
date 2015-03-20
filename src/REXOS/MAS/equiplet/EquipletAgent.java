@@ -55,7 +55,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	// Equiplet state
 	protected TreeSet<Job> schedule;
 	protected EquipletState state;
-	protected boolean isShuttingDown;
 	protected boolean reconfiguring;
 	protected Job executing;
 	protected TreeSet<Job> history;
@@ -136,7 +135,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		this.capabilities = capabilities;
 
 		this.state = EquipletState.IDLE;
-		this.isShuttingDown = false;
 		this.reconfiguring = false;
 		this.executing = null;
 		this.schedule = new TreeSet<>();
@@ -211,11 +209,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	protected EquipletState getEquipletState() {
 		return state;
-	}
-	
-	public void shutdownEquiplet(){
-		this.isShuttingDown = true;
-		hal.sendShutdownEquiplet();
 	}
 
 	/**
