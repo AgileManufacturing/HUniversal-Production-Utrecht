@@ -43,7 +43,10 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			"FROM Module \n" + 
 			"WHERE equiplet = ? AND \n" + 
 			"	attachedToRight = attachedToLeft + 1;"; 
-	
+	private static final String getModules = 
+			"SELECT manufacturer, typeNumber, serialNumber \n" + 
+			"FROM Module \n" + 
+			"WHERE equiplet = ?;"; 
 	/**
 	 * SQL query for selecting the moduleIdentifiers of the physicalModuleTrees for a functionalModuleTree of a capabilityType on an equiplet
 	 * Input: capabilityTypeName, capabilityTypeFunctionalTreeNumber, equipletName
@@ -150,6 +153,26 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 		ModuleActor module;
 		module = (ModuleActor) this.getSomethingByIdentifier(hardwareStep.getModuleIdentifier());
 		module.executeHardwareStep(processListener, hardwareStep);	
+	}
+	
+	/**
+	 * This moethod will return all the modules currently connected to the equiplet.
+	 */
+	public ArrayList<Module> getModules() {
+		ArrayList<Module> modules = new ArrayList<Module>();
+		
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getModules, hal.getEquipletName());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModules", rows);
+		for (Row row : rows) {
+			String manufacturer = (String) row.get("manufacturer");
+			String typeNumber = (String) row.get("typeNumber");
+			String serialNumber = (String) row.get("serialNumber");
+			
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			modules.add((ModuleActor) this.getSomethingByIdentifier(identifier));
+		}
+		
+		return modules;
 	}
 	
 	protected JavaSoftware getJavaSoftware(ModuleIdentifier key) {
