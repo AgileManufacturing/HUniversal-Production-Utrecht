@@ -25,7 +25,10 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
+import HAL.exceptions.FactoryException;
+import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
@@ -1020,5 +1023,21 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onReloadEquiplet(String state) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public ArrayList<Module> getBottomModules() throws FactoryException {
+		return hal.getBottomModules();
+	}
+	
+	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
+		return hal.deleteModule(moduleIdentifier);
+	}
+	
+	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
+		return hal.insertModule(staticSettings, dynamicSettings);
+	}
+	
+	public TreeSet<Job> getSchedule(){
+		return schedule;
 	}
 }
