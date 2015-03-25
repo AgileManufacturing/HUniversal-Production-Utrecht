@@ -30,6 +30,15 @@ create table RosSoftware(
   command char(200),
   primary key (id)
 );
+create table GazeboModels(
+  id int NOT NULL AUTO_INCREMENT,
+  buildNumber int NOT NULL,
+  zipFile longblob NOT NULL,
+  sdfFile char(200),
+  parentLink char(200),
+  childLink char(200),
+  primary key (id)
+);
 
 create table Equiplet(
   name char(200) NOT NULL,
@@ -50,9 +59,11 @@ create table ModuleType(
   moduleTypeProperties text NOT NULL,
   rosSoftware int NULL,
   halSoftware int NOT NULL,
+  gazeboModels int NOT NULL,
   primary key (manufacturer, typeNumber),
   foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+  foreign key (gazeboModels) references GazeboModels(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table Module(
