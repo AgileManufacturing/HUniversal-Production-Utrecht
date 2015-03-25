@@ -1,0 +1,33 @@
+<sdf version='1.4'>
+	<model name="Workplane">
+		<plugin name="attachModule" filename="/home/t/git/HUniversal-Production-Utrecht/src/REXOS/ROS/rexos_gazebo/libhello_world.so"/>
+		<static>false</static>
+		<link name="link">
+			<pose>0 0 0 0 0 0</pose>
+			<gravity>false</gravity>
+		
+			<inertial>
+				<mass>10000</mass>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>model://workplane/workplane complex.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+		<joint type="prismatic" name="linkToWorld">
+			<pose>0 0 0 0 0 0</pose>
+			<child>link</child>
+			<parent>world</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<limit>
+					<upper>0.0</upper>
+					<lower>0.0</lower>
+				</limit>
+			</axis>
+		</joint>
+	</model>
+</sdf>
