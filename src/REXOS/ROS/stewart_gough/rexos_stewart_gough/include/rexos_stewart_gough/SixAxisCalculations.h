@@ -4,6 +4,7 @@
 #include <vector>
 #include "rexos_logger/rexos_logger.h"
 #include <rexos_stewart_gough/StewartGoughLocation.h>
+#include <matrices/Matrices.h>
 
 #pragma once
 
@@ -21,18 +22,6 @@ class SixAxisCalculations {
 			bool validMove;
 			double angles[6];
 		};
-		
-		struct ParameticEquation {
-			Vector3 vector1;
-			Vector3 vector2;
-		};
-		
-		struct ArmJointAngles {
-			double angleZ;
-			double effectorArmAngleY;
-			double upperArmAngleY;
-		};
-
 		SixAxisCalculations(double upperArmLength, double lowerArmLength, 
 				double motorAxisToCenterDistance, double effectorJointtoCenterDistance, 
 				double effectorJointOffset, double motorJointOffset,
@@ -72,10 +61,10 @@ class SixAxisCalculations {
 		bool hasValidJointAngles(Vector3 upperArmLowerArmJoint, Vector3 lowerArmEffectorJoint, Vector3 effectorJointAxis);
 		double getRemainingZAngle(double yAngle);
 		double getAngleForGroup(int jointIndex);
+		Matrix4 getEffectorRotationMatrix(StewartGoughLocation preRotatedEffectorLocation, double groupAngle);
 		Vector2 getIntersectionPoint(Vector2 pointA, double radiusA, Vector2 pointB, double radiusB);
-		Vector3 getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, double groupAngle);
+		Vector3 getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, Matrix4 rotationMatrix);
 		Vector3 getMotorAxisPosition(JointPositionInGroup jointPosition);
 		double getMotorAngle(StewartGoughLocation effectorLocation, int motorIndex);
-		bool checkJoints();
 };
 }

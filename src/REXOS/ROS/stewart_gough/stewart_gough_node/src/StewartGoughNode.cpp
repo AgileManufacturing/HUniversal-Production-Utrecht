@@ -320,7 +320,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv){
-	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
+/*	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
 				50, 50, 
 				20, 20,
 				0.46);
@@ -348,7 +348,7 @@ int main(int argc, char **argv){
 		REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
 		REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
 		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
-	}
+	}*/
 	
 	ros::init(argc, argv, NODE_NAME);
 	

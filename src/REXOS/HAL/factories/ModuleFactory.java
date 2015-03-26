@@ -42,11 +42,11 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM Module \n" + 
 			"WHERE equiplet = ? AND \n" + 
-			"	attachedToRight = attachedToLeft + 1;"; 
+			"	attachedToRight = attachedToLeft + 1;";
 	private static final String getModules = 
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM Module \n" + 
-			"WHERE equiplet = ?;"; 
+			"WHERE equiplet = ?;";
 	/**
 	 * SQL query for selecting the moduleIdentifiers of the physicalModuleTrees for a functionalModuleTree of a capabilityType on an equiplet
 	 * Input: capabilityTypeName, capabilityTypeFunctionalTreeNumber, equipletName

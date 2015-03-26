@@ -94,7 +94,7 @@ class CirclewithoffsetCanvas extends Canvas {
 			target.move = {};
 			target.move.x = tx;
 			target.move.y = ty;
-			target.move.z = -26.5;
+			target.move.z = 13.8;
 			target.move.approach = {};
 			target.move.approach.x = 0;
 			target.move.approach.y = 0;

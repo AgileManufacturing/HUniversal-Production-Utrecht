@@ -64,7 +64,7 @@ bool DummyModuleB::transitionDeinitialize() {
 bool DummyModuleB::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	/*rexos_module::TransitionGoal goal;
+	rexos_module::TransitionGoal goal;
 	std::vector<rexos_module::RequiredMutation> requiredMutations;
 	rexos_module::RequiredMutation requiredMutation;
 	requiredMutation.mutation = "move";
@@ -73,7 +73,7 @@ bool DummyModuleB::transitionSetup(){
 	goal.requiredMutationsRequiredForNextPhase = requiredMutations;
 	
 	transitionActionClient.sendGoal(goal);
-	transitionActionClient.waitForResult();*/
+	transitionActionClient.waitForResult();
 	
 	REXOS_INFO("Continuing calibration");
 	return true;
