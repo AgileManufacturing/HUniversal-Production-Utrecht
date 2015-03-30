@@ -1,14 +1,12 @@
-<project name="REXOS" default="all" basedir="">
-	<property name        ="rexos-src-folder" 		value="${basedir}/src/REXOS/"/>
-	<property name        ="rexos-java-root" 		value="${rexos-src-folder}"/>
-	<property name        ="repo-root" 				value="${basedir}"/>
-	<property name        ="buildpath" 				value="${repo-root}/build/REXOS/"/>
-	<property name        ="export-classpath-file" 	value="${buildpath}/.export-classpath"/>
-	<property environment ="env"/>
+<project name            ="REXOS" default="all" basedir="">
+	<property name           ="rexos-src-folder" 		value="${basedir}/src/REXOS/"/>
+	<property name           ="rexos-java-root" 		value="${rexos-src-folder}"/>
+	<property name           ="buildpath" 				value="${repo-root}/build/REXOS/"/>
+	<property environment    ="env"/>
 
-	<taskdef resource     ="net/sf/antcontrib/antcontrib.properties">
+	<taskdef resource        ="net/sf/antcontrib/antcontrib.properties">
 	<classpath>
-	<pathelement location ="${rexos-src-folder}/external_libraries/ant-contrib.jar" />
+	<pathelement location    ="${rexos-src-folder}/external_libraries/ant-contrib.jar" />
 	</classpath>
 	</taskdef>
 
@@ -29,167 +27,76 @@
 	- adding currently build source to the classpath
 	-->
 
-    <path id="master-classpath">
-	  <fileset dir="${rexos-src-folder}/external_libraries/">
-	    <include name="*.jar"/>
-	  </fileset>
-	</path>
-
-	<target name="all" depends="MAS, HAL, generic, util"/>
-
-	<target name     ="MAS" depends="util, generic, HAL">
-	<javac destdir   ="build/REXOS">
-	<src path        ="${rexos-src-folder}/MAS"/>
-	</javac>
-	</target>
-
-	<target name     ="HAL" depends="util, generic">
-	<javac destdir   ="build/REXOS">
-	<src path        ="${rexos-src-folder}/HAL"/>
-	</javac>
-	</target>
-	
-	<target name     ="generic" depends="">
-		<mkdir dir="build"/>
-
-	<javac destdir   ="build/REXOS">
-	<src path        ="${rexos-src-folder}/generic"/>
-	</javac>
-	</target>
-	
-	<target name     ="util" depends="">
-		<mkdir dir="build"/>
-	<javac destdir   ="build/REXOS">
-	<src path        ="${rexos-src-folder}/util"/>
-	</javac>
-	</target>
-
-	<target name     ="MASSIM" depends="allpackages">
-	<javac destdir   ="build">
-	<src path        ="${rexos-src-folder}/simulation"/>
-	</javac>
-	</target>
-
-	<target name="clean">
-		<delete file="${export-classpath-file}" />
-		<delete dir="build" />
-	</target>
-
-
-
-
-	<!-- Target for adding a path to export classpath file if it isn't already in there. Requires param path.-->
-	<target name="add-path-to-classpath">
-		<antcall target="write-path-to-export-file"/>
-	</target>
-
-	<!-- Target for writing a path to the export classpath file. Requires param path and path.inFile. -->
-	<target name="write-path-to-export-file" unless="${path.inFile}">
-		<echo file="${export-classpath-file}" append="true" message=":${path}"/>
-		<echo message="adding ${path} to classpath"/>
-	</target>
-
-	<!-- Target for adding a library jar to the export classpath file if it isn't already in there. Requires param jar. -->
-	<target name="add-jar-to-classpath">
-		<echo>*** Adding JAR to classpath ${jar} -- ${rexos-java-root}/external_libraries/${jar} ***${line.separator}</echo>
-		<antcall target="add-path-to-classpath">
-			<param name="path" value="${rexos-java-root}/external_libraries/${jar}"/>
-		</antcall>
-	</target>
-
-		
-	<target name="Launch">
-		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="jade.Boot" failonerror="true" fork="yes">
-			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
-			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
-			<arg line="-platform-id Grid -container-name GridAgents -gui -agents &quot;MainAgent :agents.main_agent.MainAgent&quot;"/>
-			<classpath refid="master-classpath" />
-			<classpath>
-				<pathelement path="${classpath-file-content}" />
-			</classpath>
-		</java>
-	</target>
-	
-	<target name="Launch-Grid">
-		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="jade.Boot" failonerror="true" fork="yes">
-			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
-			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
-			<arg line="-platform-id Grid -container-name GridAgents -gui -agents Logistics:agents.logistics_agent.LogisticsAgent"/>
-			<classpath refid="master-classpath" />
-			<classpath>
-				<pathelement path="${classpath-file-content}" />
-			</classpath>
-		</java>
-	</target>
-	
-	<target name="Launch-EQ">
-		<property name="gridhost" value="${gridhost}"/>
-		<property name="equipletnumber" value="${equipletnumber}"/>
-		<property name="localip" value="${localip}"/>
-		<property name="gridip" value=""/>
-		<property name="gridport" value=""/>
-		<script language="javascript">
-			var gridhostport = project.getProperty("gridhost");
-			project.setProperty("gridip", gridhostport.split(":")[0]);
-			project.setProperty("gridport", gridhostport.split(":")[1]);
-		</script>
-		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="jade.Boot" failonerror="true" fork="yes">
-			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
-			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
-			<arg line="-container -container-name 'Equiplet ${equipletnumber}' -local-host ${localip} -host ${gridip} -port ${gridport} EQ${equipletnumber}:agents.equiplet_agent.EquipletAgent"/>
-			<!-- get local public ip? Probably from a config file / run script to get it for the first time -->
-			<classpath refid="master-classpath" />
-			<classpath>
-				<pathelement path="${classpath-file-content}" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="Launch-HAL">
-		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
-		<java classname="HAL.testerClasses.HALTesterClassPickAndPlace" failonerror="true" fork="yes">
-			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/util/configuration/"/>
-			<classpath refid="master-classpath" />
-			<classpath>
-				<pathelement path="${classpath-file-content}" />
-			</classpath>
-		</java>
-	</target>
-	
-	<target name="Generate-JARs" depends="HAL">
-		<foreach target="Generate-JAR" param="theFile">
-			<path id="modulesPathId">
-				<fileset dir="${repo-root}/build/REXOS/HAL/modules" casesensitive="yes">
-					<include name="**/*.class"/>
-				</fileset>
-			</path>
-		</foreach>
-		<foreach target="Generate-JAR" param="theFile">
-			<path id="capabilitiesPathId">
-				<fileset dir="${repo-root}/build/REXOS/HAL/capabilities" casesensitive="yes">
-					<include name="**/*.class"/>
-				</fileset>
-			</path>
-		</foreach>
-	</target>
-	
-	<target name="Generate-JAR">
-		<basename property="jar.filename" file="${theFile}" suffix=".class"/>
-		<dirname property="jar.basedir" file="${repo-root}/build/REXOS/HAL/"/>
-		<jar destfile="${repo-root}/jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.class"/>
-	</target>
-	
-	<path id="java">
-		<pathelement location="${output}"/>
-		<fileset dir="external_libraries">
-		<include name="*.jar"/>
+	<path id                 ="master-classpath">
+		<fileset dir  		 ="${rexos-src-folder}/external_libraries/">
+		<include name 		 ="*.jar"/>
 		</fileset>
 	</path>
 
-	<target name="emurex">
-    	<jar destfile="../../simulation/simulation.jar" basedir="../../build/REXOS/" includes="**" excludes="**/Test.class"/>
+	<target name             ="all" depends="MAS, HAL, generic, util"/>
+
+	<target name             ="MAS" depends="util, generic, HAL">
+		<javac destdir       ="build/REXOS">
+			<src path        ="${rexos-src-folder}/MAS"/>
+		</javac>
 	</target>
+
+	<target name             ="HAL" depends="util, generic">
+		<javac destdir       ="build/REXOS">
+		<src path            ="${rexos-src-folder}/HAL"/>
+		</javac>
+	</target>
+
+	<target name             ="generic" depends="">
+		<mkdir dir           ="build"/>
+		<javac destdir       ="build/REXOS">
+		<src path            ="${rexos-src-folder}/generic"/>
+		</javac>
+	</target>
+
+	<target name             ="util" depends="">
+		<mkdir dir           ="build"/>
+		<javac destdir       ="build/REXOS">
+		<src path            ="${rexos-src-folder}/util"/>
+		</javac>
+	</target>
+
+	<target name             ="MASSIM" depends="all">
+		<javac destdir       ="build">
+		<src path            ="${rexos-src-folder}/simulation"/>
+		</javac>
+	</target>
+
+	<target name             ="emurex">
+	<jar destfile            ="simulation/simulation.jar" basedir="build/REXOS/" includes="**" excludes="**/Test.class"/>
+	</target>
+
+	<target name             ="clean">
+	<delete file             ="${export-classpath-file}" />
+	<delete dir              ="build" />
+	</target>
+
+	<target name             ="Generate-JARs" depends="HAL">
+		<foreach target      ="Generate-JAR" param="theFile">
+			<path id         ="modulesPathId">
+			<fileset dir     ="build/REXOS/HAL/modules" casesensitive="yes">
+			<include name    ="**/*.class"/>
+			</fileset>
+			</path>
+		</foreach>
+		<foreach target      ="Generate-JAR" param="theFile">
+			<path id         ="capabilitiesPathId">
+			<fileset dir     ="build/REXOS/HAL/capabilities" casesensitive="yes">
+			<include name    ="**/*.class"/>
+			</fileset>
+			</path>
+		</foreach>
+	</target>
+
+	<target name             ="Generate-JAR">
+		<basename property   ="jar.filename" file="${theFile}" suffix=".class"/>
+		<dirname property    ="jar.basedir" file="build/REXOS/HAL/"/>
+		<jar destfile        ="jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.class"/>
+	</target>
+
 </project>
