@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import util.log.Logger;
 import HAL.ModuleActor;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;

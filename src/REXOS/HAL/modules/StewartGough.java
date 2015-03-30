@@ -7,7 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import HAL.ModuleActor;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;

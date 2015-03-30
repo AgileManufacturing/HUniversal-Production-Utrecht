@@ -1,10 +1,17 @@
 package HAL;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
+import HAL.dataTypes.DynamicSettings;
+import HAL.dataTypes.ModuleIdentifier;
+import HAL.dataTypes.StaticSettings;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
@@ -95,8 +102,15 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException
 	 *             if the equiplet is not in the correct mode.
 	 */
-	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		return reconfigHandler.insertModule(staticSettings, dynamicSettings);
+	public boolean insertModule(JSONObject jsonStaticSettings, JSONObject jsonDynamicSettings) throws InvalidMastModeException {
+		try {
+			StaticSettings staticSettings = StaticSettings.deSerialize(jsonStaticSettings);
+			DynamicSettings dynamicSettings = DynamicSettings.deSerialize(jsonDynamicSettings);
+			return reconfigHandler.insertModule(staticSettings, dynamicSettings);
+		} catch (JSONException | ParseException ex) {
+			Logger.log(LogSection.HAL_RECONFIG, LogLevel.ERROR, "Parsing static of dynamic settings failed.", ex);
+			return false;
+		}
 	}
 
 	/**
@@ -111,8 +125,16 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws InvalidMastModeException
 	 *             if the equiplet is not in the correct mode.
 	 */
-	public boolean updateModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
-		return reconfigHandler.updateModule(staticSettings, dynamicSettings);
+	public boolean updateModule(JSONObject jsonStaticSettings, JSONObject jsonDynamicSettings) throws InvalidMastModeException {
+		try {
+			StaticSettings staticSettings = StaticSettings.deSerialize(jsonStaticSettings);
+			DynamicSettings dynamicSettings = DynamicSettings.deSerialize(jsonDynamicSettings);
+			return reconfigHandler.updateModule(staticSettings, dynamicSettings);
+		} catch (JSONException | ParseException ex) {
+			Logger.log(LogSection.HAL_RECONFIG, LogLevel.ERROR, "Parsing static of dynamic settings failed.", ex);
+			return false;
+		}
+		
 	}
 
 	/**
@@ -129,7 +151,8 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 *             if the instantiation of the class in the jarFile failed
 	 */
 	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
-		return reconfigHandler.removeModule(moduleIdentifier);
+		StaticSettings staticSettings = reconfigHandler.removeModule(moduleIdentifier);
+		return staticSettings.serialize();
 	}
 
 	/**

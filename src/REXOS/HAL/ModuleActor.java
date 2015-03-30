@@ -9,6 +9,7 @@ import util.log.Logger;
 import util.math.Matrix;
 import util.math.RotationAngles;
 import util.math.Vector3;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
