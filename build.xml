@@ -1,23 +1,26 @@
-<project name="REXOS" default="all" basedir=".">
-	<!-- java source root -->
-	<property name="rexos-java-root" value="${basedir}"/>
+<project name="REXOS" default="all" basedir="">
+	<property name        ="rexos-src-folder" 		value="${basedir}/src/REXOS/"/>
+	<property name        ="rexos-java-root" 		value="${rexos-src-folder}"/>
+	<property name        ="repo-root" 				value="${basedir}"/>
+	<property name        ="buildpath" 				value="${repo-root}/build/REXOS/"/>
+	<property name        ="export-classpath-file" 	value="${buildpath}/.export-classpath"/>
+	<property environment ="env"/>
 
-	<!-- git repo root -->
-	<property name="repo-root" value="${rexos-java-root}/../.."/>
-	<!-- Specify the folder in which the binaries will be placed. -->
-	<property name="buildpath" value="${repo-root}/build/REXOS/"/>
-	<!-- Specify the location of the export classpath file. -->
-	<property name="export-classpath-file" value="${buildpath}/.export-classpath"/>
-	<!-- Add a reference to the global environment -->
-	<property environment="env"/>
-
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
-		<classpath>
-			<pathelement location="${repo-root}/src/REXOS/external_libraries/ant-contrib.jar" />
-		</classpath>
+	<taskdef resource     ="net/sf/antcontrib/antcontrib.properties">
+	<classpath>
+	<pathelement location ="${rexos-src-folder}/external_libraries/ant-contrib.jar" />
+	</classpath>
 	</taskdef>
-	
-	
+
+	<!-- @Author: Lars Veenendaal -->
+	<!-- Attempting to rewrite ant configuration. -->
+	<!-- Because a missing feature in ant 1.8 i have to set this for all javac calls -->
+	<presetdef name          ="javac">
+	<javac includeantruntime ="false">
+	<classpath refid         ="master-classpath" />
+	</javac>
+	</presetdef>
+
 	<!-- Macro for the following things:
 	- load current classpath
 	- echo the current building dir
@@ -25,61 +28,58 @@
 	- running javac command using the classpath
 	- adding currently build source to the classpath
 	-->
-	<macrodef name="buildjava">
-   		<attribute name="dir"/>
-		
-   		<sequential>
-			<echo>*** Attempting to compile dir @{dir} ***${line.separator}</echo>
 
-			<pathconvert property="relative.dir">
-				<path location="@{dir}"/>
-				<globmapper from="${rexos-java-root}/*" to="*" />
-			</pathconvert>
+    <path id="master-classpath">
+	  <fileset dir="${rexos-src-folder}/external_libraries/">
+	    <include name="*.jar"/>
+	  </fileset>
+	</path>
 
-   			<loadfile property="classpath" srcFile="${buildpath}/.export-classpath"/>
-   			<mkdir dir="${buildpath}/${relative.dir}"/>
-  
-			<javac srcdir="@{dir}" includeantruntime="true" destdir="${buildpath}" classpath="${classpath}" encoding="ISO-8859-1">
-				<compilerarg line="-Xlint:unchecked" />
-			</javac>
-   			
-			<!--<antcall target="add-path-to-classpath">
-				<param name="path" value="${buildpath}/${relative.dir}"/>
-			</antcall>-->
-		</sequential>
-	</macrodef>
+	<target name="all" depends="MAS, HAL, generic, util"/>
 
-	<!-- Macro for the following things:
-	- echo the current cleaning dir
-	- deleting the bin directory
-	-->
-	<macrodef name="cleanjava">
-   		<attribute name="dir"/>
-   		<sequential>
-   			<pathconvert property="relative.dir">
-				<path location="@{dir}"/>
-				<globmapper from="${rexos-java-root}/*" to="*" />
-			</pathconvert>
-			<echo>*** Cleaning:  ${buildpath}/${relative.dir}***${line.separator}</echo>
-   			<delete dir="${buildpath}/${relative.dir}"/>
-		</sequential>
-	</macrodef>
-
-	<!-- Creates the base export file, initialized to the current classpath -->
-	<target name="create-base-export-file">
-		<!-- Delete old file -->
-		<delete file="${export-classpath-file}" />
-		<!-- Set value of CLASSPATH to "" if it doesn exist. -->
-		<property name="env.CLASSPATH" value="" />
-		<!-- Write current classpath to file -->
-		<echo file="${export-classpath-file}" append="false" message="export CLASSPATH=${env.CLASSPATH}"/>
+	<target name     ="MAS" depends="util, generic, HAL">
+	<javac destdir   ="build/REXOS">
+	<src path        ="${rexos-src-folder}/MAS"/>
+	</javac>
 	</target>
+
+	<target name     ="HAL" depends="util, generic">
+	<javac destdir   ="build/REXOS">
+	<src path        ="${rexos-src-folder}/HAL"/>
+	</javac>
+	</target>
+	
+	<target name     ="generic" depends="">
+		<mkdir dir="build"/>
+
+	<javac destdir   ="build/REXOS">
+	<src path        ="${rexos-src-folder}/generic"/>
+	</javac>
+	</target>
+	
+	<target name     ="util" depends="">
+		<mkdir dir="build"/>
+	<javac destdir   ="build/REXOS">
+	<src path        ="${rexos-src-folder}/util"/>
+	</javac>
+	</target>
+
+	<target name     ="MASSIM" depends="allpackages">
+	<javac destdir   ="build">
+	<src path        ="${rexos-src-folder}/simulation"/>
+	</javac>
+	</target>
+
+	<target name="clean">
+		<delete file="${export-classpath-file}" />
+		<delete dir="build" />
+	</target>
+
+
+
 
 	<!-- Target for adding a path to export classpath file if it isn't already in there. Requires param path.-->
 	<target name="add-path-to-classpath">
-	 	<!--<condition property="path.inFile">	
-			<resourcecontains resource="${export-classpath-file}" substring="${path}" />
-		</condition>-->
 		<antcall target="write-path-to-export-file"/>
 	</target>
 
@@ -97,49 +97,6 @@
 		</antcall>
 	</target>
 
-	<!-- default target, handles the classpath file and calls the allpackages target -->
-	<target name="all">
-		<mkdir dir="${buildpath}"/>
-		<delete file ="${buildpath}/.export-classpath"/> 
- 		<touch file ="${buildpath}/.export-classpath"/> 
-		<antcall target="allpackages"/>
-		<antcall target="add-path-to-classpath">
-			<param name="path" value="${buildpath}/"/>
-		</antcall>
-	</target>
-	
-	<!-- allpackages target, add the required targets to depends -->
-	<target name="allpackages" depends="MAS, HAL, generic, util"/>
-
-	<target name="MAS" depends="util, generic, HAL">
-		<ant antfile="build.xml" target="all" dir="MAS" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-	</target>
-
-	<target name="HAL" depends="util, generic">
-		<ant antfile="build.xml" target="all" dir="HAL" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-	</target>
-
-	<target name="util" depends="">
-   		<ant antfile="build.xml" target="all" dir="util" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-	</target>
-
-	<target name="generic">
-   		<ant antfile="build.xml" target="all" dir="generic" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-	</target>
-
-	<target name="MASSIM" depends="allpackages">
-		<ant antfile="build.xml" target="simulation" dir="MAS" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-	</target>
-
-	<!-- clean target, cleans rexos -->
-	<target name="clean">	
-		<delete file="${export-classpath-file}" />
-		<delete dir="${buildpath}" />
-		<ant antfile="build.xml" target="clean" dir="MAS" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-		<ant antfile="build.xml" target="clean" dir="HAL" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>
-		<ant antfile="build.xml" target="clean" dir="generic" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
-		<ant antfile="build.xml" target="clean" dir="util" inheritAll="true" inheritRefs="true" useNativeBasedir="true"/>  
-	</target>
 		
 	<target name="Launch">
 		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
@@ -147,7 +104,7 @@
 			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
 			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
 			<arg line="-platform-id Grid -container-name GridAgents -gui -agents &quot;MainAgent :agents.main_agent.MainAgent&quot;"/>
-			<classpath refid="java" />
+			<classpath refid="master-classpath" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />
 			</classpath>
@@ -160,7 +117,7 @@
 			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/MAS/configuration/"/>
 			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
 			<arg line="-platform-id Grid -container-name GridAgents -gui -agents Logistics:agents.logistics_agent.LogisticsAgent"/>
-			<classpath refid="java" />
+			<classpath refid="master-classpath" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />
 			</classpath>
@@ -184,7 +141,7 @@
 			<env key="MSGPATH" value="${repo-root}/ACLMsgs/"/>
 			<arg line="-container -container-name 'Equiplet ${equipletnumber}' -local-host ${localip} -host ${gridip} -port ${gridport} EQ${equipletnumber}:agents.equiplet_agent.EquipletAgent"/>
 			<!-- get local public ip? Probably from a config file / run script to get it for the first time -->
-			<classpath refid="java" />
+			<classpath refid="master-classpath" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />
 			</classpath>
@@ -195,7 +152,7 @@
 		<loadfile property="classpath-file-content" srcfile="${export-classpath-file}"/>
 		<java classname="HAL.testerClasses.HALTesterClassPickAndPlace" failonerror="true" fork="yes">
 			<env key="PROPERTIESPATH" value="${repo-root}/src/REXOS/util/configuration/"/>
-			<classpath refid="java" />
+			<classpath refid="master-classpath" />
 			<classpath>
 				<pathelement path="${classpath-file-content}" />
 			</classpath>
