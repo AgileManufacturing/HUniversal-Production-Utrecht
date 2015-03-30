@@ -41,7 +41,7 @@ public class Configuration {
 	private static final String defaultPropertyName = "default";
 	private static final String defaultPropertiesFilePath = "src/REXOS/util/configuration/settings.json";
 	
-	protected static JSONObject configuration = null;;
+	protected static JSONObject configuration = null;
 	
 	public static void initialize() {
 		String propertiesFilePath = new String();
