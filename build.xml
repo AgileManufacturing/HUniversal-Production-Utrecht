@@ -1,4 +1,4 @@
-<project name            ="REXOS" default="all" basedir="">
+<project name            	 ="REXOS" default="all" basedir="">
 	<property name           ="rexos-src-folder" 		value="${basedir}/src/REXOS/"/>
 	<property name           ="rexos-java-root" 		value="${rexos-src-folder}"/>
 	<property name           ="buildpath" 				value="${repo-root}/build/REXOS/"/>
@@ -36,32 +36,35 @@
 	<target name             ="all" depends="MAS, HAL, generic, util"/>
 
 	<target name             ="MAS" depends="util, generic, HAL">
+		<mkdir dir           ="build/REXOS/MAS"/>
 		<javac destdir       ="build/REXOS">
 			<src path        ="${rexos-src-folder}/MAS"/>
 		</javac>
 	</target>
 
 	<target name             ="HAL" depends="util, generic">
+		<mkdir dir           ="build/REXOS/HAL"/>
 		<javac destdir       ="build/REXOS">
 		<src path            ="${rexos-src-folder}/HAL"/>
 		</javac>
 	</target>
 
-	<target name             ="generic" depends="">
-		<mkdir dir           ="build"/>
+	<target name             ="generic">
+		<mkdir dir           ="build/REXOS/generic"/>
 		<javac destdir       ="build/REXOS">
 		<src path            ="${rexos-src-folder}/generic"/>
 		</javac>
 	</target>
 
-	<target name             ="util" depends="">
-		<mkdir dir           ="build"/>
+	<target name             ="util">
+		<mkdir dir           ="build/REXOS/util"/>
 		<javac destdir       ="build/REXOS">
 		<src path            ="${rexos-src-folder}/util"/>
 		</javac>
 	</target>
 
-	<target name             ="MASSIM" depends="all">
+	<target name             ="MASSIM">
+		<mkdir dir           ="simulation"/>
 		<javac destdir       ="build">
 		<src path            ="${rexos-src-folder}/simulation"/>
 		</javac>
