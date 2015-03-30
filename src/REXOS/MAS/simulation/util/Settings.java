@@ -8,12 +8,12 @@ public class Settings {
 	 * whether the simulation need to verification the simulation while running
 	 * this has major consequence on the running time of the simulation 
 	 */
-	public static boolean VERIFICATION = false;
+	public static boolean VERIFICATION = true;
 	
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = false;
+	public final static boolean STOCHASTICS = true;
 
 	/**
 	 * whether equiplets can breakdown
@@ -22,6 +22,7 @@ public class Settings {
 
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
+	 * 0: will turn off reconfiguration
 	 */
 	public static double RECONFIGATION_TIME = 0;
 
@@ -33,7 +34,7 @@ public class Settings {
 	/**
 	 * the maximun number of jobs in an equiplet queue, when there is no scheduling
 	 */
-	public static final int QUEUE_CAPACITY = 40;
+	public static final int QUEUE_CAPACITY = 0;
 
 	/**
 	 * Warm-up period after which in multiple simulation runs the products statistics are being averaged
@@ -47,14 +48,14 @@ public class Settings {
 
 	public static final boolean CONSTANT_NUMBER_OF_PRODUCT_STEPS = true;
 
-	public static final int MEAN_PRODUCT_STEPS = 4;
+	public static final int MEAN_PRODUCT_STEPS = 10;
 
-	public static final int MIN_PRODUCT_STEPS = 4;
+	public static final int MIN_PRODUCT_STEPS = 10;
 
 	/**
 	 * Generate the product steps for a FAIM 2014 simulation run
 	 */
-	public static final boolean FAIM2014 = true;
+	public static final boolean FAIM2014 = false;
 
 	/**
 	 * input and output locations of the simulation variables

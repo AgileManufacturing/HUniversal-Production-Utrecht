@@ -78,13 +78,13 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	@Override
-	public int intValue() {
-		return dTime.intValue();
+	public float floatValue() {
+		return dTime.floatValue();
 	}
 
 	@Override
-	public float floatValue() {
-		return dTime.floatValue();
+	public int intValue() {
+		return dTime.intValue();
 	}
 
 	@Override

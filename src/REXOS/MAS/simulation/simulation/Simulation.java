@@ -310,9 +310,9 @@ public class Simulation implements ISimulation, IControl {
 				// + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
 				// }
 				//
-				// for (Entry<String, IProductSim> product : products.entrySet()) {
-				// System.out.println("PQ: " + product.getValue().toString());
-				// }
+				for (Entry<String, IProductSim> product : products.entrySet()) {
+				 System.out.println("PQ: " + product.getValue().toString());
+				 }
 
 				if (Settings.VERIFICATION) {
 					verification();
@@ -993,7 +993,6 @@ public class Simulation implements ISimulation, IControl {
 			throw new IllegalArgumentException("nullpointer not possible");
 		}
 
-		// unblock simulation when notifying job finished
 		System.out.println("CHECKPOINT ECHO");
 	}
 

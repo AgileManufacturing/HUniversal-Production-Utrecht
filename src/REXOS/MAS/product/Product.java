@@ -56,7 +56,7 @@ public class Product extends Agent {
 		return productionPath;
 	}
 
-	public String getNextEquipet() {
+	public String getNextEquiplet() {
 		state = ProductState.TRAVELING;
 		return productionPath.peek().getEquipletName();
 	}

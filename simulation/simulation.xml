@@ -2,7 +2,7 @@
 <config>
 	<runlength>1000000</runlength>
 	<runs>10</runs>
-	<travel type="normal">10</travel>
+	<travel type="normal">3</travel>
 	<products>
 		<arrival type="none">20</arrival>
 		<deadline  type="none">10000</deadline>

@@ -348,7 +348,7 @@ public class Scheduling {
 				return (1 - possibility.minus(time).doubleValue() / window.doubleValue()) * load;
 			}
 
-		}, 100);
+		}, 50);
 	}
 
 	abstract class Score {
@@ -406,7 +406,7 @@ public class Scheduling {
 			paths.add(new Pair<Double, LinkedList<Node>>(score, path));
 			// System.out.println(" added initial : " + new Pair<Double, LinkedList<Node>>(load, path));
 		}
-
+		
 		while (!paths.isEmpty()) {
 			if (MASConfiguration.VERBOSITY > 3) {
 				// //System.out.println(" PATHS =" + Util.formatPairList(paths));
@@ -420,7 +420,12 @@ public class Scheduling {
 			Node node = path.getLast();
 
 			int index = node.getIndex() + 1;
-			if (index < serviceOptions.size()) {
+			
+			if (MASConfiguration.VERBOSITY > 3) {
+				System.out.println(" index < service options : " + index + " < " + serviceOptions.size());
+			}
+			
+			if (index < serviceOptions.size() + firstIndex) {
 				// processing not finished
 				Map<AID, Pair<Tick, List<Pair<Tick, Tick>>>> options = serviceOptions.get(index);
 				for (Entry<AID, Pair<Tick, List<Pair<Tick, Tick>>>> option : options.entrySet()) {

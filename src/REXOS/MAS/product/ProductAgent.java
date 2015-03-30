@@ -12,6 +12,7 @@ import java.util.LinkedList;
 
 import org.json.JSONException;
 
+import MAS.simulation.util.Settings;
 import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
@@ -74,6 +75,12 @@ public class ProductAgent extends Agent {
 		System.out.printf("PA:%s initialize [created=%s, pos=%s, product steps=%s, deadline=%s]\n", getLocalName(), getCreated(), position, productSteps, deadline);
 	}
 
+	/**
+	 * release all the product steps (time slots) planned by the equiplets
+	 * 
+	 * @param time
+	 *            current time
+	 */
 	private void release(Tick time) {
 		// release all the time slots planned by equiplets
 		HashSet<AID> equiplets = new HashSet<>();
@@ -117,12 +124,29 @@ public class ProductAgent extends Agent {
 		}
 	}
 
+	/**
+	 * reschedule the remaining product steps
+	 * 
+	 * @param time
+	 *            current time
+	 * @param deadline
+	 *            of the product (may be increased whenever first attempt isn't successful)
+	 */
 	protected void reschedule(Tick time, Tick deadline) {
 		this.state = ProductState.SCHEDULING;
 		this.reschedule = true;
 		LinkedList<ProductStep> steps = new LinkedList<>();
 		for (ProductionStep step : productionPath) {
 			steps.add(step.getProductStep());
+		}
+
+		if (productionPath.size() != steps.size()) {
+			throw new IllegalArgumentException("WTF? for work no more?");
+		}
+
+		if (productionPath.size() > 0 && productionPath.size() + history.size() != Settings.MEAN_PRODUCT_STEPS) {
+			System.err.println(this);
+			throw new IllegalArgumentException("WTF? were dit it go??");
 		}
 
 		Tick newDeadline = time.add(deadline.minus(getCreated()).multiply(2));
@@ -171,6 +195,14 @@ public class ProductAgent extends Agent {
 	 * @param path
 	 */
 	protected void schedulingFinished(Tick time, boolean succeeded, LinkedList<ProductionStep> path) {
+		if (productionPath.size() > 0 && productionPath.size() != path.size()) {
+			System.out.println(" WTF? path=" + path.size() + " - " + path + " \nproduction path=" + productionPath.size() + " - " + productionPath + "\n history=" + history.size() + " - "
+					+ history);
+		}
+		
+		// productSteps.size() - productionPath.peek().getIndex();
+		
+		
 		productionPath = path;
 		schedulingFinished(time, succeeded);
 	}

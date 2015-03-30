@@ -125,7 +125,7 @@ public class ProductView extends JPanel implements TreeSelectionListener {
 			category.add(new DefaultMutableTreeNode(product.getProductState()));
 			category.add(new DefaultMutableTreeNode(product.getPosition()));
 			category.add(new DefaultMutableTreeNode(product.getExecutingStep()));
-			category.add(new DefaultMutableTreeNode(product.getNextEquipet()));
+			category.add(new DefaultMutableTreeNode(product.getNextEquiplet()));
 			category.add(new DefaultMutableTreeNode(product.getProductionPath()));
 		}
 	}
