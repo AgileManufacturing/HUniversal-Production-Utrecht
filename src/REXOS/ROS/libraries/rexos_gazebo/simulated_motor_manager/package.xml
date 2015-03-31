@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>rexos_gazebo</name>
+  <name>rexos_gazebo_simulated_motor_manager</name>
   <version>0.0.0</version>
   <description>The rexos_gazebo package</description>
   <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
