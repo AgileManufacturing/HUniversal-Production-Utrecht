@@ -1,9 +1,11 @@
 package HAL;
 
+import java.util.Iterator;
 import java.util.Vector;
 
+import org.json.JSONObject;
+
 import HAL.dataTypes.ModuleIdentifier;
-import HAL.dataTypes.ModuleType;
 import HAL.dataTypes.ModuleTypeIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
@@ -12,20 +14,13 @@ import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
-
-import java.util.Vector;
-import java.util.Iterator;
-
-import org.json.JSONObject;
 /**
  * Abstract representation of a module in the HAL.
  * @author Bas Voskuijlen
  * @author Lars Veenendaal
  *
  */
-public abstract class Module extends ModuleType implements BlackboardModuleListener { 
-	private static final long serialVersionUID = 5588981482441257684L;
-	
+public abstract class Module implements BlackboardModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;

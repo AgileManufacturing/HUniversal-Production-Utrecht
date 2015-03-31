@@ -13,6 +13,7 @@ drop table if exists SupportedMutation;
 drop table if exists Module;
 drop table if exists ModuleType;
 drop table if exists Equiplet;
+drop table if exists GazeboModel;
 drop table if exists RosSoftware;
 drop table if exists JavaSoftware;
 
@@ -30,13 +31,16 @@ create table RosSoftware(
   command char(200),
   primary key (id)
 );
-create table GazeboModels(
+create table GazeboModel(
   id int NOT NULL AUTO_INCREMENT,
   buildNumber int NOT NULL,
   zipFile longblob NOT NULL,
-  sdfFile char(200),
-  parentLink char(200),
-  childLink char(200),
+  sdfFilename char(200) NOT NULL,
+  parentLink char(200) NOT NULL,
+  childLink char(200) NOT NULL,
+  childLinkOffsetX double NOT NULL,
+  childLinkOffsetY double NOT NULL,
+  childLinkOffsetZ double NOT NULL,
   primary key (id)
 );
 
@@ -48,9 +52,11 @@ create table Equiplet(
   mountPointDistanceY double NOT NULL,
   rosSoftware int NOT NULL,
   masSoftware int NOT NULL,
+  gazeboModel int NOT NULL,
   primary key (name),
   foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  foreign key (masSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+  foreign key (masSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  foreign key (gazeboModel) references GazeboModel(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table ModuleType(
@@ -59,11 +65,11 @@ create table ModuleType(
   moduleTypeProperties text NOT NULL,
   rosSoftware int NULL,
   halSoftware int NOT NULL,
-  gazeboModels int NOT NULL,
+  gazeboModel int NOT NULL,
   primary key (manufacturer, typeNumber),
   foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
-  foreign key (gazeboModels) references GazeboModels(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+  foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  foreign key (gazeboModel) references GazeboModel(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table Module(

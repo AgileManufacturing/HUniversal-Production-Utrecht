@@ -15,7 +15,6 @@ import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.dataTypes.ModuleIdentifier;
-import HAL.dataTypes.StaticSettings;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
@@ -55,7 +54,10 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -95,7 +97,10 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
