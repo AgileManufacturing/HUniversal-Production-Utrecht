@@ -113,7 +113,10 @@ namespace rexos_node_spawner {
 		// extract the zip archive
 		int err = 0;
 		zip* zipArchive = zip_open((ZIP_ARCHIVE_PATH + zipArchiveFileName).c_str(), 0, &err);
-		if(err != 0) REXOS_ERROR_STREAM("zip archive opened with " << err);
+		if(err != 0) {
+			REXOS_ERROR_STREAM("zip archive opened with " << err);
+			return;
+		}
 		
 		struct zip_stat zipStat;
 		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
@@ -123,7 +126,7 @@ namespace rexos_node_spawner {
 					boost::filesystem::create_directories(zipStat.name);
 				} else {
 					// files could be specified before the upper directories. create these directories
-					boost::filesystem::path path = boost::filesystem::path(zipArchivePath + std::string(zipStat.name));
+					boost::filesystem::path path = boost::filesystem::path(ZIP_ARCHIVE_PATH + std::string(zipStat.name));
 					boost::filesystem::create_directories(path.parent_path());
 					
 					struct zip_file* zipFile;

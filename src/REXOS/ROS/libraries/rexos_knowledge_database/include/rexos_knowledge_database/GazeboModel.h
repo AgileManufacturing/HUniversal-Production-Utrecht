@@ -32,21 +32,30 @@
 #include <string>
 #include <memory>
 
-#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleTypeIdentifier.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
-	class RosSoftware {
+	class GazeboModel {
 	public:
-		RosSoftware(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier);
-		RosSoftware(std::string equipletName);
+		GazeboModel(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier);
+		GazeboModel(std::string equipletName);
 		
-		std::istream* getRosFile();
-		std::string getCommand();
+		std::istream* getModelFile();
+		std::string getParentLink();
+		std::string getChildLink();
+		double getChildLinkOffsetX();
+		double getChildLinkOffsetY();
+		double getChildLinkOffsetZ();
 		int getId();
 	private:
 		int id;
+		std::string parentLink;
+		std::string childLink;
+		double childLinkOffsetX;
+		double childLinkOffsetY;
+		double childLinkOffsetZ;
 		std::unique_ptr<sql::Connection> connection;
 	};
 }

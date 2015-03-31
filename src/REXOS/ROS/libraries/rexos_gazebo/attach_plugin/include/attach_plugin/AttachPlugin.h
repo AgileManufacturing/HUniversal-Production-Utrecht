@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
@@ -9,7 +11,7 @@
 namespace gazebo {
 	class AttachPlugin : public ModelPlugin {
 	public: 
-		AttachPlugin() : ModelPlugin();
+		AttachPlugin();
 	public: 
 		void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 	};

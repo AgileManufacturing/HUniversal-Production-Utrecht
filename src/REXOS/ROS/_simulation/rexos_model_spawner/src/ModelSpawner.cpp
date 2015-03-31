@@ -28,7 +28,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <rexos_node_spawner/NodeSpawner.h>
+#include <rexos_model_spawner/ModelSpawner.h>
 
 #include <unistd.h>
 #include <zip.h>
@@ -41,86 +41,48 @@
 
 #include "ros/ros.h"
 
-namespace rexos_node_spawner {
-	NodeSpawner::NodeSpawner(std::string equipletName) :
+namespace rexos_model_spawner {
+	ModelSpawner::ModelSpawner(std::string equipletName) :
 		equipletName(equipletName)
 	{
-		
 	}
-	void NodeSpawner::spawnNode(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
-		int pid = fork();
-		if(pid == 0) {
-			// we are the new child
-			rexos_knowledge_database::RosSoftware rosSoftware = rexos_knowledge_database::RosSoftware(moduleIdentifier);
-			rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
-			extractRosSoftware(rosSoftware);
-			extractGazeboModel()
-			
-			// start the new node
-			std::string command = rosSoftware.getCommand();
-			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
-			boost::algorithm::replace_all(command, "{manufacturer}", moduleIdentifier.getManufacturer());
-			boost::algorithm::replace_all(command, "{typeNumber}", moduleIdentifier.getTypeNumber());
-			boost::algorithm::replace_all(command, "{serialNumber}", moduleIdentifier.getSerialNumber());
-		
-			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
-			execl("/bin/bash", "/bin/bash", "-c", command.c_str(), NULL);
-			REXOS_ERROR("Unable to execl");
-			throw std::runtime_error("Unable to execl");
-		} else {
-			// we are the old parent
-		}
+	void ModelSpawner::spawnModule(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
+		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
+		extractGazeboModel(gazeboModel);
 	}
-	void NodeSpawner::spawnEquipletNode() {
-		int pid = fork();
-		if(pid == 0) {
-			// we are the new child
-			rexos_knowledge_database::RosSoftware rosSoftware = rexos_knowledge_database::RosSoftware(equipletName);
-			extractZipArchive(rosSoftware);
-			
-			// start the new node
-			std::string command = rosSoftware.getCommand();
-			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
-			
-			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
-			execl("/bin/bash", "/bin/bash", "-c", command.c_str(), NULL);
-			REXOS_ERROR("Unable to execl");
-			throw std::runtime_error("Unable to execl");
-		} else {
-			// we are the old parent
-			REXOS_INFO("node has been spawned");
-		}
+	void ModelSpawner::spawnEquipletModel() {
+		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(equipletName);
+		extractGazeboModel(gazeboModel);
 	}
-	void NodeSpawner::extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware) {
-		extractZipArchive(rosSoftware.getRosFile());
+	void ModelSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel) {
+		std::string zipArchiveFileName = boost::lexical_cast<std::string>(gazeboModel.getId()) + ".zip";
+		extractZipArchive(gazeboModel.getModelFile(), zipArchiveFileName);
 	}
-	void NodeSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel) {
-		extractZipArchive(gazeboModel.getModelFile());
-	}
-	void NodeSpawner::extractZipArchive(std::istream* rosFile) {
+	void ModelSpawner::extractZipArchive(std::istream* inputFile, std::string zipArchiveFileName) {
 		// write the zip archive to the file system
-		std::string zipArchiveFileName = boost::lexical_cast<std::string>(rosSoftware.getId()) + ".zip";
-		std::string zipArchivePath = std::string("/tmp/rexos_node_spawner/");
-		if(boost::filesystem::exists(zipArchivePath) == false) {
-			boost::filesystem::create_directories(zipArchivePath);
+		if(boost::filesystem::exists(ZIP_ARCHIVE_PATH) == false) {
+			boost::filesystem::create_directories(ZIP_ARCHIVE_PATH);
 		}
 		
 		std::ofstream zipFileOutputStream;
-		zipFileOutputStream.open(zipArchivePath + zipArchiveFileName, 
+		zipFileOutputStream.open(ZIP_ARCHIVE_PATH + zipArchiveFileName, 
 				std::ios::out | std::ios::binary); 
 		
 		char buf[100];
-		while(rosFile->good() == true) {
-			rosFile->read(buf, sizeof(buf));
-			zipFileOutputStream.write(buf, rosFile->gcount());
+		while(inputFile->good() == true) {
+			inputFile->read(buf, sizeof(buf));
+			zipFileOutputStream.write(buf, inputFile->gcount());
 		}
 		zipFileOutputStream.close();
 		REXOS_DEBUG_STREAM("zip archive has been written at " << zipArchiveFileName);
 		
 		// extract the zip archive
 		int err = 0;
-		zip* zipArchive = zip_open((zipArchivePath + zipArchiveFileName).c_str(), 0, &err);
-		if(err != 0) REXOS_ERROR_STREAM("zip archive opened with " << err);
+		zip* zipArchive = zip_open((ZIP_ARCHIVE_PATH + zipArchiveFileName).c_str(), 0, &err);
+		if(err != 0) {
+			REXOS_ERROR_STREAM("zip archive opened with " << err);
+			return;
+		}
 		
 		struct zip_stat zipStat;
 		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
@@ -130,7 +92,7 @@ namespace rexos_node_spawner {
 					boost::filesystem::create_directories(zipStat.name);
 				} else {
 					// files could be specified before the upper directories. create these directories
-					boost::filesystem3::path path = boost::filesystem3::path(zipArchivePath + std::string(zipStat.name));
+					boost::filesystem::path path = boost::filesystem::path(ZIP_ARCHIVE_PATH + std::string(zipStat.name));
 					boost::filesystem::create_directories(path.parent_path());
 					
 					struct zip_file* zipFile;
@@ -140,9 +102,9 @@ namespace rexos_node_spawner {
 					}
 					
 					std::ofstream fs;
-					fs.open((zipArchivePath + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
+					fs.open((ZIP_ARCHIVE_PATH + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
 					if (fs.good() != true) {
-						throw std::runtime_error("Unable to open fstream with path" + (zipArchivePath + std::string(zipStat.name)));
+						throw std::runtime_error("Unable to open fstream with path" + (ZIP_ARCHIVE_PATH + std::string(zipStat.name)));
 					}
 					
 					int sum = 0;

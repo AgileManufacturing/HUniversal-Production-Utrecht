@@ -1,3 +1,5 @@
+#include "attach_plugin/AttachPlugin.h"
+
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
@@ -7,7 +9,7 @@
 #include <iostream>
 
 namespace gazebo {
-	AttachPlugin::AttachPlugin() {
+	AttachPlugin::AttachPlugin() : ModelPlugin(){
 		std::cout << "AttachPlugin constructed";
 	}
 	void AttachPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {

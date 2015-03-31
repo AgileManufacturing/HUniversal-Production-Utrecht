@@ -1,18 +1,18 @@
-#include <rexos_knowledge_database/RosSoftware.h>
+#include <rexos_knowledge_database/GazeboModel.h>
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 
 #include <cppconn/resultset.h>
 #include <cppconn/prepared_statement.h>
 
 namespace rexos_knowledge_database {
-	RosSoftware::RosSoftware(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
+	GazeboModel::GazeboModel(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id \
-		FROM RosSoftware \
+		FROM GazeboModel \
 		WHERE id = ( \
-			SELECT rosSoftware \
+			SELECT gazeboModel \
 			FROM ModuleType \
 			WHERE manufacturer = ? AND \
 				typeNumber = ? \
@@ -24,7 +24,7 @@ namespace rexos_knowledge_database {
 		if(result->rowsCount() != 1){
 			delete result;
 			delete preparedStmt;
-			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
+			throw std::runtime_error("Unable to find current gazeboModel (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
@@ -33,14 +33,14 @@ namespace rexos_knowledge_database {
 		delete result;
 		delete preparedStmt;
 	}
-	RosSoftware::RosSoftware(std::string equipletName) {
+	GazeboModel::GazeboModel(std::string equipletName) {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id \
-		FROM RosSoftware \
+		FROM GazeboModel \
 		WHERE id = ( \
-			SELECT rosSoftware \
+			SELECT gazeboModel \
 			FROM Equiplet \
 			WHERE name = ? \
 		);");
@@ -58,16 +58,16 @@ namespace rexos_knowledge_database {
 		delete preparedStmt;
 	}
 	
-	std::istream* RosSoftware::getRosFile() {
+	std::istream* GazeboModel::getModelFile() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT zipFile \
-		FROM RosSoftware \
+		FROM GazeboModel \
 		WHERE id = ?;");
 		preparedStmt->setInt(1, id);
 		
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
+			throw std::runtime_error("Unable to find current gazeboModel (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
@@ -77,26 +77,22 @@ namespace rexos_knowledge_database {
 		delete preparedStmt;
 		return rosFile;
 	}
-	std::string RosSoftware::getCommand() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT command \
-		FROM RosSoftware \
-		WHERE id = ?;");
-		preparedStmt->setInt(1, id);
-		
-		sql::ResultSet* result = preparedStmt->executeQuery();
-		if(result->rowsCount() != 1){
-			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
-		}
-		// set the cursor at the first result
-		result->next();
-		std::string command = result->getString("command");
-		
-		delete result;
-		delete preparedStmt;
-		return command;
+	std::string GazeboModel::getParentLink() {
+		return parentLink;
 	}
-	int RosSoftware::getId() {
+	std::string GazeboModel::getChildLink() {
+		return childLink;
+	}
+	double GazeboModel::getChildLinkOffsetX() {
+		return childLinkOffsetX;
+	}
+	double GazeboModel::getChildLinkOffsetY() {
+		return childLinkOffsetY;
+	}
+	double GazeboModel::getChildLinkOffsetZ() {
+		return childLinkOffsetZ;
+	}
+	int GazeboModel::getId() {
 		return id;
 	}
 }

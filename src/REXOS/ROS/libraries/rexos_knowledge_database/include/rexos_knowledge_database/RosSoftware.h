@@ -32,7 +32,7 @@
 #include <string>
 #include <memory>
 
-#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleTypeIdentifier.h>
 
 #include "mysql_connection.h"
 
