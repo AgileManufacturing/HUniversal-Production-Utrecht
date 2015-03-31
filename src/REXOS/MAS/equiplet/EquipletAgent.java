@@ -116,6 +116,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			System.out.printf("EA:%s initialize [pos=%s, capabilties=%s]\n", getLocalName(), position, capabilities);
 
 			register();
+			testGetAgents();
 
 			addBehaviour(new EquipletListenerBehaviour(this));
 		} else {
@@ -1037,7 +1038,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		return hal.insertModule(staticSettings, dynamicSettings);
 	}
 	
-	public TreeSet<Job> getSchedule(){
+	public void testGetAgents(){
+		DFAgentDescription description = new DFAgentDescription();
+		//description.setType();
+		try {
+			DFAgentDescription listOfAgents[] = DFService.search(this, description);
+			System.out.println(listOfAgents);
+		} catch (FIPAException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public TreeSet<Job> getJobSchedule(){
 		return schedule;
 	}
 }
