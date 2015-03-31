@@ -215,4 +215,18 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	public void sendReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		blackboardHandler.postReloadEquiplet();
 	}
+	
+	public void reconfigureEquiplet(){
+		// TODO Implement extra logic here ensuring the safe shutdown of an equiplet.
+		String command = "STATE_OFFLINE";
+		try{
+			sendEquipletCommand(command);
+		}catch(Exception ex){
+			// TODO Implement extra error handling, such as logging.
+		}
+	}
+	
+	public void sendEquipletCommand(String command) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		blackboardHandler.postEquipletCommand(command);
+	}
 }

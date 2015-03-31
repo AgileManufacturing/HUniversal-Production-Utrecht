@@ -44,12 +44,12 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
 	private BlackboardClient equipletStepBBClient;
-	private BlackboardClient ReloadEquipletBBClient;
+	private BlackboardClient equipletCommandBBClient;
 	
 	private FieldUpdateSubscription stateSubscription;
 	private FieldUpdateSubscription modeSubscription;
 	private FieldUpdateSubscription statusSubscription;
-	private FieldUpdateSubscription reloadSubscription;
+	private FieldUpdateSubscription commandSubscription;
 	
 	private String state = null;
 	private String mode = null;
@@ -92,13 +92,13 @@ public class BlackboardHandler implements BlackboardSubscriber {
 			equipletStepBBClient.setCollection((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName));
 			equipletStepBBClient.subscribe(statusSubscription);
 
-			reloadSubscription = new FieldUpdateSubscription("reload", this);
-			reloadSubscription.addOperation(MongoUpdateLogOperation.SET);
+			commandSubscription = new FieldUpdateSubscription("equipletCommands", this);
+			commandSubscription.addOperation(MongoUpdateLogOperation.SET);
 
-			ReloadEquipletBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletCommands/ip/", equipletName));
-			ReloadEquipletBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletCommands/databaseName/", equipletName));
-			ReloadEquipletBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
-			ReloadEquipletBBClient.subscribe(reloadSubscription);
+			equipletCommandBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletCommands/ip/", equipletName));
+			equipletCommandBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletCommands/databaseName/", equipletName));
+			equipletCommandBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
+			equipletCommandBBClient.subscribe(commandSubscription);
 
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
 			throw new BlackboardUpdateException("Unable to initialize HAL.BlackBoardHandler", ex);
@@ -194,7 +194,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 			    /**
 			     * ReloadEquiplet - W.I.P (Lars Veenendaal)
 			     */
-				dbObject = ReloadEquipletBBClient.findDocumentById(entry.getTargetObjectId());
+				dbObject = equipletCommandBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null){
 					String status = dbObject.get("ReloadSucces").toString();
 					//String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
@@ -224,5 +224,9 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		JSONObject reloadEQ = new JSONObject("{\"reloadEquiplet\":RELOAD_ALL_MODULES}");
 		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
-
+	
+	public void postEquipletCommand(String command) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		JSONObject equipletCommand = new JSONObject(" { 'equipletCommands' : 'REQUESTED_STATE_CHANGE', 'desiredState' : '" + command + "' } ");
+		equipletCommandBBClient.insertDocument(equipletCommand.toString());
+	}
 }

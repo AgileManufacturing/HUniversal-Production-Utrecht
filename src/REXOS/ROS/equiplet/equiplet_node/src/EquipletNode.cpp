@@ -84,10 +84,9 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 			useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/databaseName", equipletName).asString(), 
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
-	//equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
 	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	//equipletStepSubscription->addOperation(Blackboard::SET);
 	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
+	sleep(1);
 	subscriptions.push_back(equipletStepSubscription);
 	sleep(1);
 
@@ -153,11 +152,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 		}else if(step.getReloadEquiplet() == "RELOAD_ALL_MODULES"){
 			REXOS_INFO_STREAM("HAL > ReloadEquiplet: " << jsonString);
 			//reloadModules
-		//	rexos_module::ModuleProxy *prox = 
-		// moduleRegistry.getModule(step.getModuleIdentifier());
 			moduleRegistry.reloadModules();
-		//	prox->reloadModules();
-			//ROS_INFO("%s ", step.getModuleIdentifier());
 			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {reloadEquiplet: \"RELOADING_COMPLETED\"} } ");
 		}
 	} else if(&subscription == equipletCommandSubscription) {
