@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rexos_gazebo)
+project(rexos_gazebo_simulated_motor_manager)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp message_generation gazebo_ros rexos_logger)
@@ -19,9 +19,9 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS} ${GAZEBO_LIBRARIES})
-add_library(rexos_gazebo ${sources})
+add_library(rexos_gazebo_simulated_motor_manager ${sources})
 
-target_link_libraries(rexos_gazebo ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(rexos_gazebo_simulated_motor_manager ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 
 
