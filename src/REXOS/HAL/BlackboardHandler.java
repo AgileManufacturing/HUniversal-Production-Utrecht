@@ -231,7 +231,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	 * @author Thomas Kok
 	 * @author Kevin Bosman
 	 * 
-	 * @param desiredState
+	 * @param The desiredState that will be posted on Blackboard.
 	 * @throws JSONException
 	 * @throws InvalidJSONException
 	 * @throws InvalidDBNamespaceException
