@@ -225,8 +225,20 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
 	
-	public void postEquipletCommand(String command) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		JSONObject equipletCommand = new JSONObject(" { 'equipletCommands' : 'REQUESTED_STATE_CHANGE', 'desiredState' : '" + command + "' } ");
+	/**
+	 * [postEquipletStateCommand] - This method posts a message to Blackboard containing a desiredState.
+	 * 
+	 * @author Thomas Kok
+	 * @author Kevin Bosman
+	 * 
+	 * @param desiredState
+	 * @throws JSONException
+	 * @throws InvalidJSONException
+	 * @throws InvalidDBNamespaceException
+	 * @throws GeneralMongoException
+	 */
+	public void postEquipletStateCommand(String desiredState) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+		JSONObject equipletCommand = new JSONObject(" { 'equipletCommands' : 'REQUESTED_STATE_CHANGE', 'desiredState' : '" + desiredState + "' } ");
 		equipletCommandBBClient.insertDocument(equipletCommand.toString());
 	}
 }

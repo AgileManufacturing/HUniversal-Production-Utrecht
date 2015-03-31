@@ -216,6 +216,12 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		blackboardHandler.postReloadEquiplet();
 	}
 	
+	/**
+	 * [reconfigureEquiplet] - This method starts the sequence shutting down the equiplet for reconfiguring.
+	 * 
+	 * @author Thomas Kok
+	 * @author Kevin Bosman
+	 */
 	public void reconfigureEquiplet(){
 		// TODO Implement extra logic here ensuring the safe shutdown of an equiplet.
 		String command = "STATE_OFFLINE";
@@ -227,6 +233,6 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	}
 	
 	public void sendEquipletCommand(String command) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		blackboardHandler.postEquipletCommand(command);
+		blackboardHandler.postEquipletStateCommand(command);
 	}
 }
