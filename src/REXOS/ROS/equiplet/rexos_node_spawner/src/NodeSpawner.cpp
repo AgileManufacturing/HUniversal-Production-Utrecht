@@ -32,7 +32,6 @@
 
 #include <unistd.h>
 #include <zip.h>
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 
@@ -52,9 +51,7 @@ namespace rexos_node_spawner {
 		if(pid == 0) {
 			// we are the new child
 			rexos_knowledge_database::RosSoftware rosSoftware = rexos_knowledge_database::RosSoftware(moduleIdentifier);
-			rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
 			extractRosSoftware(rosSoftware);
-			extractGazeboModel()
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
@@ -76,7 +73,7 @@ namespace rexos_node_spawner {
 		if(pid == 0) {
 			// we are the new child
 			rexos_knowledge_database::RosSoftware rosSoftware = rexos_knowledge_database::RosSoftware(equipletName);
-			extractZipArchive(rosSoftware);
+			extractRosSoftware(rosSoftware);
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
@@ -92,34 +89,30 @@ namespace rexos_node_spawner {
 		}
 	}
 	void NodeSpawner::extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware) {
-		extractZipArchive(rosSoftware.getRosFile());
-	}
-	void NodeSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel) {
-		extractZipArchive(gazeboModel.getModelFile());
-	}
-	void NodeSpawner::extractZipArchive(std::istream* rosFile) {
-		// write the zip archive to the file system
 		std::string zipArchiveFileName = boost::lexical_cast<std::string>(rosSoftware.getId()) + ".zip";
-		std::string zipArchivePath = std::string("/tmp/rexos_node_spawner/");
-		if(boost::filesystem::exists(zipArchivePath) == false) {
-			boost::filesystem::create_directories(zipArchivePath);
+		extractZipArchive(rosSoftware.getRosFile(), zipArchiveFileName);
+	}
+	void NodeSpawner::extractZipArchive(std::istream* inputFile, std::string zipArchiveFileName) {
+		// write the zip archive to the file system
+		if(boost::filesystem::exists(ZIP_ARCHIVE_PATH) == false) {
+			boost::filesystem::create_directories(ZIP_ARCHIVE_PATH);
 		}
 		
 		std::ofstream zipFileOutputStream;
-		zipFileOutputStream.open(zipArchivePath + zipArchiveFileName, 
+		zipFileOutputStream.open(ZIP_ARCHIVE_PATH + zipArchiveFileName, 
 				std::ios::out | std::ios::binary); 
 		
 		char buf[100];
-		while(rosFile->good() == true) {
-			rosFile->read(buf, sizeof(buf));
-			zipFileOutputStream.write(buf, rosFile->gcount());
+		while(inputFile->good() == true) {
+			inputFile->read(buf, sizeof(buf));
+			zipFileOutputStream.write(buf, inputFile->gcount());
 		}
 		zipFileOutputStream.close();
 		REXOS_DEBUG_STREAM("zip archive has been written at " << zipArchiveFileName);
 		
 		// extract the zip archive
 		int err = 0;
-		zip* zipArchive = zip_open((zipArchivePath + zipArchiveFileName).c_str(), 0, &err);
+		zip* zipArchive = zip_open((ZIP_ARCHIVE_PATH + zipArchiveFileName).c_str(), 0, &err);
 		if(err != 0) REXOS_ERROR_STREAM("zip archive opened with " << err);
 		
 		struct zip_stat zipStat;
@@ -130,7 +123,7 @@ namespace rexos_node_spawner {
 					boost::filesystem::create_directories(zipStat.name);
 				} else {
 					// files could be specified before the upper directories. create these directories
-					boost::filesystem3::path path = boost::filesystem3::path(zipArchivePath + std::string(zipStat.name));
+					boost::filesystem3::path path = boost::filesystem3::path(ZIP_ARCHIVE_PATH + std::string(zipStat.name));
 					boost::filesystem::create_directories(path.parent_path());
 					
 					struct zip_file* zipFile;
@@ -140,9 +133,9 @@ namespace rexos_node_spawner {
 					}
 					
 					std::ofstream fs;
-					fs.open((zipArchivePath + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
+					fs.open((ZIP_ARCHIVE_PATH + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
 					if (fs.good() != true) {
-						throw std::runtime_error("Unable to open fstream with path" + (zipArchivePath + std::string(zipStat.name)));
+						throw std::runtime_error("Unable to open fstream with path" + (ZIP_ARCHIVE_PATH + std::string(zipStat.name)));
 					}
 					
 					int sum = 0;

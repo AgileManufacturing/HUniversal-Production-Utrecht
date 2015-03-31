@@ -30,10 +30,13 @@
 
 #pragma once
 
+#define ZIP_ARCHIVE_PATH "/tmp/rexos_node_spawner/"
+
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 #include <rexos_knowledge_database/RosSoftware.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include "rexos_logger/rexos_logger.h"
+#include <iostream>
 
 namespace rexos_node_spawner{
 	class NodeSpawner{
@@ -44,6 +47,7 @@ namespace rexos_node_spawner{
 	private:
 		std::string equipletName;
 		
-		void extractZipArchive(rexos_knowledge_database::RosSoftware& rosSoftware);
+		void extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware);
+		void extractZipArchive(std::istream* inputFile, std::string zipArchiveFileName);
 	};
 }
