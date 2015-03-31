@@ -2,6 +2,9 @@ package HAL.modules;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import util.log.Logger;
 import HAL.ModuleActor;
 import HAL.dataTypes.ModuleIdentifier;
@@ -15,9 +18,6 @@ import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.steps.OriginPlacement;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DeltaRobot extends ModuleActor {
 	public final static double MAX_ACCELERATION = 50;

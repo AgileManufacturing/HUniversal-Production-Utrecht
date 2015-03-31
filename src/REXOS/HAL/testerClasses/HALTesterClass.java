@@ -54,7 +54,10 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -94,7 +97,10 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
