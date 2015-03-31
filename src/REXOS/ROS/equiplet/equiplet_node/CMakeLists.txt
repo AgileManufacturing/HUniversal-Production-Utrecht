@@ -31,6 +31,6 @@ file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS} ${LOG4CXX_INCLUDE_DIR})
 add_executable(equiplet_node ${sources})
 
-target_link_libraries(equiplet_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES} ${JSONCPP_LIBRARIES})
+target_link_libraries(equiplet_node ${catkin_LIBRARIES} ${LOG4CXX_LIBRARIES} ${JSONCPP_LIBRARIES} ${CMAKE_DL_LIBS})
 add_dependencies(equiplet_node equiplet_node_gencpp)
 
