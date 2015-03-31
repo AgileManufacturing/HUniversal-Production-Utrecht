@@ -181,16 +181,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	
 	
 	public void reconfigureEquiplet(){
+		reconfiguring = true;
 		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
 		deregister();
 		System.out.printf("EA:%s deregistered from DF.\n", getLocalName());
 		// TODO Finish current product, empty queue with other products (notify productagents for rescheduling), throw queue away.
 		hal.reconfigureEquiplet(); // Equiplet safely shuts down so it can be reconfigured.
 		// TODO Give feedback the shutdown is complete.
+		
 	}
 	
 	public void reinitializeEquiplet(){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
+		reconfiguring = false;
 		register();
 	}
 
@@ -991,8 +994,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onEquipletStateChanged(String state) {
-		// TODO Auto-generated method stub
-
+		if(this.reconfiguring == true && state == "STATE_OFFLINE"){
+			// TODO Send message to SCADA that shutdown has completed.
+		}
 	}
 
 	@Override
