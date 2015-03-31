@@ -19,19 +19,19 @@ namespace gazebo {
 			std::cerr << "Missing parentModel" << std::endl;
 			return;
 		}
-		std::string parentModel = _sdf->GetElement("parentModel")->GetValueString();
+		std::string parentModel = _sdf->GetElement("parentModel")->GetValue()->GetAsString();
 		
 		if(_sdf->HasElement("parentLink") == false) {
 			std::cerr << "Missing parentLink" << std::endl;
 			return;
 		}
-		std::string parentLink = _sdf->GetElement("parentLink")->GetValueString();
+		std::string parentLink = _sdf->GetElement("parentLink")->GetValue()->GetAsString();
 		
 		if(_sdf->HasElement("childLink") == false) {
 			std::cerr << "Missing childLink" << std::endl;
 			return;
 		}
-		std::string childLink = _sdf->GetElement("childLink")->GetValueString();
+		std::string childLink = _sdf->GetElement("childLink")->GetValue()->GetAsString();
 		
 		
 		if(_model->GetWorld()->GetModel(parentModel) == NULL) {
