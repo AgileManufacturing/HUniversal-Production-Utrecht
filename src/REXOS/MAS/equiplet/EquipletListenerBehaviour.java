@@ -39,7 +39,22 @@ public class EquipletListenerBehaviour extends Behaviour {
 		// MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
 		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
 		// MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
-		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE)))), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST));
+		MessageTemplate template = MessageTemplate.or(
+				MessageTemplate.or(
+						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(
+								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
+										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
+												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), 
+													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CHANGE_MACHINE_STATE
+												) 
+										)
+										
+										
+								)
+						)
+				), 
+				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
+		);
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
@@ -64,10 +79,18 @@ public class EquipletListenerBehaviour extends Behaviour {
 			case ACLMessage.QUERY_IF:
 				handleInformationRequest(msg);
 				break;
+			case ACLMessage.PROPOSE:
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_CHANGE_MACHINE_STATE)){
+					handleChangeMachineState(msg);
+				}
 			default:
 				break;
 			}
 		}
+	}
+
+	private void handleChangeMachineState(ACLMessage msg) {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
