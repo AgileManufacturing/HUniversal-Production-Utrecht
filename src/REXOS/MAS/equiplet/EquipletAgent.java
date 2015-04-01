@@ -11,7 +11,6 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -193,23 +192,29 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @param A list of the modules to be added during this reconfiguring.
 	 * @author Thomas Kok
 	 */
-	
 	public void reconfigureEquiplet(List<Module> toBeRemoved){
 		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
 		this.reconfiguring = true;
 		deregister();
 		
+		// TODO A form a delay should be implemented here, at least until the schedule is empty.
+		
+		while(!schedule.isEmpty()){
+			// For lack of a better waiting method...
+		}
+		
 		for(Module removedModule : toBeRemoved){
 			try{
 				// TODO Transport information on the deleted module to the GKD (The 'result' JSONObject).
 				JSONObject result = hal.deleteModule(removedModule.getModuleIdentifier());
+				Logger.log("The following module has been removed: ", result.get(getName()));
 			}catch(Exception ex){
 				Logger.log(LogLevel.ERROR, "An error occured while attempting to remove module: ", removedModule.getModuleIdentifier());
 			}
 		}
 		
 		System.out.printf("EA:%s deregistered from DF. Equiplet shutdown request sent.\n", getLocalName());
-		hal.reconfigureEquiplet(); // Equiplet safely shuts down so it can be reconfigured.
+		hal.reconfigureEquiplet();
 	}
 	
 	/**
@@ -219,7 +224,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @param An object containing two JSONObjects with drivers for the added modules.
 	 * @author Thomas Kok
 	 */
-	
 	public boolean reinitializeEquiplet(List<ModuleSettings> toBeAddedModuleSettings){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
 		boolean isInsertingModulesSuccessful = true;
