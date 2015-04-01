@@ -23,7 +23,7 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import util.ModuleSettings;
+import util.DTOModuleSettings;
 import util.log.LogLevel;
 import util.log.Logger;
 
@@ -198,9 +198,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		deregister();
 		
 		// TODO A form a delay should be implemented here, at least until the schedule is empty.
-		
-		while(!schedule.isEmpty()){
-			// For lack of a better waiting method...
+		if(this.isExecuting() || !schedule.isEmpty()){
+				this.doWait();
 		}
 		
 		for(Module removedModule : toBeRemoved){
@@ -224,12 +223,12 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @param An object containing two JSONObjects with drivers for the added modules.
 	 * @author Thomas Kok
 	 */
-	public boolean reinitializeEquiplet(List<ModuleSettings> toBeAddedModuleSettings){
+	public boolean reinitializeEquiplet(List<DTOModuleSettings> toBeAddedModuleSettings){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
 		boolean isInsertingModulesSuccessful = true;
 		List<Boolean> results = new ArrayList<Boolean>();
 		
-		for(ModuleSettings moduleSettings : toBeAddedModuleSettings){
+		for(DTOModuleSettings moduleSettings : toBeAddedModuleSettings){
 			try{
 				results.add(hal.insertModule(moduleSettings.staticSettings, moduleSettings.dynamicSettings));
 			}catch(InvalidMastModeException ex){

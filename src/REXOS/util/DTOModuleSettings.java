@@ -2,7 +2,7 @@ package util;
 
 import org.json.JSONObject;
 
-public class ModuleSettings {
+public class DTOModuleSettings {
 	public JSONObject staticSettings;
 	public JSONObject dynamicSettings;
 }
