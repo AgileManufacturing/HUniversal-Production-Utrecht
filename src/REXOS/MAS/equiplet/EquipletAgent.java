@@ -231,7 +231,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		
 		for(ModuleSettings moduleSettings : toBeAddedModuleSettings){
 			try{
-				// TODO Get drivers for the addedModule so it can actually be added by HAL (Needed staticSettings and dynamicSettings).
 				results.add(hal.insertModule(moduleSettings.staticSettings, moduleSettings.dynamicSettings));
 			}catch(InvalidMastModeException ex){
 				isInsertingModulesSuccessful = false;
