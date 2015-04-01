@@ -63,7 +63,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected Job executing;
 	protected TreeSet<Job> history;
 	protected Map<String, Tick> productionTimes;
-
+	
+	// Equiplet machine state
+	protected String machineState;
+	
 	// Equiplet
 	private HardwareAbstractionLayer hal;
 
@@ -1033,8 +1036,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onEquipletMachineStateChanged(String state) {
-		if(this.reconfiguring == true && state == "RECONFIG"){
+	public void onEquipletStateChanged(String state) {
+		if(this.reconfiguring == true && state == "STATE_OFFLINE"){
 			// TODO Send message to SCADA that shutdown has completed.
 		}
 	}

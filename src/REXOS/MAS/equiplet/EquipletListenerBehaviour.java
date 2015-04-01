@@ -55,6 +55,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 				), 
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
+		
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
@@ -83,6 +84,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_CHANGE_MACHINE_STATE)){
 					handleChangeMachineState(msg);
 				}
+				
 			default:
 				break;
 			}
@@ -90,7 +92,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	}
 
 	private void handleChangeMachineState(ACLMessage msg) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub		
 	}
 
 	@Override
