@@ -186,7 +186,7 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 
 	@Override
 	public void onEquipletStateChanged(String state) {
-		hardwareAbstractionLayerListener.onEquipletStateChanged(state);
+		hardwareAbstractionLayerListener.onEquipletMachineStateChanged(state);
 	}
 
 	@Override

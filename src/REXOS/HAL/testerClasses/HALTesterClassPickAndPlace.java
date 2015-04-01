@@ -308,7 +308,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
+	public void onEquipletMachineStateChanged(String state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
 	}
 
