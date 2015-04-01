@@ -1036,7 +1036,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
+	public void onEquipletMachineStateChanged(String state) {
 		if(this.reconfiguring == true && state == "STATE_OFFLINE"){
 			// TODO Send message to SCADA that shutdown has completed.
 		}
