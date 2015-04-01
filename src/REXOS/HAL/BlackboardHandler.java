@@ -214,7 +214,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	}
 	
 	/**
-	 * [postReloadEquiplet - This method posts to blackboard that a equiplet has to reload. - UNTESTED W.I.P (Lars Veenendaal)]
+	 * This method posts to blackboard that a equiplet has to reload. - UNTESTED W.I.P (Lars Veenendaal)]
 	 * @throws JSONException
 	 * @throws InvalidJSONException
 	 * @throws InvalidDBNamespaceException
@@ -226,7 +226,7 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	}
 	
 	/**
-	 * [postEquipletStateCommand] - This method posts a message to Blackboard containing a desiredState.
+	 * This method posts a message to Blackboard containing a desiredState.
 	 * 
 	 * @author Thomas Kok
 	 * @author Kevin Bosman

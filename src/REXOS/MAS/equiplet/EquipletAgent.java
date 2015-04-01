@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.ModuleSettings;
 import util.log.LogLevel;
 import util.log.Logger;
 
@@ -46,9 +47,6 @@ import MAS.util.Util;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	// private static final double SAFETY_FACTOR = 1;
 
@@ -197,13 +195,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	
 	public void reconfigureEquiplet(List<Module> toBeRemoved){
 		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
-		reconfiguring = true;
-		for(Job job : schedule){
-			AID productAgent = job.getProductAgent();
-			// TODO Research how ProductAgents can be notified about cancelled jobs, if at all. Laurens should know more.
-		}
-		schedule.clear();
+		this.reconfiguring = true;
 		deregister();
+		
 		for(Module removedModule : toBeRemoved){
 			try{
 				// TODO Transport information on the deleted module to the GKD (The 'result' JSONObject).
@@ -221,22 +215,33 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * [W.I.P. and untested]
 	 * This method should be called once the reconfiguration of an equiplet has been completed.
 	 * It wants a list of modules that were added in the reconfiguration.
-	 * @param A list of modules that were added during reconfiguration.
+	 * @param An object containing two JSONObjects with drivers for the added modules.
+	 * @author Thomas Kok
 	 */
 	
-	public void reinitializeEquiplet(List<Module> toBeAdded){
+	public boolean reinitializeEquiplet(List<ModuleSettings> toBeAddedModuleSettings){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
-		
-		for(Module addedModule : toBeAdded){
+		boolean isInsertingModulesSuccessful = true;
+		for(ModuleSettings moduleSettings : toBeAddedModuleSettings){
 			try{
 				// TODO Get drivers for the addedModule so it can actually be added by HAL (Needed staticSettings and dynamicSettings).
-				boolean result = hal.insertModule(null, null);
+				boolean result = hal.insertModule(moduleSettings.staticSettings, moduleSettings.dynamicSettings);
 			}catch(InvalidMastModeException ex){
-				
+				isInsertingModulesSuccessful = false;
 			}
 		}
-		reconfiguring = false;
+		if(!isInsertingModulesSuccessful){
+			Logger.log("Not all new modules could be added succesfully.");
+		}
+		
+		capabilities.clear();
+		ArrayList<String> services = hal.getSupportedServices();
+		for (String service : services) {
+			capabilities.add(new Capability(service, new HashMap<String, Object>(), new Tick(10)));
+		}
+		this.init(new Position(0,0), capabilities);
 		register();
+		return isInsertingModulesSuccessful;
 	}
 
 	/**
@@ -1037,8 +1042,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onEquipletMachineStateChanged(String state) {
-		if(this.reconfiguring == true && state == "STATE_OFFLINE"){
-			// TODO Send message to SCADA that shutdown has completed.
+		if(this.reconfiguring == true && state == "SAFE"){
+			// TODO Send message to SCADA that shutdown has completed and machine is now safe.
 		}
 	}
 
