@@ -11,6 +11,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -222,15 +223,17 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public boolean reinitializeEquiplet(List<ModuleSettings> toBeAddedModuleSettings){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
 		boolean isInsertingModulesSuccessful = true;
+		List<Boolean> results = new ArrayList<Boolean>();
+		
 		for(ModuleSettings moduleSettings : toBeAddedModuleSettings){
 			try{
 				// TODO Get drivers for the addedModule so it can actually be added by HAL (Needed staticSettings and dynamicSettings).
-				boolean result = hal.insertModule(moduleSettings.staticSettings, moduleSettings.dynamicSettings);
+				results.add(hal.insertModule(moduleSettings.staticSettings, moduleSettings.dynamicSettings));
 			}catch(InvalidMastModeException ex){
 				isInsertingModulesSuccessful = false;
 			}
 		}
-		if(!isInsertingModulesSuccessful){
+		if(!isInsertingModulesSuccessful || (results.size() != toBeAddedModuleSettings.size())){
 			Logger.log("Not all new modules could be added succesfully.");
 		}
 		
