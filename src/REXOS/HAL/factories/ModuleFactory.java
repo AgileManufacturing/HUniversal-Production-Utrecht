@@ -8,21 +8,16 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.Capability;
 import HAL.HardwareAbstractionLayer;
-import HAL.JavaSoftware;
 import HAL.Module;
 import HAL.ModuleActor;
-import HAL.ModuleIdentifier;
-import HAL.ModuleTypeIdentifier;
+import HAL.dataTypes.JavaSoftware;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
-import HAL.exceptions.ModuleExecutingException;
 import HAL.libraries.dynamicloader.DynamicClassFactory;
-import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.ModuleListener;
-import HAL.listeners.ProcessListener;
-import HAL.steps.HardwareStep;
 
 /**
  * The ModuleFactory is the factory for the {@link Module}s. 
@@ -113,7 +108,7 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
 			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			modules.add((ModuleActor) this.getSomethingByIdentifier(identifier));
+			modules.add((ModuleActor) this.getItemForIdentifier(identifier));
 		}
 		Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.DEBUG, "Found bottomModules for function module tree " + treeNumber + " of capability " + capability.getName() + ":", 
 				modules);
@@ -135,31 +130,17 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			String serialNumber = (String) row.get("serialNumber");
 			
 			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			modules.add((ModuleActor) this.getSomethingByIdentifier(identifier));
+			modules.add((ModuleActor) this.getItemForIdentifier(identifier));
 		}
 		
 		return modules;
-	}
-	/**
-	 * This method executes the {@link HardwareStep} by instantiating the module and forwarding the HardwareStep to it.
-	 * @param processListener
-	 * @param hardwareStep
-	 * @throws FactoryException
-	 * @throws JarFileLoaderException 
-	 * @throws ModuleExecutingException
-	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) throws 
-			FactoryException, JarFileLoaderException {
-		ModuleActor module;
-		module = (ModuleActor) this.getSomethingByIdentifier(hardwareStep.getModuleIdentifier());
-		module.executeHardwareStep(processListener, hardwareStep);	
 	}
 	
 	/**
 	 * This moethod will return all the modules currently connected to the equiplet.
 	 */
-	public ArrayList<Module> getModules() {
-		ArrayList<Module> modules = new ArrayList<Module>();
+	public ArrayList<ModuleIdentifier> getModules() {
+		ArrayList<ModuleIdentifier> modules = new ArrayList<ModuleIdentifier>();
 		
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModules, hal.getEquipletName());
 		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModules", rows);
@@ -168,20 +149,18 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
 			
-			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
-			modules.add((ModuleActor) this.getSomethingByIdentifier(identifier));
+			modules.add(new ModuleIdentifier(manufacturer, typeNumber, serialNumber));
 		}
 		
 		return modules;
 	}
 	
-	protected JavaSoftware getJavaSoftware(ModuleIdentifier key) {
-		return JavaSoftware.getJavaSoftwareForModuleIdentifier(key);
-	}
-	
-	
 	public HardwareAbstractionLayer getHAL() {
 		return hal;
+	}
+	@Override
+	protected JavaSoftware getJavaSoftware(ModuleIdentifier key) {
+		return JavaSoftware.getJavaSoftwareForModuleIdentifier(key, knowledgeDBClient);
 	}
 	@Override
 	protected Module getConstuctorforThisFactory(Class<Module> myClass, ModuleIdentifier key) throws NoSuchMethodException,
@@ -189,13 +168,8 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 		return myClass.getConstructor(ModuleIdentifier.class ,ModuleFactory.class ,ModuleListener.class).newInstance(key, this, moduleListener);
 	}
 	
-	public void removeModulesOfTypeFromCache(ModuleTypeIdentifier type) {
-		ArrayList<ModuleIdentifier> modulesToRemove = new ArrayList<ModuleIdentifier>();
-		for (ModuleIdentifier key : cache.keySet()) {
-			if(type.equals(key) == true) modulesToRemove.add(key);
-		}
-		for (ModuleIdentifier moduleIdentifier : modulesToRemove) {
-			removeItemFromCache(moduleIdentifier);
-		}
+	@Override
+	protected ArrayList<ModuleIdentifier> getKeysToKeepInCache() {
+		return getModules();
 	}
 }
