@@ -23,9 +23,13 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.log.LogLevel;
+import util.log.Logger;
+
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.exceptions.BlackboardUpdateException;
+import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
@@ -179,20 +183,55 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		}
 	}
 	
+	/**
+	 * [W.I.P. and untested]
+	 * This method is called whenever someone needs acces to an equiplet for reconfiguring. 
+	 * The equiplet will be safely shut down and send a signal as soon as it has done so (to be implemented in onEquipletStateChanged() )
+	 * @param A list of the modules to be removed during this reconfiguring.
+	 * @param A list of the modules to be added during this reconfiguring.
+	 * @author Thomas Kok
+	 */
 	
-	public void reconfigureEquiplet(){
-		reconfiguring = true;
+	public void reconfigureEquiplet(List<Module> toBeRemoved){
 		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
+		reconfiguring = true;
+		for(Job job : schedule){
+			AID productAgent = job.getProductAgent();
+			// TODO Research how ProductAgents can be notified about cancelled jobs, if at all. Laurens should know more.
+		}
+		schedule.clear();
 		deregister();
-		System.out.printf("EA:%s deregistered from DF.\n", getLocalName());
-		// TODO Finish current product, empty queue with other products (notify productagents for rescheduling), throw queue away.
-		hal.reconfigureEquiplet(); // Equiplet safely shuts down so it can be reconfigured.
-		// TODO Give feedback the shutdown is complete.
+		for(Module removedModule : toBeRemoved){
+			try{
+				// TODO Transport information on the deleted module to the GKD (The 'result' JSONObject).
+				JSONObject result = hal.deleteModule(removedModule.getModuleIdentifier());
+			}catch(Exception ex){
+				Logger.log(LogLevel.ERROR, "An error occured while attempting to remove module: ", removedModule.getModuleIdentifier());
+			}
+		}
 		
+		System.out.printf("EA:%s deregistered from DF. Equiplet shutdown request sent.\n", getLocalName());
+		hal.reconfigureEquiplet(); // Equiplet safely shuts down so it can be reconfigured.
 	}
 	
-	public void reinitializeEquiplet(){
+	/**
+	 * [W.I.P. and untested]
+	 * This method should be called once the reconfiguration of an equiplet has been completed.
+	 * It wants a list of modules that were added in the reconfiguration.
+	 * @param A list of modules that were added during reconfiguration.
+	 */
+	
+	public void reinitializeEquiplet(List<Module> toBeAdded){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
+		
+		for(Module addedModule : toBeAdded){
+			try{
+				// TODO Get drivers for the addedModule so it can actually be added by HAL (Needed staticSettings and dynamicSettings).
+				boolean result = hal.insertModule(null, null);
+			}catch(InvalidMastModeException ex){
+				
+			}
+		}
 		reconfiguring = false;
 		register();
 	}
@@ -947,6 +986,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			throw new IllegalArgumentException("FUCK");
 		}
 	}
+	
 
 	@Override
 	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
