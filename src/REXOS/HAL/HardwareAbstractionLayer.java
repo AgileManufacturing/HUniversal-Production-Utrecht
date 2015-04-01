@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.log.Logger;
+
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
@@ -226,13 +228,16 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		// TODO Implement extra logic here ensuring the safe shutdown of an equiplet.
 		String command = "STATE_OFFLINE";
 		try{
-			sendEquipletCommand(command);
+			sendEquipletStateCommand(command);
+		}catch(JSONException ex){
+			// These exceptions should never occur, since we hardcode the requested state.
+			Logger.log("The given command could not be correctly serialized.");
 		}catch(Exception ex){
-			// TODO Implement extra error handling, such as logging.
+			Logger.log("The MongoDB could not be reached.");
 		}
 	}
 	
-	public void sendEquipletCommand(String command) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
+	public void sendEquipletStateCommand(String command) throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		blackboardHandler.postEquipletStateCommand(command);
 	}
 }
