@@ -4,11 +4,13 @@ import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import HAL.dataTypes.ModuleIdentifier;
 import MAS.util.Ontology;
 import MAS.util.Pair;
 import MAS.util.Parser;
@@ -45,21 +47,14 @@ public class EquipletListenerBehaviour extends Behaviour {
 								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
 										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
 												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), 
-													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CHANGE_MACHINE_STATE
-												) 
-										)
-										
-										
-								)
-						)
-				), 
+													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CHANGE_MACHINE_STATE))))), 
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
 		
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
-
+			
 			switch (msg.getPerformative()) {
 			case ACLMessage.INFORM:
 				if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
@@ -84,7 +79,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_CHANGE_MACHINE_STATE)){
 					handleChangeMachineState(msg);
 				}
-				
+				break;
 			default:
 				break;
 			}
@@ -92,7 +87,23 @@ public class EquipletListenerBehaviour extends Behaviour {
 	}
 
 	private void handleChangeMachineState(ACLMessage msg) {
-		// TODO Auto-generated method stub		
+		if(msg != null){
+			String content = msg.getContent();
+			if(content != null){
+				ArrayList<ModuleIdentifier> modules = delimitACLMessage(content);
+				equiplet.reconfigureEquiplet(modules);
+			}
+		}		
+	}
+
+	/**
+	 * Dedicated function to translate the reconfigure ACLMessage received from scada.
+	 * 
+	 * @param content
+	 * @return
+	 */
+	private ArrayList<ModuleIdentifier> delimitACLMessage(String content) {
+		return new ArrayList<ModuleIdentifier>();
 	}
 
 	@Override
