@@ -29,7 +29,9 @@ import util.log.Logger;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
+//import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
@@ -73,8 +75,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	@Override
 	public void setup() {
-		Object[] args = getArguments();
-
+		//Object[] args = getArguments();
+		Object[] args = new Object[1];
+		args[0] = "hal";
+		
 		if (args != null && args.length > 0) {
 			if (args[0].equals("hal")) {
 				try {
@@ -191,8 +195,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @param A list of the modules to be removed during this reconfiguring.
 	 * @param A list of the modules to be added during this reconfiguring.
 	 * @author Thomas Kok
+	 * @author Kevin Bosman
 	 */
-	public void reconfigureEquiplet(List<Module> toBeRemoved){
+	public void reconfigureEquiplet(ArrayList<ModuleIdentifier> arrayList){
 		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
 		this.reconfiguring = true;
 		deregister();
@@ -202,13 +207,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				this.doWait();
 		}
 		
-		for(Module removedModule : toBeRemoved){
+		for(ModuleIdentifier removedModule : arrayList){
 			try{
 				// TODO Transport information on the deleted module to the GKD (The 'result' JSONObject).
-				JSONObject result = hal.deleteModule(removedModule.getModuleIdentifier());
+				JSONObject result = hal.deleteModule(removedModule);
 				Logger.log("The following module has been removed: ", result.get(getName()));
 			}catch(Exception ex){
-				Logger.log(LogLevel.ERROR, "An error occured while attempting to remove module: ", removedModule.getModuleIdentifier());
+				Logger.log(LogLevel.ERROR, "An error occured while attempting to remove module: ", removedModule);
 			}
 		}
 		
@@ -222,6 +227,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * It wants a list of modules that were added in the reconfiguration.
 	 * @param An object containing two JSONObjects with drivers for the added modules.
 	 * @author Thomas Kok
+	 * @author Kevin Bosman
 	 */
 	public boolean reinitializeEquiplet(List<DTOModuleSettings> toBeAddedModuleSettings){
 		// TODO Implement logic to further initialize the HAL and related init stuff.
@@ -247,6 +253,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		this.init(new Position(0,0), capabilities);
 		register();
 		return isInsertingModulesSuccessful;
+	}
+	
+	/**
+	 * Retun all available modules currently listed in the module factory
+	 * 
+	 * @return List of modules
+	 * 
+	 * @author Thomas Kok
+	 * @author Kevin Bosman
+	 */
+	public ArrayList<ModuleIdentifier> getAllModules(){
+		return hal.getModuleFactory().getModules();
+
 	}
 
 	/**
