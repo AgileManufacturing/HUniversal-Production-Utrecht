@@ -36,14 +36,13 @@
 #include <bondcpp/bond.h>
 
 namespace rexos_module {
-	typedef actionlib::SimpleActionClient<rexos_module::TransitionAction> TransitionActionClient;
 	class ActorModule;
 	
 	class Module : public rexos_module::AbstractModule,
 		public rexos_statemachine::ModuleStateMachine {
 	protected:
-		Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
-		Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ActorModule* actorModule);
+		Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, bool isShadow);
+		Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, bool isShadow, ActorModule* actorModule);
 		
 		/**
 		 * Method used for constructor delegation, as this is not supported by c++ < c++11
@@ -52,7 +51,10 @@ namespace rexos_module {
 		virtual void onBondBrokenCallback();
 		virtual void onBondFormedCallback();
 	protected:
-		TransitionActionClient transitionActionClient;
+		actionlib::SimpleActionClient<rexos_module::TransitionAction> transitionActionClient;
+		
+		bool isSimulated;
+		bool isShadow;
 	private:
 		/**
 		 * The bond to bind the module with the equiplet

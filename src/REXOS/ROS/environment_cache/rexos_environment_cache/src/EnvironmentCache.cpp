@@ -34,7 +34,7 @@
 #include <jsoncpp/json/reader.h>
 #include <boost/algorithm/string.hpp>
 
-#define ENVIRONMENT_CACHE_DEBUG
+//#define ENVIRONMENT_CACHE_DEBUG
 
 namespace rexos_environment_cache {
 	std::string EnvironmentCache::printEnvironmentCache() {

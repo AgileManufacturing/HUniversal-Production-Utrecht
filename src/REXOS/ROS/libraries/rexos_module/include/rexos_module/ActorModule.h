@@ -41,7 +41,7 @@ namespace rexos_module {
 	
 	class ActorModule : public rexos_module::Module {
 	protected:
-		ActorModule(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
+		ActorModule(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, bool isShadow);
 		
 		virtual void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal) = 0;
 	protected:

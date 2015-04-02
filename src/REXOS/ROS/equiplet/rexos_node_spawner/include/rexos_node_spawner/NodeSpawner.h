@@ -41,11 +41,13 @@
 namespace rexos_node_spawner{
 	class NodeSpawner{
 	protected:
-		NodeSpawner(std::string equipletName);
+		NodeSpawner(std::string equipletName, bool isSimulated, bool isShadow);
 		void spawnNode(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		void spawnEquipletNode();
 	private:
 		std::string equipletName;
+		bool isSimulated;
+		bool isShadow;
 		
 		void extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware);
 		void extractZipArchive(std::istream* inputFile, std::string zipArchiveFileName);

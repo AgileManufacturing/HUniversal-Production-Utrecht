@@ -12,8 +12,7 @@
 
 namespace equiplet_node {
 
-ModuleRegistry::ModuleRegistry(
-	std::string equipletName, ModuleRegistryListener* mrl) :
+ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
 		newRegistrationsAllowed(false),
 		equipletName(equipletName),
 		moduleRegistryListener(mrl)

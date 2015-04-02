@@ -3,9 +3,9 @@
 #include <equiplet_node/HumanInteractionAction.h>
 
 
-DummyModuleA::DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
+DummyModuleA::DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
 		equipletName(equipletName),
-		rexos_module::Module(equipletName, moduleIdentifier)
+		rexos_module::Module(equipletName, moduleIdentifier, isSimulated, isShadow)
 {
 }
 
@@ -64,19 +64,38 @@ bool DummyModuleA::transitionStop(){
 
 int main(int argc, char* argv[]) {
 	if(argc < 5){
-		REXOS_ERROR("Usage: dummy_module_a equipletId, manufacturer, typeNumber, serialNumber");
+		REXOS_ERROR("Usage: dummy_module_a (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
-
-	REXOS_INFO("Creating DummyModuleA");
-	ros::init(argc, argv, std::string("dummy_module_a") + moduleIdentifier.getManufacturer() + "_" + 
-			 moduleIdentifier.getTypeNumber() + "_" + 
-			 moduleIdentifier.getSerialNumber());
-	DummyModuleA node(equipletName, moduleIdentifier);
-	node.run();
+	bool isSimulated = false;
+	bool isShadow = false;
 	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
+	
+	DummyModuleA node(equipletName, moduleIdentifier, isSimulated, isShadow);
+	
+	ros::spin();
 	return 0;
 }

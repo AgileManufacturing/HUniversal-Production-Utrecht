@@ -39,17 +39,14 @@
 
 #include <matrices/Matrices.h>
 
-// @cond HIDE_NODE_NAME_FROM_DOXYGEN
-#define NODE_NAME "StewartGoughNode"
-// @endcond
-
+using namespace stewart_gough_node;
 /**
  * Constructor 
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier),
+StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
+		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow),
 		stewartGough(NULL),
 		lastX(0.0),
 		lastY(0.0),
@@ -79,13 +76,12 @@ stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipl
 }
 
 
-
-stewartGoughNodeNamespace::StewartGoughNode::~StewartGoughNode() {
+StewartGoughNode::~StewartGoughNode() {
 	delete stewartGough;
 }
 
 
-void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
+void StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
 	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
@@ -209,7 +205,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_m
  *
  * @return true if the calibration was successful else false 
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::calibrate(){
+bool StewartGoughNode::calibrate(){
 	if(!stewartGough->calibrateMotors()){
 		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
@@ -231,7 +227,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::calibrate(){
  * 
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration){
+bool StewartGoughNode::moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration){
 	if(maxAcceleration > 20){
 		maxAcceleration = 20;
 	}
@@ -253,12 +249,12 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_goug
 	
 }
 
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(){
+bool StewartGoughNode::transitionInitialize(){
 	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(){
+bool StewartGoughNode::transitionDeinitialize(){
 	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
@@ -268,7 +264,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(){
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(){
+bool StewartGoughNode::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 
 	// Power on the deltarobot and calibrate the motors.
@@ -288,7 +284,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(){
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionShutdown(){
+bool StewartGoughNode::transitionShutdown(){
 	REXOS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	stewartGough->powerOff();
@@ -299,7 +295,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionShutdown(){
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionStart(){
+bool StewartGoughNode::transitionStart(){
 	REXOS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
 	return true;
@@ -308,7 +304,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStart(){
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
+bool StewartGoughNode::transitionStop(){
 	REXOS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
 		return true;
@@ -320,7 +316,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv){
-/*	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
+	/*	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
 				50, 50, 
 				20, 20,
 				0.46);
@@ -350,18 +346,40 @@ int main(int argc, char **argv){
 		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
 	}*/
 	
-	ros::init(argc, argv, NODE_NAME);
 	
 	if(argc < 5){
-		REXOS_ERROR("Usage: stewart_gough_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: stewart_gough_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
+	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
 	
 	REXOS_INFO("Creating StewartGoughNode");
-	stewartGoughNodeNamespace::StewartGoughNode drn(equipletName, moduleIdentifier);
+	StewartGoughNode drn(equipletName, moduleIdentifier, isSimulated, isShadow);
 
 	ros::spin();
 	return 0;

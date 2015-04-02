@@ -30,47 +30,49 @@
 
 #include <equiplet_node/EquipletNode.h>
 
-static void show_usage(std::string name) {
-	REXOS_ERROR_STREAM("Usage: " << name << " <options(s)>\n" << "Options:\n"
-			<< "\t--help\t\tShow this help message\n"
-			<< "\t--blackboard\tIP address of the blackboard\n"
-			<< "\t--id\t\tID of this equiplet (default: 1)\n");
-}
+#include <stdlib.h>
 
 int main(int argc, char **argv) {
 	std::string blackboardIP;
-	bool spawnNodesForModules = false;
+	bool spawnNodesForModules = true;
+	bool spawnModelsForModules = true;
+	bool isSimulated = false;
+	bool isShadow = false;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
-		if (arg == "--help") {
-			show_usage(argv[0]);
-			return 0;
-		} else if (arg == "--blackboard") {
+		if (arg == "--blackboard") {
 			if (i + 1 < argc) {
 				blackboardIP = argv[++i];
 			} else {
 				REXOS_ERROR("--blackboard requires one argument");
 				return -1;
 			}
-		} else if (arg == "--spawnNodes") {
-			spawnNodesForModules = true;
+		} else if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isSimulated = true;
+			isShadow = true;
 		}
 	}
-	if(argc < 2) {
-		REXOS_ERROR("Usage: equiplet_node (--blackboard <ip-address>) (--spawnNodes) equipletName");
+	if (argc < 2) {
+		REXOS_ERROR("Usage: equiplet_node (--isSimulated | --isShadow) (--blackboard <ip-address>) equipletName");
 		return -2;
 	}
 	
-
-	// Set the name of the Equiplet
-	std::string equipletName = argv[argc - 1];
-
-	ros::init(argc, argv, equipletName);
-	equiplet_node::EquipletNode equipletNode(equipletName, blackboardIP, spawnNodesForModules);
-
-	ros::Rate poll_rate(10);
-	ros::spin();
+	std::string equipletName = std::string(argv[argc - 1]);
 	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName;
+	ros::init(argc, argv, nodeName);
+	
+	equiplet_node::EquipletNode equipletNode(equipletName, isSimulated, isShadow, blackboardIP);
+	
+	ros::spin();
 	return 0;
 }

@@ -48,8 +48,10 @@
 #include <string>
 #include <iostream>
 
-CameraControlNode::CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-		rexos_module::Module::Module(equipletName, moduleIdentifier), 
+using namespace camera_control_node;
+
+CameraControlNode::CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
+		rexos_module::Module::Module(equipletName, moduleIdentifier, isSimulated, isShadow), 
 		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::INCREASE_EXPOSURE)),
 		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::DECREASE_EXPOSURE)),
 		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(				vision_node_services::AUTO_WHITE_BALANCE)),
@@ -232,24 +234,45 @@ bool CameraControlNode::transitionStop(){
 }
 
 int main(int argc, char* argv[]) {
-	ros::init(argc, argv, "camera_control_node");
-	
 	if(argc < 5){
-		REXOS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
 	
-	CameraControlNode node(equipletName, moduleIdentifier);
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
+	
+	CameraControlNode node(equipletName, moduleIdentifier, isSimulated, isShadow);
 	
 	REXOS_INFO_STREAM("Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
 	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl
 	        << "S\tIncrease exposure" << std::endl << "X\tDecrease exposure" << std::endl << "Q\tQuit program"
 	        << std::endl << "Enter a key and press the \"Enter\" button" << std::endl);
-
-	node.run();
+	
+	ros::spin();
 	return 0;
 }
 

@@ -61,59 +61,46 @@ namespace equiplet_node {
 class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
 {
 public:
-	EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules);
+	EquipletNode(std::string equipletName, bool isSimulated, bool isShadow, std::string blackboardIp);
 	virtual ~EquipletNode();
 	
 	std::string getEquipletName();
 	ros::NodeHandle& getNodeHandle();
-
+	
 private:
 	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
 	void handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo::OID targetObjectId);
 	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed);
-
+	
 	virtual void onStateChanged(rexos_statemachine::State state);
 	virtual void onModeChanged(rexos_statemachine::Mode mode);
-
+	
 	Json::Value callLookupHandler(Json::Value originPlacementParameters);
-
-
+	
+	
 	bool setTransitionDone(rexos_statemachine::State transitionState);
-
+	
 	void updateEquipletStateOnBlackboard();
-
+	
 	void handleEquipletCommand(Json::Value n);
-
-
-	/**
-	 * @var int equipletId
-	 * The id of the equiplet
-	 **/
+	
 	std::string equipletName;
-
-	/**
-	 * @var BlackboardCppClient  *blackboardClient
-	 * Client to read from blackboard
-	 **/
-	Blackboard::BlackboardCppClient *directMoveBlackBoardClient;
-	Blackboard::BlackboardSubscription* directMoveSubscription;
-
-
-	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
-	Blackboard::BlackboardSubscription* equipletStepSubscription;
-	//Blackboard::FieldUpdateSubscription* equipletStepSubscription;
-	Blackboard::BlackboardSubscription* directEquipletStepSubscription;
-
+	bool isSimulated;
+	bool isShadow;
+	
+	Blackboard::BlackboardCppClient *hardwareStepBlackboardClient;
+	Blackboard::BlackboardSubscription* hardwareStepSubscription;
+	//Blackboard::FieldUpdateSubscription* hardwareStepSubscription;
+	
 	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
 	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
-
+	
 	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
 	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
-
+	
 	ros::NodeHandle nh;
-
+	
 	equiplet_node::scada::EquipletScada scada;
-
 };
 
 }

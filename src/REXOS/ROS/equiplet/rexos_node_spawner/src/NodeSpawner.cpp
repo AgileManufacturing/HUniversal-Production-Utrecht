@@ -41,8 +41,10 @@
 #include "ros/ros.h"
 
 namespace rexos_node_spawner {
-	NodeSpawner::NodeSpawner(std::string equipletName) :
-		equipletName(equipletName)
+	NodeSpawner::NodeSpawner(std::string equipletName, bool isSimulated, bool isShadow) :
+		equipletName(equipletName),
+		isSimulated(isSimulated),
+		isShadow(isShadow)
 	{
 		
 	}
@@ -55,6 +57,17 @@ namespace rexos_node_spawner {
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
+			if(isSimulated == true) {
+				boost::algorithm::replace_all(command, "{isSimulated}", "--isSimulated");
+			} else {
+				boost::algorithm::replace_all(command, "{isSimulated}", "");
+			}
+			if(isShadow == true) {
+				boost::algorithm::replace_all(command, "{isShadow}", "--isShadow");
+			} else {
+				boost::algorithm::replace_all(command, "{isShadow}", "");
+			}
+			
 			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
 			boost::algorithm::replace_all(command, "{manufacturer}", moduleIdentifier.getManufacturer());
 			boost::algorithm::replace_all(command, "{typeNumber}", moduleIdentifier.getTypeNumber());
@@ -77,6 +90,17 @@ namespace rexos_node_spawner {
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
+			if(isSimulated == true) {
+				boost::algorithm::replace_all(command, "{isSimulated}", "--isSimulated");
+			} else {
+				boost::algorithm::replace_all(command, "{isSimulated}", "");
+			}
+			if(isShadow == true) {
+				boost::algorithm::replace_all(command, "{isShadow}", "--isShadow");
+			} else {
+				boost::algorithm::replace_all(command, "{isShadow}", "");
+			}
+			
 			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
 			
 			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());

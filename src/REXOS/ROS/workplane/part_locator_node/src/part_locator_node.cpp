@@ -18,9 +18,9 @@ namespace part_locator_node {
 	const int PartLocatorNode::minItemSamples = 11;
 	const int PartLocatorNode::workSpaceHeight = 35;
 
-	PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
-			rexos_module::Module(equipletName, moduleIdentifier),
-			environmentCacheClient(rexos_module::AbstractModule::nodeHandle.serviceClient<environment_cache::setData>("setData")),
+	PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow):
+			rexos_module::Module(equipletName, moduleIdentifier, isSimulated, isShadow),
+			environmentCacheClient(rexos_module::AbstractModule::nodeHandle.serviceClient<environment_cache::setData>(equipletName + "/setData")),
 			samplesTopLeft(minCornerSamples),
 			samplesTopRight(minCornerSamples),
 			samplesBottomRight(minCornerSamples)
@@ -556,11 +556,6 @@ namespace part_locator_node {
 		this->setCalibrationDataForModuleAndOtherModules(modules, writer.write(jsonNode));
 		return true;
 	}
-	void PartLocatorNode::run() {
-		REXOS_INFO("waiting for camera/qr_codes");
-		ros::Subscriber sub = rexos_module::AbstractModule::nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
-		ros::spin();
-	}
 	bool PartLocatorNode::transitionInitialize() {
 		REXOS_INFO("Initialize transition called");
 		return true;
@@ -612,14 +607,40 @@ namespace part_locator_node {
 }
 
 int main(int argc, char* argv[]) {
-	ros::init(argc, argv, "part_locator_node");
+	if(argc < 5){
+		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
+		return -1;
+	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
+	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
 	
 	REXOS_INFO("Creating PartLocatorNode");
-	part_locator_node::PartLocatorNode node(equipletName, moduleIdentifier);
-	node.run();
+	part_locator_node::PartLocatorNode node(equipletName, moduleIdentifier, isSimulated, isShadow);
 	
+	ros::spin();
 	return 0;
 }

@@ -41,7 +41,7 @@ public:
 protected:
 	std::string equipletName;
 public:
-	DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+	DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 	void run();
 	void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr& goal);
 

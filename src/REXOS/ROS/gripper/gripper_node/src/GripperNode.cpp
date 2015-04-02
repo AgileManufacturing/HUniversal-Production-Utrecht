@@ -35,13 +35,10 @@
 #include <rexos_datatypes/EquipletStep.h>
 #include <jsoncpp/json/reader.h>
 
+using namespace gripper_node;
 
-// @cond HIDE_NODE_NAME_FROM_DOXYGEN
-#define NODE_NAME "GripperNode"
-// @endcond
-
-GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-		rexos_module::ActorModule(equipletName, moduleIdentifier) {
+GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
+		rexos_module::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow) {
 	REXOS_INFO("GripperNode Constructor entering...");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
@@ -189,21 +186,39 @@ void GripperNode::notifyCooledDown(){
  * Main that starts the gripper node and its statemachine.
  **/
 int main(int argc, char** argv) {
-	ros::init(argc, argv, NODE_NAME);
-	
 	if(argc < 5){
-		REXOS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: gripper_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
 	
-	REXOS_INFO("Creating GripperNode");
-
-	GripperNode gripperNode(equipletName, moduleIdentifier);
-
-	REXOS_INFO("Running StateEngine");
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
+	
+	GripperNode gripperNode(equipletName, moduleIdentifier, isSimulated, isShadow);
+	
 	ros::spin();
 	return 0;
 }

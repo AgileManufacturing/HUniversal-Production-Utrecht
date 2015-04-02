@@ -19,7 +19,8 @@ EquipletStateMachine::EquipletStateMachine(std::string equipletName):
 		}
 	),
 	moduleRegistry(equipletName),
-	desiredState(rexos_statemachine::STATE_NOSTATE)
+	desiredState(rexos_statemachine::STATE_NOSTATE),
+	spanNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>(equipletName + "/spawnNode"))
 {
 	moduleRegistry.setModuleRegistryListener(this);
 	moduleRegistry.setNewRegistrationsAllowed(true);
@@ -131,7 +132,6 @@ void EquipletStateMachine::onModuleTransitionPhaseCompleted(rexos_module::Module
 	}
 }
 void EquipletStateMachine::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
-	ros::ServiceClient spanNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
 	ROS_INFO_STREAM("Spawning node for " << moduleProxy->getModuleIdentifier());
 	node_spawner_node::spawnNode spawnNodeCall;
 	spawnNodeCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();

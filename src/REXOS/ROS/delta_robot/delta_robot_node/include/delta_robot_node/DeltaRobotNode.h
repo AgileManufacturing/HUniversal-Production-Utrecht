@@ -54,7 +54,7 @@ namespace delta_robot{
 		
 		
 	public:
-		DeltaRobotNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		DeltaRobotNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 		virtual ~DeltaRobotNode();
 		
 		virtual bool transitionInitialize();

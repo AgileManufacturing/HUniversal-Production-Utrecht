@@ -29,8 +29,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef GRIPPERNODE_H_
-#define GRIPPERNODE_H_
+#pragma once
 
 #include "ros/ros.h"
 #include "iostream"
@@ -43,12 +42,14 @@
 
 #include <jsoncpp/json/value.h>
 
+namespace gripper_node {
+
 class GripperNode : public rexos_module::ActorModule, 
 	Observer {
 	
 public:
 
-	GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+	GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 	virtual ~GripperNode();
 
 	virtual bool transitionInitialize();
@@ -101,5 +102,4 @@ private:
 	void notifyCooledDown();
 	
 };
-
-#endif /* GRIPPERNODE_H_ */
+}

@@ -47,48 +47,28 @@
 
 using namespace equiplet_node;
 
-
-/**
- * Create a new EquipletNode
- * @param id The unique identifier of the Equiplet
- **/
-EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules) :
+EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isShadow, std::string blackboardIp) :
 		nh(),
 		equipletName(equipletName),
+		isSimulated(isSimulated),
+		isShadow(isShadow),
 		EquipletStateMachine(equipletName),
-		equipletStepBlackboardClient(NULL),
+		hardwareStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
-		directMoveBlackBoardClient(NULL),
 		scada(this, &moduleRegistry) 
 {
-	if(spawnNodesForModules == true) {
-		REXOS_INFO_STREAM("Spawning nodes at startup");
-		rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
-		std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
-		
-		ros::ServiceClient spanNodeClient(nh.serviceClient<node_spawner_node::spawnNode>("spawnNode"));
-		for(std::vector<rexos_datatypes::ModuleIdentifier>::iterator it = identifiers.begin(); it < identifiers.end(); it++) {
-			REXOS_INFO_STREAM("Spawning node for " << *it);
-			node_spawner_node::spawnNode spawnNodeCall;
-			spawnNodeCall.request.manufacturer = it->getManufacturer();
-			spawnNodeCall.request.typeNumber = it->getTypeNumber();
-			spawnNodeCall.request.serialNumber = it->getSerialNumber();
-			spanNodeClient.call(spawnNodeCall);
-		}
-	}
 	bool useCustomIp = false;
 	if(blackboardIp.length() != 0) useCustomIp = true;
 	
-	REXOS_DEBUG("Subscribing to EquipletStepsBlackBoard");
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(
+	REXOS_DEBUG("Subscribing to HardwareStepsBlackBoard");
+	hardwareStepBlackboardClient = new Blackboard::BlackboardCppClient(
 			useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/databaseName", equipletName).asString(), 
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
-	//equipletStepSubscription = new Blackboard::FieldUpdateSubscription("status", *this);
-	equipletStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-	//equipletStepSubscription->addOperation(Blackboard::SET);
-	equipletStepBlackboardClient->subscribe(*equipletStepSubscription);
-	subscriptions.push_back(equipletStepSubscription);
+	
+	hardwareStepSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+	hardwareStepBlackboardClient->subscribe(*hardwareStepSubscription);
+	subscriptions.push_back(hardwareStepSubscription);
 	sleep(1);
 
 	REXOS_DEBUG("Subscribing to equipletCommands");
@@ -98,7 +78,6 @@ EquipletNode::EquipletNode(std::string equipletName, std::string blackboardIp, b
 			rexos_configuration::Configuration::getProperty("rosInterface/equipletCommands/blackboardName", equipletName).asString());
 	equipletCommandSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 	equipletCommandBlackboardClient->subscribe(*equipletCommandSubscription);
-	sleep(1);
 	subscriptions.push_back(equipletCommandSubscription);
 	sleep(1);
 
@@ -121,9 +100,7 @@ EquipletNode::~EquipletNode(){
 	}
 	subscriptions.clear();
 	
-	delete equipletStepBlackboardClient;
-	delete equipletStepBlackboardClient;
-	delete directMoveBlackBoardClient;
+	delete hardwareStepBlackboardClient;
 	delete equipletCommandBlackboardClient;
 	delete equipletStateBlackboardClient;
 }
@@ -139,8 +116,8 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 	mongo::OID targetObjectId;
 	oplogEntry.getTargetObjectId(targetObjectId);
 
-	if(&subscription == equipletStepSubscription) {
-		std::string jsonString = equipletStepBlackboardClient->findDocumentById(targetObjectId).jsonString();
+	if(&subscription == hardwareStepSubscription) {
+		std::string jsonString = hardwareStepBlackboardClient->findDocumentById(targetObjectId).jsonString();
 		Json::Reader reader;
 		Json::Value n;
 		reader.parse(jsonString, n);
@@ -158,7 +135,7 @@ void EquipletNode::onMessage(Blackboard::BlackboardSubscription & subscription, 
 			moduleRegistry.reloadModules();
 		//	prox->reloadModules();
 			//ROS_INFO("%s ", step.getModuleIdentifier());
-			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {reloadEquiplet: \"RELOADING_COMPLETED\"} } ");
+			hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {reloadEquiplet: \"RELOADING_COMPLETED\"} } ");
 		}
 	} else if(&subscription == equipletCommandSubscription) {
 		ROS_INFO("Received equiplet statemachine command");
@@ -175,13 +152,13 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	if (currentMode != rexos_statemachine::MODE_NORMAL) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
-		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
+		hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
 		return;
 	}
 	rexos_statemachine::State currentState = getCurrentState();
 	if (currentState != rexos_statemachine::STATE_NORMAL && currentState != rexos_statemachine::STATE_STANDBY) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current state is %s", rexos_statemachine::state_txt[currentState]);
-		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
+		hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{$set : {status: \"FAILED\"} } ");
 		return;
 	}
 	
@@ -193,7 +170,7 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 		Json::Value result = callLookupHandler(originPlacement.getParameters());
 		if(result == Json::Value::null) {
 			// could not find anything in the lookup handler, failing hardware step
-			equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
+			hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
 			return;
 		} else {
 			originPlacement.setLookupResult(result);
@@ -205,11 +182,11 @@ void EquipletNode::handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo
 	rexos_module::ModuleProxy *prox = moduleRegistry.getModule(step.getModuleIdentifier());
 	if(prox == NULL) {
 		REXOS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
-		equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
+		hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\"} } ");
 		return;
 	}
 	//prox->changeState(rexos_statemachine::STATE_NORMAL);
-	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\"}  }");	
+	hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"IN_PROGRESS\"}  }");	
 	prox->setInstruction(targetObjectId.toString(), step.toJSON());
 }
 
@@ -237,10 +214,10 @@ void EquipletNode::onHardwareStepCompleted(rexos_module::ModuleInterface* module
 	mongo::OID targetObjectId(id);
 
 	if(completed) {
-    	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
+    	hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"DONE\" } } ");
     	REXOS_INFO_STREAM("Module " << moduleInterface->getModuleIdentifier() << " is done step with id: " << id);
 	} else {
-    	equipletStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
+    	hardwareStepBlackboardClient->updateDocumentById(targetObjectId, "{ $set : {status: \"FAILED\" } } ");
     	REXOS_INFO_STREAM("Module " << moduleInterface->getModuleIdentifier() << " has failed step with id: " << id);
 	}
 }

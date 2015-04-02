@@ -47,7 +47,7 @@
 #include <rexos_datatypes/TransitionPhase.h>
 #include <rexos_logger/rexos_logger.h>
 
-namespace equiplet_node{
+namespace equiplet_node {
 
 class EquipletStateMachine : 
 	public rexos_statemachine::StateMachine, 
@@ -83,7 +83,8 @@ private:
 	virtual bool transitionStop();
 
 protected:
-	equiplet_node::ModuleRegistry moduleRegistry; 
+	equiplet_node::ModuleRegistry moduleRegistry;
+	ros::ServiceClient spanNodeClient;
 
 private:
 	rexos_statemachine::State desiredState;

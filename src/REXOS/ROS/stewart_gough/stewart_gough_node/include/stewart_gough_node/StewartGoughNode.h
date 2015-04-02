@@ -43,7 +43,7 @@
 
 #include <jsoncpp/json/value.h>
 
-namespace stewartGoughNodeNamespace{
+namespace stewart_gough_node {
 	/**
 	 * the DeltaRobotNode which is a ModuleStateMachine
 	**/
@@ -59,7 +59,7 @@ namespace stewartGoughNodeNamespace{
 		
 		
 	public:
-		StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 		virtual ~StewartGoughNode();
 		
 		virtual bool transitionInitialize();
