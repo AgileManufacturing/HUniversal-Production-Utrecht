@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>model_spawner_node</name>
+  <version>0.0.0</version>
+  <description>The equiplet_node package</description>
+  <maintainer email="Dickvdsteen@todo.todo">Dickvdsteen</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>rexos_knowledge_database</build_depend>
+  <build_depend>rexos_model_spawner</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>rexos_knowledge_database</run_depend>
+  <run_depend>rexos_model_spawner</run_depend>
+
+  <build_depend>rexos_bond</build_depend>
+  <run_depend>rexos_bond</run_depend>
+
+  <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_logger</build_depend>
+  <run_depend>rexos_datatypes</run_depend>
+  <build_depend>rexos_datatypes</build_depend>
+</package>
