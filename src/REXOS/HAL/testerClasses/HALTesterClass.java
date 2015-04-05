@@ -181,20 +181,6 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		hal.insertModule(a, a);
 		hal.insertModule(b, b);
-		
-		
-		
-		//hal.translateProductStep(new ProductStep(1, criteria, new Service("place")));
-		// Sending reloadEquiplet command to Blackboard
-		// UNTESTED W.I.P (Lars Veenendaal)]
-		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_A", "1"));
-		hal.deleteModule(new ModuleIdentifier("HU", "dummy_module_type_B", "1"));
-		hal.sendReloadEquiplet();
-		/*Service service = new Service("PickAndPlace");
-		ProductStep productStep = new ProductStep(0, null, service);
-		hal.translateProductStep(productStep);*/
-		
-
 	}
 	
 	@Override

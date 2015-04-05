@@ -1,4 +1,4 @@
-package util;
+package HAL.testerClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,12 +35,12 @@ public class EquipletRecordLoader {
 		modelZipFileStream.read(modelZipFileContent);
 		modelZipFileStream.close();
 		gazeboModelJson.put(GazeboModel.ZIP_FILE, new String(Base64.encodeBase64(modelZipFileContent)));
-		gazeboModelJson.put(GazeboModel.SDF_FILE_NAME, "equiplet/model.sdf");
-		gazeboModelJson.put(GazeboModel.PARENT_LINK, "link");
-		gazeboModelJson.put(GazeboModel.CHILD_LINK, "link");
-		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_X, 0.0);
-		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Y, 0.0);
-		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Z, 0.0);
+		gazeboModelJson.put(GazeboModel.SDF_FILE_NAME, "model.sdf");
+		gazeboModelJson.put(GazeboModel.PARENT_LINK, "base");
+		gazeboModelJson.put(GazeboModel.CHILD_LINK, "base");
+		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_X, -226.88);
+		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Y, -36.00);
+		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Z, 1141.97);
 		GazeboModel gazeboModel = GazeboModel.deSerialize(gazeboModelJson);
 		
 		JSONObject rosSoftwareJson = new JSONObject();

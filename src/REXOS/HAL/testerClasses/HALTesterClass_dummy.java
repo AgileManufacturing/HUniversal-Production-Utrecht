@@ -25,7 +25,7 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 	static HardwareAbstractionLayer hal;
 	static BlackboardHandler blackboardUpdated;
 	
-	static final String baseDir = "jars/";
+	static final String baseDir = "generatedOutput/";
 	
 	// dummy module A
 	static String moduleA_01 = "{" +
@@ -53,8 +53,8 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":0.0" +
@@ -67,8 +67,8 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":null," +
-			"\"mountPointX\":3," +
-			"\"mountPointY\":2" +
+			"\"mountPointX\":1," +
+			"\"mountPointY\":10" +
 			"}";
 	// dummy module B
 	static String moduleB_01 = "{" +
@@ -96,8 +96,8 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"effector\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":0.0" +
@@ -126,42 +126,42 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 		FileInputStream fis;
 		byte[] content;
 
-		File dummyModuleAHal = new File(baseDir + "DummyModuleA.jar");
+		File dummyModuleAHal = new File(baseDir + "HAL/modules/" + "DummyModuleA.jar");
 		fis = new FileInputStream(dummyModuleAHal);
 		content = new byte[(int) dummyModuleAHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleAHal = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleBHal = new File(baseDir + "DummyModuleB.jar");
+		File dummyModuleBHal = new File(baseDir + "HAL/modules/" + "DummyModuleB.jar");
 		fis = new FileInputStream(dummyModuleBHal);
 		content = new byte[(int) dummyModuleBHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleBHal = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleARos = new File(baseDir + "nodes.zip");
+		File dummyModuleARos = new File(baseDir + "nodes/" + "_testing.zip");
 		fis = new FileInputStream(dummyModuleARos);
 		content = new byte[(int) dummyModuleARos.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleARos = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleBRos = new File(baseDir + "nodes.zip");
+		File dummyModuleBRos = new File(baseDir + "nodes/" + "_testing.zip");
 		fis = new FileInputStream(dummyModuleBRos);
 		content = new byte[(int) dummyModuleBRos.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleBRos = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleAGazebo = new File(baseDir + "model.zip");
+		File dummyModuleAGazebo = new File(baseDir + "models/" + "workplane.zip");
 		fis = new FileInputStream(dummyModuleAGazebo);
 		content = new byte[(int) dummyModuleAGazebo.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleAGazebo = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleBGazebo = new File(baseDir + "model.zip");
+		File dummyModuleBGazebo = new File(baseDir + "models/" + "sixAxis.zip");
 		fis = new FileInputStream(dummyModuleBGazebo);
 		content = new byte[(int) dummyModuleBGazebo.length()];
 		fis.read(content);
@@ -180,7 +180,7 @@ public class HALTesterClass_dummy implements HardwareAbstractionLayerListener {
 		
 		
 		hal.insertModule(a, a);
-		hal.insertModule(b, b);
+		//hal.insertModule(b, b);
 		
 		hal.sendReloadEquiplet();
 		Thread.sleep(5000);
