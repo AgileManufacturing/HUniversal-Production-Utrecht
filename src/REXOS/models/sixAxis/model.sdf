@@ -1,6 +1,11 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
 	<model name="sixAxis">
+		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
+			<parentModel>{parentModel}</parentModel>
+			<parentLink>{parentLink}</parentLink>
+			<childLink>{childLink}</childLink>
+		</plugin>
 		<static>false</static>
 		<!--==================== Links ====================-->
 		<link name="base">
@@ -13,7 +18,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/base.dae</uri>
+						<uri>file://{baseDir}base.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -30,7 +35,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/upperArm.dae</uri>
+						<uri>file://{baseDir}upperArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -46,7 +51,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/upperArm.dae</uri>
+						<uri>file://{baseDir}upperArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -62,7 +67,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/upperArm.dae</uri>
+						<uri>file://{baseDir}upperArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -78,7 +83,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/upperArm.dae</uri>
+						<uri>file://{baseDir}upperArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -94,7 +99,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/upperArm.dae</uri>
+						<uri>file://{baseDir}upperArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -110,7 +115,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/upperArm.dae</uri>
+						<uri>file://{baseDir}upperArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -127,7 +132,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/lowerArm.dae</uri>
+						<uri>file://{baseDir}lowerArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -143,7 +148,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/lowerArm.dae</uri>
+						<uri>file://{baseDir}lowerArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -159,7 +164,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/lowerArm.dae</uri>
+						<uri>file://{baseDir}lowerArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -175,7 +180,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/lowerArm.dae</uri>
+						<uri>file://{baseDir}lowerArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -191,7 +196,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/lowerArm.dae</uri>
+						<uri>file://{baseDir}lowerArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -207,7 +212,7 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/lowerArm.dae</uri>
+						<uri>file://{baseDir}lowerArm.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
@@ -223,14 +228,14 @@
 			<visual name='visual'>
 				<geometry>
 					<mesh>
-						<uri>model://sixAxis/effector.dae</uri>
+						<uri>file://{baseDir}effector.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
 		</link>
 
 		<!--==================== Joints ====================-->
-		<joint type="prismatic" name="baseToWorld">
+		<joint type="prismatic" name="baseToParent">
 			<pose>0 0 0 0 0 0</pose>
 			<parent>world</parent>
 			<child>base</child>
