@@ -10,10 +10,10 @@
 
 namespace gazebo {
 	AttachPlugin::AttachPlugin() : ModelPlugin(){
-		std::cout << "AttachPlugin constructed";
+		std::cout << "AttachPlugin constructed" << std::endl;
 	}
 	void AttachPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
-		std::cout << "AttachPlugin loading";
+		std::cout << "AttachPlugin loading" << std::endl;
 		
 		if(_sdf->HasElement("parentModel") == false) {
 			std::cerr << "Missing parentModel" << std::endl;
@@ -49,8 +49,9 @@ namespace gazebo {
 			return;
 		}
 		
-		std::cerr << "Attaching..." << std::endl;
-		_model->GetJoint("linkToParent")->Attach(
+		std::cerr << "Attaching " << _model->GetName() <<"::" << childLink << " to " << 
+				parentModel << "::" << parentLink << std::endl;
+		_model->GetJoint("baseToParent")->Attach(
 				_model->GetWorld()->GetModel(parentModel)->GetLink(parentLink), 
 				_model->GetLink(childLink));
 	}
