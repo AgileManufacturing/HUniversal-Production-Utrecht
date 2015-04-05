@@ -43,6 +43,7 @@ namespace rexos_knowledge_database {
 		GazeboModel(std::string equipletName);
 		
 		std::istream* getModelFile();
+		std::string getSdfFilename();
 		std::string getParentLink();
 		std::string getChildLink();
 		double getChildLinkOffsetX();
@@ -51,6 +52,7 @@ namespace rexos_knowledge_database {
 		int getId();
 	private:
 		int id;
+		std::string sdfFilename;
 		std::string parentLink;
 		std::string childLink;
 		double childLinkOffsetX;

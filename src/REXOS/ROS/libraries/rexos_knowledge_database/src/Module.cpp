@@ -77,6 +77,7 @@ namespace rexos_knowledge_database{
 		delete preparedStmt;
 	}
 	Module* Module::getParentModule() {
+		REXOS_INFO_STREAM("-a");
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
@@ -93,6 +94,7 @@ namespace rexos_knowledge_database{
 		)\
 		ORDER BY abs(attachedToLeft - attachedToRight) \
 		ASC LIMIT 1;");
+		REXOS_INFO_STREAM("-b");
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
@@ -100,12 +102,16 @@ namespace rexos_knowledge_database{
 		preparedStmt->setString(5, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(6, moduleIdentifier.getSerialNumber());
 
+		REXOS_INFO_STREAM("-c");
 		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1) {
+		REXOS_INFO_STREAM("-d");
 			delete result;
 			delete preparedStmt;
-			return 0;
+		REXOS_INFO_STREAM("-d");
+			return NULL;
 		} else {
+		REXOS_INFO_STREAM("-e");
 			// set the cursor at the first result
 			result->next();
 			rexos_datatypes::ModuleIdentifier identifier(
@@ -116,6 +122,7 @@ namespace rexos_knowledge_database{
 			delete result;
 			delete preparedStmt;
 			return new Module(identifier);
+		REXOS_INFO_STREAM("-f");
 		}
 	}
 	std::vector<rexos_datatypes::ModuleIdentifier> Module::getChildModulesIdentifiers() {

@@ -9,7 +9,7 @@ namespace rexos_knowledge_database {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT id \
+		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
 		FROM GazeboModel \
 		WHERE id = ( \
 			SELECT gazeboModel \
@@ -29,6 +29,12 @@ namespace rexos_knowledge_database {
 		// set the cursor at the first result
 		result->next();
 		id = result->getInt("id");
+		sdfFilename = result->getString("sdfFilename");
+		parentLink = result->getString("parentLink");
+		childLink = result->getString("childLink");
+		childLinkOffsetX = result->getDouble("childLinkOffsetX");
+		childLinkOffsetY = result->getDouble("childLinkOffsetY");
+		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
 		
 		delete result;
 		delete preparedStmt;
@@ -37,7 +43,7 @@ namespace rexos_knowledge_database {
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT id \
+		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
 		FROM GazeboModel \
 		WHERE id = ( \
 			SELECT gazeboModel \
@@ -53,6 +59,12 @@ namespace rexos_knowledge_database {
 		// set the cursor at the first result
 		result->next();
 		id = result->getInt("id");
+		sdfFilename = result->getString("sdfFilename");
+		parentLink = result->getString("parentLink");
+		childLink = result->getString("childLink");
+		childLinkOffsetX = result->getDouble("childLinkOffsetX");
+		childLinkOffsetY = result->getDouble("childLinkOffsetY");
+		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
 		
 		delete result;
 		delete preparedStmt;
@@ -76,6 +88,9 @@ namespace rexos_knowledge_database {
 		delete result;
 		delete preparedStmt;
 		return rosFile;
+	}
+	std::string GazeboModel::getSdfFilename() {
+		return sdfFilename;
 	}
 	std::string GazeboModel::getParentLink() {
 		return parentLink;

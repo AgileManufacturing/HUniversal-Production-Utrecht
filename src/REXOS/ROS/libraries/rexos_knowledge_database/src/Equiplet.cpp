@@ -54,7 +54,7 @@ namespace rexos_knowledge_database{
 	
 	double Equiplet::getMountPointDistanceX() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mountPointsDistanceX \
+		SELECT mountPointDistanceX \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
@@ -74,7 +74,7 @@ namespace rexos_knowledge_database{
 
 	double Equiplet::getMountPointDistanceY() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mountPoinstDistanceY \
+		SELECT mountPointDistanceY \
 		FROM Equiplet \
 		WHERE name = ?;");
 		preparedStmt->setString(1, name);
