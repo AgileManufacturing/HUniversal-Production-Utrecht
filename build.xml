@@ -112,20 +112,26 @@
 		<foreach target      ="-generate-zip" param="theEntry" parallel="true" inheritall="true">
 			<path id         ="modelsPathId">
 			<dirset dir      ="src/REXOS/models" casesensitive="yes">
+				<include name="*/**"/>
+				<exclude name="**/*/*"/>
 			</dirset>
 			</path>
 		</foreach>
 	</target>
 
 	<target name             ="generate-nodes">
-		<var name            ="zip.basedir" value="src/REXOS/ROS/"/>
+		<var name            ="zip.basedir" value="build/REXOS/ROS/"/>
 		<var name            ="zip.targetdir" value="generatedOutput/nodes/"/>
 		<foreach target      ="-generate-zip" param="theEntry" parallel="true" inheritall="true">
 			<path id         ="nodesPathId">
 			<dirset dir     ="build/REXOS/ROS/" casesensitive="yes">
+				<include name="*/**"/>
 				<exclude name="**/*/*"/>
 				<exclude name="_*"/>
 				<exclude name="libraries"/>
+			</dirset>
+			<dirset dir     ="build/REXOS/ROS/" casesensitive="yes">
+				<include name="_testing"/>
 			</dirset>
 			</path>
 		</foreach>
@@ -133,7 +139,7 @@
 
 	<target name             ="-generate-zip">
 		<basename property   ="zip.filename" file="${theEntry}"/>
-		<zip destfile        ="${zip.targetdir}/${zip.filename}.zip" basedir="${zip.basedir}" includes="**/${zip.filename}"/>
+		<zip destfile        ="${zip.targetdir}/${zip.filename}.zip" basedir="${zip.basedir}${zip.filename}" includes="**/**"/>
 	</target>
 
 
