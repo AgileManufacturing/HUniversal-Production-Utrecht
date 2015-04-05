@@ -30,30 +30,15 @@
 
 #pragma once
 
-#define ZIP_ARCHIVE_PATH "/tmp/rexos_model_spawner/"
-
-#include <rexos_knowledge_database/rexos_knowledge_database.h>
-#include <rexos_knowledge_database/GazeboModel.h>
-#include <rexos_knowledge_database/Equiplet.h>
-#include <rexos_datatypes/ModuleIdentifier.h>
 #include "rexos_logger/rexos_logger.h"
 
-#include "ros/ros.h"
+#include <boost/filesystem/operations.hpp>
 
-namespace rexos_model_spawner{
-	class ModelSpawner{
+namespace rexos_zip{
+	class ZipExtractor{
 	protected:
-		ModelSpawner(std::string equipletName, bool isShadow);
-		void spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier);
-		void spawnEquipletModel();
-		std::string getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel);
-	protected:
-		std::string equipletName;
-		bool isShadow;
-		ros::NodeHandle nodeHandle;
-		
-		rexos_knowledge_database::Equiplet equiplet;
-		
-		void extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel);
+		ZipExtractor();
+	public:
+		static void extractZipArchive(std::istream* inputFile, std::string archiveBasename, boost::filesystem::path targetDir);
 	};
 }

@@ -39,86 +39,109 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
-#include "ros/ros.h"
+#include <rexos_knowledge_database/Module.h>
+#include <rexos_zip/ZipExtractor.h>
+#include <gazebo_msgs/SpawnModel.h>
 
 namespace rexos_model_spawner {
-	ModelSpawner::ModelSpawner(std::string equipletName) :
-		equipletName(equipletName)
+	ModelSpawner::ModelSpawner(std::string equipletName, bool isShadow) :
+		equipletName(equipletName), isShadow(isShadow), equiplet(equipletName)
 	{
 	}
-	void ModelSpawner::spawnModule(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
+	void ModelSpawner::spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
+		
+		std::string modelName = moduleIdentifier.getManufacturer() + "|" + 
+				moduleIdentifier.getTypeNumber() + "|" + 
+				moduleIdentifier.getSerialNumber();
+		
+		// acquire parent module
+		rexos_knowledge_database::GazeboModel* parentGazeboModel;
+		std::string parentModelName;
+		double childPositionX = 0;
+		double childPositionY = 0;
+		double childPositionZ = 0;
+		
+		rexos_knowledge_database::Module module(moduleIdentifier);
+		rexos_knowledge_database::Module* parentModule = module.getParentModule();
+		if(parentModule == NULL) {
+			// parent is equiplet
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(equipletName);
+			parentModelName = equipletName;
+			childPositionX = parentGazeboModel->getChildLinkOffsetX() + equiplet.getMountPointDistanceX() * module.getMountPointX();
+			childPositionY = parentGazeboModel->getChildLinkOffsetY();
+			childPositionZ = parentGazeboModel->getChildLinkOffsetZ() - equiplet.getMountPointDistanceY() * module.getMountPointY();
+		} else {
+			// parent is other module
+			rexos_datatypes::ModuleIdentifier parentModuleIdentifier = parentModule->getModuleIdentifier();
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(parentModuleIdentifier);
+			
+			parentModelName = parentModuleIdentifier.getManufacturer() + "|" + 
+					parentModuleIdentifier.getTypeNumber() + "|" + 
+					parentModuleIdentifier.getSerialNumber();
+		}
+		
+		// spawn the model
 		extractGazeboModel(gazeboModel);
+		std::string gazeboSdfFileString = getSdfFileContents(gazeboModel);
+		
+		std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(gazeboModel.getId()) + "/";
+		boost::algorithm::replace_all(gazeboSdfFileString, "{baseDir}", baseDir);
+		boost::algorithm::replace_all(gazeboSdfFileString, "{parentModel}", parentModelName);
+		boost::algorithm::replace_all(gazeboSdfFileString, "{parentLink}", parentGazeboModel->getChildLink());
+		boost::algorithm::replace_all(gazeboSdfFileString, "{childLink}", gazeboModel.getParentLink());
+		
+		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
+		gazebo_msgs::SpawnModel serviceCall;
+		serviceCall.request.model_name = modelName;
+		serviceCall.request.model_xml = gazeboSdfFileString;
+		serviceCall.request.reference_frame = parentModelName + "::" + parentGazeboModel->getChildLink();
+		// convert from millimetres to metres
+		serviceCall.request.initial_pose.position.x = childPositionX / 1000;
+		serviceCall.request.initial_pose.position.y = childPositionY / 1000;
+		serviceCall.request.initial_pose.position.z = childPositionZ / 1000;
+		
+		if(isShadow == true) {
+			serviceCall.request.robot_namespace = "shadow";
+		}
+		
+		client.waitForExistence();
+		client.call(serviceCall);
+		
+		delete parentGazeboModel;
 	}
 	void ModelSpawner::spawnEquipletModel() {
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(equipletName);
+		
+		// spawn the model
 		extractGazeboModel(gazeboModel);
+		std::string gazeboSdfFileString = getSdfFileContents(gazeboModel);
+		
+		std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(gazeboModel.getId()) + "/";
+		boost::algorithm::replace_all(gazeboSdfFileString, "{baseDir}", baseDir);
+		
+		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
+		gazebo_msgs::SpawnModel serviceCall;
+		serviceCall.request.model_name = equipletName;
+		serviceCall.request.model_xml = gazeboSdfFileString;
+		
+		client.waitForExistence();
+		client.call(serviceCall);
 	}
+	
+	std::string ModelSpawner::getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel) {
+		boost::filesystem::path gazeboSdfFilePath(ZIP_ARCHIVE_PATH + 
+				boost::lexical_cast<std::string>(gazeboModel.getId()) + "/" + gazeboModel.getSdfFilename());
+		
+		std::ifstream gazeboSdfFile(gazeboSdfFilePath.string(), std::ios::in);
+		if (gazeboSdfFile == NULL) throw std::runtime_error("Unable to open SDF file");
+		
+		std::string output((std::istreambuf_iterator<char>(gazeboSdfFile)), (std::istreambuf_iterator<char>()));
+		return output;
+	}
+	
 	void ModelSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel) {
-		std::string zipArchiveFileName = boost::lexical_cast<std::string>(gazeboModel.getId()) + ".zip";
-		extractZipArchive(gazeboModel.getModelFile(), zipArchiveFileName);
-	}
-	void ModelSpawner::extractZipArchive(std::istream* inputFile, std::string zipArchiveFileName) {
-		// write the zip archive to the file system
-		if(boost::filesystem::exists(ZIP_ARCHIVE_PATH) == false) {
-			boost::filesystem::create_directories(ZIP_ARCHIVE_PATH);
-		}
-		
-		std::ofstream zipFileOutputStream;
-		zipFileOutputStream.open(ZIP_ARCHIVE_PATH + zipArchiveFileName, 
-				std::ios::out | std::ios::binary); 
-		
-		char buf[100];
-		while(inputFile->good() == true) {
-			inputFile->read(buf, sizeof(buf));
-			zipFileOutputStream.write(buf, inputFile->gcount());
-		}
-		zipFileOutputStream.close();
-		REXOS_DEBUG_STREAM("zip archive has been written at " << zipArchiveFileName);
-		
-		// extract the zip archive
-		int err = 0;
-		zip* zipArchive = zip_open((ZIP_ARCHIVE_PATH + zipArchiveFileName).c_str(), 0, &err);
-		if(err != 0) {
-			REXOS_ERROR_STREAM("zip archive opened with " << err);
-			return;
-		}
-		
-		struct zip_stat zipStat;
-		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
-			if (zip_stat_index(zipArchive, i, 0, &zipStat) == 0) {
-				// is directory or file entry?
-				if (zipStat.name[strlen(zipStat.name) - 1] == '/') {
-					boost::filesystem::create_directories(zipStat.name);
-				} else {
-					// files could be specified before the upper directories. create these directories
-					boost::filesystem::path path = boost::filesystem::path(ZIP_ARCHIVE_PATH + std::string(zipStat.name));
-					boost::filesystem::create_directories(path.parent_path());
-					
-					struct zip_file* zipFile;
-					zipFile = zip_fopen_index(zipArchive, i, 0);
-					if (!zipFile) {
-						throw std::runtime_error("Unable to open zipFile in zipArchive");
-					}
-					
-					std::ofstream fs;
-					fs.open((ZIP_ARCHIVE_PATH + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
-					if (fs.good() != true) {
-						throw std::runtime_error("Unable to open fstream with path" + (ZIP_ARCHIVE_PATH + std::string(zipStat.name)));
-					}
-					
-					int sum = 0;
-					while (sum != zipStat.size) {
-						int len = zip_fread(zipFile, buf, 100);
-						fs.write(buf, sizeof(buf));
-						sum += len;
-					}
-					
-					fs.close();
-					zip_fclose(zipFile);
-				}
-			}
-		}
-		REXOS_DEBUG("zipArchive has been extracted");
+		std::string baseName = boost::lexical_cast<std::string>(gazeboModel.getId());
+		rexos_zip::ZipExtractor::extractZipArchive(gazeboModel.getModelFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH));
 	}
 }

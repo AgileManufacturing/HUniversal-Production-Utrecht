@@ -38,6 +38,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include <rexos_zip/ZipExtractor.h>
+
 #include "ros/ros.h"
 
 namespace rexos_node_spawner {
@@ -57,6 +59,8 @@ namespace rexos_node_spawner {
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
+			std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(rosSoftware.getId()) + "/";
+			boost::algorithm::replace_all(command, "{baseDir}", baseDir);
 			if(isSimulated == true) {
 				boost::algorithm::replace_all(command, "{isSimulated}", "--isSimulated");
 			} else {
@@ -90,6 +94,8 @@ namespace rexos_node_spawner {
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
+			std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(rosSoftware.getId()) + "/";
+			boost::algorithm::replace_all(command, "{baseDir}", baseDir);
 			if(isSimulated == true) {
 				boost::algorithm::replace_all(command, "{isSimulated}", "--isSimulated");
 			} else {
@@ -113,70 +119,7 @@ namespace rexos_node_spawner {
 		}
 	}
 	void NodeSpawner::extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware) {
-		std::string zipArchiveFileName = boost::lexical_cast<std::string>(rosSoftware.getId()) + ".zip";
-		extractZipArchive(rosSoftware.getRosFile(), zipArchiveFileName);
-	}
-	void NodeSpawner::extractZipArchive(std::istream* inputFile, std::string zipArchiveFileName) {
-		// write the zip archive to the file system
-		if(boost::filesystem::exists(ZIP_ARCHIVE_PATH) == false) {
-			boost::filesystem::create_directories(ZIP_ARCHIVE_PATH);
-		}
-		
-		std::ofstream zipFileOutputStream;
-		zipFileOutputStream.open(ZIP_ARCHIVE_PATH + zipArchiveFileName, 
-				std::ios::out | std::ios::binary); 
-		
-		char buf[100];
-		while(inputFile->good() == true) {
-			inputFile->read(buf, sizeof(buf));
-			zipFileOutputStream.write(buf, inputFile->gcount());
-		}
-		zipFileOutputStream.close();
-		REXOS_DEBUG_STREAM("zip archive has been written at " << zipArchiveFileName);
-		
-		// extract the zip archive
-		int err = 0;
-		zip* zipArchive = zip_open((ZIP_ARCHIVE_PATH + zipArchiveFileName).c_str(), 0, &err);
-		if(err != 0) {
-			REXOS_ERROR_STREAM("zip archive opened with " << err);
-			return;
-		}
-		
-		struct zip_stat zipStat;
-		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
-			if (zip_stat_index(zipArchive, i, 0, &zipStat) == 0) {
-				// is directory or file entry?
-				if (zipStat.name[strlen(zipStat.name) - 1] == '/') {
-					boost::filesystem::create_directories(zipStat.name);
-				} else {
-					// files could be specified before the upper directories. create these directories
-					boost::filesystem::path path = boost::filesystem::path(ZIP_ARCHIVE_PATH + std::string(zipStat.name));
-					boost::filesystem::create_directories(path.parent_path());
-					
-					struct zip_file* zipFile;
-					zipFile = zip_fopen_index(zipArchive, i, 0);
-					if (!zipFile) {
-						throw std::runtime_error("Unable to open zipFile in zipArchive");
-					}
-					
-					std::ofstream fs;
-					fs.open((ZIP_ARCHIVE_PATH + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
-					if (fs.good() != true) {
-						throw std::runtime_error("Unable to open fstream with path" + (ZIP_ARCHIVE_PATH + std::string(zipStat.name)));
-					}
-					
-					int sum = 0;
-					while (sum != zipStat.size) {
-						int len = zip_fread(zipFile, buf, 100);
-						fs.write(buf, sizeof(buf));
-						sum += len;
-					}
-					
-					fs.close();
-					zip_fclose(zipFile);
-				}
-			}
-		}
-		REXOS_DEBUG("zipArchive has been extracted");
+		std::string baseName = boost::lexical_cast<std::string>(rosSoftware.getId());
+		rexos_zip::ZipExtractor::extractZipArchive(rosSoftware.getRosFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH));
 	}
 }

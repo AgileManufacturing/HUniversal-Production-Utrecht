@@ -4,33 +4,17 @@ project(rexos_model_spawner)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_knowledge_database rexos_logger rexos_datatypes)
+find_package(catkin REQUIRED COMPONENTS rexos_knowledge_database rexos_logger rexos_datatypes rexos_zip gazebo_msgs)
 find_package(Boost REQUIRED)
-find_package(LIBZIP REQUIRED)
-find_package(ZLIB REQUIRED)
-
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
-INCLUDE (FindPkgConfig)
-if (PKG_CONFIG_FOUND)
-        PKG_CHECK_MODULES(UNZIP minizip)
-endif (PKG_CONFIG_FOUND)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES rexos_model_spawner
-CATKIN_DEPENDS rexos_knowledge_database rexos_logger rexos_datatypes
-DEPENDS Boost LIBZIP)
-
-MESSAGE("${LIBZIP_LIBRARIES}")
-MESSAGE("${ZLIB_LIBRARIES}")
-MESSAGE("${UNZIP_LIBRARIES}")
-
-MESSAGE("${LIBZIP_INCLUDE_DIRS}")
-MESSAGE("${ZLIB_INCLUDE_DIRS}")
-MESSAGE("${UNZIP_INCLUDE_DIRS}")
+CATKIN_DEPENDS rexos_knowledge_database rexos_logger rexos_datatypes gazebo_msgs
+DEPENDS Boost)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(rexos_model_spawner ${sources})
-target_link_libraries(rexos_model_spawner ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${LIBZIP_LIBRARIES} /usr/lib/libzip.so)
+target_link_libraries(rexos_model_spawner ${Boost_LIBRARIES} ${catkin_LIBRARIES})
