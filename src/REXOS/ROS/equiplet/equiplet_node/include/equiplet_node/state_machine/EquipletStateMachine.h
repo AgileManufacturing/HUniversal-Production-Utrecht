@@ -54,7 +54,7 @@ class EquipletStateMachine :
 	ModuleRegistryListener {
 
 public:
-	EquipletStateMachine(std::string name);
+	EquipletStateMachine(std::string name, bool isSimulated);
 
 	virtual ~EquipletStateMachine();
 
@@ -70,6 +70,8 @@ protected:
 			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
 			std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase);
 	void spawnNode(rexos_module::ModuleProxy* moduleProxy);
+	void spawnModel(rexos_module::ModuleProxy* moduleProxy);
+	void removeModel(rexos_module::ModuleProxy* moduleProxy);
 private:
 	bool allModulesInDesiredState(rexos_statemachine::State desiredState);
 
@@ -84,7 +86,9 @@ private:
 
 protected:
 	equiplet_node::ModuleRegistry moduleRegistry;
-	ros::ServiceClient spanNodeClient;
+	ros::ServiceClient spawnNodeClient;
+	ros::ServiceClient spawnModelClient;
+	ros::ServiceClient removeModelClient;
 
 private:
 	rexos_statemachine::State desiredState;

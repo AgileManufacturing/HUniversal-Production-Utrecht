@@ -58,7 +58,3 @@ bool NodeSpawnerNode::spawnNode(spawnNode::Request &request, spawnNode::Response
 	NodeSpawner::spawnNode(identifier);
 	return true;
 }
-std::vector<rexos_datatypes::ModuleIdentifier> NodeSpawnerNode::getModuleIdentifiersOfAttachedModules() {
-	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
-	return equiplet.getModuleIdentifiersOfAttachedModules();
-}

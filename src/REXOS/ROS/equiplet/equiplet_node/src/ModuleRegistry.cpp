@@ -15,6 +15,7 @@ namespace equiplet_node {
 ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
 		newRegistrationsAllowed(false),
 		equipletName(equipletName),
+		isSimulated(isSimulated),
 		moduleRegistryListener(mrl)
 {
 	registerModuleServiceServer = rosNodeHandle.advertiseService(
@@ -28,7 +29,40 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 		rexos_module::ModuleProxy* proxy = new rexos_module::ModuleProxy(equipletName, *it, this);
 		registeredModules.push_back(proxy);
 	}
+}
+void ModuleRegistry::spawnModels() {
+	// we must spawn the modules in a specifiec order (from top to bottom)
+	std::vector<rexos_module::ModuleProxy*> processedModules;
 	
+	// first spawn all the top modules
+	for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
+		REXOS_INFO_STREAM("a");
+		auto databaseEntry = rexos_knowledge_database::Module((*it)->getModuleIdentifier());
+		REXOS_INFO_STREAM("b" << (*it)->getModuleIdentifier());
+		if(databaseEntry.getParentModule() == NULL) {
+		REXOS_INFO_STREAM("c");
+			moduleRegistryListener->spawnModel(*it);
+		REXOS_INFO_STREAM("d");
+			processedModules.push_back(*it);
+		}
+	}
+	
+	// continue spawning modules if the parent has already been spawened
+	while(processedModules.size() < registeredModules.size()) {
+		int numberOfProcessedModulesBeforeRound = processedModules.size();
+		for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
+			auto databaseEntry = rexos_knowledge_database::Module((*it)->getModuleIdentifier());
+			// vector contains it?
+			if(std::find(processedModules.begin(), processedModules.end(), *it) != processedModules.end()) {
+				moduleRegistryListener->spawnModel(*it);
+				processedModules.push_back(*it);
+			}
+		}
+		
+		if(numberOfProcessedModulesBeforeRound == processedModules.size()) {
+			throw std::runtime_error("Unable to spawn models for all the modules, is a module orphan?");
+		}
+	}
 }
 
 void ModuleRegistry::reloadModules(){
@@ -74,14 +108,10 @@ void ModuleRegistry::reloadModules(){
 
 ModuleRegistry::~ModuleRegistry() {
 	for(auto it = registeredModules.begin(); it != registeredModules.end(); it++) {
+		moduleRegistryListener->removeModel(*it);
 		delete *it;
 	}
 }
-
-void ModuleRegistry::setModuleRegistryListener(ModuleRegistryListener* mrl){
-	moduleRegistryListener = mrl;
-}
-
 
 void ModuleRegistry::setNewRegistrationsAllowed(bool allowed){
 	newRegistrationsAllowed = allowed;

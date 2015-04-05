@@ -46,7 +46,6 @@ public:
 	
 private:
 	bool spawnNode(spawnNode::Request &request, spawnNode::Response &response);
-	std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
 	
 	std::string equipletName;
 	

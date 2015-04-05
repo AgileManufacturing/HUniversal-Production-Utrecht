@@ -2,11 +2,13 @@
 
 #include <equiplet_node/CyclicDependencyException.h>
 #include <node_spawner_node/spawnNode.h>
+#include <model_spawner_node/spawnModel.h>
+#include <model_spawner_node/removeModel.h>
 #include <rexos_knowledge_database/ModuleType.h>
 
 using namespace equiplet_node;
 
-EquipletStateMachine::EquipletStateMachine(std::string equipletName):
+EquipletStateMachine::EquipletStateMachine(std::string equipletName, bool isSimulated):
 	StateMachine(equipletName,
 		{
 			rexos_statemachine::MODE_NORMAL, 
@@ -18,11 +20,16 @@ EquipletStateMachine::EquipletStateMachine(std::string equipletName):
 			rexos_statemachine::MODE_STEP
 		}
 	),
-	moduleRegistry(equipletName),
+	moduleRegistry(equipletName, this),
 	desiredState(rexos_statemachine::STATE_NOSTATE),
-	spanNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>(equipletName + "/spawnNode"))
+	spawnNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>(equipletName + "/spawnNode")),
+	spawnModelClient(nodeHandle.serviceClient<model_spawner_node::spawnModel>(equipletName + "/spawnModel")),
+	removeModelClient(nodeHandle.serviceClient<model_spawner_node::removeModel>(equipletName + "/removeModel"))
 {
-	moduleRegistry.setModuleRegistryListener(this);
+	if(isSimulated == true) {
+		REXOS_INFO("Spawning models for modules");
+		moduleRegistry.spawnModels();
+	}
 	moduleRegistry.setNewRegistrationsAllowed(true);
 }
 
@@ -137,8 +144,26 @@ void EquipletStateMachine::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
 	spawnNodeCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
 	spawnNodeCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
 	spawnNodeCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
-	spanNodeClient.waitForExistence();
-	spanNodeClient.call(spawnNodeCall);
+	spawnNodeClient.waitForExistence();
+	spawnNodeClient.call(spawnNodeCall);
+}
+void EquipletStateMachine::spawnModel(rexos_module::ModuleProxy* moduleProxy) {
+	ROS_INFO_STREAM("Spawning model for " << moduleProxy->getModuleIdentifier());
+	model_spawner_node::spawnModel spawnModelCall;
+	spawnModelCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
+	spawnModelCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
+	spawnModelCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	spawnModelClient.waitForExistence();
+	spawnModelClient.call(spawnModelCall);
+}
+void EquipletStateMachine::removeModel(rexos_module::ModuleProxy* moduleProxy) {
+	ROS_INFO_STREAM("Removing model for " << moduleProxy->getModuleIdentifier());
+	model_spawner_node::removeModel removeModelCall;
+	removeModelCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
+	removeModelCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
+	removeModelCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	removeModelClient.waitForExistence();
+	removeModelClient.call(removeModelCall);
 }
 
 

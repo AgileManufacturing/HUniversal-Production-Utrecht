@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(equiplet_node)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs actionlib_msgs actionlib node_spawner_node message_generation rexos_configuration rexos_statemachine rexos_datatypes rexos_blackboard_cpp_client rexos_logger rexos_module)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs actionlib_msgs actionlib node_spawner_node model_spawner_node message_generation rexos_configuration rexos_statemachine rexos_datatypes rexos_blackboard_cpp_client rexos_logger rexos_module)
 find_package(Mongo)
 find_package(Jsoncpp)
 
@@ -24,7 +24,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES  
-CATKIN_DEPENDS roscpp std_msgs node_spawner_node rexos_configuration rexos_statemachine rexos_datatypes rexos_blackboard_cpp_client rexos_logger rexos_module
+CATKIN_DEPENDS roscpp std_msgs node_spawner_node model_spawner_node rexos_configuration rexos_statemachine rexos_datatypes rexos_blackboard_cpp_client rexos_logger rexos_module
 DEPENDS Jsoncpp)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

@@ -52,7 +52,7 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		equipletName(equipletName),
 		isSimulated(isSimulated),
 		isShadow(isShadow),
-		EquipletStateMachine(equipletName),
+		EquipletStateMachine(equipletName, isSimulated),
 		hardwareStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
 		scada(this, &moduleRegistry) 
