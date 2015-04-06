@@ -25,7 +25,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static JSONObject criteria2 = new JSONObject();
 	boolean state = false;
 
-	static final String baseDir = "jars/";
+	static final String baseDir = "generatedOutput/";
 
 	// delta robot
 	static String moduleA_01 = "{" +
@@ -81,8 +81,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"zipFile\": \"";
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"effector\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":0.0" +
@@ -190,8 +190,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"zipFile\": \"";
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":0.0" +
@@ -239,11 +239,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"zipFile\": \"";
 	static String moduleC_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
+			"			\"childLinkOffsetX\":-25.01," +
+			"			\"childLinkOffsetY\":202.24," +
+			"			\"childLinkOffsetZ\":57.19" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -254,7 +254,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":null," +
-			"	\"mountPointX\":3," +
+			"	\"mountPointX\":5," +
 			"	\"mountPointY\":16" +
 			"}";
 	// lens
@@ -278,11 +278,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"zipFile\": \"";
 	static String moduleD_03 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":22.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -335,11 +335,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"zipFile\": \"";
 	static String moduleE_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
+			"			\"childLinkOffsetX\":175.0," +
+			"			\"childLinkOffsetY\":-200.0," +
+			"			\"childLinkOffsetZ\":33.33" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -367,91 +367,91 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		FileInputStream fis;
 		byte[] content;
 
-		File deltaRobotHal = new File(baseDir + "DeltaRobot.jar");
+		File deltaRobotHal = new File(baseDir + "HAL/modules/" + "DeltaRobot.jar");
 		fis = new FileInputStream(deltaRobotHal);
 		content = new byte[(int) deltaRobotHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
 		
-		File workplaneHal = new File(baseDir + "Workplane.jar");
+		File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
 		fis = new FileInputStream(workplaneHal);
 		content = new byte[(int) workplaneHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneHal = new String(Base64.encodeBase64(content));
 		
-		File penHal = new File(baseDir + "Pen.jar");
+		File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
 		fis = new FileInputStream(penHal);
 		content = new byte[(int) penHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64PenHal = new String(Base64.encodeBase64(content));
 		
-		File gripperHal = new File(baseDir + "Gripper.jar");
+		File gripperHal = new File(baseDir + "HAL/modules/" + "Gripper.jar");
 		fis = new FileInputStream(gripperHal);
 		content = new byte[(int) gripperHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperHal = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotRos = new File(baseDir + "nodes.zip");
+		File deltaRobotRos = new File(baseDir + "nodes/" + "delta_robot.zip");
 		fis = new FileInputStream(deltaRobotRos);
 		content = new byte[(int) deltaRobotRos.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
 		
-		File gripperRos = new File(baseDir + "nodes.zip");
+		File gripperRos = new File(baseDir + "nodes/" + "gripper.zip");
 		fis = new FileInputStream(gripperRos);
 		content = new byte[(int) gripperRos.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperRos = new String(Base64.encodeBase64(content));
 		
-		File cameraRos = new File(baseDir + "nodes.zip");
+		File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
 		fis = new FileInputStream(cameraRos);
 		content = new byte[(int) cameraRos.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraRos = new String(Base64.encodeBase64(content));
 		
-		File workplaneRos = new File(baseDir + "nodes.zip");
+		File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
 		fis = new FileInputStream(workplaneRos);
 		content = new byte[(int) workplaneRos.length()];
 		fis.read(content);
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotGazebo = new File(baseDir + "model.zip");
+		File deltaRobotGazebo = new File(baseDir + "models/" + "sixAxis.zip");
 		fis = new FileInputStream(deltaRobotGazebo);
 		content = new byte[(int) deltaRobotGazebo.length()];
 		fis.read(content);
 		fis.close();
 		String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
 		
-		File gripperGazebo = new File(baseDir + "model.zip");
+		File gripperGazebo = new File(baseDir + "models/" + "lens.zip");
 		fis = new FileInputStream(gripperGazebo);
 		content = new byte[(int) gripperGazebo.length()];
 		fis.read(content);
 		fis.close();
 		String base64GripperGazebo = new String(Base64.encodeBase64(content));
 		
-		File cameraGazebo = new File(baseDir + "model.zip");
+		File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
 		fis = new FileInputStream(cameraGazebo);
 		content = new byte[(int) cameraGazebo.length()];
 		fis.read(content);
 		fis.close();
 		String base64CameraGazebo = new String(Base64.encodeBase64(content));
 		
-		File lenstGazebo = new File(baseDir + "model.zip");
+		File lenstGazebo = new File(baseDir + "models/" + "lens.zip");
 		fis = new FileInputStream(lenstGazebo);
 		content = new byte[(int) lenstGazebo.length()];
 		fis.read(content);
 		fis.close();
 		String base64LensGazebo = new String(Base64.encodeBase64(content));
 		
-		File workplaneGazebo = new File(baseDir + "model.zip");
+		File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
 		fis = new FileInputStream(workplaneGazebo);
 		content = new byte[(int) workplaneGazebo.length()];
 		fis.read(content);
@@ -459,14 +459,14 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
 		
 		
-		File drawHal = new File(baseDir + "Draw.jar");
+		File drawHal = new File(baseDir + "HAL/capabilities/" + "Draw.jar");
 		fis = new FileInputStream(drawHal);
 		content = new byte[(int) drawHal.length()];
 		fis.read(content);
 		fis.close();
 		String base64Draw = new String(Base64.encodeBase64(content));
 		
-		File pickAndPlaceHal = new File(baseDir + "PickAndPlace.jar");
+		File pickAndPlaceHal = new File(baseDir + "HAL/capabilities/" + "PickAndPlace.jar");
 		fis = new FileInputStream(pickAndPlaceHal);
 		content = new byte[(int) pickAndPlaceHal.length()];
 		fis.read(content);
