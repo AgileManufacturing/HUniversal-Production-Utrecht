@@ -1,0 +1,37 @@
+<sdf version='1.4'>
+	<model name="Workplane">
+		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
+			<parentModel>{parentModel}</parentModel>
+			<parentLink>{parentLink}</parentLink>
+			<childLink>{childLink}</childLink>
+		</plugin>
+		<static>false</static>
+		<link name="base">
+			<pose>0 0 0 0 0 0</pose>
+			<gravity>false</gravity>
+		
+			<inertial>
+				<mass>.100</mass>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>file://{baseDir}lens complex.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+		<joint type="prismatic" name="baseToParent">
+			<pose>0 0 0 0 0 0</pose>
+			<child>base</child>
+			<parent>world</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<limit>
+					<upper>0.0</upper>
+					<lower>0.0</lower>
+				</limit>
+			</axis>
+		</joint>
+	</model>
+</sdf>
