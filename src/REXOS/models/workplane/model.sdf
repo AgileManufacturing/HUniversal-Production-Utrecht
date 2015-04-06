@@ -11,7 +11,7 @@
 			<gravity>false</gravity>
 		
 			<inertial>
-				<mass>10000</mass>
+				<mass>10.000</mass>
 			</inertial>
 			<visual name="visual">
 				<geometry>

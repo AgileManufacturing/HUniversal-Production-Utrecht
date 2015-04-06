@@ -36,13 +36,9 @@ void ModuleRegistry::spawnModels() {
 	
 	// first spawn all the top modules
 	for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
-		REXOS_INFO_STREAM("a");
 		auto databaseEntry = rexos_knowledge_database::Module((*it)->getModuleIdentifier());
-		REXOS_INFO_STREAM("b" << (*it)->getModuleIdentifier());
 		if(databaseEntry.getParentModule() == NULL) {
-		REXOS_INFO_STREAM("c");
 			moduleRegistryListener->spawnModel(*it);
-		REXOS_INFO_STREAM("d");
 			processedModules.push_back(*it);
 		}
 	}
@@ -50,12 +46,21 @@ void ModuleRegistry::spawnModels() {
 	// continue spawning modules if the parent has already been spawened
 	while(processedModules.size() < registeredModules.size()) {
 		int numberOfProcessedModulesBeforeRound = processedModules.size();
+		
 		for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
-			auto databaseEntry = rexos_knowledge_database::Module((*it)->getModuleIdentifier());
-			// vector contains it?
-			if(std::find(processedModules.begin(), processedModules.end(), *it) != processedModules.end()) {
-				moduleRegistryListener->spawnModel(*it);
-				processedModules.push_back(*it);
+			rexos_knowledge_database::Module databaseEntry((*it)->getModuleIdentifier());
+			// has this module already a model?
+			if(std::find(processedModules.begin(), processedModules.end(), *it) == processedModules.end()) {
+				// no, determine the parent of this module
+				rexos_knowledge_database::Module* parentModuleDatabaseEntry = databaseEntry.getParentModule();
+				rexos_module::ModuleProxy* parentModule = getModule(parentModuleDatabaseEntry->getModuleIdentifier());
+				
+				// has the parent of this module already a model?
+				if(std::find(processedModules.begin(), processedModules.end(), parentModule) != processedModules.end()) {
+					// yes, and thus we can spawn it
+					moduleRegistryListener->spawnModel(*it);
+					processedModules.push_back(*it);
+				}
 			}
 		}
 		
