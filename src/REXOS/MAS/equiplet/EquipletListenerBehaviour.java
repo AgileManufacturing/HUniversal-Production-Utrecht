@@ -3,11 +3,14 @@ package MAS.equiplet;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -92,24 +95,67 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	private void handleChangeMachineState(ACLMessage msg) {
 		if(msg != null){
-			String content = msg.getContent();
+			Serializable content = null;
+			try{
+				content = msg.getContentObject();
+			}catch(UnreadableException uexc){
+				Logger.log("An error occured while attempting to getContentObject from the ACLMessage. Message will not be handled.");
+			}
 			if(content != null){
-				ArrayList<ModuleIdentifier> modules = delimitACLMessage(content);
+				JSONObject modulesInJSON = new JSONObject(content);
+				String desiredState = "";
+				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON, desiredState);
+				// TODO Determine what the desiredState is, and act accordingly.
+				// if(desiredState == "OFFLINE"){}else if(desiredState == "SAFE"){}
 				if(modules != null){
 					equiplet.reconfigureEquiplet(modules);
 				}else{
-					Logger.log("An error occured while delimiting the ACLMessage, unexpected formatting or missing strings.");
+					Logger.log("An error occured while deserializing the ACLMessage, missing info.");
 				}
 			}
 		}		
 	}
-
+	
 	/**
-	 * Dedicated function to translate the reconfigure ACLMessage received from scada.
+	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada.
 	 * 
 	 * @param content
-	 * @return
+	 * @return Function returns null if anything went wrong while deserializing. If not, it returns an ArrayList of ModuleIdentifiers.
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 * @author Mitchell van Rijkom
 	 */
+
+	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content, String desiredState){
+		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
+		JSONArray modules = null;
+		boolean isDeserializationSuccessfull = true;
+		try{
+			modules = content.getJSONArray("modules");
+			desiredState = content.getString("desired-state");
+			
+			for(int i = 0; i < modules.length(); i++){
+				JSONArray moduleIdentifiers = null;
+				moduleIdentifiers = modules.getJSONArray(i);
+				resultArray.add(new ModuleIdentifier(moduleIdentifiers.getString(0), moduleIdentifiers.getString(1), moduleIdentifiers.getString(2)));
+			}
+		}catch(JSONException ex){
+			Logger.log("An error occured while attempting to get information from the JSON.");
+			isDeserializationSuccessfull = false;
+		}
+		// If something went wrong while deserializing, return null.
+		return isDeserializationSuccessfull ? resultArray : null;
+	}
+	
+	/**
+	 * Dedicated function to translate the reconfigure ACLMessage in String format received from scada.
+	 * 
+	 * @param content
+	 * @return Function returns null if anything went wrong while delimiting. Otherwise it returns an ArrayList of ModuleIdentifiers.
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	
 	private ArrayList<ModuleIdentifier> delimitACLMessage(String content) {
 		String[] modules = content.split(";");
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
@@ -122,6 +168,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 				isSuccessfullyDelimited = false;
 			}
 		}
+		// Returns null if an error occured or if information was incomplete. 
 		return isSuccessfullyDelimited ? resultArray : null;
 	}
 
