@@ -105,10 +105,12 @@ public class EquipletListenerBehaviour extends Behaviour {
 				JSONObject modulesInJSON = new JSONObject(content);
 				String requestedEquipletCommand = "";
 				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON, requestedEquipletCommand);
+				
+				// Program if statements that will appropriately handle messages sent to the equiplet agent.
 				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
 					equiplet.reconfigureEquiplet(modules);
 				}else{
-					Logger.log("An error occured while deserializing the ACLMessage, missing info.");
+					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
 			}
 		}		
