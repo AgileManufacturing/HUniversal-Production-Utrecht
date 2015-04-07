@@ -8,7 +8,7 @@
 		},
 		"hardwareSteps": {
 			"ip": {
-				"default": "10.0.1.66"
+				"default": "127.0.0.1"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -24,7 +24,7 @@
 		},
 		"equipletCommands": {
 			"ip": {
-				"default": "10.0.1.66"
+				"default": "127.0.0.1"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -40,7 +40,7 @@
 		},
 		"equipletState": {
 			"ip": {
-				"default": "10.0.1.66"
+				"default": "127.0.0.1"
 			},
 			"databaseName": {
 				"default": "EQ",

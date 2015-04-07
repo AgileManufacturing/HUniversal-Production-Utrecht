@@ -42,6 +42,10 @@ import generic.Criteria;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
@@ -77,6 +81,7 @@ public class GridAgent extends Agent {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
 		addBehaviour(new GridListenerBehaviour());
+		testGetAgents();
 	}
 
 	class GridListenerBehaviour extends CyclicBehaviour {
@@ -229,5 +234,21 @@ public class GridAgent extends Agent {
 	protected void takeDown() {
 		System.out.println(getLocalName() + ": terminated");
 
+	}
+	
+	public void testGetAgents(){
+		DFAgentDescription description = new DFAgentDescription();
+		SearchConstraints sc = new SearchConstraints();
+		//sc.setMaxResults((long) -1);
+		//description.setType();
+		try {
+			DFAgentDescription listOfAgents[] = DFService.search(this, description, sc);
+			for(int i = 0; i < listOfAgents.length; i++){
+				System.out.println(listOfAgents[i]);
+			}
+		} catch (FIPAException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
