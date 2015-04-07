@@ -250,9 +250,8 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @author Kevin Bosman
 	 */
 	public void reconfigureEquiplet(){
-		String command = "STATE_OFFLINE";
 		try{
-			sendEquipletStateCommand(command);
+			sendEquipletStateCommand("STATE_OFFLINE");
 		}catch(JSONException ex){
 			// These exceptions should never occur, since we hardcode the requested state.
 			Logger.log("The given command could not be correctly serialized.");

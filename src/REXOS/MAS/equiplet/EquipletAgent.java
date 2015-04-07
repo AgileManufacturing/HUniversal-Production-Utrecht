@@ -238,9 +238,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			Logger.log("Not all new modules could be added succesfully.");
 		}
 		
-		// TODO capabilities.clear doesnt actually clear the available services from HAL, just its local variable. The KnowledgeDB should be notified as well.
 		capabilities.clear();
-		
 		ArrayList<String> services = hal.getSupportedServices();
 		for (String service : services) {
 			capabilities.add(new Capability(service, new HashMap<String, Object>(), new Tick(10)));

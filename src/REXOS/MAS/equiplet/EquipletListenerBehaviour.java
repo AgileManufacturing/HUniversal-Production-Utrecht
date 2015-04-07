@@ -84,7 +84,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			// messagetype holding the requested state for the equiplet
 			case ACLMessage.PROPOSE:
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
-					handleChangeMachineState(msg);
+					handleEquipletCommand(msg);
 				}
 				break;
 			default:
@@ -93,21 +93,19 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}
 	}
 
-	private void handleChangeMachineState(ACLMessage msg) {
+	private void handleEquipletCommand(ACLMessage msg) {
 		if(msg != null){
 			Serializable content = null;
 			try{
 				content = msg.getContentObject();
-			}catch(UnreadableException uexc){
+			}catch(UnreadableException uex){
 				Logger.log("An error occured while attempting to getContentObject from the ACLMessage. Message will not be handled.");
 			}
 			if(content != null){
 				JSONObject modulesInJSON = new JSONObject(content);
-				String desiredState = "";
-				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON, desiredState);
-				// TODO Determine what the desiredState is, and act accordingly.
-				// if(desiredState == "OFFLINE"){}else if(desiredState == "SAFE"){}
-				if(modules != null){
+				String requestedEquipletCommand = "";
+				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON, requestedEquipletCommand);
+				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
 					equiplet.reconfigureEquiplet(modules);
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info.");
@@ -126,13 +124,13 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @author Mitchell van Rijkom
 	 */
 
-	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content, String desiredState){
+	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content, String requestedEquipletCommand){
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
 		JSONArray modules = null;
 		boolean isDeserializationSuccessfull = true;
 		try{
 			modules = content.getJSONArray("modules");
-			desiredState = content.getString("desired-state");
+			requestedEquipletCommand = content.getString("requested-equiplet-command");
 			
 			for(int i = 0; i < modules.length(); i++){
 				JSONArray moduleIdentifiers = null;
