@@ -16,7 +16,7 @@
 			<visual name="visual">
 				<geometry>
 					<mesh>
-						<uri>file://{baseDir}workplane complex.dae</uri>
+						<uri>file://{baseDir}workplane complex with corners.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
