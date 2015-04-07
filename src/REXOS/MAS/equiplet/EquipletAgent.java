@@ -75,9 +75,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	@Override
 	public void setup() {
-		//Object[] args = getArguments();
-		Object[] args = new Object[1];
-		args[0] = "hal";
+		Object[] args = getArguments();
 		
 		if (args != null && args.length > 0) {
 			if (args[0].equals("hal")) {
@@ -203,9 +201,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		deregister();
 		
 		// TODO A form a delay should be implemented here, at least until the schedule is empty.
-		if(this.isExecuting() || !schedule.isEmpty()){
-				this.doWait();
-		}
 		
 		for(ModuleIdentifier removedModule : arrayList){
 			try{
@@ -230,7 +225,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @author Kevin Bosman
 	 */
 	public boolean reinitializeEquiplet(List<DTOModuleSettings> toBeAddedModuleSettings){
-		// TODO Implement logic to further reinitialize the HAL and related init stuff.
 		boolean isInsertingModulesSuccessful = true;
 		List<Boolean> results = new ArrayList<Boolean>();
 		

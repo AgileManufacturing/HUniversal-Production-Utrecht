@@ -5,10 +5,13 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import util.log.Logger;
 
 import HAL.dataTypes.ModuleIdentifier;
 import MAS.util.Ontology;
@@ -92,7 +95,11 @@ public class EquipletListenerBehaviour extends Behaviour {
 			String content = msg.getContent();
 			if(content != null){
 				ArrayList<ModuleIdentifier> modules = delimitACLMessage(content);
-				equiplet.reconfigureEquiplet(modules);
+				if(modules != null){
+					equiplet.reconfigureEquiplet(modules);
+				}else{
+					Logger.log("An error occured while delimiting the ACLMessage, unexpected formatting or missing strings.");
+				}
 			}
 		}		
 	}
@@ -104,7 +111,18 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @return
 	 */
 	private ArrayList<ModuleIdentifier> delimitACLMessage(String content) {
-		return new ArrayList<ModuleIdentifier>();
+		String[] modules = content.split(";");
+		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
+		boolean isSuccessfullyDelimited = true;
+		for (String module : modules){
+			String[] identifiers = module.split(",");
+			if((identifiers[0] != null) && (identifiers[1] != null) && (identifiers[2] != null)){
+				resultArray.add(new ModuleIdentifier(identifiers[0], identifiers[1], identifiers[2]));
+			}else{
+				isSuccessfullyDelimited = false;
+			}
+		}
+		return isSuccessfullyDelimited ? resultArray : null;
 	}
 
 	@Override
