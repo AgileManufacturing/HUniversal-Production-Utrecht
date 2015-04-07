@@ -1,5 +1,5 @@
 <sdf version='1.4'>
-	<model name="Lens">
+	<model name="Gripper">
 		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
 			<parentModel>{parentModel}</parentModel>
 			<parentLink>{parentLink}</parentLink>
@@ -16,7 +16,7 @@
 			<visual name="visual">
 				<geometry>
 					<mesh>
-						<uri>file://{baseDir}lens complex.dae</uri>
+						<uri>file://{baseDir}gripper complex.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>

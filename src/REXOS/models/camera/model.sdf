@@ -1,5 +1,5 @@
 <sdf version='1.4'>
-	<model name="Workplane">
+	<model name="Camera">
 		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
 			<parentModel>{parentModel}</parentModel>
 			<parentLink>{parentLink}</parentLink>

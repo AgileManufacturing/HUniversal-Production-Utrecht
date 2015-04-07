@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.5">
-	<model name="sixAxis">
+	<model name="SixAxis">
 		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
 			<parentModel>{parentModel}</parentModel>
 			<parentLink>{parentLink}</parentLink>
