@@ -7,7 +7,6 @@ import jade.lang.acl.UnreadableException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -135,9 +134,13 @@ public class EquipletListenerBehaviour extends Behaviour {
 			requestedEquipletCommand = content.getString("requested-equiplet-command");
 			
 			for(int i = 0; i < modules.length(); i++){
-				JSONArray moduleIdentifiers = null;
-				moduleIdentifiers = modules.getJSONArray(i);
-				resultArray.add(new ModuleIdentifier(moduleIdentifiers.getString(0), moduleIdentifiers.getString(1), moduleIdentifiers.getString(2)));
+				JSONObject moduleIdentifiers = null;
+				moduleIdentifiers = modules.getJSONObject(i);
+				resultArray.add(new ModuleIdentifier(
+					moduleIdentifiers.getString("manufacturer"), 
+					moduleIdentifiers.getString("typeNumber"), 
+					moduleIdentifiers.getString("serialNumber")
+				));
 			}
 		}catch(JSONException ex){
 			Logger.log("An error occured while attempting to get information from the JSON.");
