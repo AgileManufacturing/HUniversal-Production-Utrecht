@@ -191,7 +191,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * This method is called whenever someone needs acces to an equiplet for reconfiguring. 
 	 * The equiplet will be safely shut down and send a signal as soon as it has done so (to be implemented in onEquipletStateChanged() )
 	 * @param A list of the modules to be removed during this reconfiguring.
-	 * @param A list of the modules to be added during this reconfiguring.
 	 * @author Thomas Kok
 	 * @author Kevin Bosman
 	 */
@@ -239,7 +238,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			Logger.log("Not all new modules could be added succesfully.");
 		}
 		
+		// TODO capabilities.clear doesnt actually clear the available services from HAL, just its local variable. The KnowledgeDB should be notified as well.
 		capabilities.clear();
+		
 		ArrayList<String> services = hal.getSupportedServices();
 		for (String service : services) {
 			capabilities.add(new Capability(service, new HashMap<String, Object>(), new Tick(10)));

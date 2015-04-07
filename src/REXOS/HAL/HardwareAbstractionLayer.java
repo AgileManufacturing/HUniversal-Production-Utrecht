@@ -250,8 +250,6 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @author Kevin Bosman
 	 */
 	public void reconfigureEquiplet(){
-		// TODO Implement extra logic here ensuring the safe shutdown of an equiplet.
-		// This may have to be done in the EA and not here though.
 		String command = "STATE_OFFLINE";
 		try{
 			sendEquipletStateCommand(command);
