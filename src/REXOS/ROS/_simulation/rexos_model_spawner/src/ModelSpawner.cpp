@@ -87,6 +87,15 @@ namespace rexos_model_spawner {
 		
 		std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(gazeboModel.getId()) + "/";
 		boost::algorithm::replace_all(gazeboSdfFileString, "{baseDir}", baseDir);
+		if(isShadow == true) {
+			boost::algorithm::replace_all(gazeboSdfFileString, "{isShadow}", "shadow/");
+		} else {
+			boost::algorithm::replace_all(gazeboSdfFileString, "{isShadow}", "");
+		}
+		boost::algorithm::replace_all(gazeboSdfFileString, "{equipletName}", equipletName);
+		boost::algorithm::replace_all(gazeboSdfFileString, "{manufacturer}", moduleIdentifier.getManufacturer());
+		boost::algorithm::replace_all(gazeboSdfFileString, "{typeNumber}", moduleIdentifier.getTypeNumber());
+		boost::algorithm::replace_all(gazeboSdfFileString, "{serialNumber}", moduleIdentifier.getSerialNumber());
 		boost::algorithm::replace_all(gazeboSdfFileString, "{parentModel}", parentModelName);
 		boost::algorithm::replace_all(gazeboSdfFileString, "{parentLink}", parentGazeboModel->getChildLink());
 		boost::algorithm::replace_all(gazeboSdfFileString, "{childLink}", gazeboModel.getParentLink());
@@ -119,6 +128,12 @@ namespace rexos_model_spawner {
 		
 		std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(gazeboModel.getId()) + "/";
 		boost::algorithm::replace_all(gazeboSdfFileString, "{baseDir}", baseDir);
+		if(isShadow == true) {
+			boost::algorithm::replace_all(gazeboSdfFileString, "{isShadow}", "shadow/");
+		} else {
+			boost::algorithm::replace_all(gazeboSdfFileString, "{isShadow}", "");
+		}
+		boost::algorithm::replace_all(gazeboSdfFileString, "{equipletName}", equipletName);
 		
 		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
 		gazebo_msgs::SpawnModel serviceCall;
