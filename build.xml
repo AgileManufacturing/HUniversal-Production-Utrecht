@@ -19,14 +19,6 @@
 	</javac>
 	</presetdef>
 
-	<!-- Macro for the following things:
-	- load current classpath
-	- echo the current building dir
-	- make the bin directory
-	- running javac command using the classpath
-	- adding currently build source to the classpath
-	-->
-
 	<path id                 ="master-classpath">
 		<fileset dir  		 ="${rexos-src-folder}/external_libraries/">
 		<include name 		 ="*.jar"/>

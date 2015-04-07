@@ -16,7 +16,6 @@ import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.dataTypes.ModuleIdentifier;
-import HAL.dataTypes.StaticSettings;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
@@ -84,7 +83,10 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\"" +
@@ -190,7 +192,10 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"pick\", \"place\"" +
@@ -236,7 +241,10 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	static String moduleC_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -272,7 +280,10 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	static String moduleD_03 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -326,7 +337,10 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	static String moduleE_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +

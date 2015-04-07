@@ -85,7 +85,10 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\"" +
@@ -191,7 +194,10 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"pick\", \"place\"" +
@@ -237,7 +243,10 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static String moduleC_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -273,7 +282,10 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static String moduleD_03 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -327,7 +339,10 @@ public class StewartGoughHALTesterClass implements HardwareAbstractionLayerListe
 	static String moduleE_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"" +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +

@@ -45,6 +45,7 @@ public abstract class Factory <K ,V> {
 		}
 		try {
 			DynamicClassDescription description = getJavaSoftware(identifier).getDynamicClassDescription();
+			@SuppressWarnings("unchecked")
 			Class<V> tempclass = (Class<V>) dynamicClassFactory.getClassFromDescription(description);
 			V returnvalue = getConstuctorforThisFactory(tempclass, identifier);
 			instancesCache.put(identifier, returnvalue);
