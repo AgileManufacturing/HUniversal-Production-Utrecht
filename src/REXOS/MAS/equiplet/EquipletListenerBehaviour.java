@@ -47,7 +47,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
 										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
 												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), 
-													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CHANGE_MACHINE_STATE))))), 
+													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND))))), 
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
 		
@@ -75,8 +75,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 			case ACLMessage.QUERY_IF:
 				handleInformationRequest(msg);
 				break;
+			// messagetype holding the requested state for the equiplet
 			case ACLMessage.PROPOSE:
-				if(msg.getConversationId().equals(Ontology.CONVERSATION_CHANGE_MACHINE_STATE)){
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
 					handleChangeMachineState(msg);
 				}
 				break;

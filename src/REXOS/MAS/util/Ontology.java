@@ -14,6 +14,5 @@ public class Ontology {
 	public static final String CONVERSATION_TRAVEL_TIME = "travel-time";
 	public static final String CONVERSATION_INFORMATION_REQUEST = "information-request";
 	public static final String CONVERSATION_SUPPLY_REQUEST = "supply-request";
-	// TODO Rename this to actually reflect the intent (it being an equiplet command)
-	public static final String CONVERSATION_CHANGE_MACHINE_STATE = "change-machine-state";
+	public static final String CONVERSATION_EQUIPLET_COMMAND = "equiplet-command";
 }

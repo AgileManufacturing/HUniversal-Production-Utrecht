@@ -204,6 +204,10 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	public BlackboardHandler getBlackBoardHandler() {
 		return blackboardHandler;
 	}
+	
+	public ArrayList<ModuleIdentifier> getAllModules(){
+		return moduleFactory.getModules();
+	}
 
 	@Override
 	public void onEquipletStateChanged(String state) {

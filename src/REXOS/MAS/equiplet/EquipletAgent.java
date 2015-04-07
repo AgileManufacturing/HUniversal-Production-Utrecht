@@ -230,7 +230,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @author Kevin Bosman
 	 */
 	public boolean reinitializeEquiplet(List<DTOModuleSettings> toBeAddedModuleSettings){
-		// TODO Implement logic to further initialize the HAL and related init stuff.
+		// TODO Implement logic to further reinitialize the HAL and related init stuff.
 		boolean isInsertingModulesSuccessful = true;
 		List<Boolean> results = new ArrayList<Boolean>();
 		
@@ -250,13 +250,14 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		for (String service : services) {
 			capabilities.add(new Capability(service, new HashMap<String, Object>(), new Tick(10)));
 		}
+		// TODO Dirty as balls. This is done in the initial init function as well, a better solution for this should be implemented.
 		this.init(new Position(0,0), capabilities);
 		register();
 		return isInsertingModulesSuccessful;
 	}
 	
 	/**
-	 * Retun all available modules currently listed in the module factory
+	 * Return all available modules currently listed in the module factory
 	 * 
 	 * @return List of modules
 	 * 
@@ -264,8 +265,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @author Kevin Bosman
 	 */
 	public ArrayList<ModuleIdentifier> getAllModules(){
-		return hal.getModuleFactory().getModules();
-
+		return hal.getAllModules();
 	}
 
 	/**
