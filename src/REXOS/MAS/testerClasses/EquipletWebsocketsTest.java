@@ -36,8 +36,8 @@ public class EquipletWebsocketsTest {
 	/**
 	 * main() Spawns the EquipletAgent on the selected server.
 	 */
-	public static void main(String[] args) throws Exception {
-		spawnAgents(2, 500);
+	public static void main(String[] args) throws StaleProxyException {
+		spawnAgents(3, 50);
 	}
 	
 	public static void spawnAgents(int startingNumberAgentName, int amountOfAgents) throws StaleProxyException{
@@ -56,6 +56,8 @@ public class EquipletWebsocketsTest {
 			String name = "EQ" + i;
 			AgentController ac = container.createNewAgent(name, EquipletAgent.class.getName(), arguments);
 			ac.start();
+			
+			
 			//add delay I suppose otherwise the agents will not be added.
 			try {
 				Thread.sleep(100);
