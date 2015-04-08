@@ -3,12 +3,20 @@ package MAS.equiplet;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.log.Logger;
+
+import HAL.dataTypes.ModuleIdentifier;
 import MAS.util.Ontology;
 import MAS.util.Pair;
 import MAS.util.Parser;
@@ -39,11 +47,20 @@ public class EquipletListenerBehaviour extends Behaviour {
 		// MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
 		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
 		// MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
-		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE)))), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST));
+		MessageTemplate template = MessageTemplate.or(
+				MessageTemplate.or(
+						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(
+								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
+										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
+												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), 
+													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND))))), 
+				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
+		);
+		
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
-
+			
 			switch (msg.getPerformative()) {
 			case ACLMessage.INFORM:
 				if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
@@ -64,10 +81,95 @@ public class EquipletListenerBehaviour extends Behaviour {
 			case ACLMessage.QUERY_IF:
 				handleInformationRequest(msg);
 				break;
+			// messagetype holding the requested state for the equiplet
+			case ACLMessage.PROPOSE:
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
+					handleEquipletCommand(msg);
+				}
+				break;
 			default:
 				break;
 			}
 		}
+	}
+
+	private void handleEquipletCommand(ACLMessage msg) {
+		if(msg != null){
+			Serializable content = null;
+			try{
+				content = msg.getContentObject();
+			}catch(UnreadableException uex){
+				Logger.log("An error occured while attempting to getContentObject from the ACLMessage. Message will not be handled.");
+			}
+			if(content != null){
+				JSONObject modulesInJSON = new JSONObject(content);
+				String requestedEquipletCommand = "";
+				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON, requestedEquipletCommand);
+				
+				// Program if statements that will appropriately handle messages sent to the equiplet agent.
+				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
+					equiplet.reconfigureEquiplet(modules);
+				}else{
+					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
+				}
+			}
+		}		
+	}
+	
+	/**
+	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada.
+	 * 
+	 * @param content
+	 * @return Function returns null if anything went wrong while deserializing. If not, it returns an ArrayList of ModuleIdentifiers.
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 * @author Mitchell van Rijkom
+	 */
+
+	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content, String requestedEquipletCommand){
+		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
+		JSONArray modules = null;
+		boolean isDeserializationSuccessfull = true;
+		try{
+			modules = content.getJSONArray("modules");
+			requestedEquipletCommand = content.getString("requested-equiplet-command");
+			
+			for(int i = 0; i < modules.length(); i++){
+				JSONArray moduleIdentifiers = null;
+				moduleIdentifiers = modules.getJSONArray(i);
+				resultArray.add(new ModuleIdentifier(moduleIdentifiers.getString(0), moduleIdentifiers.getString(1), moduleIdentifiers.getString(2)));
+			}
+		}catch(JSONException ex){
+			Logger.log("An error occured while attempting to get information from the JSON.");
+			isDeserializationSuccessfull = false;
+		}
+		// If something went wrong while deserializing, return null.
+		return isDeserializationSuccessfull ? resultArray : null;
+	}
+	
+	/**
+	 * Dedicated function to translate the reconfigure ACLMessage in String format received from scada.
+	 * 
+	 * @param content
+	 * @return Function returns null if anything went wrong while delimiting. Otherwise it returns an ArrayList of ModuleIdentifiers.
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	
+	private ArrayList<ModuleIdentifier> delimitACLMessage(String content) {
+		String[] modules = content.split(";");
+		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
+		boolean isSuccessfullyDelimited = true;
+		for (String module : modules){
+			String[] identifiers = module.split(",");
+			if((identifiers[0] != null) && (identifiers[1] != null) && (identifiers[2] != null)){
+				resultArray.add(new ModuleIdentifier(identifiers[0], identifiers[1], identifiers[2]));
+			}else{
+				isSuccessfullyDelimited = false;
+			}
+		}
+		// Returns null if an error occured or if information was incomplete. 
+		return isSuccessfullyDelimited ? resultArray : null;
 	}
 
 	@Override
