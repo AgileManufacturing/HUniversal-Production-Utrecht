@@ -208,7 +208,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			}
 		}
 		
-		System.out.printf("EA:%s deregistered from DF. Equiplet shutdown request sent.\n", getLocalName());
+		System.out.printf("EA: %s was deregistered from DF. Equiplet shutdown request sent.\n", getLocalName());
 		hal.reconfigureEquiplet();
 	}
 	

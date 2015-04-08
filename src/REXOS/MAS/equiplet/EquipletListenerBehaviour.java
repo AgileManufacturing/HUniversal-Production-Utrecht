@@ -3,9 +3,6 @@ package MAS.equiplet;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -95,26 +92,55 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	private void handleEquipletCommand(ACLMessage msg) {
 		if(msg != null){
-			Serializable content = null;
 			try{
-				content = msg.getContentObject();
-			}catch(UnreadableException uex){
-				Logger.log("An error occured while attempting to getContentObject from the ACLMessage. Message will not be handled.");
-			}
-			if(content != null){
-				JSONObject modulesInJSON = new JSONObject(content);
-				String requestedEquipletCommand = "";
-				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON, requestedEquipletCommand);
+				JSONObject command = new JSONObject(msg.getContent());
+				
+				//Debug output
+				Logger.log("Content of ACL message: " + command.toString());
+				
+				//Identifying modules
+				String requestedEquipletCommand = command.getString("requested-equiplet-command").toString();
 				
 				// Program if statements that will appropriately handle messages sent to the equiplet agent.
-				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
-					equiplet.reconfigureEquiplet(modules);
+				if(requestedEquipletCommand.equals("RECONFIGURE")){
+					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
+					if(modules != null){
+						equiplet.reconfigureEquiplet(modules);
+					}else{
+						Logger.log("Error while extracting modules for reconfiguration");
+					}
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
+				
+			//Error handling
+			} catch (JSONException e) {
+				Logger.log("Invalid JSON.");
 			}
 		}		
 	}
+	
+	/*
+	 * Sample reconfig command
+	 * @see for more info MAS at WIKI
+
+		{
+			"requested-equiplet-command": "RECONFIGURE", 
+			"modules": [
+				{
+					"manufacturer":"HU",
+					"typeNumber":"1",
+					"serialNumber":"2"
+				},
+				{
+					"manufacturer":"HU",
+					"typeNumber":"5",
+					"serialNumber":"6"
+				},
+			]
+		}
+		
+	 */
 	
 	/**
 	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada.
@@ -125,27 +151,27 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @author Thomas Kok
 	 * @author Mitchell van Rijkom
 	 */
-	
 
-	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content, String requestedEquipletCommand){
+	private ArrayList<ModuleIdentifier> extractModulesForReconfig(JSONArray modules){
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
-		JSONArray modules = null;
 		boolean isDeserializationSuccessfull = true;
 		try{
-			modules = content.getJSONArray("modules");
-			requestedEquipletCommand = content.getString("requested-equiplet-command");
+			JSONObject currentModule;
 			
+			//Loop trough the array with modules
 			for(int i = 0; i < modules.length(); i++){
-				JSONObject moduleIdentifiers = null;
-				moduleIdentifiers = modules.getJSONObject(i);
+				//Extract each data object from array
+				currentModule = modules.getJSONObject(i);
+				
+				//Extract module data and get a module ID to return 
 				resultArray.add(new ModuleIdentifier(
-					moduleIdentifiers.getString("manufacturer"), 
-					moduleIdentifiers.getString("typeNumber"), 
-					moduleIdentifiers.getString("serialNumber")
+					currentModule.getString("manufacturer"), 
+					currentModule.getString("typeNumber"), 
+					currentModule.getString("serialNumber")
 				));
 			}
 		}catch(JSONException ex){
-			Logger.log("An error occured while attempting to get information from the JSON.");
+			Logger.log("An error occured while attempting to get information from the JSON. \n" + ex.getMessage());
 			isDeserializationSuccessfull = false;
 		}
 		// If something went wrong while deserializing, return null.
@@ -160,7 +186,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @author Kevin Bosman
 	 * @author Thomas Kok
 	 */
-	
+	/*
 	private ArrayList<ModuleIdentifier> delimitACLMessage(String content) {
 		String[] modules = content.split(";");
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
@@ -175,7 +201,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}
 		// Returns null if an error occured or if information was incomplete. 
 		return isSuccessfullyDelimited ? resultArray : null;
-	}
+	}*/
 
 	@Override
 	public boolean done() {
