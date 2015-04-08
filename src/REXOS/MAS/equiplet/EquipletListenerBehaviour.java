@@ -133,7 +133,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			Pair<Tick, Integer> information = Parser.parseProductArrived(message.getContent());
 			equiplet.notifyProductArrived(message.getSender(), information.first);
 
-			// send can reply
+			// send can reply enzo
 			ACLMessage reply = message.createReply();
 			reply.setContent(Parser.parseConfirmation(true));
 			reply.setPerformative(ACLMessage.CONFIRM);
