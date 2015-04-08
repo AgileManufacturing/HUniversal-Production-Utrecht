@@ -6,6 +6,7 @@ import jade.lang.acl.MessageTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -91,18 +92,22 @@ public class EquipletListenerBehaviour extends Behaviour {
 	private void handleEquipletCommand(ACLMessage msg) {
 		if(msg != null){
 			try{
-				JSONObject modulesInJSON = new JSONObject(msg.getContent());
+				JSONObject command = new JSONObject(msg.getContent());
 				
 				//Debug output
-				Logger.log("Content of ACL message: " + modulesInJSON.toString());
+				Logger.log("Content of ACL message: " + command.toString());
 				
 				//Identifying modules
-				String requestedEquipletCommand = modulesInJSON.getString("requested-equiplet-command").toString();
-				ArrayList<ModuleIdentifier> modules = deserializeACLMessage(modulesInJSON);
+				String requestedEquipletCommand = command.getString("requested-equiplet-command").toString();
 				
 				// Program if statements that will appropriately handle messages sent to the equiplet agent.
-				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
-					equiplet.reconfigureEquiplet(modules);
+				if(requestedEquipletCommand.equals("RECONFIGURE")){
+					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
+					if(modules != null){
+						equiplet.reconfigureEquiplet(modules);
+					}else{
+						Logger.log("Error while extracting modules for reconfiguration");
+					}
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
@@ -125,18 +130,24 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 */
 	
 
-	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content){
+	private ArrayList<ModuleIdentifier> extractModulesForReconfig(JSONArray modules){
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
-		JSONObject modules = null;
 		boolean isDeserializationSuccessfull = true;
 		try{
-			modules = content.getJSONObject("modules");
+			JSONObject currentModule;
 			
-			resultArray.add(new ModuleIdentifier(
-				modules.getString("manufacturer"), 
-				modules.getString("typeNumber"), 
-				modules.getString("serialNumber")
-			));
+			//Loop trough the array with modules
+			for(int i = 0; i < modules.length(); i++){
+				//Extract each data object from array
+				currentModule = modules.getJSONObject(i);
+				
+				//Extract module data and get a module ID to return 
+				resultArray.add(new ModuleIdentifier(
+					currentModule.getString("manufacturer"), 
+					currentModule.getString("typeNumber"), 
+					currentModule.getString("serialNumber")
+				));
+			}
 		}catch(JSONException ex){
 			Logger.log("An error occured while attempting to get information from the JSON. \n" + ex.getMessage());
 			isDeserializationSuccessfull = false;
