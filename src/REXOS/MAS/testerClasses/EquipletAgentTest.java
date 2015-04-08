@@ -13,8 +13,6 @@ import MAS.equiplet.EquipletAgent;
 
 
 public class EquipletAgentTest {
-<<<<<<< HEAD
-=======
 	
 	private static final String MAIN_PORT = ServerConfigurations.GS_PORT;
 	private static final String CONTAINER_NAME = "EquipletAgent";
@@ -36,5 +34,4 @@ public class EquipletAgentTest {
 		AgentController ac = container.createNewAgent("EQ2", EquipletAgent.class.getName(), arguments);
 		ac.start();
 	}
->>>>>>> b2dc67c6b6aa5251068e63c2c2e25f1ee7c56748
 }
