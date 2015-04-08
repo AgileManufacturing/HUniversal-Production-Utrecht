@@ -51,7 +51,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			while(!toExecuteSteps.isEmpty()){
 				currentStep = toExecuteSteps.poll();
 				ModuleActor module;
-				module = (ModuleActor) moduleFactory.getSomethingByIdentifier(currentStep.getModuleIdentifier());
+				module = (ModuleActor) moduleFactory.getItemForIdentifier(currentStep.getModuleIdentifier());
 				module.executeHardwareStep(this, currentStep);
 				Logger.log(LogSection.HAL_EXECUTION, LogLevel.DEBUG, "Wait for hardware step to finish: " + currentStep);
 				

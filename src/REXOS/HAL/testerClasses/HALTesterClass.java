@@ -14,7 +14,7 @@ import util.log.Logger;
 import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
@@ -28,65 +28,91 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	static final String baseDir = "jars/";
 	
 	// dummy module A
-	static String moduleA_01 = "{"
-			+ "	\"manufacturer\":\"HU\","
-			+ "	\"typeNumber\":\"dummy_module_type_A\","
-			+ "	\"serialNumber\":\"1\","
-			+ "	\"type\":{"
-			+ "		\"properties\":\"{}\","
-			+ "		\"rosSoftware\":{"
-			+ "			\"buildNumber\":1,"
-			+ "			\"rosFile\": \"";
-	static String moduleA_02 = "\","
-			+ "			\"command\":\"rosrun dummy_module_a dummy_module_a {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
-			+ "		},"
-			+ "		\"halSoftware\":{"
-			+ "			\"buildNumber\":1,"
-			+ "			\"jarFile\": \"";
-	static String moduleA_03 = "\","
-			+ "			\"className\":\"HAL.modules.DummyModuleA\""
-			+ "		},"
-			+ "		\"supportedMutations\": ["
-			+ "		],"
-			+ "		\"capabilities\":[]"
-			+ "	},"
-			+ "	\"properties\":\"{}\","
-			+ "	\"calibrationData\":["
-			+ "	],"
-			+ "	\"attachedTo\":null,"
-			+ "\"mountPointX\":3,"
-			+ "\"mountPointY\":2"
-			+ "}";
+	static String moduleA_01 = "{" +
+			"	\"moduleIdentifier\":{" +
+			"		\"manufacturer\":\"HU\"," +
+			"		\"typeNumber\":\"dummy_module_type_A\"," +
+			"		\"serialNumber\":\"1\"," +
+			"	}," +
+			"	\"type\":{" +
+			"		\"properties\":{}," +
+			"		\"rosSoftware\":{" +
+			"			\"buildNumber\":1," +
+			"			\"rosFile\": \"";
+	static String moduleA_02 = "\"," +
+			"			\"command\":\"rosrun dummy_module_a dummy_module_a {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"		}," +
+			"		\"halSoftware\":{" +
+			"			\"buildNumber\":1," +
+			"			\"jarFile\": \"";
+	static String moduleA_03 = "\"," +
+			"			\"className\":\"HAL.modules.DummyModuleA\"" +
+			"		}," +
+			"		\"gazeboModel\":{" +
+			"			\"buildNumber\":1," +
+			"			\"zipFile\": \"";
+	static String moduleA_04 = "\"," +
+			"			\"sdfFilename\":\"model.sdf\"," +
+			"			\"parentLink\":\"baseLink\"," +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
+			"		}," +
+			"		\"supportedMutations\": [" +
+			"		]," +
+			"		\"capabilities\":[]" +
+			"	}," +
+			"	\"properties\":{}," +
+			"	\"calibrationData\":[" +
+			"	]," +
+			"	\"attachedTo\":null," +
+			"\"mountPointX\":3," +
+			"\"mountPointY\":2" +
+			"}";
 	// dummy module B
-	static String moduleB_01 = "{"
-			+ "	\"manufacturer\":\"HU\","
-			+ "	\"typeNumber\":\"dummy_module_type_B\","
-			+ "	\"serialNumber\":\"1\","
-			+ "	\"type\":{"
-			+ "		\"properties\":\"{}\","
-			+ "		\"rosSoftware\":{"
-			+ "			\"buildNumber\":1,"
-			+ "			\"rosFile\": \"";
-	static String moduleB_02 = "\","
-			+ "			\"command\":\"rosrun dummy_module_b dummy_module_b {equipletName} {manufacturer} {typeNumber} {serialNumber}\""
-			+ "		},"
-			+ "		\"halSoftware\":{"
-			+ "			\"buildNumber\":1,"
-			+ "			\"jarFile\": \"";
-	static String moduleB_03 = "\","
-			+ "			\"className\":\"HAL.modules.DummyModuleB\""
-			+ "		},"
-			+ "		\"supportedMutations\": ["
-			+ "		],"
-			+ "		\"capabilities\":[]"
-			+ "	},"
-			+ "	\"properties\":\"{}\","
-			+ "	\"calibrationData\":["
-			+ "	],"
-			+ "	\"attachedTo\":null,"
-			+ "\"mountPointX\":3,"
-			+ "\"mountPointY\":4"
-			+ "}";
+	static String moduleB_01 = "{" +
+			"	\"moduleIdentifier\":{" +
+			"		\"manufacturer\":\"HU\"," +
+			"		\"typeNumber\":\"dummy_module_type_B\"," +
+			"		\"serialNumber\":\"1\"," +
+			"	}," +
+			"	\"type\":{" +
+			"		\"properties\":{}," +
+			"		\"rosSoftware\":{" +
+			"			\"buildNumber\":1," +
+			"			\"rosFile\": \"";
+	static String moduleB_02 = "\"," +
+			"			\"command\":\"rosrun dummy_module_b dummy_module_b {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"		}," +
+			"		\"halSoftware\":{" +
+			"			\"buildNumber\":1," +
+			"			\"jarFile\": \"";
+	static String moduleB_03 = "\"," +
+			"			\"className\":\"HAL.modules.DummyModuleB\"" +
+			"		}," +
+			"		\"gazeboModel\":{" +
+			"			\"buildNumber\":1," +
+			"			\"zipFile\": \"";
+	static String moduleB_04 = "\"," +
+			"			\"sdfFilename\":\"model.sdf\"," +
+			"			\"parentLink\":\"baseLink\"," +
+			"			\"childLink\":\"otherLink\"," +
+			"			\"childLinkOffsetX\":0.0," +
+			"			\"childLinkOffsetY\":0.0," +
+			"			\"childLinkOffsetZ\":0.0" +
+			"		}," +
+			"		\"supportedMutations\": [" +
+			"		]," +
+			"		\"capabilities\":[]" +
+			"	}," +
+			"	\"properties\":{}," +
+			"	\"calibrationData\":[" +
+			"	]," +
+			"	\"attachedTo\":null," +
+			"\"mountPointX\":3," +
+			"\"mountPointY\":4" +
+			"}";
 	
 	/**
 	 * @param args
@@ -100,40 +126,56 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		FileInputStream fis;
 		byte[] content;
 
-		File dummyModuleAJar = new File(baseDir + "DummyModuleA.jar");
-		fis = new FileInputStream(dummyModuleAJar);
-		content = new byte[(int) dummyModuleAJar.length()];
+		File dummyModuleAHal = new File(baseDir + "DummyModuleA.jar");
+		fis = new FileInputStream(dummyModuleAHal);
+		content = new byte[(int) dummyModuleAHal.length()];
 		fis.read(content);
 		fis.close();
-		String base64DummyModuleA = new String(Base64.encodeBase64(content));
+		String base64DummyModuleAHal = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleBJar = new File(baseDir + "DummyModuleB.jar");
-		fis = new FileInputStream(dummyModuleBJar);
-		content = new byte[(int) dummyModuleBJar.length()];
+		File dummyModuleBHal = new File(baseDir + "DummyModuleB.jar");
+		fis = new FileInputStream(dummyModuleBHal);
+		content = new byte[(int) dummyModuleBHal.length()];
 		fis.read(content);
 		fis.close();
-		String base64DummyModuleB = new String(Base64.encodeBase64(content));
+		String base64DummyModuleBHal = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleAZip = new File(baseDir + "nodes.zip");
-		fis = new FileInputStream(dummyModuleAZip);
-		content = new byte[(int) dummyModuleAZip.length()];
+		File dummyModuleARos = new File(baseDir + "nodes.zip");
+		fis = new FileInputStream(dummyModuleARos);
+		content = new byte[(int) dummyModuleARos.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleARos = new String(Base64.encodeBase64(content));
 		
-		File dummyModuleBZip = new File(baseDir + "nodes.zip");
-		fis = new FileInputStream(dummyModuleBZip);
-		content = new byte[(int) dummyModuleBZip.length()];
+		File dummyModuleBRos = new File(baseDir + "nodes.zip");
+		fis = new FileInputStream(dummyModuleBRos);
+		content = new byte[(int) dummyModuleBRos.length()];
 		fis.read(content);
 		fis.close();
 		String base64DummyModuleBRos = new String(Base64.encodeBase64(content));
 		
+		File dummyModuleAGazebo = new File(baseDir + "model.zip");
+		fis = new FileInputStream(dummyModuleAGazebo);
+		content = new byte[(int) dummyModuleAGazebo.length()];
+		fis.read(content);
+		fis.close();
+		String base64DummyModuleAGazebo = new String(Base64.encodeBase64(content));
+		
+		File dummyModuleBGazebo = new File(baseDir + "model.zip");
+		fis = new FileInputStream(dummyModuleBGazebo);
+		content = new byte[(int) dummyModuleBGazebo.length()];
+		fis.read(content);
+		fis.close();
+		String base64DummyModuleBGazebo = new String(Base64.encodeBase64(content));
+		
 		// dummy module A
-		String moduleA = moduleA_01 + base64DummyModuleARos + moduleA_02 + base64DummyModuleA + moduleA_03;
+		String moduleA = moduleA_01 + base64DummyModuleARos + moduleA_02 + base64DummyModuleAHal + 
+				moduleA_03 + base64DummyModuleAGazebo + moduleA_04;
 		JSONObject a = new JSONObject(new JSONTokener(moduleA));
 		
 		// dummy module B
-		String moduleB = moduleB_01 + base64DummyModuleBRos + moduleB_02 + base64DummyModuleB + moduleB_03;
+		String moduleB = moduleB_01 + base64DummyModuleBRos + moduleB_02 + base64DummyModuleBHal + 
+				moduleB_03 + base64DummyModuleBGazebo + moduleB_04;
 		JSONObject b = new JSONObject(new JSONTokener(moduleB));
 		
 		
@@ -196,7 +238,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
+	public void onEquipletMachineStateChanged(String state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
 	}
 

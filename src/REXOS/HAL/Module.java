@@ -1,7 +1,12 @@
 package HAL;
 
+import java.util.Iterator;
 import java.util.Vector;
 
+import org.json.JSONObject;
+
+import HAL.dataTypes.ModuleIdentifier;
+import HAL.dataTypes.ModuleTypeIdentifier;
 import HAL.exceptions.FactoryException;
 import HAL.factories.ModuleFactory;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -9,9 +14,6 @@ import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
-import HAL.ModuleIdentifier;
-import java.util.Vector;
-import java.util.Iterator;
 /**
  * Abstract representation of a module in the HAL.
  * @author Bas Voskuijlen
@@ -170,7 +172,7 @@ public abstract class Module implements BlackboardModuleListener {
 	private static final String SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET =
 		"INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) " + 
 		"VALUES (LAST_INSERT_ID(), ?, ?, ?);";
-	private static final String SET_MODULE_PROTERTIES = 
+	private static final String SET_MODULE_PROPERTIES = 
 		"UPDATE Module " +
 		"SET moduleProperties = ? " +
 		"WHERE manufacturer = ? AND " +
@@ -205,9 +207,9 @@ public abstract class Module implements BlackboardModuleListener {
 	 */
 	public int[] getMountPosition() {
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_MOUNT_POSITION, 
-																moduleIdentifier.getManufacturer(), 
-																moduleIdentifier.getTypeNumber(), 
-																moduleIdentifier.getSerialNumber());
+																moduleIdentifier.manufacturer, 
+																moduleIdentifier.typeNumber, 
+																moduleIdentifier.serialNumber);
 		if (resultSet.length == 1){
 			int[] position = new int[2];
 			position[0] = (int) resultSet[0].get("mountPointX");
@@ -224,19 +226,19 @@ public abstract class Module implements BlackboardModuleListener {
 	 */
 	public Module getParentModule() throws FactoryException {		
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	GET_PARENT_MODULE,
-																moduleIdentifier.getManufacturer(),
-																moduleIdentifier.getTypeNumber(),
-																moduleIdentifier.getSerialNumber(),
-																moduleIdentifier.getManufacturer(),
-																moduleIdentifier.getTypeNumber(),
-																moduleIdentifier.getSerialNumber());
+																moduleIdentifier.manufacturer,
+																moduleIdentifier.typeNumber,
+																moduleIdentifier.serialNumber,
+																moduleIdentifier.manufacturer,
+																moduleIdentifier.typeNumber,
+																moduleIdentifier.serialNumber);
 		
 		if (resultSet.length == 1){
 			ModuleIdentifier moduleIdentifier = new ModuleIdentifier(
 					resultSet[0].get("manufacturer").toString(),
 					resultSet[0].get("typeNumber").toString(),
 					resultSet[0].get("serialNumber").toString());
-			return this.moduleFactory.getSomethingByIdentifier(moduleIdentifier);
+			return this.moduleFactory.getItemForIdentifier(moduleIdentifier);
 		}
 		else return null;
 	}
@@ -245,7 +247,16 @@ public abstract class Module implements BlackboardModuleListener {
 	 * This method will return the properties of this specific module
 	 * @return
 	 */
-	public String getProperties() {
+	public JSONObject getConfigurationProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * This method will return the properties of this specific module
+	 * @return
+	 */
+	public JSONObject getProperties() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -270,9 +281,9 @@ public abstract class Module implements BlackboardModuleListener {
 	public int getMountPointX(){
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
 			GET_MOUNT_POINT_X, 
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(), 
-			moduleIdentifier.getSerialNumber());
+			moduleIdentifier.manufacturer, 
+			moduleIdentifier.typeNumber, 
+			moduleIdentifier.serialNumber);
 
 		if (resultSet.length == 1){
 			return (int) resultSet[0].get("mountPointX");
@@ -283,9 +294,9 @@ public abstract class Module implements BlackboardModuleListener {
 	public int getMountPointY(){
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
 			GET_MOUNT_POINT_Y, 
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(), 
-			moduleIdentifier.getSerialNumber());
+			moduleIdentifier.manufacturer, 
+			moduleIdentifier.typeNumber, 
+			moduleIdentifier.serialNumber);
 
 		if (resultSet.length == 1){
 			return (int) resultSet[0].get("mountPointY");
@@ -296,9 +307,9 @@ public abstract class Module implements BlackboardModuleListener {
 	public String getCalibrationDataForModuleOnly() {
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
 			GET_CALIBRATION_DATA_FOR_MODULE_ONLY,
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(), 
-			moduleIdentifier.getSerialNumber());
+			moduleIdentifier.manufacturer, 
+			moduleIdentifier.typeNumber, 
+			moduleIdentifier.serialNumber);
 
 		if (resultSet.length == 1){
 			return (String) resultSet[0].get("properties");
@@ -319,12 +330,12 @@ public abstract class Module implements BlackboardModuleListener {
 	private Vector<ModuleIdentifier> getChildModulesIdentifiers() {
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
 					GET_CHILD_MODULES_INDENTIFIERS,
-					moduleIdentifier.getManufacturer(), 
-					moduleIdentifier.getTypeNumber(), 
-					moduleIdentifier.getSerialNumber(),
-					moduleIdentifier.getManufacturer(), 
-					moduleIdentifier.getTypeNumber(), 
-					moduleIdentifier.getSerialNumber());
+					moduleIdentifier.manufacturer, 
+					moduleIdentifier.typeNumber, 
+					moduleIdentifier.serialNumber,
+					moduleIdentifier.manufacturer, 
+					moduleIdentifier.typeNumber, 
+					moduleIdentifier.serialNumber);
 
 		Vector<ModuleIdentifier> childModules = null;
 		if (resultSet.length != 0){
@@ -367,17 +378,17 @@ public abstract class Module implements BlackboardModuleListener {
 		Iterator itr = moduleIdentifiers.iterator();
 		while(itr.hasNext()){
 			knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_STORE_THE_MODULES,
-				((ModuleTypeIdentifier) itr).getManufacturer(),
-				((ModuleTypeIdentifier) itr).getTypeNumber(),
-				((ModuleIdentifier) itr).getSerialNumber());
+				((ModuleTypeIdentifier) itr).manufacturer,
+				((ModuleTypeIdentifier) itr).typeNumber,
+				((ModuleIdentifier) itr).serialNumber);
 			itr.next();
 		}
 
 		// preform the actual query
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_ACTUAL_QUERY,
-			moduleIdentifier.getManufacturer(),
-			moduleIdentifier.getTypeNumber(),
-			moduleIdentifier.getSerialNumber(),
+			moduleIdentifier.manufacturer,
+			moduleIdentifier.typeNumber,
+			moduleIdentifier.serialNumber,
 			moduleIdentifiers.size(),
 			moduleIdentifiers.size());
 
@@ -413,9 +424,9 @@ public abstract class Module implements BlackboardModuleListener {
 
 			knowledgeDBClient.executeSelectQuery(
 				SET_CALIBRATION_DATA_FOR_MODULE_INSERT_MODULE_CALIBRATION,
-				moduleIdentifier.getManufacturer(),
-				moduleIdentifier.getTypeNumber(),
-				moduleIdentifier.getSerialNumber());
+				moduleIdentifier.manufacturer,
+				moduleIdentifier.typeNumber,
+				moduleIdentifier.serialNumber);
 
 		}
 
@@ -445,18 +456,18 @@ public abstract class Module implements BlackboardModuleListener {
 			
 			knowledgeDBClient.executeSelectQuery(
 				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET,
-				moduleIdentifier.getManufacturer(),
-				moduleIdentifier.getTypeNumber(),
-				moduleIdentifier.getSerialNumber());
+				moduleIdentifier.manufacturer,
+				moduleIdentifier.typeNumber,
+				moduleIdentifier.serialNumber);
 			
 			//for(int i = 0; i < moduleIdentifiers.size(); i++){
 			Iterator itr = moduleIdentifiers.iterator();
 			while(itr.hasNext()){
 			knowledgeDBClient.executeSelectQuery(
 				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET,
-				((ModuleTypeIdentifier) itr).getManufacturer(),
-				((ModuleTypeIdentifier) itr).getTypeNumber(),
-				((ModuleIdentifier) itr).getSerialNumber());
+				((ModuleTypeIdentifier) itr).manufacturer,
+				((ModuleTypeIdentifier) itr).typeNumber,
+				((ModuleIdentifier) itr).serialNumber);
 				itr.next();
 			}
 		}
@@ -464,27 +475,27 @@ public abstract class Module implements BlackboardModuleListener {
 
 	protected	void setModuleProperties(String jsonProperties){
 		knowledgeDBClient.executeUpdateQuery(
-			SET_MODULE_PROTERTIES,
+			SET_MODULE_PROPERTIES,
 			jsonProperties,
-			moduleIdentifier.getManufacturer(),
-			moduleIdentifier.getTypeNumber(),
-			moduleIdentifier.getSerialNumber());
+			moduleIdentifier.manufacturer,
+			moduleIdentifier.typeNumber,
+			moduleIdentifier.serialNumber);
 	}
 
 	protected	void setMountPointX(int mountPointX){
 		knowledgeDBClient.executeSelectQuery(	
 			SET_MOUNT_POINT_X,
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(),
-			moduleIdentifier.getSerialNumber());
+			moduleIdentifier.manufacturer, 
+			moduleIdentifier.typeNumber,
+			moduleIdentifier.serialNumber);
 	}
 
 	protected	void setMountPointY(int mountPointY){
 		knowledgeDBClient.executeSelectQuery(	
 			SET_MOUNT_POINT_Y,
-			moduleIdentifier.getManufacturer(), 
-			moduleIdentifier.getTypeNumber(),
-			moduleIdentifier.getSerialNumber());
+			moduleIdentifier.manufacturer, 
+			moduleIdentifier.typeNumber,
+			moduleIdentifier.serialNumber);
 	}
 
 }

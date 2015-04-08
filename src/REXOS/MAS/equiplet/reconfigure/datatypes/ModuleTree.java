@@ -42,7 +42,7 @@ package MAS.equiplet.reconfigure.datatypes;
 import java.util.ArrayList;
 
 import HAL.Module;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 
 public class ModuleTree {
 	 /**
@@ -74,9 +74,9 @@ public class ModuleTree {
 	private void getModuleInformation(Module module) {
 		ModuleIdentifier moduleId = module.getModuleIdentifier();
 
-		moduleTreeList.add(moduleId.getManufacturer());
-		moduleTreeList.add(moduleId.getTypeNumber());
-		moduleTreeList.add(moduleId.getSerialNumber());
+		moduleTreeList.add(moduleId.manufacturer);
+		moduleTreeList.add(moduleId.typeNumber);
+		moduleTreeList.add(moduleId.serialNumber);
 		
 		int[] modulePositions = module.getMountPosition();
 		

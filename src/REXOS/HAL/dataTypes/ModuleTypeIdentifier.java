@@ -1,4 +1,6 @@
-package HAL;
+package HAL.dataTypes;
+
+import java.io.Serializable;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.json.JSONException;
@@ -12,15 +14,42 @@ import util.log.Logger;
  * @author Tommas Bakker
  *
  */
-public class ModuleTypeIdentifier {
-	private String manufacturer;
-	private String typeNumber;
+public class ModuleTypeIdentifier implements Serializable{
+	private static final long serialVersionUID = -6860907911597941990L;
 	
+	public static final String MANUFACTURER = "manufacturer";
+	public static final String TYPE_NUMBER = "typeNumber";
+	
+	public String manufacturer;
+	public String typeNumber;
+	
+	public ModuleTypeIdentifier() {
+		// nothing to do
+	}
 	public ModuleTypeIdentifier(String manufacturer, String typeNumber){
 		this.manufacturer = manufacturer;
 		this.typeNumber = typeNumber;
 	}
-
+	
+	public static ModuleTypeIdentifier deSerialize(JSONObject input) throws JSONException {
+		ModuleTypeIdentifier output = new ModuleTypeIdentifier();
+		
+		output.manufacturer = input.getString(MANUFACTURER);
+		output.typeNumber = input.getString(TYPE_NUMBER);
+		
+		return output;
+	}
+	public JSONObject serialize(){
+		JSONObject moduleIdentifier = new JSONObject();
+		try {
+			moduleIdentifier.put(MANUFACTURER, manufacturer);
+			moduleIdentifier.put(TYPE_NUMBER, typeNumber);
+		} catch (JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
+		}
+		return moduleIdentifier;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -42,32 +71,13 @@ public class ModuleTypeIdentifier {
 			return false;
 		return true;
 	}
-
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(manufacturer).append(typeNumber).toHashCode();
 	}
-	
-	public String getManufacturer(){
-		return this.manufacturer;
-	}
-	public String getTypeNumber(){
-		return this.typeNumber;
-	}
-	public JSONObject toJSON(){
-		JSONObject moduleIdentifier = new JSONObject();
-		try {
-			moduleIdentifier.putOpt("manufacturer", manufacturer);
-			moduleIdentifier.putOpt("typeNumber", typeNumber);
-		} catch (JSONException ex) {
-			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
-		}
-		return moduleIdentifier;
-	}
-	
 	@Override
 	public String toString() {
-		return "man " + manufacturer + " tNr " + typeNumber;
+		return "man " + manufacturer + " tNo " + typeNumber;
 	}
 	
 }

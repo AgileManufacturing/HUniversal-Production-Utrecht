@@ -1,0 +1,97 @@
+<project name            	 ="REXOS" default="all" basedir="">
+	<property name           ="rexos-src-folder" 		value="${basedir}/src/REXOS/"/>
+	<property name           ="rexos-java-root" 		value="${rexos-src-folder}"/>
+	<property name           ="buildpath" 				value="${repo-root}/build/REXOS/"/>
+	<property environment    ="env"/>
+
+	<taskdef resource        ="net/sf/antcontrib/antcontrib.properties">
+	<classpath>
+	<pathelement location    ="${rexos-src-folder}/external_libraries/ant-contrib.jar" />
+	</classpath>
+	</taskdef>
+
+	<!-- @Author: Lars Veenendaal -->
+	<!-- Attempting to rewrite ant configuration. -->
+	<!-- Because a missing feature in ant 1.8 i have to set this for all javac calls -->
+	<presetdef name          ="javac">
+	<javac includeantruntime ="false">
+	<classpath refid         ="master-classpath" />
+	</javac>
+	</presetdef>
+
+	<path id                 ="master-classpath">
+		<fileset dir  		 ="${rexos-src-folder}/external_libraries/">
+		<include name 		 ="*.jar"/>
+		</fileset>
+	</path>
+
+	<target name             ="all" depends="MAS, HAL, generic, util"/>
+
+	<target name             ="MAS" depends="util, generic, HAL">
+		<mkdir dir           ="build/REXOS/MAS"/>
+		<javac destdir       ="build/REXOS">
+			<src path        ="${rexos-src-folder}/MAS"/>
+		</javac>
+	</target>
+
+	<target name             ="HAL" depends="util, generic">
+		<mkdir dir           ="build/REXOS/HAL"/>
+		<javac destdir       ="build/REXOS">
+		<src path            ="${rexos-src-folder}/HAL"/>
+		</javac>
+	</target>
+
+	<target name             ="generic">
+		<mkdir dir           ="build/REXOS/generic"/>
+		<javac destdir       ="build/REXOS">
+		<src path            ="${rexos-src-folder}/generic"/>
+		</javac>
+	</target>
+
+	<target name             ="util">
+		<mkdir dir           ="build/REXOS/util"/>
+		<javac destdir       ="build/REXOS">
+		<src path            ="${rexos-src-folder}/util"/>
+		</javac>
+	</target>
+
+	<target name             ="MASSIM">
+		<mkdir dir           ="simulation"/>
+		<javac destdir       ="build">
+		<src path            ="${rexos-src-folder}/simulation"/>
+		</javac>
+	</target>
+
+	<target name             ="emurex">
+	<jar destfile            ="simulation/simulation.jar" basedir="build/REXOS/" includes="**" excludes="**/Test.class"/>
+	</target>
+
+	<target name             ="clean">
+	<delete file             ="${export-classpath-file}" />
+	<delete dir              ="build" />
+	</target>
+
+	<target name             ="Generate-JARs" depends="HAL">
+		<foreach target      ="Generate-JAR" param="theFile">
+			<path id         ="modulesPathId">
+			<fileset dir     ="build/REXOS/HAL/modules" casesensitive="yes">
+			<include name    ="**/*.class"/>
+			</fileset>
+			</path>
+		</foreach>
+		<foreach target      ="Generate-JAR" param="theFile">
+			<path id         ="capabilitiesPathId">
+			<fileset dir     ="build/REXOS/HAL/capabilities" casesensitive="yes">
+			<include name    ="**/*.class"/>
+			</fileset>
+			</path>
+		</foreach>
+	</target>
+
+	<target name             ="Generate-JAR">
+		<basename property   ="jar.filename" file="${theFile}" suffix=".class"/>
+		<dirname property    ="jar.basedir" file="build/REXOS/HAL/"/>
+		<jar destfile        ="jars/${jar.filename}.jar" basedir="${jar.basedir}" includes="**/${jar.filename}.class"/>
+	</target>
+
+</project>

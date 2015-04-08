@@ -1,12 +1,13 @@
 package HAL.factories;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
-import HAL.JavaSoftware;
+import HAL.dataTypes.JavaSoftware;
 import HAL.libraries.dynamicloader.DynamicClassDescription;
 import HAL.libraries.dynamicloader.DynamicClassFactory;
 import HAL.libraries.dynamicloader.InstantiateClassException;
@@ -23,13 +24,12 @@ import HAL.libraries.knowledgedb_client.Row;
 public abstract class Factory <K ,V> {
 	protected KnowledgeDBClient knowledgeDBClient;
 	private DynamicClassFactory<?> dynamicClassFactory;
-	protected HashMap<K , V> cache;
-	
+	private HashMap<K , V> instancesCache;
 	
 	public Factory(KnowledgeDBClient knowledgeDBClient) {
 		this.knowledgeDBClient = knowledgeDBClient;
 		dynamicClassFactory = new DynamicClassFactory<V>();
-		cache = new HashMap<K,V>();
+		instancesCache = new HashMap<K,V>();
 	}
 	
 	public void logSqlResult(LogSection logSection, String sqlQueryName, Row[] rows) {
@@ -38,18 +38,17 @@ public abstract class Factory <K ,V> {
 	}
 	
 	protected abstract JavaSoftware getJavaSoftware(K identifier);
-	
 	protected abstract V getConstuctorforThisFactory(Class<V> myClass, K key) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException;
-	
-	public V getSomethingByIdentifier(K identifier) {
-		if(cache.containsKey(identifier)) {
-			return cache.get(identifier);
+	public V getItemForIdentifier(K identifier) {
+		if(instancesCache.containsKey(identifier)) {
+			return instancesCache.get(identifier);
 		}
 		try {
 			DynamicClassDescription description = getJavaSoftware(identifier).getDynamicClassDescription();
+			@SuppressWarnings("unchecked")
 			Class<V> tempclass = (Class<V>) dynamicClassFactory.getClassFromDescription(description);
 			V returnvalue = getConstuctorforThisFactory(tempclass, identifier);
-			cache.put(identifier, returnvalue);
+			instancesCache.put(identifier, returnvalue);
 			return returnvalue;
 		} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | 
 				InstantiateClassException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
@@ -61,7 +60,20 @@ public abstract class Factory <K ,V> {
 		}
 	}
 	
-	public void removeItemFromCache(K identifier) {
-		cache.remove(identifier);
+	protected abstract ArrayList<K> getKeysToKeepInCache();
+	
+	public void checkCache() {
+		// avoid invalidating the iterator by using two stage removal
+		ArrayList<K> keysToKeep = getKeysToKeepInCache();
+		ArrayList<K> keysToRemove = new ArrayList<K>();
+		for (K key : instancesCache.keySet()) {
+			if(keysToKeep.contains(key) == false) {
+				keysToRemove.add(key);
+			}
+		}
+		
+		for (K key : keysToRemove) {
+			instancesCache.remove(key);
+		}
 	}
 }

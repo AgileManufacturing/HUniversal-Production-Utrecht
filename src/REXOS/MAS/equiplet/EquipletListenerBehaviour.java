@@ -125,6 +125,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @author Thomas Kok
 	 * @author Mitchell van Rijkom
 	 */
+	
 
 	private ArrayList<ModuleIdentifier> deserializeACLMessage(JSONObject content, String requestedEquipletCommand){
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
@@ -135,9 +136,13 @@ public class EquipletListenerBehaviour extends Behaviour {
 			requestedEquipletCommand = content.getString("requested-equiplet-command");
 			
 			for(int i = 0; i < modules.length(); i++){
-				JSONArray moduleIdentifiers = null;
-				moduleIdentifiers = modules.getJSONArray(i);
-				resultArray.add(new ModuleIdentifier(moduleIdentifiers.getString(0), moduleIdentifiers.getString(1), moduleIdentifiers.getString(2)));
+				JSONObject moduleIdentifiers = null;
+				moduleIdentifiers = modules.getJSONObject(i);
+				resultArray.add(new ModuleIdentifier(
+					moduleIdentifiers.getString("manufacturer"), 
+					moduleIdentifiers.getString("typeNumber"), 
+					moduleIdentifiers.getString("serialNumber")
+				));
 			}
 		}catch(JSONException ex){
 			Logger.log("An error occured while attempting to get information from the JSON.");
@@ -235,7 +240,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 			Pair<Tick, Integer> information = Parser.parseProductArrived(message.getContent());
 			equiplet.notifyProductArrived(message.getSender(), information.first);
 
-			// send can reply enzo
+			// send can reply
 			ACLMessage reply = message.createReply();
 			reply.setContent(Parser.parseConfirmation(true));
 			reply.setPerformative(ACLMessage.CONFIRM);

@@ -8,11 +8,7 @@
 		},
 		"hardwareSteps": {
 			"ip": {
-<<<<<<< HEAD
-				"default": "127.0.0.1"
-=======
-				"default": "10.0.1.30"
->>>>>>> origin/team_reconfig
+				"default": "localhost"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -27,13 +23,8 @@
 			}
 		},
 		"equipletCommands": {
-<<<<<<< HEAD
 			"ip": {
-				"default": "127.0.0.1"
-=======
-			"ip": { 
-				"default": "10.0.1.30" 
->>>>>>> origin/team_reconfig
+				"default": "localhost"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -49,11 +40,7 @@
 		},
 		"equipletState": {
 			"ip": {
-<<<<<<< HEAD
-				"default": "127.0.0.1"
-=======
-				"default": "10.0.1.30"
->>>>>>> origin/team_reconfig
+				"default": "localhost"
 			},
 			"databaseName": {
 				"default": "EQ",

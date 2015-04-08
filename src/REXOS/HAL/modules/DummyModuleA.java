@@ -1,7 +1,7 @@
 package HAL.modules;
 
 import HAL.Module;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.ModuleListener;
 

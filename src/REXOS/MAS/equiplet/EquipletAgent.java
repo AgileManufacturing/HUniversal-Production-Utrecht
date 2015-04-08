@@ -23,9 +23,13 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.DTOModuleSettings;
+import util.log.LogLevel;
+import util.log.Logger;
+
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.FactoryException;
 import HAL.exceptions.InvalidMastModeException;
@@ -45,9 +49,6 @@ import MAS.util.Util;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	// private static final double SAFETY_FACTOR = 1;
 
@@ -116,6 +117,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			System.out.printf("EA:%s initialize [pos=%s, capabilties=%s]\n", getLocalName(), position, capabilities);
 
 			register();
+
 			addBehaviour(new EquipletListenerBehaviour(this));
 		} else {
 			System.err.printf("EA:%s Failed to receive correct arguments\n", getLocalName());
@@ -179,6 +181,81 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		} catch (FIPAException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * [W.I.P. and untested]
+	 * This method is called whenever someone needs acces to an equiplet for reconfiguring. 
+	 * The equiplet will be safely shut down and send a signal as soon as it has done so (to be implemented in onEquipletStateChanged() )
+	 * @param A list of the modules to be removed during this reconfiguring.
+	 * @author Thomas Kok
+	 * @author Kevin Bosman
+	 */
+	public void reconfigureEquiplet(ArrayList<ModuleIdentifier> arrayList){
+		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
+		this.reconfiguring = true;
+		deregister();
+		
+		// TODO A form a delay should be implemented here, at least until the schedule is empty.
+		
+		for(ModuleIdentifier removedModule : arrayList){
+			try{
+				// TODO Transport information on the deleted module to the GKD (The 'result' JSONObject).
+				JSONObject result = hal.deleteModule(removedModule);
+				Logger.log("The following module has been removed: ", result.get(getName()));
+			}catch(Exception ex){
+				Logger.log(LogLevel.ERROR, "An error occured while attempting to remove module: ", removedModule);
+			}
+		}
+		
+		System.out.printf("EA:%s deregistered from DF. Equiplet shutdown request sent.\n", getLocalName());
+		hal.reconfigureEquiplet();
+	}
+	
+	/**
+	 * [W.I.P. and untested]
+	 * This method should be called once the reconfiguration of an equiplet has been completed.
+	 * It wants a list of modules that were added in the reconfiguration.
+	 * @param An object containing two JSONObjects with drivers for the added modules.
+	 * @author Thomas Kok
+	 * @author Kevin Bosman
+	 */
+	public boolean reinitializeEquiplet(List<DTOModuleSettings> toBeAddedModuleSettings){
+		boolean isInsertingModulesSuccessful = true;
+		List<Boolean> results = new ArrayList<Boolean>();
+		
+		for(DTOModuleSettings moduleSettings : toBeAddedModuleSettings){
+			try{
+				results.add(hal.insertModule(moduleSettings.staticSettings, moduleSettings.dynamicSettings));
+			}catch(InvalidMastModeException ex){
+				isInsertingModulesSuccessful = false;
+			}
+		}
+		if(!isInsertingModulesSuccessful || (results.size() != toBeAddedModuleSettings.size())){
+			Logger.log("Not all new modules could be added succesfully.");
+		}
+		
+		capabilities.clear();
+		ArrayList<String> services = hal.getSupportedServices();
+		for (String service : services) {
+			capabilities.add(new Capability(service, new HashMap<String, Object>(), new Tick(10)));
+		}
+		// TODO Dirty as balls. This is done in the initial init function as well, a better solution for this should be implemented.
+		this.init(new Position(0,0), capabilities);
+		register();
+		return isInsertingModulesSuccessful;
+	}
+	
+	/**
+	 * Return all available modules currently listed in the module factory
+	 * 
+	 * @return List of modules
+	 * 
+	 * @author Thomas Kok
+	 * @author Kevin Bosman
+	 */
+	public ArrayList<ModuleIdentifier> getAllModules(){
+		return hal.getAllModules();
 	}
 
 	/**
@@ -931,6 +1008,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			throw new IllegalArgumentException("FUCK");
 		}
 	}
+	
 
 	@Override
 	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
@@ -977,9 +1055,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
-		// TODO Auto-generated method stub
-
+	public void onEquipletMachineStateChanged(String state) {
+		System.out.println("Machinestate changed: " + state + ".\n");
+		if(this.reconfiguring == true && state == "SAFE"){
+			// TODO Send message to SCADA that shutdown has completed and machine is now safe.
+		}
 	}
 
 	@Override

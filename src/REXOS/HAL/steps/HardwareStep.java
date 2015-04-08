@@ -1,7 +1,7 @@
 package HAL.steps;
 
 import HAL.Module;
-import HAL.ModuleIdentifier;
+import HAL.dataTypes.ModuleIdentifier;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,7 +87,7 @@ public class HardwareStep implements Cloneable{
 	public JSONObject toJSON() {
 		JSONObject returnValue = new JSONObject();
 		try {
-			returnValue.put(MODULE_IDENTIFIER, moduleIdentifier.toJSON());
+			returnValue.put(MODULE_IDENTIFIER, moduleIdentifier.serialize());
 			returnValue.put(STATUS, hardwareStepStatus.toString());
 			returnValue.put(INSTRUCTION_DATA, instructionData);
 			if(originPlacement != null) {

@@ -40,7 +40,7 @@ public interface HardwareAbstractionLayerListener {
 	 * 
 	 * @param state
 	 */
-	public void onEquipletStateChanged(String state);
+	public void onEquipletMachineStateChanged(String state);
 
 	/**
 	 * This method is called when the MAST mode of the equiplet changes
