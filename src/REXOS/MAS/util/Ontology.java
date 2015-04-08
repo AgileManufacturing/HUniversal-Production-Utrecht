@@ -14,4 +14,5 @@ public class Ontology {
 	public static final String CONVERSATION_TRAVEL_TIME = "travel-time";
 	public static final String CONVERSATION_INFORMATION_REQUEST = "information-request";
 	public static final String CONVERSATION_SUPPLY_REQUEST = "supply-request";
+	public static final String CONVERSATION_EQUIPLET_COMMAND = "equiplet-command";
 }
