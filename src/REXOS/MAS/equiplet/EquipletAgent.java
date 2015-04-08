@@ -1024,22 +1024,55 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		
 	}
 	
+	/**
+	 * This method returns all modules.
+	 * 
+	 * @return all modules which belong to this equiplet in an arraylist.
+	 * @throws FactoryException
+	 */
 	public ArrayList<Module> getBottomModules() throws FactoryException {
 		return hal.getBottomModules();
 	}
 	
+	/**
+	 * Delete a module which belongs to this equiplet
+	 * 
+	 * @param moduleIdentifier name of the module which should be deleted
+	 * @return
+	 * @throws Exception
+	 */
 	public JSONObject deleteModule(ModuleIdentifier moduleIdentifier) throws Exception {
 		return hal.deleteModule(moduleIdentifier);
 	}
 	
+	/**
+	 * Adding an module to this equiplet. 
+	 * 
+	 * @param staticSettings the static settings of the new module
+	 * @param dynamicSettings the dynamic settings of the new module
+	 * @return
+	 * @throws InvalidMastModeException
+	 */
 	public boolean insertModule(JSONObject staticSettings, JSONObject dynamicSettings) throws InvalidMastModeException {
 		return hal.insertModule(staticSettings, dynamicSettings);
 	}
 	
+	/**
+	 * Return the schedule of the equiplet
+	 * 
+	 * @return all jobs which are scheduled on this equiplet
+	 */
 	public TreeSet<Job> getJobSchedule(){
 		return schedule;
 	}
 	
+	
+	/**
+	 * Change the state of the equiplet (MAST)
+	 * 
+	 * @param state
+	 *            the new desired state of the equiplet
+	 */
 	public void changeMAST(EquipletState state){
 		this.state = state ;	
 	}
