@@ -119,6 +119,28 @@ public class EquipletListenerBehaviour extends Behaviour {
 		}		
 	}
 	
+	/*
+	 * Sample reconfig command
+	 * @see for more info MAS at WIKI
+
+		{
+			"requested-equiplet-command": "RECONFIGURE", 
+			"modules": [
+				{
+					"manufacturer":"HU",
+					"typeNumber":"1",
+					"serialNumber":"2"
+				},
+				{
+					"manufacturer":"HU",
+					"typeNumber":"5",
+					"serialNumber":"6"
+				},
+			]
+		}
+		
+	 */
+	
 	/**
 	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada.
 	 * 
@@ -128,7 +150,6 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @author Thomas Kok
 	 * @author Mitchell van Rijkom
 	 */
-	
 
 	private ArrayList<ModuleIdentifier> extractModulesForReconfig(JSONArray modules){
 		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
