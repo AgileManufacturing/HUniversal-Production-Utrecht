@@ -36,7 +36,7 @@
  * @brief this class creates and uses a matrix in order to rectify an image \n
  * the matrix is created by loading a directory with checker board pattern images
  */
-namespace Camera {
+namespace camera {
 	class RectifyImage {
 	public:
 		cv::Mat distCoeffs;
