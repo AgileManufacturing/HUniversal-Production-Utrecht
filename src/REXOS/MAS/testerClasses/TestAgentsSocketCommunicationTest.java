@@ -38,12 +38,14 @@ public class TestAgentsSocketCommunicationTest {
 	 */
 	private static final String CONTAINER_NAME = "TestAgentsSpawnerAgent";
 
+	private static final String baseName = "TA";
 
 	/**
 	 * main() Spawns the TestAgentSpawnerAgent on the selected server.
 	 */
 	public static void main(String[] args) throws StaleProxyException {
 		spawnTestSpawnerAgent();
+		spawnTestCommuncationTest("Socket");
 	}
 	public static void spawnTestSpawnerAgent() throws StaleProxyException{
 		// Spawning TestRecieverAgent in the container that has the selected IP/Port
@@ -51,12 +53,29 @@ public class TestAgentsSocketCommunicationTest {
 		Profile profile = new ProfileImpl();
 		profile.setParameter(Profile.MAIN_HOST, MAIN_HOST);
 		profile.setParameter(Profile.MAIN_PORT, MAIN_PORT);
-		profile.setParameter(Profile.CONTAINER_NAME, CONTAINER_NAME);
+		profile.setParameter(Profile.CONTAINER_NAME,  CONTAINER_NAME);
 	
 		AgentContainer container = runtime.createAgentContainer(profile);
-		Object[] arguments = {"Socket"};
+	
+		Object[] arguments = {baseName, 0, 500};
 		String name = "TSA";
 		AgentController ac = container.createNewAgent(name, TestAgentsSpawnerAgent.class.getName(), arguments);
+		ac.start();
+	}
+	
+	public static void spawnTestCommuncationTest(String type) throws StaleProxyException{
+		// Spawning TestRecieverAgent in the container that has the selected IP/Port
+		jade.core.Runtime runtime = jade.core.Runtime.instance();
+		Profile profile = new ProfileImpl();
+		profile.setParameter(Profile.MAIN_HOST, MAIN_HOST);
+		profile.setParameter(Profile.MAIN_PORT, MAIN_PORT);
+		profile.setParameter(Profile.CONTAINER_NAME,  CONTAINER_NAME);
+	
+		AgentContainer container = runtime.createAgentContainer(profile);
+	
+		Object[] arguments = {type, baseName, 0, 500, 5};
+		String name = "TACTA";
+		AgentController ac = container.createNewAgent(name, TestAgentCommunicationTesterAgent.class.getName(), arguments);
 		ac.start();
 	}
 }
