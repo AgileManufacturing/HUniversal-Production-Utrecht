@@ -101,6 +101,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 				String requestedEquipletCommand = command.getString("requested-equiplet-command").toString();
 				
 				// Program if statements that will appropriately handle messages sent to the equiplet agent.
+<<<<<<< Updated upstream
 				if(requestedEquipletCommand.equals("RECONFIGURE")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
 					if(modules != null){
@@ -108,6 +109,16 @@ public class EquipletListenerBehaviour extends Behaviour {
 					}else{
 						Logger.log("Error while extracting modules for reconfiguration");
 					}
+=======
+				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
+					equiplet.reconfigureEquiplet(modules);
+				}else if(requestedEquipletCommand == "STATE_SAFE"){
+					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+				}else if(requestedEquipletCommand == "STATE_STANDBY"){
+					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+				}else if(requestedEquipletCommand == "STATE_NORMAL"){
+					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+>>>>>>> Stashed changes
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}

@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.json.JSONException;
@@ -69,6 +70,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	
 	// Equiplet
 	private HardwareAbstractionLayer hal;
+	
+	// agent subscriber list
+	protected Set<AID> agentListener;
 
 	/**
 	 * Equiplet agent startup
@@ -261,6 +265,14 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		return hal.getAllModules();
 	}
 
+	public void changeMachineStateEquiplet(String machineState){
+		try{
+			hal.sendEquipletStateCommand(machineState);
+		}catch(Exception ex){
+			Logger.log("error while sending state change to blackboard");
+		}
+	}
+	
 	/**
 	 * Euiplet agent clean-up operations
 	 */
@@ -1060,8 +1072,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onEquipletMachineStateChanged(String state) {
 		System.out.println("Machinestate changed: " + state + ".\n");
-		if(this.reconfiguring == true && state == "SAFE"){
-			// TODO Send message to SCADA that shutdown has completed and machine is now safe.
+		// TODO Write actual implementation			
+		if(this.reconfiguring == true && state == "OFFLINE"){
+		}else if(this.reconfiguring == true && state == "SAFE"){
+		}else if(this.reconfiguring == true && state == "STANDBY"){
+		}else if(this.reconfiguring == true && state == "NORMAL"){
 		}
 	}
 
