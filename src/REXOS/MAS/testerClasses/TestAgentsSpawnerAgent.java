@@ -44,15 +44,18 @@ public class TestAgentsSpawnerAgent extends Agent {
 	 */
 	protected void setup() {
 		Object[] args = getArguments();
-		if(args.length >= 3){
-			String agentBaseName = args[0].toString(); 
-			int startValueAgents = (int) args[1];
-			int amountOfAgents = (int) args[2];
-			if(!agentBaseName.equals("") && startValueAgents >= 0 && amountOfAgents > 0){
+		if(args.length >= 5){
+			String type = args[0].toString();
+			String agentBaseName = args[1].toString(); 
+			int startValueAgents = (int) args[2];
+			int amountOfAgents = (int) args[3];
+			int amountOfMessages = (int) args[4];
+			if(!agentBaseName.equals("") && !type.equals("") && startValueAgents >= 0 && amountOfAgents > 0){
 				try {
 					spawnReceiver();
 					spawnAgents(agentBaseName, startValueAgents, amountOfAgents);
 					Thread.sleep(1000);
+					spawnTesterAgent(type, agentBaseName, startValueAgents, amountOfAgents, amountOfMessages);
 					System.out.println("Done Spawning!");
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -101,9 +104,10 @@ public class TestAgentsSpawnerAgent extends Agent {
 			profile.setParameter(Profile.CONTAINER_NAME, CONTAINER_NAME);
 
 			AgentContainer container = runtime.createAgentContainer(profile);
-
+			
+			String name = baseAgentName + i;
 			Object[] arguments = null;
-			AgentController ac = container.createNewAgent(baseAgentName, TestAgent.class.getName(), arguments);
+			AgentController ac = container.createNewAgent(name, TestAgent.class.getName(), arguments);
 			ac.start();
 
 			// add delay so the agents have time to be added.
@@ -114,6 +118,22 @@ public class TestAgentsSpawnerAgent extends Agent {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static void spawnTesterAgent(String type, String baseAgentName, int startingNumberAgentName, int amountOfAgents, int amountOfMessages) throws StaleProxyException{
+		// Spawning TestRecieverAgent in the container that has the selected IP/Port
+		jade.core.Runtime runtime = jade.core.Runtime.instance();
+		Profile profile = new ProfileImpl();
+		profile.setParameter(Profile.MAIN_HOST, MAIN_HOST);
+		profile.setParameter(Profile.MAIN_PORT, MAIN_PORT);
+		profile.setParameter(Profile.CONTAINER_NAME,  CONTAINER_NAME);
+	
+		AgentContainer container = runtime.createAgentContainer(profile);
+	
+		Object[] arguments = { type, baseAgentName, startingNumberAgentName, amountOfAgents, amountOfMessages};
+		String name = "TACTA";
+		AgentController ac = container.createNewAgent(name, TestAgentCommunicationTesterAgent.class.getName(), arguments);
+		ac.start();
 	}
 
 }
