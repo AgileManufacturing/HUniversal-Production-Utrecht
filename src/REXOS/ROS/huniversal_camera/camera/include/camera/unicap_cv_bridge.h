@@ -30,18 +30,22 @@
 
 #pragma once
 
+#include <camera/Camera.h>
+#include <rexos_logger/rexos_logger.h>
+
 #define private reserved
 #include <unicap.h>
 #include <unicap_status.h>
 #undef private
+
 #include <boost/thread.hpp>
 #include <opencv2/core/core.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <iostream>
-#include "rexos_logger/rexos_logger.h"
 
+namespace camera {
 namespace unicap_cv_bridge {
 	/**
 	 * @brief obtain a list of device names
@@ -83,22 +87,11 @@ namespace unicap_cv_bridge {
 	/**
 	 * @brief handle to unicap camera
 	 **/
-	class UnicapCvCamera {
+	class UnicapCvCamera : public Camera{
 	private:
-		typedef enum frameCapState {
-			FCSTATE_DONT_COPY, FCSTATE_COPY, FCSTATE_SUCCESS, FCSTATE_FAILURE
-		} frameCapState;
-
-		bool tripmode;
-
 		unicap_handle_t handle;
 		unicap_device_t device;
 		unicap_format_t format;
-
-		boost::mutex mut;
-		boost::condition_variable cond;
-		frameCapState state;
-		cv::Mat* mat;
 
 	public:
 		/**
@@ -106,11 +99,8 @@ namespace unicap_cv_bridge {
 		 * @param dev device number
 		 * @param formatIndex format number
 		 **/
-		UnicapCvCamera(int dev, int formatIndex);
-
-		~UnicapCvCamera(void);
-
-		void setTripMode(bool tripmode);
+		UnicapCvCamera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps, int dev, int formatIndex);
+		~UnicapCvCamera();
 
 		/**
 		 * @brief get white balance settings
@@ -139,36 +129,16 @@ namespace unicap_cv_bridge {
 		void setAutoWhiteBalance(bool automatic);
 
 		/**
-		 * @brief get outputed image width
-		 * @return image width
-		 **/
-		int getImgWidth(void);
-
-		/**
-		 * @brief get outputed image height
-		 * @return image height
-		 **/
-		int getImgHeight(void);
-
-		/**
-		 * @brief get outputed image format
-		 * @return image format
-		 **/
-		int getImgFormat(void);
-
-		/**
 		 * @brief callback function which gets called when a new frame is captured
 		 * @note should not be called by user
 		 * @param buffer buffer which holds the frame
 		 **/
-		void newFrameCallback(unicap_data_buffer_t* buffer);
+		void handleFrame(unicap_data_buffer_t* buffer);
+		
+		virtual cv::Size getFrameSize();
+		virtual int getFrameFormat();
+		virtual void enableCamera(bool enabled);
 
-		/**
-		 * @brief get a frame
-		 *
-		 * this function blocks until a new frame is captured
-		 * @param mat the frame is copied into this matrix
-		 **/
-		void getFrame(cv::Mat* mat);
 	};
+}
 }

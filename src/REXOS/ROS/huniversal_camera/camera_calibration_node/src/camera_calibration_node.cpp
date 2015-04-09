@@ -78,7 +78,7 @@ bool CameraCalibrationNode::calibrateLens(
 	
 	// createMatrices
 	REXOS_INFO("Generating matrices...");
-	Camera::RectifyImage rectifier;
+	camera::RectifyImage rectifier;
 	int successes = rectifier.createMatrices(cv::Size(request.boardWidth, request.boardHeight), images);
 	REXOS_INFO("Successes: %d", successes);
 	

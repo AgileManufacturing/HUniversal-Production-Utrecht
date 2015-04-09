@@ -168,7 +168,7 @@ bool CameraControlNode::transitionSetup(){
 	
 	try{
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
-		REXOS_INFO(properties.c_str());
+		REXOS_INFO_STREAM(properties.c_str());
 		Json::Value jsonNode;
 		Json::Reader reader;
 		reader.parse(properties, jsonNode);
@@ -238,6 +238,7 @@ int main(int argc, char* argv[]) {
 		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
+	int argumentOffset = 1;
 	
 	bool isSimulated = false;
 	bool isShadow = false;
@@ -246,14 +247,16 @@ int main(int argc, char* argv[]) {
 		std::string arg = argv[i];
 		if (arg == "--isSimulated") {
 			isSimulated = true;
+			argumentOffset++;
 		} else if (arg == "--isShadow") {
 			isShadow = true;
 			isSimulated = true;
+			argumentOffset++;
 		}
 	}
 	
-	std::string equipletName = std::string(argv[argc - 4]);
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	std::string equipletName = std::string(argv[argumentOffset + 0]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argumentOffset + 1], argv[argumentOffset + 2], argv[argumentOffset + 3]);
 	
 	// set up node namespace and name
 	if(isShadow == true) {
@@ -267,10 +270,13 @@ int main(int argc, char* argv[]) {
 	
 	CameraControlNode node(equipletName, moduleIdentifier, isSimulated, isShadow);
 	
-	REXOS_INFO_STREAM("Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
-	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl
-	        << "S\tIncrease exposure" << std::endl << "X\tDecrease exposure" << std::endl << "Q\tQuit program"
-	        << std::endl << "Enter a key and press the \"Enter\" button" << std::endl);
+	REXOS_INFO_STREAM("Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)." << std::endl << 
+			"A\tEnable auto white balance" << std::endl << 
+			"Z\tDisable auto white balance" << std::endl << 
+			"S\tIncrease exposure" << std::endl << 
+			"X\tDecrease exposure" << std::endl << 
+			"Q\tQuit program" << std::endl << 
+			"Enter a key and press the \"Enter\" button" << std::endl);
 	
 	ros::spin();
 	return 0;

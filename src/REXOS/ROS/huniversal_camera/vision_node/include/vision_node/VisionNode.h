@@ -39,7 +39,8 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 // camera capture
-#include <camera/unicap_cv_bridge.h>
+#include <camera/CameraListener.h>
+#include <camera/Camera.h>
 // services
 #include <vision_node/autoWhiteBalance.h>
 #include <vision_node/enableComponent.h>
@@ -54,9 +55,9 @@
 #include <sstream>
 #include <string>
 
-class VisionNode {
+class VisionNode : public camera::CameraListener{
 public:
-	VisionNode(int deviceNumber, int formatNumber, std::string pathToXmlFile);
+	VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, int deviceNumber, int formatNumber);
 	~VisionNode();
 	void run();
 
@@ -68,13 +69,13 @@ public:
 	bool enableFudicialDetector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
 	bool enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
 	
+	virtual void handleFrame(cv::Mat& camFrame);
 private:
-	unicap_cv_bridge::UnicapCvCamera * cam;
-
-	cv::Mat camFrame;
+	camera::Camera * cam;
+	bool isSimulated;
 
 	ros::NodeHandle nodeHandle;
-
+	
 	bool isFishEyeCorrectorEnabled;
 	bool isQrCodeReaderEnabled;
 	bool isFudicialDetectorEnabled;
@@ -92,7 +93,6 @@ private:
 	QrCodeReader qrCodeReader;
 	FishEyeCorrector fishEyeCorrector;
 	
-
 	double exposure;
 };
 

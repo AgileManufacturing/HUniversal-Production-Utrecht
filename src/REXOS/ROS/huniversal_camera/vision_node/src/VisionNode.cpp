@@ -29,8 +29,10 @@
  *
  **/
 
-#include "vision_node/VisionNode.h"
-#include "vision_node/Services.h"
+#include <vision_node/VisionNode.h>
+#include <vision_node/Services.h>
+#include <camera/unicap_cv_bridge.h>
+#include <camera/SimulatedCamera.h>
 #include "rexos_utilities/Utilities.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -38,8 +40,8 @@
 
 #include <stdexcept>
 
-VisionNode::VisionNode(int deviceNumber, int formatNumber, std::string pathToXmlFile) : 
-		nodeHandle(), imgTransport(nodeHandle),
+VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, int deviceNumber, int formatNumber) : 
+		isSimulated(isSimulated), nodeHandle(), imgTransport(nodeHandle),
 		exposure(0.015), 
 		isCameraEnabled(true), isFishEyeCorrectorEnabled(false),
 		isQrCodeReaderEnabled(true), isFudicialDetectorEnabled(false),
@@ -47,15 +49,20 @@ VisionNode::VisionNode(int deviceNumber, int formatNumber, std::string pathToXml
 		fishEyeCorrector(nodeHandle)
 		
 {
-	// Connect to camera. On failure a exception will be thrown.
+	// Connect to camera. On failure an exception will be thrown.
 	REXOS_INFO("Initializing camera");
-	cam = new unicap_cv_bridge::UnicapCvCamera(deviceNumber, formatNumber);
-	cam->setAutoWhiteBalance(true);
-	cam->setExposure(exposure);
-	camFrame = cv::Mat(cam->getImgHeight(), cam->getImgWidth(), cam->getImgFormat());
-
-	fishEyeCorrector.setFrameSize(cv::Size(cam->getImgWidth(), cam->getImgHeight()));
-
+	if(isSimulated == true) {
+		cam = new camera::SimulatedCamera(equipletName, identifier, this, 5, nodeHandle);
+	} else {
+		auto cvCam = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier, this, 5, deviceNumber, formatNumber);
+		cvCam->setAutoWhiteBalance(true);
+		cvCam->setExposure(exposure);
+		cam = cvCam;
+	}
+	
+	cv::Size camFramSize = cam->getFrameSize();
+	fishEyeCorrector.setFrameSize(camFramSize);
+	
 	REXOS_INFO("Advertising services");
 	// Advertise the services.
 	increaseExposureService = nodeHandle.advertiseService(vision_node_services::INCREASE_EXPOSURE,
@@ -79,35 +86,51 @@ VisionNode::~VisionNode() {
 }
 
 bool VisionNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
-	REXOS_DEBUG("Service increaseExposure ");
-	exposure *= 1.125;
-	REXOS_DEBUG_STREAM("exposure=" << exposure);
-	if(cam) {
-		cam->setExposure(exposure);
-		return true;
-	} else {
+	if(isSimulated == true) {
+		REXOS_ERROR("Simulated camera does not support increaseExposure");
 		return false;
+	} else {
+		REXOS_DEBUG("Service decreaseExposure ");
+		exposure *= 1.125;
+		REXOS_DEBUG_STREAM("exposure=" << exposure);
+		if(cam) {
+			((camera::unicap_cv_bridge::UnicapCvCamera*) cam)->setExposure(exposure);
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 bool VisionNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
-	REXOS_DEBUG("Service decreaseExposure ");
-	exposure /= 1.125;
-	REXOS_DEBUG_STREAM("exposure=" << exposure);
-	if(cam) {
-		cam->setExposure(exposure);
-		return true;
-	} else {
+	if(isSimulated == true) {
+		REXOS_ERROR("Simulated camera does not support decreaseExposure");
 		return false;
+	} else {
+		REXOS_DEBUG("Service decreaseExposure ");
+		exposure /= 1.125;
+		REXOS_DEBUG_STREAM("exposure=" << exposure);
+		if(cam) {
+			((camera::unicap_cv_bridge::UnicapCvCamera*) cam)->setExposure(exposure);
+			return true;
+		} else {
+			return false;
+		}
 	}
-
 }
 bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& request, vision_node::autoWhiteBalance::Response& response) {
-	REXOS_DEBUG_STREAM("Service autoWhiteBalance " << (bool) request.enable);
-	if(cam) {
-		cam->setAutoWhiteBalance(request.enable);
-		return true;
-	} else {
+	if(isSimulated == true) {
+		REXOS_ERROR("Simulated camera does not support autoWhiteBalance");
 		return false;
+	} else {
+		REXOS_DEBUG("Service decreaseExposure ");
+		exposure *= 1.125;
+		REXOS_DEBUG_STREAM("exposure=" << exposure);
+		if(cam) {
+			((camera::unicap_cv_bridge::UnicapCvCamera*) cam)->setAutoWhiteBalance(request.enable);
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
@@ -141,38 +164,31 @@ bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& reque
 
 void VisionNode::run() {
 	if(!cam) throw std::runtime_error("Camera not initialized!");
+	ros::spin();
+}
 
-	ros::Rate frameRate(10);
-	while(ros::ok()) {
-		if(isCameraEnabled) {
-			// Read image 
-			cam->getFrame(&camFrame);
-			if(isFishEyeCorrectorEnabled == true){
-				camFrame = fishEyeCorrector.handleFrame(camFrame);
-			}
-			
-			cv::Mat grayScaleFrame;
-			if(isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true){
-				// convert to grayscale, because these readers / detecors need grayscale images
-				cvtColor(camFrame, grayScaleFrame, CV_RGB2GRAY);
-			}
-			
-			if(isQrCodeReaderEnabled == true){
-				qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
-			}
-		
-			if(cameraFeedPublisher.getNumSubscribers() != 0){
-				ros::Time time = ros::Time::now();
-				cv_bridge::CvImage cvi;
-				cvi.header.stamp = time;
-				cvi.header.frame_id = "image";
-				cvi.encoding = sensor_msgs::image_encodings::BGR8;
-				cvi.image = camFrame;
-				cameraFeedPublisher.publish(cvi.toImageMsg());
-			}
-		}
-		
-		frameRate.sleep();
-		ros::spinOnce();
+void VisionNode::handleFrame(cv::Mat& camFrame) {
+	if(isFishEyeCorrectorEnabled == true){
+		camFrame = fishEyeCorrector.handleFrame(camFrame);
+	}
+	
+	cv::Mat grayScaleFrame;
+	if(isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true){
+		// convert to grayscale, because these readers / detecors need grayscale images
+		cvtColor(camFrame, grayScaleFrame, CV_RGB2GRAY);
+	}
+	
+	if(isQrCodeReaderEnabled == true){
+		qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
+	}
+
+	if(cameraFeedPublisher.getNumSubscribers() != 0){
+		ros::Time time = ros::Time::now();
+		cv_bridge::CvImage cvi;
+		cvi.header.stamp = time;
+		cvi.header.frame_id = "image";
+		cvi.encoding = sensor_msgs::image_encodings::BGR8;
+		cvi.image = camFrame;
+		cameraFeedPublisher.publish(cvi.toImageMsg());
 	}
 }
