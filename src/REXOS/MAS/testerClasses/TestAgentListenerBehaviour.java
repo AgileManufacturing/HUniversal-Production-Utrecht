@@ -75,6 +75,7 @@ public class TestAgentListenerBehaviour extends Behaviour {
 				if(requestedEquipletCommand.equals("SENDMESSAGEACL")){
 					test.sendMessage();
 				}else if(requestedEquipletCommand.equals("SENDMESSAGESOCKET")){
+					test.sendMessageSocket();
 					System.out.println("SendMessageSocket");
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");

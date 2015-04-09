@@ -24,15 +24,17 @@ public class TestAgentCommunicationTesterAgent extends Agent {
 				if(!agentBaseName.equals("") && startingNumberAgentName >= 0 && amountOfAgents > 0 && amountOfMessages > 0){
 					sendMessages("SENDMESSAGEACL", agentBaseName,startingNumberAgentName, amountOfAgents, amountOfMessages);
 					System.out.println("Done ACL!");
+				}else{
+					System.err.println("Message settings are wrong ACL");
 				}
-				System.err.println("Message settings are wrong ACL");
 			
 			}else if(arg1.equals("Socket")){
-				if(startingNumberAgentName >= 0 && amountOfAgents > 0 && amountOfMessages > 0){
+				if((!agentBaseName.equals("")) && startingNumberAgentName >= 0 && amountOfAgents > 0 && amountOfMessages > 0){
 					sendMessages("SENDMESSAGESOCKET", agentBaseName, startingNumberAgentName, amountOfAgents, amountOfMessages);
 					System.out.println("Done Socket!");
+				}else{
+					System.err.println("Message settings are wrong Socket");
 				}
-				System.err.println("Message settings are wrong Socket");
 			}
 			else{
 				System.err.println("Invalid argument agent: " + getLocalName() + "argument: " + arg1);
