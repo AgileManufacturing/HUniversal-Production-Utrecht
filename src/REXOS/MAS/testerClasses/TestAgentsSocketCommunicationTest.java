@@ -16,7 +16,7 @@ import MAS.equiplet.EquipletAgent;
 import MAS.util.MASConfiguration;
 import MAS.util.Ontology;
 
-public class TestAgentsACLCommunicationTest {
+public class TestAgentsSocketCommunicationTest {
 	/**
 	 * 
 	 */
@@ -51,11 +51,10 @@ public class TestAgentsACLCommunicationTest {
 		Profile profile = new ProfileImpl();
 		profile.setParameter(Profile.MAIN_HOST, MAIN_HOST);
 		profile.setParameter(Profile.MAIN_PORT, MAIN_PORT);
-		profile.setParameter(Profile.CONTAINER_NAME,  CONTAINER_NAME);
+		profile.setParameter(Profile.CONTAINER_NAME, CONTAINER_NAME);
 	
 		AgentContainer container = runtime.createAgentContainer(profile);
-	
-		Object[] arguments = {"ACL"};
+		Object[] arguments = {"Socket"};
 		String name = "TSA";
 		AgentController ac = container.createNewAgent(name, TestAgentsSpawnerAgent.class.getName(), arguments);
 		ac.start();
