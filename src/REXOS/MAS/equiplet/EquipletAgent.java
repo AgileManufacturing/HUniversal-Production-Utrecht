@@ -208,6 +208,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		deregister();
 		
 		// TODO A form a delay should be implemented here, at least until the schedule is empty.
+		while(state != EquipletState.IDLE){
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				Logger.log("Schedule empty.. Continue reconfig shutdown..");
+			}
+		}
 		
 		for(ModuleIdentifier removedModule : arrayList){
 			try{
@@ -1103,6 +1110,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			executeJob(time, ready);
 		} else {
 			state = EquipletState.IDLE;
+			this.notifyAll();
 		}
 	}
 
