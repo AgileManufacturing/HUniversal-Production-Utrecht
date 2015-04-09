@@ -226,7 +226,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleC_02 = "\"," +
-			"			\"command\":\"roslaunch camera.launch equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" +
+			"			\"command\":\"roslaunch camera.launch isSimulated:={isSimulated} isShadow:={isShadow} equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -254,7 +254,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":null," +
-			"	\"mountPointX\":5," +
+			"	\"mountPointX\":4," +
 			"	\"mountPointY\":16" +
 			"}";
 	// lens
