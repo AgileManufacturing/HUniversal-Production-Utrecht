@@ -1,0 +1,433 @@
+== WORK IN PROGRESS ==
+
+How to install a MySQL cluster the hard way.
+Im writing this on how to do it on a VM (Ubuntu Server 14.04).
+MySQL clusters consist out of 3 types of node:
+	Data node (Winstead)
+	SQL daemon node (Manfredi)
+	Management node (Katina)
+
+Data node will hold the database and it will be replicated automatically to all data nodes. Sql daemon node is the interface between database and client.
+It will serve the query they got from data nodes, similar like a "gateway". Management node is required in order to monitor and manage the whole cluster. Recommended minimum setup for high availability and scalability will be 5 servers as what i have highlighted in the picture above. 
+
+== CURRENT TEST SET UP == 
+All the systems are set up with root and madmilla setup with the name of machine in lowercase as password.
+
+Management Node 	mgmrm 
+	Katina			10.0.1.223
+How to configure a management node
+
+
+Data Node 			ndbd
+	Winstead		10.0.1.205
+	Williams		10.0.1.208
+How to configure a data node
+
+
+Application Node 	app
+	Manfredi		10.0.1.241
+	Armstrong		10.0.1.211
+
+
+/**
+10.0.1.223	katina
+10.0.1.205	winstead
+10.0.1.208	williams
+10.0.1.241	manfredi
+10.0.1.211	armstrong
+
+
+ */
+
+
+NOTE: WHEN SETTING UP THE SEPERATE SERVER FIRST SET UP OPENSSH!!!
+NOTE: 
+NOTE: Put on some good music if you have to configure this stuff. Its like Dark Souls for admins.
+
+
+== Why a MySQL cluster ==
+For the current setup of the grid knowledge database we need a system that all the equiplets can connect to and get the latest database.
+And the need arouse to make this database available to all so we can keep track of moving modules and or a module database.
+
+
+== MGM  - Not the movie firm ==
+
+COMMANDS NEEDED:
+wget http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+tar xvf http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+rm mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+sudo mkdir -p /var/lib/mysql-cluster
+sudo cp -r mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64/* /var/lib/mysql-cluster
+cd /var/lib/mysql-cluster
+cp bin/ndb_mgm* /usr/local/bin
+cd /usr/local/bin
+chmod +x ndb_mgm*
+
+touch /var/lib/mysql-cluster/config.ini
+nano /var/lib/mysql-cluster/config.ini
+	[ndb_mgmd default]
+	DataDir=/var/lib/mysql-cluster
+	 
+	[ndb_mgmd]
+	HostName=katina
+	 
+	[ndbd default]
+	NoOfReplicas=1
+	DataMemory=256M
+	IndexMemory=128M
+	DataDir=/var/lib/mysql-cluster
+	 
+	[ndbd]
+	HostName=winstead
+	 
+
+	[mysqld]
+	HostName=manfredi
+
+
+1. Download MySQL cluster 
+	http://dev.mysql.com/downloads/cluster/
+	Pick linux generic
+
+	I went with:
+	http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+== NDBD - Sounds like a hipster band ==
+wget http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+tar xvf http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+rm mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+sudo mkdir -p /var/lib/mysql-cluster
+sudo cp -r mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64/* /var/lib/mysql-cluster
+
+sudo touch /etc/my.cnf
+sudo nano /etc/my.cnf
+
+
+
+[mysqld]
+# Options for mysqld process:
+ndbcluster                      # run NDB storage engine
+ndb-connectstring=katina 
+
+[mysql_cluster]
+# Options for MySQL Cluster processes:
+ndb-connectstring=katina  # location of management server
+
+
+
+cp bin/ndbd /usr/local/bin/ndbd
+cp bin/ndbmtd /usr/local/bin/ndbmtd
+cd /usr/local/bin
+chmod +x ndb*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+== APP 	- No it does not run on you phone or tablet or smart watch ==
+Data nodes.  Installation of the data nodes does not require the mysqld binary. Only the MySQL Cluster data node executable ndbd (single-threaded) or ndbmtd (multi-threaded) is required. These binaries can also be found in the .tar.gz archive. Again, we assume that you have placed this archive in /var/tmp.
+
+cd /var/tmp
+tar -zxvf mysql-5.6.24-ndb-7.4.6-linux-i686-glibc23.tar.gz
+cd mysql-5.6.24-ndb-7.4.6-linux-i686-glibc23
+cp bin/ndbd /usr/local/bin/ndbd
+cp bin/ndbmtd /usr/local/bin/ndbmtd
+cd /usr/local/bin
+chmod +x ndb*
+
+
+
+sudo apt-get install libaio-dev libaio1
+
+
+== Starting up the cluster ==
+
+Starting order:
+MANAGEMENT NODE > DATA NODE > APP NODE
+
+KATINA:
+sudo ndb_mgmd --initial -f config.ini --configdir=/var/lib/mysql-cluster
+
+Winstead
+ndbd
+Williams
+ndbd
+
+manfredi
+sudo mysqld --defaults-file=/etc/my.cnf -u root -p   BORKED!
+
+
+
+== Monitor the the cluster ==
+
+== Stopping the cluster ==
+
+Praise the sun
+
+
+
+
+
+How to configure a application node
+
+
+
+
+It isn’t necessarily immediately obvious how to set up a Cluster on LINUX; this post attempts to show how to get a simple Cluster up and running. For simplicity, all of the nodes will run on a single host – a subsequent post will take the subsequent steps of moving some of them to a second host. As with my Windows post the Cluster will contain the following nodes:
+
+    1 Management node (ndb_mgmd)
+    2 Data nodes (ndbd)
+    3 MySQL Server (API) nodes (mysqld)
+
+Downloading and installing
+
+Browse to the MySQL Cluster LINUX download page at mysql.com and download the correct version (32 or 64 bit) and store it in the desired directory (in my case, /home/billy/mysql) and then extract and rename the new folder to something easier to work with…
+
+
+
+install openssh-server
+apt-get install openssh-server
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Configure and run the Cluster
+
+Create a sub-directory called “conf” and create the following 4 files there:
+
+config.ini
+
+	[ndbd default]
+	noofreplicas=2
+
+	[ndbd]
+	hostname=localhost
+	id=2
+
+	[ndbd]
+	hostname=localhost
+	id=3
+
+	[ndb_mgmd]
+	id = 1
+	hostname=localhost
+
+	[mysqld]
+	id=4
+	hostname=localhost
+
+	[mysqld]
+	id=5
+	hostname=localhost
+
+	[mysqld]
+	id=6
+	hostname=localhost
+
+my.1.conf
+
+	[mysqld]
+	ndb-nodeid=4
+	ndbcluster
+	datadir=/usr/local/mysql/data/ndb_mgmd
+	basedir=/usr/local/mysql
+	port=3306
+	server-id=1
+	log-bin
+
+my.2.conf
+
+	[mysqld]
+	ndb-nodeid=5
+	ndbcluster
+	datadir=/usr/local/mysql/data/ndbd
+	basedir=/usr/local/mysql
+	port=3307
+	server-id=2
+	log-bin
+
+my.3.conf
+
+	[mysqld]
+	ndb-nodeid=6
+	ndbcluster
+	datadir=/usr/local/mysql/data/mysqld
+	basedir=/usr/local/mysql
+	port=3308
+	server-id=3
+	log-bin
+
+Those files configure the nodes that make up the Cluster. From a command prompt window, launch the management node:
+
+	bin/ndb_mgmd --initial -f conf/config.ini --configdir=/usr/local/mysql/conf
+	2009-06-17 13:00:08 [MgmSrvr] INFO     -- NDB Cluster Management Server. mysql-5.1.34 ndb-7.0.6
+	2009-06-17 13:00:08 [MgmSrvr] INFO     -- Reading cluster configuration from 'conf/config.ini'
+
+Check that the management node is up and running:
+
+	bin/ndb_mgm
+	ndb_mgm> show
+	Connected to Management Server at: localhost:1186
+	Cluster Configuration
+	---------------------
+	[ndbd(NDB)]    2 node(s)
+	id=2 (not connected, accepting connect from localhost)
+	id=3 (not connected, accepting connect from localhost)
+
+	[ndb_mgmd(MGM)]    1 node(s)
+	id=1    @localhost  (mysql-5.1.34 ndb-7.0.6)
+
+	[mysqld(API)]    3 node(s)
+	id=4 (not connected, accepting connect from localhost)
+	id=5 (not connected, accepting connect from localhost)
+	id=6 (not connected, accepting connect from localhost)
+	ndb_mgm> quit
+
+and then start the 2 data nodes (ndbd) and 3 MySQL API/Server nodes (ndbd) and then check that they’re all up and running:
+
+bin/ndbd --initial -c localhost:1186
+2009-06-17 13:05:47 [ndbd] INFO     -- Configuration fetched from 'localhost:1186', generation: 1
+bin/ndbd --initial -c localhost:1186
+2009-06-17 13:05:51 [ndbd] INFO     -- Configuration fetched from 'localhost:1186', generation: 1
+
+bin/mysqld --defaults-file=conf/my.1.conf&
+bin/mysqld --defaults-file=conf/my.2.conf&
+bin/mysqld --defaults-file=conf/my.3.conf&
+
+bin/ndb_mgm
+-- NDB Cluster -- Management Client --
+ndb_mgm> show
+Connected to Management Server at: localhost:1186
+Cluster Configuration
+---------------------
+[ndbd(NDB)]    2 node(s)
+id=2    @127.0.0.1  (mysql-5.1.34 ndb-7.0.6, Nodegroup: 0, Master)
+id=3    @127.0.0.1  (mysql-5.1.34 ndb-7.0.6, Nodegroup: 0)
+
+[ndb_mgmd(MGM)]    1 node(s)
+id=1    @127.0.0.1  (mysql-5.1.34 ndb-7.0.6)
+
+[mysqld(API)]    3 node(s)
+id=4    @127.0.0.1  (mysql-5.1.34 ndb-7.0.6)
+id=5    @127.0.0.1  (mysql-5.1.34 ndb-7.0.6)
+id=6    @127.0.0.1  (mysql-5.1.34 ndb-7.0.6)
+ndb_mgm> quit
+
+Using the Cluster
+
+There are now 3 API nodes/MySQL Servers/mysqlds running; all accessing the same data. Each of those nodes can be accessed by the mysql client using the ports that were configured in the my.X.cnf files. For example, we can access the first of those nodes (node 4) in the following way (each API node is accessed using the port number in its associate my.X.cnf file:
+
+[billy@ws1 7_0_6]$ bin/mysql -h localhost -P 3306
+Welcome to the MySQL monitor.  Commands end with ; or g.
+Your MySQL connection id is 4
+Server version: 5.1.34-ndb-7.0.6-cluster-gpl-log MySQL Cluster Server (GPL)
+Type 'help;' or 'h' for help. Type 'c' to clear the current input statement.
+mysql> use test;
+Database changed
+mysql> create table assets (name varchar(30) not null primary key,
+-> value int) engine=ndb;
+090617 13:21:36 [Note] NDB Binlog: CREATE TABLE Event: REPL$test/assets
+090617 13:21:36 [Note] NDB Binlog: logging ./test/assets (UPDATED,USE_WRITE)
+090617 13:21:37 [Note] NDB Binlog: DISCOVER TABLE Event: REPL$test/assets
+090617 13:21:37 [Note] NDB Binlog: DISCOVER TABLE Event: REPL$test/assets
+090617 13:21:37 [Note] NDB Binlog: logging ./test/assets (UPDATED,USE_WRITE)
+090617 13:21:37 [Note] NDB Binlog: logging ./test/assets (UPDATED,USE_WRITE)
+Query OK, 0 rows affected (0.99 sec)
+mysql> insert into assets values ('Car','1900');
+Query OK, 1 row affected (0.03 sec)
+mysql> select * from assets;
++------+-------+
+| name | value |
++------+-------+
+| Car  |  1900 |
++------+-------+
+1 row in set (0.00 sec)
+mysql> quit
+Bye
+
+Note that as this table is using the ndb (MySQL Cluster) storage engine, the data is actually held in the data nodes rather than in the SQL node and so we can access the exact same data from either of the other 2 SQL nodes:
+
+[billy@ws1 7_0_6]$ bin/mysql -h localhost -P 3307
+Welcome to the MySQL monitor.  Commands end with ; or g.
+Your MySQL connection id is 5
+Server version: 5.1.34-ndb-7.0.6-cluster-gpl-log MySQL Cluster Server (GPL)
+type 'help;' or 'h' for help. Type 'c' to clear the current input statement.
+mysql> use test;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+Database changed
+mysql> select * from assets;
++------+-------+
+| name | value |
++------+-------+
+| Car  |  1900 |
++------+-------+
+1 row in set (0.00 sec)
+mysql> quit
+Bye
+
+Your next steps
+
+This is a very simple, contrived set up – in any sensible deployment, the nodes would be spread across multiple physical hosts in the interests of performance and redundancy (take a look at the new article (Deploying MySQL Cluster over multiple host) to see how to do that). You’d also set several more variables in the configuration files in order to size and tune your Cluster.
++1 on Planet MySQL
+
+
+groupadd mysql
+useradd =g mysql mysql
+cd /var/tmp
+tar -C /usr/local -xzvf mysql-cluster-gpl-7.1.35-linux-i686-glibc23.tar.gz
+ln -s /usr/local/mysql-cluster-gpl-7.1.35-linux-i686-glibc23 /usr/local/mysql
+cd mysql
+apt-get install libaio1 libaio-dev
+
+http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-debian7-x86_64.deb
+http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
