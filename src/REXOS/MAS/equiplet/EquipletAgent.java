@@ -102,6 +102,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 					}
 
 					init(defaultPosition, capabilities);
+					
+					// initialize Set list for agents that listens to EA
+					agentListener = new HashSet<AID>();
+					
 				} catch (KnowledgeException | BlackboardUpdateException e) {
 					e.printStackTrace();
 					System.err.printf("EA:%s failed to create the HAL: %s", getLocalName(), e.getMessage());
@@ -1023,7 +1027,46 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			throw new IllegalArgumentException("FUCK");
 		}
 	}
+	/**
+	 * Add an agent that wants listens to EA
+	 * 
+	 * @param ID agent id
+	 * @author Mitchell van Rijkom
+	 */
+	public boolean addAgentListener(AID ID){
+		if(!agentListener.contains(ID)){
+			agentListener.add(ID);
+			printRegisteredAgents();
+			return true;
+		}
+		return false;
+	}
 	
+	/**
+	 * removes an agent that listens to EA
+	 * 
+	 * @param ID agent id
+	 * @author Mitchell van Rijkom
+	 */
+	public boolean removeAgentListener(AID ID){
+		if(agentListener.contains(ID)){
+			agentListener.remove(ID);
+			//printRegisteredAgents();
+			return true;
+		}
+		return false;		
+	}
+	
+	/**
+	 * This function is meant for debug output to look if the agents are registered to the EA
+	 * @author Mitchell van Rijkom 
+	 */
+	public void printRegisteredAgents(){
+		Logger.log("LIST WITH AGENTS/n/n");
+		for(AID agents : agentListener){
+			Logger.log("AGENT:	" + agents.toString() + "\n");
+		}
+	}
 
 	@Override
 	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
@@ -1073,11 +1116,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onEquipletMachineStateChanged(String state) {
 		System.out.println("Machinestate changed: " + state + ".\n");
 		// TODO Write actual implementation			
-		if(this.reconfiguring == true && state == "OFFLINE"){
-		}else if(this.reconfiguring == true && state == "SAFE"){
-		}else if(this.reconfiguring == true && state == "STANDBY"){
-		}else if(this.reconfiguring == true && state == "NORMAL"){
-		}
+		
+		for(AID agent : agentListener){			
+			// send can execute reply
+			ACLMessage message = new ACLMessage( ACLMessage.INFORM );
+			message.addReceiver(agent);
+			message.setContent(state);
+			send(message);	
+			
+//			if(this.reconfiguring == true && state == "OFFLINE"){
+//			}else if(this.reconfiguring == true && state == "SAFE"){
+//			}else if(this.reconfiguring == true && state == "STANDBY"){
+//			}else if(this.reconfiguring == true && state == "NORMAL"){
+		}		
 	}
 
 	@Override
@@ -1088,8 +1139,20 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onModuleStateChanged(String state, Module module) {
-		// TODO Auto-generated method stub
+		System.out.println("module changed: " + state + ".\n");
 
+		for(AID agent : agentListener){			
+			// send can execute reply
+			ACLMessage message = new ACLMessage( ACLMessage.PROPOSE );
+			message.addReceiver(agent);
+			message.setContent(module.toString()+ "  " + state);
+			send(message);		
+			
+//			if(this.reconfiguring == true && state == "OFFLINE"){
+//			}else if(this.reconfiguring == true && state == "SAFE"){
+//			}else if(this.reconfiguring == true && state == "STANDBY"){
+//			}else if(this.reconfiguring == true && state == "NORMAL"){
+		}
 	}
 
 	@Override

@@ -48,8 +48,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(
 								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
 										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
-												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), 
-													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND))))), 
+												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), MessageTemplate.or(
+													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND),
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND)))))),
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
 		
@@ -78,15 +79,66 @@ public class EquipletListenerBehaviour extends Behaviour {
 				handleInformationRequest(msg);
 				break;
 			// messagetype holding the requested state for the equiplet
-			case ACLMessage.PROPOSE:
+			case ACLMessage.PROPOSE:				
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
 					handleEquipletCommand(msg);
+				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
+					handleListenerCommand(msg);				
 				}
 				break;
 			default:
 				break;
 			}
 		}
+	}
+	
+	/**
+	 * Function that handles listener commands from agents
+	 * 
+	 * This message processes a message 
+	 * if an agents wants to listen or 
+	 * not longer wants to listen to the equiplet agent
+	 * 
+	 * @param msg ACL message if agents wants to add or remove to listener
+	 * @author Mitchell van Rijkom
+	 */
+	private void handleListenerCommand(ACLMessage msg) {
+		if(msg != null){
+			try {
+				JSONObject command = new JSONObject(msg.getContent());
+				
+				//Debug output
+				Logger.log("Content of ACL message: " + command.toString());
+				
+				boolean ifSucceededListener = false;
+				
+				//Identifying if an agents wants to listen or not longer to the equiplet agent
+				String requestedListenerCommand = command.getString("listener-command").toString();
+				
+				if(requestedListenerCommand.equals("addListener")){
+					ifSucceededListener = equiplet.addAgentListener(msg.getSender());
+				}else if(requestedListenerCommand.equals("removeListener")){
+					ifSucceededListener = equiplet.removeAgentListener(msg.getSender());
+				}else {
+					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
+				}
+				
+				// Reply to agent if listener succeeded
+				ACLMessage reply = msg.createReply();
+				if(ifSucceededListener){					
+					//reply.setContent(content);
+					reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+					equiplet.send(reply);
+				}else {
+					//reply.setContent(content);
+					reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+					equiplet.send(reply);					
+				}
+			}catch(Exception e){
+				Logger.log("Error adding/removing listener to EA");
+			}
+		}
+		
 	}
 
 	private void handleEquipletCommand(ACLMessage msg) {
@@ -101,7 +153,6 @@ public class EquipletListenerBehaviour extends Behaviour {
 				String requestedEquipletCommand = command.getString("requested-equiplet-command").toString();
 				
 				// Program if statements that will appropriately handle messages sent to the equiplet agent.
-<<<<<<< Updated upstream
 				if(requestedEquipletCommand.equals("RECONFIGURE")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
 					if(modules != null){
@@ -109,16 +160,10 @@ public class EquipletListenerBehaviour extends Behaviour {
 					}else{
 						Logger.log("Error while extracting modules for reconfiguration");
 					}
-=======
-				if(requestedEquipletCommand == "RECONFIGURE" && modules != null){
-					equiplet.reconfigureEquiplet(modules);
-				}else if(requestedEquipletCommand == "STATE_SAFE"){
-					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
 				}else if(requestedEquipletCommand == "STATE_STANDBY"){
 					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
 				}else if(requestedEquipletCommand == "STATE_NORMAL"){
 					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
->>>>>>> Stashed changes
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
