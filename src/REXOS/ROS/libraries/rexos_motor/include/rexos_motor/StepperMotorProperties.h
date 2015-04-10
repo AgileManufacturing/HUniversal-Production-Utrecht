@@ -30,60 +30,19 @@
 
 #pragma once
 
-#include <queue>
-#include <boost/thread.hpp>
-
 #include <rexos_motor/MotorRotation.h>
-#include <rexos_modbus/ModbusException.h>
-#include <rexos_modbus/ModbusController.h>
-#include <rexos_motor/CRD514KD.h>
-#include <rexos_motor/MotorInterface.h>
-#include "rexos_logger/rexos_logger.h"
+#include <rexos_motor/MotorProperties.h>
 
 #include <jsoncpp/json/value.h>
 
-namespace rexos_motor{
-	class StepperMotorProperties{
+namespace rexos_motor {
+	class StepperMotorProperties : public MotorProperties {
 	public:
-		/**
-		 * @var double MOTOR_ROT_MIN
-		 * Mathematical minimum angle the motor is allowed to move to in radians.
-		 **/
-		double motorMinAngle;
-		/**
-		 * @var double MOTOR_ROT_MAX
-		 * Mathematical maximum angle the motor is allowed to move to in radians.
-		 **/
-		double motorMaxAngle;
-		
 		/**
 		 * @var double MOTOR_STEP_ANGLE
 		 * The angle of a single motor microstep in radians
 		 **/
 		double microStepAngle;
-		/**
-		 * @var double MOTOR_MIN_ACCELERATION
-		 * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
-		 **/
-		double minAcceleration;
-
-		/**
-		 * @var double MOTOR_MAX_ACCELERATION
-		 * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
-		 **/
-		double maxAcceleration;
-
-		/**
-		 * @var double MOTOR_MIN_SPEED
-		 * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
-		 **/		
-		double minSpeed;
-
-		/**
-		 * @var double MOTOR_MAX_SPEED
-		 * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
-		 **/
-		double maxSpeed;
 	public:
 		StepperMotorProperties(Json::Value properties);
 		

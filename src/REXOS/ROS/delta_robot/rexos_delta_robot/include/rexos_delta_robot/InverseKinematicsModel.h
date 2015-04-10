@@ -103,7 +103,6 @@ namespace rexos_delta_robot{
 		 * @param destinationPoint The destination point.
 		 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 		 **/
-		virtual void destinationPointToMotorRotations(const Vector3& destinationPoint,
-				rexos_motor::MotorRotation* (&rotations)[3]) const = 0;
+		virtual std::vector<rexos_motor::MotorRotation> destinationPointToMotorRotations(const Vector3& destinationPoint) const = 0;
 	};
 }

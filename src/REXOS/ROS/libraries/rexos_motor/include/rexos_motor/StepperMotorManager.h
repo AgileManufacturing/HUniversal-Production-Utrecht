@@ -31,16 +31,19 @@
 
 #pragma once
 
-#include <rexos_motor/MotorInterface.h>
+#include <rexos_modbus/ModbusController.h>
+#include <rexos_motor/MotorManager.h>
+#include <rexos_motor/StepperMotor.h>
+#include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 
-namespace rexos_motor{
+namespace rexos_motor {
 
 	/**
 	 * Motor management for concurrent movement.
 	 **/
-	class MotorManager{
+	class StepperMotorManager : public MotorManager {
 	public:
 		/**
 		 * Constructor for the motor manager
@@ -49,35 +52,15 @@ namespace rexos_motor{
 		 * @param motors Pointer array containing all motors for this manager.
 		 * @param numberOfMotors Number of motors in the pointer array.
 		 **/
-		MotorManager(std::vector<MotorInterface*> motors);
+		StepperMotorManager(rexos_modbus::ModbusController* modbus, std::vector<MotorInterface*> motors);
+		virtual void startMovement();
+		void startMovement(int motionSlot);
 
-		void powerOn(void);
-		void powerOnSingleMotor(int motorIndex);
-		void powerOffSingleMotor(int motorIndex);
-		void powerOff(void);
-
+	private:
 		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
+		 * @var ModbusController::ModbusController* modbus
+		 * Pointer to an established modbus connection.
 		 **/
-		bool isPoweredOn(void){ return poweredOn; }
-		
-		/**
-		 * Start simultaneously movement of all motors
-		 **/
-		virtual void startMovement() = 0;
-
-	protected:
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<MotorInterface*> motors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
+		rexos_modbus::ModbusController* modbus;
 	};
 }

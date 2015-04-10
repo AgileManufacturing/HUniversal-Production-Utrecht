@@ -38,42 +38,6 @@
 namespace rexos_motor{
 	namespace CRD514KD{
 		/**
-		 * @var double MOTOR_STEP_ANGLE
-		 * The angle of a single motor microstep in radians
-		 **/
-		const double MOTOR_STEP_ANGLE = (0.036 / 180.) * M_PI;
-
-		/**
-		 * @var double MOTOR_FULL_STEP_IN_DEGREES
-		 * The angle of a single motor full step in degrees
-		 **/
-		//const double MOTOR_FULL_STEP_IN_DEGREES = 0.36;
-
-		/**
-		 * @var double MOTOR_MIN_ACCELERATION
-		 * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
-		 **/
-		const double MOTOR_MIN_ACCELERATION = MOTOR_STEP_ANGLE * 1000;
-
-		/**
-		 * @var double MOTOR_MAX_ACCELERATION
-		 * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
-		 **/
-		const double MOTOR_MAX_ACCELERATION = MOTOR_STEP_ANGLE * 1000000;
-
-		/**
-		 * @var double MOTOR_MIN_SPEED
-		 * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
-		 **/		
-		const double MOTOR_MIN_SPEED = MOTOR_STEP_ANGLE * 1;
-
-		/**
-		 * @var double MOTOR_MAX_SPEED
-		 * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
-		 **/
-		const double MOTOR_MAX_SPEED = MOTOR_STEP_ANGLE * 500000;
-
-		/**
 		 * @var int MOTION_SLOTS_USED
 		 * The amount of motion slots being used. This value can be anywhere from 1 to 63. However, there is currently no use for it being any more than 2. 
 		 **/

@@ -34,7 +34,7 @@
 
 #include <iostream>
 #include <vectors/Vectors.h>
-#include <rexos_motor/StepperMotor.h>
+#include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/InverseKinematicsModel.h>
@@ -53,13 +53,13 @@ namespace rexos_delta_robot{
 		
 		static EffectorBoundaries* generateEffectorBoundaries(const InverseKinematicsModel& model, 
 				const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
-				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
+				const std::vector<rexos_motor::MotorInterface*> motors, double voxelSize);
 
 		bool checkPath(const Vector3& from, const Vector3& to) const;
 
 	private:
 		EffectorBoundaries(const InverseKinematicsModel& model, const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
-				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize);
+				const std::vector<rexos_motor::MotorInterface*> motors, double voxelSize);
 
 		/**
 		 * Represents a 3-dimensional point in the 3D voxel array.
@@ -169,7 +169,7 @@ namespace rexos_delta_robot{
 		 * @var rexos_motor::StepperMotorProperties* stepperMotorProperties[3]
 		 * A reference to the InverseKinematicsModel of the deltarobot, which is used to calculate the boundaries.
 		 **/
-		const std::vector<rexos_motor::StepperMotor*> motors;
+		const std::vector<rexos_motor::MotorInterface*> motors;
 		
 		/**
 		 * @var double voxelSize

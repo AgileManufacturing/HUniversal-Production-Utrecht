@@ -30,42 +30,11 @@
 
 #include <rexos_motor/StepperMotorProperties.h>
 
-#include <cmath>
-#include <iostream>
-
 #include <rexos_utilities/Utilities.h>
 
-#include "ros/ros.h"
-
 namespace rexos_motor {
-	/**
-	 * Constructor of StepperMotor. Sets angles to unlimited.
-	 *
-	 * @param modbusController Controller for the modbus communication.
-	 * @param motorIndex Index of the motor from 0 to N dependant on the amount of motors.
-	 * @param minAngle Minimum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
-	 * @param maxAngle Maximum for the angle, in radians, the StepperMotor can travel on the theoretical plane.
-	 **/
-	StepperMotorProperties::StepperMotorProperties(Json::Value properties) {
-		motorMinAngle = rexos_utilities::degreesToRadians(properties["motorMinAngleDegrees"].asDouble());
-		REXOS_INFO_STREAM("found motorMinAngle " << motorMinAngle);
-		
-		motorMaxAngle = rexos_utilities::degreesToRadians(properties["motorMaxAngleDegrees"].asDouble());
-		REXOS_INFO_STREAM("found motorMaxAngle " << motorMaxAngle);
-		
+	StepperMotorProperties::StepperMotorProperties(Json::Value properties) : 
+		MotorProperties(properties) {
 		microStepAngle = rexos_utilities::degreesToRadians(properties["microStepAngleDegrees"].asDouble());
-		REXOS_INFO_STREAM("found microStepAngle " << microStepAngle);
-		
-		minAcceleration = rexos_utilities::degreesToRadians(properties["minAccelerationDegrees"].asDouble());
-		REXOS_INFO_STREAM("found minAcceleration " << minAcceleration);
-		
-		maxAcceleration = rexos_utilities::degreesToRadians(properties["maxAccelerationDegrees"].asDouble());
-		REXOS_INFO_STREAM("found maxAcceleration " << maxAcceleration);
-		
-		minSpeed = rexos_utilities::degreesToRadians(properties["minSpeedDegrees"].asDouble());
-		REXOS_INFO_STREAM("found minSpeed " << minSpeed);
-		
-		maxSpeed = rexos_utilities::degreesToRadians(properties["maxSpeedDegrees"].asDouble());
-		REXOS_INFO_STREAM("found maxSpeed " << maxSpeed);
 	}
 }

@@ -1,10 +1,9 @@
 /**
- * @file MotorManager.h
- * @brief Motor management for concurrent movement.
+ * @file StepperMotorProperties.cpp
+ * @brief Contains the properties of a stepper motor.
  * @date Created: 2012-10-02
  *
- * @author Koen Braham
- * @author Dennis Koole
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * License: newBSD
@@ -29,55 +28,17 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
+#include <rexos_motor/MotorProperties.h>
 
-#include <rexos_motor/MotorInterface.h>
+#include <rexos_utilities/Utilities.h>
 
-#include <vector>
-
-namespace rexos_motor{
-
-	/**
-	 * Motor management for concurrent movement.
-	 **/
-	class MotorManager{
-	public:
-		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
-		 **/
-		MotorManager(std::vector<MotorInterface*> motors);
-
-		void powerOn(void);
-		void powerOnSingleMotor(int motorIndex);
-		void powerOffSingleMotor(int motorIndex);
-		void powerOff(void);
-
-		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
-		 **/
-		bool isPoweredOn(void){ return poweredOn; }
-		
-		/**
-		 * Start simultaneously movement of all motors
-		 **/
-		virtual void startMovement() = 0;
-
-	protected:
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<MotorInterface*> motors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
-	};
+namespace rexos_motor {
+	MotorProperties::MotorProperties(Json::Value properties) {
+		motorMinAngle = rexos_utilities::degreesToRadians(properties["motorMinAngleDegrees"].asDouble());
+		motorMaxAngle = rexos_utilities::degreesToRadians(properties["motorMaxAngleDegrees"].asDouble());
+		minAcceleration = rexos_utilities::degreesToRadians(properties["minAccelerationDegrees"].asDouble());
+		maxAcceleration = rexos_utilities::degreesToRadians(properties["maxAccelerationDegrees"].asDouble());
+		minSpeed = rexos_utilities::degreesToRadians(properties["minSpeedDegrees"].asDouble());
+		maxSpeed = rexos_utilities::degreesToRadians(properties["maxSpeedDegrees"].asDouble());
+	}
 }

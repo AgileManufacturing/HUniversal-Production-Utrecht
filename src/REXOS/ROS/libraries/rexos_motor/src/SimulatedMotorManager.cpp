@@ -1,5 +1,5 @@
 /**
- * @file MotorManager.h
+ * @file MotorManager.cpp
  * @brief Motor management for concurrent movement.
  * @date Created: 2012-10-02
  *
@@ -29,55 +29,34 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
-
-#include <rexos_motor/MotorInterface.h>
-
-#include <vector>
+#include <rexos_motor/SimulatedMotorManager.h>
+#include <rexos_motor/MotorException.h>
 
 namespace rexos_motor{
-
-	/**
-	 * Motor management for concurrent movement.
-	 **/
-	class MotorManager{
-	public:
-		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
-		 **/
-		MotorManager(std::vector<MotorInterface*> motors);
-
-		void powerOn(void);
-		void powerOnSingleMotor(int motorIndex);
-		void powerOffSingleMotor(int motorIndex);
-		void powerOff(void);
-
-		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
-		 **/
-		bool isPoweredOn(void){ return poweredOn; }
+	SimulatedMotorManager::SimulatedMotorManager(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, 
+			std::vector<MotorInterface*> motors) :
+			MotorManager(motors), equipletName(equipletName), identifier(identifier) {
 		
-		/**
-		 * Start simultaneously movement of all motors
-		 **/
-		virtual void startMovement() = 0;
+	}
+	void SimulatedMotorManager::startMovement(){
+		if(!poweredOn){
+			throw MotorException("motor manager is not powered on");
+		}
 
-	protected:
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<MotorInterface*> motors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
-	};
+		// Wait for previous movement to finish
+		for(int i = 0; i < motors.size(); ++i) {
+			if(motors[i]->isPoweredOn()) {
+				motors[i]->waitTillReady();
+			}
+		}
+		
+		// Start movement
+		
+		
+		for(int i = 0; i < motors.size(); ++i) {
+			if(motors[i]->isPoweredOn()) {
+				motors[i]->updateAngle();
+			}
+		}
+	}
 }

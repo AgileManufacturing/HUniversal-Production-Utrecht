@@ -41,7 +41,10 @@
 #include <rexos_delta_robot/InverseKinematicsException.h>
 #include <rexos_delta_robot/DeltaRobot.h>
 #include <rexos_motor/MotorException.h>
-#include <rexos_motor/MotorInterface.h>
+#include <rexos_motor/SimulatedMotor.h>
+#include <rexos_motor/StepperMotor.h>
+#include <rexos_motor/SimulatedMotorManager.h>
+#include <rexos_motor/StepperMotorManager.h>
 #include <rexos_utilities/Utilities.h>
 
 #include "ros/ros.h"
@@ -55,10 +58,12 @@ namespace rexos_delta_robot{
      * @param motors The motor array with the three motor objects.
      * @param modbusIO The TCP modbus connection for the IO controller.
      **/
-    DeltaRobot::DeltaRobot(Json::Value node) :
+    DeltaRobot::DeltaRobot(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node) :
 			kinematics(NULL),
 			motorManager(NULL),
 			boundaries(NULL),
+			modbus(NULL),
+			stepperMotorProperties(node["stepperMotorProperties"]),
 			effectorLocation(Vector3(0, 0, 0)), 
 			boundariesGenerated(false),
 			currentMotionSlot(1){
@@ -77,19 +82,27 @@ namespace rexos_delta_robot{
 		assert(modbusIO != NULL);
 		
 		// initialize motors
-		modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
-			"/dev/ttyS0",
-			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-			rexos_motor::CRD514KD::RtuConfig::PARITY,
-			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
+		if(isSimulated == true) {
+			motors.push_back(new rexos_motor::SimulatedMotor(equipletName, identifier, 0, stepperMotorProperties));
+			motors.push_back(new rexos_motor::SimulatedMotor(equipletName, identifier, 1, stepperMotorProperties));
+			motors.push_back(new rexos_motor::SimulatedMotor(equipletName, identifier, 2, stepperMotorProperties));
+			
+			motorManager = new rexos_motor::SimulatedMotorManager(equipletName, identifier, motors);
+		} else {
+			modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
+				"/dev/ttyS0",
+				rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
+				rexos_motor::CRD514KD::RtuConfig::PARITY,
+				rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
+				rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
+			
+			motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, stepperMotorProperties));
+			motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, stepperMotorProperties));
+			motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, stepperMotorProperties));
+			
+			motorManager = new rexos_motor::StepperMotorManager(modbus, motors);
+		}
 		
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_0, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_1, *stepperMotorProperties));
-		motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::Slaves::MOTOR_2, *stepperMotorProperties));
-
-		motorManager = new rexos_motor::MotorManager(modbus, motors);
-
         kinematics = new InverseKinematics(*deltaRobotMeasures);
     }
 
@@ -114,7 +127,7 @@ namespace rexos_delta_robot{
 		REXOS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
 		
 		Json::Value stepperMotorPropertiesNode = node["stepperMotorProperties"];
-		stepperMotorProperties = new rexos_motor::StepperMotorProperties(stepperMotorPropertiesNode);
+		stepperMotorProperties = rexos_motor::StepperMotorProperties(stepperMotorPropertiesNode);
 		REXOS_INFO_STREAM("found stepperMotorProperties");
 		
 		Json::Value deltaRobotNode = node["deltaRobotMeasures"];
@@ -130,20 +143,7 @@ namespace rexos_delta_robot{
 		boundaries = rexos_delta_robot::EffectorBoundaries::generateEffectorBoundaries((*kinematics), deltaRobotMeasures, motors, voxelSize);
 		boundariesGenerated = true;
     }
-
-    /**
-     * Checks the validity of an angle for a motor.
-     *
-     * @param motorIndex The index for the motor from 0 to (amount of motors - 1) to be checked for.
-     * @param angle The angle in degrees where 0 degrees is directly opposite of the center of the imaginary circle for the engines.
-     *
-     * @return If the angle is valid for the motor.
-     **/
-    bool DeltaRobot::isValidAngle(int motorIndex, double angle) {
-        assert(motorIndex >= 0 && motorIndex < 3);
-        return angle > motors[motorIndex]->getMinAngle() && angle < motors[motorIndex]->getMaxAngle();
-    }
-
+	
     /**
      * Checks the path between two points.
      * 
@@ -187,147 +187,131 @@ namespace rexos_delta_robot{
      * @param point 3-dimensional point to move to.
      * @param maxAcceleration the acceleration in radians/s² that the motor with the biggest motion will accelerate at.
      **/
-    void DeltaRobot::moveTo(const Vector3& point, double maxAcceleration){
+    void DeltaRobot::moveTo(const Vector3& point, double maxAcceleration) {
         // check whether the motors are powered on.
-        if(!motorManager->isPoweredOn()){
+        if(!motorManager->isPoweredOn()) {
             throw rexos_motor::MotorException("motor drivers are not powered on");
         }
 
-        if(effectorLocation == point){
+        if(effectorLocation == point) {
             // The effector is already at the requested location, the method can be cut short.
             return;
         }
 
-        if(maxAcceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
+        if(maxAcceleration > stepperMotorProperties.maxAcceleration) {
             // The acceleration is too high, putting it down to the maximum CRD514KD acceleration.
-            maxAcceleration = rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION;
-        } else if(maxAcceleration < rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION){
+            maxAcceleration = stepperMotorProperties.maxAcceleration;
+        } else if(maxAcceleration < stepperMotorProperties.minAcceleration) {
             // The acceleration is too low, throwing an exception.
             throw std::out_of_range("maxAcceleration too low");            
         }
 
-        // Create MotorRotation objects.
-        rexos_motor::MotorRotation* rotations[3];
-        rotations[0] = new rexos_motor::MotorRotation();
-        rotations[1] = new rexos_motor::MotorRotation();
-        rotations[2] = new rexos_motor::MotorRotation();
-
         // Get the motor angles from the kinematics model
-        try{
-            kinematics->destinationPointToMotorRotations(point, rotations);
-        } catch(InverseKinematicsException& ex){
-            delete rotations[0];
-            delete rotations[1];
-            delete rotations[2];
-            throw ex;
-        }
+		std::vector<rexos_motor::MotorRotation> rotations = kinematics->destinationPointToMotorRotations(point);
 
         // Check if the angles fit within the boundaries
-        if(!isValidAngle(0, rotations[0]->angle) || !isValidAngle(1, rotations[1]->angle) || !isValidAngle(2, rotations[2]->angle)){
-            delete rotations[0];
-            delete rotations[1];
-            delete rotations[2];
-            throw InverseKinematicsException("motion angles outside of valid range", point);
-        }
+		for(int i = 0; i < motors.size(); i++) {
+			if(rotations[i].angle < stepperMotorProperties.motorMinAngle || rotations[i].angle < stepperMotorProperties.motorMaxAngle) {
+				throw std::out_of_range("motion angles outside of valid range");
+			}
+		}
 
         // Check if the path fits within the boundaries
-        if(!boundaries->checkPath(effectorLocation, point)){
-            delete rotations[0];
-            delete rotations[1];
-            delete rotations[2];
-            throw InverseKinematicsException("invalid path", point);
+        if(!checkPath(effectorLocation, point)) {
+            throw std::out_of_range("invalid path");
         }
 
-        try{
-            // An array to hold the relative angles for the motors
-            double relativeAngles[3] = {0.0,0.0,0.0};
+		// An array to hold the relative angles for the motors
+		std::vector<bool> relativeAngles;
+		for(int i = 0; i < motors.size(); i++) {
+			relativeAngles.push_back(0.0);
+		}
+		
+		// An array that indicates for each motor whether it moves in this motion or not.
+		std::vector<bool> motorIsMoved;
+		for(int i = 0; i < motors.size(); i++) {
+			motorIsMoved.push_back(true);
+		}
+		
+		// Index for the motor with the biggest motion
+		int motorWithBiggestMotion = 0;
 
-            // An array that indicates for each motor whether it moves in this motion or not.
-            bool motorIsMoved[3] = {true, true, true};
+		for(int i = 0; i < motors.size(); i++) {
+			relativeAngles[i] = fabs(rotations[i].angle - motors[i]->getCurrentAngle());
+			if (relativeAngles[i] > relativeAngles[motorWithBiggestMotion]){
+				motorWithBiggestMotion = i;
+			}
 
-            // Index for the motor with the biggest motion
-            int motorWithBiggestMotion = 0;
+			if(relativeAngles[i] < stepperMotorProperties.microStepAngle){
+				// motor does not have to move at all
+				motorIsMoved[i] = false;
+			}
+		}
+		
+		// Check if any motor has to move at all
+		bool anyMotorIsMoved = false;
+		for(int i = 0; i < motors.size(); i++) {
+			if(motorIsMoved[i] == true) {
+				anyMotorIsMoved = true;
+			}
+		}
+		if(anyMotorIsMoved == false) {
+			// none of the motors have to move, method can be cut short
+			return;
+		}
 
-            for(int i = 0; i < 3; i++){
-                relativeAngles[i] = fabs(rotations[i]->angle - motors[i]->getCurrentAngle());
-                if (relativeAngles[i] > relativeAngles[motorWithBiggestMotion]){
-                    motorWithBiggestMotion = i;
-                }
+		// switch currentMotionSlot
+		/*currentMotionSlot++;
+		if(currentMotionSlot > rexos_motor::CRD514KD::MOTION_SLOTS_USED){
+			currentMotionSlot = 1;
+		}*/
 
-                if(relativeAngles[i] < rexos_motor::CRD514KD::MOTOR_STEP_ANGLE){
-                    // motor does not have to move at all
-                    motorIsMoved[i] = false;
-                }
-            }
+		// Set the acceleration of the motor with the biggest motion to the given maximum.
+		rotations[motorWithBiggestMotion].acceleration = maxAcceleration;
+		rotations[motorWithBiggestMotion].deceleration = maxAcceleration;
 
-            if(!(motorIsMoved[0] || motorIsMoved[1] || motorIsMoved[2])){
-                // none of the motors have to move, method can be cut short
-                delete rotations[0];
-                delete rotations[1];
-                delete rotations[2];
-                return;
-            }
+		// Calculate the time the motion will take, based on the assumption that the motion is two-phase (half acceleration and half deceleration).
+		// TODO: Take the motor's maximum speed into account.
+		double moveTime;
 
-             // switch currentMotionSlot
-            currentMotionSlot++;
-            if(currentMotionSlot > rexos_motor::CRD514KD::MOTION_SLOTS_USED){
-                currentMotionSlot = 1;
-            }
+		if(sqrt(relativeAngles[motorWithBiggestMotion] * rotations[motorWithBiggestMotion].acceleration) > stepperMotorProperties.maxSpeed) {
+			// In case of a two-phase motion, the top speed would come out above the motor's maximum, so a three-phase motion must be made.
+			rotations[motorWithBiggestMotion].speed = stepperMotorProperties.maxSpeed;
+			moveTime = (relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion].speed) + 
+					(rotations[motorWithBiggestMotion].speed / rotations[motorWithBiggestMotion].acceleration);  
+		} else {
+			// The motion is fine as a two-phase motion.
+			moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion].acceleration);
+		}
+		
+		// Set speed, and also the acceleration for the smaller motion motors
+		for(int i = 0; i < motors.size(); i++) {
+			rotations[i].speed = stepperMotorProperties.maxSpeed;
 
-            // Set the acceleration of the motor with the biggest motion to the given maximum.
-            rotations[motorWithBiggestMotion]->acceleration = maxAcceleration;
-            rotations[motorWithBiggestMotion]->deceleration = maxAcceleration;
+			if(i != motorWithBiggestMotion) {
+				if(motorIsMoved[i]) {
+					rotations[i].acceleration = getAccelerationForRotation(relativeAngles[i], moveTime);
+					rotations[i].deceleration = rotations[i].acceleration;  
+					if(rotations[i].acceleration < stepperMotorProperties.minAcceleration) {
+						// The acceleration comes out too low, this means the motion cannot be half acceleration and half deceleration (without a consant speed phase).
+						// To make it comply with the move time, as well as the minimum acceleration requirements, we have to add a top speed.
+						rotations[i].acceleration = stepperMotorProperties.minAcceleration;
+						rotations[i].deceleration = stepperMotorProperties.minAcceleration;
+						rotations[i].speed = getSpeedForRotation(relativeAngles[i], moveTime, rotations[i].acceleration);
+					} else if(rotations[i].acceleration > stepperMotorProperties.maxAcceleration) {
+						throw std::out_of_range("acceleration too high");
+					}
+				} else {
+					rotations[i].acceleration = stepperMotorProperties.minAcceleration;
+					rotations[i].deceleration = stepperMotorProperties.minAcceleration;
+					rotations[i].angle = motors[i]->getCurrentAngle();
+				}
+			}
+			motors[i]->writeRotationData(rotations[i]);
+		}
 
-            // Calculate the time the motion will take, based on the assumption that the motion is two-phase (half acceleration and half deceleration).
-            // TODO: Take the motor's maximum speed into account.
-            double moveTime;
-
-            if(sqrt(relativeAngles[motorWithBiggestMotion] * rotations[motorWithBiggestMotion]->acceleration) > rexos_motor::CRD514KD::MOTOR_MAX_SPEED){
-                // In case of a two-phase motion, the top speed would come out above the motor's maximum, so a three-phase motion must be made.
-                rotations[motorWithBiggestMotion]->speed = rexos_motor::CRD514KD::MOTOR_MAX_SPEED;
-                moveTime = (relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->speed) + (rotations[motorWithBiggestMotion]->speed / rotations[motorWithBiggestMotion]->acceleration);  
-            } else {
-                // The motion is fine as a two-phase motion.
-                moveTime = 2 * sqrt(relativeAngles[motorWithBiggestMotion] / rotations[motorWithBiggestMotion]->acceleration);
-            }
-            
-            // Set speed, and also the acceleration for the smaller motion motors
-            for(int i = 0; i < 3; i++){
-                rotations[i]->speed = rexos_motor::CRD514KD::MOTOR_MAX_SPEED;
-
-                if(i != motorWithBiggestMotion){
-                    if(motorIsMoved[i]){
-                        rotations[i]->acceleration = getAccelerationForRotation(relativeAngles[i], moveTime);
-                        rotations[i]->deceleration = rotations[i]->acceleration;  
-                        if(rotations[i]->acceleration < rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION){
-                            // The acceleration comes out too low, this means the motion cannot be half acceleration and half deceleration (without a consant speed phase).
-                            // To make it comply with the move time, as well as the minimum acceleration requirements, we have to add a top speed.
-                            rotations[i]->acceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
-                            rotations[i]->deceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
-                            rotations[i]->speed = getSpeedForRotation(relativeAngles[i], moveTime, rotations[i]->acceleration);
-                        } else if(rotations[i]->acceleration > rexos_motor::CRD514KD::MOTOR_MAX_ACCELERATION){
-                            throw std::out_of_range("acceleration too high");
-                        }
-                    } else {
-                        rotations[i]->acceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
-                        rotations[i]->deceleration = rexos_motor::CRD514KD::MOTOR_MIN_ACCELERATION;
-                        rotations[i]->angle = motors[i]->getCurrentAngle();
-                    }
-                }
-                motors[i]->writeRotationData(*rotations[i], currentMotionSlot);
-            }
-
-            motorManager->startMovement(currentMotionSlot);
-        } catch(std::out_of_range& ex){
-            delete rotations[0];
-            delete rotations[1];
-            delete rotations[2];
-            throw ex;
-        }
-
-        delete rotations[0];
-        delete rotations[1];
-        delete rotations[2];
+		motorManager->startMovement();
+		
         effectorLocation = point;
     }
 
@@ -362,12 +346,12 @@ namespace rexos_delta_robot{
      * @return The amount of motor steps the motor has moved.
      **/
     int DeltaRobot::moveMotorUntilSensorIsOfValue(int motorIndex, rexos_motor::MotorRotation motorRotation, bool sensorValue){
-        motors[motorIndex]->writeRotationData(motorRotation, 1, false);
+        motors[motorIndex]->writeRotationData(motorRotation, false);
 
         int steps = 0;
         do {
-            motors[motorIndex]->startMovement(1);
-            steps += (motorRotation.angle / rexos_motor::CRD514KD::MOTOR_STEP_ANGLE);  
+            motors[motorIndex]->startMovement();
+            steps += (motorRotation.angle / stepperMotorProperties.microStepAngle);  
         } while(checkSensor(motorIndex) != sensorValue);
 
         return steps;
@@ -383,12 +367,12 @@ namespace rexos_delta_robot{
     * @param motorIndex Index of the motor to be calibrated. When standing in front of the robot looking towards it, 0 is the right motor, 1 is the front motor and 2 is the left motor.
     **/
     void DeltaRobot::calibrateMotor(int motorIndex){
-        REXOS_DEBUG_STREAM("Calibrating motor number " << motorIndex << std::endl);
+        REXOS_DEBUG_STREAM("Calibrating motor number " << motorIndex);
 
         // Setup for incremental motion in big steps, to get to the sensor quickly.
-        motors[motorIndex]->setIncrementalMode(1);
+        motors[motorIndex]->setRelativeMode();
         rexos_motor::MotorRotation motorRotation;
-        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle() * calibrationBigStepFactor;
+        motorRotation.angle = -stepperMotorProperties.microStepAngle * calibrationBigStepFactor;
         
         // Move to the sensor in large steps until it is pushed
         // actualAngleInSteps keeps track of how many motor steps the motor has moved. This is necessary to avoid accummulating errors.
@@ -399,17 +383,17 @@ namespace rexos_delta_robot{
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, false);
         
         // Move back to the sensor in small steps until it is pushed.
-        motorRotation.angle = -motors.at(motorIndex)->getMicroStepAngle();
+        motorRotation.angle = -stepperMotorProperties.microStepAngle;
         actualAngleInSteps += moveMotorUntilSensorIsOfValue(motorIndex, motorRotation, true);
 
         // calculate and set the deviation.
-        double deviation = (actualAngleInSteps * motors.at(motorIndex)->getMicroStepAngle()) + deltaRobotMeasures->motorFromZeroToTopAngle;
-        motors[motorIndex]->setDeviationAndWriteMotorLimits(deviation);
+        double deviation = (actualAngleInSteps * stepperMotorProperties.microStepAngle) + deltaRobotMeasures->motorFromZeroToTopAngle;
+        motors[motorIndex]->setDeviation(deviation);
         
         // Move back to the new 0.
-        motors[motorIndex]->setAbsoluteMode(1);
+        motors[motorIndex]->setAbsoluteMode();
         motorRotation.angle = 0;
-        motors[motorIndex]->moveTo(motorRotation, 1);
+        motors[motorIndex]->moveTo(motorRotation);
 
         motors[motorIndex]->waitTillReady();
     }
@@ -448,14 +432,14 @@ namespace rexos_delta_robot{
         motorRotation.speed = 0.1;
         motorRotation.angle = 0;
 
-        motors[0]->setDeviationAndWriteMotorLimits(0);
-        motors[1]->setDeviationAndWriteMotorLimits(0);
-        motors[2]->setDeviationAndWriteMotorLimits(0);
+        motors[0]->setDeviation(0);
+        motors[1]->setDeviation(0);
+        motors[2]->setDeviation(0);
 
-        motors[0]->writeRotationData(motorRotation, 1);
-        motors[1]->writeRotationData(motorRotation, 1);
-        motors[2]->writeRotationData(motorRotation, 1);
-        motorManager->startMovement(1);
+        motors[0]->writeRotationData(motorRotation);
+        motors[1]->writeRotationData(motorRotation);
+        motors[2]->writeRotationData(motorRotation);
+        motorManager->startMovement();
 
         motors[0]->waitTillReady();
         motors[1]->waitTillReady();

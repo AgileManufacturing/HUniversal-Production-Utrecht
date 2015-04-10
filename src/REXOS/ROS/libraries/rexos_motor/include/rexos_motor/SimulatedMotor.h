@@ -31,24 +31,20 @@
 
 #pragma once
 
-#define DEFAULT_MOTION_SLOT 1
-
 #include <rexos_motor/MotorRotation.h>
-#include <rexos_modbus/ModbusException.h>
-#include <rexos_modbus/ModbusController.h>
-#include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorInterface.h>
-#include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_motor/MotorProperties.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 namespace rexos_motor{
-	class StepperMotor : public MotorInterface{
+	class SimulatedMotor : public MotorInterface{
 	public:
-		StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, StepperMotorProperties properties);
+		SimulatedMotor(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, int index, MotorProperties properties);
 
 		/**
 		 * Deconstructor of StepperMotor. Tries to turn to power off.
 		 **/
-		virtual ~StepperMotor(void);
+		virtual ~SimulatedMotor(void);
 
 		/**
 		 * If the motor is not powered on yet, try to configure the motor and turn on excitement. Also reset any alarms.
@@ -72,23 +68,25 @@ namespace rexos_motor{
 		 **/
 		virtual void resetCounter(void);
 
-		void moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot);
-		
 		virtual void writeRotationData(const rexos_motor::MotorRotation& motorRotation, bool useDeviation);
-		void writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
 		
 		/**
 		 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
 		 **/
 		virtual void startMovement();
-		void startMovement(int motionSlot);
 		/**
 		 * Wait untill the motor indicates that the end location is reached.
 		 **/
-		virtual void waitTillReady(void);
+		void waitTillReady(void);
 
 		
 		virtual bool isReady();
+
+		/**
+		 * Sets the deviation between the motors 0 degrees and the horizontal 0 degrees, then writes the new motor limits to the motor controllers.
+		 * @param deviation The deviation between the hardware and theoretical 0 degrees.
+		 **/
+		void setDeviationAndWriteMotorLimits(double deviation);
 
 		/**
 		 * Sets the motor controller to incremental mode.
@@ -115,28 +113,17 @@ namespace rexos_motor{
 		 * Disables the limitations in the motor class, and in hardware (if supported)
 		 */
 		virtual void disableAngleLimitations();
-		
-		/**
-		 * Returns the angle per microstep, in radians.
-		 * 
-		 * @return The minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
-		 **/
-		//inline double getMicroStepAngle(void) const{ return properties.microStepAngle; }
-		
-	private:
-		StepperMotorProperties properties;
-		
-		/**
-		 * @var ModbusController* modbus
-		 * Controller for the modbus communication.
-		 **/
-		rexos_modbus::ModbusController* modbus;
 
+	private:
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier identifier;
+		int index;
+		
 		/**
-		 * @var Slaves::t motorIndex
-		 * Index for the motor in the CRD514KD slaves enum.
+		 * @var bool anglesLimited
+		 * If hardware limitations are set on the angles the motor can travel.
 		 **/
-		CRD514KD::Slaves::t motorIndex;
+		bool anglesLimited;
 
 		/**
 		 * Checks whether the motion slot is used. Throws an std::out_of_range exception if not.

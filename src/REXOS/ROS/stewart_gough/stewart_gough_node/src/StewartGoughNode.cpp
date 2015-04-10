@@ -72,7 +72,7 @@ StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::Mo
 	ROS_INFO("%s", writer.write(jsonNode).c_str());
 		
 	// Create a stewart gough robot
-	stewartGough = new rexos_stewart_gough::StewartGough(jsonNode);
+	stewartGough = new rexos_stewart_gough::StewartGough(equipletName, moduleIdentifier, isSimulated, jsonNode);
 }
 
 

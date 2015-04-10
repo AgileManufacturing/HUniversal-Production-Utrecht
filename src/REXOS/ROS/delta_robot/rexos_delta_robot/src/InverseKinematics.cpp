@@ -141,14 +141,20 @@ namespace rexos_delta_robot {
 	 * @param destinationPoint The destination point.
 	 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 	 **/
-	void InverseKinematics::destinationPointToMotorRotations(const Vector3& destinationPoint, rexos_motor::MotorRotation* (&rotations)[3]) const{
+	std::vector<rexos_motor::MotorRotation> InverseKinematics::destinationPointToMotorRotations(const Vector3& destinationPoint) const{
 		// Adding 180 degrees switches 0 degrees for the motor from the midpoint of the engines to directly opposite.
 		// When determining motorAngle the degrees determine the position of the engines:
 		// 	  0 degrees: the hip from this motor moves on the yz plane
 		//  120 degrees: this motor is located 120 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
 		//  240 degrees: this motor is located 240 degrees counter clockwise of the 0 degrees motor when looking at the side the effector is not located
-		rotations[0]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(1 * 120));
-		rotations[1]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(0 * 120));
-		rotations[2]->angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(2 * 120));
+		std::vector<rexos_motor::MotorRotation> output;
+		rexos_motor::MotorRotation rotation;
+		
+		rotation.angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(1 * 120));
+		output.push_back(rotation);
+		rotation.angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(0 * 120));
+		output.push_back(rotation);
+		rotation.angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(2 * 120));
+		output.push_back(rotation);
 	}
 }

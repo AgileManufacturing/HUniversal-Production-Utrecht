@@ -52,7 +52,7 @@ namespace rexos_delta_robot{
 	 **/
 	EffectorBoundaries* EffectorBoundaries::generateEffectorBoundaries(const InverseKinematicsModel& model, 
 				const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
-				const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize){
+				const std::vector<rexos_motor::MotorInterface*> motors, double voxelSize){
 		EffectorBoundaries* boundaries = new EffectorBoundaries(model, deltaRobotMeasures, motors, voxelSize);
 		
 		// Create boundaries variables in voxel space by dividing real space variables with the voxel size
@@ -136,7 +136,7 @@ namespace rexos_delta_robot{
 	 * @param voxelSize The size of the voxels.
 	 **/
     EffectorBoundaries::EffectorBoundaries(const InverseKinematicsModel& model, const rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures, 
-			const std::vector<rexos_motor::StepperMotor*> motors, double voxelSize) : 
+			const std::vector<rexos_motor::MotorInterface*> motors, double voxelSize) : 
 			width(0), 
 			height(0), 
 			depth(0), 
@@ -191,7 +191,7 @@ namespace rexos_delta_robot{
 	 * 
 	 * @return true if coordinate is reachable by the effector.
 	 **/
-    bool EffectorBoundaries::isValid(const BitmapCoordinate& coordinate, char* pointValidityCache) const{
+    bool EffectorBoundaries::isValid(const BitmapCoordinate& coordinate, char* pointValidityCache) const {
     	char* fromCache;
     	char dummy = UNKNOWN;
     	if(pointValidityCache == NULL){
@@ -201,36 +201,25 @@ namespace rexos_delta_robot{
     	}
 
     	if(*fromCache == UNKNOWN){
-    		rexos_motor::MotorRotation* rotations[3];
-    		rotations[0] = new rexos_motor::MotorRotation();
-    		rotations[1] = new rexos_motor::MotorRotation();
-    		rotations[2] = new rexos_motor::MotorRotation();
-
+			std::vector<rexos_motor::MotorRotation> rotations;
+			
 			try{
-				kinematics.destinationPointToMotorRotations(fromBitmapCoordinate(coordinate), rotations);
-			} catch(rexos_delta_robot::InverseKinematicsException & exception){
+				// Get the motor angles from the kinematics model
+				rotations = kinematics.destinationPointToMotorRotations(fromBitmapCoordinate(coordinate));
+			} catch(rexos_delta_robot::InverseKinematicsException& exception){
 				*fromCache = INVALID;
-				delete rotations[0];
-				delete rotations[1];
-				delete rotations[2];
 				return false;
 			}
 
 			// Check motor angles.
 			for(int i = 0; i < motors.size(); i++) {
-				if(motors.at(i)->isValidAngle(rotations[i]->angle) == false) {
+				if(motors.at(i)->isValidAngle(rotations[i].angle) == false) {
 					*fromCache = INVALID;
-					delete rotations[0];
-					delete rotations[1];
-					delete rotations[2];
 					return false;
 				}
 			}
 			*fromCache = VALID;
 
-			delete rotations[0];
-			delete rotations[1];
-			delete rotations[2];
 			return true;
     	} else{
     		return *fromCache == VALID;

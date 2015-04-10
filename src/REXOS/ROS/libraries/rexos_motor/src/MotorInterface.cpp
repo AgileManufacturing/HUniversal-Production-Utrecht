@@ -1,6 +1,6 @@
 /**
- * @file MotorManager.h
- * @brief Motor management for concurrent movement.
+ * @file StepperMotor.cpp
+ * @brief Steppermotor driver.
  * @date Created: 2012-10-02
  *
  * @author Koen Braham
@@ -29,55 +29,28 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#pragma once
+#include <rexos_motor/StepperMotor.h>
 
-#include <rexos_motor/MotorInterface.h>
+#include <cstdio>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 
-#include <vector>
+#include <rexos_utilities/Utilities.h>
+#include <rexos_motor/CRD514KD.h>
+#include <rexos_motor/CRD514KDException.h>
+#include <rexos_motor/MotorException.h>
 
-namespace rexos_motor{
+namespace rexos_motor {
+	MotorInterface::MotorInterface(MotorProperties properties):
+			properties(properties), powerStatus(false), currentAngle(0), targetAngle(0), deviation(0), anglesLimited(true) {
+	}
 
-	/**
-	 * Motor management for concurrent movement.
-	 **/
-	class MotorManager{
-	public:
-		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
-		 **/
-		MotorManager(std::vector<MotorInterface*> motors);
+	MotorInterface::~MotorInterface(void) {
+	}
 
-		void powerOn(void);
-		void powerOnSingleMotor(int motorIndex);
-		void powerOffSingleMotor(int motorIndex);
-		void powerOff(void);
-
-		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
-		 **/
-		bool isPoweredOn(void){ return poweredOn; }
-		
-		/**
-		 * Start simultaneously movement of all motors
-		 **/
-		virtual void startMovement() = 0;
-
-	protected:
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<MotorInterface*> motors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
-	};
+	void MotorInterface::moveTo(const rexos_motor::MotorRotation& motorRotation){
+		writeRotationData(motorRotation);
+		startMovement();
+	}
 }

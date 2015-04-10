@@ -64,7 +64,6 @@ namespace rexos_delta_robot{
 
 		virtual ~InverseKinematics(void);
 		
-		void destinationPointToMotorRotations(const Vector3& destinationPoint,
-				rexos_motor::MotorRotation* (&rotations)[3]) const;
+		std::vector<rexos_motor::MotorRotation> destinationPointToMotorRotations(const Vector3& destinationPoint) const;
 	};
 }

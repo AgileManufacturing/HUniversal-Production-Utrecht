@@ -73,7 +73,7 @@ DeltaRobotNode::DeltaRobotNode(std::string equipletName, rexos_datatypes::Module
 	REXOS_INFO("%s", writer.write(jsonNode).c_str());
 
 	// Create a deltarobot
-	deltaRobot = new rexos_delta_robot::DeltaRobot(jsonNode);
+	deltaRobot = new rexos_delta_robot::DeltaRobot(equipletName, moduleIdentifier, isSimulated, jsonNode);
 }
 
 

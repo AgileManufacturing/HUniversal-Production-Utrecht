@@ -15,6 +15,7 @@ catkin_package(INCLUDE_DIRS include LIBRARIES rexos_motor rexos_logger CATKIN_DE
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(rexos_motor ${sources})
+target_compile_options(rexos_motor PRIVATE -fmax-errors=10)
 target_link_libraries(rexos_motor ${catkin_LIBRARIES})
 
 

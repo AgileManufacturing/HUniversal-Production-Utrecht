@@ -1,10 +1,9 @@
 /**
- * @file MotorManager.h
- * @brief Motor management for concurrent movement.
+ * @file StepperMotorProperties.cpp
+ * @brief Contains the properties of a stepper motor.
  * @date Created: 2012-10-02
  *
- * @author Koen Braham
- * @author Dennis Koole
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * License: newBSD
@@ -31,53 +30,46 @@
 
 #pragma once
 
-#include <rexos_motor/MotorInterface.h>
-
-#include <vector>
+#include <jsoncpp/json/value.h>
 
 namespace rexos_motor{
-
-	/**
-	 * Motor management for concurrent movement.
-	 **/
-	class MotorManager{
+	class MotorProperties{
 	public:
 		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
+		 * @var double MOTOR_ROT_MIN
+		 * Mathematical minimum angle the motor is allowed to move to in radians.
 		 **/
-		MotorManager(std::vector<MotorInterface*> motors);
-
-		void powerOn(void);
-		void powerOnSingleMotor(int motorIndex);
-		void powerOffSingleMotor(int motorIndex);
-		void powerOff(void);
-
+		double motorMinAngle;
 		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
+		 * @var double MOTOR_ROT_MAX
+		 * Mathematical maximum angle the motor is allowed to move to in radians.
 		 **/
-		bool isPoweredOn(void){ return poweredOn; }
+		double motorMaxAngle;
 		
 		/**
-		 * Start simultaneously movement of all motors
+		 * @var double MOTOR_MIN_ACCELERATION
+		 * The minimum acceleration in radians per second per second. This same value counts for the minimum deceleration.
 		 **/
-		virtual void startMovement() = 0;
-
-	protected:
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<MotorInterface*> motors;
+		double minAcceleration;
 
 		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
+		 * @var double MOTOR_MAX_ACCELERATION
+		 * The maximum acceleration in radians per second per second. This same value counts for the maximum deceleration.
 		 **/
-		bool poweredOn;
+		double maxAcceleration;
+
+		/**
+		 * @var double MOTOR_MIN_SPEED
+		 * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
+		 **/		
+		double minSpeed;
+
+		/**
+		 * @var double MOTOR_MAX_SPEED
+		 * The maximum speed in radians per second that the motor can travel at, based on the maximum value in the CRD514KD speed register.
+		 **/
+		double maxSpeed;
+	public:
+		MotorProperties(Json::Value properties);
 	};
 }

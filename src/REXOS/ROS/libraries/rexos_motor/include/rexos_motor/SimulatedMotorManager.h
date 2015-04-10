@@ -31,53 +31,22 @@
 
 #pragma once
 
-#include <rexos_motor/MotorInterface.h>
-
+#include <rexos_motor/MotorManager.h>
+#include <rexos_motor/SimulatedMotor.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include <vector>
 
 namespace rexos_motor{
-
 	/**
 	 * Motor management for concurrent movement.
 	 **/
-	class MotorManager{
+	class SimulatedMotorManager : public MotorManager{
 	public:
-		/**
-		 * Constructor for the motor manager
-		 *
-		 * @param modbus Pointer to an established modbus connection.
-		 * @param motors Pointer array containing all motors for this manager.
-		 * @param numberOfMotors Number of motors in the pointer array.
-		 **/
-		MotorManager(std::vector<MotorInterface*> motors);
-
-		void powerOn(void);
-		void powerOnSingleMotor(int motorIndex);
-		void powerOffSingleMotor(int motorIndex);
-		void powerOff(void);
-
-		/**
-		 * Check whether the motormanager has been initiated.
-		 * @return bool PowerOn state.
-		 **/
-		bool isPoweredOn(void){ return poweredOn; }
+		SimulatedMotorManager(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, std::vector<MotorInterface*> motors);
 		
-		/**
-		 * Start simultaneously movement of all motors
-		 **/
-		virtual void startMovement() = 0;
-
-	protected:
-		/**
-		 * @var StepperMotor** motors
-		 * Pointer array containing all motors for this manager.
-		 **/
-		std::vector<MotorInterface*> motors;
-
-		/**
-		 * @var bool poweredOn
-		 * Stores whether the motor manager has been turned on.
-		 **/
-		bool poweredOn;
+		virtual void startMovement();
+	private:
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier identifier;
 	};
 }

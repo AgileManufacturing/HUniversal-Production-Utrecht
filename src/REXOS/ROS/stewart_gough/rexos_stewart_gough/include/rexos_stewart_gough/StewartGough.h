@@ -33,10 +33,11 @@
 #include <rexos_stewart_gough/StewartGoughMeasures.h>
 #include <rexos_stewart_gough/StewartGoughLocation.h>
 #include <rexos_motor/MotorInterface.h>
-#include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_modbus/ModbusController.h>
 #include <rexos_stewart_gough/SixAxisCalculations.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include <jsoncpp/json/value.h>
 #include "rexos_logger/rexos_logger.h"
 
@@ -66,7 +67,7 @@ namespace rexos_stewart_gough{
 	 **/
 	class StewartGough{
 	public:
-		StewartGough(Json::Value node);
+		StewartGough(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, Json::Value node);
 		~StewartGough();
 		
 		void readJSONNode(Json::Value node);
@@ -83,19 +84,23 @@ namespace rexos_stewart_gough{
 		StewartGoughLocation getEffectorLocation();
 		
 	private:
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier identifier;
+		bool isSimulated;
+		
 		/**
 		 * @var StepperMotor* motors
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
-		std::vector<rexos_motor::StepperMotor*> motors;
+		std::vector<rexos_motor::MotorInterface*> motors;
 		
-                /**
-                 *
-                 * @var ModbusController::ModbusController* modbus
-                 * the modbuscontroller
-                 **/
-                rexos_modbus::ModbusController modbus;
-                rexos_modbus::ModbusController createModbus();
+		/**
+		 *
+		 * @var ModbusController::ModbusController* modbus
+		 * the modbuscontroller
+		 **/
+		rexos_modbus::ModbusController* modbus;
+		void createModbus();
 		
 		// the inital motors and sensors are positioned on the wrong locations
 		// this is used to map them on the right locations
@@ -110,8 +115,8 @@ namespace rexos_stewart_gough{
 		 * @var MotorManager* motorManager
 		 * A pointer to the MotorManager that handles the movement for the DeltaRobot.
 		 **/
-		rexos_motor::MotorManager motorManager;
-		rexos_motor::MotorManager createMotorManager();
+		rexos_motor::MotorManager* motorManager;
+		void createMotorManager();
 		
 		/**
 		 * @var modbus_t* modbusIO
@@ -145,7 +150,7 @@ namespace rexos_stewart_gough{
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
 		
-		rexos_motor::StepperMotor* getMotor(int number);
+		rexos_motor::MotorInterface* getMotor(int number);
 		int getMotorIndexByNumber(int number);
 		
 		void deleteMotorRotationObjects(rexos_motor::MotorRotation* rotations[6]);

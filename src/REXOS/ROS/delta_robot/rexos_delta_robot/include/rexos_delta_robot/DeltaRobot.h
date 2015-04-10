@@ -41,6 +41,7 @@
 #include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include <jsoncpp/json/value.h>
 #include "rexos_logger/rexos_logger.h"
 
@@ -53,7 +54,7 @@ namespace rexos_delta_robot{
 	 **/
 	class DeltaRobot{
 	public:
-		DeltaRobot(Json::Value node);
+		DeltaRobot(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node);
 		~DeltaRobot();
 		
 		void readJSONNode(Json::Value node);
@@ -82,6 +83,9 @@ namespace rexos_delta_robot{
 		Vector3 getEffectorLocation();
 
 	private:
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier identifier;
+		bool isSimulated;
 		/**
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.
@@ -89,14 +93,14 @@ namespace rexos_delta_robot{
 		InverseKinematicsModel* kinematics;
 
 		rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures;
-		rexos_motor::StepperMotorProperties* stepperMotorProperties;
+		rexos_motor::StepperMotorProperties stepperMotorProperties;
 	
 		int calibrationBigStepFactor;
 		/**
 		 * @var StepperMotor* motors
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
-		std::vector<rexos_motor::StepperMotor*> motors;
+		std::vector<rexos_motor::MotorInterface*> motors;
 
 		/**
 		 * @var MotorManager* motorManager
@@ -142,7 +146,6 @@ namespace rexos_delta_robot{
 		 **/
 		int currentMotionSlot;
 
-		bool isValidAngle(int motorIndex, double angle);
 		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_motor::MotorRotation motorRotation, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
