@@ -35,7 +35,7 @@ public class TestSocketServer extends WebSocketServer {
 	 * @throws FileNotFoundException   [description]
 	 */
 	public TestSocketServer(int port) throws UnknownHostException {
-		super(new InetSocketAddress(Inet4Address.getLocalHost(),port));
+		super(new InetSocketAddress(port));
 	}
 
 	public void loadJson(String filepath) throws JSONException, FileNotFoundException {
@@ -66,10 +66,21 @@ public class TestSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + message);
-		
-		if (message.equals("get json")) {
-			conn.send(this.object.toString());
+		JSONObject command;
+		try {
+			command = new JSONObject(message);
+			String agentName = command.getString("name");
+			int messageID = command.getInt("id");
+			long time = command.getLong("time");
+			
+			System.out.println("Name: " + agentName + " ID: " + messageID + " time: " + time + " time now: " + System.currentTimeMillis());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+/*		if (message.equals("get json")) {
+			conn.send(this.object.toString());
+		}*/
 	}
 
 	// Javascript API does not use fragments, so this won't be used.

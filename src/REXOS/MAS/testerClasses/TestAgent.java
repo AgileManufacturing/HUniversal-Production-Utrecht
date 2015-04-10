@@ -14,6 +14,7 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
+
 import org.java_websocket.client.*;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -23,9 +24,18 @@ public class TestAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	int amountOfMessages = 0;
 	int amountOfMessagesSocket = 0;
+	MyWebsocket mws;
+	
 	
 	protected void setup() {
 		addBehaviour(new TestAgentListenerBehaviour(this));
+		try {
+			mws = new MyWebsocket(new URI("ws://127.0.0.1:5000"));
+			mws.connect();
+		}catch(URISyntaxException e) {
+				// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("Agent: " + getLocalName() + " started");
 	}
 	
@@ -49,48 +59,10 @@ public class TestAgent extends Agent {
 	public void sendMessageSocket(){
 		amountOfMessagesSocket++;
 		String JSONMessage = "{\n 'requested-equiplet-command': 'TESTMESSAGE',\n 'name': '" + getLocalName() + "', \n 'id':" + amountOfMessagesSocket +",\n 'time':" + System.currentTimeMillis() + "\n }";
-		try {
-			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-			mws.setCreated(true);
-			mws.connect();
-			boolean send = false;
-			while(!send){
-				if(mws.isOpen()){
-					mws.send(JSONMessage);
-					mws.close();
-					send = true;
-				}
-			}
-		} catch (Exception ex) {
-			try {
-				MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-				mws.setCreated(false);
-				mws.connectBlocking();
-				boolean send = false;
-				while(!send){
-					if(mws.isOpen()){
-						mws.send(JSONMessage);
-						mws.close();
-						send = true;
-					}
-				}
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-				System.out.println("Impossible, URL format incorrect: " + ServerConfigurations.WSS_URI);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
+		mws.send(JSONMessage);
 	}
 
 	private class MyWebsocket extends WebSocketClient {
-		boolean created = false;
-
-		public void setCreated(boolean created) {
-			this.created = created;
-		}
-
 		public MyWebsocket(URI serverURI) {
 			super(serverURI);
 		}
@@ -103,14 +75,7 @@ public class TestAgent extends Agent {
 		@Override
 		public void onOpen(ServerHandshake handshakedata) {
 			// TODO Auto-generated method stub
-			System.out.println("onOpen");
-			if (created) {
-				send("{\"receiver\":\"interface\", \"message\":\"Created product\", \"type\":\"success\"}");
-			} else {
-				send("{\"receiver\":\"interface\", \"message\":\"Could not create product, connection error!!\", \"type\":\"danger\"}");
-			}
-
-			close();
+			System.out.println("Open");
 		}
 
 		@Override

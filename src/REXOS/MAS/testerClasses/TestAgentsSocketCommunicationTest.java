@@ -33,7 +33,7 @@ public class TestAgentsSocketCommunicationTest {
 	private static final String MAIN_PORT = ServerConfigurations.GS_PORT;
 
 	
-	/**
+	/**-
 	 * @var CONTAINER_NAME The string holds the container name where in the TestReceiverAgent is being spawned.
 	 */
 	private static final String CONTAINER_NAME = "TestAgentsSpawnerAgent";
@@ -56,7 +56,7 @@ public class TestAgentsSocketCommunicationTest {
 	
 		AgentContainer container = runtime.createAgentContainer(profile);
 	
-		Object[] arguments = {"Socket", baseName, 0, 1, 5};
+		Object[] arguments = {"Socket", baseName, 0, 500, 5};
 		String name = "TSA";
 		AgentController ac = container.createNewAgent(name, TestAgentsSpawnerAgent.class.getName(), arguments);
 		ac.start();
