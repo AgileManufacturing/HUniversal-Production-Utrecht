@@ -35,6 +35,7 @@
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_sensor/ContactSensorInterface.h>
 #include <rexos_modbus/ModbusController.h>
 #include <rexos_stewart_gough/SixAxisCalculations.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
@@ -93,6 +94,7 @@ namespace rexos_stewart_gough{
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
 		std::vector<rexos_motor::MotorInterface*> motors;
+		std::vector<rexos_sensor::ContactSensorInterface*> sensors;
 		
 		/**
 		 *

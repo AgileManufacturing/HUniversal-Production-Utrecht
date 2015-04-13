@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rexos_stewart_gough)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS rexos_datatypes rexos_modbus rexos_motor rexos_utilities rexos_logger vectors matrices)
+find_package(catkin REQUIRED COMPONENTS rexos_datatypes rexos_modbus rexos_motor rexos_sensor rexos_utilities rexos_logger vectors matrices)
 find_package(Boost)
 
 ## Declare a catkin package
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES rexos_stewart_gough rexos_logger
-CATKIN_DEPENDS rexos_datatypes rexos_modbus rexos_motor rexos_utilities rexos_logger vectors matrices
+CATKIN_DEPENDS rexos_datatypes rexos_modbus rexos_motor rexos_sensor rexos_utilities rexos_logger vectors matrices
 DEPENDS Boost)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")

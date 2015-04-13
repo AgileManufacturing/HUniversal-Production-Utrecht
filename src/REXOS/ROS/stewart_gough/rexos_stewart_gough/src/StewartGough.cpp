@@ -41,6 +41,8 @@
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/SimulatedMotorManager.h>
 #include <rexos_motor/StepperMotorManager.h>
+#include <rexos_sensor/SimulatedContactSensor.h>
+#include <rexos_sensor/ContactSensor.h>
 #include <rexos_utilities/Utilities.h>
 
 #include "ros/ros.h"
@@ -116,14 +118,30 @@ namespace rexos_stewart_gough{
 		REXOS_INFO("Configuring motors");
 		createMotorManager();
 		
-		REXOS_INFO("Configuring Modbus...");
-		// Initialize modbus for IO controller
-		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
-		if(modbusIO == NULL){
-			throw std::runtime_error("Unable to allocate libmodbus context");
-		}
-		if(modbus_connect(modbusIO) == -1) {
-			throw std::runtime_error("Modbus connection to IO controller failed");
+		REXOS_INFO("Configuring sensors");
+		if(isSimulated == true) {
+			sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, 0));
+			sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, 1));
+			sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, 2));
+			sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, 3));
+			sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, 4));
+			sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, 5));
+		} else {
+			// Initialize modbus for IO controller
+			modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
+			if(modbusIO == NULL){
+				throw std::runtime_error("Unable to allocate libmodbus context");
+			}
+			if(modbus_connect(modbusIO) == -1) {
+				throw std::runtime_error("Modbus connection to IO controller failed");
+			}
+			
+			sensors.push_back(new rexos_sensor::ContactSensor(0, modbusIO));
+			sensors.push_back(new rexos_sensor::ContactSensor(1, modbusIO));
+			sensors.push_back(new rexos_sensor::ContactSensor(2, modbusIO));
+			sensors.push_back(new rexos_sensor::ContactSensor(3, modbusIO));
+			sensors.push_back(new rexos_sensor::ContactSensor(4, modbusIO));
+			sensors.push_back(new rexos_sensor::ContactSensor(5, modbusIO));
 		}
 		
 		sixAxisCalculations = new SixAxisCalculations(
@@ -365,16 +383,7 @@ namespace rexos_stewart_gough{
     * @return true if sensor is hit, false otherwise.
     **/
     bool StewartGough::checkSensor(int sensorIndex){
-        // The modbus library only reads
-        uint16_t sensorRegister;
-        int result;
-
-        // Read register 8000 -- this register contains the values of the input sensors.
-        result = modbus_read_registers(modbusIO, 8000, 1, &sensorRegister);
-        if (result == -1){
-            throw std::runtime_error(modbus_strerror(errno));
-        }
-        return (sensorRegister ^ 63) & 1 << sensorIndex;
+		return sensors[sensorIndex]->isTriggered();
     }
 
     /**
