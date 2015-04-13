@@ -6,6 +6,9 @@
 			<parentLink>{parentLink}</parentLink>
 			<childLink>{childLink}</childLink>
 		</plugin>
+		<plugin name="motorManager" filename="{baseDir}libmotor_manager_plugin.so">
+			<motors>upperArm1ToBase upperArm2ToBase upperArm3ToBase upperArm4ToBase upperArm5ToBase upperArm6ToBase</motors>
+		</plugin>
 		<static>false</static>
 		<!--==================== Links ====================-->
 		<link name="base">
