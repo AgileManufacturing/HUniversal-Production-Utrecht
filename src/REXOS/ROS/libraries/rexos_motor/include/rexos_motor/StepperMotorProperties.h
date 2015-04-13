@@ -45,8 +45,5 @@ namespace rexos_motor {
 		double microStepAngle;
 	public:
 		StepperMotorProperties(Json::Value properties);
-		
-	/*private:
-		JSONNode findJsonNode(JSONNode input, std::string name);*/
 	};
 }

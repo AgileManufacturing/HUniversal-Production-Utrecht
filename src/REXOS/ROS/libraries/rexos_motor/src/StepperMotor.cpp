@@ -134,7 +134,7 @@ namespace rexos_motor {
 		if(motorRotation.acceleration > properties.maxAcceleration || motorRotation.acceleration < properties.minAcceleration) {
 			throw std::out_of_range("Acceleration out of range.");
 		}
-		if(motorRotation.deceleration > properties.maxAcceleration || motorRotation.deceleration < properties.minAcceleration) {
+		if(motorRotation.deceleration > properties.minAcceleration || motorRotation.deceleration < properties.minAcceleration) {
 			throw std::out_of_range("Deacceleration out of range.");
 		}
 		

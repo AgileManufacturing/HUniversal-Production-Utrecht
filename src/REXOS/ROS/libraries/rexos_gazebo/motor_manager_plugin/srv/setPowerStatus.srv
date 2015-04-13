@@ -1,0 +1,3 @@
+int32 motorIndex
+bool powerStatus
+---

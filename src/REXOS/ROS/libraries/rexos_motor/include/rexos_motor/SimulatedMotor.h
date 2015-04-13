@@ -36,6 +36,8 @@
 #include <rexos_motor/MotorProperties.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 
+#include <ros/ros.h>
+
 namespace rexos_motor{
 	class SimulatedMotor : public MotorInterface{
 	public:
@@ -83,12 +85,6 @@ namespace rexos_motor{
 		virtual bool isReady();
 
 		/**
-		 * Sets the deviation between the motors 0 degrees and the horizontal 0 degrees, then writes the new motor limits to the motor controllers.
-		 * @param deviation The deviation between the hardware and theoretical 0 degrees.
-		 **/
-		void setDeviationAndWriteMotorLimits(double deviation);
-
-		/**
 		 * Sets the motor controller to incremental mode.
 		 * @param motionSlot The motion slot to be set to incremental.
 		 **/
@@ -118,6 +114,7 @@ namespace rexos_motor{
 		std::string equipletName;
 		rexos_datatypes::ModuleIdentifier identifier;
 		int index;
+		ros::NodeHandle nodeHandle;
 		
 		/**
 		 * @var bool anglesLimited
@@ -130,5 +127,15 @@ namespace rexos_motor{
 		 * @param motionSlot the motion slot to be checked.
 		 **/
 		void checkMotionSlot(int motionSlot);
+		
+		ros::ServiceClient isMotorReadyClient;
+		ros::ServiceClient setMinSpeedClient;
+		ros::ServiceClient setLowerAngleLimitClient;
+		ros::ServiceClient setUpperAngleLimitClient;
+		ros::ServiceClient setMotorModeClient;
+		ros::ServiceClient setPowerStatusClient;
+		ros::ServiceClient startMotorClient;
+		ros::ServiceClient stopMotorClient;
+		ros::ServiceClient writeRotationDataClient;
 	};
 }

@@ -61,7 +61,7 @@ namespace rexos_motor{
 		/**
 		 * @var double MOTOR_MIN_SPEED
 		 * The minimum speed in radians per second that the motor can travel at, based on the minimum value in the CRD514KD speed register.
-		 **/		
+		 **/
 		double minSpeed;
 
 		/**

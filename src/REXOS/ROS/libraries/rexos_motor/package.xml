@@ -18,6 +18,10 @@
 
   <run_depend>rexos_logger</run_depend>
   <build_depend>rexos_logger</build_depend>
+  
+  <build_depend>motor_manager_plugin</build_depend>
+  <run_depend>motor_manager_plugin</run_depend>
+  
 
   <export>
        <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_motor"/>
