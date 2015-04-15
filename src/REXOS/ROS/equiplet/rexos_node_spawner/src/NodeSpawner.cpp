@@ -77,7 +77,7 @@ namespace rexos_node_spawner {
 			boost::algorithm::replace_all(command, "{typeNumber}", moduleIdentifier.getTypeNumber());
 			boost::algorithm::replace_all(command, "{serialNumber}", moduleIdentifier.getSerialNumber());
 		
-			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
+			REXOS_INFO_STREAM("Spawning node with command " << command);
 			execl("/bin/bash", "/bin/bash", "-c", command.c_str(), NULL);
 			REXOS_ERROR("Unable to execl");
 			throw std::runtime_error("Unable to execl");

@@ -227,7 +227,7 @@
 			<parent>base</parent>
 			<child>upperArm2</child>
 			<axis>
-				<xyz>-1 0 0</xyz>
+				<xyz>1 0 0</xyz>
 				<dynamics>
 					<friction>0.05</friction>
 					<damping>0.25</damping>

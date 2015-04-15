@@ -46,6 +46,7 @@ namespace rexos_sensor {
 	bool SimulatedContactSensor::isTriggered() {
 		sensor_manager_plugin::isContactSensorTriggered call;
 		call.request.sensorIndex = index;
+		isContactSensorTriggeredClient.waitForExistence();
 		isContactSensorTriggeredClient.call(call);
 		return call.response.isTriggered;
 	}

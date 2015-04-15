@@ -59,8 +59,10 @@ namespace rexos_motor{
 		}
 		
 		// Start movement
-		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		modbus->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
+				motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+		modbus->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
+				CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		
 		for(int i = 0; i < motors.size(); ++i) {
 			if(motors[i]->isPoweredOn()) {

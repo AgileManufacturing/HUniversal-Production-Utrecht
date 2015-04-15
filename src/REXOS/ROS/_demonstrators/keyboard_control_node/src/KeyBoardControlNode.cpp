@@ -37,11 +37,14 @@
 #include <signal.h>
 #include <string.h>
 #include <cstdlib>
+
 #include <keyboard_control_node/KeyBoardControlNode.h>
-#include "rexos_utilities/Utilities.h"
+#include <rexos_utilities/Utilities.h>
+#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_configuration/Configuration.h>
+
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/writer.h>
-#include <rexos_datatypes/EquipletStep.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "KeyBoardControlNode"
@@ -56,7 +59,10 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string e
 	REXOS_INFO("Constructing");
 
 	//DirectMoveStepsBlackBoard
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, equipletName, "EquipletStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/databaseName", equipletName).asString(), 
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
 
 	tcgetattr(KEYBOARDNUMBER, &oldTerminalSettings);
 	memcpy(&newTerminalSettings, &oldTerminalSettings, sizeof(struct termios));
@@ -441,7 +447,7 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	KeyBoardControlNode keyBoardControlNode("127.0.0.1", "EQ3", rexos_datatypes::ModuleIdentifier("HU", "six_axis_type_A", "1"));
+	KeyBoardControlNode keyBoardControlNode("127.0.0.1", "EQ2", rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
 	keyBoardControlNode.run();
 	
 	return 0;

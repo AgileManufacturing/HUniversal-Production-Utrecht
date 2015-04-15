@@ -32,19 +32,15 @@
 
 #pragma once
 
-#include <modbus/modbus.h>
-#include <vectors/Vectors.h>
-#include <rexos_delta_robot/DeltaRobotMeasures.h>
-#include <rexos_motor/MotorInterface.h>
-#include <rexos_motor/StepperMotor.h>
-#include <rexos_motor/MotorManager.h>
-#include <rexos_motor/StepperMotorProperties.h>
+#include <rexos_motorized_actor/MotorizedActor.h>
 #include <rexos_delta_robot/DeltaRobotMeasures.h>
 #include <rexos_delta_robot/EffectorBoundaries.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include <jsoncpp/json/value.h>
 #include "rexos_logger/rexos_logger.h"
 
+#include <string>
+#include <stdexcept>
 #include <vector>
 
 namespace rexos_delta_robot{
@@ -52,7 +48,7 @@ namespace rexos_delta_robot{
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
-	class DeltaRobot{
+	class DeltaRobot : public rexos_motorized_actor::MotorizedActor {
 	public:
 		DeltaRobot(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node);
 		~DeltaRobot();
@@ -75,17 +71,10 @@ namespace rexos_delta_robot{
 		bool checkPath(const Vector3& begin, const Vector3& end);
 
 		void moveTo(const Vector3& point, double maxAcceleration);
-		void calibrateMotor(int motorIndex);
-		bool checkSensor(int sensorIndex);
-		bool calibrateMotors();
-		void powerOff();
-		void powerOn();
+		virtual bool calibrateMotors();
 		Vector3 getEffectorLocation();
 
 	private:
-		std::string equipletName;
-		rexos_datatypes::ModuleIdentifier identifier;
-		bool isSimulated;
 		/**
 		 * @var InverseKinematicsModel* kinematics
 		 * A pointer to the kinematics model used by the DeltaRobot.
@@ -93,20 +82,6 @@ namespace rexos_delta_robot{
 		InverseKinematicsModel* kinematics;
 
 		rexos_delta_robot::DeltaRobotMeasures* deltaRobotMeasures;
-		rexos_motor::StepperMotorProperties stepperMotorProperties;
-	
-		int calibrationBigStepFactor;
-		/**
-		 * @var StepperMotor* motors
-		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
-		 **/
-		std::vector<rexos_motor::MotorInterface*> motors;
-
-		/**
-		 * @var MotorManager* motorManager
-		 * A pointer to the MotorManager that handles the movement for the DeltaRobot.
-		 **/
-		rexos_motor::MotorManager* motorManager;
 
 		/**
 		 * @var EffectorBoundaries* boundaries
@@ -126,27 +101,6 @@ namespace rexos_delta_robot{
 		 **/
 		bool boundariesGenerated;
 
-		std::string modbusIp;
-		int modbusPort;
-		/**
-		 * @var modbus_t* modbusIO
-		 * A pointer to the TCP modbus connection for the IO controller.
-		 **/
-		modbus_t* modbusIO;
-		/**
-		 *
-		 * @var ModbusController::ModbusController* modbus
-		 * the modbuscontroller
-		 **/
-		rexos_modbus::ModbusController* modbus;
-
-		/**
-		 * @var int currentMotionSlot
-		 * The motion slot currently in use. The deltarobot switches between these slots when moving.
-		 **/
-		int currentMotionSlot;
-
-		int moveMotorUntilSensorIsOfValue(int motorIndex, rexos_motor::MotorRotation motorRotation, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
 	};

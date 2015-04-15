@@ -32,6 +32,13 @@ namespace sensor_manager_plugin {
 			contactSensors.push_back(contactSensor);
 		}
 		
+		if(_sdf->HasElement("rosNamespace") == false) {
+			std::cerr << "Missing rosNamespace" << std::endl;
+			return;
+		}
+		std::string rosNamespace = _sdf->GetElement("rosNamespace")->GetValue()->GetAsString();
+		ROS_INFO_STREAM("Advertising services at " << rosNamespace);
+		
 		if (!ros::isInitialized()) {
 			ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
 			<< "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
@@ -40,7 +47,7 @@ namespace sensor_manager_plugin {
 		
 		model = _model;
 		nodeHandle = new ros::NodeHandle();
-		isContactSensorTriggeredServer = nodeHandle->advertiseService("isContactSensorTriggered", 
+		isContactSensorTriggeredServer = nodeHandle->advertiseService(rosNamespace + "isContactSensorTriggered", 
 				&SensorManagerPlugin::isContactSensorTriggered, this);
 		
 		this->updateConnection = event::Events::ConnectWorldUpdateBegin(

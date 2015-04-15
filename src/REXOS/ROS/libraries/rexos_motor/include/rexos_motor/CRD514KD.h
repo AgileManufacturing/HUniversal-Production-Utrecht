@@ -43,19 +43,12 @@ namespace rexos_motor{
 		 **/
 		const int MOTION_SLOTS_USED = 2;
 
-		namespace Slaves{
+		namespace SlaveAddresses{
 			/**
 			 * CRD514KD slave addresses.
 			 **/
-			typedef enum _t{
-				BROADCAST = 0,
-				MOTOR_0 = 1,
-				MOTOR_1 = 2,
-				MOTOR_2 = 3,
-				MOTOR_3 = 4,
-				MOTOR_4 = 5,
-				MOTOR_5 = 6
-			} t;
+			const uint16_t BROADCAST = 0;
+			const uint16_t MOTOR_0 = 1;
 		}
 
 		namespace Registers{

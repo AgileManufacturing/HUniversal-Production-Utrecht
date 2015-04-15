@@ -7,7 +7,7 @@
 namespace motor_manager_plugin {
 	Motor::Motor() :
 			lowerAngleLimit(-10), upperAngleLimit(10), relativeMode(false), powerStatus(false), isActive(false), 
-			minSpeed(0), startAngle(0) {
+			minSpeed(0) {
 		
 	}
 	void Motor::setPowerStatus(bool powerStatus) {
@@ -16,9 +16,13 @@ namespace motor_manager_plugin {
 			double angle = joint->GetAngle(0).Radian();
 			joint->SetLowStop(0, gazebo::math::Angle(angle));
 			joint->SetHighStop(0, gazebo::math::Angle(angle));
+			powerOnAngle = angle;
+			currentMoveTargetAngle = powerOnAngle;
+			isActive = false;
 		} else {
 			joint->SetLowStop(0, gazebo::math::Angle(-std::numeric_limits<double>::infinity()));
 			joint->SetHighStop(0, gazebo::math::Angle(std::numeric_limits<double>::infinity()));
+			isActive = false;
 		}
 		this->powerStatus = powerStatus;
 	}
@@ -27,51 +31,62 @@ namespace motor_manager_plugin {
 	}
 	void Motor::startMotor(gazebo::common::Time currentTime) {
 		if(powerStatus == true) {
-			ROS_INFO_STREAM("startMotor " << currentTime);
+//			ROS_INFO_STREAM("startMotor " << currentTime);
+//			ROS_INFO_STREAM("targetAngle " << targetAngle);
 			isActive = true;
-			startTime = currentTime;
-			startAngle = joint->GetAngle(0).Radian();
+
+			currentMoveMinSpeed = minSpeed;
+			currentMoveMaxSpeed = maxSpeed;
+			currentMoveMaxAcceleration = maxAcceleration;
+			currentMoveMaxDecceleration = maxDecceleration;
+			currentMoveStartTime = currentTime;
+			currentMoveStartAngle = currentMoveTargetAngle;
+
+			if(relativeMode == true) {
+				// relative mode
+				currentMoveTargetAngle = currentMoveStartAngle + targetAngle;
+			} else {
+				// absolute mode
+				currentMoveTargetAngle = targetAngle + powerOnAngle;
+			}
+//			ROS_INFO_STREAM("currentMoveStartAngle " << currentMoveStartAngle);
+//			ROS_INFO_STREAM("currentMoveTargetAngle " << currentMoveTargetAngle);
 		} else {
-			ROS_FATAL_STREAM("Unable to start motor because it is not powerd on");
+			ROS_ERROR_STREAM("Unable to start motor because it is not powerd on");
 		}
 	}
 	void Motor::stopMotor(gazebo::common::Time currentTime) {
 		if(isActive == true) {
 			double newAngle = calculateMotorAngle(currentTime);
 			// TODO what if already deccelerating?
-			if(targetAngle < startAngle) {
+			if(currentMoveTargetAngle < currentMoveStartAngle) {
 				// rotating in negative direction
-				targetAngle = newAngle - calculateAccelerationDistance(maxDecceleration);
+				currentMoveTargetAngle = newAngle - calculateAccelerationDistance(currentMoveMaxDecceleration);
 			} else {
 				// rotating in positive direction
-				targetAngle = newAngle + calculateAccelerationDistance(maxDecceleration);
+				currentMoveTargetAngle = newAngle + calculateAccelerationDistance(currentMoveMaxDecceleration);
 			}
 		}
 	}
 	void Motor::updateMotor(gazebo::common::Time currentTime) {
 		if(isActive == true) {
 			double newAngle = calculateMotorAngle(currentTime);
+//			ROS_INFO_STREAM("newAngle " << newAngle);
 			setAngle(newAngle);
 		}
 	}
 	double Motor::calculateMotorAngle(gazebo::common::Time currentTime) {
-			ROS_INFO_STREAM("-----------------------------");
+//		ROS_INFO_STREAM("-----------------------------");
 		// motor is rotating
-		double deltaTime = (currentTime - startTime).Double();
-			ROS_INFO_STREAM("deltaTime " << deltaTime);
-		double accelerationDuration = calculateAccelerationDuration(maxAcceleration);
-			ROS_INFO_STREAM("accelerationDuration " << accelerationDuration);
-		double deccelerationDuration = calculateAccelerationDuration(maxDecceleration);
-			ROS_INFO_STREAM("deccelerationDuration " << deccelerationDuration);
+		double deltaTime = (currentTime - currentMoveStartTime).Double();
+		double accelerationDuration = calculateAccelerationDuration(currentMoveMaxAcceleration);
+		double deccelerationDuration = calculateAccelerationDuration(currentMoveMaxDecceleration);
 		
-		double accelerationDistance = calculateAccelerationDistance(maxAcceleration);
-			ROS_INFO_STREAM("accelerationDistance " << accelerationDistance);
-		double deccelerationDistance = calculateAccelerationDistance(maxDecceleration);
-			ROS_INFO_STREAM("deccelerationDistance " << deccelerationDistance);
-		double totalDistance = std::abs(targetAngle - startAngle);
-			ROS_INFO_STREAM("totalDistance " << totalDistance);
-		double absoluteTotalDistance = std::abs(targetAngle - startAngle);
-		double speedDifference = maxSpeed - minSpeed;
+		double accelerationDistance = calculateAccelerationDistance(currentMoveMaxAcceleration);
+		double deccelerationDistance = calculateAccelerationDistance(currentMoveMaxDecceleration);
+		double totalDistance = currentMoveTargetAngle - currentMoveStartAngle;
+		double absoluteTotalDistance = std::abs(totalDistance);
+		double speedDifference = currentMoveMaxSpeed - currentMoveMinSpeed;
 		
 		double newAngle;
 		
@@ -79,89 +94,100 @@ namespace motor_manager_plugin {
 			// this is a two phase motion. It has no constant speed phase and the acceleration phase is interrupted by the decelleration phase
 			
 			// determine the point where de acceleration is interrupted by the decelleration
+//			ROS_INFO_STREAM("absoluteTotalDistance " << absoluteTotalDistance);
+//			ROS_INFO_STREAM("accelerationDistance " << accelerationDistance);
+//			ROS_INFO_STREAM("deccelerationDistance " << deccelerationDistance);
 			double reductionFactor = absoluteTotalDistance / (accelerationDistance + deccelerationDistance);
-			ROS_INFO_STREAM("reductionFactor " << reductionFactor);
+//			ROS_INFO_STREAM("reductionFactor " << reductionFactor);
 			double turnoverPoint = accelerationDistance * reductionFactor;
-			ROS_INFO_STREAM("turnoverPoint " << turnoverPoint);
-			double reducedAccelerationTime = std::sqrt((accelerationDistance * reductionFactor - minSpeed) / (maxAcceleration / 2));
-			ROS_INFO_STREAM("reducedAccelerationTime " << reducedAccelerationTime);
-			double reducedDeccelerationTime = std::sqrt((deccelerationDistance * reductionFactor - minSpeed) / (maxDecceleration / 2));
-			ROS_INFO_STREAM("reducedDeccelerationTime " << reducedDeccelerationTime);
+//			ROS_INFO_STREAM("turnoverPoint " << turnoverPoint);
+			// ABC formula
+			double a, b, c;
+			a = currentMoveMaxAcceleration / 2;
+			b = currentMoveMinSpeed;
+			c = -accelerationDistance * reductionFactor;
+			double reducedAccelerationTime = (-b + std::sqrt(b * b - 4 * a * c)) / (2 * a);
+//			ROS_INFO_STREAM("reducedAccelerationTime " << reducedAccelerationTime);
+			a = currentMoveMaxDecceleration / 2;
+			b = currentMoveMinSpeed;
+			c = -deccelerationDistance * reductionFactor;
+			double reducedDeccelerationTime = (-b + std::sqrt(b * b - 4 * a * c)) / (2 * a);
+//			ROS_INFO_STREAM("reducedDeccelerationTime " << reducedDeccelerationTime);
 			double totalTravelTime = reducedAccelerationTime + reducedDeccelerationTime;
-			ROS_INFO_STREAM("totalTravelTime " << totalTravelTime);
+//			ROS_INFO_STREAM("totalTravelTime " << totalTravelTime);
 			
 			if(deltaTime >= totalTravelTime) {
-			ROS_INFO_STREAM("2p stop");
+//			ROS_INFO_STREAM("2p stop");
 				// motor is at destination
-				newAngle = targetAngle;
+				newAngle = currentMoveTargetAngle;
 				isActive = false;
 			} else if(deltaTime < reducedAccelerationTime) {
-			ROS_INFO_STREAM("2p acc");
+//				ROS_INFO_STREAM("2p acc");
 				// motor is accelerating
-				double averageSpeed = minSpeed + maxAcceleration * (deltaTime / 2);
-			ROS_INFO_STREAM("averageSpeed " << averageSpeed);
-				if(targetAngle < startAngle) {
+				double averageSpeed = currentMoveMinSpeed + currentMoveMaxAcceleration * (deltaTime / 2);
+//				ROS_INFO_STREAM("averageSpeed " << averageSpeed);
+				if(currentMoveTargetAngle < currentMoveStartAngle) {
 					// rotating in negative direction
-					newAngle = startAngle - averageSpeed * deltaTime;
+					newAngle = currentMoveStartAngle - averageSpeed * deltaTime;
 				} else {
 					// rotating in positive direction
-					newAngle = startAngle + averageSpeed * deltaTime;
+					newAngle = currentMoveStartAngle + averageSpeed * deltaTime;
 				}
 			} else {
-			ROS_INFO_STREAM("2p decc");
+//				ROS_INFO_STREAM("2p decc");
 				// motor is decellerating
-				double averageSpeed = minSpeed + maxDecceleration * ((totalTravelTime - deltaTime) / 2);
-			ROS_INFO_STREAM("averageSpeed " << averageSpeed);
-				if(targetAngle < startAngle) {
+				double averageSpeed = currentMoveMinSpeed + currentMoveMaxDecceleration * ((totalTravelTime - deltaTime) / 2);
+//				ROS_INFO_STREAM("averageSpeed " << averageSpeed);
+				if(currentMoveTargetAngle < currentMoveStartAngle) {
 					// rotating in negative direction
-					newAngle = targetAngle + averageSpeed * (totalTravelTime - deltaTime);
+					newAngle = currentMoveTargetAngle + averageSpeed * (totalTravelTime - deltaTime);
 				} else {
 					// rotating in positive direction
-					newAngle = targetAngle - averageSpeed * (totalTravelTime - deltaTime);
+					newAngle = currentMoveTargetAngle - averageSpeed * (totalTravelTime - deltaTime);
 				}
 			}
 		} else {
 			// this is a three phase motion
 			double distanceInConstantSpeedPhase = absoluteTotalDistance - accelerationDistance - deccelerationDistance;
-			double totalTravelTime = accelerationDuration + (distanceInConstantSpeedPhase / maxSpeed) + deccelerationDuration;
+			double totalTravelTime = accelerationDuration + (distanceInConstantSpeedPhase / currentMoveMaxSpeed) + deccelerationDuration;
 			if(deltaTime >= totalTravelTime) {
-			ROS_INFO_STREAM("3p stop");
+//				ROS_INFO_STREAM("3p stop");
 				// motor is at destination
-				newAngle = targetAngle;
+				newAngle = currentMoveTargetAngle;
 				isActive = false;
 			}
 			else if(deltaTime < accelerationDuration) {
-			ROS_INFO_STREAM("3p acc");
+//				ROS_INFO_STREAM("3p acc");
 				// motor is accelerating
-				double averageSpeed = minSpeed + maxAcceleration * (deltaTime / 2);
-				if(targetAngle < startAngle) {
+				double averageSpeed = currentMoveMinSpeed + currentMoveMaxAcceleration * (deltaTime / 2);
+				if(currentMoveTargetAngle < currentMoveStartAngle) {
 					// rotating in negative direction
-					newAngle = startAngle - averageSpeed * deltaTime;
+					newAngle = currentMoveStartAngle - averageSpeed * deltaTime;
 				} else {
 					// rotating in positive direction
-					newAngle = startAngle + averageSpeed * deltaTime;
+					newAngle = currentMoveStartAngle + averageSpeed * deltaTime;
 				}
 			} else if(deltaTime >= totalTravelTime - deccelerationDuration) {
-			ROS_INFO_STREAM("3p decc");
+//				ROS_INFO_STREAM("3p decc");
 				// motor is decelerating
-				double averageSpeed = minSpeed + maxDecceleration * ((totalTravelTime - deltaTime) / 2);
-				if(targetAngle < startAngle) {
+				double averageSpeed = currentMoveMinSpeed + currentMoveMaxDecceleration * ((totalTravelTime - deltaTime) / 2);
+				if(currentMoveTargetAngle < currentMoveStartAngle) {
 					// rotating in negative direction
-					newAngle = targetAngle + averageSpeed * (totalTravelTime - accelerationDuration - deltaTime);
+					newAngle = currentMoveTargetAngle + averageSpeed * (totalTravelTime - deltaTime);
 				} else {
 					// rotating in positive direction
-					newAngle = targetAngle - averageSpeed * (totalTravelTime - accelerationDuration - deltaTime);
+					newAngle = currentMoveTargetAngle - averageSpeed * (totalTravelTime - deltaTime);
 				}
 			} else {
-			ROS_INFO_STREAM("3p cons");
+//				ROS_INFO_STREAM("3p cons");
 				// motor is at constant speed
-				double averageSpeed = maxSpeed;
-				if(targetAngle < startAngle) {
+				double averageSpeed = currentMoveMaxSpeed;
+				if(currentMoveTargetAngle < currentMoveStartAngle) {
 					// rotating in negative direction
-					newAngle = startAngle + accelerationDistance + averageSpeed * (totalTravelTime - accelerationDuration - deltaTime);
+					newAngle = currentMoveStartAngle - accelerationDistance - currentMoveMaxSpeed * (deltaTime - accelerationDuration);
 				} else {
 					// rotating in positive direction
-					newAngle = startAngle - (accelerationDistance + averageSpeed * (totalTravelTime - accelerationDuration - deltaTime));
+					newAngle = currentMoveStartAngle + accelerationDistance + currentMoveMaxSpeed * (deltaTime - accelerationDuration);
 				}
 			}
 		}
@@ -172,20 +198,22 @@ namespace motor_manager_plugin {
 		// clip to the limits
 		if(angle < lowerAngleLimit) {
 			angle = lowerAngleLimit;
+			ROS_WARN("Clipping to lower limit");
 		} else if(angle > upperAngleLimit) {
 			angle = upperAngleLimit;
+			ROS_WARN("Clipping to upper limit");
 		}
 		joint->SetLowStop(0, gazebo::math::Angle(angle));
 		joint->SetHighStop(0, gazebo::math::Angle(angle));
 	}
 	double Motor::calculateAccelerationDuration(double acceleration) {
-		double speedDifference = maxSpeed - minSpeed;
+		double speedDifference = currentMoveMaxSpeed - currentMoveMinSpeed;
 		return speedDifference / acceleration;
 	}
 	double Motor::calculateAccelerationDistance(double acceleration) {
-		double speedDifference = maxSpeed - minSpeed;
+		double speedDifference = currentMoveMaxSpeed - currentMoveMinSpeed;
 		double timeRequiredToAccelerate = calculateAccelerationDuration(acceleration);
-		double averageSpeedDuringSAcceleration = minSpeed + speedDifference / 2;
+		double averageSpeedDuringSAcceleration = currentMoveMinSpeed + speedDifference / 2;
 		return timeRequiredToAccelerate * averageSpeedDuringSAcceleration;
 	}
 }

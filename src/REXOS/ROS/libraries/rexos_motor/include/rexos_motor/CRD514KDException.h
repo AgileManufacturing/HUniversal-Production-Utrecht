@@ -49,7 +49,7 @@ namespace rexos_motor{
 		 * @var t slave
 		 * The modbus slave which set the alarm flag.
 		 **/
-		const CRD514KD::Slaves::t slave;
+		const uint16_t slave;
 
 		/**
 		 * @var bool warning
@@ -77,7 +77,7 @@ namespace rexos_motor{
 		 * @param warning Boolean that indicates whether there is a warning.
 		 * @param alarm Boolean that indicates whether there is an alarm.
 		 **/
-		CRD514KDException(const CRD514KD::Slaves::t slave, const bool warning, const bool alarm) :
+		CRD514KDException(const uint16_t slave, const bool warning, const bool alarm) :
 				std::runtime_error(""), slave(slave), warning(warning), alarm(alarm), message(""){
 			std::stringstream stream;
 			stream << "slave: " << (int)slave << ": warning=" << (int)warning << " alarm=" << (int)alarm;
@@ -103,7 +103,7 @@ namespace rexos_motor{
 		 * 
 		 * @return The slave
 		 **/
-		CRD514KD::Slaves::t getSlave(void){
+		uint16_t getSlave(void){
 			return slave;
 		}
 

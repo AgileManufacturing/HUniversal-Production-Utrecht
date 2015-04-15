@@ -23,13 +23,15 @@
 			<sensor type="camera" name="camera">
 				<pose>0.02501 -0.20224 0.05719 0 -1.57079633 0</pose>
 				<always_on>false</always_on>
-				<update_rate>30.0</update_rate>
-				<visualize>true</visualize>
+				<update_rate>2.0</update_rate>
+				<visualize>false</visualize>
 				<camera>
-					<horizontal_fov>1.3962634</horizontal_fov>
+					<horizontal_fov>0.698131701</horizontal_fov>
 					<image>
-						<width>640</width>
-						<height>480</height>
+						<!--<width>640</width>
+						<height>480</height>-->
+						<width>1280</width>
+						<height>960</height>
 					</image>
 					<clip>
 						<near>0.02</near>
@@ -38,7 +40,7 @@
 				</camera>
 				<plugin name="camera_controller" filename="libgazebo_ros_camera.so">
 					<alwaysOn>true</alwaysOn>
-					<updateRate>0.0</updateRate>
+					<updateRate>2.0</updateRate>
 					<cameraName>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/camera</cameraName>
 					<imageTopicName>image_raw</imageTopicName>
 					<cameraInfoTopicName>camera_info</cameraInfoTopicName>

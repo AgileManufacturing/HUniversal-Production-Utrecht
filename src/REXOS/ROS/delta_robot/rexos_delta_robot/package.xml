@@ -10,12 +10,8 @@
   <author email="koenbraham@gmail.com">KBraham</author>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rexos_datatypes</build_depend>
-  <build_depend>rexos_modbus</build_depend>
-  <build_depend>rexos_motor</build_depend>
   <build_depend>rexos_utilities</build_depend>
   <run_depend>rexos_datatypes</run_depend>
-  <run_depend>rexos_modbus</run_depend>
-  <run_depend>rexos_motor</run_depend>
   <run_depend>rexos_utilities</run_depend>
   <build_depend>vectors</build_depend>
   <run_depend>vectors</run_depend>
@@ -23,6 +19,8 @@
   <run_depend>matrices</run_depend>
   <build_depend>rexos_logger</build_depend>
   <run_depend>rexos_logger</run_depend>
+  <build_depend>rexos_motorized_actor</build_depend>
+  <run_depend>rexos_motorized_actor</run_depend>
   
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_delta_robot"/>

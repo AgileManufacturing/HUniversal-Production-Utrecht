@@ -67,11 +67,6 @@ namespace rexos_delta_robot{
 		 * Maximum angle between hip and ankle when moving the ankle sideways.
 		 **/
 		double maxAngleHipAnkle;
-		/**
-		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
-		 * The angle from zero (horizontal) to the top position in radians.
-		 **/
-		double motorFromZeroToTopAngle;
 		
 		/**
 		 * @var double boundaryBoxMinX

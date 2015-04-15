@@ -43,7 +43,7 @@
 namespace rexos_motor{
 	class StepperMotor : public MotorInterface{
 	public:
-		StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, StepperMotorProperties properties);
+		StepperMotor(rexos_modbus::ModbusController* modbusController, uint16_t motorAddress, StepperMotorProperties properties);
 
 		/**
 		 * Deconstructor of StepperMotor. Tries to turn to power off.
@@ -133,10 +133,10 @@ namespace rexos_motor{
 		rexos_modbus::ModbusController* modbus;
 
 		/**
-		 * @var Slaves::t motorIndex
-		 * Index for the motor in the CRD514KD slaves enum.
+		 * @var Slaves::t motorAddress
+		 * The address of the slave on the modbus
 		 **/
-		CRD514KD::Slaves::t motorIndex;
+		uint16_t motorAddress;
 
 		/**
 		 * Checks whether the motion slot is used. Throws an std::out_of_range exception if not.

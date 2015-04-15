@@ -18,13 +18,11 @@ namespace motor_manager_plugin {
 			return;
 		}
 		std::string sdfValue = _sdf->GetElement("motors")->GetValue()->GetAsString();
-		ROS_INFO_STREAM("motors sdfValue: " << sdfValue);
 		
 		std::vector<std::string> motorStrings;
 		boost::split(motorStrings, sdfValue, boost::is_any_of(" "));
 		
 		for(int i = 0; i < motorStrings.size(); i++) {
-			ROS_INFO_STREAM("motors entry: " << motorStrings[i]);
 			Motor motor;
 			motor.joint = _model->GetJoint(motorStrings[i]);
 			if(motor.joint == NULL) {
@@ -32,6 +30,13 @@ namespace motor_manager_plugin {
 			}
 			motors.push_back(motor);
 		}
+		
+		if(_sdf->HasElement("rosNamespace") == false) {
+			std::cerr << "Missing rosNamespace" << std::endl;
+			return;
+		}
+		std::string rosNamespace = _sdf->GetElement("rosNamespace")->GetValue()->GetAsString();
+		ROS_INFO_STREAM("Advertising services at " << rosNamespace);
 		
 		if (!ros::isInitialized()) {
 			ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
@@ -41,23 +46,23 @@ namespace motor_manager_plugin {
 		
 		model = _model;
 		nodeHandle = new ros::NodeHandle();
-		isMotorReadyServer = nodeHandle->advertiseService("isMotorReady", 
+		isMotorReadyServer = nodeHandle->advertiseService(rosNamespace + "isMotorReady", 
 				&MotorManagerPlugin::isMotorReady, this);
-		setMinSpeedServer = nodeHandle->advertiseService("setMinSpeed", 
+		setMinSpeedServer = nodeHandle->advertiseService(rosNamespace + "setMinSpeed", 
 				&MotorManagerPlugin::setMinSpeed, this);
-		setUpperAngleLimitServer = nodeHandle->advertiseService("setUpperAngleLimit", 
+		setUpperAngleLimitServer = nodeHandle->advertiseService(rosNamespace + "setUpperAngleLimit", 
 				&MotorManagerPlugin::setUpperAngleLimit, this);
-		setLowerAngleLimitServer = nodeHandle->advertiseService("setLowerAngleLimit", 
+		setLowerAngleLimitServer = nodeHandle->advertiseService(rosNamespace + "setLowerAngleLimit", 
 				&MotorManagerPlugin::setLowerAngleLimit, this);
-		setMotorModeServer = nodeHandle->advertiseService("setMotorMode", 
+		setMotorModeServer = nodeHandle->advertiseService(rosNamespace + "setMotorMode", 
 				&MotorManagerPlugin::setMotorMode, this);
-		setPowerStatusServer = nodeHandle->advertiseService("setPowerStatus", 
+		setPowerStatusServer = nodeHandle->advertiseService(rosNamespace + "setPowerStatus", 
 				&MotorManagerPlugin::setPowerStatus, this);
-		startMotorServer = nodeHandle->advertiseService("startMotor", 
+		startMotorServer = nodeHandle->advertiseService(rosNamespace + "startMotor", 
 				&MotorManagerPlugin::startMotor, this);
-		stopMotorServer = nodeHandle->advertiseService("stopMotor", 
+		stopMotorServer = nodeHandle->advertiseService(rosNamespace + "stopMotor", 
 				&MotorManagerPlugin::stopMotor, this);
-		writeRotationDataServer = nodeHandle->advertiseService("writeRotationData", 
+		writeRotationDataServer = nodeHandle->advertiseService(rosNamespace + "writeRotationData", 
 				&MotorManagerPlugin::writeRotationData, this);
 		
 		this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -78,11 +83,12 @@ namespace motor_manager_plugin {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
-		response.isMotorReady = !motor.isMotorReady();
+		response.isMotorReady = motor.isMotorReady();
 		return true;
 	}
 	bool MotorManagerPlugin::setMinSpeed(motor_manager_plugin::setMinSpeed::Request& request, 
 			motor_manager_plugin::setMinSpeed::Response& response) {
+		ROS_INFO_STREAM("setMinSpeed " << request);
 		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
 			return false;
 		}
@@ -92,6 +98,7 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::setLowerAngleLimit(motor_manager_plugin::setLowerAngleLimit::Request& request, 
 			motor_manager_plugin::setLowerAngleLimit::Response& response) {
+		ROS_INFO_STREAM("setLowerAngleLimit " << request);
 		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
 			return false;
 		}
@@ -101,6 +108,7 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::setUpperAngleLimit(motor_manager_plugin::setUpperAngleLimit::Request& request, 
 			motor_manager_plugin::setUpperAngleLimit::Response& response) {
+		ROS_INFO_STREAM("setUpperAngleLimit " << request);
 		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
 			return false;
 		}
@@ -110,6 +118,7 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::setMotorMode(motor_manager_plugin::setMotorMode::Request& request, 
 			motor_manager_plugin::setMotorMode::Response& response) {
+		ROS_INFO_STREAM("setMotorMode " << request);
 		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
 			return false;
 		}
@@ -119,6 +128,7 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::setPowerStatus(motor_manager_plugin::setPowerStatus::Request& request, 
 			motor_manager_plugin::setPowerStatus::Response& response) {
+		ROS_INFO_STREAM("setPowerStatus " << request);
 		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
 			return false;
 		}
@@ -144,6 +154,7 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::stopMotor(motor_manager_plugin::stopMotor::Request& request, 
 			motor_manager_plugin::stopMotor::Response& response) {
+		ROS_INFO_STREAM("stopMotor");
 		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
@@ -160,6 +171,7 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::writeRotationData(motor_manager_plugin::writeRotationData::Request& request, 
 			motor_manager_plugin::writeRotationData::Response& response) {
+		ROS_INFO_STREAM("writeRotationData " << request);
 		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
 			return false;
 		}
@@ -167,13 +179,8 @@ namespace motor_manager_plugin {
 		motor.maxSpeed = request.maxSpeed;
 		motor.maxAcceleration = request.maxAcceleration;
 		motor.maxDecceleration = request.maxDecelleration;
-		if(motor.relativeMode == true) {
-			// relative mode
-			motor.targetAngle += request.angle;
-		} else {
-			// absolute mode
-			motor.targetAngle = request.angle;
-		}
+		motor.targetAngle = request.angle;
+		
 		return true;
 	}
 }

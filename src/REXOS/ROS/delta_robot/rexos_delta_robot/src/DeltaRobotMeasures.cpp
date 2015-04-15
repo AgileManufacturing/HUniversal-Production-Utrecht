@@ -55,9 +55,6 @@ namespace rexos_delta_robot {
 		maxAngleHipAnkle = rexos_utilities::degreesToRadians(properties["hipAnleMaxAngleDegrees"].asDouble());
 		REXOS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
 		
-		motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(properties["motorFromZeroToTopAngleDegrees"].asDouble());
-		REXOS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
-		
 		boundaryBoxMinX = properties["boundaryBoxMinX"].asDouble();
 		REXOS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);
 		

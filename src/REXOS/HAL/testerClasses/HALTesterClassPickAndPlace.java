@@ -45,7 +45,6 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"				\"effectorRadius\" : 46.19," +
 			"				\"ankleLength\" : 300.0," +
 			"				\"hipAnleMaxAngleDegrees\" : 22.0," +
-			"				\"motorFromZeroToTopAngleDegrees\" : 20.0," +
 			"				\"boundaryBoxMinX\" : -200.0," +
 			"				\"boundaryBoxMaxX\" : 200.0," +
 			"				\"boundaryBoxMinY\" : -200.0," +
@@ -53,6 +52,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"				\"boundaryBoxMinZ\" : -380.0," +
 			"				\"boundaryBoxMaxZ\" : -180.0" +
 			"			}," +
+			"			\"contactSensorToZeroAngleDegrees\" : 20.0," +
 			"			\"calibrationBigStepFactor\" : 20," +
 			"			\"stepperMotorProperties\" : {" +
 			"				\"motorMinAngleDegrees\" : -18.0," +
@@ -68,7 +68,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleA_02 = "\"," +
-			"			\"command\":\"rosrun delta_robot_node delta_robot_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"			\"command\":\"rosrun delta_robot_node delta_robot_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -177,7 +177,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleB_02 = "\"," +
-			"			\"command\":\"rosrun gripper_node gripper_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"			\"command\":\"rosrun gripper_node gripper_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -322,7 +322,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleE_02 = "\"," +
-			"			\"command\":\"rosrun part_locator_node part_locator_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"			\"command\":\"rosrun part_locator_node part_locator_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -423,7 +423,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		fis.close();
 		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 		
-		File deltaRobotGazebo = new File(baseDir + "models/" + "sixAxis.zip");
+		File deltaRobotGazebo = new File(baseDir + "models/" + "deltaRobot.zip");
 		fis = new FileInputStream(deltaRobotGazebo);
 		content = new byte[(int) deltaRobotGazebo.length()];
 		fis.read(content);
@@ -484,25 +484,25 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
 				moduleB_03 + base64GripperGazebo + moduleB_04; 
 		JSONObject b = new JSONObject(new JSONTokener(moduleB));
-		hal.insertModule(b, b);
+		//hal.insertModule(b, b);
 		
 		// camera
 		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
 				moduleC_03 + base64CameraGazebo + moduleC_04;
 		JSONObject c = new JSONObject(new JSONTokener(moduleC));
-		hal.insertModule(c, c);
+		//hal.insertModule(c, c);
 		
 		// lens
 		// TODO fix non hal software
 		String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
 		JSONObject d = new JSONObject(new JSONTokener(moduleD));
-		hal.insertModule(d, d);
+		//hal.insertModule(d, d);
 		
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
 				moduleE_03 + base64WorkplaneGazebo + moduleE_04;
 		JSONObject e = new JSONObject(new JSONTokener(moduleE));
-		hal.insertModule(e, e);
+		//hal.insertModule(e, e);
 		
 		// Bakje 3 GOED MORE TEST
 		// double falsex = -2.2;

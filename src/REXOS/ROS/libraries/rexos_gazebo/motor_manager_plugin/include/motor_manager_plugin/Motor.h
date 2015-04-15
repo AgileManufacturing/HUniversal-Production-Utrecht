@@ -18,6 +18,8 @@ namespace motor_manager_plugin {
 		double maxDecceleration;
 		double targetAngle;
 		
+		double powerOnAngle;
+		
 		Motor();
 		void setPowerStatus(bool powerStatus);
 		bool isMotorReady();
@@ -25,8 +27,13 @@ namespace motor_manager_plugin {
 		void stopMotor(gazebo::common::Time currentTime);
 		void updateMotor(gazebo::common::Time currentTime);
 	protected:
-		gazebo::common::Time startTime;
-		double startAngle;
+		gazebo::common::Time currentMoveStartTime;
+		double currentMoveMinSpeed;
+		double currentMoveMaxSpeed;
+		double currentMoveMaxAcceleration;
+		double currentMoveMaxDecceleration;
+		double currentMoveStartAngle;
+		double currentMoveTargetAngle;
 		
 		bool powerStatus;
 		bool isActive;

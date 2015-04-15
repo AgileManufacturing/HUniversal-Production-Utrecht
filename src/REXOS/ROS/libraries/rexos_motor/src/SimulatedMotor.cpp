@@ -52,20 +52,20 @@
 #include <motor_manager_plugin/writeRotationData.h>
 
 namespace rexos_motor {
-	SimulatedMotor::SimulatedMotor(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, int index, MotorProperties properties):
+	SimulatedMotor::SimulatedMotor(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, int index, MotorProperties properties) :
 			MotorInterface(properties), equipletName(equipletName), identifier(identifier), index(index), nodeHandle() {
 		std::string servicePath = equipletName + "/" + identifier.getManufacturer() + "/" + 
 				identifier.getTypeNumber() + "/" + identifier.getSerialNumber() + "/";
 		
-		ros::ServiceClient isMotorReadyClient = 		nodeHandle.serviceClient<motor_manager_plugin::isMotorReady>(servicePath + "isMotorReady");
-		ros::ServiceClient setMinSpeedClient = 		nodeHandle.serviceClient<motor_manager_plugin::setMinSpeed>(servicePath + "setMinSpeed");
-		ros::ServiceClient setLowerAngleLimitClient = nodeHandle.serviceClient<motor_manager_plugin::setLowerAngleLimit>(servicePath + "setLowerAngleLimit");
-		ros::ServiceClient setUpperAngleLimitClient = nodeHandle.serviceClient<motor_manager_plugin::setUpperAngleLimit>(servicePath + "setUpperAngleLimit");
-		ros::ServiceClient setMotorModeClient = 		nodeHandle.serviceClient<motor_manager_plugin::setMotorMode>(servicePath + "setMotorMode");
-		ros::ServiceClient setPowerStatusClient = 		nodeHandle.serviceClient<motor_manager_plugin::setPowerStatus>(servicePath + "setPowerStatus");
-		ros::ServiceClient startMotorClient = 			nodeHandle.serviceClient<motor_manager_plugin::startMotor>(servicePath + "startMotor");
-		ros::ServiceClient stopMotorClient = 			nodeHandle.serviceClient<motor_manager_plugin::stopMotor>(servicePath + "stopMotor");
-		ros::ServiceClient writeRotationDataClient = 	nodeHandle.serviceClient<motor_manager_plugin::writeRotationData>(servicePath + "writeRotationData");
+		isMotorReadyClient = 		nodeHandle.serviceClient<motor_manager_plugin::isMotorReady>(servicePath + "isMotorReady");
+		setMinSpeedClient = 		nodeHandle.serviceClient<motor_manager_plugin::setMinSpeed>(servicePath + "setMinSpeed");
+		setLowerAngleLimitClient = nodeHandle.serviceClient<motor_manager_plugin::setLowerAngleLimit>(servicePath + "setLowerAngleLimit");
+		setUpperAngleLimitClient = nodeHandle.serviceClient<motor_manager_plugin::setUpperAngleLimit>(servicePath + "setUpperAngleLimit");
+		setMotorModeClient = 		nodeHandle.serviceClient<motor_manager_plugin::setMotorMode>(servicePath + "setMotorMode");
+		setPowerStatusClient = 		nodeHandle.serviceClient<motor_manager_plugin::setPowerStatus>(servicePath + "setPowerStatus");
+		startMotorClient = 			nodeHandle.serviceClient<motor_manager_plugin::startMotor>(servicePath + "startMotor");
+		stopMotorClient = 			nodeHandle.serviceClient<motor_manager_plugin::stopMotor>(servicePath + "stopMotor");
+		writeRotationDataClient = 	nodeHandle.serviceClient<motor_manager_plugin::writeRotationData>(servicePath + "writeRotationData");
 	}
 
 	SimulatedMotor::~SimulatedMotor(void) {
@@ -77,21 +77,25 @@ namespace rexos_motor {
 			motor_manager_plugin::setLowerAngleLimit lowerAngleLimitCall;
 			lowerAngleLimitCall.request.motorIndex = index;
 			lowerAngleLimitCall.request.angle = deviation + properties.motorMinAngle;
+			setLowerAngleLimitClient.waitForExistence();
 			setLowerAngleLimitClient.call(lowerAngleLimitCall);
 			
 			motor_manager_plugin::setUpperAngleLimit upperAngleLimitCall;
 			upperAngleLimitCall.request.motorIndex = index;
 			upperAngleLimitCall.request.angle = deviation + properties.motorMaxAngle;
+			setUpperAngleLimitClient.waitForExistence();
 			setUpperAngleLimitClient.call(upperAngleLimitCall);
 			
 			motor_manager_plugin::setMinSpeed minSpeedCall;
 			minSpeedCall.request.motorIndex = index;
 			minSpeedCall.request.velocity = properties.minSpeed;
+			setMinSpeedClient.waitForExistence();
 			setMinSpeedClient.call(minSpeedCall);
 			
 			motor_manager_plugin::setPowerStatus powerStatusCall;
 			powerStatusCall.request.motorIndex = index;
 			powerStatusCall.request.powerStatus = true;
+			setPowerStatusClient.waitForExistence();
 			setPowerStatusClient.call(powerStatusCall);
 			
 			currentAngle = 0;
@@ -106,6 +110,7 @@ namespace rexos_motor {
 			motor_manager_plugin::setPowerStatus powerStatusCall;
 			powerStatusCall.request.motorIndex = index;
 			powerStatusCall.request.powerStatus = false;
+			setPowerStatusClient.waitForExistence();
 			setPowerStatusClient.call(powerStatusCall);
 			
 			powerStatus = false;
@@ -119,6 +124,7 @@ namespace rexos_motor {
 		
 		motor_manager_plugin::stopMotor stopMotorCall;
 		stopMotorCall.request.motorIndex = index;
+		stopMotorClient.waitForExistence();
 		stopMotorClient.call(stopMotorCall);
 	}
 
@@ -139,8 +145,10 @@ namespace rexos_motor {
 		if(motorRotation.acceleration > properties.maxAcceleration || motorRotation.acceleration < properties.minAcceleration) {
 			throw std::out_of_range("Acceleration out of range.");
 		}
-		if(motorRotation.deceleration > properties.minAcceleration || motorRotation.deceleration < properties.minAcceleration) {
-			throw std::out_of_range("Deacceleration out of range.");
+		if(motorRotation.deceleration > properties.maxAcceleration || motorRotation.deceleration < properties.minAcceleration) {
+			throw std::out_of_range("Deacceleration out of range. Got " + boost::lexical_cast<std::string>(motorRotation.deceleration) + 
+					", expecting between " + boost::lexical_cast<std::string>(properties.minAcceleration)+ "  and " + 
+					boost::lexical_cast<std::string>(properties.maxAcceleration));
 		}
 		
 		double motorAngle = motorRotation.angle;
@@ -157,6 +165,7 @@ namespace rexos_motor {
 		writeRotationDataCall.request.maxDecelleration = motorRotation.deceleration;
 		writeRotationDataCall.request.maxSpeed = motorRotation.speed;
 		writeRotationDataCall.request.angle = motorAngle;
+		writeRotationDataClient.waitForExistence();
 		writeRotationDataClient.call(writeRotationDataCall);
 		
 		targetAngle = motorRotation.angle;
@@ -169,7 +178,11 @@ namespace rexos_motor {
 		// wait for motor to be ready before starting new movement
 		waitTillReady();
 		
-		//
+		motor_manager_plugin::startMotor startMotorCall;
+		startMotorCall.request.motorIndex = index;
+		startMotorClient.waitForExistence();
+		startMotorClient.call(startMotorCall);
+
 		updateAngle();
 	}
 
@@ -183,7 +196,10 @@ namespace rexos_motor {
 	bool SimulatedMotor::isReady(void) {
 		motor_manager_plugin::isMotorReady isMotorReadyCall;
 		isMotorReadyCall.request.motorIndex = index;
-		isMotorReadyClient.call(isMotorReadyCall);
+		isMotorReadyClient.waitForExistence();
+		if(isMotorReadyClient.call(isMotorReadyCall) == false) {
+			throw std::runtime_error("Error calling service");
+		}
 		return isMotorReadyCall.response.isMotorReady;
 	}
 	
@@ -191,27 +207,32 @@ namespace rexos_motor {
 		motor_manager_plugin::setMotorMode setMotorModeCall;
 		setMotorModeCall.request.motorIndex = index;
 		setMotorModeCall.request.relativeMode = true;
+		setMotorModeClient.waitForExistence();
 		setMotorModeClient.call(setMotorModeCall);
 	}
 
 	void SimulatedMotor::setAbsoluteMode(void) {
 		motor_manager_plugin::setMotorMode setMotorModeCall;
 		setMotorModeCall.request.motorIndex = index;
-		setMotorModeCall.request.relativeMode = true;
+		setMotorModeCall.request.relativeMode = false;
+		setMotorModeClient.waitForExistence();
 		setMotorModeClient.call(setMotorModeCall);
 	}
 	void SimulatedMotor::setDeviation(double deviationAngle) {
 		deviation = deviationAngle;
-		
-		motor_manager_plugin::setLowerAngleLimit lowerAngleLimitCall;
-		lowerAngleLimitCall.request.motorIndex = index;
-		lowerAngleLimitCall.request.angle = deviation + properties.motorMinAngle;
-		setLowerAngleLimitClient.call(lowerAngleLimitCall);
-		
-		motor_manager_plugin::setUpperAngleLimit upperAngleLimitCall;
-		upperAngleLimitCall.request.motorIndex = index;
-		upperAngleLimitCall.request.angle = deviation + properties.motorMaxAngle;
-		setUpperAngleLimitClient.call(upperAngleLimitCall);
+		if(anglesLimited == false) {
+			motor_manager_plugin::setLowerAngleLimit lowerAngleLimitCall;
+			lowerAngleLimitCall.request.motorIndex = index;
+			lowerAngleLimitCall.request.angle = deviation + properties.motorMinAngle;
+			setLowerAngleLimitClient.waitForExistence();
+			setLowerAngleLimitClient.call(lowerAngleLimitCall);
+			
+			motor_manager_plugin::setUpperAngleLimit upperAngleLimitCall;
+			upperAngleLimitCall.request.motorIndex = index;
+			upperAngleLimitCall.request.angle = deviation + properties.motorMaxAngle;
+			setUpperAngleLimitClient.waitForExistence();
+			setUpperAngleLimitClient.call(upperAngleLimitCall);
+		}
 	}
 	
 	void SimulatedMotor::enableAngleLimitations() {
@@ -220,11 +241,13 @@ namespace rexos_motor {
 		motor_manager_plugin::setLowerAngleLimit lowerAngleLimitCall;
 		lowerAngleLimitCall.request.motorIndex = index;
 		lowerAngleLimitCall.request.angle = deviation + properties.motorMinAngle;
+		setLowerAngleLimitClient.waitForExistence();
 		setLowerAngleLimitClient.call(lowerAngleLimitCall);
 		
 		motor_manager_plugin::setUpperAngleLimit upperAngleLimitCall;
 		upperAngleLimitCall.request.motorIndex = index;
 		upperAngleLimitCall.request.angle = deviation + properties.motorMaxAngle;
+		setUpperAngleLimitClient.waitForExistence();
 		setUpperAngleLimitClient.call(upperAngleLimitCall);
 	}
 	
@@ -235,11 +258,13 @@ namespace rexos_motor {
 		motor_manager_plugin::setLowerAngleLimit lowerAngleLimitCall;
 		lowerAngleLimitCall.request.motorIndex = index;
 		lowerAngleLimitCall.request.angle = -std::numeric_limits<double>::infinity();
+		setLowerAngleLimitClient.waitForExistence();
 		setLowerAngleLimitClient.call(lowerAngleLimitCall);
 		
 		motor_manager_plugin::setUpperAngleLimit upperAngleLimitCall;
 		upperAngleLimitCall.request.motorIndex = index;
 		upperAngleLimitCall.request.angle = std::numeric_limits<double>::infinity();
+		setUpperAngleLimitClient.waitForExistence();
 		setUpperAngleLimitClient.call(upperAngleLimitCall);
 	}
 }

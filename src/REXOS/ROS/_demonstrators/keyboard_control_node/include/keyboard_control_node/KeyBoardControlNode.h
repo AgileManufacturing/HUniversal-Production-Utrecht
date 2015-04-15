@@ -36,7 +36,7 @@
 #include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
-#include "rexos_logger/rexos_logger.h"
+#include <rexos_logger/rexos_logger.h>
 #include <vectors/Vectors.h>
 
 namespace keyboard_control_node {
