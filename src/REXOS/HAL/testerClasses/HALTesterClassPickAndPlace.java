@@ -2,10 +2,12 @@ package HAL.testerClasses;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -14,17 +16,20 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.exceptions.BlackboardUpdateException;
+import HAL.exceptions.InvalidMastModeException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
 public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListener {
-	static HALTesterClassPickAndPlace htc = new HALTesterClassPickAndPlace();
-	static HardwareAbstractionLayer hal;
-	static JSONObject criteria1 = new JSONObject();
-	static JSONObject criteria2 = new JSONObject();
+	HardwareAbstractionLayer hal;
+	JSONObject criteria1 = new JSONObject();
+	JSONObject criteria2 = new JSONObject();
 	boolean state = false;
 
+	static final String equipletName = "EQ2";
 	static final String baseDir = "generatedOutput/";
 
 	// delta robot
@@ -361,8 +366,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 */
 	public static void main(String[] args) throws Exception {
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
-		
-		hal = new HardwareAbstractionLayer(htc);
+		@SuppressWarnings("unused")
+		HALTesterClassPickAndPlace htc = new HALTesterClassPickAndPlace();
+		htc = null;
+	}
+	public HALTesterClassPickAndPlace() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
+		hal = new HardwareAbstractionLayer(this);
 
 		FileInputStream fis;
 		byte[] content;
@@ -478,36 +487,34 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
 				moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlace + moduleA_06; 
 		JSONObject a = new JSONObject(new JSONTokener(moduleA));
-		hal.insertModule(a, a);
 		
 		// gripper
 		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
 				moduleB_03 + base64GripperGazebo + moduleB_04; 
 		JSONObject b = new JSONObject(new JSONTokener(moduleB));
-		//hal.insertModule(b, b);
 		
 		// camera
 		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
 				moduleC_03 + base64CameraGazebo + moduleC_04;
 		JSONObject c = new JSONObject(new JSONTokener(moduleC));
-		//hal.insertModule(c, c);
 		
 		// lens
 		// TODO fix non hal software
 		String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
 		JSONObject d = new JSONObject(new JSONTokener(moduleD));
-		//hal.insertModule(d, d);
 		
 		// workplane
 		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
 				moduleE_03 + base64WorkplaneGazebo + moduleE_04;
 		JSONObject e = new JSONObject(new JSONTokener(moduleE));
-		//hal.insertModule(e, e);
 		
-		// Bakje 3 GOED MORE TEST
-		// double falsex = -2.2;
-		// double falsey = 2.4;
-
+		
+		hal.insertModule(a, a);
+		hal.insertModule(b, b);
+		hal.insertModule(c, c);
+		hal.insertModule(d, d);
+		hal.insertModule(e, e);
+		
 		JSONObject target1 = new JSONObject();
 		JSONObject targetMove1 = new JSONObject();
 		targetMove1.put("x", 5.5);
@@ -572,8 +579,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 
 		hal.translateProductStep("place", criteria1);
 
-	}
 
+		hal.shutdown();
+		hal = null;
+	}
+	
 	@Override
 	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
@@ -582,11 +592,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 
 	@Override
 	public void onTranslationFailed(String service, JSONObject criteria) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[] { service, criteria });
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[]{ service, criteria });
 	}
 
 	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
+	public void onProcessStatusChanged(HardwareStepStatus status, 
+			Module module, HardwareStep hardwareStep) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}
 
@@ -602,20 +613,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 
 	@Override
 	public String getEquipletName() {
-		// TODO hardcoded!!!!!!
-		return "EQ2";
+		return equipletName;
 	}
 
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
-		if (state) {
-			state = false;
-			hal.translateProductStep("place", criteria1);
-		} else {
-			state = true;
-			hal.translateProductStep("place", criteria2);
-		}
 	}
 
 	@Override
@@ -630,20 +633,16 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 
 	@Override
 	public void onExecutionFailed() {
-		// TODO Auto-generated method stub
-
+		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution failed");
 	}
 
 	/**
 	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
-	 * 
-	 * @param state
-	 *            [description]
+	 * @param state [description]
 	 */
 	@Override
-	public void onReloadEquiplet(String state) {
+	public void onReloadEquiplet(String state){
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
 
 	}
-
 }

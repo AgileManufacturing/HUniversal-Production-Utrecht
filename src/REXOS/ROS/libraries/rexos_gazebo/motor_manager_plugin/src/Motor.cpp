@@ -195,7 +195,7 @@ namespace motor_manager_plugin {
 		// clip to the limits
 		if(angle < lowerAngleLimit) {
 			angle = lowerAngleLimit;
-			ROS_WARN("Clipping to lower limit");
+			ROS_WARN_STREAM("Clipping to lower limit " << lowerAngleLimit << " " << angle);
 		} else if(angle > upperAngleLimit) {
 			angle = upperAngleLimit;
 			ROS_WARN("Clipping to upper limit");

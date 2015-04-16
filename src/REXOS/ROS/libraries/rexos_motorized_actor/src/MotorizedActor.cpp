@@ -213,7 +213,6 @@ namespace rexos_motorized_actor{
 		for(uint i = 0; i < motorsToCalibrate.size(); i++) {
 			deviations[i] += contactSensorToZeroAngle;
 			motorsToCalibrate[i]->setDeviation(deviations[i]);
-			motorsToCalibrate[i]->enableAngleLimitations();
 			motorsToCalibrate[i]->setAbsoluteMode();
 		}
 		// rotate the motors back to 0
@@ -223,6 +222,10 @@ namespace rexos_motorized_actor{
 		}
 		for(uint i = 0; i < motorsToCalibrate.size(); i++) {
 			motorsToCalibrate[i]->waitTillReady();
+		}
+		// now the motor is back in normal operating range, enable the limitations
+		for(uint i = 0; i < motorsToCalibrate.size(); i++) {
+			motorsToCalibrate[i]->enableAngleLimitations();
 		}
 	}
 }

@@ -225,4 +225,28 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
 
+
+	public void finalize() {
+		processSubscribers.clear();
+		equipletSubscribers.clear();
+		moduleSubscribers.clear();
+		
+		ReloadEquipletBBClient.close();
+		ReloadEquipletBBClient = null;
+		equipletStepBBClient.close();
+		equipletStepBBClient = null;
+		modeBlackboardBBClient.close();
+		modeBlackboardBBClient = null;
+		stateBlackboardBBClient.close();
+		stateBlackboardBBClient = null;
+	}
+
+
+	public void shutdown() {
+		ReloadEquipletBBClient.close();
+		equipletStepBBClient.close();
+		modeBlackboardBBClient.close();
+		stateBlackboardBBClient.close();
+	}
+
 }

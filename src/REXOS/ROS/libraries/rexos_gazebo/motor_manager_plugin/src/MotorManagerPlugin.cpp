@@ -103,7 +103,7 @@ namespace motor_manager_plugin {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
-		motor.lowerAngleLimit = request.angle;
+		motor.lowerAngleLimit = motor.powerOnAngle + request.angle;
 		return true;
 	}
 	bool MotorManagerPlugin::setUpperAngleLimit(motor_manager_plugin::setUpperAngleLimit::Request& request, 
@@ -113,7 +113,7 @@ namespace motor_manager_plugin {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
-		motor.upperAngleLimit = request.angle;
+		motor.upperAngleLimit = motor.powerOnAngle + request.angle;
 		return true;
 	}
 	bool MotorManagerPlugin::setMotorMode(motor_manager_plugin::setMotorMode::Request& request, 

@@ -238,4 +238,14 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	public void sendReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
 		blackboardHandler.postReloadEquiplet();
 	}
+
+	public void shutdown() {
+		blackboardHandler.shutdown();
+	}
+	
+	@Override
+	public void finalize() throws Throwable {
+		super.finalize();
+		Logger.log(LogSection.HAL, LogLevel.DEBUG, "HAL has been garbage collected");
+	}
 }

@@ -220,7 +220,7 @@ namespace rexos_motor {
 	}
 	void SimulatedMotor::setDeviation(double deviationAngle) {
 		deviation = deviationAngle;
-		if(anglesLimited == false) {
+		if(anglesLimited == true) {
 			motor_manager_plugin::setLowerAngleLimit lowerAngleLimitCall;
 			lowerAngleLimitCall.request.motorIndex = index;
 			lowerAngleLimitCall.request.angle = deviation + properties.motorMinAngle;
