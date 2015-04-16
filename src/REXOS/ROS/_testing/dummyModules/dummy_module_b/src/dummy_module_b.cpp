@@ -31,8 +31,8 @@
 #include "dummy_module_b/dummy_module_b.h"
 
 DummyModuleB::DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
-		equipletName(equipletName),
-		rexos_module::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow)
+		rexos_module::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow),
+		equipletName(equipletName)
 {
 }
 

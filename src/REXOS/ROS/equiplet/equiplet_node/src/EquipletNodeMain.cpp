@@ -34,8 +34,6 @@
 
 int main(int argc, char **argv) {
 	std::string blackboardIP;
-	bool spawnNodesForModules = true;
-	bool spawnModelsForModules = true;
 	bool isSimulated = false;
 	bool isShadow = false;
 	

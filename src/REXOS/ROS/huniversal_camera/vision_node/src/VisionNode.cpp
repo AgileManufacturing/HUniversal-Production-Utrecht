@@ -41,13 +41,13 @@
 #include <stdexcept>
 
 VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, int deviceNumber, int formatNumber) : 
-		isSimulated(isSimulated), nodeHandle(), imgTransport(nodeHandle),
-		exposure(0.015), 
+		isSimulated(isSimulated), nodeHandle(),
 		isCameraEnabled(true), isFishEyeCorrectorEnabled(false),
 		isQrCodeReaderEnabled(true), isFudicialDetectorEnabled(false),
+		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
-		fishEyeCorrector(nodeHandle)
-		
+		fishEyeCorrector(nodeHandle),
+		exposure(0.015)
 {
 	// Connect to camera. On failure an exception will be thrown.
 	REXOS_INFO("Initializing camera");

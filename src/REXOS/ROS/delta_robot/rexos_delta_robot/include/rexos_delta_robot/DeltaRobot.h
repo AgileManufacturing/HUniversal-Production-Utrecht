@@ -51,7 +51,7 @@ namespace rexos_delta_robot{
 	class DeltaRobot : public rexos_motorized_actor::MotorizedActor {
 	public:
 		DeltaRobot(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node);
-		~DeltaRobot();
+		virtual ~DeltaRobot();
 		
 		void readJSONNode(Json::Value node);
 

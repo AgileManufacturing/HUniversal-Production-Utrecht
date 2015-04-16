@@ -6,8 +6,7 @@
 
 namespace motor_manager_plugin {
 	Motor::Motor() :
-			lowerAngleLimit(-10), upperAngleLimit(10), relativeMode(false), powerStatus(false), isActive(false), 
-			minSpeed(0) {
+			lowerAngleLimit(NAN), upperAngleLimit(NAN), relativeMode(false), minSpeed(NAN), powerStatus(false), isActive(false) {
 		
 	}
 	void Motor::setPowerStatus(bool powerStatus) {
@@ -86,7 +85,6 @@ namespace motor_manager_plugin {
 		double deccelerationDistance = calculateAccelerationDistance(currentMoveMaxDecceleration);
 		double totalDistance = currentMoveTargetAngle - currentMoveStartAngle;
 		double absoluteTotalDistance = std::abs(totalDistance);
-		double speedDifference = currentMoveMaxSpeed - currentMoveMinSpeed;
 		
 		double newAngle;
 		
@@ -99,7 +97,7 @@ namespace motor_manager_plugin {
 //			ROS_INFO_STREAM("deccelerationDistance " << deccelerationDistance);
 			double reductionFactor = absoluteTotalDistance / (accelerationDistance + deccelerationDistance);
 //			ROS_INFO_STREAM("reductionFactor " << reductionFactor);
-			double turnoverPoint = accelerationDistance * reductionFactor;
+//			double turnoverPoint = accelerationDistance * reductionFactor;
 //			ROS_INFO_STREAM("turnoverPoint " << turnoverPoint);
 			// ABC formula
 			double a, b, c;
@@ -181,7 +179,6 @@ namespace motor_manager_plugin {
 			} else {
 //				ROS_INFO_STREAM("3p cons");
 				// motor is at constant speed
-				double averageSpeed = currentMoveMaxSpeed;
 				if(currentMoveTargetAngle < currentMoveStartAngle) {
 					// rotating in negative direction
 					newAngle = currentMoveStartAngle - accelerationDistance - currentMoveMaxSpeed * (deltaTime - accelerationDuration);

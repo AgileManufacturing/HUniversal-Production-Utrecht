@@ -76,10 +76,10 @@ private:
 
 	ros::NodeHandle nodeHandle;
 	
+	bool isCameraEnabled;
 	bool isFishEyeCorrectorEnabled;
 	bool isQrCodeReaderEnabled;
 	bool isFudicialDetectorEnabled;
-	bool isCameraEnabled;
 	
 	ros::ServiceServer increaseExposureService;
 	ros::ServiceServer decreaseExposureService;

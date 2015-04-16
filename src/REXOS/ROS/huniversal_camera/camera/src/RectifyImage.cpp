@@ -66,7 +66,7 @@ int RectifyImage::createMatrices(const cv::Size &boardSize, const std::vector<cv
 	}
 
 	int successes = 0;
-	for (int i = 0; i < images.size(); i++) {
+	for (uint i = 0; i < images.size(); i++) {
 		cv::Mat image = *images[i];
 
 		if (image.data) {

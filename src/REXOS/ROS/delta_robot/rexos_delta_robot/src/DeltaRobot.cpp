@@ -152,8 +152,8 @@ namespace rexos_delta_robot {
 		std::vector<rexos_motor::MotorRotation> rotations = kinematics->destinationPointToMotorRotations(point);
 
 		// Check if the angles fit within the boundaries
-		for(int i = 0; i < motors.size(); i++) {
-			if(rotations[i].angle < stepperMotorProperties.motorMinAngle || rotations[i].angle < stepperMotorProperties.motorMaxAngle) {
+		for(uint i = 0; i < motors.size(); i++) {
+			if(rotations[i].angle < stepperMotorProperties.motorMinAngle || rotations[i].angle > stepperMotorProperties.motorMaxAngle) {
 				throw std::out_of_range("motion angles outside of valid range");
 			}
 		}
@@ -165,20 +165,20 @@ namespace rexos_delta_robot {
 
 		// An array to hold the relative angles for the motors
 		std::vector<bool> relativeAngles;
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			relativeAngles.push_back(0.0);
 		}
 		
 		// An array that indicates for each motor whether it moves in this motion or not.
 		std::vector<bool> motorIsMoved;
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			motorIsMoved.push_back(true);
 		}
 		
 		// Index for the motor with the biggest motion
-		int motorWithBiggestMotion = 0;
+		uint motorWithBiggestMotion = 0;
 
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			relativeAngles[i] = fabs(rotations[i].angle - motors[i]->getCurrentAngle());
 			if (relativeAngles[i] > relativeAngles[motorWithBiggestMotion]){
 				motorWithBiggestMotion = i;
@@ -192,7 +192,7 @@ namespace rexos_delta_robot {
 		
 		// Check if any motor has to move at all
 		bool anyMotorIsMoved = false;
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			if(motorIsMoved[i] == true) {
 				anyMotorIsMoved = true;
 			}
@@ -227,7 +227,7 @@ namespace rexos_delta_robot {
 		}
 		
 		// Set speed, and also the acceleration for the smaller motion motors
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			rotations[i].speed = stepperMotorProperties.maxSpeed;
 
 			if(i != motorWithBiggestMotion) {
@@ -258,7 +258,7 @@ namespace rexos_delta_robot {
 	}
 	
 	bool DeltaRobot::calibrateMotors() {
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			std::vector<rexos_motor::MotorInterface*> motorsToCalibrate;
 			std::vector<rexos_sensor::ContactSensorInterface*> sensorsToUse;
 			motorsToCalibrate.push_back(motors[i]);

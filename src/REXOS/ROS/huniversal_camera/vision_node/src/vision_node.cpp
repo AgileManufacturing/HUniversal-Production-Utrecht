@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 	std::vector<std::string> devices;
 	devices = camera::unicap_cv_bridge::listDevices();
 	REXOS_INFO_STREAM("Devices:" << std::endl);
-	for(int i = 0; i < devices.size(); i++){
+	for(uint i = 0; i < devices.size(); i++){
 		REXOS_INFO_STREAM("\t" << devices[i] << std::endl);
 	}
 	
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 		std::vector<std::string> formats;
 		formats = camera::unicap_cv_bridge::listFormats(deviceNumber);
 		REXOS_INFO_STREAM("Formats:" << std::endl);
-		for(int i = 0; i < formats.size(); i++){
+		for(uint i = 0; i < formats.size(); i++){
 			REXOS_INFO_STREAM("\t" << formats[i] << std::endl);
 		}
 	} catch (camera::unicap_cv_bridge::UnicapCvException ex) {

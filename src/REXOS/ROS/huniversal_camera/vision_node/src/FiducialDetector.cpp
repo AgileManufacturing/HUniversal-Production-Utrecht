@@ -76,7 +76,7 @@ void FiducialDetector::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	vision_node::Fiducials message;
 	
 	vision_node::Point64 fPoint;
-	for(int i = 0; i < points.size(); i++) {
+	for(uint i = 0; i < points.size(); i++) {
 		fPoint.x = points[i].x;
 		fPoint.y = points[i].y;
 		

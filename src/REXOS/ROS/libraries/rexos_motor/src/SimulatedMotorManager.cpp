@@ -31,12 +31,16 @@
 
 #include <rexos_motor/SimulatedMotorManager.h>
 #include <rexos_motor/MotorException.h>
+#include <motor_manager_plugin/startMotor.h>
 
 namespace rexos_motor{
 	SimulatedMotorManager::SimulatedMotorManager(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, 
 			std::vector<MotorInterface*> motors) :
-			MotorManager(motors), equipletName(equipletName), identifier(identifier) {
+			MotorManager(motors), equipletName(equipletName), identifier(identifier), nodeHandle() {
+		std::string servicePath = equipletName + "/" + identifier.getManufacturer() + "/" + 
+				identifier.getTypeNumber() + "/" + identifier.getSerialNumber() + "/";
 		
+		startMotorClient = nodeHandle.serviceClient<motor_manager_plugin::startMotor>(servicePath + "startMotor");
 	}
 	void SimulatedMotorManager::startMovement(){
 		if(!poweredOn){
@@ -44,16 +48,21 @@ namespace rexos_motor{
 		}
 
 		// Wait for previous movement to finish
-		for(int i = 0; i < motors.size(); ++i) {
+		for(uint i = 0; i < motors.size(); ++i) {
 			if(motors[i]->isPoweredOn()) {
 				motors[i]->waitTillReady();
 			}
 		}
 		
+				ROS_INFO_STREAM("startMotor all motors");
 		// Start movement
+		motor_manager_plugin::startMotor startMotorCall;
+		// broadcast to all motors
+		startMotorCall.request.motorIndex = -1;
+		startMotorClient.waitForExistence();
+		startMotorClient.call(startMotorCall);
 		
-		
-		for(int i = 0; i < motors.size(); ++i) {
+		for(uint i = 0; i < motors.size(); ++i) {
 			if(motors[i]->isPoweredOn()) {
 				motors[i]->updateAngle();
 			}

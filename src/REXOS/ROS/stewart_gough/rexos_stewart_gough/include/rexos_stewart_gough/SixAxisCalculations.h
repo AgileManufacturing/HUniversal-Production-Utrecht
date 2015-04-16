@@ -29,10 +29,10 @@ class SixAxisCalculations {
 			upperArmLength(upperArmLength),
 			lowerArmLength(lowerArmLength),
 			baseRadius(motorAxisToCenterDistance),
+			motorJointOffset(motorJointOffset),
 			effectorRadius(effectorJointtoCenterDistance),
-			maxJointAngle(maxJointAngle),
 			effectorJointOffset(effectorJointOffset),
-			motorJointOffset(motorJointOffset)
+			maxJointAngle(maxJointAngle)
 			{
 				maxJointAngle = 15.0 * 3.141592 / 180;
 				sphereCircleRadius = std::sin(maxJointAngle);

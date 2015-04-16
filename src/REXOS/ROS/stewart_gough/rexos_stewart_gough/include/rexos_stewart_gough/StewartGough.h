@@ -64,7 +64,7 @@ namespace rexos_stewart_gough {
 	class StewartGough : public rexos_motorized_actor::MotorizedActor {
 	public:
 		StewartGough(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, Json::Value node);
-		~StewartGough();
+		virtual ~StewartGough();
 		
 		void readJSONNode(Json::Value node);
 		

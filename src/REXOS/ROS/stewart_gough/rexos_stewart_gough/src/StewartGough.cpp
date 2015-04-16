@@ -48,8 +48,8 @@ namespace rexos_stewart_gough{
 	 **/
 	StewartGough::StewartGough(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, Json::Value node) :
 			MotorizedActor(equipletName, identifier, isSimulated, 6, node),
-			effectorLocation(),
-			stewartGoughMeasures(node["stewartGoughMeasures"]) {
+			stewartGoughMeasures(node["stewartGoughMeasures"]), 
+			effectorLocation() {
 		REXOS_INFO("StewartGough constructor entering...");
 		readJSONNode(node);
 		
@@ -76,9 +76,6 @@ namespace rexos_stewart_gough{
 		REXOS_INFO("end of constructor reached");
 	}
 
-	/**
-	 * Deconstructor of a stewart gough. Turns off the motors and deletes the kinematics model.
-	 **/
 	StewartGough::~StewartGough(void){
 	}
 	
@@ -150,7 +147,7 @@ namespace rexos_stewart_gough{
 		// Get the motor angles from the kinematics model
 		SixAxisCalculations::EffectorMove effectorMove = sixAxisCalculations->getMotorAngles(point);
 		std::vector<rexos_motor::MotorRotation> rotations;
-		for(int i = 0; i < motors.size(); i++){
+		for(uint i = 0; i < motors.size(); i++){
 			rexos_motor::MotorRotation rotation;
 			//Swap 4 and 5
 			if(i == 4){
@@ -164,7 +161,7 @@ namespace rexos_stewart_gough{
 		}
 
 		// Check if the angles fit within the boundaries
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			if(rotations[i].angle < stepperMotorProperties.motorMinAngle || rotations[i].angle < stepperMotorProperties.motorMaxAngle) {
 				throw std::out_of_range("motion angles outside of valid range");
 			}
@@ -177,20 +174,20 @@ namespace rexos_stewart_gough{
 		
 		// An array to hold the relative angles for the motors
 		std::vector<bool> relativeAngles;
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			relativeAngles.push_back(0.0);
 		}
 		
 		// An array that indicates for each motor whether it moves in this motion or not.
 		std::vector<bool> motorIsMoved;
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			motorIsMoved.push_back(true);
 		}
 		
 		// Index for the motor with the biggest motion
-		int motorWithBiggestMotion = 0;
+		uint motorWithBiggestMotion = 0;
 
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			relativeAngles[i] = fabs(rotations[i].angle - motors[i]->getCurrentAngle());
 			if (relativeAngles[i] > relativeAngles[motorWithBiggestMotion]){
 				motorWithBiggestMotion = i;
@@ -204,7 +201,7 @@ namespace rexos_stewart_gough{
 		
 		// Check if any motor has to move at all
 		bool anyMotorIsMoved = false;
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			if(motorIsMoved[i] == true) {
 				anyMotorIsMoved = true;
 			}
@@ -239,7 +236,7 @@ namespace rexos_stewart_gough{
 		}
 		
 		// Set speed, and also the acceleration for the smaller motion motors
-		for(int i = 0; i < motors.size(); i++) {
+		for(uint i = 0; i < motors.size(); i++) {
 			rotations[i].speed = stepperMotorProperties.maxSpeed;
 
 			if(i != motorWithBiggestMotion) {
@@ -277,7 +274,7 @@ namespace rexos_stewart_gough{
 	* @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
 	**/
 	bool StewartGough::calibrateMotors(){
-		for(int i = 0; i < motors.size(); i += 2) {
+		for(uint i = 0; i < motors.size(); i += 2) {
 			std::vector<rexos_motor::MotorInterface*> motorsToCalibrate;
 			std::vector<rexos_sensor::ContactSensorInterface*> sensorsToUse;
 			motorsToCalibrate.push_back(motors[i + 0]);

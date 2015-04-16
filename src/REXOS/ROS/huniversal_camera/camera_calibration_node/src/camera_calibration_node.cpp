@@ -64,7 +64,7 @@ bool CameraCalibrationNode::calibrateLens(
 	camera_calibration_node::calibrateLens::Response &response)
 {
 	REXOS_INFO("calibrateLens entered");
-	int32_t framesToCapture = request.frameCount;
+	uint framesToCapture = request.frameCount;
 	// subscribe to the camera/image feed. The buffersize of 1 is intentional.
 	image_transport::Subscriber imageSubscriber = imageTransport.subscribe("camera/image", 1, &CameraCalibrationNode::handleFrame, this);
 

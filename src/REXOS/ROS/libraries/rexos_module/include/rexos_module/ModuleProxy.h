@@ -47,7 +47,7 @@ namespace rexos_module {
 		public rexos_statemachine::StateMachineController {
 	public:
 		ModuleProxy(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleProxyListener* moduleProxyListener);
-		~ModuleProxy();
+		virtual ~ModuleProxy();
 		
 		void changeState(rexos_statemachine::State state);
 		void changeMode(rexos_statemachine::Mode mode);
@@ -62,8 +62,8 @@ namespace rexos_module {
 	private:
 		void onModuleTransitionGoalCallback(const rexos_module::TransitionGoalConstPtr& goal);
 	private:
-		TransitionActionServer transitionActionServer;
 		ModuleProxyListener* moduleProxyListener;
+		TransitionActionServer transitionActionServer;
 		/**
 		 * The bond to bind the module with the equiplet
 		 **/

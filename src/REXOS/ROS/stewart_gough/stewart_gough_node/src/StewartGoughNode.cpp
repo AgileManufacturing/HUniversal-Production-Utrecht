@@ -47,10 +47,10 @@ using namespace stewart_gough_node;
  **/
 StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
 		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow),
-		stewartGough(NULL),
 		lastX(0.0),
 		lastY(0.0),
-		lastZ(0.0){
+		lastZ(0.0),
+		stewartGough(NULL) {
 	REXOS_INFO("StewartGoughNode Constructor entering...");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
@@ -64,7 +64,7 @@ StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::Mo
 	reader.parse(typeProperties, typeJsonNode);
 	
 	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
-	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+	for(uint i = 0; i < typeJsonNodeMemberNames.size(); i++) {
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 
@@ -93,7 +93,7 @@ void StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalCo
 	
 	rexos_stewart_gough::StewartGoughLocation origin;
 	// the rotation of the axis of the tangent space against the normal space in radians
-	double rotationX, rotationY, rotationZ = 0;
+	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	// determine the position of the origin and the rotation of the axis
 	switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
@@ -135,6 +135,9 @@ void StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalCo
 			origin.rotationY = 0;
 			origin.rotationZ = 0;
 			break;
+		}
+		default: {
+			throw std::invalid_argument("equipletStep::originPlacement was of unknown type");
 		}
 	}
 	

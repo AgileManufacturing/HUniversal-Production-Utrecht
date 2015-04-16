@@ -43,7 +43,7 @@
 
 namespace rexos_motor {
 	MotorInterface::MotorInterface(MotorProperties properties):
-			properties(properties), powerStatus(false), currentAngle(0), targetAngle(0), deviation(0), anglesLimited(true) {
+			properties(properties), currentAngle(0), targetAngle(0), deviation(0), powerStatus(false), anglesLimited(true) {
 	}
 
 	MotorInterface::~MotorInterface(void) {

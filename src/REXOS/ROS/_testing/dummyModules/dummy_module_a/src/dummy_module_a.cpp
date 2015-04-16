@@ -4,8 +4,8 @@
 
 
 DummyModuleA::DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
-		equipletName(equipletName),
-		rexos_module::Module(equipletName, moduleIdentifier, isSimulated, isShadow)
+		rexos_module::Module(equipletName, moduleIdentifier, isSimulated, isShadow),
+		equipletName(equipletName)
 {
 }
 

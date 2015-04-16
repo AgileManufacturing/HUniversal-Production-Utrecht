@@ -8,7 +8,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 include(workspace.cmake OPTIONAL)
 
 set(CATKIN_TOPLEVEL TRUE)
-SET ( CMAKE_CXX_FLAGS "-std=c++0x" )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 # Include our own macros
 include(cmake/macros.cmake)

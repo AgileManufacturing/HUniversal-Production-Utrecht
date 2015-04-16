@@ -64,7 +64,7 @@ namespace rexos_knowledge_database{
 			
 			// insertion will be automatically performed when key does not exists, see http://en.cppreference.com/w/cpp/container/map/operator_at
 			requiredMutations[phase].push_back(m);
-			for(int i= 0 ; i < requiredMutations[phase].size(); i++) {
+			for(uint i= 0 ; i < requiredMutations[phase].size(); i++) {
 				REXOS_INFO_STREAM(requiredMutations[phase].at(i));
 			}
 		}

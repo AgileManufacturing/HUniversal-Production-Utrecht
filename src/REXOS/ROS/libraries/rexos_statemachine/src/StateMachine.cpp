@@ -40,9 +40,9 @@ using namespace rexos_statemachine;
  * @param moduleID the unique identifier for the module that implements the statemachine
  **/
 StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes):
+		modes(modes),
 		currentState(STATE_OFFLINE),
 		currentMode(MODE_SERVICE),
-		modes(modes),
 		changeStateActionServer(nodeHandle, nodeName + "/change_state", boost::bind(&StateMachine::onChangeStateAction, this, _1), false),
 		changeModeActionServer(nodeHandle, nodeName + "/change_mode", boost::bind(&StateMachine::onChangeModeAction, this, _1), false),
 		changeStateActionClient(nodeHandle, nodeName + "/change_state"),
@@ -206,7 +206,7 @@ bool StateMachine::transitionToMode(Mode newMode) {
 
 bool StateMachine::statePossibleInMode(State state, Mode mode) {
 	std::vector<State> States = modePossibleStates[mode];
-	for (int i = 0; i < States.size(); i++) {
+	for (uint i = 0; i < States.size(); i++) {
 		if (States[i] == state)
 			return true;
 	}

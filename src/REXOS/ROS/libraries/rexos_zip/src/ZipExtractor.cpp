@@ -72,7 +72,7 @@ namespace rexos_zip {
 		boost::filesystem::create_directories(extractionPath);
 		
 		struct zip_stat zipStat;
-		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
+		for (uint i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
 			if (zip_stat_index(zipArchive, i, 0, &zipStat) == 0) {
 				// is directory or file entry?
 				if (zipStat.name[strlen(zipStat.name) - 1] == '/') {
@@ -94,7 +94,7 @@ namespace rexos_zip {
 						throw std::runtime_error("Unable to open fstream with path" + (extractionPath.string() + std::string(zipStat.name)));
 					}
 					
-					int sum = 0;
+					uint sum = 0;
 					while (sum < zipStat.size) {
 						int len = zip_fread(zipFile, buf, 100);
 						outputFileStream.write(buf, len);

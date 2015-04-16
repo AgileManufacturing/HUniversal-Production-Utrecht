@@ -77,12 +77,12 @@ namespace rexos_module {
 	void ModuleProxy::onModuleTransitionGoalCallback(const rexos_module::TransitionGoalConstPtr& goal) {
 		REXOS_INFO("Recieved a goal call");
 		std::vector<rexos_datatypes::SupportedMutation> supportedMutations;
-		for(int i = 0; i < goal->gainedSupportedMutations.size(); i++) {
+		for(uint i = 0; i < goal->gainedSupportedMutations.size(); i++) {
 			rexos_datatypes::SupportedMutation supportedMutation(goal->gainedSupportedMutations.at(i));
 			supportedMutations.push_back(supportedMutation);
 		}
 		std::vector<rexos_datatypes::RequiredMutation> requiredMutations;
-		for(int i = 0; i < goal->requiredMutationsRequiredForNextPhase.size(); i++) {
+		for(uint i = 0; i < goal->requiredMutationsRequiredForNextPhase.size(); i++) {
 			rexos_datatypes::RequiredMutation requiredMutation(
 					goal->requiredMutationsRequiredForNextPhase.at(i).mutation, 
 					goal->requiredMutationsRequiredForNextPhase.at(i).isOptional);

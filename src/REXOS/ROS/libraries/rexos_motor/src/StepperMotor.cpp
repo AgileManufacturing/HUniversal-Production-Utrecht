@@ -43,7 +43,7 @@
 
 namespace rexos_motor {
 	StepperMotor::StepperMotor(rexos_modbus::ModbusController* modbusController, uint16_t motorAddress, StepperMotorProperties properties):
-			MotorInterface(properties), modbus(modbusController), motorAddress(motorAddress), properties(properties) {
+			MotorInterface(properties), properties(properties), modbus(modbusController), motorAddress(motorAddress) {
 	}
 
 	StepperMotor::~StepperMotor(void){

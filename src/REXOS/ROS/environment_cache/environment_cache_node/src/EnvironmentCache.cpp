@@ -66,10 +66,12 @@ bool EnvironmentCache::setData(environment_cache::setData::Request& req, environ
 	if(reader.parse(req.json, jsonNode) == false) return false;
 	ROS_INFO_STREAM(jsonNode);
 	cache.setItemDataInCache(req.identifier, jsonNode);
+	return true;
 }
 bool EnvironmentCache::removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res) {
 	ROS_INFO("Removing data");
 	cache.removeDataOfItemFromCache(req.identifier, req.paths);
+	return true;
 }
 
 /** 
@@ -77,20 +79,16 @@ bool EnvironmentCache::removeData(environment_cache::removeData::Request& req, e
  **/
 int main(int argc, char **argv){
 	if(argc < 2){
-		REXOS_ERROR("Usage: environment_cache (--isSimulated | --isShadow) equipletName");
+		REXOS_ERROR("Usage: environment_cache (--isShadow) equipletName");
 		return -1;
 	}
 	
-	bool isSimulated = false;
 	bool isShadow = false;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
-		if (arg == "--isSimulated") {
-			isSimulated = true;
-		} else if (arg == "--isShadow") {
+		if (arg == "--isShadow") {
 			isShadow = true;
-			isSimulated = true;
 		}
 	}
 	

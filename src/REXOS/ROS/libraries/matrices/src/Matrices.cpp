@@ -458,7 +458,7 @@ Matrix4& Matrix4::rotate(float angle, const Vector3& axis)
 
 Matrix4& Matrix4::rotateDegree(float angle, float x, float y, float z)
 {
-	rotate(angle * DEG2RAD, x, y, z);
+	return rotate(angle * DEG2RAD, x, y, z);
 }
 Matrix4& Matrix4::rotate(float angle, float x, float y, float z)
 {
@@ -498,7 +498,7 @@ Matrix4& Matrix4::rotate(float angle, float x, float y, float z)
 
 Matrix4& Matrix4::rotateXDegree(float angle)
 {
-	rotateX(angle * DEG2RAD);
+	return rotateX(angle * DEG2RAD);
 }
 Matrix4& Matrix4::rotateX(float angle)
 {
@@ -521,7 +521,7 @@ Matrix4& Matrix4::rotateX(float angle)
 
 Matrix4& Matrix4::rotateYDegree(float angle)
 {
-	rotateY(angle * DEG2RAD);
+	return rotateY(angle * DEG2RAD);
 }
 Matrix4& Matrix4::rotateY(float angle)
 {
@@ -544,7 +544,7 @@ Matrix4& Matrix4::rotateY(float angle)
 
 Matrix4& Matrix4::rotateZDegree(float angle)
 {
-	rotateZ(angle * DEG2RAD);
+	return rotateZ(angle * DEG2RAD);
 }
 Matrix4& Matrix4::rotateZ(float angle)
 {

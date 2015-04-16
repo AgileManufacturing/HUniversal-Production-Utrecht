@@ -67,7 +67,7 @@ namespace rexos_delta_robot {
 	 **/
 	InverseKinematics::InverseKinematics(rexos_delta_robot::DeltaRobotMeasures & deltaRobotMeasures) :
 			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
-	}	
+	}
 
 	InverseKinematics::~InverseKinematics(void){
 	}
@@ -156,5 +156,7 @@ namespace rexos_delta_robot {
 		output.push_back(rotation);
 		rotation.angle = rexos_utilities::degreesToRadians(180) + motorAngle(destinationPoint, rexos_utilities::degreesToRadians(2 * 120));
 		output.push_back(rotation);
+		
+		return output;
 	}
 }

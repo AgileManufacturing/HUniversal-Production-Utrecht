@@ -48,13 +48,13 @@
 using namespace equiplet_node;
 
 EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isShadow, std::string blackboardIp) :
-		nh(),
+		EquipletStateMachine(equipletName, isSimulated),
 		equipletName(equipletName),
 		isSimulated(isSimulated),
 		isShadow(isShadow),
-		EquipletStateMachine(equipletName, isSimulated),
 		hardwareStepBlackboardClient(NULL),
 		equipletCommandBlackboardClient(NULL),
+		nh(),
 		scada(this, &moduleRegistry) 
 {
 	bool useCustomIp = false;

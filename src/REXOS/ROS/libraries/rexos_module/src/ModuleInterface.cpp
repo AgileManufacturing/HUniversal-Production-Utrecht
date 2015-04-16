@@ -4,14 +4,14 @@
 namespace rexos_module {
 	ModuleInterface::ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier) :
 			AbstractModule(equipletName, identifier),
-			setInstructionActionClient(nodeHandle, advertisementPath + "set_instruction"),
-			moduleInterfaceListener(NULL)
+			moduleInterfaceListener(NULL),
+			setInstructionActionClient(nodeHandle, advertisementPath + "set_instruction")
 	{
 	}
 	ModuleInterface::ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleInterfaceListener* moduleInterfaceListener) :
 			AbstractModule(equipletName, identifier),
-			setInstructionActionClient(nodeHandle, advertisementPath + "set_instruction"),
-			moduleInterfaceListener(moduleInterfaceListener)
+			moduleInterfaceListener(moduleInterfaceListener),
+			setInstructionActionClient(nodeHandle, advertisementPath + "set_instruction")
 	{
 	}
 	void ModuleInterface::setInstruction(std::string OID, Json::Value n) {

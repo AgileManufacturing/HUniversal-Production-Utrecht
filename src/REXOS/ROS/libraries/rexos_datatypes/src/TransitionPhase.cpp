@@ -25,12 +25,12 @@ namespace rexos_datatypes {
 		os << "{moduleTypeIdentifier: " << obj.getModuleTypeIdentifier();
 		os << " phase: " << obj.getPhase();
 		os << " requiredMutations: [";
-		for(int i = 0; i < obj.getRequiredMutations().size(); i++) {
+		for(uint i = 0; i < obj.getRequiredMutations().size(); i++) {
 			if(i != 0) os << ", \n";
 			os << obj.getRequiredMutations().at(i);
 		}
 		os << "] supportedMutations: [";
-		for(int i = 0; i < obj.getSupportedMutations().size(); i++) {
+		for(uint i = 0; i < obj.getSupportedMutations().size(); i++) {
 			if(i != 0) os << ", \n";
 			os << obj.getSupportedMutations().at(i);
 		}

@@ -48,5 +48,8 @@ namespace rexos_motor{
 	private:
 		std::string equipletName;
 		rexos_datatypes::ModuleIdentifier identifier;
+		ros::NodeHandle nodeHandle;
+		
+		ros::ServiceClient startMotorClient;
 	};
 }

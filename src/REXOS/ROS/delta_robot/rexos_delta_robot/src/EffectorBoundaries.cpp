@@ -142,8 +142,8 @@ namespace rexos_delta_robot{
 			depth(0), 
 			boundariesBitmap(NULL), 
 			kinematics(model), 
-			motors(motors), 
 			deltaRobotMeasures(deltaRobotMeasures), 
+			motors(motors), 
 			voxelSize(voxelSize) { }
 
     EffectorBoundaries::~EffectorBoundaries(){
@@ -212,7 +212,7 @@ namespace rexos_delta_robot{
 			}
 
 			// Check motor angles.
-			for(int i = 0; i < motors.size(); i++) {
+			for(uint i = 0; i < motors.size(); i++) {
 				if(motors.at(i)->isValidAngle(rotations[i].angle) == false) {
 					*fromCache = INVALID;
 					return false;

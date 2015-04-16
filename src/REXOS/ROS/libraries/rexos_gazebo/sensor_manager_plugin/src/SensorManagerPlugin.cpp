@@ -22,7 +22,7 @@ namespace sensor_manager_plugin {
 		std::vector<std::string> contactSensorsStrings;
 		boost::split(contactSensorsStrings, sdfValue, boost::is_any_of(" "));
 		
-		for(int i = 0; i < contactSensorsStrings.size() - 1; i += 2) {
+		for(uint i = 0; i < contactSensorsStrings.size() - 1; i += 2) {
 			ContactSensor contactSensor;
 			contactSensor.joint = _model->GetJoint(contactSensorsStrings[i]);
 			contactSensor.angle = boost::lexical_cast<double>(contactSensorsStrings[i + 1]);

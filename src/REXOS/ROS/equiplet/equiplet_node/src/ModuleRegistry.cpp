@@ -2,8 +2,8 @@
  * ModuleRegistry.cpp
  *
  *  Created on: Jun 14, 2013
- *      Author: joris
- *      Author: Lars Veenendaal
+ *	  Author: joris
+ *	  Author: Lars Veenendaal
  */
 
 #include <equiplet_node/ModuleRegistry.h>
@@ -13,10 +13,9 @@
 namespace equiplet_node {
 
 ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
+		moduleRegistryListener(mrl),
 		newRegistrationsAllowed(false),
-		equipletName(equipletName),
-		isSimulated(isSimulated),
-		moduleRegistryListener(mrl)
+		equipletName(equipletName)
 {
 	registerModuleServiceServer = rosNodeHandle.advertiseService(
 			equipletName + "/register_module",
@@ -45,7 +44,7 @@ void ModuleRegistry::spawnModels() {
 	
 	// continue spawning modules if the parent has already been spawened
 	while(processedModules.size() < registeredModules.size()) {
-		int numberOfProcessedModulesBeforeRound = processedModules.size();
+		uint numberOfProcessedModulesBeforeRound = processedModules.size();
 		
 		for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
 			rexos_knowledge_database::Module databaseEntry((*it)->getModuleIdentifier());
@@ -98,15 +97,15 @@ void ModuleRegistry::reloadModules(){
 	while (track != registeredModules.end()) {
 		rexos_module::ModuleProxy* proxy = *track;
 		std::string x = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier().getManufacturer().c_str(), proxy->getModuleIdentifier().getTypeNumber().c_str(), proxy->getModuleIdentifier().getSerialNumber().c_str());
-	    if(x == "0"){
-	    	REXOS_INFO("Removing a old module.");
+		if(x == "0"){
+			REXOS_INFO("Removing a old module.");
 			proxy->changeState(rexos_statemachine::State::STATE_OFFLINE);
 			delete proxy;
-	        track = registeredModules.erase(track);
-	    }
-	    else {
-	        ++track;
-	    }
+			track = registeredModules.erase(track);
+		}
+		else {
+			++track;
+		}
 	}
 	REXOS_INFO("reloadModules() Succesfull.");
 }
@@ -146,7 +145,7 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(
 	}
 	
 	rexos_datatypes::ModuleIdentifier newModuleIdentifier(req.manufacturer, req.typeNumber, req.serialNumber);
-	for (int i = 0; i < registeredModules.size(); i++) {
+	for (uint i = 0; i < registeredModules.size(); i++) {
 		if(registeredModules[i]->getModuleIdentifier() == newModuleIdentifier) {
 			registeredModules[i]->bind();
 			REXOS_INFO("registration successful");

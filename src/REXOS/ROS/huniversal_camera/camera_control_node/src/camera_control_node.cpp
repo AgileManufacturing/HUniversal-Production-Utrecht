@@ -119,7 +119,7 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	
 	// copy all the distCoeffs from the service
 	Json::Value distCoeffs;
-	for(int i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
+	for(uint i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
 		distCoeffs.append(getCalibrationMatricesServiceCall.response.distCoeffs.at(i));
 	}
 	// copy all the distCoeffs from the service
@@ -191,7 +191,7 @@ bool CameraControlNode::transitionSetup(){
 		vision_node::setCorrectionMatrices serviceCall;
 		
 		// copy all the distCoeffs to the service
-		for(int i = 0; i < distCoeffs.size(); i++) {
+		for(uint i = 0; i < distCoeffs.size(); i++) {
 			serviceCall.request.distCoeffs.push_back(distCoeffs[i].asDouble());
 		}
 		// copy all the camera matrix to the service

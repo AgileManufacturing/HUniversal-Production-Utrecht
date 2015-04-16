@@ -94,15 +94,15 @@ namespace rexos_gripper {
 			
 			enum Notify
 			{
-				Warned, CooledDown, Overheated			
+				Warned, CooledDown, Overheated
 			};
 			
 		private:
 			void readJSONNode(Json::Value node);
 			
-			int gripperEnabledMax;
-			int gripperEnabledWarning;
-			int gripperEnabledCooldown;
+			long gripperEnabledMax;
+			long gripperEnabledWarning;
+			long gripperEnabledCooldown;
 			int watchdogInterval;
 			
 			/**
@@ -151,13 +151,13 @@ namespace rexos_gripper {
 			 * @var unsigned long timeEnabled
 			 * Timestamp of the moment when the gripper was enabled.
 			 **/
-			unsigned long timeEnabled;
+			long timeEnabled;
 
 			/**
 			 * @var unsigned long timeCooldownStarted
 			 * Timestamp of the moment when cooldown period has started.
 			 **/
-			unsigned long timeCooldownStarted;
+			long timeCooldownStarted;
 
 			static void watchdogFunction(Gripper* device);
 

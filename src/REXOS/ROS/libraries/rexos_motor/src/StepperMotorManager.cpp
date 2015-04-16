@@ -52,7 +52,7 @@ namespace rexos_motor{
 		}
 		
 		// Wait for previous movement to finish
-		for(int i = 0; i < motors.size(); ++i) {
+		for(uint i = 0; i < motors.size(); ++i) {
 			if(motors[i]->isPoweredOn()) {
 				motors[i]->waitTillReady();
 			}
@@ -64,7 +64,7 @@ namespace rexos_motor{
 		modbus->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
 				CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		
-		for(int i = 0; i < motors.size(); ++i) {
+		for(uint i = 0; i < motors.size(); ++i) {
 			if(motors[i]->isPoweredOn()) {
 				motors[i]->updateAngle();
 			}

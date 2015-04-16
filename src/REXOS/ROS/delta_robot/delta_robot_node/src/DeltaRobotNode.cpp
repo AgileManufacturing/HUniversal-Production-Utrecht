@@ -48,10 +48,10 @@ using namespace delta_robot;
  **/
 DeltaRobotNode::DeltaRobotNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
 	rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow),
-	deltaRobot(NULL),
 	lastX(0.0),
 	lastY(0.0),
-	lastZ(0.0)
+	lastZ(0.0),
+	deltaRobot(NULL)
 {
 	REXOS_INFO("DeltaRobotnode Constructor entering...");
 	// get the properties and combine them for the deltarobot
@@ -65,7 +65,7 @@ DeltaRobotNode::DeltaRobotNode(std::string equipletName, rexos_datatypes::Module
 	reader.parse(typeProperties, typeJsonNode);
 
 	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
-	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+	for(uint i = 0; i < typeJsonNodeMemberNames.size(); i++) {
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 
@@ -95,7 +95,7 @@ void DeltaRobotNode::onSetInstruction(const rexos_module::SetInstructionGoalCons
 	
 	Vector4 origin;
 	// the rotation of the axis of the tangent space against the normal space in radians
-	double rotationX, rotationY, rotationZ = 0;
+	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	// determine the position of the origin and the rotation of the axis
 	switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
@@ -127,6 +127,9 @@ void DeltaRobotNode::onSetInstruction(const rexos_module::SetInstructionGoalCons
 			// set the origin to the origin of the module (eg set it to 0, 0, 0)
 			origin = convertToModuleCoordinate(Vector4(0, 0, 0, 1));
 			break;
+		}
+		default: {
+			throw std::invalid_argument("equipletStep::originPlacement was of unknown type");
 		}
 	}
 	
@@ -229,19 +232,20 @@ bool DeltaRobotNode::transitionSetup() {
 	REXOS_INFO("Setup transition called");
 	// Generate the effector boundaries with voxel size 2
 	deltaRobot->generateBoundaries(2);
+	
+	REXOS_INFO("Calibrating motors");
 	// Power on the deltarobot and calibrate the motors.
 	deltaRobot->powerOn();
 	// Calibrate the motors
 	if(!deltaRobot->calibrateMotors()) {
 		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
-	} else {
-		rexos_module::TransitionGoal goal;
-		goal.gainedSupportedMutations.push_back("move");
-		
-		transitionActionClient.sendGoal(goal);
-		return true;
 	}
+	rexos_module::TransitionGoal goal;
+	goal.gainedSupportedMutations.push_back("move");
+	
+	transitionActionClient.sendGoal(goal);
+	return true;
 }
 
 /**

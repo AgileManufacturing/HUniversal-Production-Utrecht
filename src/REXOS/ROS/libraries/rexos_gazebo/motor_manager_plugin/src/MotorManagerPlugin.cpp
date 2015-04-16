@@ -22,7 +22,7 @@ namespace motor_manager_plugin {
 		std::vector<std::string> motorStrings;
 		boost::split(motorStrings, sdfValue, boost::is_any_of(" "));
 		
-		for(int i = 0; i < motorStrings.size(); i++) {
+		for(uint i = 0; i < motorStrings.size(); i++) {
 			Motor motor;
 			motor.joint = _model->GetJoint(motorStrings[i]);
 			if(motor.joint == NULL) {
@@ -79,7 +79,7 @@ namespace motor_manager_plugin {
 	
 	bool MotorManagerPlugin::isMotorReady(motor_manager_plugin::isMotorReady::Request& request, 
 			motor_manager_plugin::isMotorReady::Response& response) {
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
@@ -89,7 +89,7 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::setMinSpeed(motor_manager_plugin::setMinSpeed::Request& request, 
 			motor_manager_plugin::setMinSpeed::Response& response) {
 		ROS_INFO_STREAM("setMinSpeed " << request);
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
@@ -99,7 +99,7 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::setLowerAngleLimit(motor_manager_plugin::setLowerAngleLimit::Request& request, 
 			motor_manager_plugin::setLowerAngleLimit::Response& response) {
 		ROS_INFO_STREAM("setLowerAngleLimit " << request);
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
@@ -109,7 +109,7 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::setUpperAngleLimit(motor_manager_plugin::setUpperAngleLimit::Request& request, 
 			motor_manager_plugin::setUpperAngleLimit::Response& response) {
 		ROS_INFO_STREAM("setUpperAngleLimit " << request);
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
@@ -119,7 +119,7 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::setMotorMode(motor_manager_plugin::setMotorMode::Request& request, 
 			motor_manager_plugin::setMotorMode::Response& response) {
 		ROS_INFO_STREAM("setMotorMode " << request);
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
@@ -129,7 +129,7 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::setPowerStatus(motor_manager_plugin::setPowerStatus::Request& request, 
 			motor_manager_plugin::setPowerStatus::Response& response) {
 		ROS_INFO_STREAM("setPowerStatus " << request);
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];
@@ -138,11 +138,11 @@ namespace motor_manager_plugin {
 	}
 	bool MotorManagerPlugin::startMotor(motor_manager_plugin::startMotor::Request& request, 
 			motor_manager_plugin::startMotor::Response& response) {
-		if(request.motorIndex >= motors.size()) {
+		if(request.motorIndex >= (int) motors.size()) {
 			return false;
 		}
 		if(request.motorIndex < 0) {
-			for(int i = 0; i < motors.size(); i++) {
+			for(uint i = 0; i < motors.size(); i++) {
 				Motor& motor = motors[i];
 				motor.startMotor(model->GetWorld()->GetSimTime());
 			}
@@ -155,11 +155,11 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::stopMotor(motor_manager_plugin::stopMotor::Request& request, 
 			motor_manager_plugin::stopMotor::Response& response) {
 		ROS_INFO_STREAM("stopMotor");
-		if(request.motorIndex >= motors.size()) {
+		if(request.motorIndex >= (int) motors.size()) {
 			return false;
 		}
 		if(request.motorIndex < 0) {
-			for(int i = 0; i < motors.size(); i++) {
+			for(uint i = 0; i < motors.size(); i++) {
 				Motor& motor = motors[i];
 				motor.stopMotor(model->GetWorld()->GetSimTime());
 			}
@@ -172,7 +172,7 @@ namespace motor_manager_plugin {
 	bool MotorManagerPlugin::writeRotationData(motor_manager_plugin::writeRotationData::Request& request, 
 			motor_manager_plugin::writeRotationData::Response& response) {
 		ROS_INFO_STREAM("writeRotationData " << request);
-		if(request.motorIndex >= motors.size() || request.motorIndex < 0) {
+		if(request.motorIndex >= motors.size()) {
 			return false;
 		}
 		Motor& motor = motors[request.motorIndex];

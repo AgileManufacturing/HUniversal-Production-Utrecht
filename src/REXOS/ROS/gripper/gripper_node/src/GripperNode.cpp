@@ -51,7 +51,7 @@ GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdenti
 	reader.parse(typeProperties, typeJsonNode);
 	
 	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
-	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+	for(uint i = 0; i < typeJsonNodeMemberNames.size(); i++) {
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 	

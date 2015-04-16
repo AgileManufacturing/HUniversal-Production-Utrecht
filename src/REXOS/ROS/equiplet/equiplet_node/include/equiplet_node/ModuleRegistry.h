@@ -62,7 +62,6 @@ private:
 	
 	bool newRegistrationsAllowed;
 	std::string equipletName;
-	bool isSimulated;
 	
 	std::vector<rexos_module::ModuleProxy*> registeredModules;
 };
