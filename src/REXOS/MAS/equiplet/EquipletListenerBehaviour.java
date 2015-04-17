@@ -141,6 +141,14 @@ public class EquipletListenerBehaviour extends Behaviour {
 		
 	}
 
+	/**
+	 * Dedicated function to translate the ACLMessage commands to function calls.
+	 * 
+	 * @param ACLMessage
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 * @author Mitchell van Rijkom
+	 */
 	private void handleEquipletCommand(ACLMessage msg) {
 		if(msg != null){
 			try{
@@ -153,17 +161,24 @@ public class EquipletListenerBehaviour extends Behaviour {
 				String requestedEquipletCommand = command.getString("requested-equiplet-command").toString();
 				
 				// Program if statements that will appropriately handle messages sent to the equiplet agent.
-				if(requestedEquipletCommand.equals("RECONFIGURE")){
+				if(requestedEquipletCommand.equals("DELETE_MODULES")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
 					if(modules != null){
 						equiplet.reconfigureEquiplet(modules);
 					}else{
 						Logger.log("Error while extracting modules for reconfiguration");
 					}
+					
+				}else if(requestedEquipletCommand.equals("INSERT_MODULES")){
+					// TODO Get list of DTO identifiers from JSON and call the reinitalize function
+					//equiplet.reinitializeEquiplet(toBeAddedModuleSettings);
+					
 				}else if(requestedEquipletCommand == "STATE_STANDBY"){
 					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+					
 				}else if(requestedEquipletCommand == "STATE_NORMAL"){
 					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+					
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
