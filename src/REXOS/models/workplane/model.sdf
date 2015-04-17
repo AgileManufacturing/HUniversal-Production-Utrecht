@@ -20,6 +20,14 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0.175 -0.200 0.02933 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.350 0.400 0.008</size>
+					</box>
+				</geometry>
+			</collision>
 		</link>
 		<joint type="prismatic" name="baseToParent">
 			<pose>0 0 0 0 0 0</pose>

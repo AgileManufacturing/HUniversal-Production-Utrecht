@@ -1,19 +1,22 @@
 <?xml version="1.0"?>
 <package>
-  <name>rexos_modbus</name>
+  <name>rexos_io</name>
   <version>0.0.0</version>
-  <description>The rexos_modbus package</description>
+  <description>The rexos_motor package</description>
   <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
   <license>newBSD</license>
   <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
   <author email="dickvandersteen@gmail.com">Dickvdsteen</author>
   <author email="koenbraham@gmail.com">KBraham</author>
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>modbus</build_depend>
+	<build_depend>message_generation</build_depend>
+	<run_depend>message_runtime</run_depend>
+  <build_depend>rexos_datatypes</build_depend>
+  <run_depend>rexos_datatypes</run_depend>
   <build_depend>rexos_utilities</build_depend>
-  <run_depend>modbus</run_depend>
   <run_depend>rexos_utilities</run_depend>
-  <export>
-    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_modbus"/>
-  </export>
+  <build_depend>modbus</build_depend>
+  <run_depend>modbus</run_depend>
+  <build_depend>rexos_logger</build_depend>
+  <run_depend>rexos_logger</run_depend>
 </package>

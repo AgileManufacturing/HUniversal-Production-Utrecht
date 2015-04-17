@@ -32,21 +32,15 @@
 #include <rexos_sensor/ContactSensor.h>
 
 namespace rexos_sensor {
-	ContactSensor::ContactSensor(int index, modbus_t* modbusIO) :
-			index(index), modbusIO(modbusIO) {
+	ContactSensor::ContactSensor(int index, rexos_io::InputOutputControllerInterface* ioController) :
+			index(index), ioController(ioController) {
 	}
-
 	ContactSensor::~ContactSensor() {
 	}
+	
 	bool ContactSensor::isTriggered() {
-        // The modbus library only reads
-        uint16_t sensorRegister;
-		
-        // Read register 8000. this register contains the values of the input sensors.
-        int result = modbus_read_registers(modbusIO, 8000, 1, &sensorRegister);
-        if (result == -1){
-            throw std::runtime_error(modbus_strerror(errno));
-        }
-        return (sensorRegister ^ 63) & 1 << index;
+		uint16_t sensorRegister = ioController->readU16(8000, false);
+		// sensor values are inverted
+        return (sensorRegister ^ 0xFF) & 1 << index;
 	}
 }

@@ -35,15 +35,11 @@
 extern "C"{
 	#include <modbus/modbus.h>
 }
-
-#include <stdint.h>
-#include <string>
 #include <boost/thread.hpp>
-#include <map>
-
 #include <fstream>
 #include <iostream>
-#include <string>
+
+#include <rexos_io/InputOutputControllerInterface.h>
 
 /**
  * @cond HIDE_FROM_DOXYGEN
@@ -54,22 +50,33 @@ extern "C"{
  * @endcond
  **/
 
-namespace rexos_modbus{
+namespace rexos_io {
 	/**
 	 * Wrapper class for libmodbus with some extra functionality.
 	 **/
-	class ModbusController{
-	public:
-		ModbusController(modbus_t* context);
-		~ModbusController(void);
+	class ModbusInputOutputController : public InputOutputControllerInterface{
+	protected:
+		ModbusInputOutputController();
+		virtual ~ModbusInputOutputController(void);
+		
+		void initializeModbus(modbus_t* context);
+		
+		void writeU16			(uint16_t firstAddress, uint16_t* data, unsigned int length);
+		void readU16			(uint16_t firstAddress, uint16_t* data, unsigned int length);
 
-		void writeU16(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
-		void writeU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
-		void writeU32(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
-		uint16_t readU16(uint16_t slave, uint16_t address);
-		void readU16(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
-		uint32_t readU32(uint16_t slave, uint16_t address);
-
+		void setCurrentSlave(uint16_t slave);
+		
+		virtual void writeShadowU16		(uint16_t address, uint16_t value);
+		virtual void writeShadowU32		(uint16_t address, uint32_t value);
+		virtual uint16_t readShadowU16	(uint16_t address);
+		virtual uint32_t readShadowU32	(uint16_t address);
+		
+		std::map<uint16_t, ShadowMap> shadowRegistry;
+		/**
+		 * @var modbus_t* context
+		 * A pointer to the modbus interface.
+		 **/
+		modbus_t* context;
 	private:
 		enum{
 			/**
@@ -100,11 +107,6 @@ namespace rexos_modbus{
 			TIMEOUT_RESPONE = 150000,
 		};
 
-		/**
-		 * @var modbus_t* context
-		 * A pointer to the modbus interface.
-		 **/
-		modbus_t* context;
 
 		/**
 		 * @var long nextWriteTime
@@ -112,33 +114,17 @@ namespace rexos_modbus{
 		 * Some devices require a certain wait time before a next request can be processed.
 		 **/
 		long nextWriteTime;
+		
+		uint16_t currentSlave;
 
+#ifdef MODBUS_LOGGING
 		/**
-		 * Typedef for a shadowMap registers spread over multiple slaves.
-		 * Key is slave address. 64bit for multiple slaves.
+		 * @var std::ofstream logFile
+		 * Logfile used for debugging the modbus communication.
 		 **/
-		typedef std::map<uint64_t, uint16_t> ShadowMap;
-
-		/**
-		 * @var ShadowMap shadowRegisters
-		 * Actual shadowmap instance.
-		 * @see ShadowMap
-		 **/
-		ShadowMap shadowRegisters;
-
-		#ifdef MODBUS_LOGGING
-			/**
-			 * @var std::ofstream logFile
-			 * Logfile used for debugging the modbus communication.
-			 **/
-			std::ofstream logFile;
-		#endif
-
+		std::ofstream logFile;
+#endif
+		
 		void wait(void);
-
-		uint64_t getShadowAddress(uint16_t slave, uint16_t address);
-		bool getShadow(uint16_t slave, uint32_t address, uint16_t& outValue);
-		void setShadow(uint16_t slave, uint32_t address, uint16_t value);
-		void setShadow32(uint16_t slave, uint32_t address, uint32_t value);
 	};
 }

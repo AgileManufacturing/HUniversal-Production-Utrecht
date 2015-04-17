@@ -55,14 +55,12 @@ GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdenti
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 	
-	gripper = new rexos_gripper::Gripper(jsonNode);
+	gripper = new rexos_gripper::Gripper(equipletName, moduleIdentifier, isSimulated, jsonNode);
 }
 
 GripperNode::~GripperNode() {
 	REXOS_INFO_STREAM("~GripperNode" << std::endl);
 	delete gripper;
-	// Destructor of modbus will close the modbus connection!
-	delete modbus;
 }
 
 void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){

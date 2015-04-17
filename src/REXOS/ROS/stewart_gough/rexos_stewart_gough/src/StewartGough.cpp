@@ -276,7 +276,7 @@ namespace rexos_stewart_gough{
 	bool StewartGough::calibrateMotors(){
 		for(uint i = 0; i < motors.size(); i += 2) {
 			std::vector<rexos_motor::MotorInterface*> motorsToCalibrate;
-			std::vector<rexos_sensor::ContactSensorInterface*> sensorsToUse;
+			std::vector<rexos_sensor::ContactSensor*> sensorsToUse;
 			motorsToCalibrate.push_back(motors[i + 0]);
 			motorsToCalibrate.push_back(motors[i + 1]);
 			sensorsToUse.push_back(sensors[i + 0]);

@@ -260,7 +260,7 @@ namespace rexos_delta_robot {
 	bool DeltaRobot::calibrateMotors() {
 		for(uint i = 0; i < motors.size(); i++) {
 			std::vector<rexos_motor::MotorInterface*> motorsToCalibrate;
-			std::vector<rexos_sensor::ContactSensorInterface*> sensorsToUse;
+			std::vector<rexos_sensor::ContactSensor*> sensorsToUse;
 			motorsToCalibrate.push_back(motors[i]);
 			sensorsToUse.push_back(sensors[i]);
 			calibrateMotorGroup(motorsToCalibrate, sensorsToUse);

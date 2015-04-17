@@ -32,8 +32,6 @@
  **/
 
 #pragma once
-#include <rexos_modbus/ModbusController.h>
-#include <cmath>
 
 namespace rexos_motor{
 	namespace CRD514KD{
@@ -123,24 +121,6 @@ namespace rexos_motor{
 				ALARM	= (1 << 7),
 				MOVE	= (1 << 10),
 				READY	= (1 << 13)
-			};
-		}
-
-		namespace RtuConfig{
-			/**
-			 * @var char DEVICE[]
-			 * A char array (c string) holding the address of the modbus rtu.
-			 **/
-			const char DEVICE[] = "/dev/ttyS0";
-
-			/**
-			 * Constants used when constructing a modbus rtu (using modbus_new_rtu).
-			 **/
-			enum _rtu_config{
-				BAUDRATE	= 115200,
-                PARITY   = 'E',
-				DATA_BITS	= 8,
-				STOP_BITS	= 1
 			};
 		}
 	}

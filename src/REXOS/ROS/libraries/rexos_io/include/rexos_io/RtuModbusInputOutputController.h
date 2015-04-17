@@ -1,11 +1,11 @@
 /**
- * @file MotorInterface.h
- * @brief DeltaRobot motor interface.
+ * @file ModbusController.h
+ * @brief Wrapper for libmodbus with some extra functionality.
+ * @date Created: 2012-10-01
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
  * @author 1.1 Koen Braham
- * @author 1.1 Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
@@ -32,27 +32,50 @@
 
 #pragma once
 
-#include <rexos_datatypes/ModuleIdentifier.h>
-#include <rexos_sensor/ContactSensorInterface.h>
+extern "C"{
+	#include <modbus/modbus.h>
+}
 
-#include <ros/ros.h>
+#include <stdint.h>
+#include <string>
+#include <boost/thread.hpp>
+#include <map>
 
-namespace rexos_sensor{
+#include <fstream>
+#include <iostream>
+#include <string>
+
+#include <rexos_io/ModbusInputOutputController.h>
+
+/**
+ * @cond HIDE_FROM_DOXYGEN
+ * Turn on for modbus logging
+ * Parameter is the logfile location. Change before enabling the log!
+ *
+ * #define MODBUS_LOGGING "/home/agileman/modbus.log"
+ * @endcond
+ **/
+
+namespace rexos_io {
 	/**
-	 * Interface for the deltaronot motors.
+	 * Wrapper class for libmodbus with some extra functionality.
 	 **/
-	class SimulatedContactSensor : public ContactSensorInterface {
+	class RtuModbusInputOutputController : public ModbusInputOutputController {
 	public:
-		SimulatedContactSensor(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, int index);
-		virtual ~SimulatedContactSensor(void);
+		RtuModbusInputOutputController();
+		~RtuModbusInputOutputController(void);
 		
-		virtual bool isTriggered();
-	protected:
-		std::string equipletName;
-		rexos_datatypes::ModuleIdentifier identifier;
-		int index;
-		ros::NodeHandle nodeHandle;
-		
-		ros::ServiceClient isContactSensorTriggeredClient;
+		void writeU16		(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
+		void writeU32		(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
+		uint16_t readU16	(uint16_t slave, uint16_t address, bool useShadow = false);
+		uint32_t readU32	(uint16_t slave, uint16_t address, bool useShadow = false);
+		void writeU16		(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
+		void readU16		(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
+
+	private:
+		void writeShadowU16		(uint16_t slave, uint16_t address, uint16_t value);
+		void writeShadowU32		(uint16_t slave, uint16_t address, uint32_t value);
+		uint16_t readShadowU16	(uint16_t slave, uint16_t address);
+		uint32_t readShadowU32	(uint16_t slave, uint16_t address);
 	};
 }

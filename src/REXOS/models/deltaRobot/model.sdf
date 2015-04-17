@@ -13,6 +13,7 @@
 		<plugin name="sensorManager" filename="{baseDir}libsensor_manager_plugin.so">
 			<contactSensors>upperArm1ToBase -0.34906585 upperArm2ToBase -0.34906585 upperArm3ToBase -0.34906585</contactSensors>
 			<rosNamespace>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/</rosNamespace>
+			<address>8000</address>
 		</plugin>
 		<static>false</static>
 		<!--==================== Links ====================-->
@@ -96,6 +97,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.300</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		<link name="lowerArm2"> 
 			<pose>0.2577 -0.1145 -0.0345 0.5527151 0 2.0943951</pose>
@@ -112,6 +122,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.315</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		<link name="lowerArm3"> 
 			<pose>0.0947 -0.3980 -0.0345 0.5527151 0 0</pose>
@@ -128,6 +147,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.315</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		<link name="lowerArm4"> 
 			<pose>0.0553 -0.3980 -0.0345 0.5527151 0 0</pose>
@@ -144,6 +172,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.315</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		<link name="lowerArm5"> 
 			<pose>-0.1077 -0.1145 -0.0345 0.5527151 0 -2.0943951</pose>
@@ -160,6 +197,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.315</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		<link name="lowerArm6"> 
 			<pose>-0.0887 -0.0815 -0.0345 0.5527151 0 -2.0943951</pose>
@@ -176,6 +222,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.315</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		<!-- Effector --> 
 		<link name="effector"> 
@@ -183,7 +238,8 @@
 			<gravity>true</gravity>
 			
 			<inertial>
-				<mass>0.100</mass>
+				<mass>0.200</mass>
+				<pose>0 0 -0.050 0 0 0</pose>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -192,6 +248,15 @@
 					</mesh>
 				</geometry>
 			</visual>
+			<collision name="collision">
+				<pose>0 0 0.002 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0375</radius>
+						<length>0.004</length>
+					</cylinder>
+				</geometry>
+			</collision>
 		</link>
 		
 		<!--==================== Joints ====================-->
@@ -214,7 +279,7 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
+					<friction>0.10</friction>
 					<damping>0.25</damping>
 				</dynamics>
 				<limit>
@@ -229,7 +294,7 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
+					<friction>0.10</friction>
 					<damping>0.25</damping>
 				</dynamics>
 				<limit>
@@ -244,7 +309,7 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
+					<friction>0.10</friction>
 					<damping>0.25</damping>
 				</dynamics>
 				<limit>
@@ -260,15 +325,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -278,15 +343,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -296,15 +361,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -314,15 +379,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -332,15 +397,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -350,15 +415,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -370,15 +435,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -389,15 +454,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -408,15 +473,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -427,15 +492,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -446,15 +511,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>
@@ -465,15 +530,15 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis>
 			<axis2>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<!--<friction>0.01</friction>
+					<damping>0.1</damping>-->
 				</dynamics>
 			</axis2>
 		</joint>

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <rexos_utilities/Utilities.h>
-#include <rexos_modbus/ModbusController.h>
+#include <rexos_io/RtuModbusInputOutputController.h>
 #include "ros/ros.h"
 #include <rexos_motor/CRD514KD.h>
 #include "rexos_logger/rexos_logger.h"
@@ -14,14 +14,7 @@ int main(int argc, char **argv){
 	ros::Rate loop_rate(15);
 	
 	while(ros::ok()) {
-		rexos_modbus::ModbusController modbus = rexos_modbus::ModbusController(modbus_new_rtu(
-			"/dev/ttyS0",
-			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-			rexos_motor::CRD514KD::RtuConfig::PARITY,
-			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-		
-		
+		rexos_io::RtuModbusInputOutputController modbus = rexos_io::RtuModbusInputOutputController();
 		
 		REXOS_INFO("Device number to configure: ");
 		std::string deviceNumberString;

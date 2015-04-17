@@ -39,15 +39,15 @@ extern "C"{
 }
 
 namespace rexos_motor{
-	StepperMotorManager::StepperMotorManager(rexos_modbus::ModbusController* modbus, std::vector<MotorInterface*> motors):
-			MotorManager(motors), modbus(modbus) {
+	StepperMotorManager::StepperMotorManager(rexos_io::InputOutputControllerInterface* ioController, std::vector<MotorInterface*> motors):
+			MotorManager(motors), ioController(ioController) {
 	}
 	
 	void StepperMotorManager::startMovement(){
 		startMovement(DEFAULT_MOTION_SLOT);
 	}
 	void StepperMotorManager::startMovement(int motionSlot){
-		if(!poweredOn){
+		if(!poweredOn) {
 			throw MotorException("motor manager is not powered on");
 		}
 		
@@ -59,12 +59,12 @@ namespace rexos_motor{
 		}
 		
 		// Start movement
-		modbus->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
+		ioController->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
 				motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-		modbus->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
+		ioController->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
 				CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		
-		for(uint i = 0; i < motors.size(); ++i) {
+		for(uint i = 0; i < motors.size(); i++) {
 			if(motors[i]->isPoweredOn()) {
 				motors[i]->updateAngle();
 			}

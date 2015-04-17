@@ -38,8 +38,8 @@
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/SimulatedMotorManager.h>
 #include <rexos_motor/StepperMotorManager.h>
-#include <rexos_sensor/SimulatedContactSensor.h>
-#include <rexos_sensor/ContactSensor.h>
+#include <rexos_io/SimulatedInputOutputController.h>
+#include <rexos_io/TcpModbusInputOutputController.h>
 #include <rexos_utilities/Utilities.h>
 
 #include "ros/ros.h"
@@ -50,26 +50,20 @@ namespace rexos_motorized_actor{
 			equipletName(equipletName), identifier(moduleIdentifier), isSimulated(isSimulated), 
 			stepperMotorProperties(node["stepperMotorProperties"]), 
 			motorManager(NULL),
-			modbusIO(NULL), modbus(NULL) {
+			sensorIOController(NULL), motorIOController(NULL) {
 		readJSONNode(node);
 		
 		REXOS_INFO("Configuring sensors");
 		if(isSimulated == true) {
 			for(int i = 0; i < numberOfMotors; i++) {
-				sensors.push_back(new rexos_sensor::SimulatedContactSensor(equipletName, identifier, i));
+				sensorIOController = new rexos_io::SimulatedInputOutputController(equipletName, moduleIdentifier);
+				sensors.push_back(new rexos_sensor::ContactSensor(i, sensorIOController));
 			}
 		} else {
 			// Initialize modbus for IO controller
-			modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
-			if(modbusIO == NULL){
-				throw std::runtime_error("Unable to allocate libmodbus context");
-			}
-			if(modbus_connect(modbusIO) == -1) {
-				throw std::runtime_error("Modbus connection to IO controller failed");
-			}
-			
+			sensorIOController = new rexos_io::TcpModbusInputOutputController(node);
 			for(int i = 0; i < numberOfMotors; i++) {
-				sensors.push_back(new rexos_sensor::ContactSensor(i, modbusIO));
+				sensors.push_back(new rexos_sensor::ContactSensor(i, sensorIOController));
 			}
 		}
 		
@@ -80,17 +74,11 @@ namespace rexos_motorized_actor{
 			}
 			motorManager = new rexos_motor::SimulatedMotorManager(equipletName, identifier, motors);
 		} else {
-			modbus = new rexos_modbus::ModbusController(modbus_new_rtu(
-				"/dev/ttyS0",
-				rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-				rexos_motor::CRD514KD::RtuConfig::PARITY,
-				rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-				rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-			
+			motorIOController = new rexos_io::RtuModbusInputOutputController();
 			for(int i = 0; i < numberOfMotors; i++) {
-				motors.push_back(new rexos_motor::StepperMotor(modbus, rexos_motor::CRD514KD::SlaveAddresses::MOTOR_0 + i, stepperMotorProperties));
+				motors.push_back(new rexos_motor::StepperMotor(motorIOController, rexos_motor::CRD514KD::SlaveAddresses::MOTOR_0 + i, stepperMotorProperties));
 			}
-			motorManager = new rexos_motor::StepperMotorManager(modbus, motors);
+			motorManager = new rexos_motor::StepperMotorManager(motorIOController, motors);
 		}
 	}
 
@@ -115,12 +103,6 @@ namespace rexos_motorized_actor{
 		}
 	}
 	void MotorizedActor::readJSONNode(const Json::Value node) {
-		modbusIp = node["modbusIp"].asString();
-		REXOS_INFO_STREAM("found modbusIp " << modbusIp);
-		
-		modbusPort = node["modbusPort"].asInt();
-		REXOS_INFO_STREAM("found modbusPort " << modbusPort);
-		
 		calibrationBigStepFactor = node["calibrationBigStepFactor"].asInt();
 		REXOS_INFO_STREAM("found calibrationBigStepFactor " << calibrationBigStepFactor);
 		
@@ -145,7 +127,7 @@ namespace rexos_motorized_actor{
 	}
 	
 	std::vector<double> MotorizedActor::rotateMotorGroupUntillSensorIfOfValue(std::vector<rexos_motor::MotorInterface*> motorsToCalibrate, 
-			std::vector<rexos_sensor::ContactSensorInterface*> sensorsToUse, rexos_motor::MotorRotation motorRotation, bool desiredSensorValue) {
+			std::vector<rexos_sensor::ContactSensor*> sensorsToUse, rexos_motor::MotorRotation motorRotation, bool desiredSensorValue) {
 		std::vector<bool> hasDesiredValue;
 		std::vector<double> deviations;
 		for(uint i = 0; i < motorsToCalibrate.size(); i++) {
@@ -171,7 +153,7 @@ namespace rexos_motorized_actor{
 		return deviations;
 	}
 	void MotorizedActor::calibrateMotorGroup(std::vector<rexos_motor::MotorInterface*> motorsToCalibrate, 
-			std::vector<rexos_sensor::ContactSensorInterface*> sensorsToUse) {
+			std::vector<rexos_sensor::ContactSensor*> sensorsToUse) {
 		if(motorsToCalibrate.size() != sensorsToUse.size()) {
 			throw std::runtime_error("motorsToCalibrate.size() != sensorsToUse.size()");
 		}

@@ -1,11 +1,11 @@
 /**
- * @file ModbusException.h
- * @brief Exception thrown if an error ocures during modbus actions.
- * @date Created: 2012-10-01
+ * @file MotorInterface.h
+ * @brief DeltaRobot motor interface.
  *
  * @author 1.0 Lukas Vermond
  * @author 1.0 Kasper van Nieuwland
  * @author 1.1 Koen Braham
+ * @author 1.1 Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
@@ -32,74 +32,24 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <string>
-#include <sstream>
-#include <cerrno>
+#include <rexos_io/ModbusInputOutputController.h>
 
 #include <modbus/modbus.h>
+#include <stdexcept>
+#include <jsoncpp/json/value.h>
 
-namespace rexos_modbus{
-	/** 
-	 * Exception calss for modbus communication.
+namespace rexos_io{
+	/**
+	 * Interface for the deltaronot motors.
 	 **/
-	class ModbusException : public std::runtime_error{
-	private:
-		/**
-		 * @var int errorCode
-		 * The error code is set by libmodbus5.
-		 **/
-		const int errorCode;
-
-		/**
-		 * @var std::string message
-		 * Modbus error string (obtained using modbus_strerror).
-		 */
-		std::string message;
-
+	class TcpModbusInputOutputController : public ModbusInputOutputController {
 	public:
-		/**
-		 * Constructor of the modbus exception
-		 * Retrieves an error string from the modbus library.
-		 **/
-        ModbusException(void) : std::runtime_error(""), errorCode(errno), message(""){
-			std::stringstream stream;
-			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-			message = stream.str();
-		}
-
-		/**
-		 * Constructor of the modbus exception
-		 * Adds a user specified message
-		 * @see ModbusException
-		 **/
-        ModbusException(const std::string msg) : std::runtime_error(""), errorCode(errno), message(""){
-			std::stringstream stream;
-			stream << msg << std::endl;
-			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
-			message = stream.str();
-		}
-
-		/**
-		 * Deconstructor
-		 * Use for modbus error extends
-		 **/
-		virtual ~ModbusException(void) throw(){}
-
-		/**
-		 * what getter
-		 * @return const char* The error message
-		 **/
-		virtual const char* what(void) const throw(){
-			return message.c_str();
-		}
-
-		/**
-		 * Error code getter
-		 * @return int The modbus error code
-		 **/
-		int getErrorCode(void){
-			return errorCode;
-		}
+		TcpModbusInputOutputController(Json::Value node);
+		virtual ~TcpModbusInputOutputController();
+	private:
+		std::string modbusIp;
+		int modbusPort;
+		
+		void readJSONNode(const Json::Value node);
 	};
 }

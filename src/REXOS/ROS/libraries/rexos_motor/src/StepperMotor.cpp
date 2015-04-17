@@ -42,8 +42,8 @@
 #include <rexos_motor/MotorException.h>
 
 namespace rexos_motor {
-	StepperMotor::StepperMotor(rexos_modbus::ModbusController* modbusController, uint16_t motorAddress, StepperMotorProperties properties):
-			MotorInterface(properties), properties(properties), modbus(modbusController), motorAddress(motorAddress) {
+	StepperMotor::StepperMotor(rexos_io::RtuModbusInputOutputController* ioController, uint16_t motorAddress, StepperMotorProperties properties):
+			MotorInterface(properties), properties(properties), ioController(ioController), motorAddress(motorAddress) {
 	}
 
 	StepperMotor::~StepperMotor(void){
@@ -53,30 +53,30 @@ namespace rexos_motor {
 	void StepperMotor::powerOn(void) {
 		if(!isPoweredOn()){
 			//Reset alarm
-			modbus->writeU16(motorAddress, CRD514KD::Registers::RESET_ALARM, 0);
-			modbus->writeU16(motorAddress, CRD514KD::Registers::RESET_ALARM, 1);
-			modbus->writeU16(motorAddress, CRD514KD::Registers::RESET_ALARM, 0);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::RESET_ALARM, 0);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::RESET_ALARM, 1);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::RESET_ALARM, 0);
 			
 			// Set operating modes
-			modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, 0);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, 0);
 			
 			// set modes for all used motion slots
 			for(int i = 0; i < CRD514KD::MOTION_SLOTS_USED; i++){
-				modbus->writeU16(motorAddress, CRD514KD::Registers::OP_POSMODE + i, 1);
-				modbus->writeU16(motorAddress, CRD514KD::Registers::OP_OPMODE + i, 0);
-				modbus->writeU16(motorAddress, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
+				ioController->writeU16(motorAddress, CRD514KD::Registers::OP_POSMODE + i, 1);
+				ioController->writeU16(motorAddress, CRD514KD::Registers::OP_OPMODE + i, 0);
+				ioController->writeU16(motorAddress, CRD514KD::Registers::OP_SEQ_MODE + i, 1);
 			}
 			// Excite motor
-			modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 			
 			// Set motor limits
-			modbus->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((getMaxAngle() - deviation) / properties.microStepAngle));
-			modbus->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((getMinAngle() - deviation) / properties.microStepAngle));
-			modbus->writeU32(motorAddress, CRD514KD::Registers::CFG_START_SPEED, 1);
+			ioController->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((getMaxAngle() - deviation) / properties.microStepAngle));
+			ioController->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((getMinAngle() - deviation) / properties.microStepAngle));
+			ioController->writeU32(motorAddress, CRD514KD::Registers::CFG_START_SPEED, 1);
 			
 			// Clear counter
-			modbus->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 1);
-			modbus->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 0);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 1);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 0);
 
 			currentAngle = 0;
 			powerStatus = true;
@@ -86,7 +86,7 @@ namespace rexos_motor {
 	void StepperMotor::powerOff(void){
 		if(isPoweredOn()){
 			stop();
-			modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, 0);
+			ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, 0);
 			powerStatus = false;
 		}
 	}
@@ -95,18 +95,18 @@ namespace rexos_motor {
 		if(!isPoweredOn()){
 			throw MotorException("motor drivers are not powered on");
 		}
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::STOP);
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::STOP);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 	}
 
 	void StepperMotor::resetCounter(void){
 		waitTillReady();
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, 0);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, 0);
 
 		// Clear counter.
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 1);
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 0);
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 1);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CLEAR_COUNTER, 0);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 	}
 
 	void StepperMotor::moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot){
@@ -152,12 +152,12 @@ namespace rexos_motor {
 		uint32_t motorDeceleration = (uint32_t)((1000000/(motorRotation.deceleration/(properties.microStepAngle * 1000))));
 
 		// offset for the motion slot, * 2 for 32 bit registers.
-		int motionSlotOffset = (motionSlot - 1) * 2;
+		uint16_t motionSlotOffset = (motionSlot - 1) * 2;
 
-		modbus->writeU32(motorAddress, CRD514KD::Registers::OP_SPEED + motionSlotOffset, motorSpeed, true);
-		modbus->writeU32(motorAddress, CRD514KD::Registers::OP_POS + motionSlotOffset, motorSteps, true);
-		modbus->writeU32(motorAddress, CRD514KD::Registers::OP_ACC + motionSlotOffset, motorAcceleration, true);
-		modbus->writeU32(motorAddress, CRD514KD::Registers::OP_DEC + motionSlotOffset, motorDeceleration, true);
+		ioController->writeU32(motorAddress, CRD514KD::Registers::OP_SPEED + motionSlotOffset, motorSpeed, true);
+		ioController->writeU32(motorAddress, CRD514KD::Registers::OP_POS + motionSlotOffset, motorSteps, true);
+		ioController->writeU32(motorAddress, CRD514KD::Registers::OP_ACC + motionSlotOffset, motorAcceleration, true);
+		ioController->writeU32(motorAddress, CRD514KD::Registers::OP_DEC + motionSlotOffset, motorDeceleration, true);
 		targetAngle = motorRotation.angle;
 	}
 
@@ -172,14 +172,14 @@ namespace rexos_motor {
 		// wait for motor to be ready before starting new movement
 		waitTillReady();
 		
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-		modbus->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
 		updateAngle();
 	}
 
 	void StepperMotor::waitTillReady(void){
 		uint16_t status_1;
-		while(!((status_1 = modbus->readU16(motorAddress, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+		while(!((status_1 = ioController->readU16(motorAddress, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
 			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
 
 				throw CRD514KDException(motorAddress, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
@@ -189,7 +189,7 @@ namespace rexos_motor {
 	
 	bool StepperMotor::isReady(void){
 		uint16_t status_1;
-		if(!((status_1 = modbus->readU16(motorAddress, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
+		if(!((status_1 = ioController->readU16(motorAddress, CRD514KD::Registers::STATUS_1)) & CRD514KD::Status1Bits::READY)){
 			if((status_1 & CRD514KD::Status1Bits::ALARM) || (status_1 & CRD514KD::Status1Bits::WARNING)){
 
 				throw CRD514KDException(motorAddress, status_1 & CRD514KD::Status1Bits::WARNING, status_1 & CRD514KD::Status1Bits::ALARM);
@@ -200,13 +200,13 @@ namespace rexos_motor {
 	}
 	void StepperMotor::setRelativeMode(){
 		for(int motionSlot = 0; motionSlot < CRD514KD::MOTION_SLOTS_USED; motionSlot++) {
-			modbus->writeU16(motorAddress, rexos_motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
+			ioController->writeU16(motorAddress, rexos_motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 0);
 		}
 	}
 
 	void StepperMotor::setAbsoluteMode(){
 		for(int motionSlot = 0; motionSlot < CRD514KD::MOTION_SLOTS_USED; motionSlot++) {
-			modbus->writeU16(motorAddress, rexos_motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 1);
+			ioController->writeU16(motorAddress, rexos_motor::CRD514KD::Registers::OP_POSMODE + motionSlot - 1, 1);
 		}
 	}
 
@@ -218,17 +218,17 @@ namespace rexos_motor {
 	
 	void StepperMotor::setDeviation(double deviationAngle) {
 		deviation = deviationAngle;
-		modbus->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((getMinAngle() + deviation) / properties.microStepAngle));
-		modbus->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((getMaxAngle() + deviation) / properties.microStepAngle));
+		ioController->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_NEGATIVE, (uint32_t)((getMinAngle() + deviation) / properties.microStepAngle));
+		ioController->writeU32(motorAddress, CRD514KD::Registers::CFG_POSLIMIT_POSITIVE, (uint32_t)((getMaxAngle() + deviation) / properties.microStepAngle));
 	}
 	
 	void StepperMotor::enableAngleLimitations() {
-		modbus->writeU16(motorAddress, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 0);
 		anglesLimited = true;
 	}
 	
 	void StepperMotor::disableAngleLimitations() {
-		modbus->writeU16(motorAddress, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
+		ioController->writeU16(motorAddress, CRD514KD::Registers::OP_SOFTWARE_OVERTRAVEL, 1);
 		anglesLimited = false;
 	}
 }

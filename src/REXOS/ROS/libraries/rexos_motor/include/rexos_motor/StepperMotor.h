@@ -34,8 +34,7 @@
 #define DEFAULT_MOTION_SLOT 1
 
 #include <rexos_motor/MotorRotation.h>
-#include <rexos_modbus/ModbusException.h>
-#include <rexos_modbus/ModbusController.h>
+#include <rexos_io/RtuModbusInputOutputController.h>
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotorProperties.h>
@@ -43,7 +42,7 @@
 namespace rexos_motor{
 	class StepperMotor : public MotorInterface{
 	public:
-		StepperMotor(rexos_modbus::ModbusController* modbusController, uint16_t motorAddress, StepperMotorProperties properties);
+		StepperMotor(rexos_io::RtuModbusInputOutputController* ioController, uint16_t motorAddress, StepperMotorProperties properties);
 
 		/**
 		 * Deconstructor of StepperMotor. Tries to turn to power off.
@@ -130,7 +129,7 @@ namespace rexos_motor{
 		 * @var ModbusController* modbus
 		 * Controller for the modbus communication.
 		 **/
-		rexos_modbus::ModbusController* modbus;
+		rexos_io::RtuModbusInputOutputController* ioController;
 
 		/**
 		 * @var Slaves::t motorAddress

@@ -1,10 +1,11 @@
 /**
- * @file StepperMotor.cpp
- * @brief Steppermotor driver.
- * @date Created: 2012-10-02
+ * @file MotorInterface.h
+ * @brief DeltaRobot motor interface.
  *
- * @author Koen Braham
- * @author Dennis Koole
+ * @author 1.0 Lukas Vermond
+ * @author 1.0 Kasper van Nieuwland
+ * @author 1.1 Koen Braham
+ * @author 1.1 Dennis Koole
  *
  * @section LICENSE
  * License: newBSD
@@ -29,25 +30,35 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <rexos_sensor/SimulatedContactSensor.h>
-#include <sensor_manager_plugin/isContactSensorTriggered.h>
+#pragma once
 
-namespace rexos_sensor {
-	SimulatedContactSensor::SimulatedContactSensor(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, int index):
-		ContactSensorInterface(), equipletName(equipletName), identifier(identifier), index(index), nodeHandle() {
-		std::string servicePath = equipletName + "/" + identifier.getManufacturer() + "/" + 
-				identifier.getTypeNumber() + "/" + identifier.getSerialNumber() + "/";
+#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_io/InputOutputControllerInterface.h>
+
+#include <ros/ros.h>
+
+namespace rexos_io{
+	/**
+	 * Interface for the deltaronot motors.
+	 **/
+	class SimulatedInputOutputController : public InputOutputControllerInterface {
+	public:
+		SimulatedInputOutputController(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
+		virtual ~SimulatedInputOutputController(void);
 		
-		isContactSensorTriggeredClient = nodeHandle.serviceClient<sensor_manager_plugin::isContactSensorTriggered>(servicePath + "isContactSensorTriggered");
-	}
-
-	SimulatedContactSensor::~SimulatedContactSensor() {
-	}
-	bool SimulatedContactSensor::isTriggered() {
-		sensor_manager_plugin::isContactSensorTriggered call;
-		call.request.sensorIndex = index;
-		isContactSensorTriggeredClient.waitForExistence();
-		isContactSensorTriggeredClient.call(call);
-		return call.response.isTriggered;
-	}
+		void writeU16			(uint16_t firstAddress, uint16_t* data, unsigned int length);
+		void readU16			(uint16_t firstAddress, uint16_t* data, unsigned int length);
+		
+		ShadowMap shadowRegistry;
+	protected:
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier identifier;
+		ros::NodeHandle nodeHandle;
+		std::string servicePath;
+		
+		virtual void writeShadowU16		(uint16_t address, uint16_t value);
+		virtual void writeShadowU32		(uint16_t address, uint32_t value);
+		virtual uint16_t readShadowU16	(uint16_t address);
+		virtual uint32_t readShadowU32	(uint16_t address);
+	};
 }

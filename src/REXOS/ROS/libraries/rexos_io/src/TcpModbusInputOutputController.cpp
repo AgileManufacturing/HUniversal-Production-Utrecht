@@ -1,11 +1,14 @@
 /**
- * @file InputOutputController.cpp
- * @brief Manager for the IO ports
- * @date Created: 2012-10-16
+ * @file StepperMotor.cpp
+ * @brief Steppermotor driver.
+ * @date Created: 2012-10-02
  *
  * @author Koen Braham
+ * @author Dennis Koole
  *
  * @section LICENSE
+ * License: newBSD
+ * 
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
  * All rights reserved.
  *
@@ -26,65 +29,25 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <rexos_gripper/InputOutputController.h>
-#include <modbus/modbus.h>
+#include <rexos_io/TcpModbusInputOutputController.h>
+#include <rexos_logger/rexos_logger.h>
 
-#include "ros/ros.h"
-
-namespace rexos_gripper {
-	/**
-	 * Constructor for InputOutputController
-	 *
-	 * @param modbus Pointer to an established modbus connection.
-	 */
-	InputOutputController::InputOutputController(Json::Value node) {
+namespace rexos_io {
+	TcpModbusInputOutputController::TcpModbusInputOutputController(Json::Value node) {
 		readJSONNode(node);
-
-		REXOS_DEBUG("Opening modbus connection");
-		
-		modbusIO = modbus_new_tcp(modbusIp.c_str(), modbusPort);
-		if(modbusIO == NULL){
-			throw std::runtime_error("Unable to allocate libmodbus context");
-		}
-		if(modbus_connect(modbusIO) == -1) {
-			throw std::runtime_error("Modbus connection to IO controller failed");
-		}
-		assert(modbusIO != NULL);
-		
-		modbus = new rexos_modbus::ModbusController(modbusIO);
+		modbus_t* context = modbus_new_tcp(modbusIp.c_str(), modbusPort);
+		initializeModbus(context);
+		setCurrentSlave(MODBUS_TCP_SLAVE);
 	}
-	void InputOutputController::readJSONNode(const Json::Value node) {
-		modbusIp = node["modbusIp"].asString();
-		REXOS_INFO_STREAM("found modbusIp " << modbusIp);
-		modbusPort = node["modbusPort"].asInt();
-		REXOS_INFO_STREAM("found modbusPort " << modbusPort);
+	TcpModbusInputOutputController::~TcpModbusInputOutputController() {
+		modbus_free(context);
 	}
 	
-	/*InputOutputController::InputOutputController(rexos_modbus::ModbusController* modbus) :
-			modbus(modbus) {
-	}*/
-
-	/**
-	 * Sets a pin (bit) in a register high (active?)
-	 *
-	 * @param address Register address in controller
-	 * @param pin The pin to be set
-	 **/
-	void InputOutputController::pinHigh(uint32_t address, uint8_t pin) {
-		uint16_t value = modbus->readU16(MODBUS_TCP_SLAVE, address);
-		value |= (1 << pin);
-		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
-	}
-
-	/**
-	 * Clears a pin (bit) in an given register.
-	 *
-	 * @param address Register address in controller
-	 * @param pin The pin to be cleared
-	 **/
-	void InputOutputController::pinLow(uint32_t address, uint8_t pin) {
-		uint16_t value = modbus->readU16(MODBUS_TCP_SLAVE, address);
-		value &= (0xFFFF ^ (1 << (pin)));
-		modbus->writeU16(MODBUS_TCP_SLAVE, address, value, false);
+	void TcpModbusInputOutputController::readJSONNode(const Json::Value node) {
+		modbusIp = node["modbusIp"].asString();
+		REXOS_INFO_STREAM("found modbusIp " << modbusIp);
+		
+		modbusPort = node["modbusPort"].asInt();
+		REXOS_INFO_STREAM("found modbusPort " << modbusPort);
 	}
 }

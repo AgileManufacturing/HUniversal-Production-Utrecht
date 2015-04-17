@@ -13,6 +13,7 @@
 		<plugin name="sensorManager" filename="{baseDir}libsensor_manager_plugin.so">
 			<contactSensors>upperArm1ToBase -0.34906585 upperArm2ToBase -0.34906585 upperArm3ToBase -0.34906585 upperArm4ToBase -0.34906585 upperArm5ToBase -0.34906585 upperArm6ToBase -0.34906585</contactSensors>
 			<rosNamespace>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/</rosNamespace>
+			<address>8000</address>
 		</plugin>
 		<static>false</static>
 		<!--==================== Links ====================-->

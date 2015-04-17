@@ -27,15 +27,28 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <iostream>
 #include <rexos_gripper/Gripper.h>
-#include <rexos_utilities/Utilities.h>
+
+#include <iostream>
 #include "ros/ros.h"
+
+#include <rexos_utilities/Utilities.h>
+#include <rexos_io/TcpModbusInputOutputController.h>
+#include <rexos_io/SimulatedInputOutputController.h>
 
 namespace rexos_gripper {
 		
-		Gripper::Gripper(Json::Value node) : OutputDevice(node), watchdogRunning(false), isActivated(false), wasActivated(false), warned(false), overheated(false) {
-				readJSONNode(node);
+		Gripper::Gripper(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node) : 
+				watchdogRunning(false), isActivated(false), wasActivated(false), warned(false), overheated(false) {
+			readJSONNode(node);
+			
+			if(isSimulated) {
+				ioController = new rexos_io::SimulatedInputOutputController(equipletName, moduleIdentifier);
+				valveOutputDevice = new OutputDevice(node, ioController);
+			} else {
+				ioController = new rexos_io::TcpModbusInputOutputController(node);
+				valveOutputDevice = new OutputDevice(node, ioController);
+			}
 		}
 
 		void Gripper::readJSONNode(const Json::Value node) {
@@ -89,7 +102,7 @@ namespace rexos_gripper {
 		
 		void Gripper::activate() {	
 			if (overheated == false) {
-				enable();
+				valveOutputDevice->enable();
 				isActivated = true;
 			} else {
 				throw std::runtime_error("Gripper activated while it was overheated");
@@ -97,7 +110,7 @@ namespace rexos_gripper {
 		}
 			
 		void Gripper::deactivate() {
-			disable();
+			valveOutputDevice->disable();
 			isActivated = false;
 		}
 		
@@ -133,9 +146,9 @@ namespace rexos_gripper {
 					// Spam the IO with the current isActivated to keep the pin alive :)
 					// TODO: what is X amount of time? Amount of time is probably about 500ms, still the thread can run at 100ms, this will not reduce the preformance
 					if (device->isActivated) {
-						device->enable();
+						device->valveOutputDevice->enable();
 					} else {
-						device->disable();
+						device->valveOutputDevice->disable();
 					}
 					
 					// Semi correcting the loop time by calculating the run time of the loop.
@@ -156,7 +169,7 @@ namespace rexos_gripper {
 							device->overheated = true;
 							device->notifyObservers(Overheated);
 							device->timeCooldownStarted = rexos_utilities::timeNow();
-							device->disable();
+							device->valveOutputDevice->disable();
 							device->wasActivated = device->isActivated = false;
 
 						// Test for warning time. Send warning to the warning handler.

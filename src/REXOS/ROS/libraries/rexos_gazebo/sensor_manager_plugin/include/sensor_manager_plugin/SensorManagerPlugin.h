@@ -7,7 +7,7 @@
 #include <ros/ros.h>
 
 #include <sensor_manager_plugin/ContactSensor.h>
-#include <sensor_manager_plugin/isContactSensorTriggered.h>
+#include <rexos_io/readU16.h>
 
 #include <vector>
 
@@ -21,15 +21,15 @@ namespace sensor_manager_plugin {
 		void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 		void onUpdate(const common::UpdateInfo & info);
 		
-		bool isContactSensorTriggered(sensor_manager_plugin::isContactSensorTriggered::Request& request, 
-				sensor_manager_plugin::isContactSensorTriggered::Response& response);
+		bool readSensors(rexos_io::readU16::Request& request, 
+				rexos_io::readU16::Response& response);
 	protected:
 		std::vector<ContactSensor> contactSensors;
 		ros::NodeHandle* nodeHandle;
 		physics::ModelPtr model;
 		event::ConnectionPtr updateConnection;
 		
-		ros::ServiceServer isContactSensorTriggeredServer;
+		ros::ServiceServer readSensorsServer;
 	};
 	GZ_REGISTER_MODEL_PLUGIN(sensor_manager_plugin::SensorManagerPlugin)
 }

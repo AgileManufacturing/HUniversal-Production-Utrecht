@@ -66,35 +66,11 @@ public:
 	
 private:
 	/**
-	 * @var modbus_t* modbusContext
-	 * Connection to the IO modbus
-	 **/
-	modbus_t* modbusContext;
-	
-	/**
 	 * @var InputOutput::OutputDevices::Gripper* gripper
 	 * The gripper device
 	 **/
 	rexos_gripper::Gripper* gripper;
 
-	/**
-	 * @var ModbusController::ModbusController* modbus
-	 * Connection to the IO modbus controller
-	 **/
-	rexos_modbus::ModbusController* modbus;
-
-	/**
-	 * @var ros::ServiceServer gripService
-	 * The service for enabling the gripper
-	 **/
-	ros::ServiceServer gripService;
-
-	/**
-	 * @var ros::ServiceServer releaseService
-	 * The service for releasing the gripper
-	 **/
-	ros::ServiceServer releaseService;
-	
 	void notifyWarned();
 	
 	void notifyOverheated();

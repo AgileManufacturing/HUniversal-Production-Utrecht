@@ -32,15 +32,15 @@
 
 #pragma once
 
-#include <modbus/modbus.h>
 #include <jsoncpp/json/value.h>
 
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotorProperties.h>
-#include <rexos_sensor/ContactSensorInterface.h>
-#include <rexos_modbus/ModbusController.h>
+#include <rexos_sensor/ContactSensor.h>
+#include <rexos_io/InputOutputControllerInterface.h>
+#include <rexos_io/RtuModbusInputOutputController.h>
 #include <rexos_logger/rexos_logger.h>
 
 
@@ -51,7 +51,7 @@ namespace rexos_motorized_actor{
 		~MotorizedActor();
 		
 		void calibrateMotorGroup(std::vector<rexos_motor::MotorInterface*> motors, 
-			std::vector<rexos_sensor::ContactSensorInterface*> sensor);
+			std::vector<rexos_sensor::ContactSensor*> sensor);
 	public:
 		virtual bool calibrateMotors() = 0;
 		/**
@@ -80,7 +80,7 @@ namespace rexos_motorized_actor{
 		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
 		 **/
 		std::vector<rexos_motor::MotorInterface*> motors;
-		std::vector<rexos_sensor::ContactSensorInterface*> sensors;
+		std::vector<rexos_sensor::ContactSensor*> sensors;
 		
 		/**
 		 * @var MotorManager* motorManager
@@ -90,19 +90,18 @@ namespace rexos_motorized_actor{
 
 
 	private:
-		std::string modbusIp;
-		int modbusPort;
 		/**
 		 * @var modbus_t* modbusIO
 		 * A pointer to the TCP modbus connection for the IO controller.
 		 **/
-		modbus_t* modbusIO;
+		rexos_io::InputOutputControllerInterface* sensorIOController;
 		/**
 		 *
 		 * @var ModbusController::ModbusController* modbus
 		 * the modbuscontroller
 		 **/
-		rexos_modbus::ModbusController* modbus;
+		rexos_io::RtuModbusInputOutputController* motorIOController;
+		
 		void readJSONNode(Json::Value node);
 		bool checkSensors();
 		/**
@@ -116,6 +115,6 @@ namespace rexos_motorized_actor{
 		 * @return The amount of motor steps the motor has moved.
 		 **/
 		std::vector<double> rotateMotorGroupUntillSensorIfOfValue(std::vector<rexos_motor::MotorInterface*> motors, 
-			std::vector<rexos_sensor::ContactSensorInterface*> sensor, rexos_motor::MotorRotation motorRotation, bool desiredSensorValue);
+			std::vector<rexos_sensor::ContactSensor*> sensor, rexos_motor::MotorRotation motorRotation, bool desiredSensorValue);
 	};
 }

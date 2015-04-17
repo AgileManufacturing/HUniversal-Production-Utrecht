@@ -32,23 +32,20 @@
 
 #pragma once
 
-#include <rexos_sensor/ContactSensorInterface.h>
-
-#include <modbus/modbus.h>
-#include <stdexcept>
+#include <rexos_io/InputOutputControllerInterface.h>
 
 namespace rexos_sensor{
 	/**
 	 * Interface for the deltaronot motors.
 	 **/
-	class ContactSensor : public ContactSensorInterface {
+	class ContactSensor {
 	public:
-		ContactSensor(int index, modbus_t* modbusIO);
+		ContactSensor(int index, rexos_io::InputOutputControllerInterface* ioController);
 		virtual ~ContactSensor();
 		
 		virtual bool isTriggered();
 	protected:
 		int index;
-		modbus_t* modbusIO;
+		rexos_io::InputOutputControllerInterface* ioController;
 	};
 }

@@ -39,6 +39,13 @@ namespace sensor_manager_plugin {
 		std::string rosNamespace = _sdf->GetElement("rosNamespace")->GetValue()->GetAsString();
 		ROS_INFO_STREAM("Advertising services at " << rosNamespace);
 		
+		if(_sdf->HasElement("address") == false) {
+			std::cerr << "Missing address" << std::endl;
+			return;
+		}
+		std::string address = _sdf->GetElement("address")->GetValue()->GetAsString();
+		ROS_INFO_STREAM("Advertising at address " << address);
+		
 		if (!ros::isInitialized()) {
 			ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
 			<< "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
@@ -47,8 +54,8 @@ namespace sensor_manager_plugin {
 		
 		model = _model;
 		nodeHandle = new ros::NodeHandle();
-		isContactSensorTriggeredServer = nodeHandle->advertiseService(rosNamespace + "isContactSensorTriggered", 
-				&SensorManagerPlugin::isContactSensorTriggered, this);
+		readSensorsServer = nodeHandle->advertiseService(rosNamespace + address, 
+				&SensorManagerPlugin::readSensors, this);
 		
 		this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 			boost::bind(&SensorManagerPlugin::onUpdate, this, _1));
@@ -57,13 +64,13 @@ namespace sensor_manager_plugin {
 		ros::getGlobalCallbackQueue()->callAvailable(ros::WallDuration(0));
 	}
 	
-	bool SensorManagerPlugin::isContactSensorTriggered(sensor_manager_plugin::isContactSensorTriggered::Request& request, 
-			sensor_manager_plugin::isContactSensorTriggered::Response& response) {
-		if(request.sensorIndex >= contactSensors.size() || request.sensorIndex < 0) {
-			return false;
+	bool SensorManagerPlugin::readSensors(rexos_io::readU16::Request& request, 
+			rexos_io::readU16::Response& response) {
+		for(uint i = 0; i < contactSensors.size(); i++) {
+			ContactSensor& contactSensor = contactSensors[i];
+			// the real sensors are inverted. Mimic this behaviour
+			response.value |= (!contactSensor.isTriggered()) << i;
 		}
-		ContactSensor& contactSensor = contactSensors[request.sensorIndex];
-		response.isTriggered = contactSensor.isTriggered();
 		return true;
 	}
 }

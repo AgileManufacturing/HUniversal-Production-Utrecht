@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include <rexos_modbus/ModbusController.h>
+#include <rexos_io/RtuModbusInputOutputController.h>
 #include <rexos_motor/MotorManager.h>
 #include <rexos_motor/StepperMotor.h>
 #include "rexos_logger/rexos_logger.h"
@@ -39,7 +39,6 @@
 #include <vector>
 
 namespace rexos_motor {
-
 	/**
 	 * Motor management for concurrent movement.
 	 **/
@@ -52,7 +51,7 @@ namespace rexos_motor {
 		 * @param motors Pointer array containing all motors for this manager.
 		 * @param numberOfMotors Number of motors in the pointer array.
 		 **/
-		StepperMotorManager(rexos_modbus::ModbusController* modbus, std::vector<MotorInterface*> motors);
+		StepperMotorManager(rexos_io::InputOutputControllerInterface* ioController, std::vector<MotorInterface*> motors);
 		virtual void startMovement();
 		void startMovement(int motionSlot);
 
@@ -61,6 +60,6 @@ namespace rexos_motor {
 		 * @var ModbusController::ModbusController* modbus
 		 * Pointer to an established modbus connection.
 		 **/
-		rexos_modbus::ModbusController* modbus;
+		rexos_io::InputOutputControllerInterface* ioController;
 	};
 }
