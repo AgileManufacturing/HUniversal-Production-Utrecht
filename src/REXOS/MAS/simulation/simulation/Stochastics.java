@@ -91,7 +91,7 @@ class Stochastics {
 	}
 
 	/**
-	 * Generate the product steps with MEAN_PRODUCT_STEPS steps
+	 * Generate the product steps with 4 products steps, (y, a, y, b)
 	 * 
 	 * @return a list of product steps
 	 */

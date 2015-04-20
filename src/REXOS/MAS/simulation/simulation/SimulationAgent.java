@@ -210,7 +210,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 	}
 
 	private void setOutput() {
-		if (MASConfiguration.VERBOSITY <= 2) {
+		if (MASConfiguration.VERBOSITY == 0 || MASConfiguration.VERBOSITY == 2) {
 			System.setOut(new DummyPrint());
 		}
 	}

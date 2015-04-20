@@ -95,7 +95,7 @@ public class EquipletSimAgent extends EquipletAgent implements IEquipletSim {
 	}
 
 	/**
-	 * 
+	 * the equiplet will be reconfigured when he is ready
 	 * @param capabilities
 	 */
 	@Override

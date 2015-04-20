@@ -139,7 +139,7 @@ public class Simulation implements ISimulation, IControl {
 	/**
 	 * initialize the simulation
 	 */
-	protected void init() {
+	public void init() {
 		eventStack = new TreeSet<>();
 
 		run_length = config.getRunLength();
@@ -217,22 +217,6 @@ public class Simulation implements ISimulation, IControl {
 
 		eventStack.add(new Event(time, EventType.PRODUCT));
 		eventStack.add(new Event(run_length, EventType.DONE));
-		//
-		// simulation.delay(2000);
-		//
-		// IEquipletSim e1= equiplets.get("E1");
-		// IEquipletSim e2= equiplets.get("E2");
-		// IEquipletSim e7= equiplets.get("E7");
-		// IEquipletSim e8= equiplets.get("E8");
-		// IEquipletSim e9= equiplets.get("E9");
-		//
-		// e7.reconfigureFinished(e9.getCapabilities());
-		// e8.reconfigureFinished(e9.getCapabilities());
-		// e9.reconfigureFinished(e1.getCapabilities());
-		//
-		// reconfigured.put("E7", new Tuple<String, Tick, Tick, String>("E9", new Tick(0), time, "E7" + "-> " +"E9"));
-		// reconfigured.put("E8", new Tuple<String, Tick, Tick, String>("E9", new Tick(0), time, "E8" + "-> " +"E9"));
-		// reconfigured.put("E9", new Tuple<String, Tick, Tick, String>("E1", new Tick(0), time, "E9" + "-> " +"E1"));
 	}
 
 	/**
@@ -311,8 +295,8 @@ public class Simulation implements ISimulation, IControl {
 				// }
 				//
 				for (Entry<String, IProductSim> product : products.entrySet()) {
-				 System.out.println("PQ: " + product.getValue().toString());
-				 }
+					System.out.println("PQ: " + product.getValue().toString());
+				}
 
 				if (Settings.VERIFICATION) {
 					verification();
@@ -817,7 +801,7 @@ public class Simulation implements ISimulation, IControl {
 
 		System.err.printf("Simlation: run finished stats=[finished=%d, failed=%d, overdue=%d, production times=%.2f, load=%.4f]\n", productsFinished, productsFailed, productsOverdue, avgProductionTimes, avgLoad);
 
-		saveStatistics();
+		saveStatistics(productsFinished, productsFailed, productsOverdue, avgProductionTimes, avgLoad);
 
 		// take down all agents
 		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
@@ -1327,8 +1311,70 @@ public class Simulation implements ISimulation, IControl {
 		}
 	}
 
+	/**
+	 * save the statistics from one simulation run
+	 * this calculates first the statistics: finished, failed, overdue product etc,
+	 * then uses the other function saveStatistics to save it all
+	 * 
+	 */
 	@Override
 	public synchronized void saveStatistics() {
+		// calculate statistics of a run
+		TreeMap<Tick, Integer> pFinished = productStatistics.get(STATS_FINISHED);
+		int sFinished = pFinished.get(pFinished.headMap(Settings.WARMUP).lastKey());
+		int productsFinished = pFinished.lastEntry().getValue() - sFinished;
+
+		TreeMap<Tick, Integer> pFailed = productStatistics.get(STATS_FAILED_CREATION);
+		int sFailed = pFailed.get(pFailed.headMap(Settings.WARMUP).lastKey());
+		int productsFailed = pFailed.lastEntry().getValue() - sFailed;
+
+		TreeMap<Tick, Integer> pOverdue = productStatistics.get(STATS_FAILED_DEADLINE);
+		int sOverdue = pOverdue.get(pOverdue.headMap(Settings.WARMUP).lastKey());
+		int productsOverdue = pOverdue.lastEntry().getValue() - sOverdue;
+
+		double sumProductionTimes = 0;
+		int countProductionTimes = 0;
+		for (Entry<Tick, Tick> entry : productionTimes.entrySet()) {
+			if (entry.getKey().greaterOrEqualThan(Settings.WARMUP)) {
+				sumProductionTimes += entry.getValue().doubleValue();
+				countProductionTimes++;
+			}
+		}
+
+		float avgProductionTimes = (float) (sumProductionTimes / countProductionTimes);
+
+		double sumLoad = 0;
+		double countLoad = 0;
+
+		for (Entry<String, TreeMap<Tick, Float>> entry : equipletLoadHistory.entrySet()) {
+			for (Entry<Tick, Float> time : entry.getValue().entrySet()) {
+				if (time.getKey().greaterOrEqualThan(Settings.WARMUP)) {
+					double eLoad = time.getValue();
+					double l = sumLoad + time.getValue();
+					if ((sumLoad < 0 && eLoad < 0 && l >= 0) || (sumLoad > 0 && eLoad > 0 && l <= 0)) {
+						// Overflow occurred
+						throw new RuntimeException("load calculation overflow. write method for discarding values");
+					}
+					sumLoad = l;
+					countLoad++;
+				}
+			}
+		}
+		float avgLoad = (float) (sumLoad / countLoad);
+		saveStatistics(productsFinished, productsFailed, productsOverdue, avgProductionTimes, avgLoad);
+	}
+
+	/**
+	 * save the statistics from one simulation run
+	 * saves config, products stats, equiplets loads, graphs and things in one folder
+	 * 
+	 * @param productsFinished
+	 * @param productsFailed
+	 * @param productsOverdue
+	 * @param avgProductionTimes
+	 * @param avgLoad
+	 */
+	private void saveStatistics(int productsFinished, int productsFailed, int productsOverdue, float avgProductionTimes, float avgLoad) {
 		System.out.println("Simulation: save statistics");
 
 		String path = Settings.SIMULATION_OUTPUT;
@@ -1417,8 +1463,10 @@ public class Simulation implements ISimulation, IControl {
 			// write simulation statistics
 			writer = new PrintWriter(statFile);
 			writer.println("Grid Simulation run");
-			// writer.printf("Product Statistics: \t%s\r\n", productStatistics);
-			writer.println();
+
+			writer.printf("avg;%.2f;%.2f;%.2f;%.2f;%.4f;\n", 1.0 * productsFinished / runStats.size(), 1.0 * productsFailed / runStats.size(), 1.0 * productsOverdue
+					/ runStats.size(), 1.0 * avgProductionTimes / runStats.size(), avgLoad / runStats.size());
+
 			writer.println();
 			// writer.printf("Equiplet Statistics: \t%s\r\n", equipletStatistics);
 			writer.println("\r\t");

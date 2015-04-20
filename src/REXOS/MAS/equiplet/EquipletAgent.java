@@ -474,7 +474,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			}
 		}
 
-		if (!MASConfiguration.KEEP_FULL_EQUIPLET_HISORY) {
+		if (!MASConfiguration.KEEP_FULL_EQUIPLET_HISTORY) {
 			removeUnnecessaryHistory(time, window);
 		}
 
