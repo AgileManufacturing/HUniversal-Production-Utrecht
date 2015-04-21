@@ -39,7 +39,7 @@ namespace rexos_io{
 		/**
 		 * Writes a 32-bit value to a shadow register.
 		 **/
-		void writeShadowU32		(uint16_t address, uint32_t value, ShadowMap& shadow);
+		//void writeShadowU32		(uint16_t address, uint32_t value, ShadowMap& shadow);
 		/**
 		 * Reads a 16-bit shadow register.
 		 **/
@@ -47,7 +47,7 @@ namespace rexos_io{
 		/**
 		 * Reads a 32-bit shadow register.
 		 **/
-		uint32_t readShadowU32	(uint16_t address, ShadowMap& shadow);
+		//uint32_t readShadowU32	(uint16_t address, ShadowMap& shadow);
 		
 		/**
 		 * Writes a 16-bit value to a shadow register.
@@ -56,7 +56,7 @@ namespace rexos_io{
 		/**
 		 * Writes a 32-bit value to a shadow register.
 		 **/
-		virtual void writeShadowU32		(uint16_t address, uint32_t value) = 0;
+		//virtual void writeShadowU32		(uint16_t address, uint32_t value) = 0;
 		/**
 		 * Reads a 16-bit shadow register.
 		 **/
@@ -64,6 +64,6 @@ namespace rexos_io{
 		/**
 		 * Reads a 32-bit shadow register.
 		 **/
-		virtual uint32_t readShadowU32	(uint16_t address) = 0;
+		//virtual uint32_t readShadowU32	(uint16_t address) = 0;
 	};
 }

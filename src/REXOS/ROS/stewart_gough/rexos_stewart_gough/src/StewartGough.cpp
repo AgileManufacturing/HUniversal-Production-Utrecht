@@ -162,7 +162,7 @@ namespace rexos_stewart_gough{
 
 		// Check if the angles fit within the boundaries
 		for(uint i = 0; i < motors.size(); i++) {
-			if(rotations[i].angle < stepperMotorProperties.motorMinAngle || rotations[i].angle < stepperMotorProperties.motorMaxAngle) {
+			if(rotations[i].angle < stepperMotorProperties.motorMinAngle || rotations[i].angle > stepperMotorProperties.motorMaxAngle) {
 				throw std::out_of_range("motion angles outside of valid range");
 			}
 		}
@@ -274,7 +274,7 @@ namespace rexos_stewart_gough{
 	* @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
 	**/
 	bool StewartGough::calibrateMotors(){
-		for(uint i = 0; i < motors.size(); i += 2) {
+		/*for(uint i = 0; i < motors.size(); i += 2) {
 			std::vector<rexos_motor::MotorInterface*> motorsToCalibrate;
 			std::vector<rexos_sensor::ContactSensor*> sensorsToUse;
 			motorsToCalibrate.push_back(motors[i + 0]);
@@ -282,7 +282,9 @@ namespace rexos_stewart_gough{
 			sensorsToUse.push_back(sensors[i + 0]);
 			sensorsToUse.push_back(sensors[i + 1]);
 			calibrateMotorGroup(motorsToCalibrate, sensorsToUse);
-		}
+		}*/
+		calibrateMotorGroup(motors, sensors);
+		
 		effectorLocation.location.x = 0;
 		effectorLocation.location.y = 0;
 		effectorLocation.location.z = -270; // TODO yet to be set 

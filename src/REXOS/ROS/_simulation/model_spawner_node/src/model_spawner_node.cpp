@@ -37,12 +37,25 @@ int main(int argc, char **argv) {
 	}
 	
 	bool spawnEquipletModel = false;
+	bool spawnModuleModels = false;
+	bool spawnPartModel = false;
 	bool isShadow = false;
+	
+	int gridPositionX = 0;
+	int gridPositionY = 0;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
 		if (arg == "--spawnEquipletModel") {
 			spawnEquipletModel = true;
+		} else if (arg == "--spawnModuleModels") {
+			spawnModuleModels = true;
+		} else if (arg == "--spawnPartModel") {
+			spawnPartModel = true;
+		} else if (arg == "-x") {
+			gridPositionX = boost::lexical_cast<int>(argv[++i]);
+		} else if (arg == "-y") {
+			gridPositionY = boost::lexical_cast<int>(argv[++i]);
 		} else if (arg == "--isShadow") {
 			isShadow = true;
 		}
@@ -59,7 +72,22 @@ int main(int argc, char **argv) {
 	std::string nodeName = equipletName + "_modelSpawner";
 	ros::init(argc, argv, nodeName);
 	
-	model_spawner_node::ModelSpawnerNode modelSpawnerNode(equipletName, spawnEquipletModel, isShadow);
+	model_spawner_node::ModelSpawnerNode modelSpawnerNode(equipletName, isShadow);
+	
+	if(spawnEquipletModel == true) {
+		REXOS_INFO("spawning equiplet model");
+		modelSpawnerNode.spawnEquipletModel(gridPositionX, gridPositionY);
+	}
+	
+	if(spawnModuleModels == true) {
+		rexos_knowledge_database::Equiplet equiplet(equipletName);
+		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers = equiplet.getModuleIdentifiersOfAttachedModules();
+		
+		for(uint i = 0; i < moduleIdentifiers.size(); i++) {
+			modelSpawnerNode.spawnModuleModel(moduleIdentifiers[i]);
+		}
+		ros::shutdown();
+	}
 	
 	ros::spin();
 	return 0;

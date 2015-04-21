@@ -158,24 +158,28 @@ void StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalCo
 	// get the max acceleration
 	double maxAcceleration;
 	if(moveCommand.isMember("maxAcceleration") == false) {
-		REXOS_WARN("move command does not contain maxAcceleration, assuming ");
+		REXOS_WARN("move command does not contain maxAcceleration, assuming 50.0");
 		maxAcceleration = 50.0;
 	} else {
 		maxAcceleration = moveCommand["maxAcceleration"].asDouble();
 	}
 	
+	double targetRotationX, targetRotationY, targetRotationZ;
 	// get the rotation from the instruction data
 	if(instructionData.isMember("rotate") == false) {
-		throw std::runtime_error("instruction data does not contain rotate");
+		REXOS_WARN("instruction data does not contain rotate, assuming 0 0");
+		targetRotationX = 0;
+		targetRotationY = 0;
+		targetRotationZ = 0;
+	} else {
+		Json::Value rotateCommand = equipletStep.getInstructionData()["rotate"];
+		if(rotateCommand.isMember("x")) targetRotationX = rotateCommand["x"].asDouble();
+		else targetRotationX = stewartGough->getEffectorLocation().rotationX;
+		if(rotateCommand.isMember("y")) targetRotationY = rotateCommand["y"].asDouble();
+		else targetRotationY = stewartGough->getEffectorLocation().rotationY;
+		if(rotateCommand.isMember("z")) targetRotationZ = rotateCommand["z"].asDouble();
+		else targetRotationZ = stewartGough->getEffectorLocation().rotationZ;
 	}
-	Json::Value rotateCommand = equipletStep.getInstructionData()["rotate"];
-	double targetRotationX, targetRotationY, targetRotationZ;
-	if(rotateCommand.isMember("x")) targetRotationX = rotateCommand["x"].asDouble();
-	else targetRotationX = stewartGough->getEffectorLocation().rotationX;
-	if(rotateCommand.isMember("y")) targetRotationY = rotateCommand["y"].asDouble();
-	else targetRotationY = stewartGough->getEffectorLocation().rotationY;
-	if(rotateCommand.isMember("z")) targetRotationZ = rotateCommand["z"].asDouble();
-	else targetRotationZ = stewartGough->getEffectorLocation().rotationZ;
 	
 	// calculate the target vector
 	Matrix4 rotationMatrix;
@@ -277,9 +281,12 @@ bool StewartGoughNode::transitionSetup(){
 	if(!stewartGough->calibrateMotors()){
 		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
-	} else {
-		return true;
 	}
+	rexos_module::TransitionGoal goal;
+	goal.gainedSupportedMutations.push_back("move");
+	
+	transitionActionClient.sendGoal(goal);
+	return true;
 }
 
 /**

@@ -44,8 +44,10 @@ namespace rexos_model_spawner{
 	class ModelSpawner{
 	protected:
 		ModelSpawner(std::string equipletName, bool isShadow);
+	public:
 		void spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier);
-		void spawnEquipletModel();
+		void spawnEquipletModel(int gridPositionX = 0, int gridPositionY = 0);
+	protected:
 		std::string getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel);
 	protected:
 		std::string equipletName;

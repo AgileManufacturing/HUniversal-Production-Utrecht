@@ -25,7 +25,7 @@ import HAL.steps.HardwareStep.HardwareStepStatus;
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 	
-	static final String equipletName = "EQ3";
+	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
 	
 	// dummy module A
@@ -120,6 +120,11 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		if(args.length >= 1) {
+			equipletName = args[0];
+		}
+		System.out.println("Inserting equiplet " + equipletName);
+		
 		@SuppressWarnings("unused")
 		HALTesterClass htc = new HALTesterClass();
 		htc = null;

@@ -42,7 +42,7 @@
 namespace model_spawner_node {
 class ModelSpawnerNode : public rexos_model_spawner::ModelSpawner {
 public:
-	ModelSpawnerNode(std::string equipletName, bool spawnEquipletModel, bool isShadow);
+	ModelSpawnerNode(std::string equipletName, bool isShadow);
 	
 private:
 	bool spawnModel(spawnModel::Request &request, spawnModel::Response &response);

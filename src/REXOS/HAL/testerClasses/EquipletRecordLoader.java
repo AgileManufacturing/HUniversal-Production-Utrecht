@@ -15,9 +15,14 @@ import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 public class EquipletRecordLoader {
 	
-	static String equipletName = "EQ2";
+	static String equipletName = "EQ3";
 	
 	public static void main(String[] args) throws JSONException, IOException {
+		if(args.length >= 1) {
+			equipletName = args[0];
+		}
+		System.out.println("Inserting equiplet " + equipletName);
+		
 		KnowledgeDBClient client = new KnowledgeDBClient();
 		
 		JSONObject javaSoftwareJson = new JSONObject();

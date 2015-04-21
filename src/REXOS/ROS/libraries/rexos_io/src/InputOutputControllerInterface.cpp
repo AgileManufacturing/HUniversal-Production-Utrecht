@@ -55,12 +55,13 @@ namespace rexos_io {
 		uint16_t data[2];
 		data[0] = ((value >> 16) & 0x0000FFFF);
 		data[1] = ((value >>  0) & 0x0000FFFF);
-		writeU16(address, data, 1);
-		writeShadowU32(address, value);
+		writeU16(address, data, 2);
+		writeShadowU16(address + 0, data[0]);
+		writeShadowU16(address + 1, data[1]);
 	}
 	uint32_t InputOutputControllerInterface::readU32(uint16_t address) {
 		uint16_t data[2];
-		writeU16(address, data, 2);
+		readU16(address, data, 2);
 		
 		uint32_t output = 0;
 		output |= (((uint32_t)data[0] << 16) & 0xFFFF0000);
@@ -75,7 +76,7 @@ namespace rexos_io {
 	}
 	void InputOutputControllerInterface::writePinLow(uint16_t address, uint8_t pin, bool useShadow) {
 		uint16_t value = readU16(address, useShadow);
-		value ^= 1 << pin;
+		value &= (1 << pin) ^ 0xFFFF;
 		writeU16(address, value, useShadow);
 	}
 	bool InputOutputControllerInterface::readPin(uint16_t address, uint8_t pin, bool useShadow) {
@@ -145,7 +146,7 @@ namespace rexos_io {
 	uint16_t InputOutputControllerInterface::readU16(uint16_t address, bool useShadow) {
 		if(useShadow == true) {
 			try {
-				return readShadowU32(address);
+				return readShadowU16(address);
 			} catch (ShadowException& ex) {
 				// reading shadow failed, manually read below
 			}
@@ -154,13 +155,40 @@ namespace rexos_io {
 	}
 	uint32_t InputOutputControllerInterface::readU32(uint16_t address, bool useShadow) {
 		if(useShadow == true) {
+			bool skipMostSignificant = true;
+			bool skipLeastSignificant = true;
+			uint16_t mostSignificant;
+			uint16_t leastSignificant;
 			try {
-				return readShadowU32(address);
-			} catch (ShadowException& ex) {
-				// reading shadow failed, manually read below
+				mostSignificant = readShadowU16(address);
+			} catch (ShadowException ex) {
+				// reading completely failed
+				skipMostSignificant = false;
 			}
+			try {
+				leastSignificant = readShadowU16(address);
+			} catch (ShadowException ex) {
+				// reading completely failed
+				skipLeastSignificant = false;
+			}
+			
+			if(skipMostSignificant == false && skipLeastSignificant == false) {
+				return readU32(address);
+			} else {
+				if(skipMostSignificant == false) {
+					mostSignificant = readU16(address + 0);
+				} else if(skipLeastSignificant == false) {
+					leastSignificant = readU16(address + 1);
+				}
+				
+				uint32_t output = 0;
+				output |= (((uint32_t)mostSignificant << 16) & 0xFFFF0000);
+				output |= (((uint32_t)leastSignificant <<  0) & 0x0000FFFF);
+				return output;
+			}
+		} else {
+			return readU32(address);
 		}
-		return readU32(address);
 	}
 	
 	
@@ -168,10 +196,10 @@ namespace rexos_io {
 		shadow[address] = value;
 	}
 
-	void InputOutputControllerInterface::writeShadowU32(uint16_t address, uint32_t value, ShadowMap& shadow){
+	/*void InputOutputControllerInterface::writeShadowU32(uint16_t address, uint32_t value, ShadowMap& shadow){
 		shadow[address + 0] = (value >> 16) & 0xFFFF;
 		shadow[address + 1] = value & 0xFFFF;
-	}
+	}*/
 	uint16_t InputOutputControllerInterface::readShadowU16(uint16_t address, ShadowMap& shadow){
 		ShadowMap::iterator it = shadow.find(address);
 		if(it == shadow.end()){
@@ -179,7 +207,7 @@ namespace rexos_io {
 		}
 		return it->second;
 	}
-	uint32_t InputOutputControllerInterface::readShadowU32(uint16_t address, ShadowMap& shadow){
+	/*uint32_t InputOutputControllerInterface::readShadowU32(uint16_t address, ShadowMap& shadow){
 		ShadowMap::iterator itMostSigificant	 = shadow.find(address + 0);
 		ShadowMap::iterator itLeastSignificant	 = shadow.find(address + 1);
 		if(itMostSigificant == shadow.end() || itLeastSignificant == shadow.end()){
@@ -189,6 +217,6 @@ namespace rexos_io {
 		output |= (((uint32_t)itMostSigificant->second << 16) & 0xFFFF0000);
 		output |= (((uint32_t)itLeastSignificant->second << 0) & 0x0000FFFF);
 		return output;
-	}
+	}*/
 	
 }

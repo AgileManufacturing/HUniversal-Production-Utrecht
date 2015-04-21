@@ -39,6 +39,7 @@ namespace rexos_zip{
 	protected:
 		ZipExtractor();
 	public:
-		static void extractZipArchive(std::istream* inputFile, std::string archiveBasename, boost::filesystem::path targetDir);
+		static void extractZipArchive(std::istream* inputFile, std::string archiveBasename, 
+				boost::filesystem::path targetDir, bool overwriteExistingFiles);
 	};
 }

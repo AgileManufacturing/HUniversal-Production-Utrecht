@@ -89,6 +89,10 @@ public class GazeboModel implements Serializable {
 	public static GazeboModel getGazeboModelForModuleIdentifier(ModuleTypeIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getGazeboModelForModuleType, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber);
 		
+		if(rows.length != 1) {
+			return null;
+		}
+		
 		int id = (Integer) rows[0].get("id");
 		int buildNumber = (Integer) rows[0].get("buildNumber");
 		String sdfFilename = (String) rows[0].get("sdfFilename");

@@ -40,7 +40,8 @@
 namespace rexos_zip {
 	ZipExtractor::ZipExtractor() {
 	}
-	void ZipExtractor::extractZipArchive(std::istream* inputFile, std::string archiveBasename, boost::filesystem::path targetDir) {
+	void ZipExtractor::extractZipArchive(std::istream* inputFile, std::string archiveBasename, 
+			boost::filesystem::path targetDir, bool overwriteExistingFiles) {
 		char buf[100];
 		
 		// write the zip archive to the file system
@@ -74,35 +75,41 @@ namespace rexos_zip {
 		struct zip_stat zipStat;
 		for (uint i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
 			if (zip_stat_index(zipArchive, i, 0, &zipStat) == 0) {
+				boost::filesystem::path path = boost::filesystem::path(extractionPath.string() + zipStat.name);
 				// is directory or file entry?
 				if (zipStat.name[strlen(zipStat.name) - 1] == '/') {
-					boost::filesystem::create_directories(extractionPath.string() + zipStat.name);
+					if(overwriteExistingFiles == true || boost::filesystem::exists(path) == false) {
+						boost::filesystem::create_directories(path);
+					}
 				} else {
 					// files could be specified before the upper directories. create these directories
-					boost::filesystem::path path = boost::filesystem::path(extractionPath.string() + zipStat.name);
-					boost::filesystem::create_directories(path.parent_path());
-					
-					struct zip_file* zipFile;
-					zipFile = zip_fopen_index(zipArchive, i, 0);
-					if (!zipFile) {
-						throw std::runtime_error("Unable to open zipFile in zipArchive");
+					if(boost::filesystem::exists(path.parent_path()) == false) {
+						boost::filesystem::create_directories(path.parent_path());
 					}
 					
-					std::ofstream outputFileStream;
-					outputFileStream.open((extractionPath.string() + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
-					if (outputFileStream.good() != true) {
-						throw std::runtime_error("Unable to open fstream with path" + (extractionPath.string() + std::string(zipStat.name)));
+					if(overwriteExistingFiles == true || boost::filesystem::exists(path) == false) {
+						struct zip_file* zipFile;
+						zipFile = zip_fopen_index(zipArchive, i, 0);
+						if (!zipFile) {
+							throw std::runtime_error("Unable to open zipFile in zipArchive");
+						}
+						
+						std::ofstream outputFileStream;
+						outputFileStream.open((extractionPath.string() + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
+						if (outputFileStream.good() != true) {
+							throw std::runtime_error("Unable to open fstream with path" + (extractionPath.string() + std::string(zipStat.name)));
+						}
+						
+						uint sum = 0;
+						while (sum < zipStat.size) {
+							int len = zip_fread(zipFile, buf, 100);
+							outputFileStream.write(buf, len);
+							sum += len;
+						}
+						
+						outputFileStream.close();
+						zip_fclose(zipFile);
 					}
-					
-					uint sum = 0;
-					while (sum < zipStat.size) {
-						int len = zip_fread(zipFile, buf, 100);
-						outputFileStream.write(buf, len);
-						sum += len;
-					}
-					
-					outputFileStream.close();
-					zip_fclose(zipFile);
 				}
 			}
 		}

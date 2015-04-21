@@ -100,7 +100,7 @@ namespace rexos_gripper {
 			observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
 		}
 		
-		void Gripper::activate() {	
+		void Gripper::activate() {
 			if (overheated == false) {
 				valveOutputDevice->enable();
 				isActivated = true;

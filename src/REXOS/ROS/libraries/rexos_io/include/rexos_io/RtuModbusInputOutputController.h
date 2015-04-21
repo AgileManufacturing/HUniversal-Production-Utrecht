@@ -65,10 +65,10 @@ namespace rexos_io {
 		RtuModbusInputOutputController();
 		~RtuModbusInputOutputController(void);
 		
-		void writeU16		(uint16_t slave, uint16_t address, uint16_t data, bool useShadow = false);
-		void writeU32		(uint16_t slave, uint16_t address, uint32_t data, bool useShadow = false);
-		uint16_t readU16	(uint16_t slave, uint16_t address, bool useShadow = false);
-		uint32_t readU32	(uint16_t slave, uint16_t address, bool useShadow = false);
+		void writeU16		(uint16_t slave, uint16_t address, uint16_t data, bool useShadow);
+		void writeU32		(uint16_t slave, uint16_t address, uint32_t data, bool useShadow);
+		uint16_t readU16	(uint16_t slave, uint16_t address, bool useShadow);
+		uint32_t readU32	(uint16_t slave, uint16_t address, bool useShadow);
 		void writeU16		(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
 		void readU16		(uint16_t slave, uint16_t firstAddress, uint16_t* data, unsigned int length);
 

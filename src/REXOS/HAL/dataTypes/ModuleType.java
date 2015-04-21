@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.omg.PortableInterceptor.INACTIVE;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -196,31 +197,46 @@ public class ModuleType implements Serializable {
 	 * @throws JSONException
 	 */
 	private void updateModuleType(KnowledgeDBClient knowledgeDBClient) {
-		JavaSoftware currentJavaSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleTypeIdentifier, knowledgeDBClient);
-		int newJavaBuildNumber = halSoftware.buildNumber;
-		int currentJavaBuildNumber = currentJavaSoftware.buildNumber;
-		if (newJavaBuildNumber > currentJavaBuildNumber) {
-			// update the halSoftware
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating HAL software for module " + moduleTypeIdentifier);
-			halSoftware.updateDatabase(currentJavaSoftware, knowledgeDBClient);
-		}
-
-		RosSoftware currentRosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleTypeIdentifier, knowledgeDBClient);
-		int newRosBuildNumber = rosSoftware.buildNumber;
-		int currentRosBuildNumber = currentRosSoftware.buildNumber;
-		if (newRosBuildNumber > currentRosBuildNumber) {
-			// update the rosSoftware
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating ROS software for module " + moduleTypeIdentifier);
-			rosSoftware.updateDatabase(currentRosSoftware, knowledgeDBClient);
+		if(halSoftware != null) {
+			JavaSoftware currentJavaSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleTypeIdentifier, knowledgeDBClient);
+			int currentJavaBuildNumber;
+			if(currentJavaSoftware == null) currentJavaBuildNumber = Integer.MIN_VALUE;
+			else currentJavaBuildNumber = currentJavaSoftware.buildNumber;
+			
+			int newJavaBuildNumber = halSoftware.buildNumber;
+			if (newJavaBuildNumber > currentJavaBuildNumber) {
+				// update the halSoftware
+				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating HAL software for module " + moduleTypeIdentifier);
+				halSoftware.updateDatabase(currentJavaSoftware, knowledgeDBClient);
+			}
 		}
 		
-		GazeboModel currentGazeboModel = GazeboModel.getGazeboModelForModuleIdentifier(moduleTypeIdentifier, knowledgeDBClient);
-		int newModelBuildNumber = gazeboModel.buildNumber;
-		int currentModelBuildNumber = currentGazeboModel.buildNumber;
-		if (newModelBuildNumber > currentModelBuildNumber) {
-			// update the gazeboModel
-			Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating Gazebo model for module " + moduleTypeIdentifier);
-			gazeboModel.updateGazeboModel(currentGazeboModel, knowledgeDBClient);
+		if(rosSoftware != null) {
+			RosSoftware currentRosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleTypeIdentifier, knowledgeDBClient);
+			int currentRosBuildNumber;
+			if(currentRosSoftware == null) currentRosBuildNumber = Integer.MIN_VALUE;
+			else currentRosBuildNumber = currentRosSoftware.buildNumber;
+			
+			int newRosBuildNumber = rosSoftware.buildNumber;
+			if (newRosBuildNumber > currentRosBuildNumber) {
+				// update the rosSoftware
+				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating ROS software for module " + moduleTypeIdentifier);
+				rosSoftware.updateDatabase(currentRosSoftware, knowledgeDBClient);
+			}
+		}
+		
+		if(gazeboModel != null) {	
+			GazeboModel currentGazeboModel = GazeboModel.getGazeboModelForModuleIdentifier(moduleTypeIdentifier, knowledgeDBClient);
+			int currentModelBuildNumber;
+			if(currentGazeboModel == null) currentModelBuildNumber = Integer.MIN_VALUE;
+			else currentModelBuildNumber = currentGazeboModel.buildNumber;
+			
+			int newModelBuildNumber = gazeboModel.buildNumber;
+			if (newModelBuildNumber > currentModelBuildNumber) {
+				// update the gazeboModel
+				Logger.log(LogSection.HAL_MODULE_FACTORY, LogLevel.INFORMATION, "Updating Gazebo model for module " + moduleTypeIdentifier);
+				gazeboModel.updateGazeboModel(currentGazeboModel, knowledgeDBClient);
+			}
 		}
 		
 		for (SerializedCapability capability : capabilities) {

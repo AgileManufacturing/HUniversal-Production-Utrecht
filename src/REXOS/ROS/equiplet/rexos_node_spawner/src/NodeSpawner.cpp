@@ -120,6 +120,6 @@ namespace rexos_node_spawner {
 	}
 	void NodeSpawner::extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware) {
 		std::string baseName = boost::lexical_cast<std::string>(rosSoftware.getId());
-		rexos_zip::ZipExtractor::extractZipArchive(rosSoftware.getRosFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH));
+		rexos_zip::ZipExtractor::extractZipArchive(rosSoftware.getRosFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH), false);
 	}
 }

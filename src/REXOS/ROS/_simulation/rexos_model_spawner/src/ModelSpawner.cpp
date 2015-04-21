@@ -49,6 +49,7 @@ namespace rexos_model_spawner {
 	{
 	}
 	void ModelSpawner::spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
+		REXOS_INFO_STREAM("Spawning model for " << moduleIdentifier);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
 		
 		std::string modelName = moduleIdentifier.getManufacturer() + "|" + 
@@ -113,13 +114,14 @@ namespace rexos_model_spawner {
 		if(isShadow == true) {
 			serviceCall.request.robot_namespace = "shadow";
 		}
-		
+		REXOS_INFO_STREAM("Call: " << serviceCall.request);
 		client.waitForExistence();
 		client.call(serviceCall);
 		
 		delete parentGazeboModel;
 	}
-	void ModelSpawner::spawnEquipletModel() {
+	void ModelSpawner::spawnEquipletModel(int gridPositionX, int gridPositionY) {
+		REXOS_INFO_STREAM("Spawning model for " << equipletName << " at " << gridPositionX << " " << gridPositionY);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(equipletName);
 		
 		// spawn the model
@@ -139,6 +141,8 @@ namespace rexos_model_spawner {
 		gazebo_msgs::SpawnModel serviceCall;
 		serviceCall.request.model_name = equipletName;
 		serviceCall.request.model_xml = gazeboSdfFileString;
+		serviceCall.request.initial_pose.position.x = gridPositionX;
+		serviceCall.request.initial_pose.position.y = gridPositionY;
 		
 		client.waitForExistence();
 		client.call(serviceCall);
@@ -157,6 +161,6 @@ namespace rexos_model_spawner {
 	
 	void ModelSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel) {
 		std::string baseName = boost::lexical_cast<std::string>(gazeboModel.getId());
-		rexos_zip::ZipExtractor::extractZipArchive(gazeboModel.getModelFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH));
+		rexos_zip::ZipExtractor::extractZipArchive(gazeboModel.getModelFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH), false);
 	}
 }

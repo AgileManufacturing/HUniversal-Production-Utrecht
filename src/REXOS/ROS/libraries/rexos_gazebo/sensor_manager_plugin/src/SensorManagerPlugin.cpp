@@ -54,7 +54,7 @@ namespace sensor_manager_plugin {
 		
 		model = _model;
 		nodeHandle = new ros::NodeHandle();
-		readSensorsServer = nodeHandle->advertiseService(rosNamespace + address, 
+		readSensorsServer = nodeHandle->advertiseService(rosNamespace + address + "/read/", 
 				&SensorManagerPlugin::readSensors, this);
 		
 		this->updateConnection = event::Events::ConnectWorldUpdateBegin(

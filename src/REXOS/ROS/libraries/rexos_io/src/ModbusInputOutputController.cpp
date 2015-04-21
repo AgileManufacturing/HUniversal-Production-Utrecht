@@ -3,11 +3,17 @@
 #include <rexos_io/ShadowException.h>
 #include <rexos_utilities/Utilities.h>
 
+#include <boost/filesystem.hpp>
+
 namespace rexos_io {
 	ModbusInputOutputController::ModbusInputOutputController() :
 			context(NULL), nextWriteTime(0) {
 #ifdef MODBUS_LOGGING
-		logFile.open(MODBUS_LOGGING);
+		int offset = 0;
+		while(boost::filesystem::exists(boost::filesystem::path(MODBUS_LOGGING + boost::lexical_cast<std::string>(offset))) == true) {
+			offset++;
+		}
+		logFile.open(MODBUS_LOGGING + boost::lexical_cast<std::string>(offset));
 		if(!logFile.is_open()) {
 			throw ModbusException("File Error!");
 		}
@@ -60,7 +66,7 @@ namespace rexos_io {
 
 #ifdef MODBUS_LOGGING
 		for(unsigned int i = 0; i < length; i++){
-			logFile << "WriteU16Array\t" << curr << "\t" << (firstAddress + i) << "\t" << data[i] << std::endl;
+			logFile << "WriteU16Array\t" << currentSlave << "\t" << (firstAddress + i) << "\t" << data[i] << std::endl;
 		}
 #endif
 		
@@ -97,18 +103,18 @@ namespace rexos_io {
 		// shadowRegistry entry will be created if slave did not exist yet
 		InputOutputControllerInterface::writeShadowU16(address, value, shadowRegistry[currentSlave]);
 	}
-	void ModbusInputOutputController::writeShadowU32(uint16_t address, uint32_t value) {
+	/*void ModbusInputOutputController::writeShadowU32(uint16_t address, uint32_t value) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		InputOutputControllerInterface::writeShadowU32(address, value, shadowRegistry[currentSlave]);
-	}
+	}*/
 	uint16_t ModbusInputOutputController::readShadowU16(uint16_t address) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		return InputOutputControllerInterface::readShadowU16(address, shadowRegistry[currentSlave]);
 	}
-	uint32_t ModbusInputOutputController::readShadowU32(uint16_t address) {
+	/*uint32_t ModbusInputOutputController::readShadowU32(uint16_t address) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		return InputOutputControllerInterface::readShadowU32(address, shadowRegistry[currentSlave]);
-	}
+	}*/
 	
 	void ModbusInputOutputController::wait(void){
 		long delta = nextWriteTime - rexos_utilities::timeNow();

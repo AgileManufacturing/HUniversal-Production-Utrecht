@@ -49,7 +49,7 @@ namespace rexos_io {
 	}
 	void SimulatedInputOutputController::writeU16(uint16_t firstAddress, uint16_t* data, unsigned int length) {
 		for(uint i = 0; i < length; i++) {
-			std::string clientPath = servicePath + "/" + boost::lexical_cast<std::string>(firstAddress + i);
+			std::string clientPath = servicePath + "/" + boost::lexical_cast<std::string>(firstAddress + i) + "/write/";
 			ros::ServiceClient client = nodeHandle.serviceClient<rexos_io::writeU16>(clientPath);
 			if(client.exists() == true) {
 				rexos_io::writeU16 call;
@@ -62,7 +62,7 @@ namespace rexos_io {
 	}
 	void SimulatedInputOutputController::readU16(uint16_t firstAddress, uint16_t* data, unsigned int length) {
 		for(uint i = 0; i < length; i++) {
-			std::string clientPath = servicePath + "/" + boost::lexical_cast<std::string>(firstAddress + i);
+			std::string clientPath = servicePath + "/" + boost::lexical_cast<std::string>(firstAddress + i) + "/read/";
 			ros::ServiceClient client = nodeHandle.serviceClient<rexos_io::readU16>(clientPath);
 			if(client.exists() == true) {
 				rexos_io::readU16 call;
@@ -78,16 +78,16 @@ namespace rexos_io {
 		// shadowRegistry entry will be created if slave did not exist yet
 		InputOutputControllerInterface::writeShadowU16(address, value, shadowRegistry);
 	}
-	void SimulatedInputOutputController::writeShadowU32(uint16_t address, uint32_t value) {
+	/*void SimulatedInputOutputController::writeShadowU32(uint16_t address, uint32_t value) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		InputOutputControllerInterface::writeShadowU32(address, value, shadowRegistry);
-	}
+	}*/
 	uint16_t SimulatedInputOutputController::readShadowU16(uint16_t address) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		return InputOutputControllerInterface::readShadowU16(address, shadowRegistry);
 	}
-	uint32_t SimulatedInputOutputController::readShadowU32(uint16_t address) {
+	/*uint32_t SimulatedInputOutputController::readShadowU32(uint16_t address) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		return InputOutputControllerInterface::readShadowU32(address, shadowRegistry);
-	}
+	}*/
 }

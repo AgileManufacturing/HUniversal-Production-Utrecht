@@ -29,7 +29,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	JSONObject criteria2 = new JSONObject();
 	boolean state = false;
 
-	static final String equipletName = "EQ2";
+	static String equipletName = "EQ2";
 	static final String baseDir = "generatedOutput/";
 
 	// delta robot
@@ -259,7 +259,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":null," +
-			"	\"mountPointX\":4," +
+			"	\"mountPointX\":3," +
 			"	\"mountPointY\":16" +
 			"}";
 	// lens
@@ -365,6 +365,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		if(args.length >= 1) {
+			equipletName = args[0];
+		}
+		System.out.println("Inserting equiplet " + equipletName);
+		
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
 		@SuppressWarnings("unused")
 		HALTesterClassPickAndPlace htc = new HALTesterClassPickAndPlace();

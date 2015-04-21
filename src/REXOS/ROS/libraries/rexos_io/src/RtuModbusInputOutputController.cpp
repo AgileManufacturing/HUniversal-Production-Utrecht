@@ -46,16 +46,16 @@ namespace rexos_io {
 		// shadowRegistry entry will be created if slave did not exist yet
 		InputOutputControllerInterface::writeShadowU16(address, value, shadowRegistry[slave]);
 	}
-	void RtuModbusInputOutputController::writeShadowU32(uint16_t slave, uint16_t address, uint32_t value) {
+	/*void RtuModbusInputOutputController::writeShadowU32(uint16_t slave, uint16_t address, uint32_t value) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		InputOutputControllerInterface::writeShadowU32(address, value, shadowRegistry[slave]);
-	}
+	}*/
 	uint16_t RtuModbusInputOutputController::readShadowU16(uint16_t slave, uint16_t address) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		return InputOutputControllerInterface::readShadowU16(address, shadowRegistry[slave]);
 	}
-	uint32_t RtuModbusInputOutputController::readShadowU32(uint16_t slave, uint16_t address) {
+	/*uint32_t RtuModbusInputOutputController::readShadowU32(uint16_t slave, uint16_t address) {
 		// shadowRegistry entry will be created if slave did not exist yet
 		return InputOutputControllerInterface::readShadowU32(address, shadowRegistry[slave]);
-	}
+	}*/
 }

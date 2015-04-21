@@ -57,8 +57,8 @@ namespace rexos_io{
 		std::string servicePath;
 		
 		virtual void writeShadowU16		(uint16_t address, uint16_t value);
-		virtual void writeShadowU32		(uint16_t address, uint32_t value);
+		//virtual void writeShadowU32		(uint16_t address, uint32_t value);
 		virtual uint16_t readShadowU16	(uint16_t address);
-		virtual uint32_t readShadowU32	(uint16_t address);
+		//virtual uint32_t readShadowU32	(uint16_t address);
 	};
 }

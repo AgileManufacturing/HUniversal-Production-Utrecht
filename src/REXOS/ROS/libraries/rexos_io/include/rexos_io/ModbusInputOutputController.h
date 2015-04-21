@@ -49,6 +49,7 @@ extern "C"{
  * #define MODBUS_LOGGING "/home/agileman/modbus.log"
  * @endcond
  **/
+#define MODBUS_LOGGING "/home/agileman/modbus.log"
 
 namespace rexos_io {
 	/**
@@ -67,9 +68,9 @@ namespace rexos_io {
 		void setCurrentSlave(uint16_t slave);
 		
 		virtual void writeShadowU16		(uint16_t address, uint16_t value);
-		virtual void writeShadowU32		(uint16_t address, uint32_t value);
+		//virtual void writeShadowU32		(uint16_t address, uint32_t value);
 		virtual uint16_t readShadowU16	(uint16_t address);
-		virtual uint32_t readShadowU32	(uint16_t address);
+		//virtual uint32_t readShadowU32	(uint16_t address);
 		
 		std::map<uint16_t, ShadowMap> shadowRegistry;
 		/**

@@ -141,6 +141,10 @@ namespace rexos_motorized_actor{
 			for(uint i = 0; i < motorsToCalibrate.size(); i++) {
 				if(hasDesiredValue[i] == false) {
 					motorsToCalibrate[i]->startMovement();
+				}
+			}
+			for(uint i = 0; i < motorsToCalibrate.size(); i++) {
+				if(hasDesiredValue[i] == false) {
 					motorsToCalibrate[i]->waitTillReady();
 					deviations[i] += motorRotation.angle;
 					if(sensorsToUse[i]->isTriggered() == desiredSensorValue) {

@@ -41,6 +41,6 @@ namespace rexos_sensor {
 	bool ContactSensor::isTriggered() {
 		uint16_t sensorRegister = ioController->readU16(8000, false);
 		// sensor values are inverted
-        return (sensorRegister ^ 0xFF) & 1 << index;
+		return (sensorRegister ^ 0xFF) & (1 << index);
 	}
 }

@@ -29,7 +29,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 	JSONObject criteria2 = new JSONObject();
 	boolean state = false;
 
-	static final String equipletName = "EQ2";
+	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
 
 	// six axis
@@ -159,14 +159,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	]," +
 			"	\"attachedTo\":null," +
 			"\"mountPointX\":3," +
-			"\"mountPointY\":0" +
+			"\"mountPointY\":2" +
 			"}";
 	// gripper
 	static String moduleB_01 = "{" +
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"HU\"," +
 			"		\"typeNumber\":\"gripper_type_A\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"2\"," +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{" +
@@ -223,7 +223,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
 			"		\"typeNumber\":\"DFK_22AUC03\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"2\"," +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{}," +
@@ -259,7 +259,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":null," +
-			"	\"mountPointX\":4," +
+			"	\"mountPointX\":3," +
 			"	\"mountPointY\":16" +
 			"}";
 	// lens
@@ -267,7 +267,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
 			"		\"typeNumber\":\"Cheap_ass_lens\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"2\"," +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{}," +
@@ -300,7 +300,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"attachedTo\":{" +
 			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
 			"		\"typeNumber\":\"DFK_22AUC03\"," +
-			"		\"serialNumber\":\"1\"" +
+			"		\"serialNumber\":\"2\"" +
 			"	}," +
 			"	\"mountPointX\":null," +
 			"	\"mountPointY\":null" +
@@ -310,7 +310,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"HU\"," +
 			"		\"typeNumber\":\"workplane_type_A\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"2\"," +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{" +
@@ -365,6 +365,11 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		if(args.length >= 1) {
+			equipletName = args[0];
+		}
+		System.out.println("Inserting equiplet " + equipletName);
+		
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
 		@SuppressWarnings("unused")
 		HALTesterClassStewartGough htc = new HALTesterClassStewartGough();

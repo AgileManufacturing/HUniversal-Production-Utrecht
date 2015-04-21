@@ -41,15 +41,10 @@ using namespace model_spawner_node;
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
  **/
-ModelSpawnerNode::ModelSpawnerNode(std::string equipletName, bool spawnEquipletModel, bool isShadow) :
+ModelSpawnerNode::ModelSpawnerNode(std::string equipletName, bool isShadow) :
 		rexos_model_spawner::ModelSpawner(equipletName, isShadow), 
 		equipletName(equipletName)
 {
-	if(spawnEquipletModel == true) {
-		REXOS_INFO("spawning equiplet model");
-		ModelSpawner::spawnEquipletModel();
-	}
-	
 	spawnNodeServer = nodeHandle.advertiseService(equipletName + "/spawnModel", &ModelSpawnerNode::spawnModel, this);
 	
 	REXOS_INFO("model_spawner_node has been started");

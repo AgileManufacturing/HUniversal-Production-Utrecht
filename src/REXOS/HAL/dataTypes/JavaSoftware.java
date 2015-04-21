@@ -126,6 +126,10 @@ public class JavaSoftware implements JarFileLoader, Serializable{
 	public static JavaSoftware getJavaSoftwareForModuleIdentifier(ModuleTypeIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForModuleType, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber);
 		
+		if(rows.length != 1) {
+			return null;
+		}
+		
 		int id = (Integer) rows[0].get("id");
 		int buildNumber = (Integer) rows[0].get("buildNumber");
 		String className = (String) rows[0].get("className");
