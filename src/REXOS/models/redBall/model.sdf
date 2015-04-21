@@ -1,0 +1,30 @@
+<sdf version='1.4'>
+	<model name="RedBall">
+		<static>false</static>
+		<link name="base">
+			<pose>0 0 0 0 0 0</pose>
+			<gravity>true</gravity>
+		
+			<inertial>
+				<mass>.005</mass>
+			</inertial>
+			<visual name="visual">
+				<material>
+					<ambient>1 0 0 1</ambient>
+				</material>
+				<geometry>
+					<sphere>
+						<radius>0.0045</radius>
+					</sphere>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<geometry>
+					<sphere>
+						<radius>0.0045</radius>
+					</sphere>
+				</geometry>
+			</collision>
+		</link>
+	</model>
+</sdf>

@@ -232,7 +232,8 @@
 			<gravity>true</gravity>
 			
 			<inertial>
-				<mass>0.100</mass>
+				<mass>0.050</mass>
+				<pose>0 0 0 0 0 0</pose>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -348,7 +349,7 @@
 			</axis>
 		</joint>
 		<!-- Lower arms --> 
-		<joint type="universal" name="lowerArm1ToUpperArm1"> 
+		<joint type="ball" name="lowerArm1ToUpperArm1"> 
 			<parent>upperArm1</parent>
 			<child>lowerArm1</child>
 			<axis>
@@ -359,14 +360,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm2ToUpperArm2"> 
+		<joint type="ball" name="lowerArm2ToUpperArm2"> 
 			<parent>upperArm2</parent>
 			<child>lowerArm2</child>
 			<axis>
@@ -377,14 +378,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm3ToUpperArm3"> 
+		<joint type="ball" name="lowerArm3ToUpperArm3"> 
 			<parent>upperArm3</parent>
 			<child>lowerArm3</child>
 			<axis>
@@ -395,14 +396,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm4ToUpperArm4"> 
+		<joint type="ball" name="lowerArm4ToUpperArm4"> 
 			<parent>upperArm4</parent>
 			<child>lowerArm4</child>
 			<axis>
@@ -413,14 +414,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm5ToUpperArm5"> 
+		<joint type="ball" name="lowerArm5ToUpperArm5"> 
 			<parent>upperArm5</parent>
 			<child>lowerArm5</child>
 			<axis>
@@ -431,14 +432,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm6ToUpperArm6"> 
+		<joint type="ball" name="lowerArm6ToUpperArm6"> 
 			<parent>upperArm6</parent>
 			<child>lowerArm6</child>
 			<axis>
@@ -449,7 +450,7 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
@@ -457,7 +458,7 @@
 			</axis2>
 		</joint>
 		<!-- Effector -->
-		<joint type="universal" name="lowerArm1ToEffector"> 
+		<joint type="ball" name="lowerArm1ToEffector"> 
 			<parent>effector</parent>
 			<child>lowerArm1</child>
 			<pose>0 0 -0.300 0 0 0</pose>
@@ -469,14 +470,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm2ToEffector"> 
+		<joint type="ball" name="lowerArm2ToEffector"> 
 			<parent>effector</parent>
 			<child>lowerArm2</child>
 			<pose>0 0 -0.300 0 0 0</pose>
@@ -488,14 +489,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm3ToEffector"> 
+		<joint type="ball" name="lowerArm3ToEffector"> 
 			<parent>effector</parent>
 			<child>lowerArm3</child>
 			<pose>0 0 -0.300 0 0 0</pose>
@@ -507,14 +508,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm4ToEffector"> 
+		<joint type="ball" name="lowerArm4ToEffector"> 
 			<parent>effector</parent>
 			<child>lowerArm4</child>
 			<pose>0 0 -0.300 0 0 0</pose>
@@ -526,14 +527,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm5ToEffector"> 
+		<joint type="ball" name="lowerArm5ToEffector"> 
 			<parent>effector</parent>
 			<child>lowerArm5</child>
 			<pose>0 0 -0.300 0 0 0</pose>
@@ -545,14 +546,14 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
 				</dynamics>
 			</axis2>
 		</joint>
-		<joint type="universal" name="lowerArm6ToEffector"> 
+		<joint type="ball" name="lowerArm6ToEffector"> 
 			<parent>effector</parent>
 			<child>lowerArm6</child>
 			<pose>0 0 -0.300 0 0 0</pose>
@@ -564,7 +565,7 @@
 				</dynamics>
 			</axis>
 			<axis2>
-				<xyz>1 0 0</xyz>
+				<xyz>0 0 1</xyz>
 				<dynamics>
 					<friction>0.01</friction>
 					<damping>0.1</damping>
