@@ -60,9 +60,6 @@ VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifi
 		cam = cvCam;
 	}
 	
-	cv::Size camFramSize = cam->getFrameSize();
-	fishEyeCorrector.setFrameSize(camFramSize);
-	
 	REXOS_INFO("Advertising services");
 	// Advertise the services.
 	increaseExposureService = nodeHandle.advertiseService(vision_node_services::INCREASE_EXPOSURE,
@@ -135,6 +132,9 @@ bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& reques
 }
 bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	REXOS_DEBUG_STREAM("Service fishEyeCorrection " << request.enable);
+	
+	cv::Size camFramSize = cam->getFrameSize();
+	fishEyeCorrector.setFrameSize(camFramSize);
 	if(cam && fishEyeCorrector.isReady() == true) {
 		isFishEyeCorrectorEnabled = request.enable;
 		return true;

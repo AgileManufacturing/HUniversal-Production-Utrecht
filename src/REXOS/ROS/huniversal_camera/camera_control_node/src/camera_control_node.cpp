@@ -100,8 +100,8 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 
 	camera_calibration_node::calibrateLens calibrateLensServiceCall;
 	calibrateLensServiceCall.request.frameCount = 20;
-	calibrateLensServiceCall.request.boardWidth = 9;
-	calibrateLensServiceCall.request.boardHeight = 6;
+	calibrateLensServiceCall.request.boardWidth = 8;
+	calibrateLensServiceCall.request.boardHeight = 5;
 	calibrateLensClient.call(calibrateLensServiceCall);
 	
 	fishEyeServiceCall.request.enable = true;

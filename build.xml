@@ -83,7 +83,7 @@
 	<target name             ="generate-HAL" depends="generate-HAL-modules, generate-HAL-capabilities"/>
 
 	<target name             ="generate-HAL-modules" depends="HAL">
-		<var name            ="jar.basedir" value="build/REXOS/HAL/"/>
+		<var name            ="jar.basedir" value="build/REXOS/"/>
 		<var name            ="jar.targetdir" value="generatedOutput/HAL/modules/"/>
 		<foreach target      ="-generate-jar" param="theEntry" parallel="true" inheritall="true">
 			<path id         ="modulesPathId">
@@ -95,7 +95,7 @@
 	</target>
 
 	<target name             ="generate-HAL-capabilities" depends="HAL">
-		<var name            ="jar.basedir" value="build/REXOS/HAL/"/>
+		<var name            ="jar.basedir" value="build/REXOS/"/>
 		<var name            ="jar.targetdir" value="generatedOutput/HAL/capabilities/"/>
 		<foreach target      ="-generate-jar" param="theEntry" parallel="true" inheritall="true">
 			<path id         ="capabilitiesPathId">
@@ -114,9 +114,11 @@
 			<dirset dir      ="src/REXOS/models" casesensitive="yes">
 				<include name="*/**"/>
 				<exclude name="**/*/*"/>
+				<exclude name="_qrCodes"/>
 			</dirset>
 			</path>
 		</foreach>
+		<copydir src		="src/REXOS/models/_qrCodes" dest="generatedOutput/models/_qrCodes" />
 	</target>
 
 	<target name             ="generate-nodes">

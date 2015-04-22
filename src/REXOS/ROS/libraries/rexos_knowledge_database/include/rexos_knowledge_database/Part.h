@@ -4,6 +4,7 @@
  * @date Created: 2012-01-??  TODO: Date
  *
  * @author Tommas Bakker
+ * @author Lars Veenendaal
  *
  * @section LICENSE
  * Copyright © 2012, HU University of Applied Sciences Utrecht.
@@ -30,36 +31,39 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <memory>
-
-#include <rexos_datatypes/ModuleTypeIdentifier.h>
-#include <rexos_knowledge_database/Part.h>
+#include <rexos_logger/rexos_logger.h>
+#include <rexos_knowledge_database/PartType.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
-	class GazeboModel {
-	public:
-		GazeboModel(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier);
-		GazeboModel(std::string equipletName);
-		GazeboModel(PartType& partType);
+	class Part : public PartType {
 		
-		std::istream* getModelFile();
-		std::string getSdfFilename();
-		std::string getParentLink();
-		std::string getChildLink();
-		double getChildLinkOffsetX();
-		double getChildLinkOffsetY();
-		double getChildLinkOffsetZ();
-		int getId();
+	public:
+		Part(std::string partName);
+		std::string getPartName();
+		std::string getPartProperties();
+		inline double getPositionX() { return positionX; }
+		inline double getPositionY() { return positionY; }
+		inline double getPositionZ() { return positionZ; }
+		inline double getRotationX() { return rotationX; }
+		inline double getRotationY() { return rotationY; }
+		inline double getRotationZ() { return rotationZ; }
+		Part* getParentPart();
+		std::vector<std::string> getChildPartNames();
+		bool hasQrCodeFile();
+		std::istream* getQrCodeFile();
+	protected:
+		void setPartProperties(std::string jsonProperties);
 	private:
-		int id;
-		std::string sdfFilename;
-		std::string parentLink;
-		std::string childLink;
-		double childLinkOffsetX;
-		double childLinkOffsetY;
-		double childLinkOffsetZ;
-		std::unique_ptr<sql::Connection> connection;
+		std::string partName;
+		double positionX;
+		double positionY;
+		double positionZ;
+		double rotationX;
+		double rotationY;
+		double rotationZ;
 	};
 }

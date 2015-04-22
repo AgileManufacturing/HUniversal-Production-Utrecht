@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import util.log.LogLevel;
 import util.log.LogSection;

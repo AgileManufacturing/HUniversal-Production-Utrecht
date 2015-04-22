@@ -31,6 +31,14 @@ public class GazeboModel implements Serializable {
 			"	WHERE manufacturer = ? AND \n" + 
 			"		typeNumber = ? \n" + 
 			");"; 
+	private static final String getGazeboModelForPartType =
+			"SELECT id, buildNumber, sdfFilename, parentLink, childLink, zipFile, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \n" + 
+			"FROM GazeboModel \n" + 
+			"WHERE id = ( \n" + 
+			"	SELECT gazeboModel \n" + 
+			"	FROM PartType \n" + 
+			"	WHERE typeNumber = ? \n" + 
+			");"; 
 	private static final String addGazeboModel =
 			"INSERT INTO GazeboModel \n" + 
 			"(buildNumber, sdfFilename, parentLink, childLink, zipFile, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ) \n" + 
@@ -111,6 +119,35 @@ public class GazeboModel implements Serializable {
 		}
 	}
 	
+	/**
+	 * This method will get the JavaSoftware associated with the part. 
+	 * @param moduleIdentifier
+	 * @return
+	 */
+	public static GazeboModel getGazeboModelForPartTypeNumber(String partTypeNumber, KnowledgeDBClient knowledgeDBClient) {
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getGazeboModelForPartType, partTypeNumber);
+		
+		if(rows.length != 1) {
+			return null;
+		}
+		
+		int id = (Integer) rows[0].get("id");
+		int buildNumber = (Integer) rows[0].get("buildNumber");
+		String sdfFilename = (String) rows[0].get("sdfFilename");
+		String parentLink = (String) rows[0].get("parentLink");
+		String childLink = (String) rows[0].get("childLink");
+		byte[] zipFile = (byte[]) rows[0].get("zipFile");
+		double childLinkOffsetX = (double) rows[0].get("childLinkOffsetX");
+		double childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
+		double childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
+		
+		if(gazeboModelInstances.containsKey(id) == true) {
+			return gazeboModelInstances.get(id);
+		} else {
+			return new GazeboModel(id, buildNumber, zipFile, sdfFilename, parentLink, childLink, 
+					childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ);
+		}
+	}
 	public static GazeboModel deSerialize(JSONObject input) throws JSONException {
 		GazeboModel output = new GazeboModel();
 		

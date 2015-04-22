@@ -31,6 +31,8 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
+	static boolean insertModules = false;
+	static boolean translateSteps = true;
 
 	// six axis
 	static String moduleA_01 = "{" +
@@ -365,7 +367,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 1) {
+		if(args.length >= 2) {
+			if(args[0].equals("--noInsert")) {
+				insertModules = false;
+			} else if(args[0].equals("--noTranslate")) {
+				translateSteps = false;
+			}
+			equipletName = args[1];
+		} else if(args.length >= 1) {
 			equipletName = args[0];
 		}
 		System.out.println("Inserting equiplet " + equipletName);
@@ -378,215 +387,220 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 	public HALTesterClassStewartGough() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
 		hal = new HardwareAbstractionLayer(this);
 
-		FileInputStream fis;
-		byte[] content;
-
-		File stewartGoughHal = new File(baseDir + "HAL/modules/" + "StewartGough.jar");
-		fis = new FileInputStream(stewartGoughHal);
-		content = new byte[(int) stewartGoughHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
+		if(insertModules == true) {
+			FileInputStream fis;
+			byte[] content;
+	
+			File stewartGoughHal = new File(baseDir + "HAL/modules/" + "StewartGough.jar");
+			fis = new FileInputStream(stewartGoughHal);
+			content = new byte[(int) stewartGoughHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
+			
+			File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
+			fis = new FileInputStream(workplaneHal);
+			content = new byte[(int) workplaneHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+			
+			File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
+			fis = new FileInputStream(penHal);
+			content = new byte[(int) penHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64PenHal = new String(Base64.encodeBase64(content));
+			
+			File gripperHal = new File(baseDir + "HAL/modules/" + "Gripper.jar");
+			fis = new FileInputStream(gripperHal);
+			content = new byte[(int) gripperHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64GripperHal = new String(Base64.encodeBase64(content));
+			
+			File stewartGoughRos = new File(baseDir + "nodes/" + "stewart_gough.zip");
+			fis = new FileInputStream(stewartGoughRos);
+			content = new byte[(int) stewartGoughRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
+			
+			File gripperRos = new File(baseDir + "nodes/" + "gripper.zip");
+			fis = new FileInputStream(gripperRos);
+			content = new byte[(int) gripperRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64GripperRos = new String(Base64.encodeBase64(content));
+			
+			File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
+			fis = new FileInputStream(cameraRos);
+			content = new byte[(int) cameraRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64CameraRos = new String(Base64.encodeBase64(content));
+			
+			File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
+			fis = new FileInputStream(workplaneRos);
+			content = new byte[(int) workplaneRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
+			
+			File stewartGoughGazebo = new File(baseDir + "models/" + "sixAxis.zip");
+			fis = new FileInputStream(stewartGoughGazebo);
+			content = new byte[(int) stewartGoughGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
+			
+			File gripperGazebo = new File(baseDir + "models/" + "gripper.zip");
+			fis = new FileInputStream(gripperGazebo);
+			content = new byte[(int) gripperGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64GripperGazebo = new String(Base64.encodeBase64(content));
+			
+			File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
+			fis = new FileInputStream(cameraGazebo);
+			content = new byte[(int) cameraGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64CameraGazebo = new String(Base64.encodeBase64(content));
+			
+			File lensGazebo = new File(baseDir + "models/" + "lens.zip");
+			fis = new FileInputStream(lensGazebo);
+			content = new byte[(int) lensGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64LensGazebo = new String(Base64.encodeBase64(content));
+			
+			File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
+			fis = new FileInputStream(workplaneGazebo);
+			content = new byte[(int) workplaneGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
+			
+			
+			File drawHal = new File(baseDir + "HAL/capabilities/" + "Draw.jar");
+			fis = new FileInputStream(drawHal);
+			content = new byte[(int) drawHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64Draw = new String(Base64.encodeBase64(content));
+			
+			File pickAndPlaceWithRotationHal = new File(baseDir + "HAL/capabilities/" + "PickAndPlaceWithRotation.jar");
+			fis = new FileInputStream(pickAndPlaceWithRotationHal);
+			content = new byte[(int) pickAndPlaceWithRotationHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64PickAndPlaceWithRotation = new String(Base64.encodeBase64(content));
+			
+			
+			// six axsi
+			String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
+					moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlaceWithRotation + moduleA_06; 
+			JSONObject a = new JSONObject(new JSONTokener(moduleA));
+			
+			// gripper
+			String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
+					moduleB_03 + base64GripperGazebo + moduleB_04; 
+			JSONObject b = new JSONObject(new JSONTokener(moduleB));
+			
+			// camera
+			String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
+					moduleC_03 + base64CameraGazebo + moduleC_04;
+			JSONObject c = new JSONObject(new JSONTokener(moduleC));
+			
+			// lens
+			// TODO fix non hal software
+			String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
+			JSONObject d = new JSONObject(new JSONTokener(moduleD));
+			
+			// workplane
+			String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
+					moduleE_03 + base64WorkplaneGazebo + moduleE_04;
+			JSONObject e = new JSONObject(new JSONTokener(moduleE));
+			
+			
+			hal.insertModule(a, a);
+			hal.insertModule(b, b);
+			hal.insertModule(c, c);
+			hal.insertModule(d, d);
+			hal.insertModule(e, e);
+		}
 		
-		File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
-		fis = new FileInputStream(workplaneHal);
-		content = new byte[(int) workplaneHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+		if(translateSteps == true) {
+			JSONObject target1 = new JSONObject();
+			JSONObject targetMove1 = new JSONObject();
+			targetMove1.put("x", 5.5);
+			targetMove1.put("y", -5.5);
+			targetMove1.put("z", 13.8);
+			JSONObject targetMove1Approach = new JSONObject();
+			targetMove1Approach.put("x", 0);
+			targetMove1Approach.put("y", 0);
+			targetMove1Approach.put("z", 20);
+			targetMove1.put("approach", targetMove1Approach);
+			target1.put("move", targetMove1);
+			target1.put("identifier", "GC4x4MB_1");
+	
+			JSONArray subjects1 = new JSONArray();
+			JSONObject subject1 = new JSONObject();
+			JSONObject subjectMove1 = new JSONObject();
+			subjectMove1.put("x", 5.5);
+			subjectMove1.put("y", -5.5);
+			subjectMove1.put("z", 13.8);
+			JSONObject subjectMove1Approach = new JSONObject();
+			subjectMove1Approach.put("x", 0);
+			subjectMove1Approach.put("y", 0);
+			subjectMove1Approach.put("z", 20);
+			subjectMove1.put("approach", subjectMove1Approach);
+			subject1.put("move", subjectMove1);
+			subject1.put("identifier", "GC4x4MB_6");
+			subjects1.put(subject1);
+	
+			JSONObject target2 = new JSONObject();
+			JSONObject targetMove2 = new JSONObject();
+			targetMove2.put("x", 5.5);
+			targetMove2.put("y", -5.5);
+			targetMove2.put("z", 13.8);
+			JSONObject targetMove2Approach = new JSONObject();
+			targetMove2Approach.put("x", 0);
+			targetMove2Approach.put("y", 0);
+			targetMove2Approach.put("z", 20);
+			targetMove2.put("approach", targetMove2Approach);
+			target2.put("move", targetMove2);
+			target2.put("identifier", "GC4x4MB_6");
+	
+			JSONArray subjects2 = new JSONArray();
+			JSONObject subject2 = new JSONObject();
+			JSONObject subjectMove2 = new JSONObject();
+			subjectMove2.put("x", 5.5);
+			subjectMove2.put("y", -5.5);
+			subjectMove2.put("z", 13.8);
+			JSONObject subjectMove2Approach = new JSONObject();
+			subjectMove2Approach.put("x", 0);
+			subjectMove2Approach.put("y", 0);
+			subjectMove2Approach.put("z", 20);
+			subjectMove2.put("approach", subjectMove2Approach);
+			subject2.put("move", subjectMove2);
+			subject2.put("identifier", "GC4x4MB_1");
+			subjects2.put(subject2);
+	
+			criteria1.put("target", target1);
+			criteria1.put("subjects", subjects1);
+	
+			criteria2.put("target", target2);
+			criteria2.put("subjects", subjects2);
+	
+			hal.translateProductStep("place", criteria1);
+		}
 		
-		File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
-		fis = new FileInputStream(penHal);
-		content = new byte[(int) penHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64PenHal = new String(Base64.encodeBase64(content));
-		
-		File gripperHal = new File(baseDir + "HAL/modules/" + "Gripper.jar");
-		fis = new FileInputStream(gripperHal);
-		content = new byte[(int) gripperHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64GripperHal = new String(Base64.encodeBase64(content));
-		
-		File stewartGoughRos = new File(baseDir + "nodes/" + "stewart_gough.zip");
-		fis = new FileInputStream(stewartGoughRos);
-		content = new byte[(int) stewartGoughRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
-		
-		File gripperRos = new File(baseDir + "nodes/" + "gripper.zip");
-		fis = new FileInputStream(gripperRos);
-		content = new byte[(int) gripperRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64GripperRos = new String(Base64.encodeBase64(content));
-		
-		File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
-		fis = new FileInputStream(cameraRos);
-		content = new byte[(int) cameraRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraRos = new String(Base64.encodeBase64(content));
-		
-		File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
-		fis = new FileInputStream(workplaneRos);
-		content = new byte[(int) workplaneRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
-		
-		File stewartGoughGazebo = new File(baseDir + "models/" + "sixAxis.zip");
-		fis = new FileInputStream(stewartGoughGazebo);
-		content = new byte[(int) stewartGoughGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
-		
-		File gripperGazebo = new File(baseDir + "models/" + "gripper.zip");
-		fis = new FileInputStream(gripperGazebo);
-		content = new byte[(int) gripperGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64GripperGazebo = new String(Base64.encodeBase64(content));
-		
-		File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
-		fis = new FileInputStream(cameraGazebo);
-		content = new byte[(int) cameraGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraGazebo = new String(Base64.encodeBase64(content));
-		
-		File lensGazebo = new File(baseDir + "models/" + "lens.zip");
-		fis = new FileInputStream(lensGazebo);
-		content = new byte[(int) lensGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64LensGazebo = new String(Base64.encodeBase64(content));
-		
-		File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
-		fis = new FileInputStream(workplaneGazebo);
-		content = new byte[(int) workplaneGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
-		
-		
-		File drawHal = new File(baseDir + "HAL/capabilities/" + "Draw.jar");
-		fis = new FileInputStream(drawHal);
-		content = new byte[(int) drawHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64Draw = new String(Base64.encodeBase64(content));
-		
-		File pickAndPlaceWithRotationHal = new File(baseDir + "HAL/capabilities/" + "PickAndPlaceWithRotation.jar");
-		fis = new FileInputStream(pickAndPlaceWithRotationHal);
-		content = new byte[(int) pickAndPlaceWithRotationHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64PickAndPlaceWithRotation = new String(Base64.encodeBase64(content));
-		
-		
-		// six axsi
-		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
-				moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlaceWithRotation + moduleA_06; 
-		JSONObject a = new JSONObject(new JSONTokener(moduleA));
-		
-		// gripper
-		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
-				moduleB_03 + base64GripperGazebo + moduleB_04; 
-		JSONObject b = new JSONObject(new JSONTokener(moduleB));
-		
-		// camera
-		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
-				moduleC_03 + base64CameraGazebo + moduleC_04;
-		JSONObject c = new JSONObject(new JSONTokener(moduleC));
-		
-		// lens
-		// TODO fix non hal software
-		String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
-		JSONObject d = new JSONObject(new JSONTokener(moduleD));
-		
-		// workplane
-		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
-				moduleE_03 + base64WorkplaneGazebo + moduleE_04;
-		JSONObject e = new JSONObject(new JSONTokener(moduleE));
-		
-		
-		hal.insertModule(a, a);
-		hal.insertModule(b, b);
-		hal.insertModule(c, c);
-		hal.insertModule(d, d);
-		hal.insertModule(e, e);
-		
-		JSONObject target1 = new JSONObject();
-		JSONObject targetMove1 = new JSONObject();
-		targetMove1.put("x", 5.5);
-		targetMove1.put("y", -5.5);
-		targetMove1.put("z", 13.8);
-		JSONObject targetMove1Approach = new JSONObject();
-		targetMove1Approach.put("x", 0);
-		targetMove1Approach.put("y", 0);
-		targetMove1Approach.put("z", 20);
-		targetMove1.put("approach", targetMove1Approach);
-		target1.put("move", targetMove1);
-		target1.put("identifier", "GC4x4MB_1");
-
-		JSONArray subjects1 = new JSONArray();
-		JSONObject subject1 = new JSONObject();
-		JSONObject subjectMove1 = new JSONObject();
-		subjectMove1.put("x", 5.5);
-		subjectMove1.put("y", -5.5);
-		subjectMove1.put("z", 13.8);
-		JSONObject subjectMove1Approach = new JSONObject();
-		subjectMove1Approach.put("x", 0);
-		subjectMove1Approach.put("y", 0);
-		subjectMove1Approach.put("z", 20);
-		subjectMove1.put("approach", subjectMove1Approach);
-		subject1.put("move", subjectMove1);
-		subject1.put("identifier", "GC4x4MB_6");
-		subjects1.put(subject1);
-
-		JSONObject target2 = new JSONObject();
-		JSONObject targetMove2 = new JSONObject();
-		targetMove2.put("x", 5.5);
-		targetMove2.put("y", -5.5);
-		targetMove2.put("z", 13.8);
-		JSONObject targetMove2Approach = new JSONObject();
-		targetMove2Approach.put("x", 0);
-		targetMove2Approach.put("y", 0);
-		targetMove2Approach.put("z", 20);
-		targetMove2.put("approach", targetMove2Approach);
-		target2.put("move", targetMove2);
-		target2.put("identifier", "GC4x4MB_6");
-
-		JSONArray subjects2 = new JSONArray();
-		JSONObject subject2 = new JSONObject();
-		JSONObject subjectMove2 = new JSONObject();
-		subjectMove2.put("x", 5.5);
-		subjectMove2.put("y", -5.5);
-		subjectMove2.put("z", 13.8);
-		JSONObject subjectMove2Approach = new JSONObject();
-		subjectMove2Approach.put("x", 0);
-		subjectMove2Approach.put("y", 0);
-		subjectMove2Approach.put("z", 20);
-		subjectMove2.put("approach", subjectMove2Approach);
-		subject2.put("move", subjectMove2);
-		subject2.put("identifier", "GC4x4MB_1");
-		subjects2.put(subject2);
-
-		criteria1.put("target", target1);
-		criteria1.put("subjects", subjects1);
-
-		criteria2.put("target", target2);
-		criteria2.put("subjects", subjects2);
-
-		hal.translateProductStep("place", criteria1);
-
-
-		hal.shutdown();
-		hal = null;
+		// we are done if we are not going to translate hw steps
+		if(translateSteps == false) {
+			hal.shutdown();
+		}
 	}
 	
 	@Override

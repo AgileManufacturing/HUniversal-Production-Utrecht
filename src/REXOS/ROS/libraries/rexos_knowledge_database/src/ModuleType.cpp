@@ -7,7 +7,7 @@
 
 namespace rexos_knowledge_database{
 	ModuleType::ModuleType(rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier) :
-				moduleTypeIdentifier(moduleTypeIdentifier)
+			moduleTypeIdentifier(moduleTypeIdentifier)
 	{
 		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
 	}

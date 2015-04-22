@@ -31,6 +31,7 @@
 #pragma once
 
 #define ZIP_ARCHIVE_PATH "/tmp/rexos_model_spawner/"
+#define QR_CODE_FILENAME "qrCode.png"
 
 #include <rexos_knowledge_database/rexos_knowledge_database.h>
 #include <rexos_knowledge_database/GazeboModel.h>
@@ -41,14 +42,24 @@
 #include "ros/ros.h"
 
 namespace rexos_model_spawner{
+	enum OriginPlacementType {
+		RELATIVE_TO_EQUIPLET_ORIGIN,
+		RELATIVE_TO_MODULE_ORIGIN,
+		RELATIVE_TO_PART_ORIGIN,
+		RELATIVE_TO_WORLD_ORIGIN
+	};
+	
 	class ModelSpawner{
 	protected:
 		ModelSpawner(std::string equipletName, bool isShadow);
 	public:
 		void spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier);
-		void spawnEquipletModel(int gridPositionX = 0, int gridPositionY = 0);
+		void spawnEquipletModel(double gridPositionX = 0, double gridPositionY = 0);
+		void spawnPartModel(std::string partName, OriginPlacementType originPlacementType, 
+				double positionX, double positionY, double positionZ, 
+				double rotationX, double rotationY, double rotationZ, std::string relativeTo, bool spawnChildParts = true);
 	protected:
-		std::string getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel);
+		std::string getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName = "");
 	protected:
 		std::string equipletName;
 		bool isShadow;
@@ -56,6 +67,6 @@ namespace rexos_model_spawner{
 		
 		rexos_knowledge_database::Equiplet equiplet;
 		
-		void extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel);
+		void extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName = "");
 	};
 }

@@ -69,6 +69,36 @@ namespace rexos_knowledge_database {
 		delete result;
 		delete preparedStmt;
 	}
+	GazeboModel::GazeboModel(PartType& partType) {
+		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		
+		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
+		FROM GazeboModel \
+		WHERE id = ( \
+			SELECT gazeboModel \
+			FROM PartType \
+			WHERE typeNumber = ? \
+		);");
+		preparedStmt->setString(1, partType.getTypeNumber());
+		
+		sql::ResultSet* result = preparedStmt->executeQuery();
+		if(result->rowsCount() != 1){
+			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
+		}
+		// set the cursor at the first result
+		result->next();
+		id = result->getInt("id");
+		sdfFilename = result->getString("sdfFilename");
+		parentLink = result->getString("parentLink");
+		childLink = result->getString("childLink");
+		childLinkOffsetX = result->getDouble("childLinkOffsetX");
+		childLinkOffsetY = result->getDouble("childLinkOffsetY");
+		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
+		
+		delete result;
+		delete preparedStmt;
+	}
 	
 	std::istream* GazeboModel::getModelFile() {
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\

@@ -27,6 +27,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
+	static boolean insertModules = false;
+	static boolean translateSteps = true;
 	
 	// dummy module A
 	static String moduleA_01 = "{" +
@@ -120,7 +122,14 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 1) {
+		if(args.length >= 2) {
+			if(args[0].equals("--noInsert")) {
+				insertModules = false;
+			} else if(args[0].equals("--noTranslate")) {
+				translateSteps = false;
+			}
+			equipletName = args[1];
+		} else if(args.length >= 1) {
 			equipletName = args[0];
 		}
 		System.out.println("Inserting equiplet " + equipletName);
@@ -134,67 +143,71 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		
 		hal = new HardwareAbstractionLayer(this);
 
-		FileInputStream fis;
-		byte[] content;
-
-		File dummyModuleAHal = new File(baseDir + "HAL/modules/" + "DummyModuleA.jar");
-		fis = new FileInputStream(dummyModuleAHal);
-		content = new byte[(int) dummyModuleAHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64DummyModuleAHal = new String(Base64.encodeBase64(content));
+		if(insertModules == true) {
+			FileInputStream fis;
+			byte[] content;
+	
+			File dummyModuleAHal = new File(baseDir + "HAL/modules/" + "DummyModuleA.jar");
+			fis = new FileInputStream(dummyModuleAHal);
+			content = new byte[(int) dummyModuleAHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64DummyModuleAHal = new String(Base64.encodeBase64(content));
+			
+			File dummyModuleBHal = new File(baseDir + "HAL/modules/" + "DummyModuleB.jar");
+			fis = new FileInputStream(dummyModuleBHal);
+			content = new byte[(int) dummyModuleBHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64DummyModuleBHal = new String(Base64.encodeBase64(content));
+			
+			File dummyModuleARos = new File(baseDir + "nodes/" + "_testing.zip");
+			fis = new FileInputStream(dummyModuleARos);
+			content = new byte[(int) dummyModuleARos.length()];
+			fis.read(content);
+			fis.close();
+			String base64DummyModuleARos = new String(Base64.encodeBase64(content));
+			
+			File dummyModuleBRos = new File(baseDir + "nodes/" + "_testing.zip");
+			fis = new FileInputStream(dummyModuleBRos);
+			content = new byte[(int) dummyModuleBRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64DummyModuleBRos = new String(Base64.encodeBase64(content));
+			
+			File dummyModuleAGazebo = new File(baseDir + "models/" + "workplane.zip");
+			fis = new FileInputStream(dummyModuleAGazebo);
+			content = new byte[(int) dummyModuleAGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64DummyModuleAGazebo = new String(Base64.encodeBase64(content));
+			
+			File dummyModuleBGazebo = new File(baseDir + "models/" + "sixAxis.zip");
+			fis = new FileInputStream(dummyModuleBGazebo);
+			content = new byte[(int) dummyModuleBGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64DummyModuleBGazebo = new String(Base64.encodeBase64(content));
+			
+			// dummy module A
+			String moduleA = moduleA_01 + base64DummyModuleARos + moduleA_02 + base64DummyModuleAHal + 
+					moduleA_03 + base64DummyModuleAGazebo + moduleA_04;
+			JSONObject a = new JSONObject(new JSONTokener(moduleA));
+			
+			// dummy module B
+			String moduleB = moduleB_01 + base64DummyModuleBRos + moduleB_02 + base64DummyModuleBHal + 
+					moduleB_03 + base64DummyModuleBGazebo + moduleB_04;
+			JSONObject b = new JSONObject(new JSONTokener(moduleB));
+			
+			
+			hal.insertModule(a, a);
+			hal.insertModule(b, b);
+		}
 		
-		File dummyModuleBHal = new File(baseDir + "HAL/modules/" + "DummyModuleB.jar");
-		fis = new FileInputStream(dummyModuleBHal);
-		content = new byte[(int) dummyModuleBHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64DummyModuleBHal = new String(Base64.encodeBase64(content));
-		
-		File dummyModuleARos = new File(baseDir + "nodes/" + "_testing.zip");
-		fis = new FileInputStream(dummyModuleARos);
-		content = new byte[(int) dummyModuleARos.length()];
-		fis.read(content);
-		fis.close();
-		String base64DummyModuleARos = new String(Base64.encodeBase64(content));
-		
-		File dummyModuleBRos = new File(baseDir + "nodes/" + "_testing.zip");
-		fis = new FileInputStream(dummyModuleBRos);
-		content = new byte[(int) dummyModuleBRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64DummyModuleBRos = new String(Base64.encodeBase64(content));
-		
-		File dummyModuleAGazebo = new File(baseDir + "models/" + "workplane.zip");
-		fis = new FileInputStream(dummyModuleAGazebo);
-		content = new byte[(int) dummyModuleAGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64DummyModuleAGazebo = new String(Base64.encodeBase64(content));
-		
-		File dummyModuleBGazebo = new File(baseDir + "models/" + "sixAxis.zip");
-		fis = new FileInputStream(dummyModuleBGazebo);
-		content = new byte[(int) dummyModuleBGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64DummyModuleBGazebo = new String(Base64.encodeBase64(content));
-		
-		// dummy module A
-		String moduleA = moduleA_01 + base64DummyModuleARos + moduleA_02 + base64DummyModuleAHal + 
-				moduleA_03 + base64DummyModuleAGazebo + moduleA_04;
-		JSONObject a = new JSONObject(new JSONTokener(moduleA));
-		
-		// dummy module B
-		String moduleB = moduleB_01 + base64DummyModuleBRos + moduleB_02 + base64DummyModuleBHal + 
-				moduleB_03 + base64DummyModuleBGazebo + moduleB_04;
-		JSONObject b = new JSONObject(new JSONTokener(moduleB));
-		
-		
-		hal.insertModule(a, a);
-		hal.insertModule(b, b);
-		
-		hal.shutdown();
-		hal = null;
+		// we are done if we are not going to translate hw steps
+		if(translateSteps == false) {
+			hal.shutdown();
+		}
 	}
 	
 	@Override

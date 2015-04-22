@@ -111,7 +111,7 @@ namespace gripper_plugin {
 	
 	bool GripperPlugin::writeGripperActive(rexos_io::writeU16::Request& request, 
 			rexos_io::writeU16::Response& response) {
-		ROS_INFO_STREAM("writing gripper " << request.value);
+//		ROS_INFO_STREAM("writing gripper " << request.value);
 		for(uint i = 0; i < grippers.size(); i++) {
 			// The gripper valve works inverted, mimic that behavior
 			if((request.value >> i) & 1) {
@@ -130,7 +130,7 @@ namespace gripper_plugin {
 				response.value |= 1 << i;
 			}
 		}
-		ROS_INFO_STREAM("reading gripper " << response.value);
+//		ROS_INFO_STREAM("reading gripper " << response.value);
 		return true;
 	}
 }

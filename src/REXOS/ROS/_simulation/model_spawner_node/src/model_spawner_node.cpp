@@ -36,13 +36,28 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 	
+	std::string command;
+	for(int i = 0; i < argc; i++) {
+		command += std::string(argv[i]) + " ";
+	}
+	REXOS_INFO_STREAM("command " << command);
+	
+	
 	bool spawnEquipletModel = false;
 	bool spawnModuleModels = false;
 	bool spawnPartModel = false;
 	bool isShadow = false;
 	
-	int gridPositionX = 0;
-	int gridPositionY = 0;
+	int positionX = 0;
+	int positionY = 0;
+	int positionZ = 0;
+	double rotationX = 0;
+	double rotationY = 0;
+	double rotationZ = 0;
+	
+	rexos_model_spawner::OriginPlacementType originPlacementType;
+	std::string partName;
+	std::string relativeTo;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
@@ -53,15 +68,51 @@ int main(int argc, char **argv) {
 		} else if (arg == "--spawnPartModel") {
 			spawnPartModel = true;
 		} else if (arg == "-x") {
-			gridPositionX = boost::lexical_cast<int>(argv[++i]);
+			positionX = boost::lexical_cast<int>(argv[++i]);
+			REXOS_INFO_STREAM("positionX " << positionZ);
 		} else if (arg == "-y") {
-			gridPositionY = boost::lexical_cast<int>(argv[++i]);
+			positionY = boost::lexical_cast<int>(argv[++i]);
+			REXOS_INFO_STREAM("positionY " << positionY);
+		} else if (arg == "-z") {
+			positionZ = boost::lexical_cast<int>(argv[++i]);
+			REXOS_INFO_STREAM("positionZ " << positionZ);
+		} else if (arg == "--pitch") {
+			rotationX = boost::lexical_cast<double>(argv[++i]);
+			REXOS_INFO_STREAM("rotationX " << rotationX);
+		} else if (arg == "--roll") {
+			rotationY = boost::lexical_cast<double>(argv[++i]);
+			REXOS_INFO_STREAM("rotationY " << rotationY);
+		} else if (arg == "--yaw") {
+			rotationZ = boost::lexical_cast<double>(argv[++i]);
+			REXOS_INFO_STREAM("rotationZ " << rotationZ);
+		} else if (arg == "--partName") {
+			partName = argv[++i];
+		} else if (arg == "--originPlacementType") {
+			std::string s = argv[++i];
+			if(s == "relativeToEquipletOrigin") {
+				originPlacementType = rexos_model_spawner::RELATIVE_TO_EQUIPLET_ORIGIN;
+				relativeTo = argv[++i];
+			} else if(s == "relativeToModuleOrigin") {
+				originPlacementType = rexos_model_spawner::RELATIVE_TO_MODULE_ORIGIN;
+				relativeTo = argv[++i];
+			} else if(s == "relativeToIdentifier") {
+				originPlacementType = rexos_model_spawner::RELATIVE_TO_PART_ORIGIN;
+				relativeTo = argv[++i];
+			} else if(s == "relativeToWorldOrigin") {
+				originPlacementType = rexos_model_spawner::RELATIVE_TO_WORLD_ORIGIN;
+			}
 		} else if (arg == "--isShadow") {
 			isShadow = true;
 		}
 	}
 	
-	std::string equipletName = std::string(argv[argc - 1]);
+	// TODO this is quite a nasty hack
+	std::string equipletName;
+	if(spawnPartModel == false) {
+		equipletName = std::string(argv[argc - 1]);
+	} else {
+		equipletName = "NOT_RELEVANT";
+	}
 	
 	// set up node namespace and name
 	if(isShadow == true) {
@@ -76,7 +127,7 @@ int main(int argc, char **argv) {
 	
 	if(spawnEquipletModel == true) {
 		REXOS_INFO("spawning equiplet model");
-		modelSpawnerNode.spawnEquipletModel(gridPositionX, gridPositionY);
+		modelSpawnerNode.spawnEquipletModel(positionX, positionY);
 	}
 	
 	if(spawnModuleModels == true) {
@@ -86,6 +137,10 @@ int main(int argc, char **argv) {
 		for(uint i = 0; i < moduleIdentifiers.size(); i++) {
 			modelSpawnerNode.spawnModuleModel(moduleIdentifiers[i]);
 		}
+		ros::shutdown();
+	}
+	if(spawnPartModel == true) {
+		modelSpawnerNode.spawnPartModel(partName, originPlacementType, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, relativeTo);
 		ros::shutdown();
 	}
 	

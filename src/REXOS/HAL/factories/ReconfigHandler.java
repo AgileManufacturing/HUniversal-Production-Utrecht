@@ -178,8 +178,8 @@ public class ReconfigHandler {
 	private static final String insertSpaceInNestedTreeForModuleLeft = 
 			"UPDATE Module \n" +
 			"SET attachedToLeft = attachedToLeft + 2 \n" +
-			"WHERE attachedToLeft >= ( \n" +
-			"	SELECT attachedToRight \n" +
+			"WHERE attachedToLeft > ( \n" +
+			"	SELECT attachedToLeft \n" +
 			"	FROM (SELECT * FROM Module) AS tbl1 \n" +
 			"	WHERE manufacturer = ? AND \n" +
 			"		typeNumber = ? AND \n" +
@@ -195,7 +195,7 @@ public class ReconfigHandler {
 			"UPDATE Module \n" +
 			"SET attachedToRight = attachedToRight + 2 \n" +
 			"WHERE attachedToRight >= ( \n" +
-			"	SELECT attachedToRight \n" +
+			"	SELECT attachedToLeft \n" +
 			"	FROM (SELECT * FROM Module) AS tbl1 \n" +
 			"	WHERE manufacturer = ? AND \n" +
 			"		typeNumber = ? AND \n" +

@@ -30,36 +30,24 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <map>
 #include <memory>
 
-#include <rexos_datatypes/ModuleTypeIdentifier.h>
-#include <rexos_knowledge_database/Part.h>
-
 #include "mysql_connection.h"
+#include "rexos_logger/rexos_logger.h"
 
 namespace rexos_knowledge_database {
-	class GazeboModel {
-	public:
-		GazeboModel(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier);
-		GazeboModel(std::string equipletName);
-		GazeboModel(PartType& partType);
+	class PartType{
+	protected:
+		static std::string getTypeNumberForParName(std::string partName);
 		
-		std::istream* getModelFile();
-		std::string getSdfFilename();
-		std::string getParentLink();
-		std::string getChildLink();
-		double getChildLinkOffsetX();
-		double getChildLinkOffsetY();
-		double getChildLinkOffsetZ();
-		int getId();
-	private:
-		int id;
-		std::string sdfFilename;
-		std::string parentLink;
-		std::string childLink;
-		double childLinkOffsetX;
-		double childLinkOffsetY;
-		double childLinkOffsetZ;
+		std::string typeNumber;
 		std::unique_ptr<sql::Connection> connection;
+	public:
+		PartType(std::string typeNumber);
+		
+		std::string getTypeNumber();
+		std::string getPartTypeProperties();
 	};
 }

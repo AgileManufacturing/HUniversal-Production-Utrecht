@@ -56,6 +56,7 @@ public:
 private:
 	ros::NodeHandle& nodeHandle;
 	ros::Subscriber cameraFeedSubscriber;
+	cv::Size frameSize;
 	
 	void handleFrame(const sensor_msgs::ImageConstPtr& msg);
 };

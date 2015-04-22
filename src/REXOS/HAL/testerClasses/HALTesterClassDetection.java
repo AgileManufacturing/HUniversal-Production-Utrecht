@@ -30,6 +30,8 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 
 	static String equipletName = "EQD";
 	static final String baseDir = "generatedOutput/";
+	static boolean insertModules = false;
+	static boolean translateSteps = true;
 
 	// camera
 	static String moduleA_01 = "{" +
@@ -178,7 +180,14 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 1) {
+		if(args.length >= 2) {
+			if(args[0].equals("--noInsert")) {
+				insertModules = false;
+			} else if(args[0].equals("--noTranslate")) {
+				translateSteps = false;
+			}
+			equipletName = args[1];
+		} else if(args.length >= 1) {
 			equipletName = args[0];
 		}
 		System.out.println("Inserting equiplet " + equipletName);
@@ -191,82 +200,85 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 	public HALTesterClassDetection() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
 		hal = new HardwareAbstractionLayer(this);
 
-		FileInputStream fis;
-		byte[] content;
-
-		File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
-		fis = new FileInputStream(workplaneHal);
-		content = new byte[(int) workplaneHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+		if(insertModules == true) {
+			FileInputStream fis;
+			byte[] content;
+	
+			File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
+			fis = new FileInputStream(workplaneHal);
+			content = new byte[(int) workplaneHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+			
+			File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
+			fis = new FileInputStream(penHal);
+			content = new byte[(int) penHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64PenHal = new String(Base64.encodeBase64(content));
+			
+			File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
+			fis = new FileInputStream(cameraRos);
+			content = new byte[(int) cameraRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64CameraRos = new String(Base64.encodeBase64(content));
+			
+			File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
+			fis = new FileInputStream(workplaneRos);
+			content = new byte[(int) workplaneRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
+			
+			File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
+			fis = new FileInputStream(cameraGazebo);
+			content = new byte[(int) cameraGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64CameraGazebo = new String(Base64.encodeBase64(content));
+			
+			File lensGazebo = new File(baseDir + "models/" + "lens.zip");
+			fis = new FileInputStream(lensGazebo);
+			content = new byte[(int) lensGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64LensGazebo = new String(Base64.encodeBase64(content));
+			
+			File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
+			fis = new FileInputStream(workplaneGazebo);
+			content = new byte[(int) workplaneGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
+			
+			
+			// camera
+			String moduleA = moduleA_01 + base64CameraRos + moduleA_02 + base64PenHal + 
+					moduleA_03 + base64CameraGazebo + moduleA_04;
+			JSONObject a = new JSONObject(new JSONTokener(moduleA));
+			
+			// lens
+			// TODO fix non hal software
+			String moduleB = moduleB_01 + "" + moduleB_02 + base64LensGazebo + moduleB_03;
+			JSONObject b = new JSONObject(new JSONTokener(moduleB));
+			
+			// workplane
+			String moduleC = moduleC_01 + base64WorkplaneRos + moduleC_02 + base64WorkplaneHal + 
+					moduleC_03 + base64WorkplaneGazebo + moduleC_04;
+			JSONObject c = new JSONObject(new JSONTokener(moduleC));
+			
+			
+			hal.insertModule(a, a);
+			hal.insertModule(b, b);
+			hal.insertModule(c, c);
+		}
 		
-		File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
-		fis = new FileInputStream(penHal);
-		content = new byte[(int) penHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64PenHal = new String(Base64.encodeBase64(content));
-		
-		File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
-		fis = new FileInputStream(cameraRos);
-		content = new byte[(int) cameraRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraRos = new String(Base64.encodeBase64(content));
-		
-		File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
-		fis = new FileInputStream(workplaneRos);
-		content = new byte[(int) workplaneRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
-		
-		File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
-		fis = new FileInputStream(cameraGazebo);
-		content = new byte[(int) cameraGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraGazebo = new String(Base64.encodeBase64(content));
-		
-		File lensGazebo = new File(baseDir + "models/" + "lens.zip");
-		fis = new FileInputStream(lensGazebo);
-		content = new byte[(int) lensGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64LensGazebo = new String(Base64.encodeBase64(content));
-		
-		File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
-		fis = new FileInputStream(workplaneGazebo);
-		content = new byte[(int) workplaneGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
-		
-		
-		// camera
-		String moduleA = moduleA_01 + base64CameraRos + moduleA_02 + base64PenHal + 
-				moduleA_03 + base64CameraGazebo + moduleA_04;
-		JSONObject a = new JSONObject(new JSONTokener(moduleA));
-		
-		// lens
-		// TODO fix non hal software
-		String moduleB = moduleB_01 + "" + moduleB_02 + base64LensGazebo + moduleB_03;
-		JSONObject b = new JSONObject(new JSONTokener(moduleB));
-		
-		// workplane
-		String moduleC = moduleC_01 + base64WorkplaneRos + moduleC_02 + base64WorkplaneHal + 
-				moduleC_03 + base64WorkplaneGazebo + moduleC_04;
-		JSONObject c = new JSONObject(new JSONTokener(moduleC));
-		
-		
-		hal.insertModule(a, a);
-		hal.insertModule(b, b);
-		hal.insertModule(c, c);
-		
-
-		hal.shutdown();
-		hal = null;
+		// we are done if we are not going to translate hw steps
+		if(translateSteps == false) {
+			hal.shutdown();
+		}
 	}
 	
 	@Override
