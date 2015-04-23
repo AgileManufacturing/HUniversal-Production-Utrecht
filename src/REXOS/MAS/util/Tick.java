@@ -8,48 +8,47 @@ public class Tick extends Number implements Comparable<Tick> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Class<?> type;
-	private Long lTime;
-	private Double dTime;
+	private double dTime;
 
 	public Tick() {
 		this(System.currentTimeMillis());
 	}
 
-	public Tick(Long time) {
-		type = Long.class;
-		this.lTime = time;
-		this.dTime = time.doubleValue();
-	}
+	//
+	//	public Tick(Long time) {
+	//		type = Long.class;
+	//		this.lTime = time;
+	//		this.dTime = time.doubleValue();
+	//	}
 
 	public Tick(double time) {
-		type = Double.class;
+		//		type = Double.class;
 		this.dTime = time;
 	}
 
-	public <T> T get(Class<T> typeClass) {
-		if (type.equals(typeClass)) {
-			return typeClass.cast(dTime);
-		} else if (type.equals(typeClass)) {
-			return typeClass.cast(lTime);
-		}
-		return null;
-	}
+	//	public <T> T get(Class<T> typeClass) {
+	//		if (type.equals(typeClass)) {
+	//			return typeClass.cast(dTime);
+	//		} else if (type.equals(typeClass)) {
+	//			return typeClass.cast(lTime);
+	//		}
+	//		return null;
+	//	}
 
 	@Override
 	public String toString() {
-		if (type.equals(Double.class)) {
-			return String.format("%.2f", dTime);
-		} else if (type.equals(Long.class)) {
-			return lTime.toString();
-		}
-		// instead of illegal argument exception
-		return dTime.toString();
+		// 		if (type.equals(Double.class)) {
+		return String.format("%.2f", dTime);
+		//		} else if (type.equals(Long.class)) {
+		//			return lTime.toString();
+		//		}
+		//		// instead of illegal argument exception
+		//		return dTime.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(29, 73).append(dTime).append(lTime).toHashCode();
+		return new HashCodeBuilder(29, 73).append(dTime).toHashCode(); // .append(lTime).toHashCode();
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class Tick extends Number implements Comparable<Tick> {
 			return false;
 		}
 		Tick tick = (Tick) obj;
-		return dTime.doubleValue() == tick.doubleValue();
+		return dTime == tick.doubleValue();
 	}
 
 	@Override
@@ -74,26 +73,26 @@ public class Tick extends Number implements Comparable<Tick> {
 
 	@Override
 	public long longValue() {
-		return dTime.longValue();
+		return new Double(dTime).longValue();
 	}
 
 	@Override
 	public float floatValue() {
-		return dTime.floatValue();
+		return new Double(dTime).floatValue();
 	}
 
 	@Override
 	public int intValue() {
-		return dTime.intValue();
+		return new Double(dTime).intValue();
 	}
 
 	@Override
 	public int compareTo(Tick time) {
-		return Double.compare(dTime, time.get(Double.class));
+		return Double.compare(dTime, time.doubleValue());
 	}
 
 	public boolean greaterThan(Tick time) {
-		return dTime > time.get(Double.class);
+		return dTime > time.doubleValue();
 	}
 
 	public boolean greaterThan(int time) {
@@ -101,11 +100,11 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	public boolean greaterOrEqualThan(Tick time) {
-		return dTime >= time.get(Double.class);
+		return dTime >= time.doubleValue();
 	}
 
 	public boolean lessThan(Tick time) {
-		return dTime < time.get(Double.class);
+		return dTime < time.doubleValue();
 	}
 
 	public boolean lessThan(double time) {
@@ -113,7 +112,7 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	public boolean lessOrEqualThan(Tick time) {
-		return dTime <= time.get(Double.class);
+		return dTime <= time.doubleValue();
 	}
 
 	public Tick multiply(int time) {
@@ -125,11 +124,11 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	public Tick div(Tick time) {
-		return new Tick(dTime / time.get(Double.class));
+		return new Tick(dTime / time.doubleValue());
 	}
 
 	public Tick add(Tick time) {
-		return new Tick(dTime + time.get(Double.class));
+		return new Tick(dTime + time.doubleValue());
 	}
 
 	public Tick add(double time) {
@@ -137,7 +136,7 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	public Tick minus(Tick time) {
-		return new Tick(dTime - time.get(Double.class));
+		return new Tick(dTime - time.doubleValue());
 	}
 
 	public Tick minus(double time) {
@@ -145,7 +144,7 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	public Tick max(Tick time) {
-		return new Tick(Math.max(dTime, time.get(Double.class)));
+		return new Tick(Math.max(dTime, time.doubleValue()));
 	}
 
 	public Tick max(double time) {
@@ -153,6 +152,6 @@ public class Tick extends Number implements Comparable<Tick> {
 	}
 
 	public Tick min(Tick time) {
-		return new Tick(Math.min(dTime, time.get(Double.class)));
+		return new Tick(Math.min(dTime, time.doubleValue()));
 	}
 }
