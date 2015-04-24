@@ -119,7 +119,7 @@ nano /var/lib/mysql-cluster/config.ini
 
 == NDBD - Sounds like a hipster band ==
 wget http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
-tar xvf http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4/mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
+tar xvf mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
 rm mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64.tar.gz
 sudo mkdir -p /var/lib/mysql-cluster
 sudo cp -r mysql-cluster-gpl-7.4.5-linux-glibc2.5-x86_64/* /var/lib/mysql-cluster
@@ -194,24 +194,33 @@ sudo apt-get install libaio-dev libaio1
 Starting order:
 MANAGEMENT NODE > DATA NODE > APP NODE
 
-KATINA:
-sudo ndb_mgmd --initial -f config.ini --configdir=/var/lib/mysql-cluster
+MGM
+Katina
+	sudo ndb_mgmd --initial -f config.ini --configdir=/var/lib/mysql-cluster
 
+NDB
 Winstead
-ndbd
+	sudo ndbd
 Williams
-ndbd
+	sudo ndbd
 
-manfredi
-sudo mysqld --defaults-file=/etc/my.cnf -u root -p   BORKED!
+SQL
+Manfredi
+	sudo /etc/init.d/mysql.server start
+Armstrong
+	sudo /etc/init.d/mysql.server start
 
 
 
 == Monitor the the cluster ==
 
-== Stopping the cluster ==
+ndb_mgm
+"show" will show you the current configuration.
 
-Praise the sun
+== Stopping the cluster ==
+ndb_mgm
+"shutdown -e" will send shutdown commands to all the nodes. !!! THE MySQL nodes require to be shutdown seperately !!!
+sudo /etc/init.d/mysql.server stop
 
 
 
@@ -227,10 +236,6 @@ It isn’t necessarily immediately obvious how to set up a Cluster on LINUX; thi
     1 Management node (ndb_mgmd)
     2 Data nodes (ndbd)
     3 MySQL Server (API) nodes (mysqld)
-
-Downloading and installing
-
-Browse to the MySQL Cluster LINUX download page at mysql.com and download the correct version (32 or 64 bit) and store it in the desired directory (in my case, /home/billy/mysql) and then extract and rename the new folder to something easier to work with…
 
 
 
