@@ -28,7 +28,7 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2216</x>
+      <x>2072</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -39,7 +39,7 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2232</x>
+      <x>2088</x>
       <y>736</y>
       <w>40</w>
       <h>112</h>
@@ -50,7 +50,7 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2576</x>
+      <x>2432</x>
       <y>736</y>
       <w>40</w>
       <h>160</h>
@@ -61,7 +61,7 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2384</x>
+      <x>2240</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -72,7 +72,7 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2368</x>
+      <x>2224</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -83,7 +83,7 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2560</x>
+      <x>2416</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -94,7 +94,7 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2680</x>
+      <x>2536</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -105,7 +105,7 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2464</x>
+      <x>2320</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -116,13 +116,35 @@
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>2824</x>
+      <x>2680</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
     </coordinates>
     <panel_attributes>_:Equiplet_</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>2552</x>
+      <y>736</y>
+      <w>40</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>24;24;24;48</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>2336</x>
+      <y>736</y>
+      <w>40</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>24;24;24;248</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
@@ -136,31 +158,9 @@
     <additional_attributes>24;24;24;48</additional_attributes>
   </element>
   <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2480</x>
-      <y>736</y>
-      <w>40</w>
-      <h>264</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>24;24;24;248</additional_attributes>
-  </element>
-  <element>
-    <type>com.umlet.element.Relation</type>
-    <coordinates>
-      <x>2840</x>
-      <y>736</y>
-      <w>40</w>
-      <h>64</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>24;24;24;48</additional_attributes>
-  </element>
-  <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>2248</x>
+      <x>2104</x>
       <y>832</y>
       <w>16</w>
       <h>504</h>
@@ -171,10 +171,21 @@
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>2592</x>
+      <x>2448</x>
       <y>880</y>
       <w>16</w>
       <h>456</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.custom.SeqObjectActive</type>
+    <coordinates>
+      <x>2568</x>
+      <y>784</y>
+      <w>16</w>
+      <h>552</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -191,20 +202,9 @@
     <additional_attributes/>
   </element>
   <element>
-    <type>com.umlet.element.custom.SeqObjectActive</type>
-    <coordinates>
-      <x>2856</x>
-      <y>784</y>
-      <w>16</w>
-      <h>552</h>
-    </coordinates>
-    <panel_attributes/>
-    <additional_attributes/>
-  </element>
-  <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2096</x>
+      <x>1952</x>
       <y>800</y>
       <w>168</w>
       <h>56</h>
@@ -216,7 +216,7 @@ PRODUCT event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>816</y>
       <w>176</w>
       <h>56</h>
@@ -229,7 +229,7 @@ generateProductSteps()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>840</y>
       <w>368</w>
       <h>56</h>
@@ -242,7 +242,7 @@ new Product( simulation, product steps, position, time )
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>2496</x>
+      <x>2352</x>
       <y>984</y>
       <w>16</w>
       <h>40</h>
@@ -253,7 +253,7 @@ new Product( simulation, product steps, position, time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2584</x>
+      <x>2440</x>
       <y>856</y>
       <w>144</w>
       <h>56</h>
@@ -265,7 +265,7 @@ search( service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2480</x>
+      <x>2336</x>
       <y>1000</y>
       <w>40</w>
       <h>352</h>
@@ -276,7 +276,7 @@ search( service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2584</x>
+      <x>2440</x>
       <y>976</y>
       <w>288</w>
       <h>56</h>
@@ -288,7 +288,7 @@ schedule( service, criteria, time )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2488</x>
+      <x>2344</x>
       <y>944</y>
       <w>120</w>
       <h>56</h>
@@ -301,7 +301,7 @@ calculatePath()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2584</x>
+      <x>2440</x>
       <y>904</y>
       <w>288</w>
       <h>56</h>
@@ -313,7 +313,7 @@ canExecute(service, criteria)</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2584</x>
+      <x>2440</x>
       <y>880</y>
       <w>144</w>
       <h>56</h>
@@ -325,7 +325,7 @@ List&lt;Equiplet&gt; </panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2584</x>
+      <x>2440</x>
       <y>928</y>
       <w>288</w>
       <h>56</h>
@@ -337,7 +337,7 @@ List&lt;posibilities, duration service, load, position&gt;</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2584</x>
+      <x>2440</x>
       <y>1000</y>
       <w>288</w>
       <h>56</h>
@@ -349,7 +349,7 @@ acknowlegde</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>1120</y>
       <w>368</w>
       <h>56</h>
@@ -361,7 +361,7 @@ notifyProductCreated( product, equiplet )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>1176</y>
       <w>160</w>
       <h>64</h>
@@ -374,7 +374,7 @@ scheduleArrivedEvent()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>2040</x>
+      <x>1896</x>
       <y>800</y>
       <w>880</w>
       <h>520</h>
@@ -385,7 +385,7 @@ scheduleArrivedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>1240</y>
       <w>164</w>
       <h>64</h>
@@ -398,7 +398,7 @@ scheduleProductEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>1144</y>
       <w>176</w>
       <h>56</h>
@@ -411,7 +411,7 @@ generateTravelTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>1208</y>
       <w>176</w>
       <h>56</h>
@@ -424,7 +424,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1272</x>
+      <x>1128</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -435,7 +435,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1288</x>
+      <x>1144</x>
       <y>736</y>
       <w>40</w>
       <h>112</h>
@@ -446,7 +446,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1632</x>
+      <x>1488</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -457,7 +457,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1424</x>
+      <x>1280</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -468,7 +468,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1616</x>
+      <x>1472</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -479,7 +479,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>1872</x>
+      <x>1728</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -490,7 +490,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1888</x>
+      <x>1744</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -501,7 +501,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1304</x>
+      <x>1160</x>
       <y>832</y>
       <w>16</w>
       <h>544</h>
@@ -512,7 +512,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1536</x>
+      <x>1392</x>
       <y>1000</y>
       <w>32</w>
       <h>40</h>
@@ -523,7 +523,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>1088</x>
+      <x>944</x>
       <y>800</y>
       <w>880</w>
       <h>552</h>
@@ -534,7 +534,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1456</x>
+      <x>1312</x>
       <y>784</y>
       <w>16</w>
       <h>592</h>
@@ -545,7 +545,7 @@ generateProductArrival()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1160</x>
+      <x>1016</x>
       <y>800</y>
       <w>160</w>
       <h>56</h>
@@ -557,7 +557,7 @@ ARRIVED event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>816</y>
       <w>368</w>
       <h>56</h>
@@ -570,7 +570,7 @@ notifyProductArrived( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>928</y>
       <w>280</w>
       <h>56</h>
@@ -583,7 +583,7 @@ informProductArrived( time )
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>1120</x>
+      <x>976</x>
       <y>984</y>
       <w>816</w>
       <h>144</h>
@@ -595,7 +595,7 @@ informProductArrived( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>968</y>
       <w>280</w>
       <h>56</h>
@@ -608,7 +608,7 @@ informProductProcessing()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>1072</y>
       <w>280</w>
       <h>56</h>
@@ -621,7 +621,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>1112</y>
       <w>280</w>
       <h>56</h>
@@ -634,7 +634,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>1040</y>
       <w>168</w>
       <h>64</h>
@@ -647,7 +647,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>1008</y>
       <w>176</w>
       <h>56</h>
@@ -660,7 +660,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>328</x>
+      <x>184</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -671,7 +671,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>344</x>
+      <x>200</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -682,7 +682,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>688</x>
+      <x>544</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -693,7 +693,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>672</x>
+      <x>528</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -704,7 +704,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>936</x>
+      <x>792</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -715,7 +715,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>952</x>
+      <x>808</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -726,7 +726,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>704</x>
+      <x>560</x>
       <y>784</y>
       <w>16</w>
       <h>856</h>
@@ -737,7 +737,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>144</x>
+      <x>0</x>
       <y>800</y>
       <w>880</w>
       <h>1040</h>
@@ -748,7 +748,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>208</x>
+      <x>64</x>
       <y>808</y>
       <w>168</w>
       <h>56</h>
@@ -760,7 +760,7 @@ FINISHED event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>160</x>
+      <x>16</x>
       <y>864</y>
       <w>848</w>
       <h>40</h>
@@ -772,7 +772,7 @@ FINISHED event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>848</y>
       <w>632</w>
       <h>56</h>
@@ -785,7 +785,7 @@ notifyJobFinished( time )
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>160</x>
+      <x>16</x>
       <y>936</y>
       <w>848</w>
       <h>104</h>
@@ -797,7 +797,7 @@ notifyJobFinished( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>944</y>
       <w>632</w>
       <h>56</h>
@@ -810,7 +810,7 @@ notifyJobFinished( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>920</y>
       <w>632</w>
       <h>56</h>
@@ -823,7 +823,7 @@ getRemainingTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>976</y>
       <w>168</w>
       <h>64</h>
@@ -836,7 +836,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>160</x>
+      <x>16</x>
       <y>1072</y>
       <w>848</w>
       <h>632</h>
@@ -848,7 +848,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1056</y>
       <w>632</w>
       <h>56</h>
@@ -861,7 +861,7 @@ notifyJobFinished( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1248</y>
       <w>288</w>
       <h>56</h>
@@ -873,7 +873,7 @@ informProductStepFinished()</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1584</y>
       <w>280</w>
       <h>56</h>
@@ -886,7 +886,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqDestroyMark</type>
     <coordinates>
-      <x>704</x>
+      <x>560</x>
       <y>1664</y>
       <w>16</w>
       <h>16</h>
@@ -897,7 +897,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1096</y>
       <w>288</w>
       <h>56</h>
@@ -909,7 +909,7 @@ notifyProductProcessing()</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1208</y>
       <w>288</w>
       <h>56</h>
@@ -922,7 +922,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>688</x>
+      <x>544</x>
       <y>1616</y>
       <w>40</w>
       <h>64</h>
@@ -933,7 +933,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1440</x>
+      <x>1296</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -944,7 +944,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1904</x>
+      <x>1760</x>
       <y>784</y>
       <w>16</w>
       <h>592</h>
@@ -955,7 +955,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>1648</x>
+      <x>1504</x>
       <y>784</y>
       <w>16</w>
       <h>592</h>
@@ -966,7 +966,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>360</x>
+      <x>216</x>
       <y>784</y>
       <w>16</w>
       <h>1072</h>
@@ -977,7 +977,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>968</x>
+      <x>824</x>
       <y>784</y>
       <w>16</w>
       <h>1072</h>
@@ -988,7 +988,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>496</x>
+      <x>352</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -999,7 +999,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>480</x>
+      <x>336</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1010,7 +1010,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>512</x>
+      <x>368</x>
       <y>784</y>
       <w>16</w>
       <h>1072</h>
@@ -1021,7 +1021,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>4152</x>
+      <x>4008</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1032,7 +1032,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4168</x>
+      <x>4024</x>
       <y>736</y>
       <w>40</w>
       <h>112</h>
@@ -1043,7 +1043,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4512</x>
+      <x>4368</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -1054,7 +1054,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>4304</x>
+      <x>4160</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1065,7 +1065,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>4496</x>
+      <x>4352</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1076,7 +1076,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>4760</x>
+      <x>4616</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1087,7 +1087,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4776</x>
+      <x>4632</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -1098,7 +1098,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>4336</x>
+      <x>4192</x>
       <y>784</y>
       <w>16</w>
       <h>472</h>
@@ -1109,7 +1109,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4320</x>
+      <x>4176</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -1120,7 +1120,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>4792</x>
+      <x>4648</x>
       <y>784</y>
       <w>16</w>
       <h>472</h>
@@ -1131,7 +1131,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>4528</x>
+      <x>4384</x>
       <y>784</y>
       <w>16</w>
       <h>472</h>
@@ -1142,7 +1142,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>4184</x>
+      <x>4040</x>
       <y>832</y>
       <w>16</w>
       <h>424</h>
@@ -1153,7 +1153,7 @@ acknowledge
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>3968</x>
+      <x>3824</x>
       <y>800</y>
       <w>880</w>
       <h>432</h>
@@ -1164,7 +1164,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4032</x>
+      <x>3888</x>
       <y>800</y>
       <w>168</w>
       <h>56</h>
@@ -1176,7 +1176,7 @@ REPAIR event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>920</y>
       <w>632</w>
       <h>56</h>
@@ -1189,7 +1189,7 @@ notifyRepaired( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>840</y>
       <w>632</w>
       <h>56</h>
@@ -1202,7 +1202,7 @@ getRemainingTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>872</y>
       <w>168</w>
       <h>64</h>
@@ -1215,7 +1215,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>3984</x>
+      <x>3840</x>
       <y>856</y>
       <w>848</w>
       <h>80</h>
@@ -1226,7 +1226,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4168</x>
+      <x>4024</x>
       <y>1168</y>
       <w>180</w>
       <h>64</h>
@@ -1239,7 +1239,7 @@ scheduleBreakdownEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>1136</y>
       <w>176</w>
       <h>56</h>
@@ -1252,7 +1252,7 @@ generateBreakdownTime()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>3984</x>
+      <x>3840</x>
       <y>984</y>
       <w>848</w>
       <h>160</h>
@@ -1264,7 +1264,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>3176</x>
+      <x>3032</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1275,7 +1275,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3192</x>
+      <x>3048</x>
       <y>736</y>
       <w>40</w>
       <h>112</h>
@@ -1286,7 +1286,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3536</x>
+      <x>3392</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -1297,7 +1297,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>3328</x>
+      <x>3184</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1308,7 +1308,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>3520</x>
+      <x>3376</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1319,7 +1319,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>3784</x>
+      <x>3640</x>
       <y>736</y>
       <w>80</w>
       <h>24</h>
@@ -1330,7 +1330,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3800</x>
+      <x>3656</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -1341,7 +1341,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>3208</x>
+      <x>3064</x>
       <y>832</y>
       <w>16</w>
       <h>144</h>
@@ -1352,7 +1352,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>3360</x>
+      <x>3216</x>
       <y>784</y>
       <w>16</w>
       <h>192</h>
@@ -1363,7 +1363,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3344</x>
+      <x>3200</x>
       <y>736</y>
       <w>40</w>
       <h>64</h>
@@ -1374,7 +1374,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>3816</x>
+      <x>3672</x>
       <y>784</y>
       <w>16</w>
       <h>192</h>
@@ -1385,7 +1385,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>3552</x>
+      <x>3408</x>
       <y>784</y>
       <w>16</w>
       <h>192</h>
@@ -1396,7 +1396,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>2992</x>
+      <x>2848</x>
       <y>800</y>
       <w>880</w>
       <h>152</h>
@@ -1407,7 +1407,7 @@ or job has become ready</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3056</x>
+      <x>2912</x>
       <y>800</y>
       <w>168</w>
       <h>56</h>
@@ -1419,7 +1419,7 @@ BREAKDOWN event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3200</x>
+      <x>3056</x>
       <y>816</y>
       <w>632</w>
       <h>56</h>
@@ -1432,7 +1432,7 @@ notifyBreakdown( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3200</x>
+      <x>3056</x>
       <y>872</y>
       <w>166</w>
       <h>64</h>
@@ -1445,7 +1445,7 @@ scheduleRepairEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>3200</x>
+      <x>3056</x>
       <y>840</y>
       <w>176</w>
       <h>56</h>
@@ -1458,7 +1458,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>5080</x>
+      <x>4936</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -1469,7 +1469,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5096</x>
+      <x>4952</x>
       <y>728</y>
       <w>40</w>
       <h>120</h>
@@ -1480,7 +1480,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5296</x>
+      <x>5152</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -1491,7 +1491,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>5280</x>
+      <x>5136</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -1502,7 +1502,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>5488</x>
+      <x>5344</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -1513,7 +1513,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5504</x>
+      <x>5360</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -1524,7 +1524,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>5112</x>
+      <x>4968</x>
       <y>832</y>
       <w>16</w>
       <h>216</h>
@@ -1535,7 +1535,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>5520</x>
+      <x>5376</x>
       <y>776</y>
       <w>16</w>
       <h>272</h>
@@ -1546,7 +1546,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>5312</x>
+      <x>5168</x>
       <y>776</y>
       <w>16</w>
       <h>272</h>
@@ -1557,7 +1557,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>4896</x>
+      <x>4752</x>
       <y>800</y>
       <w>672</w>
       <h>232</h>
@@ -1568,7 +1568,7 @@ generateRepairTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4960</x>
+      <x>4816</x>
       <y>800</y>
       <w>168</w>
       <h>56</h>
@@ -1580,7 +1580,7 @@ STARTED event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>2400</x>
+      <x>2256</x>
       <y>784</y>
       <w>16</w>
       <h>552</h>
@@ -1591,7 +1591,7 @@ STARTED event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>984</y>
       <w>368</w>
       <h>56</h>
@@ -1603,7 +1603,7 @@ notifyProductProcessing( product, equiplet, service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>1304</y>
       <w>368</w>
       <h>40</h>
@@ -1615,7 +1615,7 @@ notifyProductProcessing( product, equiplet, service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1576</y>
       <w>368</w>
       <h>56</h>
@@ -1628,7 +1628,7 @@ notifyProductFinished( product )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1320</y>
       <w>368</w>
       <h>56</h>
@@ -1641,7 +1641,7 @@ notifyProductTraveling( product, equiplet )
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>176</x>
+      <x>32</x>
       <y>1592</y>
       <w>560</w>
       <h>96</h>
@@ -1652,7 +1652,7 @@ notifyProductTraveling( product, equiplet )
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>176</x>
+      <x>32</x>
       <y>1304</y>
       <w>688</w>
       <h>272</h>
@@ -1663,7 +1663,7 @@ notifyProductTraveling( product, equiplet )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1376</y>
       <w>160</w>
       <h>64</h>
@@ -1676,7 +1676,7 @@ scheduleArrivedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1344</y>
       <w>176</w>
       <h>56</h>
@@ -1689,7 +1689,7 @@ generateTravelTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1136</y>
       <w>176</w>
       <h>56</h>
@@ -1702,7 +1702,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1168</y>
       <w>168</w>
       <h>64</h>
@@ -1715,7 +1715,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1208</y>
       <w>368</w>
       <h>40</h>
@@ -1727,7 +1727,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1416</y>
       <w>368</w>
       <h>40</h>
@@ -1739,7 +1739,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1112</y>
       <w>368</w>
       <h>56</h>
@@ -1751,7 +1751,7 @@ notifyProductProcessing( product, equiplet, service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4520</x>
+      <x>4376</x>
       <y>968</y>
       <w>288</w>
       <h>56</h>
@@ -1763,7 +1763,7 @@ informProductProcessing()</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>984</y>
       <w>368</w>
       <h>56</h>
@@ -1775,7 +1775,7 @@ notifyProductProcessing( product, equiplet, service )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>1008</y>
       <w>176</w>
       <h>56</h>
@@ -1788,7 +1788,7 @@ generateProductionTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>1040</y>
       <w>168</w>
       <h>64</h>
@@ -1801,7 +1801,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4176</x>
+      <x>4032</x>
       <y>1080</y>
       <w>368</w>
       <h>40</h>
@@ -1812,7 +1812,7 @@ scheduleFinishedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>4520</x>
+      <x>4376</x>
       <y>1080</y>
       <w>288</w>
       <h>56</h>
@@ -1824,7 +1824,7 @@ acknowledge</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>2056</x>
+      <x>1912</x>
       <y>1128</y>
       <w>848</w>
       <h>176</h>
@@ -1835,7 +1835,7 @@ acknowledge</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>2056</x>
+      <x>1912</x>
       <y>1056</y>
       <w>848</w>
       <h>48</h>
@@ -1846,7 +1846,7 @@ acknowledge</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>2240</x>
+      <x>2096</x>
       <y>1040</y>
       <w>368</w>
       <h>56</h>
@@ -1858,7 +1858,7 @@ notifyProductCreationFailed( product )</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>176</x>
+      <x>32</x>
       <y>1112</y>
       <w>824</w>
       <h>152</h>
@@ -1869,7 +1869,7 @@ notifyProductCreationFailed( product )</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>192</x>
+      <x>48</x>
       <y>1336</y>
       <w>648</w>
       <h>120</h>
@@ -1880,7 +1880,7 @@ notifyProductCreationFailed( product )</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>192</x>
+      <x>48</x>
       <y>1472</y>
       <w>648</w>
       <h>88</h>
@@ -1891,7 +1891,7 @@ notifyProductCreationFailed( product )</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1448</y>
       <w>288</w>
       <h>56</h>
@@ -1904,7 +1904,7 @@ informReleaseProductSteps()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>160</x>
+      <x>16</x>
       <y>1720</y>
       <w>848</w>
       <h>104</h>
@@ -1915,7 +1915,7 @@ informReleaseProductSteps()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1704</y>
       <w>632</w>
       <h>56</h>
@@ -1927,7 +1927,7 @@ notifyReconfigReady()</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>344</x>
+      <x>200</x>
       <y>1728</y>
       <w>198</w>
       <h>56</h>
@@ -1940,7 +1940,7 @@ generateReconfigurationTime()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>352</x>
+      <x>208</x>
       <y>1760</y>
       <w>170</w>
       <h>64</h>
@@ -1953,7 +1953,7 @@ scheduleReconfigEvent()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>1104</x>
+      <x>960</x>
       <y>888</y>
       <w>848</w>
       <h>288</h>
@@ -1965,7 +1965,7 @@ scheduleReconfigEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>872</y>
       <w>368</w>
       <h>56</h>
@@ -1978,7 +1978,7 @@ notifyShouldStart( time )
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>904</y>
       <w>162</w>
       <h>64</h>
@@ -1991,7 +1991,7 @@ scheduleStartedEvent()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1496</y>
       <w>140</w>
       <h>64</h>
@@ -2004,7 +2004,7 @@ reschedule()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>1104</x>
+      <x>960</x>
       <y>1192</y>
       <w>632</w>
       <h>112</h>
@@ -2015,7 +2015,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>1176</y>
       <w>280</w>
       <h>56</h>
@@ -2028,7 +2028,7 @@ informReleaseProductSteps()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>1232</y>
       <w>124</w>
       <h>64</h>
@@ -2041,7 +2041,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>5800</x>
+      <x>5656</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2052,7 +2052,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5816</x>
+      <x>5672</x>
       <y>728</y>
       <w>40</w>
       <h>120</h>
@@ -2063,7 +2063,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5976</x>
+      <x>5832</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -2074,7 +2074,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>5960</x>
+      <x>5816</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2085,7 +2085,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>6120</x>
+      <x>5976</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2096,7 +2096,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>6136</x>
+      <x>5992</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -2107,7 +2107,7 @@ reschedule()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>5832</x>
+      <x>5688</x>
       <y>832</y>
       <w>16</w>
       <h>120</h>
@@ -2118,7 +2118,7 @@ reschedule()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>6152</x>
+      <x>6008</x>
       <y>776</y>
       <w>16</w>
       <h>176</h>
@@ -2129,7 +2129,7 @@ reschedule()
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>5992</x>
+      <x>5848</x>
       <y>776</y>
       <w>16</w>
       <h>176</h>
@@ -2140,7 +2140,7 @@ reschedule()
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>5616</x>
+      <x>5472</x>
       <y>800</y>
       <w>584</w>
       <h>136</h>
@@ -2151,7 +2151,7 @@ reschedule()
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5688</x>
+      <x>5544</x>
       <y>800</y>
       <w>160</w>
       <h>56</h>
@@ -2163,7 +2163,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>6944</x>
+      <x>6800</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2174,7 +2174,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>6960</x>
+      <x>6816</x>
       <y>728</y>
       <w>40</w>
       <h>120</h>
@@ -2185,7 +2185,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>7304</x>
+      <x>7160</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -2196,7 +2196,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>7096</x>
+      <x>6952</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2207,7 +2207,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>7288</x>
+      <x>7144</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2218,7 +2218,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Class</type>
     <coordinates>
-      <x>7552</x>
+      <x>7408</x>
       <y>728</y>
       <w>80</w>
       <h>24</h>
@@ -2229,7 +2229,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>7568</x>
+      <x>7424</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -2240,7 +2240,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>6976</x>
+      <x>6832</x>
       <y>832</y>
       <w>16</w>
       <h>32</h>
@@ -2251,7 +2251,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>7128</x>
+      <x>6984</x>
       <y>776</y>
       <w>16</w>
       <h>144</h>
@@ -2262,7 +2262,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>7112</x>
+      <x>6968</x>
       <y>728</y>
       <w>40</w>
       <h>64</h>
@@ -2273,7 +2273,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>7584</x>
+      <x>7440</x>
       <y>776</y>
       <w>16</w>
       <h>152</h>
@@ -2284,7 +2284,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqObjectActive</type>
     <coordinates>
-      <x>7320</x>
+      <x>7176</x>
       <y>776</y>
       <w>16</w>
       <h>152</h>
@@ -2295,7 +2295,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>6760</x>
+      <x>6616</x>
       <y>800</y>
       <w>880</w>
       <h>104</h>
@@ -2306,7 +2306,7 @@ RECONFIG event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>6824</x>
+      <x>6680</x>
       <y>800</y>
       <w>168</w>
       <h>56</h>
@@ -2318,7 +2318,7 @@ DONE event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>6960</x>
+      <x>6816</x>
       <y>840</y>
       <w>40</w>
       <h>56</h>
@@ -2329,7 +2329,7 @@ DONE event</panel_attributes>
   <element>
     <type>com.umlet.element.custom.SeqDestroyMark</type>
     <coordinates>
-      <x>6976</x>
+      <x>6832</x>
       <y>880</y>
       <w>16</w>
       <h>16</h>
@@ -2340,7 +2340,7 @@ DONE event</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5104</x>
+      <x>4960</x>
       <y>816</y>
       <w>224</w>
       <h>56</h>
@@ -2352,7 +2352,7 @@ onProductStarted(time)</panel_attributes>
   <element>
     <type>com.umlet.element.custom.InteractionFrame</type>
     <coordinates>
-      <x>4920</x>
+      <x>4776</x>
       <y>880</y>
       <w>632</w>
       <h>136</h>
@@ -2364,7 +2364,7 @@ onProductStarted(time)</panel_attributes>
     <element>
       <type>com.umlet.element.custom.InteractionFrame</type>
       <coordinates>
-        <x>4232</x>
+        <x>4088</x>
         <y>0</y>
         <w>360</w>
         <h>200</h>
@@ -2384,7 +2384,7 @@ with inner frames
     <element>
       <type>com.umlet.element.custom.InteractionFrame</type>
       <coordinates>
-        <x>4264</x>
+        <x>4120</x>
         <y>56</y>
         <w>312</w>
         <h>40</h>
@@ -2395,7 +2395,7 @@ with inner frames
     <element>
       <type>com.umlet.element.custom.InteractionFrame</type>
       <coordinates>
-        <x>4264</x>
+        <x>4120</x>
         <y>120</y>
         <w>312</w>
         <h>72</h>
@@ -2410,7 +2410,7 @@ inner</panel_attributes>
     <element>
       <type>com.umlet.element.custom.InteractionFrame</type>
       <coordinates>
-        <x>4392</x>
+        <x>4248</x>
         <y>184</y>
         <w>360</w>
         <h>200</h>
@@ -2430,7 +2430,7 @@ with inner frames
     <element>
       <type>com.umlet.element.custom.InteractionFrame</type>
       <coordinates>
-        <x>4424</x>
+        <x>4280</x>
         <y>240</y>
         <w>312</w>
         <h>40</h>
@@ -2441,7 +2441,7 @@ with inner frames
     <element>
       <type>com.umlet.element.custom.InteractionFrame</type>
       <coordinates>
-        <x>4424</x>
+        <x>4280</x>
         <y>304</y>
         <w>312</w>
         <h>72</h>
@@ -2455,7 +2455,7 @@ inner</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5304</x>
+      <x>5160</x>
       <y>864</y>
       <w>232</w>
       <h>56</h>
@@ -2467,7 +2467,7 @@ informReleaseProductSteps()</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5304</x>
+      <x>5160</x>
       <y>920</y>
       <w>116</w>
       <h>72</h>
@@ -2479,7 +2479,7 @@ reschedule()</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5824</x>
+      <x>5680</x>
       <y>816</y>
       <w>344</w>
       <h>56</h>
@@ -2492,7 +2492,7 @@ reconfigureFinished(newCapabilities)
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5984</x>
+      <x>5840</x>
       <y>840</y>
       <w>184</w>
       <h>56</h>
@@ -2504,7 +2504,7 @@ register(services)</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5824</x>
+      <x>5680</x>
       <y>896</y>
       <w>344</w>
       <h>40</h>
@@ -2516,7 +2516,7 @@ register(services)</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5304</x>
+      <x>5160</x>
       <y>888</y>
       <w>232</w>
       <h>56</h>
@@ -2528,7 +2528,7 @@ acknowledge</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5104</x>
+      <x>4960</x>
       <y>960</y>
       <w>224</w>
       <h>56</h>
@@ -2541,7 +2541,7 @@ notifyProductRescheduled(true)
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>5984</x>
+      <x>5840</x>
       <y>864</y>
       <w>184</w>
       <h>56</h>
@@ -2553,7 +2553,7 @@ acknowledge</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1640</x>
+      <x>1496</x>
       <y>1200</y>
       <w>280</w>
       <h>56</h>
@@ -2566,7 +2566,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>696</x>
+      <x>552</x>
       <y>1464</y>
       <w>288</w>
       <h>56</h>
@@ -2579,7 +2579,7 @@ acknowledge
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>1296</x>
+      <x>1152</x>
       <y>1264</y>
       <w>368</w>
       <h>40</h>

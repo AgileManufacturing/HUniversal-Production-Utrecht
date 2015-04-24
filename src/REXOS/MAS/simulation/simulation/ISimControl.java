@@ -11,13 +11,13 @@ import MAS.simulation.mas.product.IProductSim;
 import MAS.util.Position;
 import MAS.util.Tick;
 
-public interface ISimControl {
+public interface ISimControl<Product extends IProductSim, Equiplet extends IEquipletSim> {
 
 	void delay(long delay);
-	
-	IProductSim createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) throws Exception;
-	
-	IEquipletSim createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception;
+
+	Product createProduct(String name, Position position, LinkedList<ProductStep> productSteps, Tick time, Tick deadline) throws Exception;
+
+	Equiplet createEquiplet(String name, Position position, List<Capability> capabilities) throws Exception;
 
 	void killAgent(String name);
 

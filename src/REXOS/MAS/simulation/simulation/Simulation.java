@@ -43,17 +43,17 @@ import MAS.util.Triple;
 import MAS.util.Tuple;
 import MAS.util.Util;
 
-public class Simulation implements ISimulation, IControl {
+public class Simulation<Product extends IProductSim, Equiplet extends IEquipletSim> implements ISimulation, IControl {
 
 	// product statistics
-	private static final String STATS_TRAVEL = "Traveling";
+	protected static final String STATS_TRAVEL = "Traveling";
 	private static final String STATS_WAITING = "Waiting";
 	private static final String STATS_BUSY = "Processing";
 	private static final String STATS_FINISHED = "Finished";
 	private static final String STATS_RESCHEDULED = "Rescheduled";
-	private static final String STATS_FAILED_CREATION = "Failed to schedule";
+	protected static final String STATS_FAILED_CREATION = "Failed to schedule";
 	private static final String STATS_FAILED_DEADLINE = "Failed to meet the deadline";
-	private static final String STATS_SYSTEM = "In system";
+	protected static final String STATS_SYSTEM = "In system";
 	private static final String STATS_PHYSICAL = "Physically in system";
 	private static final String STATS_BROKEN = "Broken";
 
@@ -62,10 +62,10 @@ public class Simulation implements ISimulation, IControl {
 	private static final String STATS_LOAD_AVG_HISTORY = "Load History Average";
 	private static final Tick LOAD_WINDOW = new Tick(1000);
 
-	private ISimControl simulation;
+	private ISimControl<Product, Equiplet> simulation;
 	private SimInterface gui;
 	private IConfig config;
-	private Stochastics stochastics;
+	protected Stochastics stochastics;
 
 	private Lock lock = new Lock();
 
@@ -79,12 +79,12 @@ public class Simulation implements ISimulation, IControl {
 	private int delay;
 
 	// State
-	private volatile TreeSet<Event> eventStack;
-	private Tick time;
+	protected volatile TreeSet<Event> eventStack;
+	protected Tick time;
 
-	private TreeMap<String, IEquipletSim> equiplets;
-	private Map<String, IProductSim> products;
-	private int productCount;
+	protected TreeMap<String, Equiplet> equiplets;
+	protected Map<String, Product> products;
+	protected int productCount;
 
 	private Tick timeReconfig;
 	private double reconfigThreshold;
@@ -106,7 +106,7 @@ public class Simulation implements ISimulation, IControl {
 	private String outputFolder;
 	private Map<Integer, Pair<Tuple<Integer, Integer, Integer, Float>, Float>> runStats;
 
-	public Simulation(ISimControl simulation) {
+	public Simulation(ISimControl<Product, Equiplet> simulation) {
 		this.simulation = simulation;
 
 		delay = 0;
@@ -185,7 +185,7 @@ public class Simulation implements ISimulation, IControl {
 
 			// start equiplet agent
 			try {
-				IEquipletSim equiplet = simulation.createEquiplet(equipletName, position, capabilities);
+				Equiplet equiplet = simulation.createEquiplet(equipletName, position, capabilities);
 				equiplets.put(equipletName, equiplet);
 
 				equipletLoads.put(equipletName, new TreeMap<Tick, Float>());
@@ -235,9 +235,9 @@ public class Simulation implements ISimulation, IControl {
 				}
 
 				// wait if needed to continue with the next event
-				// System.out.println("Simulation: lock();");
+				System.out.println("Simulation: lock();");
 				lock.lock();
-				// System.out.println("Simulation: continue");
+				System.out.println("Simulation: continue");
 
 				Event e = eventStack.pollFirst();
 
@@ -289,14 +289,14 @@ public class Simulation implements ISimulation, IControl {
 					update(e);
 				}
 
-				// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-				// System.out.println("EQ: " + equiplet.getValue().toString()
-				// + (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
-				// }
-				//
-				for (Entry<String, IProductSim> product : products.entrySet()) {
-					System.out.println("PQ: " + product.getValue().toString());
-				}
+//				for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
+//					System.out.println("EQ: " + equiplet.getValue().toString()
+//							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+//				}
+//				
+//				for (Entry<String, Product> product : products.entrySet()) {
+//					System.out.println("PQ: " + product.getValue().toString());
+//				}
 
 				if (Settings.VERIFICATION) {
 					verification();
@@ -343,7 +343,7 @@ public class Simulation implements ISimulation, IControl {
 		// equiplets that are in error repaired, but never continuing with a the executing job
 		List<String> equipletNames = new ArrayList<String>(equiplets.keySet());
 
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 
 			// equiplet busy validation
 			if (entry.getValue().getEquipletState() == EquipletState.BUSY) {
@@ -398,19 +398,18 @@ public class Simulation implements ISimulation, IControl {
 	 * @param add
 	 *            the addition of the statistic
 	 */
-	private void updateProductStats(String type, int add) {
+	protected void updateProductStats(String type, int add) {
 		int lastValue = productStatistics.get(type).lastEntry().getValue();
 		productStatistics.get(type).put(time, lastValue + add);
 	}
 
 	/**
 	 * calculate load,
-	 * TODO throw not an illegal argument exception
 	 */
 	private void calculateEquipletLoad() {
 		float sumLoad = 0f;
 		float sumLoadHistory = 0f;
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 			Double load = 1 - entry.getValue().load(time, LOAD_WINDOW);
 			equipletLoads.get(entry.getKey()).put(time, load.floatValue());
 			sumLoad += load;
@@ -434,7 +433,7 @@ public class Simulation implements ISimulation, IControl {
 			System.out.println("CHECKPOINT MIKE");
 			Map<Capability, List<Pair<String, Double>>> serviceLoads = new HashMap<Capability, List<Pair<String, Double>>>();
 
-			for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+			for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 				IEquipletSim equiplet = entry.getValue();
 				// change load to 1 high, 0 no load
 				double load = 1 - equiplet.load(time, LOAD_WINDOW);
@@ -513,7 +512,7 @@ public class Simulation implements ISimulation, IControl {
 	private void update(Event e) {
 		// equiplet states = List of Tuple < name, position, services, Tuple < state, waiting, scheduled,executed > >
 		List<Tuple<String, Position, List<String>, Tuple<String, Integer, Integer, Integer>>> equipletStates = new ArrayList<>();
-		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
 			equipletStates.add(equiplet.getValue().getUpdateState());
 		}
 
@@ -531,7 +530,7 @@ public class Simulation implements ISimulation, IControl {
 	 * A product agent is created and started which will invoke the schedule
 	 * behaviour
 	 */
-	private void productEvent() {
+	protected void productEvent() {
 		try {
 			// product agent settings
 			LinkedList<ProductStep> productSteps = stochastics.generateProductSteps();
@@ -540,7 +539,9 @@ public class Simulation implements ISimulation, IControl {
 			Position startPosition = new Position(-1, -1);
 
 			Tick deadline = time.add(stochastics.generateDeadline());
-			products.put(productName, simulation.createProduct(productName, startPosition, productSteps, time, deadline));
+			Product product = simulation.createProduct(productName, startPosition, productSteps, time, deadline);
+			products.put(productName, product);
+			product.schedule(time);
 
 			// update statistics
 			totalSteps += productSteps.size();
@@ -550,7 +551,7 @@ public class Simulation implements ISimulation, IControl {
 		}
 
 		// wait for confirmation creation of product agent
-		System.out.println("CHECKPOINT BETA");
+		System.out.println("CHECKPOINT BRAVO");
 	}
 
 	/**
@@ -700,7 +701,7 @@ public class Simulation implements ISimulation, IControl {
 				}
 			}
 		} catch (IllegalArgumentException e) {
-			for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+			for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
 				System.out.println("EQ: " + equiplet.getValue());
 				List<Triple<String, Tick, Tick>> schedule = equiplet.getValue().getSchedule();
 
@@ -740,6 +741,8 @@ public class Simulation implements ISimulation, IControl {
 		synchronized (this) {
 			lock.unlock();
 		}
+
+		System.out.println("CHECKPOINT SIERRA");
 	}
 
 	/**
@@ -804,11 +807,11 @@ public class Simulation implements ISimulation, IControl {
 		saveStatistics(productsFinished, productsFailed, productsOverdue, avgProductionTimes, avgLoad);
 
 		// take down all agents
-		for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
 			equiplet.getValue().kill();
 		}
 
-		for (Entry<String, IProductSim> product : products.entrySet()) {
+		for (Entry<String, Product> product : products.entrySet()) {
 			product.getValue().kill();
 		}
 
@@ -971,7 +974,7 @@ public class Simulation implements ISimulation, IControl {
 			// TODO no error handling
 			e.printStackTrace();
 			System.out.println("reconfigured " + reconfigured);
-			for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
+			for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
 				System.out.println("EQ: " + equiplet.getValue());
 			}
 			throw new IllegalArgumentException("nullpointer not possible");
@@ -1455,7 +1458,7 @@ public class Simulation implements ISimulation, IControl {
 
 			// Equiplets
 			writer = new PrintWriter(equipletFile);
-			for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+			for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 				writer.println(entry.getValue().toFullString());
 			}
 			writer.close();
@@ -1523,7 +1526,7 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public Map<String, List<Triple<String, Tick, Tick>>> getCompleteSchedule() {
 		TreeMap<String, List<Triple<String, Tick, Tick>>> schedules = new TreeMap<String, List<Triple<String, Tick, Tick>>>();
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 			schedules.put(entry.getKey(), entry.getValue().getCompleteSchedule());
 		}
 		return schedules;
@@ -1532,7 +1535,7 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public Map<String, List<Triple<String, Tick, Tick>>> getEquipletSchedule() {
 		TreeMap<String, List<Triple<String, Tick, Tick>>> schedules = new TreeMap<String, List<Triple<String, Tick, Tick>>>();
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 			schedules.put(entry.getKey(), entry.getValue().getSchedule());
 		}
 		return schedules;
@@ -1541,7 +1544,7 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public Map<String, List<Triple<String, Tick, Tick>>> getEquipletHistory() {
 		TreeMap<String, List<Triple<String, Tick, Tick>>> histories = new TreeMap<String, List<Triple<String, Tick, Tick>>>();
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 			histories.put(entry.getKey(), entry.getValue().getHistory());
 		}
 		return histories;
@@ -1550,7 +1553,7 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public TreeMap<String, Triple<? extends Number, ? extends Number, ? extends Number>> getEquipletUtilization() {
 		TreeMap<String, Triple<? extends Number, ? extends Number, ? extends Number>> data = new TreeMap<String, Triple<? extends Number, ? extends Number, ? extends Number>>();
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 			data.put(entry.getKey(), entry.getValue().getStatistics(time));
 		}
 		return data;
@@ -1559,7 +1562,7 @@ public class Simulation implements ISimulation, IControl {
 	@Override
 	public Map<String, Map<Tick, Tick>> getEquipletLatency() {
 		TreeMap<String, Map<Tick, Tick>> data = new TreeMap<String, Map<Tick, Tick>>();
-		for (Entry<String, IEquipletSim> entry : equiplets.entrySet()) {
+		for (Entry<String, Equiplet> entry : equiplets.entrySet()) {
 			data.put(entry.getKey(), entry.getValue().getLatency());
 		}
 		return data;

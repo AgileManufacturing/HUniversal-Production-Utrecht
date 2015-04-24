@@ -89,7 +89,7 @@ public class Node implements Comparable<Node> {
 	public String toString() {
 		if (equipletAID != null) {
 			return String.format("N(%s), %d, %s, %s", equipletAID.getLocalName(), index, time, duration);
-			//return String.format("N(%s)", equipletAID.getLocalName());
+			// return String.format("N(%s)", equipletAID.getLocalName());
 		} else if (equiplet != null) {
 			return String.format("N(%s), %d, %s, %s", equiplet, index, time, duration);
 		} else if (time.greaterThan(-1)) {

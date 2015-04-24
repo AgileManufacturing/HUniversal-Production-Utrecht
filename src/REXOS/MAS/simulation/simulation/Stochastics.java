@@ -15,12 +15,12 @@ import MAS.util.Pair;
 import MAS.util.Position;
 import MAS.util.Tick;
 
-class Stochastics {
+public class Stochastics {
 	private Random random;
 	private IConfig config;
 	private double meanProcessingTime;
 
-	Stochastics(IConfig config) {
+	public Stochastics(IConfig config) {
 		random = new Random();
 		this.config = config;
 

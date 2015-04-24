@@ -35,13 +35,13 @@ import MAS.util.Position;
 import MAS.util.SchedulingAlgorithm;
 import MAS.util.Tick;
 
-public class SimulationAgent extends Agent implements ISimControl {
+public class SimulationAgent extends Agent implements ISimControl<IProductSim, IEquipletSim> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Simulation simulation;
+	private Simulation<IProductSim, IEquipletSim> simulation;
 
 	/**
 	 * Setup the simulation agent
@@ -55,7 +55,7 @@ public class SimulationAgent extends Agent implements ISimControl {
 			System.err.println("Simulation: parsing error verbosity");
 		}
 		setOutput();
-		simulation = new Simulation(this);
+		simulation = new Simulation<IProductSim, IEquipletSim>(this);
 		simulation.init();
 		addBehaviour(new SimulationBehaviour());
 

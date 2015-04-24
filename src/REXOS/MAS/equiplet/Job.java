@@ -34,11 +34,11 @@ public class Job implements Comparable<Job> {
 	}
 
 	@Deprecated
-	public Job(int index, String service, String product, JSONObject criteria, Tick start, Tick due, Tick deadline) {
+	public Job(int index, String product, String service, JSONObject criteria, Tick start, Tick due, Tick deadline) {
 		this.dummy = false;
 		this.index = index;
-		this.service = service;
 		this.productName = product;
+		this.service = service;
 		this.criteria = criteria;
 		this.start = start;
 		this.due = due;
@@ -77,7 +77,11 @@ public class Job implements Comparable<Job> {
 			return false;
 		}
 		Job job = (Job) obj;
-		return job.getProductAgent().equals(getProductAgent()) && job.getIndex() == index;
+		if (job.getProductAgent() == null && getProductAgent() == null) {
+			return job.getProductAgentName().equals(getProductAgentName()) && job.getIndex() == index;
+		} else {
+			return job.getProductAgent() != null && job.getProductAgent().equals(getProductAgent()) && job.getIndex() == index;
+		}
 	}
 
 	@Override

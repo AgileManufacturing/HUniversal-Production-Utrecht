@@ -13,7 +13,7 @@ public class Settings {
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = true;
+	public final static boolean STOCHASTICS = false;
 
 	/**
 	 * whether equiplets can breakdown

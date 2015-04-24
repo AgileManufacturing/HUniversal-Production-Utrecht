@@ -1,5 +1,5 @@
 package MAS.simulation.simulation;
 
-enum EventType {
+public enum EventType {
 	PRODUCT, ARRIVED, FINISHED, BREAKDOWN, REPAIRED, RECONFIG, STARTED, DONE
 }

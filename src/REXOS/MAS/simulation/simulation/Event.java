@@ -2,7 +2,7 @@ package MAS.simulation.simulation;
 
 import MAS.util.Tick;
 
-class Event implements Comparable<Event> {
+public class Event implements Comparable<Event> {
 
 	private Tick time;
 	private EventType type;
