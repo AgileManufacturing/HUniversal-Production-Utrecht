@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.DTOModuleSettings;
 import util.log.Logger;
 
 import HAL.dataTypes.ModuleIdentifier;
@@ -170,6 +171,14 @@ public class EquipletListenerBehaviour extends Behaviour {
 					}
 					
 				}else if(requestedEquipletCommand.equals("INSERT_MODULES")){
+					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
+					ArrayList<DTOModuleSettings> DTOSettings = extractDTOSettings(command.getJSONArray("modules"));
+					
+					if(modules != null && DTOSettings != null && modules.size() == DTOSettings.size()){
+						equiplet.reconfigureEquiplet(modules);
+					}else{
+						Logger.log("Error while extracting modules for reconfiguration");
+					}
 					// TODO Get list of DTO identifiers from JSON and call the reinitalize function
 					//equiplet.reinitializeEquiplet(toBeAddedModuleSettings);
 					
@@ -239,6 +248,40 @@ public class EquipletListenerBehaviour extends Behaviour {
 					currentModule.getString("typeNumber"), 
 					currentModule.getString("serialNumber")
 				));
+			}
+		}catch(JSONException ex){
+			Logger.log("An error occured while attempting to get information from the JSON. \n" + ex.getMessage());
+			isDeserializationSuccessfull = false;
+		}
+		// If something went wrong while deserializing, return null.
+		return isDeserializationSuccessfull ? resultArray : null;
+	}
+	
+	/**
+	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada and extract module settings from it.
+	 * 
+	 * @param content
+	 * @return Function returns null if anything went wrong while deserializing. If not, it returns an ArrayList of DTOModuleSettings.
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	private ArrayList<DTOModuleSettings> extractDTOSettings(JSONArray modules){
+		ArrayList<DTOModuleSettings> resultArray = new ArrayList<DTOModuleSettings>();
+		boolean isDeserializationSuccessfull = true;
+		try{
+			JSONObject currentModule;
+			
+			//Loop trough the array with modules
+			for(int i = 0; i < modules.length(); i++){
+				//Extract each data object from array
+				currentModule = modules.getJSONObject(i);
+				
+				//Extract module data and get a module ID to return 
+				DTOModuleSettings moduleSettings = new DTOModuleSettings();
+				moduleSettings.dynamicSettings = currentModule.getJSONObject("dynamicSettings");
+				moduleSettings.staticSettings = currentModule.getJSONObject("staticSettings");
+				
+				resultArray.add(moduleSettings);
 			}
 		}catch(JSONException ex){
 			Logger.log("An error occured while attempting to get information from the JSON. \n" + ex.getMessage());
