@@ -264,6 +264,17 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		return isInsertingModulesSuccessful;
 	}
 	
+	public boolean insertModuleFromDatabase(ModuleIdentifier module){
+		//hal.insertModule(jsonStaticSettings, jsonDynamicSettings);
+//		JSONObject staticSettings = new JSONObject();
+//		JSONObject dynamicSettings = new JSONObject();
+//		KnowledgeDBClient database = new KnowledgeDBClient();
+		
+//		hal.insertModule(JouwClass.serialize, jsonDynamicSettings)
+		
+		return false;
+	}
+	
 	/**
 	 * Return all available modules currently listed in the module factory
 	 * 
