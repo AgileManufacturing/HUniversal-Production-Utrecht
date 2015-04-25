@@ -81,12 +81,16 @@ class Product implements IProductSim {
 
 	@Override
 	public String toString() {
-		return String.format("Product:[created=%s, product steps=%s, current step=%s]", created, Arrays.toString(productSteps.toArray()), productionPath.peek());
+		return String.format("%s:[state=%s created=%s, product steps=%s, current step=%s]", name, state, created, Arrays.toString(productSteps.toArray()), productionPath.peek());
 	}
 
 	// @Override
 	public void onProductArrived(Tick time) {
+		// change state from travelling to ready
+		state = ProductState.WAITING;
+
 		ProductionStep step = getCurrentStep();
+		position = step.getPosition();
 		simulation.informProductArrived(time, name, step.getEquipletName());
 
 		if (state == ProductState.WAITING) {
@@ -195,7 +199,8 @@ class Product implements IProductSim {
 	 * @param time
 	 *            current time
 	 * @param deadline
-	 *            of the product (may be increased whenever first attempt isn't successful)
+	 *            of the product (may be increased whenever first attempt isn't
+	 *            successful)
 	 */
 	protected void reschedule(Tick time, Tick deadline) {
 		this.state = ProductState.SCHEDULING;
@@ -221,7 +226,7 @@ class Product implements IProductSim {
 			reschedule(time, deadline.add(1000000));
 		}
 	}
-	
+
 	public void informProductProcessing(Tick time) {
 		state = ProductState.PROCESSING;
 

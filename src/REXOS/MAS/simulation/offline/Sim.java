@@ -181,6 +181,7 @@ public class Sim extends Simulation<Product, Equiplet> {
 	}
 
 	public void informProductProcessing(Tick time, String productName, String equipletName) {
+		System.out.println("inform: PROCESSING [time=" + time + ", product=" + productName + ", equiplet=" + equipletName + "]");
 		Product product = products.get(productName);
 		product.informProductProcessing(time);
 	}

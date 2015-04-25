@@ -13,12 +13,12 @@ public class Settings {
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = false;
+	public final static boolean STOCHASTICS = true;
 
 	/**
 	 * whether equiplets can breakdown
 	 */
-	public final static boolean BREAKDOWNS = false;
+	public final static boolean BREAKDOWNS = true;
 
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet

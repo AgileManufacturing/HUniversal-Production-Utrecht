@@ -289,14 +289,14 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 					update(e);
 				}
 
-//				for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
-//					System.out.println("EQ: " + equiplet.getValue().toString()
-//							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
-//				}
-//				
-//				for (Entry<String, Product> product : products.entrySet()) {
-//					System.out.println("PQ: " + product.getValue().toString());
-//				}
+				//				for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
+				//					System.out.println("EQ: " + equiplet.getValue().toString()
+				//							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+				//				}
+				//				
+				//				for (Entry<String, Product> product : products.entrySet()) {
+				//					System.out.println("PQ: " + product.getValue().toString());
+				//				}
 
 				if (Settings.VERIFICATION) {
 					verification();

@@ -35,9 +35,11 @@ public class StaticSimulation extends Thread implements ISimControl<Product, Equ
 	}
 
 	public void run() {
+		System.err.println("Static simulation start");
 		while (!simulation.isFinished()) {
 			simulation.handleEvent();
 		}
+		System.err.println("Static simulation finished");
 	}
 
 	@Override
