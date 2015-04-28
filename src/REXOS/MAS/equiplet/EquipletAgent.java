@@ -359,8 +359,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 		// when ever behind on schedule, the latency would otherwise keep increasing
 		Tick window = schedule.isEmpty() ? deadline : deadline.minus(time.minus(schedule.first().getStartTime()).max(0));
-		// System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
-		// " - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
+		System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
+		" - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
 
 		// not availale when going to be reconfigured
 		if (reconfiguring) {
@@ -373,6 +373,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			// reschedules in the same timeslot
 			start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
 		}
+		
+		System.out.println("executing " + executing + "");
 
 		if (state == EquipletState.ERROR || state == EquipletState.ERROR_FINISHED) {
 			// when broken down add the largest time slot to now to prevent
@@ -394,8 +396,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 						if (job.getStartTime().lessThan(window)) {
 							available.add(new Pair<Tick, Tick>(start, job.getStartTime()));
 							start = job.getDue();
-						} else {
+						} else if (start.lessThan(window)) {
 							available.add(new Pair<Tick, Tick>(start, window));
+							break;
+						} else {
 							break;
 						}
 					} else {

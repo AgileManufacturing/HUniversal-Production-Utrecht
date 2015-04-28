@@ -62,7 +62,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	private static final String STATS_LOAD_AVG_HISTORY = "Load History Average";
 	private static final Tick LOAD_WINDOW = new Tick(1000);
 
-	private ISimControl<Product, Equiplet> simulation;
+	protected ISimControl<Product, Equiplet> simulation;
 	private SimInterface gui;
 	private IConfig config;
 	protected Stochastics stochastics;
@@ -94,7 +94,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	private Map<String, Tuple<String, Tick, Tick, String>> reconfigured;
 
 	// Performance
-	private int totalSteps;
+	protected int totalSteps;
 
 	private HashMap<Tick, Tick> productionTimes;
 	private Map<String, TreeMap<Tick, Integer>> productStatistics;
@@ -289,10 +289,10 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 					update(e);
 				}
 
-				//				for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
-				//					System.out.println("EQ: " + equiplet.getValue().toString()
-				//							+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
-				//				}
+								for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
+									System.out.println("EQ: " + equiplet.getValue().toString()
+											+ (equiplet.getValue().getSchedule().size() > 0 ? " " + equiplet.getValue().getSchedule().get(0) : ""));
+								}
 				//				
 				//				for (Entry<String, Product> product : products.entrySet()) {
 				//					System.out.println("PQ: " + product.getValue().toString());
@@ -318,24 +318,26 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	 */
 	private void verification() {
 
-		// this doesn't work with breakdowns
-		// int busy = 0;
-		// for (Entry<String, IEquipletSim> equiplet : equiplets.entrySet()) {
-		// if (equiplet.getValue().getEquipletState() == EquipletState.BUSY
-		// || (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
-		// busy++;
-		// }
-		// }
-		//
-		// if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
-		// System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
-		// throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
-		// }
-		//
-		// if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
-		// System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
-		// throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
-		// }
+		if (!Settings.BREAKDOWNS) {
+			// this doesn't work with breakdowns
+			// check whether the equiplets that are busy are equal to the stats of busy equiplets
+			int busy = 0;
+			for (Entry<String, Equiplet> equiplet : equiplets.entrySet()) {
+				if (equiplet.getValue().getEquipletState() == EquipletState.BUSY || (equiplet.getValue().getEquipletState() == EquipletState.RECONFIG && equiplet.getValue().isExecuting())) {
+					busy++;
+				}
+			}
+			if (busy != productStatistics.get(STATS_BUSY).lastEntry().getValue()) {
+				System.out.println("BUSY:  " + Util.formatArray(productStatistics.get(STATS_BUSY)));
+				throw new IllegalArgumentException("DAMN!! busy: " + busy + " == " + productStatistics.get(STATS_BUSY).lastEntry().getValue());
+			}
+		}
+
+		// check whether the products in the system are equal to the stats of products in the system
+		if (products.size() != productStatistics.get(STATS_SYSTEM).lastEntry().getValue()) {
+			System.out.println("IN SYSTEM:  " + Util.formatArray(productStatistics.get(STATS_SYSTEM)));
+			throw new IllegalArgumentException("DAMN!! products " + products.size() + " == " + productStatistics.get(STATS_SYSTEM).lastEntry().getValue());
+		}
 
 		// if an equiplet is busy, there need to be a finished event in the event stack
 		List<String> busyEquiplets = new ArrayList<String>();
@@ -352,8 +354,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 
 			// error repaired validation
 			if (entry.getValue().isExecuting() && entry.getValue().getEquipletState() == EquipletState.IDLE) {
-				throw new IllegalArgumentException("Equiplet can not be idle and executing [eq=" + entry.getKey() + ", \n\nequiplets=" + equiplets + ", \n\nschedule="
-						+ entry.getValue().getCompleteSchedule() + ", \n\nhistory=" + entry.getValue().getHistory() + "]");
+				throw new IllegalArgumentException("Equiplet can not be idle and executing [eq=" + entry.getKey() + ", \n\nequiplets=" + equiplets + ", \n\nschedule=" + entry.getValue().getCompleteSchedule() + ", \n\nhistory=" + entry.getValue().getHistory() + "]");
 			}
 
 			if (entry.getValue().getEquipletState() == EquipletState.ERROR_REPAIRED) {
@@ -400,6 +401,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	 */
 	protected void updateProductStats(String type, int add) {
 		int lastValue = productStatistics.get(type).lastEntry().getValue();
+		System.out.println("UPDATE STATS: " + type + "=" + lastValue + " -> " + (lastValue + add));
 		productStatistics.get(type).put(time, lastValue + add);
 	}
 
@@ -495,8 +497,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 					String configEquiplet = reconfigured.containsKey(highest.first) ? reconfigured.get(highest.first).first : highest.first;
 					reconfiguring = new Tuple<>(lowest.first, configEquiplet, time, new Pair<>(fromCapabilties, toCapabilities));
 
-					log("reconfiguring", "Simulation", "Equiplet reconfigured [equiplet=" + lowest.first + ", load=" + lowest.second + ", toLoad=" + highest.second + ", form="
-							+ fromCapabilties + ", to=" + toCapabilities + "(" + highest.first + ")]");
+					log("reconfiguring", "Simulation", "Equiplet reconfigured [equiplet=" + lowest.first + ", load=" + lowest.second + ", toLoad=" + highest.second + ", form=" + fromCapabilties + ", to=" + toCapabilities + "(" + highest.first + ")]");
 				}
 			}
 			timeReconfig = time;
@@ -541,7 +542,6 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 			Tick deadline = time.add(stochastics.generateDeadline());
 			Product product = simulation.createProduct(productName, startPosition, productSteps, time, deadline);
 			products.put(productName, product);
-			product.schedule(time);
 
 			// update statistics
 			totalSteps += productSteps.size();
@@ -681,7 +681,8 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	}
 
 	/**
-	 * event that signals that a product agent would check whether his product step is started
+	 * event that signals that a product agent would check whether his product
+	 * step is started
 	 * 
 	 * @param productName
 	 *            name of product
@@ -714,7 +715,8 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 
 	/**
 	 * event that signals the reconfiguration finished of an equiplet
-	 * the capabilities changes of the equiplet and he registers by the df after which he becomes available for product agents.
+	 * the capabilities changes of the equiplet and he registers by the df after
+	 * which he becomes available for product agents.
 	 * 
 	 * @param equipletName
 	 *            name of the equiplet
@@ -924,8 +926,10 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	public void notifyProductOverdue(String productName) {
 		System.out.printf("Simulation: product agent %s not completed within deadline\n", productName);
 		/*
-		 * The question is whether or not the product should continue with producing or he should just quit and die.
-		 * For now, the product will just continue and when he is finished the statistics will be updated.
+		 * The question is whether or not the product should continue with
+		 * producing or he should just quit and die.
+		 * For now, the product will just continue and when he is finished the
+		 * statistics will be updated.
 		 */
 
 		// updateProductStats(STATS_FAILED_DEADLINE, +1);
@@ -1016,7 +1020,9 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	}
 
 	/**
-	 * when a product arrives at an equiplet, he (probably) sets a timer that goes off on the last moment a product steps could start affecting the next product step
+	 * when a product arrives at an equiplet, he (probably) sets a timer that
+	 * goes off on the last moment a product steps could start affecting the
+	 * next product step
 	 */
 	public void notifyProductShouldStart(String productName, Tick start, int index) {
 		if (MASConfiguration.RESCHEDULE) {
@@ -1108,7 +1114,8 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	}
 
 	/**
-	 * log function available for agents that want to log certain information during the simulation
+	 * log function available for agents that want to log certain information
+	 * during the simulation
 	 */
 	@Override
 	public void log(String info, String agent, String message) {
@@ -1184,8 +1191,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 				sumEStats += stats.second;
 			}
 
-			writer.printf("avg;%.2f;%.2f;%.2f;%.2f;%.4f;\n", 1.0 * sumPStats.first / runStats.size(), 1.0 * sumPStats.second / runStats.size(), 1.0 * sumPStats.third
-					/ runStats.size(), 1.0 * sumPStats.fourth / runStats.size(), sumEStats / runStats.size());
+			writer.printf("avg;%.2f;%.2f;%.2f;%.2f;%.4f;\n", 1.0 * sumPStats.first / runStats.size(), 1.0 * sumPStats.second / runStats.size(), 1.0 * sumPStats.third / runStats.size(), 1.0 * sumPStats.fourth / runStats.size(), sumEStats / runStats.size());
 
 			writer.println();
 			writer.close();
@@ -1214,8 +1220,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 		writer.printf("Reconfiguration threshold: %s\n", reconfigThreshold);
 		writer.printf("Travel square time: %s\n", config.getTravelTime());
 		writer.printf("Warm-up period: %s\n", Settings.WARMUP);
-		writer.printf("Product generation: (%.0f * %d) / (%.2f * %d) = %.2f\n", stochastics.getMeanProcessingTime(), Settings.MEAN_PRODUCT_STEPS, Settings.UTILIZATION, config.getEquipletsConfigurations().size(), (stochastics.getMeanProcessingTime() * Settings.MEAN_PRODUCT_STEPS)
-				/ (Settings.UTILIZATION * config.getEquipletsConfigurations().size()));
+		writer.printf("Product generation: (%.0f * %d) / (%.2f * %d) = %.2f\n", stochastics.getMeanProcessingTime(), Settings.MEAN_PRODUCT_STEPS, Settings.UTILIZATION, config.getEquipletsConfigurations().size(), (stochastics.getMeanProcessingTime() * Settings.MEAN_PRODUCT_STEPS) / (Settings.UTILIZATION * config.getEquipletsConfigurations().size()));
 		writer.printf("Verbosity: %d\n", MASConfiguration.VERBOSITY);
 		writer.printf("Communication timeout: %s\n", MASConfiguration.COMMUNICATION_TIMEOUT);
 		writer.printf("Configuration:\n%s\n", config);
@@ -1224,7 +1229,8 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	}
 
 	/**
-	 * save statistics into a comma separated values file. these are time based statistics
+	 * save statistics into a comma separated values file. these are time based
+	 * statistics
 	 * with the files graph could be reproduced
 	 * 
 	 * @param path
@@ -1316,7 +1322,8 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 
 	/**
 	 * save the statistics from one simulation run
-	 * this calculates first the statistics: finished, failed, overdue product etc,
+	 * this calculates first the statistics: finished, failed, overdue product
+	 * etc,
 	 * then uses the other function saveStatistics to save it all
 	 * 
 	 */
@@ -1369,7 +1376,8 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 
 	/**
 	 * save the statistics from one simulation run
-	 * saves config, products stats, equiplets loads, graphs and things in one folder
+	 * saves config, products stats, equiplets loads, graphs and things in one
+	 * folder
 	 * 
 	 * @param productsFinished
 	 * @param productsFailed
@@ -1467,8 +1475,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 			writer = new PrintWriter(statFile);
 			writer.println("Grid Simulation run");
 
-			writer.printf("avg;%.2f;%.2f;%.2f;%.2f;%.4f;\n", 1.0 * productsFinished / runStats.size(), 1.0 * productsFailed / runStats.size(), 1.0 * productsOverdue
-					/ runStats.size(), 1.0 * avgProductionTimes / runStats.size(), avgLoad / runStats.size());
+			writer.printf("avg;%.2f;%.2f;%.2f;%.2f;%.4f;\n", 1.0 * productsFinished / runStats.size(), 1.0 * productsFailed / runStats.size(), 1.0 * productsOverdue / runStats.size(), 1.0 * avgProductionTimes / runStats.size(), avgLoad / runStats.size());
 
 			writer.println();
 			// writer.printf("Equiplet Statistics: \t%s\r\n", equipletStatistics);

@@ -47,6 +47,11 @@ public class ProductAgent extends Agent {
 				this.created = new Tick();
 				this.history = new ArrayList<>();
 				this.reschedule = false;
+				
+				scheduleBehaviour = new ScheduleBehaviour(this, productSteps);
+				listenerBehaviour = new ProductListenerBehaviour(this);
+				addBehaviour(scheduleBehaviour);
+				addBehaviour(listenerBehaviour);
 			} catch (JSONException e) {
 				System.err.printf("PA:%s failed to parse the arguments\n", getLocalName());
 				System.err.printf("PA:%s %s", getLocalName(), e.getMessage());
@@ -67,16 +72,6 @@ public class ProductAgent extends Agent {
 		this.state = ProductState.SCHEDULING;
 
 		System.out.printf("PA:%s initialize [created=%s, pos=%s, product steps=%s, deadline=%s]\n", getLocalName(), getCreated(), position, productSteps, deadline);
-	}
-
-	/**
-	 * make a distinction between whether the product is directly operational after the start or when for example the simulation gives the green light to start.
-	 */
-	protected void start() {
-		scheduleBehaviour = new ScheduleBehaviour(this, productSteps);
-		listenerBehaviour = new ProductListenerBehaviour(this);
-		addBehaviour(scheduleBehaviour);
-		addBehaviour(listenerBehaviour);
 	}
 
 	/**

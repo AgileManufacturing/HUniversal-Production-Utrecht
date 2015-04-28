@@ -4,8 +4,6 @@ import MAS.util.Position;
 import MAS.util.Tick;
 
 public interface IProductSim {
-	
-	void schedule(Tick time);
 
 	void onProductArrived(Tick time);
 

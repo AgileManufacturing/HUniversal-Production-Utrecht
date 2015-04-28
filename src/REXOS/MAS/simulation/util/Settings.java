@@ -13,12 +13,12 @@ public class Settings {
 	/**
 	 * whether the simulation uses stochastic processing times and other time consuming variables.
 	 */
-	public final static boolean STOCHASTICS = true;
+	public final static boolean STOCHASTICS = false;
 
 	/**
 	 * whether equiplets can breakdown
 	 */
-	public final static boolean BREAKDOWNS = true;
+	public final static boolean BREAKDOWNS = false;
 
 	/**
 	 * time penalty of a reconfiguration. the time it takes to (re) config an equiplet
@@ -44,7 +44,7 @@ public class Settings {
 	/**
 	 * Target of utilization of equiplet for depending the interarrival time of new products
 	 */
-	public static final double UTILIZATION = 0.80;
+	public static final double UTILIZATION = 0.90;
 
 	public static final boolean CONSTANT_NUMBER_OF_PRODUCT_STEPS = true;
 

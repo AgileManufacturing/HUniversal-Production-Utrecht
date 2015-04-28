@@ -20,12 +20,12 @@ public class MASConfiguration {
 	/**
 	 * Scheduling algorithm used by product agent to schedule his product step
 	 */
-	public final static SchedulingAlgorithm SCHEDULING = SchedulingAlgorithm.MATRIX;
+	public final static SchedulingAlgorithm SCHEDULING = SchedulingAlgorithm.SUPREME;
 
 	/**
 	 * Reshedule when start time of product step is not met
 	 */
-	public static boolean RESCHEDULE = true;
+	public static boolean RESCHEDULE = false;
 
 	/**
 	 * keep track of the equiplet history while the equiplet agent is alive

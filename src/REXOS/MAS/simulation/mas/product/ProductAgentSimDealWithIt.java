@@ -95,17 +95,6 @@ public class ProductAgentSimDealWithIt extends ProductAgent implements IProductS
 	}
 
 	@Override
-	public void start() {
-		// wait for it...
-		// the simulation will give the green light
-	}
-
-	@Override
-	public void schedule(Tick time) {
-		super.start();
-	}
-
-	@Override
 	public void kill() {
 		// TODO handle properly, let the equiplet know that I been killed
 		System.out.printf("PA:%s terminating\n", getLocalName());

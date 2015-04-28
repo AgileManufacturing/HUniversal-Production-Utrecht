@@ -45,7 +45,6 @@ class Product implements IProductSim {
 
 	}
 
-	@Override
 	public void schedule(Tick time) {
 		try {
 			simulation.scheduleProduct(name, time, position, productSteps, deadline);
@@ -227,12 +226,15 @@ class Product implements IProductSim {
 		}
 	}
 
-	public void informProductProcessing(Tick time) {
+	public void informProductProcessing(Tick time, String equiplet) {
 		state = ProductState.PROCESSING;
 
 		// notify the simulation that processing begins
 		ProductionStep step = getCurrentStep();
 		step.updateStart(time);
+		if (!step.getEquipletName().equals(equiplet)) {
+			throw new IllegalArgumentException("Equiplet name: "+ equiplet + " differs from "+ step.getEquipletName() + " in step "+ step + " and path: " + productionPath);
+		}
 		simulation.notifyProductProcessing(name, step.getEquipletName(), step.getService(), step.getIndex());
 	}
 

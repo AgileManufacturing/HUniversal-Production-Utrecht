@@ -26,7 +26,7 @@ public class Sim extends Simulation<Product, Equiplet> {
 
 	// dit ding ook maar twee keer bijhouden, jeeh
 	// private StaticSimulation simulation;
-	private Tick travelTime;
+	private Tick travelTime; 
 
 	public Sim(StaticSimulation simulation) {
 		super(simulation);
@@ -34,15 +34,43 @@ public class Sim extends Simulation<Product, Equiplet> {
 		this.travelTime = Config.read().getTravelTime().first;
 	}
 
-	public void scheduleProduct(String productName, Tick time, Position position, LinkedList<ProductStep> productSteps, Tick deadline) throws SchedulingException {
-		updateProductStats(STATS_SYSTEM, +1);
+	/**
+	 * Event that signals the arrival of a new product in the system
+	 * A product agent is created and started which will invoke the schedule
+	 * behaviour
+	 */
+	@Override
+	protected void productEvent() {
+		try {
+			// product agent settings
+			LinkedList<ProductStep> productSteps = stochastics.generateProductSteps();
 
+			String productName = "P" + productCount++;
+			Position startPosition = new Position(-1, -1);
+
+			Tick deadline = time.add(stochastics.generateDeadline());
+			Product product = simulation.createProduct(productName, startPosition, productSteps, time, deadline);
+			products.put(productName, product);
+			product.schedule(time);
+
+			// update statistics
+			totalSteps += productSteps.size();
+			updateProductStats(STATS_SYSTEM, +1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// wait for confirmation creation of product agent
+		System.out.println("CHECKPOINT BRAVO");
+	}
+
+	public void scheduleProduct(String productName, Tick time, Position position, LinkedList<ProductStep> productSteps, Tick deadline) throws SchedulingException {
 		// find capable equiplets
 		// calculate travel times between equiplets
 		// calculate production path
 		// schedule equiplets
 
-		System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour at %s, product steps: %s\n", productName, time, productSteps);
+		System.out.printf(System.currentTimeMillis() + "\tPA:%s starts schedule behaviour at %s, product steps: %s  before deadline: %s\n", productName, time, productSteps, deadline);
 
 		// option to execute product step ::
 		// Map < product step index, Options to execute product step <Equiplet, Pair < estimate duration of service, List of possibilities < from time, until time> > > >
@@ -183,7 +211,7 @@ public class Sim extends Simulation<Product, Equiplet> {
 	public void informProductProcessing(Tick time, String productName, String equipletName) {
 		System.out.println("inform: PROCESSING [time=" + time + ", product=" + productName + ", equiplet=" + equipletName + "]");
 		Product product = products.get(productName);
-		product.informProductProcessing(time);
+		product.informProductProcessing(time, equipletName);
 	}
 
 	public void informProductStepFinished(String productName, Tick time, int index) {

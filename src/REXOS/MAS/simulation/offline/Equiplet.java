@@ -24,7 +24,7 @@ import MAS.util.Triple;
 import MAS.util.Tuple;
 import MAS.util.Util;
 
-class Equiplet implements IEquipletSim {
+public class Equiplet implements IEquipletSim {
 	private Sim simulation;
 
 	// Equiplet knowledge
@@ -71,7 +71,7 @@ class Equiplet implements IEquipletSim {
 	 */
 	private Map<Tick, Tick> scheduleLatency;
 
-	Equiplet(Sim simulation, String name, Position position, List<Capability> capabilities) {
+	protected Equiplet(Sim simulation, String name, Position position, List<Capability> capabilities) {
 		this.simulation = simulation;
 		this.name = name;
 
@@ -110,7 +110,6 @@ class Equiplet implements IEquipletSim {
 	public String getExecutingProduct() {
 		return executing.getProductAgentName();
 	}
-	
 
 	/**
 	 * Schedule a job
@@ -128,8 +127,7 @@ class Equiplet implements IEquipletSim {
 	 *            of the job
 	 * @return if it succeeded to schedule the job
 	 */
-	protected synchronized boolean schedule(String product, int index, Tick start, Tick deadline, String service,
-			JSONObject criteria) {
+	protected synchronized boolean schedule(String product, int index, Tick start, Tick deadline, String service, JSONObject criteria) {
 		// do not schedule a job when going to be reconfigured
 		if (reconfiguring) {
 			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
@@ -147,8 +145,7 @@ class Equiplet implements IEquipletSim {
 			// this shouldn't yet occur (not in the simulation), a equiplet
 			// should never give a product the available time which cannot be
 			// scheduled
-			System.err.println("\n----------\nstart=" + start + ", due=" + start.add(duration) + "\nSCHEDULE:\n"
-					+ schedule + "\n\n");
+			System.err.println("\n----------\nstart=" + start + ", due=" + start.add(duration) + "\nSCHEDULE:\n" + schedule + "\n\n");
 			throw new IllegalArgumentException("overlap schedule ");
 		}
 	}
@@ -173,13 +170,11 @@ class Equiplet implements IEquipletSim {
 
 	@Override
 	public String toString() {
-		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d]", name, state, capabilities, (executing == null ? "null"
-				: executing), schedule.size(), getWaiting(), history.size());
+		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d]", name, state, capabilities, (executing == null ? "null" : executing), schedule.size(), getWaiting(), history.size());
 	}
 
 	public String toFullString() {
-		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d] \n\thistory=%s \n\tschedule=%s", name, state, capabilities, (executing == null ? "null"
-				: executing), schedule.size(), getWaiting(), history.size(), Util.formatSet(history), Util.formatSet(schedule));
+		return String.format("%s:[state=%s, \tcapabilities=%s, \texecuting=%s, \tscheduled=%d, \twaiting=%d, \thistory=%d] \n\thistory=%s \n\tschedule=%s", name, state, capabilities, (executing == null ? "null" : executing), schedule.size(), getWaiting(), history.size(), Util.formatSet(history), Util.formatSet(schedule));
 	}
 
 	public boolean release(String product) {
@@ -193,7 +188,8 @@ class Equiplet implements IEquipletSim {
 	}
 
 	/**
-	 * Checks whether a job is ready for execution TODO check not only the first in the schedule but also after if job
+	 * Checks whether a job is ready for execution TODO check not only the first
+	 * in the schedule but also after if job
 	 * can be executed earlier than planned, which increases complexity
 	 * 
 	 * @return if there is job ready for executing
@@ -215,7 +211,8 @@ class Equiplet implements IEquipletSim {
 	}
 
 	/**
-	 * Start with executing the first job in the schedule Note: that the first job in the schedule need to be ready TODO
+	 * Start with executing the first job in the schedule Note: that the first
+	 * job in the schedule need to be ready TODO
 	 * fix that the job can be performed earlier that scheduled.
 	 * 
 	 * @param start
@@ -401,7 +398,8 @@ class Equiplet implements IEquipletSim {
 	}
 
 	/**
-	 * check whether the equiplet is capable to perform a service with certain criteria
+	 * check whether the equiplet is capable to perform a service with certain
+	 * criteria
 	 * 
 	 * @param service
 	 * @param criteria
@@ -430,23 +428,24 @@ class Equiplet implements IEquipletSim {
 		return productionTimes.get(service);
 	}
 
-
 	/**
-	 * the first possible time there is enough room in the schedule to perform a service load = 1 - Sr / Sw
+	 * the first possible time there is enough room in the schedule to perform a
+	 * service load = 1 - Sr / Sw
 	 * 
 	 * @param time
 	 *            the first possible time from which to look
 	 * @param duration
 	 *            an estimate of time the equiplet is checked for availability
-	 * @return a list of time it is possible to plan the duration TODO can only plan in end of schedule
+	 * @return a list of time it is possible to plan the duration TODO can only
+	 *         plan in end of schedule
 	 */
 	protected synchronized List<Pair<Tick, Tick>> available(Tick time, Tick duration, Tick deadline) {
 		List<Pair<Tick, Tick>> available = new ArrayList<Pair<Tick, Tick>>();
 
 		// when ever behind on schedule, the latency would otherwise keep increasing
 		Tick window = schedule.isEmpty() ? deadline : deadline.minus(time.minus(schedule.first().getStartTime()).max(0));
-		// System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
-		// " - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
+		//		System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
+		//		" - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
 
 		// not availale when going to be reconfigured
 		if (reconfiguring) {
@@ -457,8 +456,12 @@ class Equiplet implements IEquipletSim {
 		if (isExecuting()) {
 			// when executing add 10% of the duration to the time to prevent
 			// reschedules in the same timeslot
-			start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
+			// start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
+			// or not ... ?
+			start = start.max(executing.getDue());
 		}
+
+		System.out.println("executing " + executing + "");
 
 		if (state == EquipletState.ERROR || state == EquipletState.ERROR_FINISHED) {
 			// when broken down add the largest time slot to now to prevent
@@ -480,8 +483,10 @@ class Equiplet implements IEquipletSim {
 						if (job.getStartTime().lessThan(window)) {
 							available.add(new Pair<Tick, Tick>(start, job.getStartTime()));
 							start = job.getDue();
-						} else {
+						} else if (start.lessThan(window)) {
 							available.add(new Pair<Tick, Tick>(start, window));
+							break;
+						} else {
 							break;
 						}
 					} else {
@@ -501,7 +506,8 @@ class Equiplet implements IEquipletSim {
 	}
 
 	/**
-	 * calculate the load of the equiplet from a certain time with a window load = 1 - Sr / Sw
+	 * calculate the load of the equiplet from a certain time with a window load
+	 * = 1 - Sr / Sw
 	 * 
 	 * @param time
 	 *            from which the load needs to be calculated
@@ -513,8 +519,7 @@ class Equiplet implements IEquipletSim {
 		Tick sum = new Tick(0);
 
 		for (Job job : schedule) {
-			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
-					&& job.getDue().lessOrEqualThan(time.add(window))) {
+			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time) && job.getDue().lessOrEqualThan(time.add(window))) {
 				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
 			}
 
@@ -533,7 +538,8 @@ class Equiplet implements IEquipletSim {
 	}
 
 	/**
-	 * calculate the load of the history of the equiplet from a certain time with a window
+	 * calculate the load of the history of the equiplet from a certain time
+	 * with a window
 	 * 
 	 * @param time
 	 *            from which the load needs to be calculated
@@ -551,8 +557,7 @@ class Equiplet implements IEquipletSim {
 		Iterator<Job> iterator = history.descendingIterator();
 		while (iterator.hasNext()) {
 			Job job = iterator.next();
-			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time)
-					&& job.getDue().lessOrEqualThan(time.add(window))) {
+			if (job.getStartTime().greaterOrEqualThan(time) && job.getStartTime().lessOrEqualThan(time.add(window)) || job.getDue().greaterThan(time) && job.getDue().lessOrEqualThan(time.add(window))) {
 				sum = sum.add(job.getDue().min(time.add(window)).minus(job.getStartTime().max(time)));
 			} else if (job.getDue().lessThan(time)) {
 				// the jobs are outside the scope of the load window
@@ -631,7 +636,8 @@ class Equiplet implements IEquipletSim {
 	}
 
 	/**
-	 * Get the number of jobs waiting to be executed i.e. ready for execution A job is ready for executing when the
+	 * Get the number of jobs waiting to be executed i.e. ready for execution A
+	 * job is ready for executing when the
 	 * product arrived by the equiplet
 	 * 
 	 * @return number of jobs ready to executed
