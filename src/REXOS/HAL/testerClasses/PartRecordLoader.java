@@ -10,9 +10,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import HAL.dataTypes.GazeboModel;
-import HAL.dataTypes.JavaSoftware;
 import HAL.dataTypes.PartType;
-import HAL.dataTypes.RosSoftware;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 public class PartRecordLoader {

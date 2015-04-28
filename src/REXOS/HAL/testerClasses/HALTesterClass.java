@@ -1,5 +1,7 @@
 package HAL.testerClasses;
 
+import generic.Mast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
@@ -27,8 +30,9 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = false;
+	static boolean insertModules = true;
 	static boolean translateSteps = true;
+	static int serialNumber = 1;
 	
 	// dummy module A
 	static String moduleA_01 = "{" +
@@ -122,12 +126,18 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 2) {
+		if(args.length >= 1) {
 			if(args[0].equals("--noInsert")) {
 				insertModules = false;
 			} else if(args[0].equals("--noTranslate")) {
 				translateSteps = false;
 			}
+		}
+		
+		if(args.length >= 3) {
+			equipletName = args[1];
+			serialNumber = Integer.parseInt(args[2]);
+		} if(args.length >= 2) {
 			equipletName = args[1];
 		} else if(args.length >= 1) {
 			equipletName = args[0];
@@ -141,7 +151,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	public HALTesterClass() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
 		
-		hal = new HardwareAbstractionLayer(this);
+		hal = new HardwareAbstractionLayer(equipletName, this);
 
 		if(insertModules == true) {
 			FileInputStream fis;
@@ -199,6 +209,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 					moduleB_03 + base64DummyModuleBGazebo + moduleB_04;
 			JSONObject b = new JSONObject(new JSONTokener(moduleB));
 			
+			a.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
 			
 			hal.insertModule(a, a);
 			hal.insertModule(b, b);
@@ -222,24 +234,18 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status, 
-			Module module, HardwareStep hardwareStep) {
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}
 
 	@Override
-	public void onModuleStateChanged(String state, Module module) {
+	public void onModuleStateChanged(Module module, Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
-	public void onModuleModeChanged(String mode, Module module) {
+	public void onModuleModeChanged(Module module, Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
-	}
-
-	@Override
-	public String getEquipletName() {
-		return equipletName;
 	}
 
 	@Override
@@ -248,13 +254,13 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
+	public void onEquipletStateChanged(Mast.State state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + equipletName + " has changed to " + state);
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
+	public void onEquipletModeChanged(Mast.Mode mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + equipletName + " has changed to " + mode);
 	}
 
 	@Override
@@ -262,13 +268,9 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution failed");
 	}
 
-	/**
-	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
-	 * @param state [description]
-	 */
 	@Override
-	public void onReloadEquiplet(String state){
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
+	public void onReloadEquipletStatusChanged(EquipletReloadStatus status) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
 
 	}
 }

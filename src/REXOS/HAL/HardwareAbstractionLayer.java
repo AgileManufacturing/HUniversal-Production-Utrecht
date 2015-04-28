@@ -1,5 +1,7 @@
 package HAL;
 
+import generic.Mast;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -23,7 +25,7 @@ import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
-import HAL.listeners.BlackboardEquipletListener;
+import HAL.listeners.EquipletListener;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.listeners.ModuleListener;
 import HAL.steps.HardwareStep;
@@ -38,12 +40,12 @@ import HAL.tasks.TranslationProcess;
  * 
  * @see http://wiki.agilemanufacturing.nl/index.php/HAL
  */
-public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquipletListener {
+public class HardwareAbstractionLayer implements ModuleListener, EquipletListener {
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
 	private ReconfigHandler reconfigHandler;
 	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
-	private BlackboardHandler blackboardHandler;
+	private RosInterface rosInterface;
 
 	private String equipletName;
 
@@ -60,15 +62,16 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * @throws KnowledgeException
 	 * @throws BlackboardUpdateException
 	 */
-	public HardwareAbstractionLayer(HardwareAbstractionLayerListener hardwareAbstractionLayerListener) throws KnowledgeException, BlackboardUpdateException {
-		equipletName = hardwareAbstractionLayerListener.getEquipletName();
+	public HardwareAbstractionLayer(String equipletName, HardwareAbstractionLayerListener hardwareAbstractionLayerListener) 
+			throws KnowledgeException, BlackboardUpdateException {
+		this.equipletName = equipletName;
 
 		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
 		reconfigHandler = new ReconfigHandler(this, capabilityFactory, moduleFactory);
-		blackboardHandler = new BlackboardHandler(equipletName);
-		blackboardHandler.addBlackboardEquipletListener(this);
+		rosInterface = new BlackboardHandler(equipletName);
+		rosInterface.addEquipletListener(this);
 	}
 
 	/**
@@ -179,16 +182,16 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	 * This method will be called by the blackboard handler when the state of the equiplet has changed. Do not call this method!
 	 */
 	@Override
-	public void onModuleStateChanged(String state, Module module) {
-		hardwareAbstractionLayerListener.onModuleStateChanged(state, module);
+	public void onModuleStateChanged(Module module, Mast.State state) {
+		hardwareAbstractionLayerListener.onModuleStateChanged(module, state);
 	}
 
 	/**
 	 * This method will be called by the blackboard handler when the mode of the equiplet has changed. Do not call this method!
 	 */
 	@Override
-	public void onModuleModeChanged(String mode, Module module) {
-		hardwareAbstractionLayerListener.onModuleModeChanged(mode, module);
+	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+		hardwareAbstractionLayerListener.onModuleModeChanged(module, mode);
 	}
 
 	/**
@@ -201,46 +204,26 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 	/**
 	 * Do not call this method!
 	 */
-	public BlackboardHandler getBlackBoardHandler() {
-		return blackboardHandler;
+	public RosInterface getRosInterface() {
+		return rosInterface;
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
+	public void onEquipletStateChanged(Mast.State state) {
 		hardwareAbstractionLayerListener.onEquipletStateChanged(state);
 	}
-
 	@Override
-	public void onEquipletModeChanged(String mode) {
+	public void onEquipletModeChanged(Mast.Mode mode) {
 		hardwareAbstractionLayerListener.onEquipletModeChanged(mode);
 	}
-
-	/**
-	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
-	 * 
-	 * @param state
-	 *            [description]
-	 */
 	@Override
-	public void onReloadEquiplet(String state) {
-		hardwareAbstractionLayerListener.onReloadEquiplet(state);
-	}
-
-	/**
-	 * [sendReloadEquiplet - This method call the blackboard handler to submit a reloadEquiplet command - UNTESTED W.I.P (Lars Veenendaal)]
-	 * 
-	 * @throws GeneralMongoException
-	 * @throws InvalidDBNamespaceException
-	 * @throws InvalidJSONException
-	 * @throws JSONException
-	 */
-	@Override
-	public void sendReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		blackboardHandler.postReloadEquiplet();
+	public void onEquipletReloadStatusChanged(EquipletReloadStatus status) {
+		hardwareAbstractionLayerListener.onReloadEquipletStatusChanged(status);
+		
 	}
 
 	public void shutdown() {
-		blackboardHandler.shutdown();
+		rosInterface.shutdown();
 	}
 	
 	@Override
@@ -248,4 +231,5 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		super.finalize();
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "HAL has been garbage collected");
 	}
+
 }

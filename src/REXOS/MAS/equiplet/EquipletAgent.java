@@ -1,5 +1,6 @@
 package MAS.equiplet;
 
+import generic.Mast;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -28,6 +29,7 @@ import HAL.Module;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import MAS.util.MASConfiguration;
@@ -73,7 +75,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		if (args != null && args.length > 0) {
 			if (args[0].equals("hal")) {
 				try {
-					hal = new HardwareAbstractionLayer(this);
+					hal = new HardwareAbstractionLayer(this.getLocalName(), this);
 					System.out.println("EA:" + getLocalName() + " has created HAL");
 
 					ArrayList<String> services = hal.getSupportedServices();
@@ -931,7 +933,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep) {
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status) {
 		// TODO Auto-generated method stub
 		
 		// just wrong
@@ -975,25 +977,25 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
+	public void onEquipletStateChanged(Mast.State state) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode) {
+	public void onEquipletModeChanged(Mast.Mode mode) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onModuleStateChanged(String state, Module module) {
+	public void onModuleStateChanged(Module module, Mast.State state) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onModuleModeChanged(String mode, Module module) {
+	public void onModuleModeChanged(Module module, Mast.Mode mode) {
 		// TODO Auto-generated method stub
 
 	}
@@ -1012,12 +1014,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public String getEquipletName() {
-		return this.getLocalName();
-	}
-
-	@Override
-	public void onReloadEquiplet(String state) {
+	public void onReloadEquipletStatusChanged(EquipletReloadStatus status) {
 		// TODO Auto-generated method stub
 		
 	}

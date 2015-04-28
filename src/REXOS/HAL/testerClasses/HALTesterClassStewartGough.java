@@ -1,5 +1,7 @@
 package HAL.testerClasses;
 
+import generic.Mast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
@@ -385,7 +388,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 		htc = null;
 	}
 	public HALTesterClassStewartGough() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
-		hal = new HardwareAbstractionLayer(this);
+		hal = new HardwareAbstractionLayer(equipletName, this);
 
 		if(insertModules == true) {
 			FileInputStream fis;
@@ -615,24 +618,18 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 	}
 
 	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status, 
-			Module module, HardwareStep hardwareStep) {
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
 	}
 
 	@Override
-	public void onModuleStateChanged(String state, Module module) {
+	public void onModuleStateChanged(Module module, Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
-	public void onModuleModeChanged(String mode, Module module) {
+	public void onModuleModeChanged(Module module, Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
-	}
-
-	@Override
-	public String getEquipletName() {
-		return equipletName;
 	}
 
 	@Override
@@ -641,13 +638,13 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 	}
 
 	@Override
-	public void onEquipletStateChanged(String state) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
+	public void onEquipletStateChanged(Mast.State state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + equipletName + " has changed to " + state);
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
+	public void onEquipletModeChanged(Mast.Mode mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + equipletName + " has changed to " + mode);
 	}
 
 	@Override
@@ -655,13 +652,9 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution failed");
 	}
 
-	/**
-	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
-	 * @param state [description]
-	 */
 	@Override
-	public void onReloadEquiplet(String state){
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
+	public void onReloadEquipletStatusChanged(EquipletReloadStatus status) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
 
 	}
 }

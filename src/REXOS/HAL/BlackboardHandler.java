@@ -1,7 +1,11 @@
 package HAL;
 
+import generic.Mast;
+import generic.Mast.Mode;
+import generic.Mast.State;
+
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.Map;
 
 import util.configuration.Configuration;
 import util.log.LogLevel;
@@ -17,11 +21,11 @@ import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
 import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.blackboard_client.data_classes.MongoOperation;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
-import HAL.listeners.BlackboardEquipletListener;
-import HAL.listeners.BlackboardModuleListener;
-import HAL.listeners.BlackboardProcessListener;
+import HAL.listeners.EquipletListener.EquipletReloadStatus;
+import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
+import org.bson.types.ObjectId;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -35,16 +39,11 @@ import com.mongodb.DBObject;
  * @author Lars Veenendaal
  * 
  */
-public class BlackboardHandler implements BlackboardSubscriber {
-
-	private ArrayList<BlackboardModuleListener> moduleSubscribers;
-	private ArrayList<BlackboardEquipletListener> equipletSubscribers;
-	private ArrayList<BlackboardProcessListener> processSubscribers;
-	
+public class BlackboardHandler extends RosInterface implements BlackboardSubscriber {
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient modeBlackboardBBClient;
-	private BlackboardClient equipletStepBBClient;
-	private BlackboardClient ReloadEquipletBBClient;
+	private BlackboardClient hardwareStepBBClient;
+	private BlackboardClient equipletCommandBBClient;
 	
 	private FieldUpdateSubscription stateSubscription;
 	private FieldUpdateSubscription modeSubscription;
@@ -55,15 +54,14 @@ public class BlackboardHandler implements BlackboardSubscriber {
 	private String mode = null;
 	private String equipletName;
 	
+	private Map<ObjectId, HardwareStep> hardwareSteps;
+	
 	/**
 	 * @throws BlackboardUpdateException 
 	 * 
 	 */
 	public BlackboardHandler(String equipletName) throws BlackboardUpdateException{
 		this.equipletName = equipletName;
-		moduleSubscribers = new ArrayList<BlackboardModuleListener>();
-		equipletSubscribers = new ArrayList<BlackboardEquipletListener>();
-		processSubscribers = new ArrayList<BlackboardProcessListener>();
 		
 		try {
 			stateSubscription = new FieldUpdateSubscription("state", this);
@@ -87,73 +85,23 @@ public class BlackboardHandler implements BlackboardSubscriber {
 			statusSubscription = new FieldUpdateSubscription("status", this);
 			statusSubscription.addOperation(MongoUpdateLogOperation.SET);
 		   
-			equipletStepBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/hardwareSteps/ip/", equipletName));
-			equipletStepBBClient.setDatabase((String) Configuration.getProperty("rosInterface/hardwareSteps/databaseName/", equipletName));
-			equipletStepBBClient.setCollection((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName));
-			equipletStepBBClient.subscribe(statusSubscription);
+			hardwareStepBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/hardwareSteps/ip/", equipletName));
+			hardwareStepBBClient.setDatabase((String) Configuration.getProperty("rosInterface/hardwareSteps/databaseName/", equipletName));
+			hardwareStepBBClient.setCollection((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName));
+			hardwareStepBBClient.subscribe(statusSubscription);
 
 			reloadSubscription = new FieldUpdateSubscription("reload", this);
 			reloadSubscription.addOperation(MongoUpdateLogOperation.SET);
 
-			ReloadEquipletBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletCommands/ip/", equipletName));
-			ReloadEquipletBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletCommands/databaseName/", equipletName));
-			ReloadEquipletBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
-			ReloadEquipletBBClient.subscribe(reloadSubscription);
+			equipletCommandBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/equipletCommands/ip/", equipletName));
+			equipletCommandBBClient.setDatabase((String) Configuration.getProperty("rosInterface/equipletCommands/databaseName/", equipletName));
+			equipletCommandBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
+			equipletCommandBBClient.subscribe(reloadSubscription);
 
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
 			throw new BlackboardUpdateException("Unable to initialize HAL.BlackBoardHandler", ex);
 		}
 	}
-	
-
-	/**
-	 * 
-	 * @param blackboardListener
-	 */
-	public void addBlackboardModuleListener(BlackboardModuleListener blackboardListener){
-		moduleSubscribers.add(blackboardListener);
-	}
-
-	/**
-	 * 
-	 * @param blackboardListener
-	 */
-	public void addBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
-		equipletSubscribers.add(blackboardListener);
-	}
-	
-	/**
-	 * 
-	 * @param blackboardListener
-	 */
-	public void addBlackboardProcessListener(BlackboardProcessListener blackboardListener){
-		processSubscribers.add(blackboardListener);
-	}
-	
-	/**
-	 * 
-	 * @param blackboardListener
-	 */
-	public void removeBlackboardEquipletListener(BlackboardEquipletListener blackboardListener){
-		equipletSubscribers.remove(blackboardListener);
-	}
-
-	/**
-	 * 
-	 * @param blackboardListener
-	 */
-	public void removeBlackboardModuleListener(BlackboardModuleListener blackboardListener){
-		moduleSubscribers.remove(blackboardListener);
-	}
-	
-	/**
-	 * 
-	 * @param blackboardListener
-	 */
-	public void removeBlackboardProcessListener(BlackboardProcessListener blackboardListener){
-		processSubscribers.remove(blackboardListener);
-	}
-	
 	
 	/**
 	 * @see BlackboardSubscriber#onMessage(MongoOperation, OplogEntry)
@@ -164,89 +112,104 @@ public class BlackboardHandler implements BlackboardSubscriber {
 		try{
 			String collectionName = entry.getNamespace().split("\\.")[1];
 			if(collectionName.equals((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", equipletName))) { 
-				Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ state or mode changed");
+				Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "EQ state or mode changed");
 				dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null) {
 					if(dbObject.containsField("state")){
 						state = dbObject.get("state").toString();
+						onEquipletStateChanged(Mast.State.valueOf(state));
 					}
 					if(dbObject.containsField("mode")){
 						mode = dbObject.get("mode").toString();
-					}	
-					for(BlackboardEquipletListener listener: equipletSubscribers){
-						listener.onEquipletStateChanged(state);
-						listener.onEquipletModeChanged(mode);
+						onEquipletModeChanged(Mast.Mode.valueOf(mode));
 					}
 				}
 			} else if(collectionName.equals((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", equipletName))) {
-				dbObject = equipletStepBBClient.findDocumentById(entry.getTargetObjectId());
+				dbObject = hardwareStepBBClient.findDocumentById(entry.getTargetObjectId());
 				
 				if(dbObject != null) {
 					String status = dbObject.get("status").toString();
 					String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
-					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "EQ step process status changed: " + status + " " + id);
 					
-					for(BlackboardProcessListener listener: processSubscribers) {
-						listener.onProcessStatusChanged(HardwareStepStatus.valueOf(status), id); 
-					}
+					
+					onHardwareStepStatusChanged(hardwareSteps.get(id), HardwareStepStatus.valueOf(status));
 				}
 			} else if(collectionName.equals((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName))) {
-			    /**
-			     * ReloadEquiplet - W.I.P (Lars Veenendaal)
-			     */
-				dbObject = ReloadEquipletBBClient.findDocumentById(entry.getTargetObjectId());
+				dbObject = equipletCommandBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null){
-					String status = dbObject.get("ReloadSucces").toString();
+					String status = dbObject.get("status").toString();
 					//String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
-					Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "Reloading of the Equiplet has: " + status);
-					for(BlackboardEquipletListener listener: equipletSubscribers) {
-						listener.onReloadEquiplet(status); 
-					}
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "Reloading of the Equiplet has: " + status);
+					
+					onEquipletReloadStatusChanged(EquipletReloadStatus.valueOf(status));
 				}
 			}
-		}catch(InvalidDBNamespaceException | GeneralMongoException ex) {
-			Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.ERROR, "Unknown exception occured:", ex);
+		} catch(InvalidDBNamespaceException | GeneralMongoException ex) {
+			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Unknown exception occured:", ex);
 		}
 	}
 	
 	public void postHardwareStep(JSONObject hardwareStep) throws InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		equipletStepBBClient.insertDocument(hardwareStep.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
+		hardwareStepBBClient.insertDocument(hardwareStep.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
 	}
 	
-	/**
-	 * [postReloadEquiplet - This method posts to blackboard that a equiplet has to reload. - UNTESTED W.I.P (Lars Veenendaal)]
-	 * @throws JSONException
-	 * @throws InvalidJSONException
-	 * @throws InvalidDBNamespaceException
-	 * @throws GeneralMongoException
-	 */
-	public void postReloadEquiplet() throws JSONException, InvalidJSONException, InvalidDBNamespaceException, GeneralMongoException {
-		JSONObject reloadEQ = new JSONObject("{\"reloadEquiplet\":RELOAD_ALL_MODULES}");
-		equipletStepBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
-	}
-
-
-	public void finalize() {
-		processSubscribers.clear();
-		equipletSubscribers.clear();
-		moduleSubscribers.clear();
-		
-		ReloadEquipletBBClient.close();
-		ReloadEquipletBBClient = null;
-		equipletStepBBClient.close();
-		equipletStepBBClient = null;
-		modeBlackboardBBClient.close();
-		modeBlackboardBBClient = null;
-		stateBlackboardBBClient.close();
-		stateBlackboardBBClient = null;
-	}
-
-
 	public void shutdown() {
-		ReloadEquipletBBClient.close();
-		equipletStepBBClient.close();
+		equipletCommandBBClient.close();
+		hardwareStepBBClient.close();
 		modeBlackboardBBClient.close();
 		stateBlackboardBBClient.close();
 	}
+	
+	@Override
+	public void postHardwareStep(HardwareStep hardwareStep) {
+		try {
+			ObjectId id = hardwareStepBBClient.insertDocument(hardwareStep.toJSON().toString());
+			hardwareSteps.put(id, hardwareStep);
+		} catch (InvalidJSONException | InvalidDBNamespaceException | GeneralMongoException ex) {
+			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.CRITICAL, "Posting hardware step failed", ex);
+			throw new RuntimeException(ex);
+		}
+	}
 
+	@Override
+	public void postStateChange(State desiredState) {
+		try {
+			JSONObject reloadEQ;
+			reloadEQ = new JSONObject();
+			reloadEQ.put("command", "CHANGE_STATE");
+			reloadEQ.put("desiredMode", desiredState.toString());
+			equipletCommandBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
+		} catch (JSONException | InvalidJSONException | InvalidDBNamespaceException | GeneralMongoException ex) {
+			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.CRITICAL, "Posting command failed", ex);
+			throw new RuntimeException(ex);
+		}
+	}
+
+	@Override
+	public void postModeChange(Mode desiredMode) {
+		try {
+			JSONObject reloadEQ;
+			reloadEQ = new JSONObject();
+			reloadEQ.put("command", "CHANGE_MODE");
+			reloadEQ.put("desiredMode", desiredMode.toString());
+			equipletCommandBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
+		} catch (JSONException | InvalidJSONException | InvalidDBNamespaceException | GeneralMongoException ex) {
+			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.CRITICAL, "Posting command failed", ex);
+			throw new RuntimeException(ex);
+		}
+	}
+
+	@Override
+	public void postReloadRosModules() {
+		try {
+			JSONObject reloadEQ;
+			reloadEQ = new JSONObject();
+			reloadEQ.put("command", "RELOAD_ALL_MODULES");
+			equipletCommandBBClient.insertDocument(reloadEQ.toString() + ", { writeConcern: { w: 2, wtimeout: 0 } }");
+		} catch (JSONException | InvalidJSONException | InvalidDBNamespaceException | GeneralMongoException ex) {
+			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.CRITICAL, "Posting command failed", ex);
+			throw new RuntimeException(ex);
+		}
+	}
 }

@@ -79,7 +79,7 @@ public class MongoDBConnection {
 	 **/
 	private MongoDBConnection(ServerAddress address) throws GeneralMongoException {
 		try {
-			Logger.log(LogSection.HAL_BLACKBOARD, LogLevel.DEBUG, "Starting a new mongoclient.");
+			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "Starting a new mongoclient.");
 			
 			MongoOptions mongoOptions = new MongoOptions();
 			mongoOptions.connectionsPerHost = (int) Configuration.getProperty("rosInterface/connectionsPerHost");

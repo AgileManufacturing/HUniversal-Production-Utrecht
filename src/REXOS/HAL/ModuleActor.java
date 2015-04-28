@@ -14,11 +14,7 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
-import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
-import HAL.listeners.BlackboardProcessListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
@@ -33,7 +29,7 @@ import org.json.JSONObject;
  * @author Lars Veenendaal
  * 
  */
-public abstract class ModuleActor extends Module implements BlackboardProcessListener {
+public abstract class ModuleActor extends Module implements ProcessListener {
 	protected static final String MODULE_COMMAND = "module_command";
 	protected static final String APPROACH = "approach";
 	protected static final String DESTINATION = "destination";
@@ -52,7 +48,7 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	protected static final String MOVE = "move";
 	protected static final String ROTATE = "rotate";
 	
-	protected ProcessListener processListener;
+	protected ArrayList<ProcessListener> processListeners;
 	
 	
 	/**
@@ -67,43 +63,10 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
-		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardProcessListener(this);
+		moduleFactory.getHAL().getRosInterface().addProcessListener(this);
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
-	}
-	/**
-	 * Executes a command by inserting it in the blackboard.
-	 * @param command
-	 * @throws ModuleExecutingException
-	 */
-	protected void executeMongoCommand(JSONObject command){
-		try {
-			moduleFactory.getHAL().getBlackBoardHandler().postHardwareStep(command);
-		} catch (InvalidJSONException ex) {
-			throw new RuntimeException("Executing invalid JSON", ex);
-		} catch (InvalidDBNamespaceException ex) {
-			throw new RuntimeException("Executing invalid DBNamespace", ex);
-		} catch (GeneralMongoException ex) {
-			throw new RuntimeException("General mongo exception while trying to execute", ex);
-		}
-	}
-
-	/**
-	 * [executeReloadEquipletCommand This function fires a 'ReloadEquiplet' message.]
-	 */
-	protected void executeReloadEquipletCommand(){
-		try{
-			moduleFactory.getHAL().getBlackBoardHandler().postReloadEquiplet();
-		} catch (JSONException ex) {
- 			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()");
-		} catch (InvalidJSONException ex) {
-			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()", ex);
-		} catch (InvalidDBNamespaceException ex) {
-			throw new RuntimeException("Executing invalid DBNamespace - executeReloadEquipletCommand()", ex);
-		} catch (GeneralMongoException ex) {
-			throw new RuntimeException("General mongo exception while trying to execute - executeReloadEquipletCommand()", ex);
-		}
 	}
 	
 	/**
@@ -144,9 +107,9 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	 * @throws ModuleExecutingException
 	 */
 	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
-		this.processListener = processListener;
-		JSONObject command = hardwareStep.toJSON();
-		executeMongoCommand(command);
+		addProcessListener(processListener);
+		moduleFactory.getHAL().getRosInterface().addProcessListener(this);
+		moduleFactory.getHAL().getRosInterface().postHardwareStep(hardwareStep);
 	}
 	/**
 	 * This method will translate the {@link CompositeStep} and forward the remainder to its parent.
@@ -210,16 +173,16 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 		return compositeCommand;
 	}
 	
-
-
-	public void onProcessStatusChanged(HardwareStepStatus status, String hardwareStepSerialId) {
-		if(processListener != null) {
-			// the listener might reset the processListener, and therefore the listener must be set before calling the listener
-			ProcessListener temp = processListener;
-			if(status.equals(HardwareStepStatus.DONE) || status.equals(HardwareStepStatus.FAILED)){
-				processListener = null;
-			}
-			temp.onProcessStatusChanged(status, hardwareStepSerialId, this);
+	public void addProcessListener(ProcessListener processListener) {
+		processListeners.add(processListener);
+	}
+	public void removeProcessListener(ProcessListener processListener) {
+		processListeners.remove(processListener);
+	}
+	@Override
+	public void onProcessStatusChanged(HardwareStep hardwareStep, HardwareStepStatus status) {
+		for (ProcessListener processListener : processListeners) {
+			processListener.onProcessStatusChanged(hardwareStep, status);
 		}
 	}
 }

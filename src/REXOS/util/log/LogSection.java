@@ -3,7 +3,7 @@ package util.log;
 public enum LogSection {
 	NONE(null, ""),
 	HAL(null, "hal"),
-		HAL_BLACKBOARD(HAL, "halBb"),
+		HAL_ROS_INTERFACE(HAL, "halRos"),
 		HAL_FACTORIES(HAL, "halFact"),
 			HAL_MODULE_FACTORY(HAL_FACTORIES, "halModFact"),
 				HAL_MODULE_FACTORY_SQL(HAL_MODULE_FACTORY, "halModFactSql"),

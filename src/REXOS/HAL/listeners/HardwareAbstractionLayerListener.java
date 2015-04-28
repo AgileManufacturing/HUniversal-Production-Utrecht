@@ -1,11 +1,14 @@
 package HAL.listeners;
 
+import generic.Mast;
+
 import java.util.ArrayList;
 
 import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.tasks.ExecutionProcess;
@@ -24,7 +27,7 @@ public interface HardwareAbstractionLayerListener {
 	 * @param module
 	 * @param hardwareStep
 	 */
-	public void onProcessStatusChanged(HardwareStepStatus status, Module module, HardwareStep hardwareStep);
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status);
 	/**
 	 * This method is called when the execution of the {@link HardwareStep}s has finished (e.g. when a {@link ExecutionProcess} finishes)
 	 */
@@ -40,14 +43,14 @@ public interface HardwareAbstractionLayerListener {
 	 * 
 	 * @param state
 	 */
-	public void onEquipletStateChanged(String state);
+	public void onEquipletStateChanged(Mast.State state);
 
 	/**
 	 * This method is called when the MAST mode of the equiplet changes
 	 * 
 	 * @param mode
 	 */
-	public void onEquipletModeChanged(String mode);
+	public void onEquipletModeChanged(Mast.Mode mode);
 
 	/**
 	 * This method is called when the MAST state of the module changes
@@ -55,7 +58,7 @@ public interface HardwareAbstractionLayerListener {
 	 * @param state
 	 * @param module
 	 */
-	public void onModuleStateChanged(String state, Module module);
+	public void onModuleStateChanged(Module module, Mast.State state);
 
 	/**
 	 * This method is called when the MAST mode of the module changes
@@ -63,7 +66,7 @@ public interface HardwareAbstractionLayerListener {
 	 * @param mode
 	 * @param module
 	 */
-	public void onModuleModeChanged(String mode, Module module);
+	public void onModuleModeChanged(Module module, Mast.Mode mode);
 
 	/**
 	 * This method is called when the translation of a Job has succesfully finished.
@@ -80,16 +83,5 @@ public interface HardwareAbstractionLayerListener {
 	 */
 	public void onTranslationFailed(String service, JSONObject criteria);
 
-	/**
-	 * This method is used by the HAL to retrieve the equiplet name
-	 * 
-	 * @return
-	 */
-	public String getEquipletName();
-
-	/**
-	 * This method is called when the MAST mode of the equiplet is supposed to Reload
-	 * @param state
-	 */
-	public void onReloadEquiplet(String state);
+	public void onReloadEquipletStatusChanged(EquipletReloadStatus status);
 }
