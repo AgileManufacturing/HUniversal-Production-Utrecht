@@ -35,7 +35,7 @@ public:
 	
 	void onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::State newState, rexos_statemachine::State previousState);
 	void onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, rexos_statemachine::Mode newMode, rexos_statemachine::Mode previousMode);
-	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed);
+	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep);
 	void onModuleDied(rexos_module::ModuleProxy* moduleProxy);
 	void onModuleTransitionPhaseCompleted(rexos_module::ModuleProxy* moduleProxy, 
 			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 

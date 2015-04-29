@@ -34,6 +34,7 @@
 
 int main(int argc, char **argv) {
 	std::string blackboardIP;
+	int scadaPort = 8081;
 	bool isSimulated = false;
 	bool isShadow = false;
 	
@@ -44,6 +45,13 @@ int main(int argc, char **argv) {
 				blackboardIP = argv[++i];
 			} else {
 				REXOS_ERROR("--blackboard requires one argument");
+				return -1;
+			}
+		} else if (arg == "--scadaPort") {
+			if (i + 1 < argc) {
+				scadaPort = boost::lexical_cast<int>(argv[++i]);
+			} else {
+				REXOS_ERROR("--scadaPort requires one argument");
 				return -1;
 			}
 		} else if (arg == "--isSimulated") {
@@ -69,7 +77,7 @@ int main(int argc, char **argv) {
 	std::string nodeName = equipletName;
 	ros::init(argc, argv, nodeName);
 	
-	equiplet_node::EquipletNode equipletNode(equipletName, isSimulated, isShadow, blackboardIP);
+	equiplet_node::EquipletNode equipletNode(equipletName, isSimulated, isShadow, blackboardIP, scadaPort);
 	
 	ros::spin();
 	return 0;

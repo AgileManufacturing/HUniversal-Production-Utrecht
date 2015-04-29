@@ -178,9 +178,9 @@ void ModuleRegistry::onModuleModeChanged(
 	}
 }
 
-void ModuleRegistry::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed) {
+void ModuleRegistry::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep) {
 	if(moduleRegistryListener != NULL) {
-		moduleRegistryListener->onHardwareStepCompleted(moduleInterface, id, completed);
+		moduleRegistryListener->onHardwareStepCompleted(moduleInterface, hardwareStep);
 	}
 }
 

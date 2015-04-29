@@ -49,9 +49,7 @@
 
 namespace equiplet_node {
 
-class EquipletStateMachine : 
-	public rexos_statemachine::StateMachine, 
-	ModuleRegistryListener {
+class EquipletStateMachine : public rexos_statemachine::StateMachine, public ModuleRegistryListener {
 
 public:
 	EquipletStateMachine(std::string name, bool isSimulated);
