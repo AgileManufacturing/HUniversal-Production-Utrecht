@@ -219,10 +219,10 @@ class Product implements IProductSim {
 		}
 
 		try {
-			simulation.scheduleProduct(name, time, position, steps, deadline);
+			simulation.scheduleProduct(name, time, position, steps, deadline.add(1000000));
 		} catch (SchedulingException e) {
 			// infinite recursion?
-			reschedule(time, deadline.add(1000000));
+			// reschedule(time, deadline.add(1000000));
 		}
 	}
 

@@ -401,7 +401,7 @@ public class Simulation<Product extends IProductSim, Equiplet extends IEquipletS
 	 */
 	protected void updateProductStats(String type, int add) {
 		int lastValue = productStatistics.get(type).lastEntry().getValue();
-		System.out.println("UPDATE STATS: " + type + "=" + lastValue + " -> " + (lastValue + add));
+		// System.out.println("UPDATE STATS: " + type + "=" + lastValue + " -> " + (lastValue + add));
 		productStatistics.get(type).put(time, lastValue + add);
 	}
 

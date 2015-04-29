@@ -232,7 +232,6 @@ public class ProductAgent extends Agent {
 		state = ProductState.WAITING;
 
 		ProductionStep productionStep = productionPath.peek();
-		position = productionStep.getPosition();
 
 		try {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);

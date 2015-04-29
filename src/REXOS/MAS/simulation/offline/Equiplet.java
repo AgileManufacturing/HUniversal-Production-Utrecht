@@ -456,12 +456,8 @@ public class Equiplet implements IEquipletSim {
 		if (isExecuting()) {
 			// when executing add 10% of the duration to the time to prevent
 			// reschedules in the same timeslot
-			// start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
-			// or not ... ?
-			start = start.max(executing.getDue());
+			start = start.max(executing.getDue()).add(executing.getDuration().multiply(0.1));
 		}
-
-		System.out.println("executing " + executing + "");
 
 		if (state == EquipletState.ERROR || state == EquipletState.ERROR_FINISHED) {
 			// when broken down add the largest time slot to now to prevent
