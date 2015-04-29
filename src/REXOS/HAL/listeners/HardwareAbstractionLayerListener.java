@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.listeners.EquipletListener.EquipletReloadStatus;
+import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.tasks.ExecutionProcess;
@@ -27,7 +27,7 @@ public interface HardwareAbstractionLayerListener {
 	 * @param module
 	 * @param hardwareStep
 	 */
-	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status);
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep);
 	/**
 	 * This method is called when the execution of the {@link HardwareStep}s has finished (e.g. when a {@link ExecutionProcess} finishes)
 	 */
@@ -83,5 +83,5 @@ public interface HardwareAbstractionLayerListener {
 	 */
 	public void onTranslationFailed(String service, JSONObject criteria);
 
-	public void onReloadEquipletStatusChanged(EquipletReloadStatus status);
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status);
 }

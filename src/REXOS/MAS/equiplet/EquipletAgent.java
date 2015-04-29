@@ -28,10 +28,9 @@ import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.listeners.HardwareAbstractionLayerListener;
-import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
 import MAS.util.MASConfiguration;
 import MAS.util.Ontology;
 import MAS.util.Pair;
@@ -933,7 +932,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status) {
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep) {
 		// TODO Auto-generated method stub
 		
 		// just wrong
@@ -1014,7 +1013,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onReloadEquipletStatusChanged(EquipletReloadStatus status) {
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		// TODO Auto-generated method stub
 		
 	}

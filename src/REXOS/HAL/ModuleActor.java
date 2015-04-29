@@ -3,6 +3,9 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -14,15 +17,12 @@ import HAL.exceptions.FactoryException;
 import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
+import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
@@ -63,6 +63,7 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
+		processListeners = new ArrayList<ProcessListener>();
 		moduleFactory.getHAL().getRosInterface().addProcessListener(this);
 	}
 	public void setModuleListener(ModuleListener moduleListener){
@@ -90,9 +91,8 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 		} else {
 			// root module, no more parents			
 			// if commands remain then the modules were not able to fully translate the compositeStep
-			// TODO better comparison method
-			if (!compositeStep.getCommand().toString().trim().equalsIgnoreCase("{}")){
-				throw new ModuleTranslatingException("The compositestep isn't completely empty: " + 
+			if (compositeStep.getCommand().keys().hasNext() == true){
+				throw new ModuleTranslatingException("The compositestep isn't completely empty: \n" + 
 						compositeStep.getCommand(), compositeStep);
 			} else {
 				Logger.log(LogSection.HAL_MODULES, LogLevel.DEBUG, "Root of the module tree has been reached, composite step succesfully translated");
@@ -106,9 +106,7 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 	 * @param hardwareStep
 	 * @throws ModuleExecutingException
 	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
-		addProcessListener(processListener);
-		moduleFactory.getHAL().getRosInterface().addProcessListener(this);
+	public void executeHardwareStep(HardwareStep hardwareStep) {
 		moduleFactory.getHAL().getRosInterface().postHardwareStep(hardwareStep);
 	}
 	/**
@@ -180,9 +178,11 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 		processListeners.remove(processListener);
 	}
 	@Override
-	public void onProcessStatusChanged(HardwareStep hardwareStep, HardwareStepStatus status) {
-		for (ProcessListener processListener : processListeners) {
-			processListener.onProcessStatusChanged(hardwareStep, status);
+	public void onProcessStatusChanged(HardwareStep hardwareStep) {
+		if(hardwareStep.getModuleIdentifier() == this.moduleIdentifier) {
+			for (ProcessListener processListener : processListeners) {
+				processListener.onProcessStatusChanged(hardwareStep);
+			}
 		}
 	}
 }

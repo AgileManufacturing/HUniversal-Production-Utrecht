@@ -68,4 +68,5 @@ public:
 	virtual bool transitionStop();
 private:
 	ros::NodeHandle nodeHandle;
+	ros::ServiceClient environmentCacheClient;
 };

@@ -15,7 +15,7 @@ import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 public class EquipletRecordLoader {
 	
-	static String equipletName = "EQ3";
+	static String equipletName = "EQ2";
 	
 	public static void main(String[] args) throws JSONException, IOException {
 		if(args.length >= 1) {

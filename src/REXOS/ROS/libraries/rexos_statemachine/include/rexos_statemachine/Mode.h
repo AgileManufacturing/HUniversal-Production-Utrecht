@@ -50,6 +50,6 @@ namespace rexos_statemachine{
 	 * @var const char* const state_txt[]
 	 * The representation of the states in a char array so its easy to print the enum values instead of the integer
 	 **/
-	const char* const mode_txt[] = { "Normal", "LOCK", "STEP", "Error", "Critical Error", "E_Stop", "Service" };
+	const char* const mode_txt[] = { "NORMAL", "LOCK", "STEP", "ERROR", "CRITICAL ERROR", "E_STOP", "SERVICE" };
 }
 #endif

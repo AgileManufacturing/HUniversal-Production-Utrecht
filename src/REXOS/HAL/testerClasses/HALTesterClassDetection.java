@@ -20,10 +20,9 @@ import HAL.Module;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.listeners.HardwareAbstractionLayerListener;
-import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
 
 public class HALTesterClassDetection implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
@@ -296,8 +295,8 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 	}
 
 	@Override
-	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + hardwareStep.getStatus());
 	}
 
 	@Override
@@ -331,8 +330,7 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 	}
 
 	@Override
-	public void onReloadEquipletStatusChanged(EquipletReloadStatus status) {
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
-
 	}
 }

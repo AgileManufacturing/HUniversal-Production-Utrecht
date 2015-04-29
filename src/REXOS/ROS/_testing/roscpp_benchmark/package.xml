@@ -20,4 +20,6 @@
   <build_depend>actionlib_msgs</build_depend>
   <run_depend>actionlib_msgs</run_depend>
   <build_depend>genmsg</build_depend>
+  <run_depend>rexos_blackboard_cpp_client</run_depend>
+  <build_depend>rexos_blackboard_cpp_client</build_depend>
 </package>

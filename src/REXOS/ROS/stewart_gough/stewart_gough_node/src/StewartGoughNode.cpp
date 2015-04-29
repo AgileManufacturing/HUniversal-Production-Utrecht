@@ -81,14 +81,14 @@ StewartGoughNode::~StewartGoughNode() {
 }
 
 
-void StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
+void StewartGoughNode::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) {
 	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
-	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
+	rexos_datatypes::HardwareStep equipletStep(equipletStepNode);
 	
-	rexos_module::SetInstructionResult result;
+	rexos_module::ExecuteHardwareStepResult result;
 	result.OID = goal->OID;
 	
 	rexos_stewart_gough::StewartGoughLocation origin;
@@ -198,10 +198,10 @@ void StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalCo
 	
   	// finally move to point
 	if(moveToPoint(targetLocation, maxAcceleration)) {
-		setInstructionActionServer.setSucceeded(result);
+		executeHardwareStepServer.setSucceeded(result);
 	} else {
 		REXOS_WARN("Failed moving to point");
-		setInstructionActionServer.setAborted(result);
+		executeHardwareStepServer.setAborted(result);
 	}
 }
 

@@ -9,5 +9,5 @@ import HAL.steps.HardwareStep.HardwareStepStatus;
  *
  */
 public interface ProcessListener {
-	public void onProcessStatusChanged(HardwareStep hardwareStep, HardwareStepStatus status);
+	public void onProcessStatusChanged(HardwareStep hardwareStep);
 }

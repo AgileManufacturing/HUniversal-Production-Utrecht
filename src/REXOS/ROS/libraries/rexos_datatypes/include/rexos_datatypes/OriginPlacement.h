@@ -25,8 +25,10 @@ namespace rexos_datatypes {
 			RELATIVE_TO_CURRENT_POSITION,
 			RELATIVE_TO_MODULE_ORIGIN,
 			RELATIVE_TO_EQUIPLET_ORIGIN,
-			UNDEFINED
+			UNDEFINED,
+			COUNT
 		};
+		static const char* const originPlacementTypeTxt[];
 		
 		OriginPlacement(); 
 		OriginPlacement(Json::Value n); 

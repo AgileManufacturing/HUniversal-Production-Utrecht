@@ -61,7 +61,7 @@ public class DeltaRobot extends ModuleActor {
 		instructionData.put(MOVE, commandMove);
 		if (forceStraightLine){
 			//Straight line
-			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, instructionData, originPlacement));	
 		} else {
 			//Approach
 			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
@@ -73,10 +73,10 @@ public class DeltaRobot extends ModuleActor {
 			approachInstructionData.put(MOVE, commandApproach);
 			
 			//Entry point
-			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, approachInstructionData, originPlacement));
 			
 			//Actual point
-			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));
+			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, instructionData, originPlacement));
 			
 			//Placeholder
 			translatedHardwareSteps.add(null);

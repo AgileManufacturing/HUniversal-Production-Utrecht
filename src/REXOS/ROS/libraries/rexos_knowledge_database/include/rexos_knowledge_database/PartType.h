@@ -43,7 +43,7 @@ namespace rexos_knowledge_database {
 		static std::string getTypeNumberForParName(std::string partName);
 		
 		std::string typeNumber;
-		std::unique_ptr<sql::Connection> connection;
+		std::shared_ptr<sql::Connection> connection;
 	public:
 		PartType(std::string typeNumber);
 		

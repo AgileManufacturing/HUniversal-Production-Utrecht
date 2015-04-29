@@ -32,19 +32,19 @@
 #include <string>
 
 #include <rexos_module/Module.h>
-#include <rexos_module/SetInstructionAction.h>
+#include <rexos_module/ExecuteHardwareStepAction.h>
 #include <rexos_statemachine/ModuleStateMachine.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 
 namespace rexos_module {
-	typedef actionlib::SimpleActionServer<rexos_module::SetInstructionAction> SetInstructionActionServer;
+	typedef actionlib::SimpleActionServer<rexos_module::ExecuteHardwareStepAction> ExecuteHardwareStepServer;
 	
 	class ActorModule : public rexos_module::Module {
 	protected:
 		ActorModule(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, bool isShadow);
 		
-		virtual void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal) = 0;
+		virtual void onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) = 0;
 	protected:
-		SetInstructionActionServer setInstructionActionServer;
+		ExecuteHardwareStepServer executeHardwareStepServer;
 	};
 }

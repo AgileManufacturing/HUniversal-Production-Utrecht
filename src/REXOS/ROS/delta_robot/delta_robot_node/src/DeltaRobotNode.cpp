@@ -83,14 +83,14 @@ DeltaRobotNode::~DeltaRobotNode() {
 }
 
 
-void DeltaRobotNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal) {
+void DeltaRobotNode::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) {
 	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
-	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
+	rexos_datatypes::HardwareStep equipletStep(equipletStepNode);
 	
-	rexos_module::SetInstructionResult result;
+	rexos_module::ExecuteHardwareStepResult result;
 	result.OID = goal->OID;
 	
 	Vector4 origin;
@@ -169,10 +169,10 @@ void DeltaRobotNode::onSetInstruction(const rexos_module::SetInstructionGoalCons
 	// finally move to point
 	if(moveToPoint(targetVector.x, targetVector.y, targetVector.z, maxAcceleration))
 	{
-		setInstructionActionServer.setSucceeded(result);
+		executeHardwareStepServer.setSucceeded(result);
 	} else {
 		REXOS_WARN("Failed moving to point");
-		setInstructionActionServer.setAborted(result);
+		executeHardwareStepServer.setAborted(result);
 	}
 }
 

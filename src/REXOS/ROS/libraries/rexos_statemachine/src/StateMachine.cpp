@@ -120,7 +120,7 @@ void StateMachine::changeState(State desiredState) {
  * @param changeModeActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
 void StateMachine::changeMode(Mode desiredMode) {
-	REXOS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::state_txt[desiredMode]);
+	REXOS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::mode_txt[desiredMode]);
 	ChangeModeGoal goal;
 	goal.desiredMode = desiredMode;
 	changeModeActionClient.sendGoal(goal);

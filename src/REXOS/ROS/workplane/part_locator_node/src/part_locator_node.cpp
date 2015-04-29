@@ -8,7 +8,7 @@
 
 #include <environment_cache/EnvironmentCache.h>
 #include <rexos_utilities/Utilities.h>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <rexos_knowledge_database/KnowledgeDatabaseException.h>
 
 namespace part_locator_node {
@@ -341,7 +341,7 @@ namespace part_locator_node {
 	void PartLocatorNode::MoveToPoint(Vector3 v, std::string hardwarestepId, rexos_module::ModuleInterface& moverInterface){
 		int acceleration = 20;
 		
-		rexos_datatypes::EquipletStep equipletStep;
+		rexos_datatypes::HardwareStep equipletStep;
 		equipletStep.setModuleIdentifier(moverInterface.getModuleIdentifier());
 		rexos_datatypes::OriginPlacement originPlacement;
 		originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_EQUIPLET_ORIGIN);
@@ -355,7 +355,7 @@ namespace part_locator_node {
 		instructionData["move"]["y"] = v.y;
 		instructionData["move"]["z"] = v.z;
 		equipletStep.setInstructionData(instructionData);
-		moverInterface.setInstruction(hardwarestepId, equipletStep.toJSON());
+		moverInterface.executeHardwareStep(equipletStep);
 	}
 	
 	bool PartLocatorNode::mannuallyCalibrate(rexos_datatypes::ModuleIdentifier moverIdentifier){

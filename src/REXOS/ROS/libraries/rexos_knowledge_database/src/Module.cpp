@@ -13,7 +13,7 @@ namespace rexos_knowledge_database{
 			ModuleType(moduleIdentifier), 
 			moduleIdentifier(moduleIdentifier)
 	{
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT * \

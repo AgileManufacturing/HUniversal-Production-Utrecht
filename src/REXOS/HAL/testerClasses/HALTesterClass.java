@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -20,15 +21,15 @@ import HAL.Module;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.listeners.HardwareAbstractionLayerListener;
-import HAL.listeners.EquipletListener.EquipletReloadStatus;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
 
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
+	JSONObject criteria1 = new JSONObject();
 	
-	static String equipletName = "EQ3";
+	static String equipletName = "EQ1";
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
@@ -110,8 +111,31 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			"			\"childLinkOffsetZ\":0.0" +
 			"		}," +
 			"		\"supportedMutations\": [" +
+			"			\"move\", \"pick\", \"place\"" +
 			"		]," +
-			"		\"capabilities\":[]" +
+			"		\"capabilities\":[" + 
+			"			{" +
+			"				\"name\":\"PickAndPlace\"," +
+			"				\"treeNumber\":1," +
+			"				\"halSoftware\":{" +
+			"					\"buildNumber\":1," +
+			"					\"jarFile\": \"";
+	static String moduleB_05 = "\"," +
+			"					\"className\":\"HAL.capabilities.PickAndPlace\"" +
+			"				}," +
+			"				\"requiredMutationsTrees\":[" +
+			"					{" +
+			"						\"treeNumber\":1," +
+			"						\"mutations\":[" +
+			"							\"move\", \"pick\", \"place\"" +
+			"						]" +
+			"					}" +
+			"				]," +
+			"				\"services\":[" +
+			"					\"place\"" +
+			"				]" +
+			"			}" +
+			"		]" +
 			"	}," +
 			"	\"properties\":{}," +
 			"	\"calibrationData\":[" +
@@ -199,6 +223,13 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			fis.close();
 			String base64DummyModuleBGazebo = new String(Base64.encodeBase64(content));
 			
+			File pickAndPlaceHal = new File(baseDir + "HAL/capabilities/" + "PickAndPlace.jar");
+			fis = new FileInputStream(pickAndPlaceHal);
+			content = new byte[(int) pickAndPlaceHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64PickAndPlace = new String(Base64.encodeBase64(content));
+			
 			// dummy module A
 			String moduleA = moduleA_01 + base64DummyModuleARos + moduleA_02 + base64DummyModuleAHal + 
 					moduleA_03 + base64DummyModuleAGazebo + moduleA_04;
@@ -206,7 +237,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			
 			// dummy module B
 			String moduleB = moduleB_01 + base64DummyModuleBRos + moduleB_02 + base64DummyModuleBHal + 
-					moduleB_03 + base64DummyModuleBGazebo + moduleB_04;
+					moduleB_03 + base64DummyModuleBGazebo + moduleB_04 + base64PickAndPlace + moduleB_05;
 			JSONObject b = new JSONObject(new JSONTokener(moduleB));
 			
 			a.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
@@ -219,6 +250,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		// we are done if we are not going to translate hw steps
 		if(translateSteps == false) {
 			hal.shutdown();
+		} else {
+			hal.changeState(Mast.State.SAFE);
 		}
 	}
 	
@@ -234,8 +267,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep, HardwareStepStatus status) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + hardwareStep.getStatus());
 	}
 
 	@Override
@@ -251,16 +284,59 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
+		hal.translateProductStep("place", criteria1);
 	}
 
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + equipletName + " has changed to " + state);
+		if(state == Mast.State.SAFE) {
+			hal.changeState(Mast.State.STANDBY);
+		} else if(state == Mast.State.STANDBY) {
+			hal.changeMode(Mast.Mode.NORMAL);
+		}
 	}
 
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + equipletName + " has changed to " + mode);
+		try{
+			JSONObject target1 = new JSONObject();
+			JSONObject targetMove1 = new JSONObject();
+			targetMove1.put("x", 5.5);
+			targetMove1.put("y", -5.5);
+			targetMove1.put("z", 13.8);
+			JSONObject targetMove1Approach = new JSONObject();
+			targetMove1Approach.put("x", 0);
+			targetMove1Approach.put("y", 0);
+			targetMove1Approach.put("z", 20);
+			targetMove1.put("approach", targetMove1Approach);
+			target1.put("move", targetMove1);
+			target1.put("identifier", "GC4x4MB_1");
+	
+			JSONArray subjects1 = new JSONArray();
+			JSONObject subject1 = new JSONObject();
+			JSONObject subjectMove1 = new JSONObject();
+			subjectMove1.put("x", 5.5);
+			subjectMove1.put("y", -5.5);
+			subjectMove1.put("z", 13.8);
+			JSONObject subjectMove1Approach = new JSONObject();
+			subjectMove1Approach.put("x", 0);
+			subjectMove1Approach.put("y", 0);
+			subjectMove1Approach.put("z", 20);
+			subjectMove1.put("approach", subjectMove1Approach);
+			subject1.put("move", subjectMove1);
+			subject1.put("identifier", "GC4x4MB_6");
+			subjects1.put(subject1);
+	
+	
+			criteria1.put("target", target1);
+			criteria1.put("subjects", subjects1);
+		} catch (JSONException ex) {
+			ex.printStackTrace();
+		}
+
+		hal.translateProductStep("place", criteria1);
 	}
 
 	@Override
@@ -269,8 +345,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onReloadEquipletStatusChanged(EquipletReloadStatus status) {
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
-
 	}
 }

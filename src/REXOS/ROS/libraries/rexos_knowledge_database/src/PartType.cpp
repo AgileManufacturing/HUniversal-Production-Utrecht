@@ -7,7 +7,7 @@
 
 namespace rexos_knowledge_database {
 	std::string PartType::getTypeNumberForParName(std::string partName) {
-		std::unique_ptr<sql::Connection> connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		std::shared_ptr<sql::Connection> connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT partType \
@@ -30,7 +30,7 @@ namespace rexos_knowledge_database {
 	PartType::PartType(std::string typeNumber) :
 			typeNumber(typeNumber)
 	{
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 	}
 	std::string PartType::getTypeNumber() {
 		return typeNumber;

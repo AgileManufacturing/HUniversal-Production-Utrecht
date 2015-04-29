@@ -45,7 +45,7 @@ namespace rexos_knowledge_database {
 	class ModuleType{
 	private:
 		rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier;
-		std::unique_ptr<sql::Connection> connection;
+		std::shared_ptr<sql::Connection> connection;
 	public:
 		ModuleType(rexos_datatypes::ModuleTypeIdentifier moduleTypeIdentifier);
 		

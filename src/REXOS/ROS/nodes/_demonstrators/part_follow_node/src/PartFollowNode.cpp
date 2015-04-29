@@ -39,7 +39,7 @@
 #include <ros/ros.h>
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/writer.h>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "part_follow_node"
@@ -53,7 +53,7 @@ PartFollowNode::PartFollowNode(std::string blackboardIp) :
 
 	REXOS_INFO("Constructing");
 
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "EquipletStepsBlackBoard");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "HardwareStepsBlackBoard");
 	//equipletStepBlackboardClient->removeDocuments("");
 }
 
@@ -72,7 +72,7 @@ void PartFollowNode::run(){
 }
 
 void PartFollowNode::writeToBlackBoard(double acceleration){
-	rexos_datatypes::EquipletStep equipletStep;
+	rexos_datatypes::HardwareStep equipletStep;
 	Json::Value instructionData;
 	Json::Value moveCommand;
 	

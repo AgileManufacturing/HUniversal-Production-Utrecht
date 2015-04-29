@@ -34,7 +34,7 @@
 #include <hardcoded_mover_node/HardcodedMoverNode.h>
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/writer.h>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "HardcodedMoverNode"
@@ -64,7 +64,7 @@ HardcodedMoverNode::~HardcodedMoverNode() {
 	REXOS_INFO("Destructing");
 }
 
-void HardcodedMoverNode::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed) {
+void HardcodedMoverNode::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep) {
 	REXOS_INFO("done with hardware step");
 	
 	movementIterator++;
@@ -76,11 +76,11 @@ void HardcodedMoverNode::onHardwareStepCompleted(rexos_module::ModuleInterface* 
 		ros::shutdown();
 		return;
 	}
-	startNextMovement(id);
+	startNextMovement(hardwareStep.getId());
 }
 
 void HardcodedMoverNode::startNextMovement(string id) {
-	rexos_datatypes::EquipletStep hardwareStep;
+	rexos_datatypes::HardwareStep hardwareStep;
 	hardwareStep.setId(id);
 	hardwareStep.setModuleIdentifier(identifier);
 	
@@ -101,7 +101,7 @@ void HardcodedMoverNode::startNextMovement(string id) {
 	instructionData["rotate"] = rotate;
 	hardwareStep.setInstructionData(instructionData);
 	
-	moduleInterface.setInstruction(id, hardwareStep.toJSON());
+	moduleInterface.executeHardwareStep(hardwareStep);
 }
 
 /**

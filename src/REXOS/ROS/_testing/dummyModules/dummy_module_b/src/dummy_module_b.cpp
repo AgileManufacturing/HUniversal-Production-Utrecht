@@ -41,12 +41,15 @@ void DummyModuleB::run() {
 	ros::spin();
 }
 
-void DummyModuleB::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr& goal) {
+void DummyModuleB::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) {
+	rexos_module::ExecuteHardwareStepResult result;
+	result.OID = goal->OID;
+	
 	REXOS_INFO("executing hardware step...");
-	ros::Duration d(5.0);
+	ros::Duration d(1.0);
 	d.sleep();
 	REXOS_INFO("done with executing hardware step");
-	setInstructionActionServer.setSucceeded();
+	executeHardwareStepServer.setSucceeded(result);
 }
 
 bool DummyModuleB::transitionInitialize() {

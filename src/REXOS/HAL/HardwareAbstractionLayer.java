@@ -1,12 +1,16 @@
 package HAL;
 
 import generic.Mast;
+import generic.Mast.Mode;
+import generic.Mast.State;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.mongodb.util.JSONCallback;
 
 import util.log.LogLevel;
 import util.log.LogSection;
@@ -20,9 +24,6 @@ import HAL.exceptions.InvalidMastModeException;
 import HAL.factories.CapabilityFactory;
 import HAL.factories.ModuleFactory;
 import HAL.factories.ReconfigHandler;
-import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.EquipletListener;
@@ -70,7 +71,7 @@ public class HardwareAbstractionLayer implements ModuleListener, EquipletListene
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
 		reconfigHandler = new ReconfigHandler(this, capabilityFactory, moduleFactory);
-		rosInterface = new BlackboardHandler(equipletName);
+		rosInterface = new RosInterface(this);
 		rosInterface.addEquipletListener(this);
 	}
 
@@ -217,8 +218,8 @@ public class HardwareAbstractionLayer implements ModuleListener, EquipletListene
 		hardwareAbstractionLayerListener.onEquipletModeChanged(mode);
 	}
 	@Override
-	public void onEquipletReloadStatusChanged(EquipletReloadStatus status) {
-		hardwareAbstractionLayerListener.onReloadEquipletStatusChanged(status);
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
+		hardwareAbstractionLayerListener.onEquipletCommandStatusChanged(status);
 		
 	}
 
@@ -230,6 +231,34 @@ public class HardwareAbstractionLayer implements ModuleListener, EquipletListene
 	public void finalize() throws Throwable {
 		super.finalize();
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "HAL has been garbage collected");
+	}
+
+	public void changeState(State state) {
+		try{
+			JSONObject equipletCommand = new JSONObject();
+			equipletCommand.put("command", "changeState");
+			equipletCommand.put("status", "WAITING");
+			JSONObject parameters = new JSONObject();
+			parameters.put("desiredState", state.toString());
+			equipletCommand.put("parameters", parameters);
+			rosInterface.postEquipletCommand(equipletCommand);
+		} catch(JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
+		}
+	}
+
+	public void changeMode(Mode mode) {
+		try{
+			JSONObject equipletCommand = new JSONObject();
+			equipletCommand.put("command", "changeMode");
+			equipletCommand.put("status", "WAITING");
+			JSONObject parameters = new JSONObject();
+			parameters.put("desiredMode", mode.toString());
+			equipletCommand.put("parameters", parameters);
+			rosInterface.postEquipletCommand(equipletCommand);
+		} catch(JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
+		}
 	}
 
 }

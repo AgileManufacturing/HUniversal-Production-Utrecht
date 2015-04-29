@@ -48,12 +48,14 @@ function launchEquipletWithPrimaryNodes() {
 	getEquipletName
 	if [ "$keepWindowOpenAfterCommandEnds" == true ]; then
 		gnome-terminal --title="$equipletName" \
-			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node $equipletName\";bash" \
-			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node $equipletName\";bash"
+			--tab -t "equiplet_node" 	-e "bash -c \"rosrun equiplet_node equiplet_node $equipletName\";bash" \
+			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node $equipletName\";bash" \
+			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache $equipletName\";bash"
 	else
 		gnome-terminal --title="$equipletName" \
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node $equipletName\"" \
-			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node $equipletName\""
+			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node $equipletName\"" \
+			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache $equipletName\""
 	fi
 }
 
@@ -69,7 +71,7 @@ function launchEquipletWithoutPrimaryNodes() {
 	fi
 }
 
-function launchSimulatedEquipletWithoutPrimaryNodes() {
+function launchSimulatedEquipletWithPrimaryNodes() {
 	echo "Launching simulated equiplet with primary nodes"
 	getEquipletName
 	getPosition
@@ -77,16 +79,18 @@ function launchSimulatedEquipletWithoutPrimaryNodes() {
 		gnome-terminal --title="$equipletName" \
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node --isSimulated $equipletName\";bash" \
 			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node --isSimulated $equipletName\";bash" \
+			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache --isSimulated $equipletName\";bash" \
 			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnEquipletModel -x $positionX -y $positionY $equipletName\";bash"
 	else
 		gnome-terminal --title="$equipletName" \
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node --isSimulated $equipletName\"" \
 			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node --isSimulated $equipletName\"" \
+			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache --isSimulated $equipletName\"" \
 			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnEquipletModel -x $positionX -y $positionY $equipletName\""
 	fi
 }
 
-function launchSimulatedEquipletWithPrimaryNodes() {
+function launchSimulatedEquipletWithoutPrimaryNodes() {
 	echo "Launching simulated equiplet without primary nodes"
 	getEquipletName
 	if [ "$keepWindowOpenAfterCommandEnds" == true ]; then
@@ -106,11 +110,13 @@ function launchShadowEquipletWithPrimaryNodes() {
 		gnome-terminal --title="$equipletName" \
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node --isShadow $equipletName\";bash" \
 			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node --isShadow $equipletName\";bash" \
+			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache --isShadow $equipletName\";bash" \
 			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnEquipletModel -x $positionX -y $positionY $equipletName\";bash"
 	else
 		gnome-terminal --title="$equipletName" \
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node --isShadow $equipletName\"" \
 			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node --isShadow $equipletName\"" \
+			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache --isShadow $equipletName\"" \
 			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnEquipletModel -x $positionX -y $positionY $equipletName\""
 	fi
 }
@@ -180,9 +186,9 @@ fi
 	elif [ "$chosenOption" == 2 ]; then
 		launchEquipletWithoutPrimaryNodes
 	elif [ "$chosenOption" == 3 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then
-		launchSimulatedEquipletWithoutPrimaryNodes
-	elif [ "$chosenOption" == 4 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then
 		launchSimulatedEquipletWithPrimaryNodes
+	elif [ "$chosenOption" == 4 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then
+		launchSimulatedEquipletWithoutPrimaryNodes
 	elif [ "$chosenOption" == 5 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then
 		launchShadowEquipletWithPrimaryNodes
 	elif [ "$chosenOption" == 6 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then

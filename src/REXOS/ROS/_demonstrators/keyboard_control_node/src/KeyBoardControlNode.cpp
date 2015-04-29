@@ -40,7 +40,7 @@
 
 #include <keyboard_control_node/KeyBoardControlNode.h>
 #include <rexos_utilities/Utilities.h>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <rexos_configuration/Configuration.h>
 
 #include <jsoncpp/json/value.h>
@@ -200,7 +200,7 @@ void KeyBoardControlNode::readInputFromKeyBoard(int inputCharacter){
 }
 
 void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double acceleration, double rotationX, double rotationY, double rotationZ){
-	rexos_datatypes::EquipletStep equipletStep;
+	rexos_datatypes::HardwareStep equipletStep;
 	Json::Value instructionData;
 	
 	Json::Value moveCommand;

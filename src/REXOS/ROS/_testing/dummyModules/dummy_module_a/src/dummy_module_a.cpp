@@ -1,17 +1,36 @@
 #include "dummy_module_a/dummy_module_a.h"
 #include <actionlib/client/simple_action_client.h>
 #include <equiplet_node/HumanInteractionAction.h>
+#include <environment_cache/EnvironmentCache.h>
 
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/writer.h>
 
 DummyModuleA::DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
 		rexos_module::Module(equipletName, moduleIdentifier, isSimulated, isShadow),
-		equipletName(equipletName)
+		equipletName(equipletName),
+		environmentCacheClient(rexos_module::AbstractModule::nodeHandle.serviceClient<environment_cache::setData>(equipletName + "/setData"))
 {
+	
 }
 
 void DummyModuleA::run() {
 	REXOS_INFO("running");
-	ros::spin();
+	ros::Rate rate(100);
+	while(ros::ok())
+	{
+		environment_cache::setData serviceCall;
+		serviceCall.request.identifier = "partA";
+		
+		Json::Value data;
+		data["random"] = 12;
+		
+		Json::StyledWriter writer;
+		serviceCall.request.json = writer.write(data);
+		environmentCacheClient.call(serviceCall);
+		ros::spinOnce();
+		rate.sleep();
+	}
 }
 bool DummyModuleA::transitionInitialize() {
 	REXOS_INFO("Initialize transition called");
@@ -28,7 +47,7 @@ bool DummyModuleA::transitionDeinitialize() {
 bool DummyModuleA::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 	
-	ros::Duration(5.0).sleep();
+	/*ros::Duration(5.0).sleep();
 	
 	rexos_module::TransitionGoal goal;
 	goal.gainedSupportedMutations.push_back("move");
@@ -44,7 +63,7 @@ bool DummyModuleA::transitionSetup(){
 	humanInteraction.waitForServer();
 	REXOS_INFO("sending data");
 	humanInteraction.sendGoal(humanInteractionGoal);
-	humanInteraction.waitForResult();
+	humanInteraction.waitForResult();*/
 	
 	REXOS_INFO("done");
 	return true;

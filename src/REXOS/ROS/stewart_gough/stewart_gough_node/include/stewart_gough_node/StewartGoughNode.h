@@ -33,7 +33,7 @@
 #include "ros/ros.h"
 #include "rexos_logger/rexos_logger.h"
 
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <rexos_utilities/Utilities.h>
 #include <rexos_stewart_gough/StewartGough.h>
 #include <rexos_stewart_gough/StewartGoughLocation.h>
@@ -73,8 +73,7 @@ namespace stewart_gough_node {
 		bool calibrate();
 		bool moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration);
 		
-		void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal);
-
+		virtual void onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal);
 	private:
 		float lastX;
 		float lastY;

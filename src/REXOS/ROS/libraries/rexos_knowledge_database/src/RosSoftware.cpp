@@ -6,7 +6,7 @@
 
 namespace rexos_knowledge_database {
 	RosSoftware::RosSoftware(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id \
@@ -34,7 +34,7 @@ namespace rexos_knowledge_database {
 		delete preparedStmt;
 	}
 	RosSoftware::RosSoftware(std::string equipletName) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id \

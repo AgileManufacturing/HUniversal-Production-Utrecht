@@ -34,6 +34,8 @@
 #include <jsoncpp/json/writer.h>
 
 namespace rexos_datatypes{
+	const char* const OriginPlacement::originPlacementTypeTxt[] = {"RELATIVE_TO_IDENTIFIER", "RELATIVE_TO_CURRENT_POSITION", 
+			"RELATIVE_TO_MODULE_ORIGIN", "RELATIVE_TO_EQUIPLET_ORIGIN", "UNDEFINED"};
 
     OriginPlacement::OriginPlacement(){}
 
@@ -53,31 +55,19 @@ namespace rexos_datatypes{
 		return originPlacementType;
 	}
 	std::string OriginPlacement::getOriginPlacementTypeAsString() {
-		if(originPlacementType == OriginPlacementType::RELATIVE_TO_IDENTIFIER) {
-			return "relativeToIdentifier";
-		} else if(originPlacementType == OriginPlacementType::RELATIVE_TO_CURRENT_POSITION) {
-			return "relativeToCurrentPosition";
-		} else if(originPlacementType == OriginPlacementType::RELATIVE_TO_MODULE_ORIGIN) {
-			return "relativeToModuleOrigin";
-		} else if(originPlacementType == OriginPlacementType::RELATIVE_TO_EQUIPLET_ORIGIN) {
-			return "relativeToEquipletOrigin";
-		} else {
-			throw std::runtime_error("OriginPlacementType is of unknown type");
-		}
+		return originPlacementTypeTxt[originPlacementType];
 	}
 	void OriginPlacement::setOriginPlacementType(OriginPlacementType type) {
 		originPlacementType = type;
 	}
 	void OriginPlacement::setOriginPlacementType(std::string type) {
-		if(type == "relativeToIdentifier") {
-			originPlacementType = OriginPlacementType::RELATIVE_TO_IDENTIFIER;
-		} else if (type == "relativeToCurrentPosition") {
-			originPlacementType = OriginPlacementType::RELATIVE_TO_CURRENT_POSITION;
-		} else if (type == "relativeToModuleOrigin") {
-			originPlacementType = OriginPlacementType::RELATIVE_TO_MODULE_ORIGIN;
-		} else if (type == "relativeToEquipletOrigin") {
-			originPlacementType = OriginPlacementType::RELATIVE_TO_EQUIPLET_ORIGIN;
+		for(int i = 0; i < OriginPlacementType::COUNT; i++) {
+			if(type == originPlacementTypeTxt[i]) {
+				originPlacementType = static_cast<OriginPlacementType>(i);
+				return;
+			}
 		}
+		throw std::runtime_error("OriginPlacementType is of unknown type");
 	}
 
 	Json::Value OriginPlacement::getLookupResult() {

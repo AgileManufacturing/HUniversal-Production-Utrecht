@@ -43,7 +43,7 @@ protected:
 public:
 	DummyModuleB(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 	void run();
-	void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr& goal);
+	virtual void onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal);
 
 	
 	

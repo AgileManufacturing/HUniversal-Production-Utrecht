@@ -47,6 +47,6 @@ namespace rexos_knowledge_database {
 		int getId();
 	private:
 		int id;
-		std::unique_ptr<sql::Connection> connection;
+		std::shared_ptr<sql::Connection> connection;
 	};
 }

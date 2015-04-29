@@ -58,10 +58,12 @@ java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.PartRecor
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.PartRecordLoader blueBall_15	blueBall	GC4x4MB_2 5.5	-16.5 	10 0 0 0 ;
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.PartRecordLoader blueBall_16	blueBall	GC4x4MB_2 16.5	-16.5 	10 0 0 0 ;
 # insert equiplets
+java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.EquipletRecordLoader EQ1 ;
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.EquipletRecordLoader EQ2 ;
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.EquipletRecordLoader EQ3 ;
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.EquipletRecordLoader EQD ;
 # insert modules
-java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassPickAndPlace --noTranslate EQ2;
+java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClass --noTranslate EQ1;
+#java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassPickAndPlace --noTranslate EQ2;
 #java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassStewartGough --noTranslate EQ3;
 

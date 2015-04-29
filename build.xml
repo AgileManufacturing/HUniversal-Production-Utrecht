@@ -85,7 +85,7 @@
 	<target name             ="generate-HAL-modules" depends="HAL">
 		<var name            ="jar.basedir" value="build/REXOS/"/>
 		<var name            ="jar.targetdir" value="generatedOutput/HAL/modules/"/>
-		<foreach target      ="-generate-jar" param="theEntry" parallel="true" inheritall="true">
+		<foreach target      ="-generate-jar" param="theEntry" parallel="false" inheritall="true">
 			<path id         ="modulesPathId">
 			<fileset dir     ="build/REXOS/HAL/modules" casesensitive="yes">
 			<include name    ="**/*.class"/>
@@ -97,7 +97,7 @@
 	<target name             ="generate-HAL-capabilities" depends="HAL">
 		<var name            ="jar.basedir" value="build/REXOS/"/>
 		<var name            ="jar.targetdir" value="generatedOutput/HAL/capabilities/"/>
-		<foreach target      ="-generate-jar" param="theEntry" parallel="true" inheritall="true">
+		<foreach target      ="-generate-jar" param="theEntry" parallel="false" inheritall="true">
 			<path id         ="capabilitiesPathId">
 			<fileset dir     ="build/REXOS/HAL/capabilities" casesensitive="yes">
 			<include name    ="**/*.class"/>
@@ -109,7 +109,7 @@
 	<target name             ="generate-models">
 		<var name            ="zip.basedir" value="src/REXOS/models/"/>
 		<var name            ="zip.targetdir" value="generatedOutput/models/"/>
-		<foreach target      ="-generate-zip" param="theEntry" parallel="true" inheritall="true">
+		<foreach target      ="-generate-zip" param="theEntry" parallel="false" inheritall="true">
 			<path id         ="modelsPathId">
 			<dirset dir      ="src/REXOS/models" casesensitive="yes">
 				<include name="*/**"/>
@@ -124,7 +124,7 @@
 	<target name             ="generate-nodes">
 		<var name            ="zip.basedir" value="build/REXOS/ROS/"/>
 		<var name            ="zip.targetdir" value="generatedOutput/nodes/"/>
-		<foreach target      ="-generate-zip" param="theEntry" parallel="true" inheritall="true">
+		<foreach target      ="-generate-zip" param="theEntry" parallel="false" inheritall="true">
 			<path id         ="nodesPathId">
 			<dirset dir     ="build/REXOS/ROS/" casesensitive="yes">
 				<include name="*/**"/>

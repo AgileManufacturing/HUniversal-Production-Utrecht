@@ -11,7 +11,7 @@ namespace rexos_knowledge_database{
 	Part::Part(std::string partName) :
 			PartType(PartType::getTypeNumberForParName(partName)), partName(partName)
 	{
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT * \

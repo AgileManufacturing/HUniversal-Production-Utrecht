@@ -7,7 +7,8 @@ namespace rexos_module {
 			moduleProxyListener(moduleProxyListener),
 			transitionActionServer(AbstractModule::nodeHandle, advertisementPath + "transition", 
 				boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), false),
-			bond(NULL)
+			bond(NULL),
+			connectedWithNode(false)
 	{
 		transitionActionServer.start();
 	}
@@ -23,12 +24,12 @@ namespace rexos_module {
 				moduleProxyListener->spawnNode(this);
 				
 				// wait for the node to come online
+				boost::unique_lock<boost::mutex> lock(nodeStartupMutex);
 				if(connectedWithNode == false) {
-					boost::unique_lock<boost::mutex> lock(nodeStartupMutex);
 					nodeStartupCondition.wait(lock);
 				}
 			} else {
-				REXOS_WARN("Node has already been stated, which is not expected (did someone manually start this node?)");
+				REXOS_WARN("Node has already been started, which is not expected (did someone manually start this node?)");
 			}
 		}
 		StateMachineController::changeState(state);

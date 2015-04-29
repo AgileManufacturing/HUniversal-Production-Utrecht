@@ -22,7 +22,8 @@
 	<run_depend>rexos_logger</run_depend>
 	<build_depend>equiplet_node</build_depend>
 	<run_depend>equiplet_node</run_depend>
-	
+	<build_depend>environment_cache</build_depend>
+	<run_depend>environment_cache</run_depend>
 	<export>
 	</export>
 </package>

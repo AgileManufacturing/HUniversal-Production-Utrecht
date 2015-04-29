@@ -62,7 +62,7 @@ public:
 	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
 
-	virtual void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal);
+	virtual void onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal);
 	
 private:
 	/**

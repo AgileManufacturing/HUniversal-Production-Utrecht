@@ -6,7 +6,7 @@
 
 namespace rexos_knowledge_database {
 	GazeboModel::GazeboModel(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
@@ -40,7 +40,7 @@ namespace rexos_knowledge_database {
 		delete preparedStmt;
 	}
 	GazeboModel::GazeboModel(std::string equipletName) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
@@ -70,7 +70,7 @@ namespace rexos_knowledge_database {
 		delete preparedStmt;
 	}
 	GazeboModel::GazeboModel(PartType& partType) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
 		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
 		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \

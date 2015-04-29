@@ -32,7 +32,7 @@
 
 #include "ros/ros.h"
 
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <rexos_delta_robot/DeltaRobot.h>
 #include <rexos_motor/StepperMotor.h>
 #include <rexos_motor/StepperMotorProperties.h>
@@ -68,7 +68,7 @@ namespace delta_robot{
 		bool calibrate();
 		bool moveToPoint(double x, double y, double z, double maxAcceleration);
 		
-		void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal);
+		virtual void onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal);
 
 	private:
 		float lastX;
