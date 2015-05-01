@@ -15,41 +15,41 @@ namespace rexos_knowledge_database{
 	{
 		connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT * \
 		FROM Module \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
-		serialNumber = ?;");
+		serialNumber = ?;"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
-		if(result->rowsCount() != 1){
-			std::string message = "This module (" + moduleIdentifier.toString() + ") does not exist";
-			throw KnowledgeDatabaseException(message.c_str());
-		}
-		REXOS_INFO_STREAM("Constructed module with manufacturer=" << moduleIdentifier.getManufacturer() << 
-				" typeNumber=" << moduleIdentifier.getTypeNumber() << " serialNumber=" << moduleIdentifier.getSerialNumber());
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		delete result;
+		if(result->rowsCount() != 1){
+			throw KnowledgeDatabaseException("This module (" + moduleIdentifier.toString() + ") does not exist");
+		}
+		
+		mountPointX = result->getInt("mountPointX");
+		mountPointY = result->getInt("mountPointY");
+		
+		REXOS_DEBUG_STREAM("Constructed module with manufacturer=" << moduleIdentifier);
 	}
 	rexos_datatypes::ModuleIdentifier Module::getModuleIdentifier() {
 		return moduleIdentifier;
 	}
 	std::string Module::getModuleProperties(){
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT moduleProperties \
 		FROM Module \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
-		serialNumber = ?;");
+		serialNumber = ?;"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current module (someone deleted this instance in the database)");
 		}
@@ -57,27 +57,23 @@ namespace rexos_knowledge_database{
 		result->next();
 		std::string jsonProperties = result->getString("moduleProperties");
 		
-		delete result;
-		delete preparedStmt;
 		return jsonProperties;
 	}
 	void Module::setModuleProperties(std::string jsonProperties) {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		UPDATE Module \
 		SET moduleProperties = ? \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
-		serialNumber = ?;");
+		serialNumber = ?;"));
 		preparedStmt->setString(1, jsonProperties);
 		preparedStmt->setString(2, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(3, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(4, moduleIdentifier.getSerialNumber());
-
 		preparedStmt->executeQuery();
-		delete preparedStmt;
 	}
 	Module* Module::getParentModule() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
 		WHERE attachedToLeft < (\
@@ -92,18 +88,16 @@ namespace rexos_knowledge_database{
 				AND serialNumber = ? \
 		)\
 		ORDER BY abs(attachedToLeft - attachedToRight) \
-		ASC LIMIT 1;");
+		ASC LIMIT 1;"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 		preparedStmt->setString(4, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(5, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(6, moduleIdentifier.getSerialNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1) {
-			delete result;
-			delete preparedStmt;
 			return NULL;
 		} else {
 			// set the cursor at the first result
@@ -113,13 +107,11 @@ namespace rexos_knowledge_database{
 				result->getString("typeNumber"),
 				result->getString("serialNumber")
 			);
-			delete result;
-			delete preparedStmt;
 			return new Module(identifier);
 		}
 	}
 	std::vector<rexos_datatypes::ModuleIdentifier> Module::getChildModulesIdentifiers() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
 		WHERE attachedToLeft > (\
@@ -132,111 +124,66 @@ namespace rexos_knowledge_database{
 			WHERE manufacturer = ? \
 				AND typeNumber = ? \
 				AND serialNumber = ? \
-		);");
+		);"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 		preparedStmt->setString(4, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(5, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(6, moduleIdentifier.getSerialNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		std::vector<rexos_datatypes::ModuleIdentifier> childModules;
-		if(result->rowsCount() != 0){
-			// get all the childs
-			while(result->next()){
-				rexos_datatypes::ModuleIdentifier identifier(
-					result->getString("manufacturer"),
-					result->getString("typeNumber"),
-					result->getString("serialNumber")
-				);
-				childModules.push_back(identifier);
-			}
+		while(result->next()){
+			rexos_datatypes::ModuleIdentifier identifier(
+				result->getString("manufacturer"),
+				result->getString("typeNumber"),
+				result->getString("serialNumber")
+			);
+			childModules.push_back(identifier);
 		}
-		delete result;
-		delete preparedStmt;
 		return childModules;
 	}
 	
 	int Module::getMountPointX() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mountPointX \
-		FROM Module \
-		WHERE manufacturer = ? AND \
-		typeNumber = ? AND \
-		serialNumber = ?;");
-		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
-		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
-		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-		
-		sql::ResultSet* result = preparedStmt->executeQuery();
-		if(result->rowsCount() != 1){
-			throw std::runtime_error("Unable to find current module (someone deleted this instance in the database)");
-		}
-		// set the cursor at the first result
-		result->next();
-		int mountPointX = result->getInt("mountPointX");
-		
-		delete result;
-		delete preparedStmt;
 		return mountPointX;
 	}
 	void Module::setMountPointX(int mountPointX) {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		UPDATE Module \
 		SET mountPointY = ? \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
-		serialNumber = ?;");
+		serialNumber = ?;"));
 		preparedStmt->setInt(1, mountPointX);
 		preparedStmt->setString(2, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(3, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(4, moduleIdentifier.getSerialNumber());
-		
 		preparedStmt->executeQuery();
-		delete preparedStmt;
+		
+		this->mountPointX = mountPointX;
 	}
 	int Module::getMountPointY() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mountPointY \
-		FROM Module \
-		WHERE manufacturer = ? AND \
-		typeNumber = ? AND \
-		serialNumber = ?;");
-		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
-		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
-		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-		
-		sql::ResultSet* result = preparedStmt->executeQuery();
-		if(result->rowsCount() != 1){
-			throw std::runtime_error("Unable to find current module (someone deleted this instance in the database)");
-		}
-		// set the cursor at the first result
-		result->next();
-		int mountPointY = result->getInt("mountPointY");
-		
-		delete result;
-		delete preparedStmt;
 		return mountPointY;		
 	}
 	void Module::setMountPointY(int mountPointY) {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		UPDATE Module \
 		SET mountPointY = ? \
 		WHERE manufacturer = ? AND \
 		typeNumber = ? AND \
-		serialNumber = ?;");
+		serialNumber = ?;"));
 		preparedStmt->setInt(1, mountPointY);
 		preparedStmt->setString(2, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(3, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(4, moduleIdentifier.getSerialNumber());
-		
 		preparedStmt->executeQuery();
-		delete preparedStmt;
+		
+		this->mountPointY = mountPointY;
 	}
 
 	std::string Module::getCalibrationDataForModuleOnly() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT properties \
 		FROM ModuleCalibration \
 		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \
@@ -247,85 +194,69 @@ namespace rexos_knowledge_database{
 			SELECT count(*) \
 			FROM ModuleCalibrationModuleSet AS subTable \
 			WHERE ModuleCalibrationModuleSet.ModuleCalibration = subTable.ModuleCalibration \
-		) = 1;");
+		) = 1;"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
 		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw KnowledgeDatabaseException("Unable to find calibration entry for only this module (there might be a calibration \
 					entry shared with another module)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::string properties = result->getString("properties");
-		delete result;
-		delete preparedStmt;
-		return properties;
+		return result->getString("properties");
 	}
 	std::string Module::getCalibrationDataForModuleAndChilds() {
-		REXOS_INFO("getCalibrationDataForModuleAndChilds a1");
 		std::vector<rexos_datatypes::ModuleIdentifier> childs = getChildModulesIdentifiers();
-		REXOS_INFO("getCalibrationDataForModuleAndChilds a2, vector size = %lu", childs.size());
-		std::string returnValue = getCalibrationDataForModuleAndOtherModules(childs);
-		REXOS_INFO("%s", returnValue.c_str());
-		return returnValue;
+		return getCalibrationDataForModuleAndOtherModules(childs);
 	}
 	std::string Module::getCalibrationDataForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers) {
-		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b1" );
 		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
-		std::string query = "SELECT properties FROM ModuleCalibration WHERE id = ?;";
-		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b2, SQL query = %s", query.c_str());
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement(query);
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
+		SELECT properties \
+		FROM ModuleCalibration \
+		WHERE id = ?;"));
 		preparedStmt->setInt(1, calibrationId);
-		REXOS_INFO("getCalibrationDataForModuleAndOtherModules b3, SQL preparedStatement = ");
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw KnowledgeDatabaseException("Unable to find calibration entry");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::string properties = result->getString("properties");
-		delete result;
-		delete preparedStmt;
-		return properties;
+		return result->getString("properties");
 	}
 	void Module::setCalibrationDataForModuleOnly(std::string properties) {
-		sql::PreparedStatement* preparedStmt;
 		try{
 			std::vector<rexos_datatypes::ModuleIdentifier> emptyList;
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(emptyList);
 			
 			// update existing entry
-			preparedStmt = connection->prepareStatement("\
+			std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 			UPDATE ModuleCalibration \
 			SET properties = ? \
-			WHERE id = ?;");
+			WHERE id = ?;"));
 			preparedStmt->setString(1, properties);
 			preparedStmt->setInt(2, calibrationId);
 			preparedStmt->executeQuery();
-			delete preparedStmt;
 		} catch (KnowledgeDatabaseException ex) {
 			// create a new entry
-			preparedStmt = connection->prepareStatement("\
+			std::unique_ptr<sql::PreparedStatement> preparedStmtA(connection->prepareStatement("\
 			INSERT INTO ModuleCalibration (properties) \
-			VALUES (?);");
-			preparedStmt->setString(1, properties);
-			preparedStmt->executeQuery();
-			delete preparedStmt;
+			VALUES (?);"));
+			preparedStmtA->setString(1, properties);
+			preparedStmtA->executeQuery();
 			
-			sql::PreparedStatement* preparedStmt;
-			preparedStmt = connection->prepareStatement("\
+			std::unique_ptr<sql::PreparedStatement> preparedStmtB(connection->prepareStatement("\
 			INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
-			VALUES (LAST_INSERT_ID(), ?, ?, ?);");
+			VALUES (LAST_INSERT_ID(), ?, ?, ?);"));
 			
-			preparedStmt->setString(1, moduleIdentifier.getManufacturer());
-			preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
-			preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-			
-			preparedStmt->executeQuery();
-			delete preparedStmt;
+			preparedStmtB->setString(1, moduleIdentifier.getManufacturer());
+			preparedStmtB->setString(2, moduleIdentifier.getTypeNumber());
+			preparedStmtB->setString(3, moduleIdentifier.getSerialNumber());
+			preparedStmtB->executeQuery();
 		}
 	}
 	void Module::setCalibrationDataForModuleAndChilds(std::string properties) {
@@ -334,83 +265,70 @@ namespace rexos_knowledge_database{
 	}
 	void Module::setCalibrationDataForModuleAndOtherModules(
 			std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers, std::string properties) {
-		sql::PreparedStatement* preparedStmt;
 		try{
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 			
 			// update existing entry
-			preparedStmt = connection->prepareStatement("\
+			std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 			UPDATE ModuleCalibration \
 			SET properties = ? \
-			WHERE id = ?;");
+			WHERE id = ?;"));
 			preparedStmt->setString(1, properties);
 			preparedStmt->setInt(2, calibrationId);
 			preparedStmt->executeQuery();
-			delete preparedStmt;
 		} catch (KnowledgeDatabaseException ex) {
 			// create a new entry
-			preparedStmt = connection->prepareStatement("\
+			std::unique_ptr<sql::PreparedStatement> preparedStmtA(connection->prepareStatement("\
 			INSERT INTO ModuleCalibration (properties) \
-			VALUES (?);");
-			preparedStmt->setString(1, properties);
-			preparedStmt->executeQuery();
-			delete preparedStmt;
+			VALUES (?);"));
+			preparedStmtA->setString(1, properties);
+			preparedStmtA->executeQuery();
 			
-			sql::PreparedStatement* preparedStmt;
-			preparedStmt = connection->prepareStatement("\
+			std::unique_ptr<sql::PreparedStatement> preparedStmtB(connection->prepareStatement("\
 			INSERT INTO ModuleCalibrationModuleSet (ModuleCalibration, manufacturer, typeNumber, serialNumber) \
-			VALUES (LAST_INSERT_ID(), ?, ?, ?);");
+			VALUES (LAST_INSERT_ID(), ?, ?, ?);"));
 			
-			preparedStmt->setString(1, moduleIdentifier.getManufacturer());
-			preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
-			preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-			preparedStmt->executeQuery();
+			preparedStmtB->setString(1, moduleIdentifier.getManufacturer());
+			preparedStmtB->setString(2, moduleIdentifier.getTypeNumber());
+			preparedStmtB->setString(3, moduleIdentifier.getSerialNumber());
+			preparedStmtB->executeQuery();
 			
 			for(uint i = 0; i < moduleIdentifiers.size(); i++){
-				preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
-				preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
-				preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
-				preparedStmt->executeQuery();
+				preparedStmtB->setString(1, moduleIdentifiers.at(i).getManufacturer());
+				preparedStmtB->setString(2, moduleIdentifiers.at(i).getTypeNumber());
+				preparedStmtB->setString(3, moduleIdentifiers.at(i).getSerialNumber());
+				preparedStmtB->executeQuery();
 			}
-			delete preparedStmt;
 		}
 	}
 	
 	
 	int Module::getCalibrationGroupForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers) {
 		// create a temp table for storing the modules
-		REXOS_INFO("getCalibrationGroupForModuleAndOtherModules c1");
-		sql::PreparedStatement* preparedStmt;
-		std::string query = "\
+		std::unique_ptr<sql::PreparedStatement> preparedStmtA(connection->prepareStatement("\
 		CREATE TEMPORARY TABLE otherModules( \
 			manufacturer char(200) NOT NULL, \
 			typeNumber char(200) NOT NULL, \
 			serialNumber char(200) NOT NULL \
-		);";
-		REXOS_INFO("%s", query.c_str());
-		preparedStmt = connection->prepareStatement(query);
-		preparedStmt->executeQuery();
-		delete preparedStmt;
+		);"));
+		preparedStmtA->executeQuery();
 		
 		// store the modules
-		query = "\
+		std::unique_ptr<sql::PreparedStatement> preparedStmtB(connection->prepareStatement("\
 		INSERT INTO otherModules( \
 			manufacturer, typeNumber, serialNumber \
 		) VALUES ( \
 			?, ?, ? \
-		);";
-		REXOS_INFO("%s", query.c_str());
-		preparedStmt = connection->prepareStatement(query);
+		);"));
 		for(uint i = 0; i < moduleIdentifiers.size(); i++){
-			preparedStmt->setString(1, moduleIdentifiers.at(i).getManufacturer());
-			preparedStmt->setString(2, moduleIdentifiers.at(i).getTypeNumber());
-			preparedStmt->setString(3, moduleIdentifiers.at(i).getSerialNumber());
-			preparedStmt->executeQuery();
+			preparedStmtB->setString(1, moduleIdentifiers.at(i).getManufacturer());
+			preparedStmtB->setString(2, moduleIdentifiers.at(i).getTypeNumber());
+			preparedStmtB->setString(3, moduleIdentifiers.at(i).getSerialNumber());
+			preparedStmtB->executeQuery();
 		}
-		delete preparedStmt;
 		
 		// preform the actual query
-		query = "\
+		std::unique_ptr<sql::PreparedStatement> preparedStmtC(connection->prepareStatement("\
 		SELECT id \
 		FROM ModuleCalibration \
 		JOIN ModuleCalibrationModuleSet ON ModuleCalibrationModuleSet.ModuleCalibration = ModuleCalibration.id \
@@ -434,37 +352,29 @@ namespace rexos_knowledge_database{
 				listGroup.typeNumber != ModuleCalibrationModuleSet.typeNumber OR \
 				listGroup.serialNumber != ModuleCalibrationModuleSet.serialNumber \
 			) \
-		) = ?;";
-		REXOS_INFO("%s", query.c_str());
-		preparedStmt = connection->prepareStatement(query);
-		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
-		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
-		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
-		preparedStmt->setInt(4, moduleIdentifiers.size());
-		preparedStmt->setInt(5, moduleIdentifiers.size());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		) = ?;"));
+		preparedStmtC->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmtC->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmtC->setString(3, moduleIdentifier.getSerialNumber());
+		preparedStmtC->setInt(4, moduleIdentifiers.size());
+		preparedStmtC->setInt(5, moduleIdentifiers.size());
+		std::unique_ptr<sql::ResultSet> result(preparedStmtC->executeQuery());
+		
 		if(result->rowsCount() != 1){
-			REXOS_INFO("result...");
 			// delete the temp table for storing the modules
-			preparedStmt = connection->prepareStatement("\
-			DROP TEMPORARY TABLE otherModules;");
-			preparedStmt->executeQuery();
-			delete preparedStmt;
+			std::unique_ptr<sql::PreparedStatement> preparedStmtD(connection->prepareStatement("\
+			DROP TEMPORARY TABLE otherModules;"));
+			preparedStmtD->executeQuery();
 			throw KnowledgeDatabaseException("Unable to find calibration entry for only this module and other modules");
 		}
 		// set the cursor at the first result
 		result->next();
 		int calibrationId = result->getInt("id");
-		delete result;
-		delete preparedStmt;
 		
 		// delete the temp table for storing the modules
-		preparedStmt = connection->prepareStatement("\
-		DROP TEMPORARY TABLE otherModules;");
-		preparedStmt->executeQuery();
-		delete preparedStmt;
-		
+		std::unique_ptr<sql::PreparedStatement> preparedStmtE(connection->prepareStatement("\
+		DROP TEMPORARY TABLE otherModules;"));
+		preparedStmtE->executeQuery();
 		return calibrationId;
 	}
 }

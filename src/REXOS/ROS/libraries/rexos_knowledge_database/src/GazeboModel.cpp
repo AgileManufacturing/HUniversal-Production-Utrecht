@@ -8,7 +8,7 @@ namespace rexos_knowledge_database {
 	GazeboModel::GazeboModel(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
 		connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
 		FROM GazeboModel \
 		WHERE id = ( \
@@ -16,14 +16,12 @@ namespace rexos_knowledge_database {
 			FROM ModuleType \
 			WHERE manufacturer = ? AND \
 				typeNumber = ? \
-		);");
+		);"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			delete result;
-			delete preparedStmt;
 			throw std::runtime_error("Unable to find current gazeboModel (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
@@ -35,24 +33,21 @@ namespace rexos_knowledge_database {
 		childLinkOffsetX = result->getDouble("childLinkOffsetX");
 		childLinkOffsetY = result->getDouble("childLinkOffsetY");
 		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
-		
-		delete result;
-		delete preparedStmt;
 	}
 	GazeboModel::GazeboModel(std::string equipletName) {
 		connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
 		FROM GazeboModel \
 		WHERE id = ( \
 			SELECT gazeboModel \
 			FROM Equiplet \
 			WHERE name = ? \
-		);");
+		);"));
 		preparedStmt->setString(1, equipletName);
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
@@ -65,24 +60,21 @@ namespace rexos_knowledge_database {
 		childLinkOffsetX = result->getDouble("childLinkOffsetX");
 		childLinkOffsetY = result->getDouble("childLinkOffsetY");
 		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
-		
-		delete result;
-		delete preparedStmt;
 	}
 	GazeboModel::GazeboModel(PartType& partType) {
 		connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT id, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \
 		FROM GazeboModel \
 		WHERE id = ( \
 			SELECT gazeboModel \
 			FROM PartType \
 			WHERE typeNumber = ? \
-		);");
+		);"));
 		preparedStmt->setString(1, partType.getTypeNumber());
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
@@ -95,29 +87,22 @@ namespace rexos_knowledge_database {
 		childLinkOffsetX = result->getDouble("childLinkOffsetX");
 		childLinkOffsetY = result->getDouble("childLinkOffsetY");
 		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
-		
-		delete result;
-		delete preparedStmt;
 	}
 	
 	std::istream* GazeboModel::getModelFile() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT zipFile \
 		FROM GazeboModel \
-		WHERE id = ?;");
+		WHERE id = ?;"));
 		preparedStmt->setInt(1, id);
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current gazeboModel (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::istream* rosFile = result->getBlob("zipFile");
-		
-		delete result;
-		delete preparedStmt;
-		return rosFile;
+		return result->getBlob("zipFile");;
 	}
 	std::string GazeboModel::getSdfFilename() {
 		return sdfFilename;

@@ -13,25 +13,21 @@ namespace rexos_knowledge_database{
 	}
 	
 	std::string ModuleType::getModuleTypeProperties() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT moduleTypeProperties \
 		FROM ModuleType \
 		WHERE manufacturer = ? AND \
-		typeNumber = ?;");
+		typeNumber = ?;"));
 		preparedStmt->setString(1, moduleTypeIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleTypeIdentifier.getTypeNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current moduleType (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::string jsonProperties = result->getString("moduleTypeProperties");
-		
-		delete result;
-		delete preparedStmt;
-		return jsonProperties;
+		return result->getString("moduleTypeProperties");
 	}
 	std::vector<rexos_datatypes::TransitionPhase> ModuleType::getTransitionPhases() {
 		std::vector<rexos_datatypes::TransitionPhase> output;
@@ -48,15 +44,15 @@ namespace rexos_knowledge_database{
 	}
 	
 	std::map<int, std::vector<rexos_datatypes::RequiredMutation>> ModuleType::getRequiredMutations() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT phase, mutation, isOptional \
 		FROM RequiredCalibrationMutation \
 		WHERE manufacturer = ? AND \
-		typeNumber = ?;");
+		typeNumber = ?;"));
 		preparedStmt->setString(1, moduleTypeIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleTypeIdentifier.getTypeNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		std::map<int, std::vector<rexos_datatypes::RequiredMutation>> requiredMutations;
 		while(result->next() == true) {
 			int phase = result->getInt("phase");
@@ -64,24 +60,19 @@ namespace rexos_knowledge_database{
 			
 			// insertion will be automatically performed when key does not exists, see http://en.cppreference.com/w/cpp/container/map/operator_at
 			requiredMutations[phase].push_back(m);
-			for(uint i= 0 ; i < requiredMutations[phase].size(); i++) {
-				REXOS_INFO_STREAM(requiredMutations[phase].at(i));
-			}
 		}
-		delete result;
-		delete preparedStmt;
 		return requiredMutations;
 	}
 	std::map<int, std::vector<rexos_datatypes::SupportedMutation>> ModuleType::getSupportedMutations() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT phase, mutation \
 		FROM SupportedCalibrationMutation \
 		WHERE manufacturer = ? AND \
-		typeNumber = ?;");
+		typeNumber = ?;"));
 		preparedStmt->setString(1, moduleTypeIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleTypeIdentifier.getTypeNumber());
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		std::map<int, std::vector<rexos_datatypes::SupportedMutation>> supportedMutations;
 		while(result->next() == true) {
 			int phase = result->getInt("phase");
@@ -90,8 +81,6 @@ namespace rexos_knowledge_database{
 			// insertion will be automatically performed when key does not exists, see http://en.cppreference.com/w/cpp/container/map/operator_at
 			supportedMutations[phase].push_back(m);
 		}
-		delete result;
-		delete preparedStmt;
 		return supportedMutations;
 	}
 }

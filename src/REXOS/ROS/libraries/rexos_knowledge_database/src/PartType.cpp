@@ -9,24 +9,21 @@ namespace rexos_knowledge_database {
 	std::string PartType::getTypeNumberForParName(std::string partName) {
 		std::shared_ptr<sql::Connection> connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT partType \
 		FROM Part \
-		WHERE partName = ?;");
+		WHERE partName = ?;"));
 		preparedStmt->setString(1, partName);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current part (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::string partType = result->getString("partType");
-		
-		delete result;
-		delete preparedStmt;
-		return partType;
+		return result->getString("partType");
 	}
+	
 	PartType::PartType(std::string typeNumber) :
 			typeNumber(typeNumber)
 	{
@@ -36,22 +33,18 @@ namespace rexos_knowledge_database {
 		return typeNumber;
 	}
 	std::string PartType::getPartTypeProperties() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT partTypeProperties \
 		FROM PartType \
-		WHERE typeNumber = ?;");
+		WHERE typeNumber = ?;"));
 		preparedStmt->setString(1, typeNumber);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current partType (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::string jsonProperties = result->getString("partTypeProperties");
-		
-		delete result;
-		delete preparedStmt;
-		return jsonProperties;
+		return result->getString("partTypeProperties");
 	}
 }
