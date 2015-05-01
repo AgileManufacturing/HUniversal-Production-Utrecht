@@ -20,7 +20,7 @@ public class EQMessageAgent extends Agent {
 	private static final long serialVersionUID = 1L;
 	
 	public void setup(){
-		sleep(3000);
+		sleep(1500);
 		
 		//Send message
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);

@@ -197,12 +197,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 						dto.staticSettings = staticSettings.get(i).serialize();
 						
 						//Create DTO dynamicSettings
-//						int mountX = 1;
-//						int mountY = 1;
-//						JSONObject temp = new JSONObject();
-//						dto.dynamicSettings.append(DynamicSettings.ATTACHED_TO, temp);
-//						dto.dynamicSettings.append(DynamicSettings.MOUNT_POINT_X, mountX);
-//						dto.dynamicSettings.append(DynamicSettings.MOUNT_POINT_Y, mountY);
+						dto.dynamicSettings.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
+						dto.dynamicSettings.put(DynamicSettings.MOUNT_POINT_X, 1);
+						dto.dynamicSettings.put(DynamicSettings.MOUNT_POINT_Y, 1);
 						
 						//Add DTO to array
 						dtoSettings.add(dto);

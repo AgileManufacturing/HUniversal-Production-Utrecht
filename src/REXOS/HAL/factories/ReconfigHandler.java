@@ -331,6 +331,10 @@ public class ReconfigHandler {
 				}
 				knowledgeDBClient.getConnection().commit();
 				return true;
+			} catch (KnowledgeException kex){
+				Logger.log(LogSection.HAL_RECONFIG, LogLevel.WARNING, "Duplicate module", kex.getLocalizedMessage());
+				knowledgeDBClient.getConnection().rollback();
+				return false;
 			} catch (Exception ex) {
 				Logger.log(LogSection.HAL_RECONFIG, LogLevel.ERROR, "Error occured while inserting module ", ex);
 				knowledgeDBClient.getConnection().rollback();
