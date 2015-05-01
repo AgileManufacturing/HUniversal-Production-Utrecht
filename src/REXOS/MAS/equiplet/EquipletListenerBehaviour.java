@@ -3,6 +3,8 @@ package MAS.equiplet;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +13,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.DTOModuleSettings;
+import util.log.LogLevel;
+import util.log.LogSection;
 import util.log.Logger;
 
 import HAL.dataTypes.ModuleIdentifier;
+import HAL.dataTypes.StaticSettings;
+import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import MAS.util.Ontology;
 import MAS.util.Pair;
 import MAS.util.Parser;
@@ -171,13 +177,22 @@ public class EquipletListenerBehaviour extends Behaviour {
 					}
 					
 				}else if(requestedEquipletCommand.equals("INSERT_MODULES")){
-					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
+					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));	
+					ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
+					KnowledgeDBClient kdb = new KnowledgeDBClient();
+					
+					//Get the staticSettings and push into array
+					for(int i = 0; i < modules.size(); i++){
+						staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(modules.get(i), kdb));
+						Logger.log(staticSettings.get(i).toString());
+					}
+					
 					ArrayList<DTOModuleSettings> DTOSettings = extractDTOSettings(command.getJSONArray("modules"));
 					
 					if(modules != null && DTOSettings != null && modules.size() == DTOSettings.size()){
 						equiplet.reconfigureEquiplet(modules);
 					}else{
-						Logger.log("Error while extracting modules for reconfiguration");
+						Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 					}
 					// TODO Get list of DTO identifiers from JSON and call the reinitalize function
 					//equiplet.reinitializeEquiplet(toBeAddedModuleSettings);
@@ -195,6 +210,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 			//Error handling
 			} catch (JSONException e) {
 				Logger.log("Invalid JSON.");
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}		
 	}
