@@ -1,0 +1,182 @@
+html {
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+	font-size: 1em;
+
+	height: 100%;
+}
+
+body {
+	min-height: 100%;
+
+	background-color: #EEEEEE;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+
+/**
+ * Generic class and element styling
+ */
+a {
+	/*font-weight: bold;*/
+	color: inherit;
+}
+
+
+
+/**
+ * Major structure elements styling
+ */
+header,
+main,
+footer,
+nav {
+	width: 100%;
+}
+
+main > section, main > div,
+footer > div,
+nav > ul {
+	margin: 0 auto;
+
+	width: 768px;
+}
+
+
+/**
+ * Header and footer styling
+ */
+nav {
+	border-bottom: 2px solid #BBBBBB;
+}
+nav.top {
+	border-top: 2px solid #BBBBBB;
+	border-bottom: none;
+}
+
+nav > ul {
+	list-style: none;
+	padding: 0;
+}
+
+nav > ul > li {
+	display: inline-block;
+	vertical-align: top;
+}
+nav > ul > li {
+	min-width: 25%;
+}
+nav.small > ul > li {
+	min-width: 0;
+}
+
+nav > ul > li > a {
+	display: block;
+
+	text-align: center;
+	text-transform: uppercase;
+	text-decoration: none;
+
+	position: relative;
+
+	font-weight: bold;
+
+	border-bottom: 2px solid transparent;
+	bottom: -2px;
+	margin-top: -2px;
+
+	padding: 16px 32px;
+}
+nav.top > ul > li > a {
+	border-top: 2px solid transparent;
+	top: -2px;
+	margin-bottom: -2px;
+
+	border-bottom: none;
+	bottom: auto;
+	margin-top: auto;
+}
+
+nav.small > ul > li > a {
+	padding: 8px 16px;
+	font-size: .75em;
+}
+
+nav > ul > li.current > a {
+	border-color: #0066BB;
+}
+nav > ul > li > a:hover {
+	border-color: #000000;
+}
+
+
+/**
+ * Header styling
+ */
+
+
+/**
+ * Main styling
+ */
+main {
+	padding: 16px 0;
+
+	background-color: #FFFFFF;
+}
+
+
+/**
+ * Footer styling
+ */
+footer {
+	/*position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;*/
+}
+
+/**
+ * Form styling
+ */
+form input {
+	outline: none;
+	border-radius: 0;
+}
+form input {
+	-webkit-appearance: none;
+}
+
+form > div {
+	vertical-align: top;
+	display: inline-block;
+	box-sizing: border-box;
+
+	min-width: 192px;
+	width: 33.33%;
+	padding: 4px;
+	margin: 4px 0;
+}
+form > div > label {
+	display: block;
+	font-style: italic;
+}
+form > div > input {
+	display: block;
+	box-sizing: border-box;
+
+	padding: 4px 8px;
+	width: 100%;
+
+	border: 1px solid #BBBBBB;
+}
+form > div > input:hover, form > div > input:focus {
+	border-color: #0066BB;
+}
+form > div > input:focus {
+	border-right-width: 4px;
+}
