@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mongodb.util.JSONCallback;
-
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -71,7 +69,7 @@ public class HardwareAbstractionLayer implements ModuleListener, EquipletListene
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
 		reconfigHandler = new ReconfigHandler(this, capabilityFactory, moduleFactory);
-		rosInterface = new RosInterface(this);
+		rosInterface = new NodeRosInterface(this);
 		rosInterface.addEquipletListener(this);
 	}
 
@@ -260,5 +258,17 @@ public class HardwareAbstractionLayer implements ModuleListener, EquipletListene
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
 		}
 	}
-
+	public void reloadRos() {
+		try{
+			JSONObject equipletCommand = new JSONObject();
+			equipletCommand.put("command", "reload");
+			equipletCommand.put("status", "WAITING");
+			JSONObject parameters = new JSONObject();
+			parameters.put("reload", "ALL_MODULES");
+			equipletCommand.put("parameters", parameters);
+			rosInterface.postEquipletCommand(equipletCommand);
+		} catch(JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
+		}
+	}
 }

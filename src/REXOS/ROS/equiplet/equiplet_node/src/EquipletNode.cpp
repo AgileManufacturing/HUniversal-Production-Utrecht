@@ -51,6 +51,7 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		isShadow(isShadow),
 		nh(),
 		scada(this, &moduleRegistry, scadaPort),
+//		halInterface(equipletName, this, blackboardIp)
 		halInterface(equipletName, this)
 {
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
@@ -172,7 +173,9 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 			}
 		}
 		REXOS_ERROR("Unknown mode");
+	} else if (equipletCommand.getCommand() == "reload") {
+		moduleRegistry.reloadModules();
 	} else {
-		// TODO
+		REXOS_WARN_STREAM("Unknown equiplet command, ignoring input");
 	}
 }

@@ -87,7 +87,7 @@ public class MongoDBConnection {
 					(int) Configuration.getProperty("rosInterface/threadsAllowedToBlockForConnectionMultiplier");
 			
 			mongoClient = new Mongo(address, mongoOptions);
-			mongoClient.setWriteConcern(WriteConcern.SAFE);
+			mongoClient.setWriteConcern(WriteConcern.NORMAL);
 		} catch (MongoException mongoException) {
 			throw new GeneralMongoException("A mongo exception occurred while connecting.", mongoException);
 		}

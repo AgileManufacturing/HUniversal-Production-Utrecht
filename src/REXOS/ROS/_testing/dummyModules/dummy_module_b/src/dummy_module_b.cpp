@@ -46,7 +46,7 @@ void DummyModuleB::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStep
 	result.OID = goal->OID;
 	
 	REXOS_INFO("executing hardware step...");
-	ros::Duration d(1.0);
+	ros::Duration d(0.1);
 	d.sleep();
 	REXOS_INFO("done with executing hardware step");
 	executeHardwareStepServer.setSucceeded(result);

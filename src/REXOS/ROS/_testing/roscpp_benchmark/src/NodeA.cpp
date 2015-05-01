@@ -12,21 +12,21 @@ namespace roscpp_benchmark {
 			totalLatency += latencies[i].toNSec();
 		}
 		long averagelatency = totalLatency / numberOfMeasurements;
-		ROS_INFO_STREAM("Average latency (nanoseconds): " << averagelatency);
+		std::cout << "Average latency (nanoseconds): " << averagelatency << std::endl;
 		
 		// calculate standard deviation
 		long totalStandardDeviation = 0;
 		for(uint i = 0; i < latencies.size(); i++) {
 			totalStandardDeviation += std::pow(latencies[i].toNSec() - averagelatency, 2);
 		}
-		ROS_INFO_STREAM("Standard deviation: " << (std::sqrt(totalStandardDeviation / numberOfMeasurements)));
+		std::cout << "Standard deviation: " << (std::sqrt(totalStandardDeviation / numberOfMeasurements)) << std::endl;
 		
 		// calculate average deviation
 		long totalAverageDeviation = 0;
 		for(uint i = 0; i < latencies.size(); i++) {
 			totalAverageDeviation += std::abs(latencies[i].toNSec() - averagelatency);
 		}
-		ROS_INFO_STREAM("Average deviation: " << (std::sqrt(totalAverageDeviation / numberOfMeasurements)));
+		std::cout << "Average deviation: " << (std::sqrt(totalAverageDeviation / numberOfMeasurements)) << std::endl;
 	}
 
 	void NodeA::handleMessage(const std_msgs::Int32ConstPtr& input) {
@@ -64,7 +64,7 @@ namespace roscpp_benchmark {
 	std::cout << "1: latency topics" << std::endl;
 	std::cout << "2: latency services" << std::endl;
 	std::cout << "3: latency actionServers" << std::endl;
-	std::cout << "3: latency actionServers" << std::endl;
+	std::cout << "4: latency blackboard" << std::endl;
 	std::cout << "Choose: ";
 	int method;
 	std::cin >> method;
@@ -134,6 +134,9 @@ namespace roscpp_benchmark {
 		std::string output = writer.write(blackboardMessage);
 		measurementStart = ros::WallTime::now();
 		blackboardClient->insertDocument(output);
+	} else {
+		std::cerr "Unkown method" << std::endl;
+		ros::shutdown();
 	}
 	ros::spin();
 	}

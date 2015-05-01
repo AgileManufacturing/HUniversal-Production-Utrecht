@@ -33,7 +33,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = false;
+	static boolean insertModules = true;
 	static boolean translateSteps = true;
 
 	// six axis

@@ -10,9 +10,9 @@ import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
 import HAL.tasks.ExecutionProcess;
 import HAL.testerClasses.HALTesterClass;
+import MAS.equiplet.EquipletAgent;
 
 /**
  * A HardwareAbstractionLayerListener listens to events in the {@link HardwareAbstractionLayer}. This interface is usually implemented by the {@link EquipletAgent} or the {@link HALTesterClass}

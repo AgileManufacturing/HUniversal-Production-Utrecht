@@ -46,6 +46,7 @@
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/scada/EquipletScada.h>
 #include <equiplet_node/NodeHalInterface.h>
+#include <equiplet_node/BlackBoardHalInterface.h>
 #include <equiplet_node/HalInterfaceListener.h>
 
 #include <jsoncpp/json/value.h>
@@ -87,6 +88,7 @@ private:
 	
 	equiplet_node::scada::EquipletScada scada;
 	
+//	BlackBoardHalInterface halInterface;
 	NodeHalInterface halInterface;
 	
 	virtual void onHardwareStep(rexos_datatypes::HardwareStep hardwareStep);

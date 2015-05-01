@@ -16,7 +16,7 @@ DummyModuleA::DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIden
 
 void DummyModuleA::run() {
 	REXOS_INFO("running");
-	ros::Rate rate(100);
+	ros::Rate rate(200);
 	while(ros::ok())
 	{
 		environment_cache::setData serviceCall;
@@ -31,6 +31,7 @@ void DummyModuleA::run() {
 		ros::spinOnce();
 		rate.sleep();
 	}
+	//ros::spin();
 }
 bool DummyModuleA::transitionInitialize() {
 	REXOS_INFO("Initialize transition called");

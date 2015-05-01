@@ -32,7 +32,7 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 
 	static String equipletName = "EQD";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = false;
+	static boolean insertModules = true;
 	static boolean translateSteps = true;
 
 	// camera

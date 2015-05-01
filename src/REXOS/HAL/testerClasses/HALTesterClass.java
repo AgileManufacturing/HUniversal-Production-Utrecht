@@ -29,7 +29,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 	JSONObject criteria1 = new JSONObject();
 	
-	static String equipletName = "EQ1";
+	static String equipletName = "EQ0";
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
@@ -251,6 +251,14 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		if(translateSteps == false) {
 			hal.shutdown();
 		} else {
+			// wait for ros node to come online
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			hal.changeState(Mast.State.SAFE);
 		}
 	}
@@ -263,7 +271,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 
 	@Override
 	public void onTranslationFailed(String service, JSONObject criteria) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[]{ service, criteria });
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, equipletName + " Translation failed of the following product step:", new Object[]{ service, criteria });
 	}
 
 	@Override
@@ -335,13 +343,13 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 		} catch (JSONException ex) {
 			ex.printStackTrace();
 		}
-
+		
 		hal.translateProductStep("place", criteria1);
 	}
 
 	@Override
 	public void onExecutionFailed() {
-		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution failed");
+		Logger.log(LogSection.NONE, LogLevel.ERROR, equipletName + " Execution failed");
 	}
 
 	@Override

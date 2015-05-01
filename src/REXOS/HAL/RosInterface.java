@@ -13,86 +13,96 @@ import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
 
-public class RosInterface {
-	private HardwareAbstractionLayer hal;
-	private IRosInterfaceManager manager;
-	
+public abstract class RosInterface {
+	protected HardwareAbstractionLayer hal;
 	private ArrayList<ModuleListener> moduleSubscribers;
 	private ArrayList<EquipletListener> equipletSubscribers;
 	private ArrayList<ProcessListener> processSubscribers;
 	
-	public RosInterface(HardwareAbstractionLayer hal) {
+	protected RosInterface(HardwareAbstractionLayer hal) {
 		this.hal = hal;
-		this.manager = new RosJavaNode(this);
-		
 		moduleSubscribers = new ArrayList<ModuleListener>();
 		equipletSubscribers = new ArrayList<EquipletListener>();
 		processSubscribers = new ArrayList<ProcessListener>();
 	}
 	
 	public void addProcessListener(ProcessListener listener) {
-		processSubscribers.add(listener);
+		synchronized (processSubscribers) {
+			processSubscribers.add(listener);
+		}
 	}
 	public void removeProcessListener(ProcessListener listener) {
-		processSubscribers.remove(listener);
+		synchronized (processSubscribers) {
+			processSubscribers.remove(listener);
+		}
 	}
-	public void onHardwareStepStatusChanged(HardwareStep hardwareStep) {
-		for (ProcessListener processListener : processSubscribers) {
-			processListener.onProcessStatusChanged(hardwareStep);
+	protected void onHardwareStepStatusChanged(HardwareStep hardwareStep) {
+		synchronized (processSubscribers) {
+			for (ProcessListener processListener : processSubscribers) {
+				processListener.onProcessStatusChanged(hardwareStep);
+			}
 		}
 	}
 
 	public void addEquipletListener(EquipletListener listener) {
-		equipletSubscribers.add(listener);
+		synchronized (equipletSubscribers) {
+			equipletSubscribers.add(listener);
+		}
 	}
 	public void removeEquipletListener(EquipletListener listener) {
-		equipletSubscribers.remove(listener);
-	}
-	public void onEquipletStateChanged(State state) {
-		for (EquipletListener equipletListener : equipletSubscribers) {
-			equipletListener.onEquipletStateChanged(state);
+		synchronized (equipletSubscribers) {
+			equipletSubscribers.remove(listener);
 		}
 	}
-	public void onEquipletModeChanged(Mode mode) {
-		for (EquipletListener equipletListener : equipletSubscribers) {
-			equipletListener.onEquipletModeChanged(mode);
+	protected void onEquipletStateChanged(State state) {
+		synchronized (equipletSubscribers) {
+			for (EquipletListener equipletListener : equipletSubscribers) {
+				equipletListener.onEquipletStateChanged(state);
+			}
 		}
 	}
-	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
-		for (EquipletListener equipletListener : equipletSubscribers) {
-			equipletListener.onEquipletCommandStatusChanged(status);
+	protected void onEquipletModeChanged(Mode mode) {
+		synchronized (equipletSubscribers) {
+			for (EquipletListener equipletListener : equipletSubscribers) {
+				equipletListener.onEquipletModeChanged(mode);
+			}
+		}
+	}
+	protected void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
+		synchronized (equipletSubscribers) {
+			for (EquipletListener equipletListener : equipletSubscribers) {
+				equipletListener.onEquipletCommandStatusChanged(status);
+			}
 		}
 	}
 
 	public void addModuleListener(ModuleListener listener) {
-		moduleSubscribers.add(listener);
+		synchronized (moduleSubscribers) {
+			moduleSubscribers.add(listener);
+		}
 	}
 	public void removeModuleListener(ModuleListener listener) {
-		moduleSubscribers.remove(listener);
-	}
-	public void onModuleStateChanged(Module module, State state) {
-		for (ModuleListener moduleListener : moduleSubscribers) {
-			moduleListener.onModuleStateChanged(module, state);
+		synchronized (moduleSubscribers) {
+			moduleSubscribers.remove(listener);
 		}
 	}
-	public void onModuleModeChanged(Module module, Mode mode) {
-		for (ModuleListener moduleListener : moduleSubscribers) {
-			moduleListener.onModuleModeChanged(module, mode);
+	protected void onModuleStateChanged(Module module, State state) {
+		synchronized (moduleSubscribers) {
+			for (ModuleListener moduleListener : moduleSubscribers) {
+				moduleListener.onModuleStateChanged(module, state);
+			}
+		}
+	}
+	protected void onModuleModeChanged(Module module, Mode mode) {
+		synchronized (moduleSubscribers) {
+			for (ModuleListener moduleListener : moduleSubscribers) {
+				moduleListener.onModuleModeChanged(module, mode);
+			}
 		}
 	}
 	
-	void postHardwareStep(HardwareStep hardwareStep) {
-		manager.postHardwareStep(hardwareStep);
-	}
-	void postEquipletCommand(JSONObject equipletCommand) {
-		manager.postEquipletCommand(equipletCommand);
-	}
+	abstract public void postHardwareStep(HardwareStep hardwareStep);
+	abstract public void postEquipletCommand(JSONObject equipletCommand);
 	
-	void shutdown() {
-		manager.shutdown();
-	}
-
-	public HardwareAbstractionLayer getHal() {
-		return hal;
-	}
+	abstract public void shutdown();
 }

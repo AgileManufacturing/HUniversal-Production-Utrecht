@@ -1,13 +1,40 @@
 #!/usr/bin/env sh
+###################### SETTINGS ######################
+keepWindowOpenAfterCommandEnds=false
+defaultManufacturer="HU"
+defaultTypeNumber="workplane_type_A"
+defaultSerialNumber="1"
+###################### END OF SETTINGS ######################
 ###################### VARS ######################
 launchedPrimaryInfrastructureWithSimulation=false
-keepWindowOpenAfterCommandEnds=true
-
+cancelAction=false
 ###################### END OF VARS ######################
 ###################### FUNCTIONS ######################
 function getEquipletName() {
 	echo -n "Choose equipletName: "
 	read equipletName
+}
+function getPartName() {
+	echo -n "Choose partName: "
+	read partName
+}
+function getModuleIdentifier() {
+	echo -n "Choose manufacturer (default: $defaultManufacturer): "
+	read manufacturer
+	if [ "$manufacturer" == "" ]; then
+		manufacturer="$defaultManufacturer"
+	fi
+	echo -n "Choose typeNumber (default: $defaultTypeNumber): "
+	read typeNumber
+	if [ "$typeNumber" == "" ]; then
+		typeNumber="$defaultTypeNumber"
+	fi
+	echo -n "Choose serialNumber (default: $defaultSerialNumber): "
+	read serialNumber
+	if [ "$serialNumber" == "" ]; then
+		serialNumber="$defaultSerialNumber"
+	fi
+	moduleIdentifier="$manufacturer|$typeNumber|$serialNumber"
 }
 function getPosition() {
 	echo -n "Choose positionX: "
@@ -15,19 +42,63 @@ function getPosition() {
 	echo -n "Choose positionY: "
 	read positionY
 }
+function getOriginPlacementType() {
+	echo "Choose origin placement type: "
+	echo "1: Relative to equiplet origin (relativeToEquipletOrigin)"
+	echo "2: Relative to module origin (relativeToModuleOrigin)"
+	echo "3: Relative to part origin (relativeToIdentifier)"
+	echo "4: Relative to world origin (relativeToWorldOrigin)"
+	echo "Q: Cancel"
+	echo ""
+	echo -n "Choose option: "
+	read chosenOption
+	if [ "$chosenOption" == 1 ]; then
+		originPlacementType=relativeToEquipletOrigin
+		getEquipletName
+		relativeTo="$equipletName"
+	elif [ "$chosenOption" == 2 ]; then
+		originPlacementType=relativeToModuleOrigin
+		getModuleIdentifier
+		relativeTo="$moduleIdentifier"
+	elif [ "$chosenOption" == 3 ]; then
+		originPlacementType=relativeToIdentifier
+		getPartName
+		relativeTo="$partName"
+	elif [ "$chosenOption" == 4 ]; then
+		originPlacementType=relativeToWorldOrigin
+		relativeTo=""
+	else
+		echo "Cancelling"
+		cancelAction=true
+	fi
+}
+function getPose() {
+	echo -n "Choose positionX: "
+	read positionX
+	echo -n "Choose positionY: "
+	read positionY
+	echo -n "Choose positionZ: "
+	read positionZ
+	echo -n "Choose rotationX: "
+	read rotationX
+	echo -n "Choose rotationY: "
+	read rotationY
+	echo -n "Choose rotationZ: "
+	read rotationZ
+}
 
 function launchPrimaryInfrastructureWithSimulation() {
 	echo "Launching primary infrastructure with simulation"
 	if [ "$keepWindowOpenAfterCommandEnds" == true ]; then
 		gnome-terminal --title="Primary infrastructure" \
 			--tab -t "roscore" 	-e "bash -c \"roscore\";bash" \
-			--tab -t "gzclient" 	-e "bash -c \"rosrun gazebo_ros gzserver --verbose\";bash" \
-			--tab -t "roscore" 	-e "bash -c \"rosrun gazebo_ros gzclient --verbose\";bash"
+			--tab -t "gzserver" -e "bash -c \"rosrun gazebo_ros gzserver --verbose\";bash" \
+			--tab -t "gzclient" -e "bash -c \"rosrun gazebo_ros gzclient --verbose\";bash"
 	else
 		gnome-terminal --title="Primary infrastructure" \
 			--tab -t "roscore" 	-e "bash -c \"roscore\"" \
-			--tab -t "gzserver" 	-e "bash -c \"rosrun gazebo_ros gzserver --verbose\"" \
-			--tab -t "gzclient" 	-e "bash -c \"rosrun gazebo_ros gzclient --verbose\""
+			--tab -t "gzserver" -e "bash -c \"rosrun gazebo_ros gzserver --verbose\"" \
+			--tab -t "gzclient" -e "bash -c \"rosrun gazebo_ros gzclient --verbose\""
 	fi
 	launchedPrimaryInfrastructureWithSimulation=true
 }
@@ -132,6 +203,38 @@ function launchShadowEquipletWithoutPrimaryNodes() {
 			--tab -t "equiplet_node" -e "bash -c \"rosrun equiplet_node equiplet_node --isShadow $equipletName\""
 	fi
 }
+
+function launchPartModel() {
+	echo "Launching part model"
+	getPartName
+	partNameToSpawn="$partName"
+	if [ "$cancelAction" == true ] ; then
+		return
+	fi
+	getOriginPlacementType
+	if [ "$cancelAction" == true ] ; then
+		return
+	fi
+	getPose
+	
+	echo "bash -c \"rosrun model_spawner_node model_spawner_node --spawnPartModel --partName $partNameToSpawn \
+				--originPlacementType $originPlacementType \\\"$relativeTo\\\" \
+				-x $positionX -y $positionY -z $positionZ --pitch $rotationX --roll $rotationY --yaw $rotationZ\""
+	
+	if [ "$keepWindowOpenAfterCommandEnds" == true ]; then
+		gnome-terminal --title="$partName" \
+			--tab -t "$partName" -e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnPartModel --partName $partNameToSpawn \
+				--originPlacementType $originPlacementType \\\"$relativeTo\\\" \
+				-x $positionX -y $positionY -z $positionZ --pitch $rotationX --roll $rotationY --yaw $rotationZ\";bash"
+	else
+		gnome-terminal --title="$partName" \
+			--tab -t "$partName" -e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnPartModel --partName $partNameToSpawn \
+				--originPlacementType $originPlacementType \\\"$relativeTo\\\" \
+				-x $positionX -y $positionY -z $positionZ --pitch $rotationX --roll $rotationY --yaw $rotationZ\""
+	fi
+	
+	
+}
 ###################### END OF FUNCTIONS ######################
 
 
@@ -141,6 +244,8 @@ echo "This script allows you to dynamically launch ROS components of REXOS";
 echo "Step 1: choose primary infrastructure:"
 echo "1: Launch primary infrastructure with simulation"
 echo "2: Launch primary infrastructure without simulation"
+echo "3: Primary infrastructure with simulation is already running"
+echo "4: Primary infrastructure without simulation is already running"
 echo "Q: Exit"
 echo ""
 echo -n "Choose option: "
@@ -150,6 +255,10 @@ if [ "$chosenOption" == 1 ]; then
 	launchPrimaryInfrastructureWithSimulation
 elif [ "$chosenOption" == 2 ]; then
 	launchPrimaryInfrastructureWithoutSimulation
+elif [ "$chosenOption" == 3 ]; then
+	launchedPrimaryInfrastructureWithSimulation=true
+elif [ "$chosenOption" == 4 ]; then
+	launchedPrimaryInfrastructureWithSimulation=false
 elif [ "$chosenOption" == "Q" ] || [ "$chosenOption" == "q" ]; 
 then
 	echo "Exiting"
@@ -163,6 +272,7 @@ exitRequested=false
 
 while [ "$exitRequested" == false ];
 do
+	cancelAction=false
 	echo ""
 	echo ""
 	echo "Step 2: choose action:"
@@ -193,6 +303,8 @@ fi
 		launchShadowEquipletWithPrimaryNodes
 	elif [ "$chosenOption" == 6 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then
 		launchShadowEquipletWithoutPrimaryNodes
+	elif [ "$chosenOption" == 8 ] && [ "$launchedPrimaryInfrastructureWithSimulation" == true ]; then
+		launchPartModel
 	elif [ "$chosenOption" == "Q" ] || [ "$chosenOption" == "q" ]; then
 		echo "Exiting"
 		exitRequested=true

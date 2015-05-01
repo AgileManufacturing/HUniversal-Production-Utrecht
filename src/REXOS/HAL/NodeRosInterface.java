@@ -4,8 +4,6 @@ import generic.Mast;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +26,7 @@ import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
-public class RosJavaNode implements NodeMain, IRosInterfaceManager {
+public class NodeRosInterface extends RosInterface implements NodeMain {
 	private Subscriber<std_msgs.String> hardwareStepStatusChangedSubscriber;
 	private Subscriber<std_msgs.String> equipletCommandStatusChangedSubscriber;
 	private Subscriber<std_msgs.String> stateChangedSubscriber;
@@ -40,17 +38,15 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 	private Map<Integer, HardwareStep> hardwareSteps;
 	private Integer hardwareStepId;
 	
-	private RosInterface rosInterface;
 	private NodeMainExecutor executor;
 	
-	private boolean nodeStarted;
+	private boolean hasNodeStarted;
 
-	public RosJavaNode(RosInterface rosInterface) {
-		super();
-		this.rosInterface = rosInterface;
+	public NodeRosInterface(HardwareAbstractionLayer hal) {
+		super(hal);
 		this.hardwareSteps = new HashMap<Integer, HardwareStep>();
 		this.hardwareStepId = 1;
-		this.nodeStarted = false;
+		this.hasNodeStarted = false;
 		
 		//ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 		//executor = DefaultNodeMainExecutor.newDefault(scheduler);
@@ -59,7 +55,7 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 		
 		synchronized (this) {
 			try {
-				if(nodeStarted == false) {
+				if(hasNodeStarted == false) {
 					System.out.println("Waiting for node");
 					wait();
 				}
@@ -74,12 +70,12 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 	
 	@Override
 	public GraphName getDefaultNodeName() {
-		return GraphName.of(rosInterface.getHal().getEquipletName() + "_HAL/");
+		return GraphName.of(hal.getEquipletName() + "_HAL/");
 	}
 
 	@Override
 	public void onStart(ConnectedNode node) {
-		String path = rosInterface.getHal().getEquipletName() + "/";
+		String path = hal.getEquipletName() + "/";
 		
 		hardwareStepStatusChangedSubscriber = node.newSubscriber(path + "hardwareStepStatus", std_msgs.String._TYPE);
 		hardwareStepStatusChangedSubscriber.addMessageListener(new MessageListener<std_msgs.String>() {
@@ -90,9 +86,16 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 					Integer id = Integer.valueOf(messageJson.getString("id"));
 					String status = messageJson.getString("status");
 					
-					HardwareStep step = hardwareSteps.get(id);
-					step.setStatus(HardwareStepStatus.valueOf(status));
-					rosInterface.onHardwareStepStatusChanged(step);
+					HardwareStep step;
+					synchronized (hardwareSteps) {
+						step = hardwareSteps.get(id);
+						step.setStatus(HardwareStepStatus.valueOf(status));
+						if(step.getStatus() == HardwareStepStatus.DONE || step.getStatus() == HardwareStepStatus.FAILED) {
+							// we are done with this step
+							hardwareSteps.remove(id);
+						}
+					}
+					NodeRosInterface.this.onHardwareStepStatusChanged(step);
 				} catch (JSONException ex) {
 					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading hardware step status changed failed", ex);
 				}
@@ -105,7 +108,7 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 				try {
 					JSONObject messageJson = new JSONObject(message.getData());
 					String status = messageJson.getString("status");
-					rosInterface.onEquipletCommandStatusChanged(EquipletCommandStatus.valueOf(status));
+					NodeRosInterface.this.onEquipletCommandStatusChanged(EquipletCommandStatus.valueOf(status));
 				} catch (JSONException ex) {
 					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading equiplet command status changed failed", ex);
 				}
@@ -122,10 +125,10 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 						JSONObject moduleIdentifierJson = messageJson.getJSONObject("moduleIdentifier");
 						ModuleIdentifier identifier = new ModuleIdentifier(moduleIdentifierJson.getString("manufacturer"), 
 								moduleIdentifierJson.getString("typeNumber"), moduleIdentifierJson.getString("serialNumber"));
-						Module module = rosInterface.getHal().getModuleFactory().getItemForIdentifier(identifier);
-						rosInterface.onModuleStateChanged(module, Mast.State.valueOf(state));
+						Module module = hal.getModuleFactory().getItemForIdentifier(identifier);
+						NodeRosInterface.this.onModuleStateChanged(module, Mast.State.valueOf(state));
 					} else {
-						rosInterface.onEquipletStateChanged(Mast.State.valueOf(state));
+						NodeRosInterface.this.onEquipletStateChanged(Mast.State.valueOf(state));
 					}
 				} catch (JSONException ex) {
 					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading state changed failed", ex);
@@ -143,10 +146,10 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 						JSONObject moduleIdentifierJson = messageJson.getJSONObject("moduleIdentifier");
 						ModuleIdentifier identifier = new ModuleIdentifier(moduleIdentifierJson.getString("manufacturer"), 
 								moduleIdentifierJson.getString("typeNumber"), moduleIdentifierJson.getString("serialNumber"));
-						Module module = rosInterface.getHal().getModuleFactory().getItemForIdentifier(identifier);
-						rosInterface.onModuleModeChanged(module, Mast.Mode.valueOf(mode));
+						Module module = hal.getModuleFactory().getItemForIdentifier(identifier);
+						NodeRosInterface.this.onModuleModeChanged(module, Mast.Mode.valueOf(mode));
 					} else {
-						rosInterface.onEquipletModeChanged(Mast.Mode.valueOf(mode));
+						NodeRosInterface.this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
 					}
 				} catch (JSONException ex) {
 					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading mode changed failed", ex);
@@ -159,7 +162,7 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 		equipletCommandPublisher = node.newPublisher(path + "equipletCommands", std_msgs.String._TYPE);
 		
 		synchronized (this) {
-			nodeStarted = true;
+			hasNodeStarted = true;
 			this.notifyAll();
 		}
 	}
@@ -185,10 +188,12 @@ public class RosJavaNode implements NodeMain, IRosInterfaceManager {
 			JSONObject hardwareStepJson = hardwareStep.toJSON();
 			hardwareStepJson.put("id", String.valueOf(hardwareStepId));
 			message.setData(hardwareStepJson.toString());
-			hardwareStepPublisher.publish(message);
 			
-			hardwareSteps.put(hardwareStepId, hardwareStep);
-			hardwareStepId++;
+			synchronized (hardwareSteps) {
+				hardwareStepPublisher.publish(message);
+				hardwareSteps.put(hardwareStepId, hardwareStep);
+				hardwareStepId++;
+			}
 		} catch (JSONException ex) {
 			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
 		}

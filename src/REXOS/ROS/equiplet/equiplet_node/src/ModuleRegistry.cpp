@@ -96,8 +96,8 @@ void ModuleRegistry::reloadModules(){
 	auto track = registeredModules.begin();
 	while (track != registeredModules.end()) {
 		rexos_module::ModuleProxy* proxy = *track;
-		std::string x = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier().getManufacturer().c_str(), proxy->getModuleIdentifier().getTypeNumber().c_str(), proxy->getModuleIdentifier().getSerialNumber().c_str());
-		if(x == "0"){
+		bool isInDatabase = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier());
+		if(isInDatabase == false){
 			REXOS_INFO("Removing a old module.");
 			proxy->changeState(rexos_statemachine::State::STATE_OFFLINE);
 			delete proxy;

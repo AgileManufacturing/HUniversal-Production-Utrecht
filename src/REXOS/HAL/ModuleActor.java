@@ -172,16 +172,22 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 	}
 	
 	public void addProcessListener(ProcessListener processListener) {
-		processListeners.add(processListener);
+		synchronized (processListeners) {
+			processListeners.add(processListener);
+		}
 	}
 	public void removeProcessListener(ProcessListener processListener) {
-		processListeners.remove(processListener);
+		synchronized (processListeners) {
+			processListeners.remove(processListener);
+		}
 	}
 	@Override
 	public void onProcessStatusChanged(HardwareStep hardwareStep) {
-		if(hardwareStep.getModuleIdentifier() == this.moduleIdentifier) {
-			for (ProcessListener processListener : processListeners) {
-				processListener.onProcessStatusChanged(hardwareStep);
+		synchronized (processListeners) {
+			if(hardwareStep.getModuleIdentifier() == this.moduleIdentifier) {
+				for (ProcessListener processListener : processListeners) {
+					processListener.onProcessStatusChanged(hardwareStep);
+				}
 			}
 		}
 	}

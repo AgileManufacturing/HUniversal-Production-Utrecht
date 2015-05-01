@@ -151,4 +151,30 @@ public class OplogEntry {
 	
 		return id;
 	}
+	
+	/**
+	 * Returns the part of the document that was modified by the operation.
+	 * @return
+	 */
+
+	public DBObject getModifiedDocumentPart() { 
+		DBObject updateDocField = (DBObject)oplogEntry.get(UPDATE_DOC_FIELD);
+		if(getOperation() == MongoOperation.INSERT) {
+			return updateDocField;
+		} else if(getOperation() == MongoOperation.UPDATE) {
+			if(updateDocField.containsField(FieldUpdateSubscription.MongoUpdateLogOperation.SET.getOperatorString())) {
+				// a field has been updated to a value
+				return (DBObject) updateDocField.get(FieldUpdateSubscription.MongoUpdateLogOperation.SET.getOperatorString());
+			} else if(updateDocField.containsField(FieldUpdateSubscription.MongoUpdateLogOperation.UNSET.getOperatorString())) {
+				// a field has been updated to null (eg. removed)
+				return (DBObject) updateDocField.get(FieldUpdateSubscription.MongoUpdateLogOperation.UNSET.getOperatorString());
+			} else {
+				// the entire document has been updated
+				return updateDocField;
+			}
+		} else {
+			// for other operation no usable document part is available
+			return null;
+		}
+	}
 }
