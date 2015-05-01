@@ -19,10 +19,10 @@ public class DynamicSettings {
 			output.attachedTo = ModuleIdentifier.deSerialize(input.getJSONObject(ATTACHED_TO));
 		}
 		if(input.isNull(MOUNT_POINT_X) == false) {
-			output.mountPointX = input.getInt(MOUNT_POINT_X);
+			output.mountPointX = Integer.getInteger(input.get(MOUNT_POINT_X).toString());
 		}
 		if(input.isNull(MOUNT_POINT_Y) == false) {
-			output.mountPointY = input.getInt(MOUNT_POINT_Y);
+			output.mountPointY = Integer.getInteger(input.get(MOUNT_POINT_Y).toString());
 		}
 		
 		return output;

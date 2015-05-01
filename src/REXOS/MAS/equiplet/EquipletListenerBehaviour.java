@@ -17,6 +17,7 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 
+import HAL.dataTypes.DynamicSettings;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.dataTypes.StaticSettings;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -173,7 +174,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 				if(requestedEquipletCommand.equals("DELETE_MODULES")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
 					if(modules != null){
-						equiplet.reconfigureEquiplet(modules);
+						equiplet.shutdownAndRemove(modules);
 					}else{
 						Logger.log("Error while extracting modules for reconfiguration");
 					}
@@ -183,16 +184,33 @@ public class EquipletListenerBehaviour extends Behaviour {
 				}else if(requestedEquipletCommand.equals("INSERT_MODULES")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));	
 					ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
+					ArrayList<DTOModuleSettings> dtoSettings = new ArrayList<DTOModuleSettings>();
 					KnowledgeDBClient kdb = new KnowledgeDBClient();
 					
 					//Get the staticSettings and push into array
 					for(int i = 0; i < modules.size(); i++){
+						//Get static settings from Grid Knowledge DB
 						staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(modules.get(i), kdb));
-						Logger.log(staticSettings.get(i).toString());
+						
+						DTOModuleSettings dto = new DTOModuleSettings();
+						//Create DTO staticSettings
+						dto.staticSettings = staticSettings.get(i).serialize();
+						
+						//Create DTO dynamicSettings
+//						int mountX = 1;
+//						int mountY = 1;
+//						JSONObject temp = new JSONObject();
+//						dto.dynamicSettings.append(DynamicSettings.ATTACHED_TO, temp);
+//						dto.dynamicSettings.append(DynamicSettings.MOUNT_POINT_X, mountX);
+//						dto.dynamicSettings.append(DynamicSettings.MOUNT_POINT_Y, mountY);
+						
+						//Add DTO to array
+						dtoSettings.add(dto);
 					}
 					
+					
 					if(modules != null && staticSettings != null && modules.size() == staticSettings.size()){
-						//equiplet.reconfigureEquiplet(staticSettings);
+						equiplet.startupAndInsert(dtoSettings);
 					}else{
 						Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 					}

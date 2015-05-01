@@ -202,7 +202,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @author Thomas Kok
 	 * @author Kevin Bosman
 	 */
-	public void reconfigureEquiplet(ArrayList<ModuleIdentifier> arrayList){
+	public void shutdownAndRemove(ArrayList<ModuleIdentifier> arrayList){
 		System.out.printf("EA:%s starting to reconfigure.\n", getLocalName());
 		this.reconfiguring = true;
 		deregister();
@@ -238,7 +238,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @author Thomas Kok
 	 * @author Kevin Bosman
 	 */
-	public boolean reinitializeEquiplet(List<DTOModuleSettings> toBeAddedModuleSettings){
+	public boolean startupAndInsert(List<DTOModuleSettings> toBeAddedModuleSettings){
 		boolean isInsertingModulesSuccessful = true;
 		List<Boolean> results = new ArrayList<Boolean>();
 		

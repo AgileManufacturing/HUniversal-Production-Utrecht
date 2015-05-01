@@ -299,7 +299,7 @@ public class ReconfigHandler {
 	 *            position, attached to other modules, orientation, etc).
 	 * @return true if insertion of the module is successful, false otherwise.
 	 */
-	public boolean insertModule(StaticSettings staticSettings, DynamicSettings dynamicSettings) {
+	public boolean insertModule(StaticSettings staticSettings, DynamicSettings dynamicSettings) throws FactoryException {
 		try {
 			try {
 				knowledgeDBClient.getConnection().setAutoCommit(false);

@@ -110,6 +110,9 @@ public class HardwareAbstractionLayer implements ModuleListener, BlackboardEquip
 		} catch (JSONException | ParseException ex) {
 			Logger.log(LogSection.HAL_RECONFIG, LogLevel.ERROR, "Parsing static of dynamic settings failed.", ex);
 			return false;
+		} catch (FactoryException ex){
+			Logger.log(LogSection.HAL_RECONFIG, LogLevel.WARNING, ex.getLocalizedMessage());
+			return false;
 		}
 	}
 

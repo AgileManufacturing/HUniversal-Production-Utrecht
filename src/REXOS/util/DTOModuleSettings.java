@@ -11,4 +11,9 @@ import org.json.JSONObject;
 public class DTOModuleSettings {
 	public JSONObject staticSettings;
 	public JSONObject dynamicSettings;
+	
+	public DTOModuleSettings(){
+		staticSettings = new JSONObject();
+		dynamicSettings = new JSONObject();
+	}
 }
