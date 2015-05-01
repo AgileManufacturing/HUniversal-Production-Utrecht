@@ -167,6 +167,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 				//Identifying modules
 				String requestedEquipletCommand = command.getString("requested-equiplet-command").toString();
 				
+				
+				
 				// Program if statements that will appropriately handle messages sent to the equiplet agent.
 				if(requestedEquipletCommand.equals("DELETE_MODULES")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));
@@ -175,6 +177,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 					}else{
 						Logger.log("Error while extracting modules for reconfiguration");
 					}
+					
+					
 					
 				}else if(requestedEquipletCommand.equals("INSERT_MODULES")){
 					ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(command.getJSONArray("modules"));	
@@ -187,21 +191,25 @@ public class EquipletListenerBehaviour extends Behaviour {
 						Logger.log(staticSettings.get(i).toString());
 					}
 					
-					ArrayList<DTOModuleSettings> DTOSettings = extractDTOSettings(command.getJSONArray("modules"));
-					
-					if(modules != null && DTOSettings != null && modules.size() == DTOSettings.size()){
-						equiplet.reconfigureEquiplet(modules);
+					if(modules != null && staticSettings != null && modules.size() == staticSettings.size()){
+						//equiplet.reconfigureEquiplet(staticSettings);
 					}else{
 						Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 					}
 					// TODO Get list of DTO identifiers from JSON and call the reinitalize function
 					//equiplet.reinitializeEquiplet(toBeAddedModuleSettings);
 					
+					
+					
 				}else if(requestedEquipletCommand == "STATE_STANDBY"){
 					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
 					
+					
+					
 				}else if(requestedEquipletCommand == "STATE_NORMAL"){
 					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+					
+					
 					
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
@@ -276,6 +284,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	}
 	
 	/**
+	 * DEPRICATED
 	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada and extract module settings from it.
 	 * 
 	 * @param content
@@ -283,6 +292,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 	 * @author Kevin Bosman
 	 * @author Thomas Kok
 	 */
+	/*
 	private ArrayList<DTOModuleSettings> extractDTOSettings(JSONArray modules){
 		ArrayList<DTOModuleSettings> resultArray = new ArrayList<DTOModuleSettings>();
 		boolean isDeserializationSuccessfull = true;
@@ -308,6 +318,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 		// If something went wrong while deserializing, return null.
 		return isDeserializationSuccessfull ? resultArray : null;
 	}
+	*/
 	
 	/**
 	 * Dedicated function to translate the reconfigure ACLMessage in String format received from scada.
