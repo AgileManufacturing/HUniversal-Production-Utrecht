@@ -17,8 +17,8 @@ import MAS.util.Triple;
 
 public class WebSocketContainer implements WebSocketListener {
 	
-	private static final int CLIENTSERVERPORT     = 3527;
-	private static final int SCADA_AGENTSERVERPORT = 3528;
+	private static final int CLIENTSERVERPORT      = 3528;
+	private static final int SCADA_AGENTSERVERPORT = 3529;
 	
 	private ArrayList<Pair<WebSocket, WebSocket>> connectionList;
 	
