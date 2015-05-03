@@ -60,93 +60,93 @@ namespace roscpp_benchmark {
 		}
 	}
 	void NodeA::main() {
-	std::cout << "Method: " << std::endl;
-	std::cout << "1: latency topics" << std::endl;
-	std::cout << "2: latency services" << std::endl;
-	std::cout << "3: latency actionServers" << std::endl;
-	std::cout << "4: latency blackboard" << std::endl;
-	std::cout << "Choose: ";
-	int method;
-	std::cin >> method;
-	
-	std::cout << "Number of measurements: ";
-	std::cin >> numberOfMeasurements;
-	
-	ros::NodeHandle nh;
-	
-	
-	
-	if(method == 1) {
-		// topics
-		publisher = nh.advertise<std_msgs::Int32>("roscpp_benchmark_a", 1);
-		subscriber = nh.subscribe("roscpp_benchmark_b", 1, &NodeA::handleMessage, this);
+		std::cout << "Method: " << std::endl;
+		std::cout << "1: latency topics" << std::endl;
+		std::cout << "2: latency services" << std::endl;
+		std::cout << "3: latency actionServers" << std::endl;
+		std::cout << "4: latency blackboard" << std::endl;
+		std::cout << "Choose: ";
+		int method;
+		std::cin >> method;
 		
-		ros::Duration(5).sleep();
+		std::cout << "Number of measurements: ";
+		std::cin >> numberOfMeasurements;
 		
-		message.data = numberOfMeasurementsDone;
-		measurementStart = ros::WallTime::now();
-		publisher.publish(message);
-	} else if(method == 2) {
-		// services
-		serviceClient = nh.serviceClient<std_srvs::Empty>("roscpp_benchmark_service");
+		ros::NodeHandle nh;
 		
-		for(int i = 0; i < numberOfMeasurements; i++) {
+		
+		
+		if(method == 1) {
+			// topics
+			publisher = nh.advertise<std_msgs::Int32>("roscpp_benchmark_a", 1);
+			subscriber = nh.subscribe("roscpp_benchmark_b", 1, &NodeA::handleMessage, this);
+			
+			ros::Duration(5).sleep();
+			
+			message.data = numberOfMeasurementsDone;
 			measurementStart = ros::WallTime::now();
-			serviceClient.call(call);
+			publisher.publish(message);
+		} else if(method == 2) {
+			// services
+			serviceClient = nh.serviceClient<std_srvs::Empty>("roscpp_benchmark_service");
 			
-			ros::WallTime measurementEnd = ros::WallTime::now();
-			latencies.push_back(measurementEnd - measurementStart);
-			
-			numberOfMeasurementsDone++;
-			if(numberOfMeasurementsDone == numberOfMeasurements) {
-				calculateResults();
-				ros::shutdown();
+			for(int i = 0; i < numberOfMeasurements; i++) {
+				measurementStart = ros::WallTime::now();
+				serviceClient.call(call);
+				
+				ros::WallTime measurementEnd = ros::WallTime::now();
+				latencies.push_back(measurementEnd - measurementStart);
+				
+				numberOfMeasurementsDone++;
+				if(numberOfMeasurementsDone == numberOfMeasurements) {
+					calculateResults();
+					ros::shutdown();
+				}
 			}
-		}
-	} else if(method == 3) {
-		// actionServers
-		actionlib::SimpleActionClient<roscpp_benchmark::benchmarkAction> actionClient("roscpp_benchmark_action", true);
-		actionClient.waitForServer();
-		
-		for(int i = 0; i < numberOfMeasurements; i++) {
-			measurementStart = ros::WallTime::now();
-			actionClient.sendGoal(goal);
-			actionClient.waitForResult();
+		} else if(method == 3) {
+			// actionServers
+			actionlib::SimpleActionClient<roscpp_benchmark::benchmarkAction> actionClient("roscpp_benchmark_action", true);
+			actionClient.waitForServer();
 			
-			ros::WallTime measurementEnd = ros::WallTime::now();
-			latencies.push_back(measurementEnd - measurementStart);
-			
-			numberOfMeasurementsDone++;
-			if(numberOfMeasurementsDone == numberOfMeasurements) {
-				calculateResults();
-				ros::shutdown();
+			for(int i = 0; i < numberOfMeasurements; i++) {
+				measurementStart = ros::WallTime::now();
+				actionClient.sendGoal(goal);
+				actionClient.waitForResult();
+				
+				ros::WallTime measurementEnd = ros::WallTime::now();
+				latencies.push_back(measurementEnd - measurementStart);
+				
+				numberOfMeasurementsDone++;
+				if(numberOfMeasurementsDone == numberOfMeasurements) {
+					calculateResults();
+					ros::shutdown();
+				}
 			}
+		} else if(method == 4) {
+			blackboardClient       = new Blackboard::BlackboardCppClient("127.0.0.1", "benchmark", "benchmark");
+			blackboardSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
+			blackboardClient->subscribe(*blackboardSubscription);
+			
+			ros::Duration(5).sleep();
+			
+			blackboardMessage["data"] = numberOfMeasurementsDone;
+			Json::StyledWriter writer;
+			std::string output = writer.write(blackboardMessage);
+			measurementStart   = ros::WallTime::now();
+			blackboardClient->insertDocument(output);
+		} else {
+			std::cerr << "Unknown method" << std::endl;
+			ros::shutdown();
 		}
-	} else if(method == 4) {
-		blackboardClient = new Blackboard::BlackboardCppClient("127.0.0.1", "benchmark", "benchmark");
-		blackboardSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
-		blackboardClient->subscribe(*blackboardSubscription);
-		
-		ros::Duration(5).sleep();
-		
-		blackboardMessage["data"] = numberOfMeasurementsDone;
-		Json::StyledWriter writer;
-		std::string output = writer.write(blackboardMessage);
-		measurementStart = ros::WallTime::now();
-		blackboardClient->insertDocument(output);
-	} else {
-		std::cerr "Unkown method" << std::endl;
-		ros::shutdown();
+		ros::spin();
+		}
 	}
-	ros::spin();
-	}
-}
 
-int main(int argc, char **argv){
-	ros::init(argc, argv, "node_a");
-	
-	roscpp_benchmark::NodeA node;
-	node.main();
-	
-	return 0;
-}
+	int main(int argc, char **argv){
+		ros::init(argc, argv, "node_a");
+		
+		roscpp_benchmark::NodeA node;
+		node.main();
+		
+		return 0;
+	}
