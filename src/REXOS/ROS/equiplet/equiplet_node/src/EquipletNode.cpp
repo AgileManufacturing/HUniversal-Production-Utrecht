@@ -51,8 +51,8 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		isShadow(isShadow),
 		nh(),
 		scada(this, &moduleRegistry, scadaPort),
-//		halInterface(equipletName, this, blackboardIp)
-		halInterface(equipletName, this)
+		halInterface(equipletName, this, blackboardIp)
+//		halInterface(equipletName, this)
 {
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }
@@ -98,7 +98,7 @@ Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameter
 	msg.request.paths.push_back("rotation/y");
 	msg.request.paths.push_back("rotation/z");
 	
-	ros::ServiceClient lookupClient = nh.serviceClient<environment_cache::getData>("getData");
+	ros::ServiceClient lookupClient = nh.serviceClient<environment_cache::getData>(equipletName + "/getData");
 	if(lookupClient.call(msg)){
 		Json::Reader reader;
 		Json::Value result;

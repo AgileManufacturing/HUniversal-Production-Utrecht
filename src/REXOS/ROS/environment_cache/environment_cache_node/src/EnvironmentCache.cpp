@@ -42,9 +42,9 @@
 EnvironmentCache::EnvironmentCache(std::string equipletName) :
 		equipletName(equipletName) {
 	// Initialise services
-	getDataServiceServer = nh.advertiseService("getData", &EnvironmentCache::getData, this);
-	setDataServiceServer = nh.advertiseService("setData", &EnvironmentCache::setData, this);
-	removeDataServiceServer = nh.advertiseService("removeData", &EnvironmentCache::removeData, this);
+	getDataServiceServer = nh.advertiseService(equipletName + "/getData", &EnvironmentCache::getData, this);
+	setDataServiceServer = nh.advertiseService(equipletName + "/setData", &EnvironmentCache::setData, this);
+	removeDataServiceServer = nh.advertiseService(equipletName + "/removeData", &EnvironmentCache::removeData, this);
 	REXOS_INFO("environment cache started");
 }
 

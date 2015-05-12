@@ -46,8 +46,8 @@ namespace rexos_knowledge_database {
 			WHERE name = ? \
 		);"));
 		preparedStmt->setString(1, equipletName);
-		
 		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
@@ -73,8 +73,8 @@ namespace rexos_knowledge_database {
 			WHERE typeNumber = ? \
 		);"));
 		preparedStmt->setString(1, partType.getTypeNumber());
-		
 		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
@@ -95,8 +95,8 @@ namespace rexos_knowledge_database {
 		FROM GazeboModel \
 		WHERE id = ?;"));
 		preparedStmt->setInt(1, id);
-		
 		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current gazeboModel (someone deleted this instance in the database)");
 		}

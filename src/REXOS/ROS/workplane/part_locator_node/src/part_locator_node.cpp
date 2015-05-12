@@ -48,6 +48,8 @@ namespace part_locator_node {
 				topLeftValue.length() == 0 || topRightValue.length() == 0 || bottomRightValue.length() == 0) {
 			throw std::runtime_error("The properties do not contain the top/bottom left/right values or do not contain the workplane width/height");
 		}
+		
+		qrCodeSubscriber = rexos_module::AbstractModule::nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
 	}
 
 	void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
@@ -342,6 +344,7 @@ namespace part_locator_node {
 		int acceleration = 20;
 		
 		rexos_datatypes::HardwareStep equipletStep;
+		equipletStep.setStatus(rexos_datatypes::HardwareStep::WAITING);
 		equipletStep.setModuleIdentifier(moverInterface.getModuleIdentifier());
 		rexos_datatypes::OriginPlacement originPlacement;
 		originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_EQUIPLET_ORIGIN);
@@ -572,7 +575,6 @@ namespace part_locator_node {
 		rexos_datatypes::ModuleIdentifier moverIdentifier;
 		
 		std::vector<rexos_datatypes::ModuleIdentifier> modules;
-		modules.push_back(this->getModuleIdentifier());
 		modules.push_back(moverIdentifier);
 		
 		try {

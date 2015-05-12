@@ -92,12 +92,12 @@ function launchPrimaryInfrastructureWithSimulation() {
 	if [ "$keepWindowOpenAfterCommandEnds" == true ]; then
 		gnome-terminal --title="Primary infrastructure" \
 			--tab -t "roscore" 	-e "bash -c \"roscore\";bash" \
-			--tab -t "gzserver" -e "bash -c \"rosrun gazebo_ros gzserver --verbose\";bash" \
+			--tab -t "gzserver" -e "bash -c \"rosrun gazebo_ros gzserver --verbose world.sdf\";bash" \
 			--tab -t "gzclient" -e "bash -c \"rosrun gazebo_ros gzclient --verbose\";bash"
 	else
 		gnome-terminal --title="Primary infrastructure" \
 			--tab -t "roscore" 	-e "bash -c \"roscore\"" \
-			--tab -t "gzserver" -e "bash -c \"rosrun gazebo_ros gzserver --verbose\"" \
+			--tab -t "gzserver" -e "bash -c \"rosrun gazebo_ros gzserver --verbose world.sdf\"" \
 			--tab -t "gzclient" -e "bash -c \"rosrun gazebo_ros gzclient --verbose\""
 	fi
 	launchedPrimaryInfrastructureWithSimulation=true

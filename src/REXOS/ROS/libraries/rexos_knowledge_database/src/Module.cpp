@@ -30,6 +30,8 @@ namespace rexos_knowledge_database{
 			throw KnowledgeDatabaseException("This module (" + moduleIdentifier.toString() + ") does not exist");
 		}
 		
+		// set the cursor at the first result
+		result->next();
 		mountPointX = result->getInt("mountPointX");
 		mountPointY = result->getInt("mountPointY");
 		

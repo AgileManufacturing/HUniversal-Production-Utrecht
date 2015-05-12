@@ -69,7 +69,9 @@ public class HardwareAbstractionLayer implements ModuleListener, EquipletListene
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
 		reconfigHandler = new ReconfigHandler(this, capabilityFactory, moduleFactory);
-		rosInterface = new NodeRosInterface(this);
+		//rosInterface = new NodeRosInterface(this);
+		rosInterface = new BlackboarRosInterface(this);
+		//rosInterface = new BridgeRosInterface(this);
 		rosInterface.addEquipletListener(this);
 	}
 

@@ -85,7 +85,7 @@ namespace rexos_datatypes{
 		output["moduleIdentifier"] = moduleIdentifier.toJSONObject();
 		output["instructionData"] = instructionData;
 		output["originPlacement"] = originPlacement.toJSON();
-		output["status"] = status;
+		output["status"] = getStatusAsString();
 		return output;
 	}
 }

@@ -1,7 +1,7 @@
 {
 	"rosInterface": {
 		"connectionsPerHost": {
-			"default": 50
+			"default": 10
 		},
 		"threadsAllowedToBlockForConnectionMultiplier": {
 			"default": 5

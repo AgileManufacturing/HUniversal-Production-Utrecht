@@ -33,6 +33,8 @@ namespace roscpp_benchmark {
 		ros::WallTime measurementEnd = ros::WallTime::now();
 		latencies.push_back(measurementEnd - measurementStart);
 		
+		std::cout << "Measurement taken " << numberOfMeasurementsDone << std::endl;
+		
 		numberOfMeasurementsDone++;
 		if(numberOfMeasurementsDone < numberOfMeasurements) {
 			message.data = numberOfMeasurementsDone;
@@ -46,6 +48,8 @@ namespace roscpp_benchmark {
 	void NodeA::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {
 		ros::WallTime measurementEnd = ros::WallTime::now();
 		latencies.push_back(measurementEnd - measurementStart);
+		
+		std::cout << "Measurement taken " << numberOfMeasurementsDone << std::endl;
 		
 		numberOfMeasurementsDone++;
 		if(numberOfMeasurementsDone < numberOfMeasurements) {
@@ -97,6 +101,8 @@ namespace roscpp_benchmark {
 				ros::WallTime measurementEnd = ros::WallTime::now();
 				latencies.push_back(measurementEnd - measurementStart);
 				
+				std::cout << "Measurement taken " << numberOfMeasurementsDone << std::endl;
+				
 				numberOfMeasurementsDone++;
 				if(numberOfMeasurementsDone == numberOfMeasurements) {
 					calculateResults();
@@ -115,6 +121,8 @@ namespace roscpp_benchmark {
 				
 				ros::WallTime measurementEnd = ros::WallTime::now();
 				latencies.push_back(measurementEnd - measurementStart);
+				
+				std::cout << "Measurement taken " << numberOfMeasurementsDone << std::endl;
 				
 				numberOfMeasurementsDone++;
 				if(numberOfMeasurementsDone == numberOfMeasurements) {
@@ -139,14 +147,14 @@ namespace roscpp_benchmark {
 			ros::shutdown();
 		}
 		ros::spin();
-		}
 	}
+}
 
-	int main(int argc, char **argv){
-		ros::init(argc, argv, "node_a");
-		
-		roscpp_benchmark::NodeA node;
-		node.main();
-		
-		return 0;
-	}
+int main(int argc, char **argv){
+	ros::init(argc, argv, "node_a");
+	
+	roscpp_benchmark::NodeA node;
+	node.main();
+	
+	return 0;
+}

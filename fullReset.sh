@@ -64,6 +64,6 @@ java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.EquipletR
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.EquipletRecordLoader EQD ;
 # insert modules
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClass --noTranslate EQ1;
-#java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassPickAndPlace --noTranslate EQ2;
-#java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassStewartGough --noTranslate EQ3;
+java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassPickAndPlace --noTranslate EQ2;
+java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassStewartGough --noTranslate EQ3;
 

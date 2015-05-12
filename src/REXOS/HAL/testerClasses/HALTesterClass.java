@@ -260,6 +260,15 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			}
 
 			hal.changeState(Mast.State.SAFE);
+			
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
