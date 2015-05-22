@@ -210,19 +210,20 @@ public class EquipletListenerBehaviour extends Behaviour {
 						equiplet.startupAndInsert(dtoSettings);
 					}else{
 						Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
-					}
-					// TODO Get list of DTO identifiers from JSON and call the reinitalize function
-					//equiplet.reinitializeEquiplet(toBeAddedModuleSettings);
+					}					
+					
+					
+				}else if(requestedEquipletCommand == "CHANGE_EQUIPLET_MACHINE_STATE"){
+					//Change state
+					equiplet.changeMachineStateEquiplet(command.getString("state").toString());
 					
 					
 					
-				}else if(requestedEquipletCommand == "STATE_STANDBY"){
-					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
-					
-					
-					
-				}else if(requestedEquipletCommand == "STATE_NORMAL"){
-					equiplet.changeMachineStateEquiplet(requestedEquipletCommand);
+				}else if(requestedEquipletCommand == "CHANGE_EQUIPLET_MODULE_MACHINE_STATE"){
+					//TODO
+					//Create path trough HAL and MAS for individual module state change...
+					//String state = command.getString("state").toString();
+					//equiplet.changeMachineStateEquiplet(state);
 					
 					
 					
@@ -234,7 +235,6 @@ public class EquipletListenerBehaviour extends Behaviour {
 			} catch (JSONException e) {
 				Logger.log("Invalid JSON.");
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}		

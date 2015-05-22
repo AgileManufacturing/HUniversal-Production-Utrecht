@@ -290,6 +290,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void changeMachineStateEquiplet(String machineState){
 		try{
 			hal.sendEquipletStateCommand(machineState);
+			
 		}catch(Exception ex){
 			Logger.log("error while sending state change to blackboard");
 		}
