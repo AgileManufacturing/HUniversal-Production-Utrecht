@@ -79,8 +79,8 @@ public class TestSocketServer extends WebSocketServer {
 			messages.add(newMessage);
 			
 			//500 agents and 5 messages. Yes this is ugly
-			if(messages.size() == (500 * 5)){
-				logToFile("SocketTest.csv");
+			if(messages.size() == (500 * 500)){
+				logToFile("WebSocketTest.csv");
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -111,7 +111,7 @@ public class TestSocketServer extends WebSocketServer {
 	/*@Override
 	public void onFragment(WebSocket conn, Framedata fragment) {
 		System.out.println("received fragment: " + fragment);
-	}*/
+	}*/			
 
 	@Override
 	public void onError(WebSocket conn, Exception ex) {

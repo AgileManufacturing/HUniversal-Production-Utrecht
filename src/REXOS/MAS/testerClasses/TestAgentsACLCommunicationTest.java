@@ -1,20 +1,13 @@
 package MAS.testerClasses;
 
-import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
-import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
-import java.util.Date;
-import java.util.concurrent.Delayed;
-
 import util.configuration.ServerConfigurations;
-import MAS.equiplet.EquipletAgent;
-import MAS.util.MASConfiguration;
-import MAS.util.Ontology;
+
 
 public class TestAgentsACLCommunicationTest {
 	/**
@@ -56,7 +49,7 @@ public class TestAgentsACLCommunicationTest {
 	
 		AgentContainer container = runtime.createAgentContainer(profile);
 	
-		Object[] arguments = {"ACL", baseName, 0, 500, 5};
+		Object[] arguments = {"ACL", baseName, 0, 500, 500};
 		String name = "TSA";
 		AgentController ac = container.createNewAgent(name, TestAgentsSpawnerAgent.class.getName(), arguments);
 		ac.start();

@@ -24,8 +24,8 @@ public class TestReceiverAgent extends Agent{
 		Message newMessage = new Message(name, messageID, time, timeNow);
 		messages.add(newMessage);
 		//500 agents and 5 messages. Yes this is ugly
-		if(messages.size() == (500 * 5)){
-			logToFile("ACLMessagesTest.csv");
+		if(messages.size() == (500 * 500)){
+			logToFile("ACLMessageTest.csv");
 		}
 	}
 	
