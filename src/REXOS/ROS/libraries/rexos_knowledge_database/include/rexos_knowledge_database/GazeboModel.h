@@ -44,14 +44,14 @@ namespace rexos_knowledge_database {
 		GazeboModel(std::string equipletName);
 		GazeboModel(PartType& partType);
 		
-		std::istream* getModelFile();
-		std::string getSdfFilename();
-		std::string getParentLink();
-		std::string getChildLink();
-		double getChildLinkOffsetX();
-		double getChildLinkOffsetY();
-		double getChildLinkOffsetZ();
-		int getId();
+		std::istream* getModelFile() const;
+		std::string getSdfFilename() const;
+		std::string getParentLink() const;
+		std::string getChildLink() const;
+		double getChildLinkOffsetX() const;
+		double getChildLinkOffsetY() const;
+		double getChildLinkOffsetZ() const;
+		int getId() const;
 	private:
 		int id;
 		std::string sdfFilename;

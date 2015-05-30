@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 ###################### SETTINGS ######################
-keepWindowOpenAfterCommandEnds=false
+keepWindowOpenAfterCommandEnds=true
 defaultManufacturer="HU"
 defaultTypeNumber="workplane_type_A"
 defaultSerialNumber="1"
@@ -182,13 +182,13 @@ function launchShadowEquipletWithPrimaryNodes() {
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node --isShadow $equipletName\";bash" \
 			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node --isShadow $equipletName\";bash" \
 			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache --isShadow $equipletName\";bash" \
-			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnEquipletModel -x $positionX -y $positionY $equipletName\";bash"
+			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --isShadow --spawnEquipletModel -x $positionX -y $positionY $equipletName\";bash"
 	else
 		gnome-terminal --title="$equipletName" \
 			--tab -t "equiplet_node" 		-e "bash -c \"rosrun equiplet_node equiplet_node --isShadow $equipletName\"" \
 			--tab -t "node_spawner_node" 	-e "bash -c \"rosrun node_spawner_node node_spawner_node --isShadow $equipletName\"" \
 			--tab -t "environment_cache" 	-e "bash -c \"rosrun environment_cache environment_cache --isShadow $equipletName\"" \
-			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnEquipletModel -x $positionX -y $positionY $equipletName\""
+			--tab -t "model_spawner_node" 	-e "bash -c \"rosrun model_spawner_node model_spawner_node --isShadow --spawnEquipletModel -x $positionX -y $positionY $equipletName\""
 	fi
 }
 
@@ -223,12 +223,12 @@ function launchPartModel() {
 	
 	if [ "$keepWindowOpenAfterCommandEnds" == true ]; then
 		gnome-terminal --title="$partName" \
-			--tab -t "$partName" -e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnPartModel --partName $partNameToSpawn \
+			--tab -t "$partName" -e "bash -c \"rosrun model_spawner_node model_spawner_node --isShadow --spawnPartModel --partName $partNameToSpawn \
 				--originPlacementType $originPlacementType \\\"$relativeTo\\\" \
 				-x $positionX -y $positionY -z $positionZ --pitch $rotationX --roll $rotationY --yaw $rotationZ\";bash"
 	else
 		gnome-terminal --title="$partName" \
-			--tab -t "$partName" -e "bash -c \"rosrun model_spawner_node model_spawner_node --spawnPartModel --partName $partNameToSpawn \
+			--tab -t "$partName" -e "bash -c \"rosrun model_spawner_node model_spawner_node --isShadow --spawnPartModel --partName $partNameToSpawn \
 				--originPlacementType $originPlacementType \\\"$relativeTo\\\" \
 				-x $positionX -y $positionY -z $positionZ --pitch $rotationX --roll $rotationY --yaw $rotationZ\""
 	fi

@@ -102,7 +102,7 @@
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.300</length>
+						<length>0.309</length>
 					</cylinder>
 				</geometry>
 			</collision>
@@ -127,7 +127,7 @@
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.315</length>
+						<length>0.309</length>
 					</cylinder>
 				</geometry>
 			</collision>
@@ -152,7 +152,7 @@
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.315</length>
+						<length>0.309</length>
 					</cylinder>
 				</geometry>
 			</collision>
@@ -177,7 +177,7 @@
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.315</length>
+						<length>0.309</length>
 					</cylinder>
 				</geometry>
 			</collision>
@@ -202,7 +202,7 @@
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.315</length>
+						<length>0.309</length>
 					</cylinder>
 				</geometry>
 			</collision>
@@ -227,7 +227,7 @@
 				<geometry>
 					<cylinder>
 						<radius>0.0025</radius>
-						<length>0.315</length>
+						<length>0.309</length>
 					</cylinder>
 				</geometry>
 			</collision>
@@ -248,15 +248,15 @@
 					</mesh>
 				</geometry>
 			</visual>
-			<!--<collision name="collision">
+			<collision name="collision">
 				<pose>0 0 0.002 0 0 0</pose>
 				<geometry>
 					<cylinder>
-						<radius>0.0375</radius>
-						<length>0.004</length>
+						<radius>0.039</radius>
+						<length>0.005</length>
 					</cylinder>
 				</geometry>
-			</collision>-->
+			</collision>
 		</link>
 		
 		<!--==================== Joints ====================-->

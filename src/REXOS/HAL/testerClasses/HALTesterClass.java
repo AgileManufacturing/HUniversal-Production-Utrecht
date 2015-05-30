@@ -29,7 +29,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 	JSONObject criteria1 = new JSONObject();
 	
-	static String equipletName = "EQ0";
+	static String equipletName = "EQ2";
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
@@ -40,7 +40,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"HU\"," +
 			"		\"typeNumber\":\"dummy_module_type_A\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"1\"" +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{}," +
@@ -65,7 +65,16 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":0.0," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -108,7 +117,9 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			"			\"childLink\":\"effector\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":0.0," +
+			"			\"collisions\":[" +
+			"			]," +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\", \"pick\", \"place\"" +

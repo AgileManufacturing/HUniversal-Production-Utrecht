@@ -89,7 +89,7 @@ namespace rexos_knowledge_database {
 		childLinkOffsetZ = result->getDouble("childLinkOffsetZ");
 	}
 	
-	std::istream* GazeboModel::getModelFile() {
+	std::istream* GazeboModel::getModelFile() const {
 		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT zipFile \
 		FROM GazeboModel \
@@ -104,25 +104,25 @@ namespace rexos_knowledge_database {
 		result->next();
 		return result->getBlob("zipFile");;
 	}
-	std::string GazeboModel::getSdfFilename() {
+	std::string GazeboModel::getSdfFilename() const {
 		return sdfFilename;
 	}
-	std::string GazeboModel::getParentLink() {
+	std::string GazeboModel::getParentLink() const {
 		return parentLink;
 	}
-	std::string GazeboModel::getChildLink() {
+	std::string GazeboModel::getChildLink() const {
 		return childLink;
 	}
-	double GazeboModel::getChildLinkOffsetX() {
+	double GazeboModel::getChildLinkOffsetX() const {
 		return childLinkOffsetX;
 	}
-	double GazeboModel::getChildLinkOffsetY() {
+	double GazeboModel::getChildLinkOffsetY() const {
 		return childLinkOffsetY;
 	}
-	double GazeboModel::getChildLinkOffsetZ() {
+	double GazeboModel::getChildLinkOffsetZ() const {
 		return childLinkOffsetZ;
 	}
-	int GazeboModel::getId() {
+	int GazeboModel::getId() const {
 		return id;
 	}
 }

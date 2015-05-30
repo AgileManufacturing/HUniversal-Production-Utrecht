@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import HAL.dataTypes.GazeboCollision;
 import HAL.dataTypes.GazeboModel;
 import HAL.dataTypes.PartType;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -63,6 +65,39 @@ public class PartRecordLoader {
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_X, 0);
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Y, 0);
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Z, 0);
+		
+		JSONArray gazeboCollisions = new JSONArray();
+		// TODO remove hardcoding
+		if(partTypeNumber.equals("GC4x4MB")) {
+			// we are dealing with a crate
+			JSONObject gazeboCollisionJson = new JSONObject();
+			gazeboCollisionJson.put(GazeboCollision.LINK_NAME, "base");
+			gazeboCollisionJson.put(GazeboCollision.COLLISION_NAME, "collision");
+			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
+			gazeboCollisions.put(gazeboCollisionJson);
+		} else if(partTypeNumber.equals("chessboard")) {
+			// we are dealing with a chessboard
+			JSONObject gazeboCollisionJson = new JSONObject();
+			gazeboCollisionJson.put(GazeboCollision.LINK_NAME, "base");
+			gazeboCollisionJson.put(GazeboCollision.COLLISION_NAME, "collision");
+			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
+			gazeboCollisions.put(gazeboCollisionJson);
+		} else {
+			// we are dealing with a ball
+			JSONObject gazeboCollisionJson = new JSONObject();
+			gazeboCollisionJson.put(GazeboCollision.LINK_NAME, "base");
+			gazeboCollisionJson.put(GazeboCollision.COLLISION_NAME, "collision");
+			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
+			gazeboCollisions.put(gazeboCollisionJson);
+		}
+		gazeboModelJson.put(GazeboModel.COLLISIONS, gazeboCollisions);
+		
 		
 		JSONObject partTypeJson = new JSONObject();
 		partTypeJson.put(PartType.TYPE_NUMBER, partTypeNumber);

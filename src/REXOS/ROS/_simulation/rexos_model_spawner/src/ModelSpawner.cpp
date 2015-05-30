@@ -44,7 +44,10 @@
 
 #include <rexos_knowledge_database/Module.h>
 #include <rexos_knowledge_database/Part.h>
+#include <rexos_knowledge_database/GazeboCollision.h>
 #include <rexos_zip/ZipExtractor.h>
+#include <collision_plugin/addCollision.h>
+#include <collision_plugin/addContactExclusion.h>
 #include <gazebo_msgs/SpawnModel.h>
 
 namespace rexos_model_spawner {
@@ -61,7 +64,7 @@ namespace rexos_model_spawner {
 				moduleIdentifier.getSerialNumber();
 		
 		// acquire parent module
-		rexos_knowledge_database::GazeboModel* parentGazeboModel;
+		rexos_knowledge_database::GazeboModel* parentGazeboModel = NULL;
 		std::string parentModelName;
 		double childPositionX = 0;
 		double childPositionY = 0;
@@ -105,23 +108,16 @@ namespace rexos_model_spawner {
 		boost::algorithm::replace_all(gazeboSdfFileString, "{parentLink}", parentGazeboModel->getChildLink());
 		boost::algorithm::replace_all(gazeboSdfFileString, "{childLink}", gazeboModel.getParentLink());
 		
-		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
-		gazebo_msgs::SpawnModel serviceCall;
-		serviceCall.request.model_name = modelName;
-		serviceCall.request.model_xml = gazeboSdfFileString;
-		serviceCall.request.reference_frame = parentModelName + "::" + parentGazeboModel->getChildLink();
+		geometry_msgs::Pose pose;
 		// convert from millimetres to metres
-		serviceCall.request.initial_pose.position.x = childPositionX / 1000;
-		serviceCall.request.initial_pose.position.y = childPositionY / 1000;
-		serviceCall.request.initial_pose.position.z = childPositionZ / 1000;
+		pose.position.x = childPositionX / 1000;
+		pose.position.y = childPositionY / 1000;
+		pose.position.z = childPositionZ / 1000;
+
+		std::string robotNamespace = "";
+		if(isShadow == true) robotNamespace = "shadow";
 		
-		if(isShadow == true) {
-			serviceCall.request.robot_namespace = "shadow";
-		}
-		REXOS_INFO_STREAM("Call: " << serviceCall.request);
-		client.waitForExistence();
-		client.call(serviceCall);
-		
+		spawnModel(&gazeboModel, parentGazeboModel, modelName, gazeboSdfFileString, pose, parentModelName, parentGazeboModel->getChildLink());
 		delete parentGazeboModel;
 	}
 	void ModelSpawner::spawnEquipletModel(double gridPositionX, double gridPositionY) {
@@ -141,15 +137,11 @@ namespace rexos_model_spawner {
 		}
 		boost::algorithm::replace_all(gazeboSdfFileString, "{equipletName}", equipletName);
 		
-		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
-		gazebo_msgs::SpawnModel serviceCall;
-		serviceCall.request.model_name = equipletName;
-		serviceCall.request.model_xml = gazeboSdfFileString;
-		serviceCall.request.initial_pose.position.x = gridPositionX;
-		serviceCall.request.initial_pose.position.y = gridPositionY;
+		geometry_msgs::Pose pose;
+		pose.position.x = gridPositionX;
+		pose.position.y = gridPositionY;
 		
-		client.waitForExistence();
-		client.call(serviceCall);
+		spawnModel(&gazeboModel, NULL, equipletName, gazeboSdfFileString, pose);
 	}
 	void ModelSpawner::spawnPartModel(std::string partName, OriginPlacementType originPlacementType, 
 			double positionX, double positionY, double positionZ, 
@@ -165,11 +157,6 @@ namespace rexos_model_spawner {
 		std::string baseDir = ZIP_ARCHIVE_PATH + part.getPartName() + "/" + 
 					boost::lexical_cast<std::string>(gazeboModel.getId()) + "/";
 		boost::algorithm::replace_all(gazeboSdfFileString, "{baseDir}", baseDir);
-		
-		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
-		gazebo_msgs::SpawnModel serviceCall;
-		serviceCall.request.model_name = partName;
-		serviceCall.request.model_xml = gazeboSdfFileString;
 		
 		// create the qrCode texture
 		if(part.hasQrCodeFile() == true) {
@@ -190,13 +177,15 @@ namespace rexos_model_spawner {
 		}
 		
 		// relative to
+		rexos_knowledge_database::GazeboModel* parentGazeboModel = NULL;
+		std::string referenceLink = "";
 		if(originPlacementType == RELATIVE_TO_EQUIPLET_ORIGIN) {
 			// The equiplet origin is at the same position as the childLinkOffset of the equiplet model
 			rexos_knowledge_database::GazeboModel equipletGazeboModel = rexos_knowledge_database::GazeboModel(relativeTo);
 			positionX += equipletGazeboModel.getChildLinkOffsetX();
 			positionY += equipletGazeboModel.getChildLinkOffsetY();
 			positionZ += equipletGazeboModel.getChildLinkOffsetZ();
-			serviceCall.request.reference_frame = relativeTo + "::" + equipletGazeboModel.getParentLink();
+			referenceLink = equipletGazeboModel.getParentLink();
 		} else if(originPlacementType == RELATIVE_TO_MODULE_ORIGIN) {
 			// The origin of the gazebo model (and thus the reference frame) is at the mount point. The module origin is at mount point + midpoint
 			std::vector<std::string> identifierSegments;
@@ -219,24 +208,24 @@ namespace rexos_model_spawner {
 			positionZ += properties["midPointZ"].asDouble();
 			
 			// midPoint is calculated from the moint position, thus we need the parent link
-			serviceCall.request.reference_frame = relativeTo + "::" + modelGazeboModel.getParentLink();
+			referenceLink = modelGazeboModel.getParentLink();
 		} else if (originPlacementType == RELATIVE_TO_PART_ORIGIN) {
-			rexos_knowledge_database::Part part = rexos_knowledge_database::Part(relativeTo);
-			rexos_knowledge_database::GazeboModel partGazeboModel = rexos_knowledge_database::GazeboModel(part);
-			serviceCall.request.reference_frame = relativeTo + "::" + partGazeboModel.getParentLink();
+			rexos_knowledge_database::Part parentPart = rexos_knowledge_database::Part(relativeTo);
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(parentPart);
+			referenceLink = parentGazeboModel->getParentLink();
 		}
 		// nothing to do for RELATIVE_TO_WORLD_ORIGIN
 		
+		geometry_msgs::Pose pose;
 		// convert from milis to meters
-		serviceCall.request.initial_pose.position.x = positionX / 1000;
-		serviceCall.request.initial_pose.position.y = positionY / 1000;
-		serviceCall.request.initial_pose.position.z = positionZ / 1000;
-		serviceCall.request.initial_pose.orientation.x = rotationX;
-		serviceCall.request.initial_pose.orientation.y = rotationY;
-		serviceCall.request.initial_pose.orientation.z = rotationZ;
+		pose.position.x = positionX / 1000;
+		pose.position.y = positionY / 1000;
+		pose.position.z = positionZ / 1000;
+		pose.orientation.x = rotationX;
+		pose.orientation.y = rotationY;
+		pose.orientation.z = rotationZ;
 		
-		client.waitForExistence();
-		client.call(serviceCall);
+		spawnModel(&gazeboModel, parentGazeboModel, partName, gazeboSdfFileString, pose, relativeTo, referenceLink);
 		
 		// spawn child parts
 		if(spawnChildParts == true) {
@@ -247,6 +236,9 @@ namespace rexos_model_spawner {
 						part.getPositionX(), part.getPositionY(), part.getPositionZ(),
 						part.getRotationX(), part.getRotationY(), part.getRotationZ(), partName, true);
 			}
+		}
+		if(parentGazeboModel != NULL) {
+			delete parentGazeboModel;
 		}
 	}
 	
@@ -259,6 +251,55 @@ namespace rexos_model_spawner {
 		
 		std::string output((std::istreambuf_iterator<char>(gazeboSdfFile)), (std::istreambuf_iterator<char>()));
 		return output;
+	}
+	void ModelSpawner::spawnModel(rexos_knowledge_database::GazeboModel* model, rexos_knowledge_database::GazeboModel* parentModel, 
+				std::string& modelName, std::string& sdf, geometry_msgs::Pose& pose, 
+				std::string referenceModel, std::string referenceLink, std::string robotNamespace) {
+		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
+		gazebo_msgs::SpawnModel serviceCall;
+		serviceCall.request.model_name = modelName;
+		serviceCall.request.model_xml = sdf;
+		serviceCall.request.initial_pose = pose;
+		if(referenceModel.empty() == false && referenceLink.empty() == false) {
+			serviceCall.request.reference_frame = referenceModel + "::" + referenceLink;
+		}
+		serviceCall.request.robot_namespace = robotNamespace;
+		client.waitForExistence();
+		client.call(serviceCall);
+		
+		if(isShadow == true) {
+			// also add safety checks
+			ros::ServiceClient addCollisionClient = nodeHandle.serviceClient<collision_plugin::addCollision>("/collision/addCollision/");
+			collision_plugin::addCollision addCollisionCall;
+			ros::ServiceClient addExclusionClient = nodeHandle.serviceClient<collision_plugin::addContactExclusion>("/collision/addContactExclusion/");
+			collision_plugin::addContactExclusion addExclusionCall;
+			
+			auto collisions = rexos_knowledge_database::GazeboCollision::getCollisionsForModel(*model);
+			for(auto collision = collisions.begin(); collision < collisions.end(); collision++) {
+				addCollisionCall.request.model = modelName;
+				addCollisionCall.request.link = collision->getLinkName();
+				addCollisionCall.request.collision = collision->getCollisionName();
+				addCollisionCall.request.maxForce = collision->getMaxForce();
+				addCollisionCall.request.maxTorque = collision->getMaxTorque();
+				addCollisionClient.call(addCollisionCall);
+				
+				if(parentModel != NULL) {
+					// add contact exclusions for the parent collisions
+					auto collisionsParent = rexos_knowledge_database::GazeboCollision::getCollisionsForModel(*parentModel);
+					for(auto parentCollision = collisionsParent.begin(); parentCollision < collisionsParent.end(); parentCollision++) {
+						if(parentCollision->getMayHaveContactWithChildModules() == true) {
+							addExclusionCall.request.model1 = modelName;
+							addExclusionCall.request.link1 = collision->getLinkName();
+							addExclusionCall.request.collision1 = collision->getCollisionName();
+							addExclusionCall.request.model2 = referenceModel;
+							addExclusionCall.request.link2 = parentCollision->getLinkName();
+							addExclusionCall.request.collision2 = parentCollision->getCollisionName();
+							addExclusionClient.call(addExclusionCall);
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	void ModelSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName) {

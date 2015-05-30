@@ -41,7 +41,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"HU\"," +
 			"		\"typeNumber\":\"six_axis_type_A\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"1\"" +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{" +
@@ -94,7 +94,58 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLink\":\"effector\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":0.0," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"lowerArm1\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm2\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm3\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm4\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm5\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm6\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"effector\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\", \"rotate\"" +
@@ -203,7 +254,16 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":0.0," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":20.0," +
+			"					\"maxTorque\":1.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"pick\", \"place\"" +
@@ -252,7 +312,9 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":-25.01," +
 			"			\"childLinkOffsetY\":202.24," +
-			"			\"childLinkOffsetZ\":57.19" +
+			"			\"childLinkOffsetZ\":57.19," +
+			"			\"collisions\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -291,7 +353,9 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":22.0" +
+			"			\"childLinkOffsetZ\":22.0," +
+			"			\"collisions\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -348,7 +412,16 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":175.0," +
 			"			\"childLinkOffsetY\":-200.0," +
-			"			\"childLinkOffsetZ\":33.33" +
+			"			\"childLinkOffsetZ\":33.33," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":20.0," +
+			"					\"maxTorque\":1.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +

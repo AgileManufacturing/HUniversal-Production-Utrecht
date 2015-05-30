@@ -3,8 +3,8 @@
 #include <rexos_logger/rexos_logger.h>
 
 namespace equiplet_node {
-	NodeHalInterface::NodeHalInterface(std::string equipletName, HalInterfaceListener* listener) : 
-			listener(listener), nh(), jsonReader(), jsonWriter() {
+	NodeHalInterface::NodeHalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener) : 
+			HalInterface(equipletName, isShadow, listener), nh(), jsonReader(), jsonWriter() {
 		std::string path = equipletName + "/";
 		hardwareStepStatusChangedPublisher = nh.advertise<std_msgs::String>(path + "hardwareStepStatus", 10);
 		equipletCommandStatusChangedPublisher = nh.advertise<std_msgs::String>(path + "equipletCommandStatus", 10);

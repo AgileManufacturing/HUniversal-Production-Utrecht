@@ -1,9 +1,11 @@
 package HAL.dataTypes;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +23,7 @@ public class GazeboModel implements Serializable {
 	public static final String CHILD_LINK_OFFSET_X = "childLinkOffsetX";
 	public static final String CHILD_LINK_OFFSET_Y = "childLinkOffsetY";
 	public static final String CHILD_LINK_OFFSET_Z = "childLinkOffsetZ";
+	public static final String COLLISIONS = "collisions";
 	
 	private static final String getGazeboModelForModuleType =
 			"SELECT id, buildNumber, sdfFilename, parentLink, childLink, zipFile, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \n" + 
@@ -72,12 +75,14 @@ public class GazeboModel implements Serializable {
 	public double childLinkOffsetX;
 	public double childLinkOffsetY;
 	public double childLinkOffsetZ;
+	ArrayList<GazeboCollision> collisions;
 	
 	public GazeboModel() {
 		id = null;
+		collisions = new ArrayList<GazeboCollision>();
 	}
 	public GazeboModel(int id, int buildNumber, byte[] zipFile, String sdfFilename, String parentLink, String childLink, 
-			double childLinkOffsetX, double childLinkOffsetY, double childLinkOffsetZ) {
+			double childLinkOffsetX, double childLinkOffsetY, double childLinkOffsetZ, ArrayList<GazeboCollision> collisions) {
 		this.id = id;
 		this.buildNumber = buildNumber;
 		this.zipFile = zipFile;
@@ -87,6 +92,7 @@ public class GazeboModel implements Serializable {
 		this.childLinkOffsetX = childLinkOffsetX;
 		this.childLinkOffsetY = childLinkOffsetY;
 		this.childLinkOffsetZ = childLinkOffsetZ;
+		this.collisions = collisions;
 	}
 	
 	/**
@@ -100,23 +106,24 @@ public class GazeboModel implements Serializable {
 		if(rows.length != 1) {
 			return null;
 		}
-		
 		int id = (Integer) rows[0].get("id");
-		int buildNumber = (Integer) rows[0].get("buildNumber");
-		String sdfFilename = (String) rows[0].get("sdfFilename");
-		String parentLink = (String) rows[0].get("parentLink");
-		String childLink = (String) rows[0].get("childLink");
-		byte[] zipFile = (byte[]) rows[0].get("zipFile");
-		double childLinkOffsetX = (double) rows[0].get("childLinkOffsetX");
-		double childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
-		double childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
-		
 		if(gazeboModelInstances.containsKey(id) == true) {
 			return gazeboModelInstances.get(id);
-		} else {
-			return new GazeboModel(id, buildNumber, zipFile, sdfFilename, parentLink, childLink, 
-					childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ);
 		}
+		
+		GazeboModel gazeboModel = new GazeboModel();
+		gazeboModel.id = id;
+		gazeboModel.buildNumber = (Integer) rows[0].get("buildNumber");
+		gazeboModel.sdfFilename = (String) rows[0].get("sdfFilename");
+		gazeboModel.parentLink = (String) rows[0].get("parentLink");
+		gazeboModel.childLink = (String) rows[0].get("childLink");
+		gazeboModel.zipFile = (byte[]) rows[0].get("zipFile");
+		gazeboModel.childLinkOffsetX = (double) rows[0].get("childLinkOffsetX");
+		gazeboModel.childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
+		gazeboModel.childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
+		gazeboModel.collisions = GazeboCollision.getGazeboCollisionsForGazeboModel(gazeboModel, knowledgeDBClient);
+		
+		return gazeboModel;
 	}
 	
 	/**
@@ -130,23 +137,24 @@ public class GazeboModel implements Serializable {
 		if(rows.length != 1) {
 			return null;
 		}
-		
 		int id = (Integer) rows[0].get("id");
-		int buildNumber = (Integer) rows[0].get("buildNumber");
-		String sdfFilename = (String) rows[0].get("sdfFilename");
-		String parentLink = (String) rows[0].get("parentLink");
-		String childLink = (String) rows[0].get("childLink");
-		byte[] zipFile = (byte[]) rows[0].get("zipFile");
-		double childLinkOffsetX = (double) rows[0].get("childLinkOffsetX");
-		double childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
-		double childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
-		
 		if(gazeboModelInstances.containsKey(id) == true) {
 			return gazeboModelInstances.get(id);
-		} else {
-			return new GazeboModel(id, buildNumber, zipFile, sdfFilename, parentLink, childLink, 
-					childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ);
 		}
+		
+		GazeboModel gazeboModel = new GazeboModel();
+		gazeboModel.id = id;
+		gazeboModel.buildNumber = (Integer) rows[0].get("buildNumber");
+		gazeboModel.sdfFilename = (String) rows[0].get("sdfFilename");
+		gazeboModel.parentLink = (String) rows[0].get("parentLink");
+		gazeboModel.childLink = (String) rows[0].get("childLink");
+		gazeboModel.zipFile = (byte[]) rows[0].get("zipFile");
+		gazeboModel.childLinkOffsetX = (double) rows[0].get("childLinkOffsetX");
+		gazeboModel.childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
+		gazeboModel.childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
+		gazeboModel.collisions = GazeboCollision.getGazeboCollisionsForGazeboModel(gazeboModel, knowledgeDBClient);
+		
+		return gazeboModel;
 	}
 	public static GazeboModel deSerialize(JSONObject input) throws JSONException {
 		GazeboModel output = new GazeboModel();
@@ -159,6 +167,11 @@ public class GazeboModel implements Serializable {
 		output.childLinkOffsetX = input.getDouble(CHILD_LINK_OFFSET_X);
 		output.childLinkOffsetY = input.getDouble(CHILD_LINK_OFFSET_Y);
 		output.childLinkOffsetZ = input.getDouble(CHILD_LINK_OFFSET_Z);
+		
+		JSONArray collisions = input.getJSONArray(COLLISIONS);
+		for(int i = 0; i < collisions.length(); i++) {
+			output.collisions.add(GazeboCollision.deSerialize(collisions.getJSONObject(i), output));
+		}
 		
 		return output;
 	}
@@ -173,6 +186,11 @@ public class GazeboModel implements Serializable {
 		output.put(CHILD_LINK_OFFSET_X, childLinkOffsetX);
 		output.put(CHILD_LINK_OFFSET_Y, childLinkOffsetY);
 		output.put(CHILD_LINK_OFFSET_Z, childLinkOffsetZ);
+		JSONArray collisionsJson = new JSONArray();
+		for (GazeboCollision collision : collisions) {
+			collisionsJson.put(collision.serialize());
+		}
+		output.put(COLLISIONS, collisionsJson);
 		
 		return output;
 	}
@@ -189,6 +207,11 @@ public class GazeboModel implements Serializable {
 				buildNumber, sdfFilename, parentLink, childLink, zipFile, 
 				childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ);
 		this.id = id;
+		
+		for (GazeboCollision collision : collisions) {
+			collision.insertIntoDatabase(knowledgeDBClient);
+		}
+		
 		gazeboModelInstances.put(id, this);
 		return id;
 	}
@@ -202,8 +225,17 @@ public class GazeboModel implements Serializable {
 				buildNumber, sdfFilename, parentLink, childLink, zipFile, 
 				childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ, 
 				gazeboModelToBeUpdated.id);
+		for (GazeboCollision collision : gazeboModelToBeUpdated.collisions) {
+			collision.removeFromDatabase(knowledgeDBClient);
+		}
+		for (GazeboCollision collision : collisions) {
+			collision.insertIntoDatabase(knowledgeDBClient);
+		}
 	}
 	public void removeFromDatabase(KnowledgeDBClient knowledgeDBClient) {
+		for (GazeboCollision collision : collisions) {
+			collision.removeFromDatabase(knowledgeDBClient);
+		}
 		knowledgeDBClient.executeUpdateQuery(removeGazeboModel, id);
 	}
 }

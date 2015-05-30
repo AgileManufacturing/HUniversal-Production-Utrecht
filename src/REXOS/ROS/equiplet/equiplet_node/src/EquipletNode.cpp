@@ -51,8 +51,8 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		isShadow(isShadow),
 		nh(),
 		scada(this, &moduleRegistry, scadaPort),
-		halInterface(equipletName, this, blackboardIp)
-//		halInterface(equipletName, this)
+		halInterface(equipletName, isShadow, this, blackboardIp)
+//		halInterface(equipletName, isShadow, this)
 {
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }

@@ -40,7 +40,7 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
 			"		\"typeNumber\":\"DFK_22AUC03\"," +
-			"		\"serialNumber\":\"3\"," +
+			"		\"serialNumber\":\"3\"" +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{}," +
@@ -65,7 +65,9 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":-25.01," +
 			"			\"childLinkOffsetY\":202.24," +
-			"			\"childLinkOffsetZ\":57.19" +
+			"			\"childLinkOffsetZ\":57.19," +
+			"			\"collisions\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -104,7 +106,9 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":22.0" +
+			"			\"childLinkOffsetZ\":22.0," +
+			"			\"collisions\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -161,7 +165,15 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":175.0," +
 			"			\"childLinkOffsetY\":-200.0," +
-			"			\"childLinkOffsetZ\":33.33" +
+			"			\"childLinkOffsetZ\":33.33," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"collisionName\":\"base::collision\"," +
+			"					\"maxForce\":20.0," +
+			"					\"maxTorque\":1.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +

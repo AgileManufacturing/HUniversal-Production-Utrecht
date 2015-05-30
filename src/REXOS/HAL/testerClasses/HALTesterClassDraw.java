@@ -41,7 +41,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"HU\"," +
 			"		\"typeNumber\":\"delta_robot_type_B\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"1\"" +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{" +
@@ -94,7 +94,58 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"childLink\":\"effector\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":0.0," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"lowerArm1\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm2\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm3\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm4\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm5\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm6\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"effector\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\"" +
@@ -252,7 +303,9 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":-25.01," +
 			"			\"childLinkOffsetY\":202.24," +
-			"			\"childLinkOffsetZ\":57.19" +
+			"			\"childLinkOffsetZ\":57.19," +
+			"			\"collisions\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -291,7 +344,9 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":22.0" +
+			"			\"childLinkOffsetZ\":22.0," +
+			"			\"collisions\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -348,7 +403,16 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":175.0," +
 			"			\"childLinkOffsetY\":-200.0," +
-			"			\"childLinkOffsetZ\":33.33" +
+			"			\"childLinkOffsetZ\":33.33," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":20.0," +
+			"					\"maxTorque\":1.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +

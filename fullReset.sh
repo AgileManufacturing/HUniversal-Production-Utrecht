@@ -3,6 +3,11 @@ mysql -u rexos -p equiplet < src/REXOS/databases/knowledgeDatabaseDef.sql ;
 #rm -r generatedOutput/ ; 
 rm -r /tmp/rexos_model_spawner/ ; 
 rm -r /tmp/rexos_node_spawner/ ; 
+# copy compiled plugins to the worlds
+mkdir -p generatedOutput/worlds/ ; 
+cp devel/lib/libacceleration_plugin.so generatedOutput/worlds/ ; 
+cp devel/lib/libcollision_plugin.so generatedOutput/worlds/ ; 
+cp devel/lib/libjoint_plugin.so generatedOutput/worlds/ ; 
 # copy compiled plugins to the models
 cp devel/lib/libattach_plugin.so src/REXOS/models/camera/ ; 
 cp devel/lib/libattach_plugin.so src/REXOS/models/deltaRobot/ ; 

@@ -40,6 +40,7 @@
 #include "rexos_logger/rexos_logger.h"
 
 #include "ros/ros.h"
+#include <geometry_msgs/Pose.h>
 
 namespace rexos_model_spawner{
 	enum OriginPlacementType {
@@ -60,6 +61,9 @@ namespace rexos_model_spawner{
 				double rotationX, double rotationY, double rotationZ, std::string relativeTo, bool spawnChildParts = true);
 	protected:
 		std::string getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName = "");
+		void spawnModel(rexos_knowledge_database::GazeboModel* model, rexos_knowledge_database::GazeboModel* parentModel, 
+				std::string& modelName, std::string& sdf, geometry_msgs::Pose& pose, 
+				std::string referenceModel = "", std::string referenceLink = "", std::string robotNamespace = "");
 	protected:
 		std::string equipletName;
 		bool isShadow;

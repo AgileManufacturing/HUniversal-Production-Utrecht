@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,6 +47,7 @@ public class EquipletRecordLoader {
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_X, -226.88);
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Y, -36.00);
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Z, 1141.97);
+		gazeboModelJson.put(GazeboModel.COLLISIONS, new JSONArray());
 		GazeboModel gazeboModel = GazeboModel.deSerialize(gazeboModelJson);
 		
 		JSONObject rosSoftwareJson = new JSONObject();

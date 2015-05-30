@@ -6,15 +6,20 @@
 #include <rexos_blackboard_cpp_client/OplogEntry.h>
 
 namespace equiplet_node {
-	BlackBoardHalInterface::BlackBoardHalInterface(std::string equipletName, HalInterfaceListener* listener, std::string blackboardIp) : 
-			listener(listener) {
+	BlackBoardHalInterface::BlackBoardHalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener, std::string blackboardIp) : 
+			HalInterface(equipletName, isShadow, listener) {
+		std::string dbName = equipletName;
+		if(isShadow == true) {
+			dbName = "shadow_" + equipletName;
+		}
+		
 		bool useCustomIp = false;
 		if(blackboardIp.length() != 0) useCustomIp = true;
 		
 		REXOS_DEBUG("Subscribing to HardwareStepsBlackBoard");
 		hardwareStepsBlackboardClient = new Blackboard::BlackboardCppClient(
 				useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
-				equipletName, 
+				dbName, 
 				rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
 		
 		hardwareStepsSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
@@ -25,7 +30,7 @@ namespace equiplet_node {
 		REXOS_DEBUG("Subscribing to equipletCommands");
 		equipletCommandsBlackboardClient = new Blackboard::BlackboardCppClient(
 				useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/equipletCommands/ip", equipletName).asString(), 
-				equipletName, 
+				dbName, 
 				rexos_configuration::Configuration::getProperty("rosInterface/equipletCommands/blackboardName", equipletName).asString());
 		equipletCommandsSubscription = new Blackboard::BasicOperationSubscription(Blackboard::INSERT, *this);
 		equipletCommandsBlackboardClient->subscribe(*equipletCommandsSubscription);
@@ -35,7 +40,7 @@ namespace equiplet_node {
 		REXOS_DEBUG("Subscribing to state");
 		stateBlackboardClient = new Blackboard::BlackboardCppClient(
 				useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/equipletState/ip", equipletName).asString(), 
-				equipletName, 
+				dbName, 
 				rexos_configuration::Configuration::getProperty("rosInterface/equipletState/blackboardName", equipletName).asString());
 		sleep(1);
 	}

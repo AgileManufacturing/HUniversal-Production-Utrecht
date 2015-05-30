@@ -15,6 +15,7 @@ drop table if exists SupportedMutation;
 drop table if exists Module;
 drop table if exists ModuleType;
 drop table if exists Equiplet;
+drop table if exists GazeboCollision;
 drop table if exists GazeboModel;
 drop table if exists RosSoftware;
 drop table if exists JavaSoftware;
@@ -44,6 +45,17 @@ create table GazeboModel(
   childLinkOffsetY double NOT NULL,
   childLinkOffsetZ double NOT NULL,
   primary key (id)
+);
+
+create table GazeboCollision(
+  gazeboModel int NOT NULL AUTO_INCREMENT,
+  linkName char(200) NOT NULL,
+  collisionName char(200) NOT NULL,
+  maxForce double NOT NULL,
+  maxTorque double NOT NULL,
+  mayHaveContactWithChildModules bool NOT NULL,
+  primary key (gazeboModel, linkName, collisionName),
+  foreign key (gazeboModel) references GazeboModel(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table Equiplet(

@@ -11,7 +11,7 @@
 namespace equiplet_node {
 	class NodeHalInterface : public HalInterface {
 	public:
-		NodeHalInterface(std::string equipletName, HalInterfaceListener* listener);
+		NodeHalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener);
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep);
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand);
 		virtual void postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state);

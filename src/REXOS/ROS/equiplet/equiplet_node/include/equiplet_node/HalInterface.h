@@ -1,5 +1,6 @@
 #pragma once
 
+#include <equiplet_node/HalInterfaceListener.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 #include <rexos_datatypes/EquipletCommand.h>
 #include <rexos_datatypes/HardwareStep.h>
@@ -8,6 +9,13 @@
 
 namespace equiplet_node {
 	class HalInterface {
+	protected:
+		HalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener) :
+				equipletName(equipletName), isShadow(isShadow), listener(listener) {}
+		
+		std::string equipletName;
+		bool isShadow;
+		HalInterfaceListener* listener;
 	public:
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep) = 0;
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand) = 0;
