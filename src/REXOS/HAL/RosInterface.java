@@ -7,20 +7,18 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
 import HAL.listeners.EquipletListener;
-import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
 
 public abstract class RosInterface {
-	protected HardwareAbstractionLayer hal;
 	private ArrayList<ModuleListener> moduleSubscribers;
 	private ArrayList<EquipletListener> equipletSubscribers;
 	private ArrayList<ProcessListener> processSubscribers;
 	
-	protected RosInterface(HardwareAbstractionLayer hal) {
-		this.hal = hal;
+	protected RosInterface() {
 		moduleSubscribers = new ArrayList<ModuleListener>();
 		equipletSubscribers = new ArrayList<EquipletListener>();
 		processSubscribers = new ArrayList<ProcessListener>();

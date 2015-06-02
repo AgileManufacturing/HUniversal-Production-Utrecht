@@ -2,16 +2,15 @@ package HAL.tasks;
 
 import java.util.ArrayList;
 
-import org.json.JSONObject;
-
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.Capability;
 import HAL.exceptions.CapabilityException;
 import HAL.factories.CapabilityFactory;
-import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.listeners.TranslationProcessListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 /**
  * The thread that manages the translation of ProductSteps.
@@ -20,9 +19,8 @@ import HAL.steps.HardwareStep;
  *
  */
 public class TranslationProcess implements Runnable{
-	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
-	private String service;
-	private JSONObject criteria;
+	private TranslationProcessListener listener;
+	private ProductStep step;
 	private CapabilityFactory capabilityFactory;
 	/**
 	 * Constructs the TranslationProcess but does NOT start it.
@@ -31,10 +29,9 @@ public class TranslationProcess implements Runnable{
 	 * @param criteria
 	 * @param capabilityFactory
 	 */
-	public TranslationProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, String service, JSONObject criteria, CapabilityFactory capabilityFactory){
-		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
-		this.service = service;
-		this.criteria = criteria;
+	public TranslationProcess(TranslationProcessListener listener, ProductStep step, CapabilityFactory capabilityFactory){
+		this.listener = listener;
+		this.step = step;
 		this.capabilityFactory = capabilityFactory;
 	}
 	
@@ -44,35 +41,38 @@ public class TranslationProcess implements Runnable{
 	 */
 	@Override
 	public void run() {
-		Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Translation process started with job: " + service + " with criteria " + criteria);
+		Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Translation process started with job: "
+				+ step.getService() + " with criteria " + step.getCriteria());
 		
-		ArrayList<Capability> capabilities = capabilityFactory.getCapabilitiesForService(service);
+		ArrayList<Capability> capabilities = capabilityFactory.getCapabilitiesForService(step.getService());
 		
 		if (capabilities.size() == 0) {
-			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.ERROR, "This equiplet has no capabilities for the service in job: " + service + " with criteria " + criteria + 
+			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.ERROR, "This equiplet has no capabilities for the service in job: "
+					+ step.getService() + " with criteria " + step.getCriteria() + 
 					". This should never happen as the equiplet should know which services are supported.");
-			hardwareAbstractionLayerListener.onTranslationFailed(service, criteria);
+			listener.onTranslationFailed(step);
 		} else {
 			ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
 			
 			for (int i = 0; i < capabilities.size(); i++) {
 				try{
 					ArrayList<HardwareStep> translatedSteps = new ArrayList<HardwareStep>();
-					translatedSteps = capabilities.get(i).translateProductStep(service, criteria);
+					translatedSteps = capabilities.get(i).translateProductStep(step.getService(), step.getCriteria());
 					
 					for (int j = 0; j < translatedSteps.size(); j++){
 						// a translated hardware step from a module might be null if it is a place holder, we skip these place holders
 						if (translatedSteps.get(j) != null) hardwareSteps.add(translatedSteps.get(j));
 					}
-					hardwareAbstractionLayerListener.onTranslationFinished(service, criteria, hardwareSteps);
+					listener.onTranslationFinished(step, hardwareSteps);
 					return;
 				} catch (CapabilityException ex) {
 					Logger.log(LogSection.HAL_TRANSLATION, LogLevel.INFORMATION, "Capability " + capabilities.get(i).getName() + 
-							" failed to translate job: " + service +" with criteria "+  criteria);
+							" failed to translate job: " + step.getService() + " with criteria " + step.getCriteria());
 				}
 			}
-			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, "No capability was able to translated job: " + service + " with criteria "+ criteria);
-			hardwareAbstractionLayerListener.onTranslationFailed(service, criteria);
+			Logger.log(LogSection.HAL_TRANSLATION, LogLevel.NOTIFICATION, "No capability was able to translated job: "
+						+ step.getService() + " with criteria " + step.getCriteria());
+			listener.onTranslationFailed(step);
 		}
 	}
 

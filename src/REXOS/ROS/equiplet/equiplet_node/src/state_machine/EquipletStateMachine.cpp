@@ -2,8 +2,8 @@
 
 #include <equiplet_node/CyclicDependencyException.h>
 #include <node_spawner_node/spawnNode.h>
-#include <model_spawner_node/spawnModel.h>
-#include <model_spawner_node/removeModel.h>
+#include <model_spawner_node/spawnModule.h>
+#include <model_spawner_node/removeModule.h>
 #include <rexos_knowledge_database/ModuleType.h>
 
 using namespace equiplet_node;
@@ -22,8 +22,8 @@ EquipletStateMachine::EquipletStateMachine(std::string equipletName, bool isSimu
 	),
 	moduleRegistry(equipletName, this),
 	spawnNodeClient(nodeHandle.serviceClient<node_spawner_node::spawnNode>(equipletName + "/spawnNode")),
-	spawnModelClient(nodeHandle.serviceClient<model_spawner_node::spawnModel>(equipletName + "/spawnModel")),
-	removeModelClient(nodeHandle.serviceClient<model_spawner_node::removeModel>(equipletName + "/removeModel")),
+	spawnModelClient(nodeHandle.serviceClient<model_spawner_node::spawnModule>(equipletName + "/model/spawnModule")),
+	removeModelClient(nodeHandle.serviceClient<model_spawner_node::removeModule>(equipletName + "/model/removeModule")),
 	desiredState(rexos_statemachine::STATE_NOSTATE)
 {
 	if(isSimulated == true) {
@@ -151,21 +151,21 @@ void EquipletStateMachine::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
 }
 void EquipletStateMachine::spawnModel(rexos_module::ModuleProxy* moduleProxy) {
 	ROS_INFO_STREAM("Spawning model for " << moduleProxy->getModuleIdentifier());
-	model_spawner_node::spawnModel spawnModelCall;
-	spawnModelCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
-	spawnModelCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
-	spawnModelCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	model_spawner_node::spawnModule spawnModuleCall;
+	spawnModuleCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
+	spawnModuleCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
+	spawnModuleCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
 	spawnModelClient.waitForExistence();
-	spawnModelClient.call(spawnModelCall);
+	spawnModelClient.call(spawnModuleCall);
 }
 void EquipletStateMachine::removeModel(rexos_module::ModuleProxy* moduleProxy) {
 	ROS_INFO_STREAM("Removing model for " << moduleProxy->getModuleIdentifier());
-	model_spawner_node::removeModel removeModelCall;
-	removeModelCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
-	removeModelCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
-	removeModelCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	model_spawner_node::removeModule removeModuleCall;
+	removeModuleCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
+	removeModuleCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
+	removeModuleCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
 	removeModelClient.waitForExistence();
-	removeModelClient.call(removeModelCall);
+	removeModelClient.call(removeModuleCall);
 }
 
 
@@ -184,8 +184,8 @@ bool EquipletStateMachine::transitionInitialize(){
 	changeModuleStates(rexos_statemachine::STATE_SAFE);
 	
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_SAFE)) {
-		boost::unique_lock<boost::mutex> lock( mutexit );
-		condit.wait( lock );
+		boost::unique_lock<boost::mutex> lock(mutexit);
+		condit.wait(lock);
 	}
 	
 	return true;
@@ -195,8 +195,8 @@ bool EquipletStateMachine::transitionDeinitialize(){
 	changeModuleStates(rexos_statemachine::STATE_OFFLINE);
 	
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_OFFLINE)) {
-		boost::unique_lock<boost::mutex> lock( mutexit );
-		condit.wait( lock );
+		boost::unique_lock<boost::mutex> lock(mutexit);
+		condit.wait(lock);
 	}
 	
 	return true;
@@ -208,8 +208,8 @@ bool EquipletStateMachine::transitionSetup(){
 	changeModuleStates(rexos_statemachine::STATE_STANDBY);
 	
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_STANDBY)) {
-		boost::unique_lock<boost::mutex> lock( mutexit );
-		condit.wait( lock );
+		boost::unique_lock<boost::mutex> lock(mutexit);
+		condit.wait(lock);
 	}
 	
 	return true;
@@ -220,8 +220,8 @@ bool EquipletStateMachine::transitionShutdown(){
 	changeModuleStates(rexos_statemachine::STATE_SAFE);
 
 	if(!allModulesInDesiredState(desiredState = rexos_statemachine::STATE_SAFE)) {
-		boost::unique_lock<boost::mutex> lock( mutexit );
-		condit.wait( lock );
+		boost::unique_lock<boost::mutex> lock(mutexit);
+		condit.wait(lock);
 	}
 	moduleRegistry.setNewRegistrationsAllowed(true);
 	return true;

@@ -120,7 +120,7 @@ namespace equiplet_node {
 			Json::Value equipletCommandJson;
 			if(jsonReader.parse(equipletCommandString, equipletCommandJson) == true) {
 				rexos_datatypes::EquipletCommand command(equipletCommandJson);
-				command.setId(equipletCommandJson["id"].asString());
+				command.setId(targetObjectId.toString());
 				listener->onEquipletCommand(command);
 			} else {
 				REXOS_ERROR("Reading equiplet command failed");

@@ -34,8 +34,8 @@
 #include <jsoncpp/json/writer.h>
 
 namespace rexos_datatypes{
-	const char* const OriginPlacement::originPlacementTypeTxt[] = {"RELATIVE_TO_IDENTIFIER", "RELATIVE_TO_CURRENT_POSITION", 
-			"RELATIVE_TO_MODULE_ORIGIN", "RELATIVE_TO_EQUIPLET_ORIGIN", "UNDEFINED"};
+	const char* const OriginPlacement::originPlacementTypeTxt[] = {"RELATIVE_TO_CURRENT_POSITION", "RELATIVE_TO_MODULE_ORIGIN", 
+			"RELATIVE_TO_EQUIPLET_ORIGIN", "RELATIVE_TO_PART_ORIGIN", "RELATIVE_TO_WORLD_ORIGIN", "UNDEFINED"};
 
     OriginPlacement::OriginPlacement(){}
 

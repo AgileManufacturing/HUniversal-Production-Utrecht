@@ -99,7 +99,7 @@ void DeltaRobotNode::onExecuteHardwareStep(const rexos_module::ExecuteHardwareSt
 	
 	// determine the position of the origin and the rotation of the axis
 	switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
-		case rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER: {
+		case rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN: {
 			// set the origin to the result of the lookup
 			if(equipletStep.getOriginPlacement().getLookupResult().isMember("location") == false) {
 				throw std::runtime_error("lookup result does not contain location");

@@ -8,7 +8,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.ModuleActor;
 import HAL.factories.ModuleFactory;
-import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.listeners.ExecutionProcessListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
@@ -18,8 +18,7 @@ import HAL.steps.HardwareStep.HardwareStepStatus;
  *
  */
 public class ExecutionProcess implements Runnable, ProcessListener{
-	private HardwareAbstractionLayerListener hardwareAbstractionLayerListener;
-	//private ArrayList<HardwareStep> hardwareSteps;
+	private ExecutionProcessListener listener;
 	private ModuleFactory moduleFactory;
 	
 	private HardwareStep currentStep = null;
@@ -32,8 +31,8 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 	 * @param hardwareSteps
 	 * @param moduleFactory
 	 */
-	public ExecutionProcess(HardwareAbstractionLayerListener hardwareAbstractionLayerListener, ArrayList<HardwareStep> hardwareSteps, ModuleFactory moduleFactory){
-		this.hardwareAbstractionLayerListener = hardwareAbstractionLayerListener;
+	public ExecutionProcess(ExecutionProcessListener listener, ArrayList<HardwareStep> hardwareSteps, ModuleFactory moduleFactory){
+		this.listener = listener;
 		
 		this.toExecuteSteps.addAll(hardwareSteps);
 		this.moduleFactory = moduleFactory;
@@ -73,9 +72,9 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 			e.printStackTrace();
 		} finally {
 			if(continueExecution == true) {
-				hardwareAbstractionLayerListener.onExecutionFinished();
+				listener.onExecutionFinished();
 			} else {
-				hardwareAbstractionLayerListener.onExecutionFailed();
+				listener.onExecutionFailed();
 			}
 		}
 	}
@@ -92,7 +91,7 @@ public class ExecutionProcess implements Runnable, ProcessListener{
 					"Recieved a progressStatusChanged from hardware step that is not being executed");
 		}
 		ModuleActor module = (ModuleActor) moduleFactory.getItemForIdentifier(hardwareStep.getModuleIdentifier());
-		hardwareAbstractionLayerListener.onProcessStatusChanged(module, hardwareStep);
+		listener.onProcessStatusChanged(module, hardwareStep);
 		
 		if(hardwareStep.getStatus() == HardwareStepStatus.DONE) {
 		    this.notify();

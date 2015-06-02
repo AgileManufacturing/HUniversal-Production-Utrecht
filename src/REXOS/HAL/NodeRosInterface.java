@@ -22,7 +22,7 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.dataTypes.ModuleIdentifier;
-import HAL.listeners.EquipletListener.EquipletCommandStatus;
+import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
@@ -42,8 +42,10 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 	
 	private boolean hasNodeStarted;
 
-	public NodeRosInterface(HardwareAbstractionLayer hal) {
-		super(hal);
+	AbstractHardwareAbstractionLayer hal;
+
+	public NodeRosInterface(AbstractHardwareAbstractionLayer hal) {
+		this.hal = hal;
 		this.hardwareSteps = new HashMap<Integer, HardwareStep>();
 		this.hardwareStepId = 1;
 		this.hasNodeStarted = false;
@@ -70,7 +72,11 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 	
 	@Override
 	public GraphName getDefaultNodeName() {
-		return GraphName.of(hal.getEquipletName() + "_HAL/");
+		if(hal.isShadow() == true) {
+			return GraphName.of("shadow/" + hal.getEquipletName() + "_HAL/");
+		} else {
+			return GraphName.of(hal.getEquipletName() + "_HAL/");
+		}
 	}
 
 	@Override

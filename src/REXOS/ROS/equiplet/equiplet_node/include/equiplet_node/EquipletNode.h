@@ -75,7 +75,6 @@ private:
 	
 	Json::Value callLookupHandler(Json::Value originPlacementParameters);
 	
-	
 	bool setTransitionDone(rexos_statemachine::State transitionState);
 	
 	void handleEquipletCommand(Json::Value n);
@@ -85,11 +84,11 @@ private:
 	bool isShadow;
 	
 	ros::NodeHandle nh;
-	
 	equiplet_node::scada::EquipletScada scada;
-	
 	BlackBoardHalInterface halInterface;
-//	NodeHalInterface halInterface;
+	//NodeHalInterface halInterface;
+	ros::ServiceClient spawnPartClient;
+	ros::ServiceClient removePartClient;
 	
 	virtual void onHardwareStep(rexos_datatypes::HardwareStep hardwareStep);
 	virtual void onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand);

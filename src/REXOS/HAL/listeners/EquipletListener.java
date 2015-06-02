@@ -8,11 +8,7 @@ import generic.Mast;
  * @author Bas Voskuijlen
  * @author Lars Veenendaal
  */
-public interface EquipletListener {
-	public enum EquipletCommandStatus {
-		WAITING, IN_PROGRESS, DONE, FAILED
-	}
-	
+public interface EquipletListener extends EquipletCommandListener {
 	/**
 	 * This method is called when the MAST state of the equiplet changes
 	 * @param state
@@ -23,6 +19,4 @@ public interface EquipletListener {
 	 * @param mode
 	 */
 	public void onEquipletModeChanged(Mast.Mode mode);
-	
-	public void onEquipletCommandStatusChanged(EquipletCommandStatus status);
 }

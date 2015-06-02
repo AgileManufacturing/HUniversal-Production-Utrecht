@@ -55,9 +55,8 @@ int main(int argc, char **argv) {
 	double rotationY = 0;
 	double rotationZ = 0;
 	
-	rexos_model_spawner::OriginPlacementType originPlacementType;
+	rexos_datatypes::OriginPlacement originPlacement;
 	std::string partName;
-	std::string relativeTo;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
@@ -88,18 +87,12 @@ int main(int argc, char **argv) {
 		} else if (arg == "--partName") {
 			partName = argv[++i];
 		} else if (arg == "--originPlacementType") {
-			std::string s = argv[++i];
-			if(s == "relativeToEquipletOrigin") {
-				originPlacementType = rexos_model_spawner::RELATIVE_TO_EQUIPLET_ORIGIN;
-				relativeTo = argv[++i];
-			} else if(s == "relativeToModuleOrigin") {
-				originPlacementType = rexos_model_spawner::RELATIVE_TO_MODULE_ORIGIN;
-				relativeTo = argv[++i];
-			} else if(s == "relativeToIdentifier") {
-				originPlacementType = rexos_model_spawner::RELATIVE_TO_PART_ORIGIN;
-				relativeTo = argv[++i];
-			} else if(s == "relativeToWorldOrigin") {
-				originPlacementType = rexos_model_spawner::RELATIVE_TO_WORLD_ORIGIN;
+			originPlacement.setOriginPlacementType(argv[++i]);
+			if(originPlacement.getOriginPlacementType() != rexos_datatypes::OriginPlacement::RELATIVE_TO_WORLD_ORIGIN) {
+				// we need the identifier
+				Json::Value originPlacementParameters;
+				originPlacementParameters["relativeTo"] = argv[++i];
+				originPlacement.setParameters(originPlacementParameters);
 			}
 		} else if (arg == "--isShadow") {
 			isShadow = true;
@@ -140,7 +133,7 @@ int main(int argc, char **argv) {
 		ros::shutdown();
 	}
 	if(spawnPartModel == true) {
-		modelSpawnerNode.spawnPartModel(partName, originPlacementType, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, relativeTo);
+		modelSpawnerNode.spawnPartModel(partName, originPlacement, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, true);
 		ros::shutdown();
 	}
 	

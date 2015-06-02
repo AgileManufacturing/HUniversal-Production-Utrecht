@@ -53,19 +53,19 @@ function getOriginPlacementType() {
 	echo -n "Choose option: "
 	read chosenOption
 	if [ "$chosenOption" == 1 ]; then
-		originPlacementType=relativeToEquipletOrigin
+		originPlacementType=RELATIVE_TO_EQUIPLET_ORIGIN
 		getEquipletName
 		relativeTo="$equipletName"
 	elif [ "$chosenOption" == 2 ]; then
-		originPlacementType=relativeToModuleOrigin
+		originPlacementType=RELATIVE_TO_MODULE_ORIGIN
 		getModuleIdentifier
 		relativeTo="$moduleIdentifier"
 	elif [ "$chosenOption" == 3 ]; then
-		originPlacementType=relativeToIdentifier
+		originPlacementType=RELATIVE_TO_PART_ORIGIN
 		getPartName
 		relativeTo="$partName"
 	elif [ "$chosenOption" == 4 ]; then
-		originPlacementType=relativeToWorldOrigin
+		originPlacementType=RELATIVE_TO_WORLD_ORIGIN
 		relativeTo=""
 	else
 		echo "Cancelling"

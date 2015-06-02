@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import util.log.LogSection;
 import HAL.Capability;
-import HAL.HardwareAbstractionLayer;
+import HAL.AbstractHardwareAbstractionLayer;
 import HAL.dataTypes.JavaSoftware;
 import HAL.libraries.dynamicloader.DynamicClassFactory;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -106,14 +106,14 @@ public class CapabilityFactory extends Factory<String, Capability> {
 	/**
 	 * The {@link DynamicClassFactory} used by the CapabilityFactory to load classes of capabilities.
 	 */
-	private HardwareAbstractionLayer hal;
+	private AbstractHardwareAbstractionLayer hal;
 	/**
 	 * Constructs a new CapabilityFactory with a new {@link KnowledgeDBClient}.
 	 * 
 	 * @param hal
 	 * @throws KnowledgeException
 	 */
-	public CapabilityFactory(HardwareAbstractionLayer hal) throws KnowledgeException {
+	public CapabilityFactory(AbstractHardwareAbstractionLayer hal) throws KnowledgeException {
 		super(new KnowledgeDBClient());
 		this.hal = hal;
 	}

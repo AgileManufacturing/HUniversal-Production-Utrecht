@@ -36,7 +36,10 @@
 #include <vector>
 
 #include "rexos_logger/rexos_logger.h"
-#include <model_spawner_node/spawnModel.h>
+#include <model_spawner_node/spawnModule.h>
+#include <model_spawner_node/removeModule.h>
+#include <model_spawner_node/spawnPart.h>
+#include <model_spawner_node/removePart.h>
 #include <rexos_model_spawner/ModelSpawner.h>
 
 namespace model_spawner_node {
@@ -45,11 +48,17 @@ public:
 	ModelSpawnerNode(std::string equipletName, bool isShadow);
 	
 private:
-	bool spawnModel(spawnModel::Request &request, spawnModel::Response &response);
+	bool spawnModule(spawnModule::Request &request, spawnModule::Response &response);
+	bool removeModule(removeModule::Request &request, removeModule::Response &response);
+	bool spawnPart(spawnPart::Request &request, spawnPart::Response &response);
+	bool removePart(removePart::Request &request, removePart::Response &response);
 	
 	std::string equipletName;
 	
-	ros::ServiceServer spawnNodeServer;
+	ros::ServiceServer spawnModelServer;
+	ros::ServiceServer removeModelServer;
+	ros::ServiceServer spawnPartServer;
+	ros::ServiceServer removePartServer;
 };
 
 }

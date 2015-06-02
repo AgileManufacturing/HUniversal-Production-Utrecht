@@ -48,7 +48,7 @@ import org.json.JSONException;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
-import HAL.HardwareAbstractionLayer;
+import HAL.AbstractHardwareAbstractionLayer;
 import HAL.Module;
 import HAL.dataTypes.CalibrationEntry;
 import HAL.dataTypes.DynamicSettings;
@@ -276,11 +276,11 @@ public class ReconfigHandler {
 			");";
 
 	private KnowledgeDBClient knowledgeDBClient;
-	private HardwareAbstractionLayer hal;
+	private AbstractHardwareAbstractionLayer hal;
 	private CapabilityFactory capabilityFactory;
 	private ModuleFactory moduleFactory;
 
-	public ReconfigHandler(HardwareAbstractionLayer hal, CapabilityFactory capabilityFactory, ModuleFactory moduleFactory) {
+	public ReconfigHandler(AbstractHardwareAbstractionLayer hal, CapabilityFactory capabilityFactory, ModuleFactory moduleFactory) {
 		this.hal = hal;
 		this.capabilityFactory = capabilityFactory;
 		this.moduleFactory = moduleFactory;

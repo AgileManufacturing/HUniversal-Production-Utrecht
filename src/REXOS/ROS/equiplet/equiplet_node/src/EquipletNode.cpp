@@ -35,9 +35,11 @@
 #include "equiplet_node/StateBlackboard.h"
 #include "rexos_utilities/Utilities.h"
 #include <rexos_configuration/Configuration.h>
+#include <rexos_datatypes/OriginPlacement.h>
 #include <rexos_knowledge_database/Equiplet.h>
 #include <node_spawner_node/spawnNode.h>
-#include <rexos_datatypes/OriginPlacement.h>
+#include <model_spawner_node/spawnPart.h>
+#include <model_spawner_node/removePart.h>
 
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>
@@ -54,6 +56,8 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		halInterface(equipletName, isShadow, this, blackboardIp)
 //		halInterface(equipletName, isShadow, this)
 {
+	spawnPartClient = nodeHandle.serviceClient<model_spawner_node::spawnPart>(equipletName + "/model/spawnPart/");
+	removePartClient = nodeHandle.serviceClient<model_spawner_node::removePart>(equipletName + "/model/removePart/");
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }
 
@@ -128,7 +132,7 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 	
 	// check originPlacement and gather required information
 	rexos_datatypes::OriginPlacement originPlacement = hardwareStep.getOriginPlacement();
-	if(originPlacement.getOriginPlacementType() == rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER) {
+	if(originPlacement.getOriginPlacementType() == rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN) {
 		REXOS_DEBUG("Gathering information from the environment cache");
 		Json::Value result = callLookupHandler(originPlacement.getParameters());
 		if(result == Json::Value::null) {
@@ -156,6 +160,8 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 	prox->executeHardwareStep(hardwareStep);
 }
 void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand) {
+	equipletCommand.setStatus(rexos_datatypes::EquipletCommand::IN_PROGRESS);
+	
 	Json::Value parameters = equipletCommand.getParameters();
 	if(equipletCommand.getCommand() == "changeState") {
 		for(int i = 0; i < STATE_COUNT; i++) {
@@ -165,6 +171,8 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 			}
 		}
 		REXOS_ERROR("Unknown state");
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::FAILED);
+		halInterface.postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "changeMode") {
 		for(int i = 0; i < MODE_COUNT; i++) {
 			if(parameters["desiredMode"] == rexos_statemachine::mode_txt[i]) {
@@ -173,8 +181,45 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 			}
 		}
 		REXOS_ERROR("Unknown mode");
-	} else if (equipletCommand.getCommand() == "reload") {
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::FAILED);
+		halInterface.postEquipletCommandStatus(equipletCommand);
+	} else if(equipletCommand.getCommand() == "reload") {
 		moduleRegistry.reloadModules();
+	} else if(equipletCommand.getCommand() == "spawnPartModel") {
+		if(isSimulated == false) {
+			REXOS_WARN("Unable to spawn part because not simulated");
+			return;
+		}
+		model_spawner_node::spawnPart call;
+		call.request.partName = parameters["partName"].asString();
+		call.request.originPlacementType = parameters["originPlacementType"].asString();
+		call.request.positionX = parameters["positionX"].asDouble();
+		call.request.positionY = parameters["positionY"].asDouble();
+		call.request.positionZ = parameters["positionZ"].asDouble();
+		call.request.rotationX = parameters["rotationX"].asDouble();
+		call.request.rotationY = parameters["rotationY"].asDouble();
+		call.request.rotationZ = parameters["rotationZ"].asDouble();
+		call.request.relativeTo = parameters["relativeTo"].asString();
+		call.request.spawnChildParts = parameters["spawnChildParts"].asBool();
+		
+		spawnPartClient.waitForExistence();
+		spawnPartClient.call(call);
+		
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
+		halInterface.postEquipletCommandStatus(equipletCommand);
+	} else if(equipletCommand.getCommand() == "removePartModel") {
+		if(isSimulated == false) {
+			REXOS_WARN("Unable to remove part because not simulated");
+			return;
+		}
+		model_spawner_node::removePart call;
+		call.request.partName = parameters["partName"].asString();
+		
+		removePartClient.waitForExistence();
+		removePartClient.call(call);
+		
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
+		halInterface.postEquipletCommandStatus(equipletCommand);
 	} else {
 		REXOS_WARN_STREAM("Unknown equiplet command, ignoring input");
 	}

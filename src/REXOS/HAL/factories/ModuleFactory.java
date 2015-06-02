@@ -7,7 +7,7 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.Capability;
-import HAL.HardwareAbstractionLayer;
+import HAL.AbstractHardwareAbstractionLayer;
 import HAL.Module;
 import HAL.ModuleActor;
 import HAL.dataTypes.JavaSoftware;
@@ -78,14 +78,14 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	/**
 	 * The {@link DynamicClassFactory} used by the CapabilityFactory to load classes of capabilities.
 	 */
-	private HardwareAbstractionLayer hal;
+	private AbstractHardwareAbstractionLayer hal;
 	
 	/**
 	 * Constructs a new ModuleFactory with a new {@link KnowledgeDBClient}.
 	 * @param hal
 	 * @throws KnowledgeException
 	 */
-	public ModuleFactory(ModuleListener moduleListener, HardwareAbstractionLayer hal) throws KnowledgeException{
+	public ModuleFactory(ModuleListener moduleListener, AbstractHardwareAbstractionLayer hal) throws KnowledgeException{
 		super(new KnowledgeDBClient());
 		this.moduleListener = moduleListener;
 		this.hal = hal;
@@ -155,7 +155,7 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 		return modules;
 	}
 	
-	public HardwareAbstractionLayer getHAL() {
+	public AbstractHardwareAbstractionLayer getHAL() {
 		return hal;
 	}
 	@Override

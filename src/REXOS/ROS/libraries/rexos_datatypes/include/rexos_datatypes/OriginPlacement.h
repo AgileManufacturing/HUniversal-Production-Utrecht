@@ -21,10 +21,11 @@ namespace rexos_datatypes {
 	class OriginPlacement {
 	public:
 		enum OriginPlacementType {
-			RELATIVE_TO_IDENTIFIER,
 			RELATIVE_TO_CURRENT_POSITION,
 			RELATIVE_TO_MODULE_ORIGIN,
 			RELATIVE_TO_EQUIPLET_ORIGIN,
+			RELATIVE_TO_PART_ORIGIN,
+			RELATIVE_TO_WORLD_ORIGIN,
 			UNDEFINED,
 			COUNT
 		};

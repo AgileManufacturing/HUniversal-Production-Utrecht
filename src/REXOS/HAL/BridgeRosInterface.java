@@ -10,7 +10,7 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.dataTypes.ModuleIdentifier;
-import HAL.listeners.EquipletListener.EquipletCommandStatus;
+import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import edu.wpi.rail.jrosbridge.Ros;
@@ -42,15 +42,23 @@ public class BridgeRosInterface extends RosInterface {
 	Topic hardwareStepsTopic;
 	Topic equipletCommandsTopic;
 	
-	protected BridgeRosInterface(final HardwareAbstractionLayer hal) {
-		super(hal);
+	AbstractHardwareAbstractionLayer hal;
+	
+	protected BridgeRosInterface(final AbstractHardwareAbstractionLayer hal) {
+		this.hal = hal;
 		this.hardwareSteps = new HashMap<Integer, HardwareStep>();
 		this.hardwareStepId = 1;
 		this.rosNode = new Ros();
 		
 		rosNode.connect();
 		
-		String path = hal.getEquipletName() + "/";
+		String path;
+		if(hal.isShadow() == true) {
+			 path = "shadow/" + hal.getEquipletName() + "/";
+		} else {
+			 path = hal.getEquipletName() + "/";
+		}
+		
 		hardwareStepStatusTopic = new Topic(rosNode, path + "hardwareStepStatus", "std_msgs/String");
 		hardwareStepStatusTopic.subscribe(new TopicCallback() {
 			@Override

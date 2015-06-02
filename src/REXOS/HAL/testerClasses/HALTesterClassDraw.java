@@ -21,9 +21,9 @@ import HAL.Module;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
-import HAL.listeners.EquipletListener.EquipletCommandStatus;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
@@ -142,7 +142,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"					\"linkName\":\"effector\"," +
 			"					\"collisionName\":\"collision\"," +
 			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
+			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
 			"			]" +
@@ -409,7 +409,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"					\"linkName\":\"base\"," +
 			"					\"collisionName\":\"collision\"," +
 			"					\"maxForce\":20.0," +
-			"					\"maxTorque\":1.0," +
+			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
 			"			]" +
@@ -670,14 +670,14 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	}
 	
 	@Override
-	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareSteps) {
+	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
-	public void onTranslationFailed(String service, JSONObject criteria) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[]{ service, criteria });
+	public void onTranslationFailed(ProductStep productStep) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
 	}
 
 	@Override

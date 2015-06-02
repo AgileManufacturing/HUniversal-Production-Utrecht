@@ -37,6 +37,7 @@
 #include <rexos_knowledge_database/GazeboModel.h>
 #include <rexos_knowledge_database/Equiplet.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_datatypes/OriginPlacement.h>
 #include "rexos_logger/rexos_logger.h"
 
 #include "ros/ros.h"
@@ -46,7 +47,6 @@ namespace rexos_model_spawner{
 	enum OriginPlacementType {
 		RELATIVE_TO_EQUIPLET_ORIGIN,
 		RELATIVE_TO_MODULE_ORIGIN,
-		RELATIVE_TO_PART_ORIGIN,
 		RELATIVE_TO_WORLD_ORIGIN
 	};
 	
@@ -56,14 +56,18 @@ namespace rexos_model_spawner{
 	public:
 		void spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 		void spawnEquipletModel(double gridPositionX = 0, double gridPositionY = 0);
-		void spawnPartModel(std::string partName, OriginPlacementType originPlacementType, 
+		void spawnPartModel(std::string partName, rexos_datatypes::OriginPlacement originPlacement, 
 				double positionX, double positionY, double positionZ, 
-				double rotationX, double rotationY, double rotationZ, std::string relativeTo, bool spawnChildParts = true);
+				double rotationX, double rotationY, double rotationZ, bool spawnChildParts = true);
+		void removeModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		void removeEquipletModel();
+		void removePartModel(std::string partName);
 	protected:
 		std::string getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName = "");
 		void spawnModel(rexos_knowledge_database::GazeboModel* model, rexos_knowledge_database::GazeboModel* parentModel, 
 				std::string& modelName, std::string& sdf, geometry_msgs::Pose& pose, 
 				std::string referenceModel = "", std::string referenceLink = "", std::string robotNamespace = "");
+		void removeModel(std::string modelName);
 	protected:
 		std::string equipletName;
 		bool isShadow;

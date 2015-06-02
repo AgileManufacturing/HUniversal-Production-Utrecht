@@ -49,6 +49,7 @@
 #include <collision_plugin/addCollision.h>
 #include <collision_plugin/addContactExclusion.h>
 #include <gazebo_msgs/SpawnModel.h>
+#include <gazebo_msgs/DeleteModel.h>
 
 namespace rexos_model_spawner {
 	ModelSpawner::ModelSpawner(std::string equipletName, bool isShadow) :
@@ -143,9 +144,9 @@ namespace rexos_model_spawner {
 		
 		spawnModel(&gazeboModel, NULL, equipletName, gazeboSdfFileString, pose);
 	}
-	void ModelSpawner::spawnPartModel(std::string partName, OriginPlacementType originPlacementType, 
+	void ModelSpawner::spawnPartModel(std::string partName, rexos_datatypes::OriginPlacement originPlacement, 
 			double positionX, double positionY, double positionZ, 
-			double rotationX, double rotationY, double rotationZ, std::string relativeTo, bool spawnChildParts) {
+			double rotationX, double rotationY, double rotationZ, bool spawnChildParts) {
 		REXOS_INFO_STREAM("Spawning model for " << partName);
 		rexos_knowledge_database::Part part = rexos_knowledge_database::Part(partName);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(part);
@@ -179,14 +180,17 @@ namespace rexos_model_spawner {
 		// relative to
 		rexos_knowledge_database::GazeboModel* parentGazeboModel = NULL;
 		std::string referenceLink = "";
-		if(originPlacementType == RELATIVE_TO_EQUIPLET_ORIGIN) {
+		rexos_datatypes::OriginPlacement::OriginPlacementType originPlacementType = originPlacement.getOriginPlacementType();
+		std::string relativeTo = originPlacement.getParameters()["relativeTo"].asString();
+		
+		if(originPlacementType == rexos_datatypes::OriginPlacement::RELATIVE_TO_EQUIPLET_ORIGIN) {
 			// The equiplet origin is at the same position as the childLinkOffset of the equiplet model
 			rexos_knowledge_database::GazeboModel equipletGazeboModel = rexos_knowledge_database::GazeboModel(relativeTo);
 			positionX += equipletGazeboModel.getChildLinkOffsetX();
 			positionY += equipletGazeboModel.getChildLinkOffsetY();
 			positionZ += equipletGazeboModel.getChildLinkOffsetZ();
 			referenceLink = equipletGazeboModel.getParentLink();
-		} else if(originPlacementType == RELATIVE_TO_MODULE_ORIGIN) {
+		} else if(originPlacementType == rexos_datatypes::OriginPlacement::RELATIVE_TO_MODULE_ORIGIN) {
 			// The origin of the gazebo model (and thus the reference frame) is at the mount point. The module origin is at mount point + midpoint
 			std::vector<std::string> identifierSegments;
 			boost::split(identifierSegments, relativeTo, boost::is_any_of("|"));
@@ -209,7 +213,7 @@ namespace rexos_model_spawner {
 			
 			// midPoint is calculated from the moint position, thus we need the parent link
 			referenceLink = modelGazeboModel.getParentLink();
-		} else if (originPlacementType == RELATIVE_TO_PART_ORIGIN) {
+		} else if (originPlacementType == rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN) {
 			rexos_knowledge_database::Part parentPart = rexos_knowledge_database::Part(relativeTo);
 			parentGazeboModel = new rexos_knowledge_database::GazeboModel(parentPart);
 			referenceLink = parentGazeboModel->getParentLink();
@@ -231,15 +235,34 @@ namespace rexos_model_spawner {
 		if(spawnChildParts == true) {
 			std::vector<std::string> childNames = part.getChildPartNames();
 			for(uint i = 0; i < childNames.size(); i++) {
-				rexos_knowledge_database::Part part(childNames[i]);
-				spawnPartModel(part.getPartName(), RELATIVE_TO_PART_ORIGIN, 
+				rexos_knowledge_database::Part childPart(childNames[i]);
+				rexos_datatypes::OriginPlacement childOriginPlacement;
+				childOriginPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN);
+				Json::Value childOriginPlacementParameters;
+				childOriginPlacementParameters["relativeTo"] = partName;
+				childOriginPlacement.setParameters(childOriginPlacementParameters);
+				
+				spawnPartModel(childPart.getPartName(), childOriginPlacement, 
 						part.getPositionX(), part.getPositionY(), part.getPositionZ(),
-						part.getRotationX(), part.getRotationY(), part.getRotationZ(), partName, true);
+						part.getRotationX(), part.getRotationY(), part.getRotationZ(), true);
 			}
 		}
 		if(parentGazeboModel != NULL) {
 			delete parentGazeboModel;
 		}
+	}
+	
+	void ModelSpawner::removeModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
+		std::string modelName = moduleIdentifier.getManufacturer() + "|" + 
+				moduleIdentifier.getTypeNumber() + "|" + 
+				moduleIdentifier.getSerialNumber();
+		removeModel(modelName);
+	}
+	void ModelSpawner::removeEquipletModel() {
+		removeModel(equipletName);
+	}
+	void ModelSpawner::removePartModel(std::string partName) {
+		removeModel(partName);
 	}
 	
 	std::string ModelSpawner::getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName) {
@@ -300,6 +323,12 @@ namespace rexos_model_spawner {
 				}
 			}
 		}
+	}
+	void ModelSpawner::removeModel(std::string modelName) {
+		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::DeleteModel>("/gazebo/delete_model/");
+		gazebo_msgs::DeleteModel call;
+		call.request.model_name = modelName;
+		client.call(call);
 	}
 	
 	void ModelSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName) {

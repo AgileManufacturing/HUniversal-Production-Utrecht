@@ -85,7 +85,7 @@ void PartFollowNode::writeToBlackBoard(double acceleration){
 	equipletStep.setInstructionData(instructionData);
 	
 	rexos_datatypes::OriginPlacement originPlacement = equipletStep.getOriginPlacement();
-	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER);
+	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN);
 	Json::Value parameters;
 	parameters["identifier"] = "GC4x4MB_2";
 	originPlacement.setParameters(parameters);

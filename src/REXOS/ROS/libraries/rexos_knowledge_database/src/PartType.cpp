@@ -17,7 +17,7 @@ namespace rexos_knowledge_database {
 		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
 		if(result->rowsCount() != 1){
-			throw std::runtime_error("Unable to find current part (someone deleted this instance in the database)");
+			throw std::runtime_error("Unable to find partType for part \"" + partName + "\"");
 		}
 		// set the cursor at the first result
 		result->next();
