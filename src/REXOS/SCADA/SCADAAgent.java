@@ -1,19 +1,32 @@
 package SCADA;
 
+import jade.core.Agent;
+
 import java.net.UnknownHostException;
 
-public class SCADAAgent {
+public class SCADAAgent extends Agent implements WebSocketServerListener{
 
 	private SCADAWebSocketServer webSocketServer;
-	private static final int webSocketPort = 3529;
+	private static final int webSocketServerPort = 3529;
 	
-	public SCADAAgent() {
+	protected void setup() {
+		
 		try {
-			webSocketServer = new SCADAWebSocketServer(webSocketPort);
+			webSocketServer = new SCADAWebSocketServer(webSocketServerPort);
+			webSocketServer.start();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void onWebSocketMessage(String message) {
+		//convertToAction?
+		
+	}
+	
+	
+	
+	
 	
 }
