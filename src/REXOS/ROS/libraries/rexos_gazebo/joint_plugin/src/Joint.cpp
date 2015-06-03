@@ -10,7 +10,7 @@ namespace joint_plugin {
 	}
 	Joint::Joint(physics::JointPtr joint, double maxErrorPose, ros::NodeHandle* nodeHandle) : 
 			joint(joint), maxErrorPose(maxErrorPose) {
-		violationPublisher = nodeHandle->advertise<std_msgs::String>("jointConstraint/violation/", 5);
+		violationPublisher = nodeHandle->advertise<std_msgs::String>("joint/violation/", 5);
 	}
 	void Joint::handleUpdate(common::Time currentTime) {
 		math::Pose errorPose = joint->GetAnchorErrorPose();

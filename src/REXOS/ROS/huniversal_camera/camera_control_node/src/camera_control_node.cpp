@@ -172,12 +172,10 @@ bool CameraControlNode::transitionSetup(){
 		Json::Value jsonNode;
 		Json::Reader reader;
 		reader.parse(properties, jsonNode);
-		ROS_INFO("Trying transition setup a3");
 		
 		if(jsonNode.isMember("distCoeffs") == false || jsonNode.isMember("cameraMatrix") == false) {
-			if(mannuallyCalibrateLens() == false){
-				return false;
-			}
+			if(mannuallyCalibrateLens() == false) return false;
+			else return true;
 		}
 		
 		Json::Value cameraMatrix = jsonNode["cameraMatrix"];
@@ -198,6 +196,7 @@ bool CameraControlNode::transitionSetup(){
 		for(int i = 0; i < 9; i++) {
 			serviceCall.request.cameraMatrix.values[i] = cameraMatrix[i].asDouble();
 		}
+		client.waitForExistence();
 		client.call(serviceCall);
 
 		vision_node::enableComponent fishEyeServiceCall;

@@ -8,6 +8,9 @@
 		<plugin name="acceleration" filename="libacceleration_plugin.so">
 			<rosNamespace>/</rosNamespace>
 		</plugin>
+		<plugin name="joint" filename="libjoint_plugin.so">
+			<rosNamespace>/</rosNamespace>
+		</plugin>
 		<plugin name="collision" filename="libcollision_plugin.so">
 			<rosNamespace>/</rosNamespace>
 		</plugin>

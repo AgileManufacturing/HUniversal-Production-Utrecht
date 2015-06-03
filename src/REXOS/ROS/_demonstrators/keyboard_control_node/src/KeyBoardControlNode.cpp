@@ -53,7 +53,7 @@
 using namespace keyboard_control_node;
 
 
-KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
+KeyBoardControlNode::KeyBoardControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isShadow) :
 	maxAcceleration(5.0), exitProgram(false), equipletName(equipletName), identifier(moduleIdentifier) 
 {
 	REXOS_INFO("Constructing");
@@ -61,7 +61,7 @@ KeyBoardControlNode::KeyBoardControlNode(std::string blackboardIp, std::string e
 	//DirectMoveStepsBlackBoard
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
-			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/databaseName", equipletName).asString(), 
+			isShadow ? "shadow_" + equipletName : equipletName, 
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
 
 	tcgetattr(KEYBOARDNUMBER, &oldTerminalSettings);
@@ -223,7 +223,7 @@ void KeyBoardControlNode::writeToBlackBoard(Vector3 direction, double accelerati
 	equipletStep.setOriginPlacement(originPlacement);
 	
 	equipletStep.setModuleIdentifier(identifier);
-	equipletStep.setStatus("WAITING");
+	equipletStep.setStatus(rexos_datatypes::HardwareStep::WAITING);
 	
 	REXOS_INFO_STREAM("hardware step: " << equipletStep.toJSON());
 	Json::StyledWriter writer;
@@ -447,7 +447,7 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	KeyBoardControlNode keyBoardControlNode("127.0.0.1", "EQ2", rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"));
+	KeyBoardControlNode keyBoardControlNode("EQ2", rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"), true);
 	keyBoardControlNode.run();
 	
 	return 0;

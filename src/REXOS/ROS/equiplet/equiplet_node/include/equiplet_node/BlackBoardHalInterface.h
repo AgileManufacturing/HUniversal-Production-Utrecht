@@ -20,6 +20,7 @@ namespace equiplet_node {
 		virtual void postModeChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::Mode mode);
 		virtual void postStateChange(rexos_statemachine::State state);
 		virtual void postModeChange(rexos_statemachine::Mode mode);
+		virtual void postViolation(std::string type, std::string message);
 	private:
 		Blackboard::BlackboardCppClient* hardwareStepsBlackboardClient;
 		Blackboard::BlackboardSubscription* hardwareStepsSubscription;
@@ -28,6 +29,8 @@ namespace equiplet_node {
 		Blackboard::BlackboardSubscription* equipletCommandsSubscription; 
 
 		Blackboard::BlackboardCppClient* stateBlackboardClient;
+		
+		Blackboard::BlackboardCppClient* violationBlackboardClient;
 		
 		std::vector<Blackboard::BlackboardSubscription*> subscriptions; 
 

@@ -90,8 +90,16 @@ private:
 	ros::ServiceClient spawnPartClient;
 	ros::ServiceClient removePartClient;
 	
+	ros::Subscriber accelerationViolationSubscriber;
+	ros::Subscriber collisionViolationSubscriber;
+	ros::Subscriber jointViolationSubscriber;
+	
 	virtual void onHardwareStep(rexos_datatypes::HardwareStep hardwareStep);
 	virtual void onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand);
+	
+	void onAccelerationViolation(std_msgs::String message);
+	void onCollisionViolation(std_msgs::String message);
+	void onJointViolation(std_msgs::String message);
 };
 
 }

@@ -25,6 +25,7 @@ import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.blackboard_client.data_classes.MongoOperation;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
 import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
+import HAL.listeners.ViolationListener.ViolationType;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
@@ -42,10 +43,12 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient hardwareStepsBBClient;
 	private BlackboardClient equipletCommandsBBClient;
+	private BlackboardClient violationsBBClient;
 	
 	private BasicOperationSubscription stateSubscription;
 	private FieldUpdateSubscription hardwareStepStatusSubscription;
 	private FieldUpdateSubscription equipletCommandStatusSubscription;
+	private BasicOperationSubscription violationsSubscription;
 	
 	private Map<ObjectId, HardwareStep> hardwareSteps;
 	
@@ -85,6 +88,13 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 			equipletCommandsBBClient.setDatabase(databaseName);
 			equipletCommandsBBClient.setCollection((String) Configuration.getProperty("rosInterface/equipletCommands/blackboardName/", equipletName));
 			equipletCommandsBBClient.subscribe(equipletCommandStatusSubscription);
+			
+			violationsSubscription = new BasicOperationSubscription(MongoOperation.INSERT, this);
+			
+			violationsBBClient = new BlackboardClient((String) Configuration.getProperty("rosInterface/violations/ip/", equipletName));
+			violationsBBClient.setDatabase(databaseName);
+			violationsBBClient.setCollection((String) Configuration.getProperty("rosInterface/violations/blackboardName/", equipletName));
+			violationsBBClient.subscribe(violationsSubscription);
 		} catch (InvalidDBNamespaceException | UnknownHostException | GeneralMongoException ex) {
 			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.CRITICAL, "Unable to initialize HAL.BlackBoardHandler", ex);
 		}
@@ -133,10 +143,18 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 				dbObject = equipletCommandsBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null){
 					String status = dbObject.get("status").toString();
-					//String id = ((org.bson.types.ObjectId) dbObject.get("_id")).toString();
-					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "Reloading of the Equiplet has: " + status);
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "Equiplet command status: " + status);
 					
 					this.onEquipletCommandStatusChanged(EquipletCommandStatus.valueOf(status));
+				}
+			} else if(collectionName.equals((String) Configuration.getProperty("rosInterface/violations/blackboardName/", hal.getEquipletName()))) {
+				dbObject = violationsBBClient.findDocumentById(entry.getTargetObjectId());
+				if(dbObject != null){
+					ViolationType type = ViolationType.valueOf(dbObject.get("type").toString());
+					String message = dbObject.get("message").toString();
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "Violation occured: " + type + " " + message);
+					
+					this.onViolationOccured(type, message);
 				}
 			}
 		} catch(InvalidDBNamespaceException | GeneralMongoException ex) {
@@ -149,6 +167,7 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 	}
 	
 	public void shutdown() {
+		violationsBBClient.close();
 		equipletCommandsBBClient.close();
 		hardwareStepsBBClient.close();
 		stateBlackboardBBClient.close();

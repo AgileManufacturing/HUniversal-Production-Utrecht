@@ -11,6 +11,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
+import HAL.listeners.ViolationListener.ViolationType;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 import edu.wpi.rail.jrosbridge.Ros;
@@ -41,6 +42,7 @@ public class BridgeRosInterface extends RosInterface {
 	Topic modeChangedTopic;
 	Topic hardwareStepsTopic;
 	Topic equipletCommandsTopic;
+	Topic violationsTopic;
 	
 	AbstractHardwareAbstractionLayer hal;
 	
@@ -133,6 +135,20 @@ public class BridgeRosInterface extends RosInterface {
 					} else {
 						BridgeRosInterface.this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
 					}
+				} catch (JSONException ex) {
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading mode changed failed", ex);
+				}
+			}
+		});
+		violationsTopic = new Topic(rosNode, path + "violationOccured", "std_msgs/String");
+		violationsTopic.subscribe(new TopicCallback() {
+			@Override
+			public void handleMessage(Message message) {
+				try {
+					JSONObject messageJson = new JSONObject(message.toJsonObject().getString("data"));
+					ViolationType violationType = ViolationType.valueOf(messageJson.getString("type"));
+					String violationMessage = messageJson.getString("message");
+					BridgeRosInterface.this.onViolationOccured(violationType, violationMessage);
 				} catch (JSONException ex) {
 					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading mode changed failed", ex);
 				}

@@ -18,6 +18,7 @@ namespace equiplet_node {
 		virtual void postModeChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::Mode mode);
 		virtual void postStateChange(rexos_statemachine::State state);
 		virtual void postModeChange(rexos_statemachine::Mode mode);
+		virtual void postViolation(std::string type, std::string message);
 	private:
 		HalInterfaceListener* listener;
 		
@@ -27,6 +28,7 @@ namespace equiplet_node {
 		ros::Publisher equipletCommandStatusChangedPublisher;
 		ros::Publisher stateChangedPublisher;
 		ros::Publisher modeChangedPublisher;
+		ros::Publisher violationOccuredPublisher;
 		
 		ros::Subscriber hardwareStepSubscriber;
 		ros::Subscriber equipletCommandSubscriber;

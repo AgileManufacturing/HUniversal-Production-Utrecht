@@ -44,7 +44,7 @@ namespace keyboard_control_node {
 	class KeyBoardControlNode 
 	{
 	public:
-		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		KeyBoardControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isShadow);
 		~KeyBoardControlNode();
 		void run();
 		

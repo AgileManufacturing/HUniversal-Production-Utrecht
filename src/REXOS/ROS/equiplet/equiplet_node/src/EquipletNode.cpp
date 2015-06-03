@@ -56,8 +56,18 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		halInterface(equipletName, isShadow, this, blackboardIp)
 //		halInterface(equipletName, isShadow, this)
 {
-	spawnPartClient = nodeHandle.serviceClient<model_spawner_node::spawnPart>(equipletName + "/model/spawnPart/");
-	removePartClient = nodeHandle.serviceClient<model_spawner_node::removePart>(equipletName + "/model/removePart/");
+	if(isShadow) {
+		spawnPartClient = nodeHandle.serviceClient<model_spawner_node::spawnPart>(equipletName + "/model/spawnPart/");
+		removePartClient = nodeHandle.serviceClient<model_spawner_node::removePart>(equipletName + "/model/removePart/");
+		
+		/*accelerationViolationSubscriber = 	nodeHandle.subscribe(equipletName + "/acceleration/violation/", 5, &EquipletNode::onAccelerationViolation, this);
+		collisionViolationSubscriber = 		nodeHandle.subscribe(equipletName + "/collision/violation/", 5, &EquipletNode::onCollisionViolation, this);
+		jointViolationSubscriber = 			nodeHandle.subscribe(equipletName + "/joint/violation/", 5, &EquipletNode::onJointViolation, this);*/
+		accelerationViolationSubscriber = 	nodeHandle.subscribe("/acceleration/violation/", 5, &EquipletNode::onAccelerationViolation, this);
+		collisionViolationSubscriber = 		nodeHandle.subscribe("/collision/violation/", 5, &EquipletNode::onCollisionViolation, this);
+		jointViolationSubscriber = 			nodeHandle.subscribe("/joint/violation/", 5, &EquipletNode::onJointViolation, this);
+	}
+	
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }
 
@@ -223,4 +233,13 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 	} else {
 		REXOS_WARN_STREAM("Unknown equiplet command, ignoring input");
 	}
+}
+void EquipletNode::onAccelerationViolation(std_msgs::String message) {
+	halInterface.postViolation("ACCELERATION", message.data);
+}
+void EquipletNode::onCollisionViolation(std_msgs::String message) {
+	halInterface.postViolation("COLLISION", message.data);
+}
+void EquipletNode::onJointViolation(std_msgs::String message) {
+	halInterface.postViolation("JOINT", message.data);
 }

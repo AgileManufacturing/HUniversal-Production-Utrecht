@@ -44,7 +44,7 @@ public class HardwareAbstractionLayer extends AbstractHardwareAbstractionLayer i
 		if(shadowHal != null) {
 			try {
 				shadowHalSemaphore.acquire();
-				shadowHal.testHardwareSteps(hardwareSteps, step.getCriteria());
+				shadowHal.testHardwareSteps(hardwareSteps, step);
 			} catch (InterruptedException ex) {
 				Logger.log(LogSection.HAL, LogLevel.ERROR, "Acquiring semaphore lock failed");
 			}

@@ -23,6 +23,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
+import HAL.listeners.ViolationListener.ViolationType;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
 
@@ -31,6 +32,7 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 	private Subscriber<std_msgs.String> equipletCommandStatusChangedSubscriber;
 	private Subscriber<std_msgs.String> stateChangedSubscriber;
 	private Subscriber<std_msgs.String> modeChangedSubscriber;
+	private Subscriber<std_msgs.String> violationSubscriber;
 	
 	private Publisher<std_msgs.String> hardwareStepPublisher;
 	private Publisher<std_msgs.String> equipletCommandPublisher;
@@ -157,6 +159,20 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 					} else {
 						NodeRosInterface.this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
 					}
+				} catch (JSONException ex) {
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading mode changed failed", ex);
+				}
+			}
+		}, 10);
+		violationSubscriber = node.newSubscriber(path + "violationOccured", std_msgs.String._TYPE);
+		violationSubscriber.addMessageListener(new MessageListener<std_msgs.String>() {
+			@Override
+			public void onNewMessage(std_msgs.String message) {
+				try {
+					JSONObject messageJson = new JSONObject(message.getData());
+					ViolationType violationType = ViolationType.valueOf(messageJson.getString("type"));
+					String violationMessage = messageJson.getString("message");
+					NodeRosInterface.this.onViolationOccured(violationType, violationMessage);
 				} catch (JSONException ex) {
 					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading mode changed failed", ex);
 				}

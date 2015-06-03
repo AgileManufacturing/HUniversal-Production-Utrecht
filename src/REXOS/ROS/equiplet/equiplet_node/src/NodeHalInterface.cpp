@@ -10,6 +10,7 @@ namespace equiplet_node {
 		equipletCommandStatusChangedPublisher = nh.advertise<std_msgs::String>(path + "equipletCommandStatus", 10);
 		stateChangedPublisher = nh.advertise<std_msgs::String>(path + "stateChanged", 10);
 		modeChangedPublisher = nh.advertise<std_msgs::String>(path + "modeChanged", 10);
+		violationOccuredPublisher = nh.advertise<std_msgs::String>(path + "violationOccured", 10);
 		
 		hardwareStepSubscriber = nh.subscribe(path + "hardwareSteps", 10, &NodeHalInterface::onHardwareStepMessage, this);
 		equipletCommandSubscriber = nh.subscribe(path + "equipletCommands", 10, &NodeHalInterface::onEquipletCommandMessage, this);
@@ -71,6 +72,15 @@ namespace equiplet_node {
 		std_msgs::String message;
 		message.data = jsonWriter.write(messageJson);
 		modeChangedPublisher.publish(message);
+	}
+	void NodeHalInterface::postViolation(std::string type, std::string message) {
+		Json::Value messageJson;
+		messageJson["type"] = type;
+		messageJson["message"] = message;
+		
+		std_msgs::String blackBoardMessage;
+		blackBoardMessage.data = jsonWriter.write(messageJson);
+		violationOccuredPublisher.publish(blackBoardMessage);
 	}
 	
 	void NodeHalInterface::onHardwareStepMessage(const std_msgs::StringConstPtr& message) {

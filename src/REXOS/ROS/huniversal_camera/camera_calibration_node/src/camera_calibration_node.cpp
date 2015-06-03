@@ -110,10 +110,9 @@ bool CameraCalibrationNode::calibrateLens(
 		
 		client.call(serviceCall);
 	} else {
-		REXOS_INFO("No chessboard deteced...");
+		REXOS_WARN("No chessboard detected...");
 	}
 
-	REXOS_INFO("Cleaning up...");
 	while(images.size() != 0){
 		cv::Mat* image = images.back();
 		images.pop_back();
@@ -121,7 +120,6 @@ bool CameraCalibrationNode::calibrateLens(
 	}
 	
 	response.processedFrames = successes;
-	REXOS_INFO("Done");
 	return true;
 }
 bool CameraCalibrationNode::calibrateEffector(

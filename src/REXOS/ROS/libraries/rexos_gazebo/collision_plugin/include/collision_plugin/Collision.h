@@ -11,8 +11,6 @@
 #include <gazebo/common/Time.hh>
 #include <ros/ros.h>
 
-#include <rexos_io/writeU16.h>
-
 #include <vector>
 #include <map>
 

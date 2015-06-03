@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import HAL.dataTypes.GazeboCollision;
+import HAL.dataTypes.GazeboLink;
 import HAL.dataTypes.GazeboModel;
 import HAL.dataTypes.PartType;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
@@ -67,6 +68,8 @@ public class PartRecordLoader {
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Z, 0);
 		
 		JSONArray gazeboCollisions = new JSONArray();
+		JSONArray gazeboJoints = new JSONArray();
+		JSONArray gazeboLinks = new JSONArray();
 		// TODO remove hardcoding
 		if(partTypeNumber.equals("GC4x4MB")) {
 			// we are dealing with a crate
@@ -77,6 +80,11 @@ public class PartRecordLoader {
 			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
 			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
 			gazeboCollisions.put(gazeboCollisionJson);
+			
+			JSONObject gazeboLinkJson = new JSONObject();
+			gazeboLinkJson.put(GazeboLink.LINK_NAME, "base");
+			gazeboLinkJson.put(GazeboLink.MAX_ACCELERATION, 10.0);
+			gazeboLinks.put(gazeboLinkJson);
 		} else if(partTypeNumber.equals("chessboard")) {
 			// we are dealing with a chessboard
 			JSONObject gazeboCollisionJson = new JSONObject();
@@ -95,8 +103,15 @@ public class PartRecordLoader {
 			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
 			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
 			gazeboCollisions.put(gazeboCollisionJson);
+			
+			JSONObject gazeboLinkJson = new JSONObject();
+			gazeboLinkJson.put(GazeboLink.LINK_NAME, "base");
+			gazeboLinkJson.put(GazeboLink.MAX_ACCELERATION, 20.0);
+			gazeboLinks.put(gazeboLinkJson);
 		}
 		gazeboModelJson.put(GazeboModel.COLLISIONS, gazeboCollisions);
+		gazeboModelJson.put(GazeboModel.JOINTS, gazeboJoints);
+		gazeboModelJson.put(GazeboModel.LINKS, gazeboLinks);
 		
 		
 		JSONObject partTypeJson = new JSONObject();

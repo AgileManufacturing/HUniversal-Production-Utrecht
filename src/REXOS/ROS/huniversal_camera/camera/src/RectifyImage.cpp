@@ -104,6 +104,7 @@ void RectifyImage::loadMatrices(const cv::Mat& cameraMatrix, const cv::Mat& dist
 
 void RectifyImage::setImageSize(const cv::Size &imageSize) {
 	this->imageSize = imageSize;
+	initRectify();
 }
 
 

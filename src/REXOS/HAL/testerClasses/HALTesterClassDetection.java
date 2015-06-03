@@ -67,6 +67,10 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"			\"childLinkOffsetY\":202.24," +
 			"			\"childLinkOffsetZ\":57.19," +
 			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -108,6 +112,10 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":22.0," +
 			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -173,6 +181,10 @@ public class HALTesterClassDetection implements HardwareAbstractionLayerListener
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +

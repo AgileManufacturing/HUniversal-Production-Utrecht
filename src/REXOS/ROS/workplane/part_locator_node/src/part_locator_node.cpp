@@ -362,35 +362,6 @@ namespace part_locator_node {
 	}
 	
 	bool PartLocatorNode::mannuallyCalibrate(rexos_datatypes::ModuleIdentifier moverIdentifier){
-		
-		rexos_module::TransitionGoal transitionGoal;
-		
-		std::vector<rexos_module::RequiredMutation> requiredMutations;
-		rexos_module::RequiredMutation requiredMutation;
-		requiredMutation.mutation = "move";
-		requiredMutation.isOptional = false;
-		requiredMutations.push_back(requiredMutation); 
-		transitionGoal.requiredMutationsRequiredForNextPhase = requiredMutations;
-		
-		REXOS_INFO("Waiting for mover");
-		transitionActionClient.sendGoal(transitionGoal);
-		transitionActionClient.waitForResult();
-		rexos_module::TransitionResultConstPtr result = transitionActionClient.getResult();
-		
-		bool foundCandidate = false;
-
-		for(rexos_module::CandidateModules candidates : result->candidates) {
-			if(candidates.mutation == "move") {
-				moverIdentifier = rexos_datatypes::ModuleIdentifier(
-						candidates.manufacturer[0], candidates.typeNumber[0], candidates.serialNumber[0]);
-				foundCandidate = true;
-			}
-		}
-		if(foundCandidate == false) {
-			REXOS_ERROR("Did not acquire mover");
-			return false;
-		}
-		
 		REXOS_INFO_STREAM("Accuired mover " << moverIdentifier);
 		rexos_module::ModuleInterface moverInterface(rexos_module::AbstractModule::equipletName, moverIdentifier);
 		// Go to every corner and ask the userinput for the difference in mm to the corner of the QR code (thus the black corner)
@@ -571,8 +542,35 @@ namespace part_locator_node {
 
 	bool PartLocatorNode::transitionSetup() {
 		REXOS_INFO("Setup transition called");
-		
 		rexos_datatypes::ModuleIdentifier moverIdentifier;
+		
+		// accuire a mover for the second transition phase
+		rexos_module::TransitionGoal transitionGoal;
+		
+		std::vector<rexos_module::RequiredMutation> requiredMutations;
+		rexos_module::RequiredMutation requiredMutation;
+		requiredMutation.mutation = "move";
+		requiredMutation.isOptional = false;
+		requiredMutations.push_back(requiredMutation); 
+		transitionGoal.requiredMutationsRequiredForNextPhase = requiredMutations;
+		
+		transitionActionClient.sendGoal(transitionGoal);
+		REXOS_INFO("Waiting for mover");
+		transitionActionClient.waitForResult();
+		rexos_module::TransitionResultConstPtr result = transitionActionClient.getResult();
+		
+		bool foundCandidate = false;
+		for(rexos_module::CandidateModules candidates : result->candidates) {
+			if(candidates.mutation == "move") {
+				moverIdentifier = rexos_datatypes::ModuleIdentifier(
+						candidates.manufacturer[0], candidates.typeNumber[0], candidates.serialNumber[0]);
+				foundCandidate = true;
+			}
+		}
+		if(foundCandidate == false) {
+			REXOS_ERROR("Did not acquire mover");
+			return false;
+		}
 		
 		std::vector<rexos_datatypes::ModuleIdentifier> modules;
 		modules.push_back(moverIdentifier);

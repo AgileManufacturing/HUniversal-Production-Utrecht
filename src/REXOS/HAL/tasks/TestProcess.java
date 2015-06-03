@@ -13,42 +13,58 @@ import HAL.Module;
 import HAL.ShadowHardwareAbstractionLayer;
 import HAL.listeners.EquipletCommandListener;
 import HAL.listeners.ExecutionProcessListener;
+import HAL.listeners.TestProcessListener;
+import HAL.listeners.ViolationListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
-public class TestProcess implements Runnable, ExecutionProcessListener, EquipletCommandListener {
+public class TestProcess implements Runnable, ExecutionProcessListener, EquipletCommandListener, ViolationListener {
 	protected ShadowHardwareAbstractionLayer hal;
 	protected ArrayList<HardwareStep> hardwareSteps;
-	protected JSONObject criteria;
+	protected ProductStep productStep;
+	protected TestProcessListener listener;
+	protected boolean testFailed;
 	
-	public TestProcess(ShadowHardwareAbstractionLayer hal, ArrayList<HardwareStep> hardwareSteps, JSONObject criteria) {
+	public TestProcess(ShadowHardwareAbstractionLayer hal, ArrayList<HardwareStep> hardwareSteps, ProductStep productStep, TestProcessListener listener) {
 		this.hal = hal;
 		this.hardwareSteps = hardwareSteps;
-		this.criteria = criteria;
+		this.productStep = productStep;
+		this.listener = listener;
+		this.testFailed = false;
 	}
 
 	@Override
 	public synchronized void run() {
 		try{
 			addParts();
+			hal.getRosInterface().addViolationListener(this);
+			
 			hal.executeHardwareSteps(hardwareSteps, this);
 			Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Waiting for part model to spawn");
 			wait();
 			removeParts();
+			
+			if(testFailed == false) listener.onTestFinished(productStep, hardwareSteps);
+			else listener.onTestFailed(productStep);
 		} catch (InterruptedException ex) {
 			Logger.log(LogSection.HAL_TEST, LogLevel.WARNING, "Test process interrupted", ex);
+			listener.onTestFailed(productStep);
 		} catch (JSONException ex) {
 			Logger.log(LogSection.HAL_TEST, LogLevel.ERROR, "Invalid product step", ex);
+			listener.onTestFailed(productStep);
+		} finally {
+			hal.getRosInterface().removeViolationListener(this);
 		}
 	}
 	protected JSONObject[] retrieveParts() throws JSONException {
-		JSONArray subjects = criteria.getJSONArray("subjects");
+		JSONArray subjects = productStep.getCriteria().getJSONArray("subjects");
 		// also add part for target product
 		JSONObject[] output = new JSONObject[subjects.length() + 1];
 		for(int i = 0; i < subjects.length(); i++) {
 			JSONObject subject = (JSONObject) subjects.get(i);
 			output[i] = subject;
 		}
-		output[output.length - 1] = (JSONObject) criteria.getJSONObject("target");
+		output[output.length - 1] = (JSONObject) productStep.getCriteria().getJSONObject("target");
 		return output;
 	}
 
@@ -67,20 +83,20 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 				parameters.put("originPlacementType", "RELATIVE_TO_MODULE_ORIGIN");
 				// TODO hardcoding, retrieve location from transport unit or something?
 				if(i == 0) {
-					parameters.put("positionX", 50.0);
+					parameters.put("positionX", 35.0);
 					parameters.put("positionY", 0.0);
 					parameters.put("positionZ", 0.0);
 				} else if(i == 1) {
-					parameters.put("positionX", 0.0);
-					parameters.put("positionY", 50.0);
+					parameters.put("positionX", -35.0);
+					parameters.put("positionY", 0.0);
 					parameters.put("positionZ", 0.0);
 				} else if(i == 2) {
-					parameters.put("positionX", -50.0);
-					parameters.put("positionY", 0.0);
+					parameters.put("positionX", 0.0);
+					parameters.put("positionY", 55.0);
 					parameters.put("positionZ", 0.0);
 				} else if(i == 3) {
 					parameters.put("positionX", 0.0);
-					parameters.put("positionY", -50.0);
+					parameters.put("positionY", -55.0);
 					parameters.put("positionZ", 0.0);
 				}
 				// TODO hardcoding, determine moduleId by searching for a mutation support?
@@ -99,6 +115,7 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 				Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
 			}
 		}
+		Thread.sleep(10000);
 	}
 
 	private synchronized void removeParts() {
@@ -126,6 +143,7 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 
 	@Override
 	public synchronized void onExecutionFailed() {
+		testFailed = true;
 		notify();
 	}
 
@@ -134,5 +152,11 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 		if(status == EquipletCommandStatus.DONE || status == EquipletCommandStatus.FAILED) {
 			notify();
 		}
+	}
+
+	@Override
+	public void onViolationOccured(ViolationType violationType, String message) {
+		Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Violation occured of type " + violationType, message);
+		testFailed = true;
 	}
 }

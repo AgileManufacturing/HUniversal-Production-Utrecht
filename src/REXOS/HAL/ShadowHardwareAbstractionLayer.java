@@ -13,6 +13,7 @@ import HAL.listeners.ExecutionProcessListener;
 import HAL.listeners.MastListener;
 import HAL.listeners.TestProcessListener;
 import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 import HAL.tasks.ExecutionProcess;
 import HAL.tasks.TestProcess;
 
@@ -27,8 +28,8 @@ public class ShadowHardwareAbstractionLayer extends AbstractHardwareAbstractionL
 		this.testProcessListener = testProcessListener;
 	}
 	
-	public void testHardwareSteps(ArrayList<HardwareStep> hardwareSteps, JSONObject criteria) {
-		TestProcess testProcess = new TestProcess(this, hardwareSteps, criteria);
+	public void testHardwareSteps(ArrayList<HardwareStep> hardwareSteps, ProductStep productStep) {
+		TestProcess testProcess = new TestProcess(this, hardwareSteps, productStep, testProcessListener);
 		testProcess.start();
 	}
 	

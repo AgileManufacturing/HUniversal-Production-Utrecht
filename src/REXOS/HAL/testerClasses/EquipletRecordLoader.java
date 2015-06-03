@@ -48,6 +48,8 @@ public class EquipletRecordLoader {
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Y, -36.00);
 		gazeboModelJson.put(GazeboModel.CHILD_LINK_OFFSET_Z, 1141.97);
 		gazeboModelJson.put(GazeboModel.COLLISIONS, new JSONArray());
+		gazeboModelJson.put(GazeboModel.JOINTS, new JSONArray());
+		gazeboModelJson.put(GazeboModel.LINKS, new JSONArray());
 		GazeboModel gazeboModel = GazeboModel.deSerialize(gazeboModelJson);
 		
 		JSONObject rosSoftwareJson = new JSONObject();

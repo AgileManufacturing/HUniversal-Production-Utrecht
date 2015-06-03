@@ -145,6 +145,86 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"				{" +
+			"					\"jointName\":\"upperArm1ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm2ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm3ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm4ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm5ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm6ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm1ToUpperArm1\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm2ToUpperArm2\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm3ToUpperArm3\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm4ToUpperArm4\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm5ToUpperArm5\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm6ToUpperArm6\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm1ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm2ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm3ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm4ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm5ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm6ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}" +
+			"			]," +
+			"			\"links\":[" +
+			"				{" +
+			"					\"linkName\":\"effector\"," +
+			"					\"maxAcceleration\":40.0" +
+			"				}" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -263,6 +343,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"maxAcceleration\":40.0" +
+			"				}" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -314,6 +402,10 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLinkOffsetY\":202.24," +
 			"			\"childLinkOffsetZ\":57.19," +
 			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -355,6 +447,10 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":22.0," +
 			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -421,6 +517,10 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +

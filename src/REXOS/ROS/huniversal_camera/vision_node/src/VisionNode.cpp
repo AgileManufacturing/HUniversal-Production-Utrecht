@@ -133,8 +133,10 @@ bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& reques
 bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	REXOS_DEBUG_STREAM("Service fishEyeCorrection " << request.enable);
 	
-	cv::Size camFramSize = cam->getFrameSize();
-	fishEyeCorrector.setFrameSize(camFramSize);
+	if(request.enable == true) {
+		cv::Size camFramSize = cam->getFrameSize();
+		fishEyeCorrector.setFrameSize(camFramSize);
+	}
 	if(cam && fishEyeCorrector.isReady() == true) {
 		isFishEyeCorrectorEnabled = request.enable;
 		return true;
@@ -144,7 +146,7 @@ bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& r
 
 }
 bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
-	REXOS_DEBUG_STREAM("Service enableCamera " << request.enable);
+	REXOS_DEBUG_STREAM("Service enableCamera " << request);
 	if(cam) {
 		isCameraEnabled = request.enable;
 		return true;
@@ -153,7 +155,7 @@ bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vi
 	}
 }
 bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
-	REXOS_DEBUG_STREAM("Service enableQrCodeReader " << request.enable);
+	REXOS_DEBUG_STREAM("Service enableQrCodeReader " << request);
 	if(cam) {
 		isQrCodeReaderEnabled = request.enable;
 		return true;

@@ -11,12 +11,15 @@ import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
 import HAL.listeners.EquipletListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
+import HAL.listeners.ViolationListener;
+import HAL.listeners.ViolationListener.ViolationType;
 import HAL.steps.HardwareStep;
 
 public abstract class RosInterface {
 	private ArrayList<ModuleListener> moduleSubscribers;
 	private ArrayList<EquipletListener> equipletSubscribers;
 	private ArrayList<ProcessListener> processSubscribers;
+	private ArrayList<ViolationListener> violationSubscribers;
 	
 	protected RosInterface() {
 		moduleSubscribers = new ArrayList<ModuleListener>();
@@ -95,6 +98,24 @@ public abstract class RosInterface {
 		synchronized (moduleSubscribers) {
 			for (ModuleListener moduleListener : moduleSubscribers) {
 				moduleListener.onModuleModeChanged(module, mode);
+			}
+		}
+	}
+	
+	public void addViolationListener(ViolationListener listener) {
+		synchronized (violationSubscribers) {
+			violationSubscribers.add(listener);
+		}
+	}
+	public void removeViolationListener(ViolationListener listener) {
+		synchronized (violationSubscribers) {
+			violationSubscribers.remove(listener);
+		}
+	}
+	public void onViolationOccured(ViolationType violationType, String message) {
+		synchronized (violationSubscribers) {
+			for (ViolationListener violationListener : violationSubscribers) {
+				violationListener.onViolationOccured(violationType, message);
 			}
 		}
 	}

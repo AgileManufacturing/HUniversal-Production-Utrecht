@@ -20,6 +20,10 @@
 	<build_depend>rexos_datatypes</build_depend>
 	<run_depend>rexos_zip</run_depend>
 	<build_depend>rexos_zip</build_depend>
+	<run_depend>acceleration_plugin</run_depend>
+	<build_depend>acceleration_plugin</build_depend>
+	<run_depend>joint_plugin</run_depend>
+	<build_depend>joint_plugin</build_depend>
 	<run_depend>collision_plugin</run_depend>
 	<build_depend>collision_plugin</build_depend>
 </package>

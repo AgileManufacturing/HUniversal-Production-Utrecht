@@ -31,7 +31,7 @@ namespace joint_plugin {
 		ros::ServiceServer addJointServer;
 		ros::ServiceServer removeJointServer;
 		
-		std::vector<Joint> entities;
+		std::vector<Joint> joints;
 	private:
 		physics::WorldPtr world;
 		

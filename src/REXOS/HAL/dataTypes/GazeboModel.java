@@ -24,6 +24,8 @@ public class GazeboModel implements Serializable {
 	public static final String CHILD_LINK_OFFSET_Y = "childLinkOffsetY";
 	public static final String CHILD_LINK_OFFSET_Z = "childLinkOffsetZ";
 	public static final String COLLISIONS = "collisions";
+	public static final String JOINTS = "joints";
+	public static final String LINKS = "links";
 	
 	private static final String getGazeboModelForModuleType =
 			"SELECT id, buildNumber, sdfFilename, parentLink, childLink, zipFile, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ \n" + 
@@ -76,13 +78,18 @@ public class GazeboModel implements Serializable {
 	public double childLinkOffsetY;
 	public double childLinkOffsetZ;
 	ArrayList<GazeboCollision> collisions;
+	ArrayList<GazeboJoint> joints;
+	ArrayList<GazeboLink> links;
 	
 	public GazeboModel() {
 		id = null;
 		collisions = new ArrayList<GazeboCollision>();
+		joints = new ArrayList<GazeboJoint>();
+		links = new ArrayList<GazeboLink>();
 	}
 	public GazeboModel(int id, int buildNumber, byte[] zipFile, String sdfFilename, String parentLink, String childLink, 
-			double childLinkOffsetX, double childLinkOffsetY, double childLinkOffsetZ, ArrayList<GazeboCollision> collisions) {
+			double childLinkOffsetX, double childLinkOffsetY, double childLinkOffsetZ, 
+			ArrayList<GazeboCollision> collisions, ArrayList<GazeboJoint> joints, ArrayList<GazeboLink> links) {
 		this.id = id;
 		this.buildNumber = buildNumber;
 		this.zipFile = zipFile;
@@ -93,6 +100,8 @@ public class GazeboModel implements Serializable {
 		this.childLinkOffsetY = childLinkOffsetY;
 		this.childLinkOffsetZ = childLinkOffsetZ;
 		this.collisions = collisions;
+		this.joints = joints;
+		this.links = links;
 	}
 	
 	/**
@@ -122,6 +131,8 @@ public class GazeboModel implements Serializable {
 		gazeboModel.childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
 		gazeboModel.childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
 		gazeboModel.collisions = GazeboCollision.getGazeboCollisionsForGazeboModel(gazeboModel, knowledgeDBClient);
+		gazeboModel.joints = GazeboJoint.getGazeboJointsForGazeboModel(gazeboModel, knowledgeDBClient);
+		gazeboModel.links = GazeboLink.getGazeboLinksForGazeboModel(gazeboModel, knowledgeDBClient);
 		
 		return gazeboModel;
 	}
@@ -153,6 +164,8 @@ public class GazeboModel implements Serializable {
 		gazeboModel.childLinkOffsetY = (double) rows[0].get("childLinkOffsetY");
 		gazeboModel.childLinkOffsetZ = (double) rows[0].get("childLinkOffsetZ");
 		gazeboModel.collisions = GazeboCollision.getGazeboCollisionsForGazeboModel(gazeboModel, knowledgeDBClient);
+		gazeboModel.joints = GazeboJoint.getGazeboJointsForGazeboModel(gazeboModel, knowledgeDBClient);
+		gazeboModel.links = GazeboLink.getGazeboLinksForGazeboModel(gazeboModel, knowledgeDBClient);
 		
 		return gazeboModel;
 	}
@@ -172,6 +185,14 @@ public class GazeboModel implements Serializable {
 		for(int i = 0; i < collisions.length(); i++) {
 			output.collisions.add(GazeboCollision.deSerialize(collisions.getJSONObject(i), output));
 		}
+		JSONArray joints = input.getJSONArray(JOINTS);
+		for(int i = 0; i < joints.length(); i++) {
+			output.joints.add(GazeboJoint.deSerialize(joints.getJSONObject(i), output));
+		}
+		JSONArray links = input.getJSONArray(LINKS);
+		for(int i = 0; i < links.length(); i++) {
+			output.links.add(GazeboLink.deSerialize(links.getJSONObject(i), output));
+		}
 		
 		return output;
 	}
@@ -186,11 +207,24 @@ public class GazeboModel implements Serializable {
 		output.put(CHILD_LINK_OFFSET_X, childLinkOffsetX);
 		output.put(CHILD_LINK_OFFSET_Y, childLinkOffsetY);
 		output.put(CHILD_LINK_OFFSET_Z, childLinkOffsetZ);
+		
 		JSONArray collisionsJson = new JSONArray();
 		for (GazeboCollision collision : collisions) {
 			collisionsJson.put(collision.serialize());
 		}
 		output.put(COLLISIONS, collisionsJson);
+		
+		JSONArray jointsJson = new JSONArray();
+		for (GazeboJoint joint : joints) {
+			jointsJson.put(joint.serialize());
+		}
+		output.put(JOINTS, jointsJson);
+		
+		JSONArray linksJson = new JSONArray();
+		for (GazeboLink link : links) {
+			linksJson.put(link.serialize());
+		}
+		output.put(LINKS, linksJson);
 		
 		return output;
 	}
@@ -210,6 +244,12 @@ public class GazeboModel implements Serializable {
 		
 		for (GazeboCollision collision : collisions) {
 			collision.insertIntoDatabase(knowledgeDBClient);
+		}
+		for (GazeboJoint joint : joints) {
+			joint.insertIntoDatabase(knowledgeDBClient);
+		}
+		for (GazeboLink link : links) {
+			link.insertIntoDatabase(knowledgeDBClient);
 		}
 		
 		gazeboModelInstances.put(id, this);
@@ -231,10 +271,30 @@ public class GazeboModel implements Serializable {
 		for (GazeboCollision collision : collisions) {
 			collision.insertIntoDatabase(knowledgeDBClient);
 		}
+		
+		for (GazeboJoint joint : gazeboModelToBeUpdated.joints) {
+			joint.removeFromDatabase(knowledgeDBClient);
+		}
+		for (GazeboJoint joint : joints) {
+			joint.insertIntoDatabase(knowledgeDBClient);
+		}
+		
+		for (GazeboLink link : gazeboModelToBeUpdated.links) {
+			link.removeFromDatabase(knowledgeDBClient);
+		}
+		for (GazeboLink link : links) {
+			link.insertIntoDatabase(knowledgeDBClient);
+		}
 	}
 	public void removeFromDatabase(KnowledgeDBClient knowledgeDBClient) {
 		for (GazeboCollision collision : collisions) {
 			collision.removeFromDatabase(knowledgeDBClient);
+		}
+		for (GazeboJoint joint : joints) {
+			joint.removeFromDatabase(knowledgeDBClient);
+		}
+		for (GazeboLink link : links) {
+			link.removeFromDatabase(knowledgeDBClient);
 		}
 		knowledgeDBClient.executeUpdateQuery(removeGazeboModel, id);
 	}

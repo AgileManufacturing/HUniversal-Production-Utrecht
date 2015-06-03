@@ -21,7 +21,7 @@ SimulatedCamera::~SimulatedCamera() {
 }
 
 cv::Size SimulatedCamera::getFrameSize() {
-	if(frameSize != cv::Size(0, 0)){
+	if(frameSize.width > 0 && frameSize.height > 0) {
 		return frameSize;
 	} else {
 		boost::shared_ptr<sensor_msgs::CameraInfo const> cameraInfoPtr;
@@ -48,12 +48,12 @@ void SimulatedCamera::enableCamera(bool enabled) {
 }
 
 void SimulatedCamera::handleFrame(const sensor_msgs::ImageConstPtr& msg) {
+	frameSize = cv::Size(msg->width, msg->height);
 	if(isNewFrameRequired() == true) {
 		// someone is waiting for this frame, lets store the frame and notify him
 		cv_bridge::CvImagePtr cv_ptr;
 		cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 		camFrame = cv_ptr->image;
-		frameSize = camFrame.size();
 		
 		onNewFrame();
 	} else {

@@ -43,6 +43,13 @@ namespace equiplet_node {
 				dbName, 
 				rexos_configuration::Configuration::getProperty("rosInterface/equipletState/blackboardName", equipletName).asString());
 		sleep(1);
+		
+		REXOS_DEBUG("Subscribing to violations");
+		violationBlackboardClient = new Blackboard::BlackboardCppClient(
+				useCustomIp ? blackboardIp : rexos_configuration::Configuration::getProperty("rosInterface/violations/ip", equipletName).asString(), 
+				dbName, 
+				rexos_configuration::Configuration::getProperty("rosInterface/violations/blackboardName", equipletName).asString());
+		sleep(1);
 	}
 	BlackBoardHalInterface::~BlackBoardHalInterface() {
 		for (std::vector<Blackboard::BlackboardSubscription *>::iterator iter = subscriptions.begin() ; iter != subscriptions.end() ; iter++) {
@@ -99,6 +106,15 @@ namespace equiplet_node {
 		std::string message;
 		message = jsonWriter.write(messageJson);
 		stateBlackboardClient->insertDocument(message);
+	}
+	void BlackBoardHalInterface::postViolation(std::string type, std::string message) {
+		Json::Value messageJson;
+		messageJson["type"] = type;
+		messageJson["message"] = message;
+		
+		std::string blackBoardMessage;
+		blackBoardMessage = jsonWriter.write(messageJson);
+		violationBlackboardClient->insertDocument(blackBoardMessage);
 	}
 	
 	void BlackBoardHalInterface::onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry) {

@@ -33,7 +33,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 
 	static String equipletName = "EQ2";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = false;
+	static boolean insertModules = true;
 	static boolean translateSteps = true;
 
 	// delta robot
@@ -144,6 +144,74 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"					\"maxForce\":10.0," +
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"				{" +
+			"					\"jointName\":\"upperArm1ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm2ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm3ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm1ToUpperArm1\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm2ToUpperArm1\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm3ToUpperArm2\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm4ToUpperArm2\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm5ToUpperArm3\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm6ToUpperArm3\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm1ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm2ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm3ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm4ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm5ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm6ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}" +
+			"			]," +
+			"			\"links\":[" +
+			"				{" +
+			"					\"linkName\":\"effector\"," +
+			"					\"maxAcceleration\":40.0" +
 			"				}" +
 			"			]" +
 			"		}," +
@@ -263,6 +331,14 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"maxAcceleration\":40.0" +
+			"				}" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -314,6 +390,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"childLinkOffsetY\":202.24," +
 			"			\"childLinkOffsetZ\":57.19," +
 			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -355,6 +435,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":22.0," +
 			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -421,6 +505,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -460,7 +548,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		htc = null;
 	}
 	public HALTesterClassPickAndPlace() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
-		hal = new HardwareAbstractionLayer(equipletName, this);
+		hal = new HardwareAbstractionLayer(equipletName, this, true);
 		
 		if(insertModules == true) {
 			FileInputStream fis;

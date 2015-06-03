@@ -45,7 +45,11 @@
 #include <rexos_knowledge_database/Module.h>
 #include <rexos_knowledge_database/Part.h>
 #include <rexos_knowledge_database/GazeboCollision.h>
+#include <rexos_knowledge_database/GazeboJoint.h>
+#include <rexos_knowledge_database/GazeboLink.h>
 #include <rexos_zip/ZipExtractor.h>
+#include <acceleration_plugin/addEntity.h>
+#include <joint_plugin/addJoint.h>
 #include <collision_plugin/addCollision.h>
 #include <collision_plugin/addContactExclusion.h>
 #include <gazebo_msgs/SpawnModel.h>
@@ -243,8 +247,8 @@ namespace rexos_model_spawner {
 				childOriginPlacement.setParameters(childOriginPlacementParameters);
 				
 				spawnPartModel(childPart.getPartName(), childOriginPlacement, 
-						part.getPositionX(), part.getPositionY(), part.getPositionZ(),
-						part.getRotationX(), part.getRotationY(), part.getRotationZ(), true);
+						childPart.getPositionX(), childPart.getPositionY(), childPart.getPositionZ(),
+						childPart.getRotationX(), childPart.getRotationY(), childPart.getRotationZ(), true);
 			}
 		}
 		if(parentGazeboModel != NULL) {
@@ -292,9 +296,13 @@ namespace rexos_model_spawner {
 		
 		if(isShadow == true) {
 			// also add safety checks
+			
+			// collisions
 			ros::ServiceClient addCollisionClient = nodeHandle.serviceClient<collision_plugin::addCollision>("/collision/addCollision/");
+			addCollisionClient.waitForExistence();
 			collision_plugin::addCollision addCollisionCall;
 			ros::ServiceClient addExclusionClient = nodeHandle.serviceClient<collision_plugin::addContactExclusion>("/collision/addContactExclusion/");
+			addExclusionClient.waitForExistence();
 			collision_plugin::addContactExclusion addExclusionCall;
 			
 			auto collisions = rexos_knowledge_database::GazeboCollision::getCollisionsForModel(*model);
@@ -321,6 +329,32 @@ namespace rexos_model_spawner {
 						}
 					}
 				}
+			}
+			
+			// joints
+			ros::ServiceClient addJointClient = nodeHandle.serviceClient<joint_plugin::addJoint>("/joint/addJoint/");
+			addJointClient.waitForExistence();
+			joint_plugin::addJoint addJointCall;
+			
+			auto joints = rexos_knowledge_database::GazeboJoint::getJointsForModel(*model);
+			for(auto joint = joints.begin(); joint < joints.end(); joint++) {
+				addJointCall.request.model = modelName;
+				addJointCall.request.joint = joint->getJointName();
+				addJointCall.request.maxErrorDistance = joint->getMaxErrorPose();
+				addJointClient.call(addJointCall);
+			}
+			
+			// links
+			ros::ServiceClient addLinkClient = nodeHandle.serviceClient<acceleration_plugin::addEntity>("/acceleration/addEntity/");
+			addLinkClient.waitForExistence();
+			acceleration_plugin::addEntity addLinkCall;
+			
+			auto links = rexos_knowledge_database::GazeboLink::getLinksForModel(*model);
+			for(auto link = links.begin(); link < links.end(); link++) {
+				addLinkCall.request.model = modelName;
+				addLinkCall.request.link = link->getLinkName();
+				addLinkCall.request.maxAcceleration = link->getMaxAcceleration();
+				addLinkClient.call(addLinkCall);
 			}
 		}
 	}

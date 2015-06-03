@@ -23,5 +23,6 @@ namespace equiplet_node {
 		virtual void postModeChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::Mode mode) = 0;
 		virtual void postStateChange(rexos_statemachine::State state) = 0;
 		virtual void postModeChange(rexos_statemachine::Mode mode) = 0;
+		virtual void postViolation(std::string type, std::string message) = 0;
 	};
 }

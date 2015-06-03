@@ -74,6 +74,14 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			"					\"maxTorque\":5.0," +
 			"					\"mayHaveContactWithChildModules\":true" +
 			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"maxAcceleration\":20.0" +
+			"				}" +
 			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
@@ -120,6 +128,10 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			"			\"childLinkOffsetZ\":0.0," +
 			"			\"collisions\":[" +
 			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\", \"pick\", \"place\"" +
