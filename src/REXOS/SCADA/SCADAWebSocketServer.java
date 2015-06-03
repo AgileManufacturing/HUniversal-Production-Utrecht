@@ -30,6 +30,7 @@ public class SCADAWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		theListener.onWebSocketMessage(message);
+		System.out.println("WebSocketServer received: " +  message);
 	}
 	
 	@Override
@@ -39,11 +40,11 @@ public class SCADAWebSocketServer extends WebSocketServer {
 
 	@Override
 	public void onError(WebSocket conn, Exception ex) {
-
+		ex.printStackTrace();
 	}
 	
 	public void sendMessage(WebSocket conn, String message) {
-		
+		conn.send(message);
 	}
 	
 	public void setListener(WebSocketServerListener s) {
