@@ -6,6 +6,12 @@ import java.net.URISyntaxException;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+/*
+ * 
+ * @author: Pim te Slaa & Jeroen Huisen
+ * 
+ */
+
 public class WebSocketClientTest extends WebSocketClient {
 
 	public WebSocketClientTest(URI serverURI) {
