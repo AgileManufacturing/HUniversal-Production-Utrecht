@@ -35,7 +35,14 @@ public class WebSocketClientTest extends WebSocketClient {
 	
 	public static void main(String[] args) {
 		try {
-			WebSocketClientTest mws = new WebSocketClientTest(new URI("127.0.0.1:3529"));
+			WebSocketClientTest mws = new WebSocketClientTest(new URI("ws://127.0.0.1:3529"));
+			mws.connect();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			mws.send("THIS IS A TEST MESSAGE!");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block

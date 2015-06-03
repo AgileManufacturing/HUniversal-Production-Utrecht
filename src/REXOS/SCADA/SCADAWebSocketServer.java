@@ -20,6 +20,8 @@ public class SCADAWebSocketServer extends WebSocketServer {
 
 	public SCADAWebSocketServer(int port) throws UnknownHostException {
 		super(new InetSocketAddress(port));
+		connectionList = new ArrayList<WebSocket>();
+		System.out.println("WSS created");
 	}
 	
 	@Override
@@ -29,8 +31,8 @@ public class SCADAWebSocketServer extends WebSocketServer {
 
 	@Override
 	public void onMessage(WebSocket conn, String message) {
-		theListener.onWebSocketMessage(message);
 		System.out.println("WebSocketServer received: " +  message);
+		theListener.onWebSocketMessage(message);
 	}
 	
 	@Override
