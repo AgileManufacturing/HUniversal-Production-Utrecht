@@ -61,14 +61,9 @@ namespace rexos_stewart_gough{
 		motorMap[5] = MotorMap(5,5);
 		
 		// TODO hardcoded
-		sixAxisCalculations = new SixAxisCalculations(
-			100, 300.00,
-			101.3, 40.93,
-			31.05, 32.59,
-			0.26
-			);
+		sixAxisCalculations = new SixAxisCalculations(stewartGoughMeasures);
 
-		REXOS_INFO_STREAM(" max angle: " << stewartGoughMeasures.maxAngleHipAnkle << std::endl); 
+		REXOS_INFO_STREAM(" max angle: " << stewartGoughMeasures.maxJointAngle << std::endl); 
 	
 
 	   // kinematics = new InverseKinematics;
@@ -287,7 +282,10 @@ namespace rexos_stewart_gough{
 		
 		effectorLocation.location.x = 0;
 		effectorLocation.location.y = 0;
-		effectorLocation.location.z = -270; // TODO yet to be set 
+		effectorLocation.location.z = -sqrt(
+					pow(stewartGoughMeasures.ankleLength, 2) - 
+					pow(stewartGoughMeasures.baseRadius + stewartGoughMeasures.hipLength - stewartGoughMeasures.effectorRadius, 2)
+				) - stewartGoughMeasures.effectorHeight;
 		effectorLocation.rotationX = 0;
 		effectorLocation.rotationY = 0;
 		effectorLocation.rotationZ = 0;

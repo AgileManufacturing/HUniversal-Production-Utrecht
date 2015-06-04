@@ -4,6 +4,7 @@
 #include <vector>
 #include "rexos_logger/rexos_logger.h"
 #include <rexos_stewart_gough/StewartGoughLocation.h>
+#include <rexos_stewart_gough/StewartGoughMeasures.h>
 #include <matrices/Matrices.h>
 
 #pragma once
@@ -22,20 +23,11 @@ class SixAxisCalculations {
 			bool validMove;
 			double angles[6];
 		};
-		SixAxisCalculations(double upperArmLength, double lowerArmLength, 
-				double motorAxisToCenterDistance, double effectorJointtoCenterDistance, 
-				double effectorJointOffset, double motorJointOffset,
-				double maxJointAngle):
-			upperArmLength(upperArmLength),
-			lowerArmLength(lowerArmLength),
-			baseRadius(motorAxisToCenterDistance),
-			motorJointOffset(motorJointOffset),
-			effectorRadius(effectorJointtoCenterDistance),
-			effectorJointOffset(effectorJointOffset),
-			maxJointAngle(maxJointAngle)
-			{
-				maxJointAngle = 15.0 * 3.141592 / 180;
-				sphereCircleRadius = std::sin(maxJointAngle);
+		
+		SixAxisCalculations(StewartGoughMeasures stewartGoughMeasures) :
+			stewartGoughMeasures(stewartGoughMeasures) {
+				//maxJointAngle = 15.0 * 3.141592 / 180;
+				sphereCircleRadius = std::sin(stewartGoughMeasures.maxJointAngle);
 				REXOS_INFO_STREAM("sphereCircleRadius: " << sphereCircleRadius);
 	
 				//hasValidJointAngles(Vector4(20, -50 - 100, 0, 1), Vector4(-23.81, -51.82, -264.14, 1), Vector4(-23.81 - -37.10, -51.82 - -46.98, -264.14 - -250.00, 1));
@@ -46,13 +38,7 @@ class SixAxisCalculations {
 		bool checkPath(StewartGoughLocation from, StewartGoughLocation to);
 		
 	private:
-		double upperArmLength;
-		double lowerArmLength;
-		double baseRadius;
-		double motorJointOffset;
-		double effectorRadius;
-		double effectorJointOffset;
-		double maxJointAngle;
+		StewartGoughMeasures stewartGoughMeasures;
 		
 		double sphereCircleRadius;
 		

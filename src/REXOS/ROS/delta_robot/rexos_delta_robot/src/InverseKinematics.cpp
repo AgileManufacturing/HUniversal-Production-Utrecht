@@ -47,26 +47,11 @@
 namespace rexos_delta_robot {
 	/**
 	 * Constructor for inverse kinematics.
-	 *
-	 * @param base Radius of the base in millimeters.
-	 * @param hip Length of the hip in millimeters.
-	 * @param effector Radius of the effector in millimeters.
-	 * @param ankle Length of the ankle in millimeters.
-	 * @param maxAngleHipAnkle Maximal angle between the hip and ankle when moving the hip sideways, in radians.
-	 **/
-	InverseKinematics::InverseKinematics(const double base, const double hip,
-			const double effector, const double ankle,
-			const double maxAngleHipAnkle) :
-			InverseKinematicsModel(base, hip, effector, ankle, maxAngleHipAnkle){
-	}
-
-	/**
-	 * Constructor for inverse kinematics.
 	 * 
 	 * @param deltaRobotMeasures The measures of the deltarobot configuration.
 	 **/
 	InverseKinematics::InverseKinematics(rexos_delta_robot::DeltaRobotMeasures & deltaRobotMeasures) :
-			InverseKinematicsModel(deltaRobotMeasures.base, deltaRobotMeasures.hip, deltaRobotMeasures.effector, deltaRobotMeasures.ankle, deltaRobotMeasures.maxAngleHipAnkle){
+			InverseKinematicsModel(deltaRobotMeasures){
 	}
 
 	InverseKinematics::~InverseKinematics(void){
@@ -80,7 +65,10 @@ namespace rexos_delta_robot {
 	 * 
 	 * @return The angle, in radians, the motor should move to.
 	 **/
-	double InverseKinematics::motorAngle(const Vector3& destinationPoint, double motorLocation) const{
+	double InverseKinematics::motorAngle(Vector3 destinationPoint, double motorLocation) const {
+		// add the height of the effector (and thus move the destination point upwards 
+		// to the point where the lower arms connect with the effector
+		destinationPoint.z += deltaRobotMeasures.effectorHeight;
 		// Rotate the destination point so calculations can be made as if the motor is always in front
 		// (rotating the point places it in the same position relative to the front motor
 		// as it would be relative to the motor indicated by motor_angle).
@@ -91,10 +79,10 @@ namespace rexos_delta_robot {
 		Vector3 destinationPointRotatedAroundZAxis = rotationMatrix * destinationPoint;
 		
 		// Places the point towards the "ankle to effector connection".
-		destinationPointRotatedAroundZAxis.y -= effector;
+		destinationPointRotatedAroundZAxis.y -= deltaRobotMeasures.effectorRadius;
 		
 		// Places the point relative to a motor in (x,y,z) = (0, 0, 0).
-		destinationPointRotatedAroundZAxis.y += base;
+		destinationPointRotatedAroundZAxis.y += deltaRobotMeasures.baseRadius;
 
 		double distanceMotorToEffectorOnYAndZAxis = sqrt(pow(destinationPointRotatedAroundZAxis.y, 2)
 				+ pow(destinationPointRotatedAroundZAxis.z, 2));
@@ -107,11 +95,11 @@ namespace rexos_delta_robot {
 		// To calculate alpha, the angle between actuator arm and goal vector.
 		double alphaAcosInput = (
 				pow(destinationPointRotatedAroundZAxis.x, 2)
-				- pow(ankle, 2) + pow(hip, 2)
+				- pow(deltaRobotMeasures.ankleLength, 2) + pow(deltaRobotMeasures.hipLength, 2)
 				+ pow(distanceMotorToEffectorOnYAndZAxis, 2)
 				)/(
 				2 
-				* hip 
+				* deltaRobotMeasures.hipLength 
 				* distanceMotorToEffectorOnYAndZAxis);
 
 		if(alphaAcosInput < -1 || alphaAcosInput > 1){
@@ -127,8 +115,8 @@ namespace rexos_delta_robot {
 		// The required angle between actuator arm and base (0 degrees).
 		double rho = beta - alpha;
 
-		double hipAnkleAngle = asin(abs(destinationPointRotatedAroundZAxis.x) / ankle);
-		if (hipAnkleAngle > maxAngleHipAnkle) {
+		double hipAnkleAngle = asin(abs(destinationPointRotatedAroundZAxis.x) / deltaRobotMeasures.ankleLength);
+		if (hipAnkleAngle > deltaRobotMeasures.maxAngleHipAnkle) {
 			throw InverseKinematicsException("angle between hip and ankle is out of range", destinationPoint);
 		}
 

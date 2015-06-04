@@ -147,7 +147,7 @@ namespace rexos_delta_robot {
 			// The acceleration is too low, throwing an exception.
 			throw std::out_of_range("maxAcceleration too low");
 		}
-
+		
 		// Get the motor angles from the kinematics model
 		std::vector<rexos_motor::MotorRotation> rotations = kinematics->destinationPointToMotorRotations(point);
 
@@ -262,10 +262,10 @@ namespace rexos_delta_robot {
 
 		effectorLocation.x = 0;
 		effectorLocation.y = 0;
-		effectorLocation.z = -sqrt((deltaRobotMeasures->ankle * deltaRobotMeasures->ankle) - ((
-				deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector) * (
-				deltaRobotMeasures->base + deltaRobotMeasures->hip - deltaRobotMeasures->effector))
-		);
+		effectorLocation.z = -sqrt(
+					pow(deltaRobotMeasures->ankleLength, 2) - 
+					pow(deltaRobotMeasures->baseRadius + deltaRobotMeasures->hipLength - deltaRobotMeasures->effectorRadius, 2)
+				) - deltaRobotMeasures->effectorHeight;
 		REXOS_DEBUG_STREAM("effector location z: " << effectorLocation.z); 
 
 		return true;

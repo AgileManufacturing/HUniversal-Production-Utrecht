@@ -40,17 +40,20 @@
 
 namespace rexos_delta_robot {
 	DeltaRobotMeasures::DeltaRobotMeasures(Json::Value properties) {
-		base = properties["baseRadius"].asDouble();
-		REXOS_INFO_STREAM("found baseRadius " << base);
+		baseRadius = properties["baseRadius"].asDouble();
+		REXOS_INFO_STREAM("found baseRadius " << baseRadius);
 		
-		hip = properties["hipLength"].asDouble();
-		REXOS_INFO_STREAM("found hipLength " << hip);
+		hipLength = properties["hipLength"].asDouble();
+		REXOS_INFO_STREAM("found hipLength " << hipLength);
 		
-		effector = properties["effectorRadius"].asDouble();
-		REXOS_INFO_STREAM("found effectorRadius " << effector);
+		effectorRadius = properties["effectorRadius"].asDouble();
+		REXOS_INFO_STREAM("found effectorRadius " << effectorRadius);
 		
-		ankle = properties["ankleLength"].asDouble();
-		REXOS_INFO_STREAM("found ankleLength " << ankle);
+		effectorHeight = properties["effectorHeight"].asDouble();
+		REXOS_INFO_STREAM("found effectorHeight " << effectorHeight);
+		
+		ankleLength = properties["ankleLength"].asDouble();
+		REXOS_INFO_STREAM("found ankleLength " << ankleLength);
 		
 		maxAngleHipAnkle = rexos_utilities::degreesToRadians(properties["hipAnleMaxAngleDegrees"].asDouble());
 		REXOS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);

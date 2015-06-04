@@ -22,7 +22,7 @@
 			<gravity>false</gravity>
 			
 			<inertial>
-				<mass>20.000</mass>
+				<mass>30.000</mass>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -34,12 +34,17 @@
 		</link>
 		<!-- Upper arms --> 
 		<link name="upperArm1"> 
-			<pose>0.1557 -0.1397 -0.0345 0 0 2.0943951</pose>
+			<pose>0.1726 -0.1399 -0.0343 0 0 2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.200</mass>
 				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -50,12 +55,17 @@
 			</visual>
 		</link>
 		<link name="upperArm2"> 
-			<pose>0.1676 -0.1603 -0.0345 0 3.14159265 2.0943951</pose>
+			<pose>0.1505 -0.1601 -0.0343 0 3.14159265 2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.200</mass>
 				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -66,12 +76,17 @@
 			</visual>
 		</link>
 		<link name="upperArm3"> 
-			<pose>0.0869 -0.3000 -0.0345 0 0 0</pose>
+			<pose>0.0867 -0.3000 -0.0343 0 0 0</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.200</mass>
 				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -82,12 +97,17 @@
 			</visual>
 		</link>
 		<link name="upperArm4"> 
-			<pose>0.0631 -0.3000 -0.0345 0 3.14159265 0</pose>
+			<pose>0.0633 -0.3000 -0.0343 0 3.14159265 0</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.200</mass>
 				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -98,12 +118,17 @@
 			</visual>
 		</link>
 		<link name="upperArm5"> 
-			<pose>-0.0176 -0.1603 -0.0345 0 0 -2.0943951</pose>
+			<pose>-0.0175 -0.1601 -0.0343 0 0 -2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.200</mass>
 				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -114,12 +139,17 @@
 			</visual>
 		</link>
 		<link name="upperArm6"> 
-			<pose>-0.0057 -0.1397 -0.0345 0 3.14159265 -2.0943951</pose>
+			<pose>-0.0057 -0.1399 -0.0343 0 3.14159265 -2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.200</mass>
 				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -131,12 +161,17 @@
 		</link>
 		<!-- Lower arms --> 
 		<link name="lowerArm1"> 
-			<pose>0.2324 -0.07255 -0.0345 0.5527151 0 2.0943951</pose>
+			<pose>0.2323 -0.07253 -0.0343 0.5527151 0 2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.040</mass>
 				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -147,13 +182,18 @@
 			</visual>
 		</link>
 		<link name="lowerArm2"> 
-			<pose>0.2641 -0.1275 -0.0345 0.5527151 0 2.0943951</pose>
+			<pose>0.2641 -0.1274 -0.0343 0.5527151 0 2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.040</mass>
 				<pose>0 0 -0.150 0 0 0</pose>
-			</inertial>
+					<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+		</inertial>
 			<visual name="visual">
 				<geometry>
 					<mesh>
@@ -163,12 +203,17 @@
 			</visual>
 		</link>
 		<link name="lowerArm3"> 
-			<pose>0.1067 -0.4000 -0.0345 0.5527151 0 0</pose>
+			<pose>0.1067 -0.4000 -0.0343 0.5527151 0 0</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.040</mass>
 				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -179,12 +224,17 @@
 			</visual>
 		</link>
 		<link name="lowerArm4"> 
-			<pose>0.0433 -0.4000 -0.0345 0.5527151 0 0</pose>
+			<pose>0.0433 -0.4000 -0.0343 0.5527151 0 0</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.040</mass>
 				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -195,12 +245,17 @@
 			</visual>
 		</link>
 		<link name="lowerArm5"> 
-			<pose>-0.1141 -0.1275 -0.0345 0.5527151 0 -2.0943951</pose>
+			<pose>-0.1141 -0.1275 -0.0343 0.5527151 0 -2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.040</mass>
 				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -211,12 +266,17 @@
 			</visual>
 		</link>
 		<link name="lowerArm6"> 
-			<pose>-0.0824 -0.07255 -0.0345 0.5527151 0 -2.0943951</pose>
+			<pose>-0.0823 -0.0725 -0.0343 0.5527151 0 -2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
 				<mass>0.040</mass>
 				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -228,12 +288,20 @@
 		</link>
 		<!-- Effector --> 
 		<link name="effector"> 
-			<pose>0.075 -0.200 -0.2993 0 0 0</pose>
+			<pose>0.075 -0.200 -0.2991 0 0 0</pose>
 			<gravity>true</gravity>
 			
+			<velocity_decay>
+				<angular>2</angular>
+			</velocity_decay>
 			<inertial>
 				<mass>0.050</mass>
 				<pose>0 0 0 0 0 0</pose>
+				<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>1000</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>
 			</inertial>
 			<visual name="visual">
 				<geometry>
@@ -252,8 +320,8 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<limit>
-					<upper>0.0</upper>
 					<lower>0.0</lower>
+					<upper>0.0</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -264,12 +332,12 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.25</damping>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
 				</dynamics>
 				<limit>
-					<upper>3.14159265</upper>
-					<lower>-3.14159265</lower>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -279,12 +347,12 @@
 			<axis>
 				<xyz>-1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.25</damping>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
 				</dynamics>
 				<limit>
-					<upper>3.14159265</upper>
-					<lower>-3.14159265</lower>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -294,12 +362,12 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.25</damping>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
 				</dynamics>
 				<limit>
-					<upper>3.14159265</upper>
-					<lower>-3.14159265</lower>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -309,12 +377,12 @@
 			<axis>
 				<xyz>-1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.25</damping>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
 				</dynamics>
 				<limit>
-					<upper>3.14159265</upper>
-					<lower>-3.14159265</lower>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -324,12 +392,12 @@
 			<axis>
 				<xyz>1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.25</damping>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
 				</dynamics>
 				<limit>
-					<upper>3.14159265</upper>
-					<lower>-3.14159265</lower>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -339,12 +407,12 @@
 			<axis>
 				<xyz>-1 0 0</xyz>
 				<dynamics>
-					<friction>0.05</friction>
-					<damping>0.25</damping>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
 				</dynamics>
 				<limit>
-					<upper>3.14159265</upper>
-					<lower>-3.14159265</lower>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
 				</limit>
 			</axis>
 		</joint>
@@ -355,16 +423,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm2ToUpperArm2"> 
@@ -373,16 +449,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm3ToUpperArm3"> 
@@ -391,16 +475,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm4ToUpperArm4"> 
@@ -409,16 +501,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm5ToUpperArm5"> 
@@ -427,16 +527,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm6ToUpperArm6"> 
@@ -445,16 +553,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<!-- Effector -->
@@ -465,16 +581,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm2ToEffector"> 
@@ -484,16 +608,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm3ToEffector"> 
@@ -503,16 +635,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm4ToEffector"> 
@@ -522,16 +662,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm5ToEffector"> 
@@ -541,16 +689,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 		<joint type="ball" name="lowerArm6ToEffector"> 
@@ -560,16 +716,24 @@
 			<axis>
 				<xyz>0 1 0</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis>
 			<axis2>
 				<xyz>0 0 1</xyz>
 				<dynamics>
-					<friction>0.01</friction>
-					<damping>0.1</damping>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
 				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
 			</axis2>
 		</joint>
 	</model>

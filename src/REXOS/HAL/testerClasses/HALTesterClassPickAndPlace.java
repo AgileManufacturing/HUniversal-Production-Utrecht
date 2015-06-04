@@ -47,11 +47,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"		\"properties\":{" +
 			"			\"midPointX\" : 75.0," +
 			"			\"midPointY\" : -200.0," +
-			"			\"midPointZ\" : -35.3," +
+			"			\"midPointZ\" : -34.3," +
 			"			\"deltaRobotMeasures\" : {" +
-			"				\"baseRadius\" : 101.3," +
+			"				\"baseRadius\" : 100.0," +
 			"				\"hipLength\" : 100.0," +
-			"				\"effectorRadius\" : 46.19," +
+			"				\"effectorRadius\" : 42.5," +
+			"				\"effectorHeight\" : 9.50," +
 			"				\"ankleLength\" : 300.0," +
 			"				\"hipAnleMaxAngleDegrees\" : 22.0," +
 			"				\"boundaryBoxMinX\" : -200.0," +
@@ -295,7 +296,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"		\"properties\":{" +
 			"			\"modbusAddress\" : 8001," +
 			"			\"modbusDevicePin\" : 0," +
-			" 			\"gripperSize\" : 46.54," +
+			" 			\"gripperSize\" : 18.5," +
 			"			\"gripperEnabledMaxSeconds\" : 60," +
 			"			\"gripperEnabledWarningSeconds\" : 50," +
 			"			\"gripperEnabledCooldownSeconds\" : 180," +

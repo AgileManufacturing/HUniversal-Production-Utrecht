@@ -32,7 +32,7 @@ bool SixAxisCalculations::hasValidJointAngles(Vector3 upperArmLowerArmJoint, Vec
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "upperArmJointAxisYAngle: " << rexos_utilities::radiansToDegrees(upperArmJointAxisYAngle));
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "upperArmJointYAngle: " << rexos_utilities::radiansToDegrees(upperArmJointYAngle));
 	
-	if(std::abs(upperArmJointYAngle) > maxJointAngle) {
+	if(std::abs(upperArmJointYAngle) > stewartGoughMeasures.maxJointAngle) {
 		return false;
 	}
 	
@@ -45,7 +45,7 @@ bool SixAxisCalculations::hasValidJointAngles(Vector3 upperArmLowerArmJoint, Vec
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "effectorJointAxisYAngle: " << rexos_utilities::radiansToDegrees(effectorJointAxisYAngle));
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "effectorJointYAngle: " << rexos_utilities::radiansToDegrees(effectorJointYAngle));
 	
-	if(std::abs(effectorJointYAngle) > maxJointAngle) {
+	if(std::abs(effectorJointYAngle) > stewartGoughMeasures.maxJointAngle) {
 		return false;
 	}
 	
@@ -73,7 +73,7 @@ double SixAxisCalculations::getRemainingZAngle(double yAngle) {
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "yCoordinateInCircel: " << yCoordinateInCircel);
 	
 	double remainingZ = std::sqrt(1 - std::pow(yCoordinateInCircel, 2));
-	double remainingZAngle = std::asin(remainingZ) / rexos_utilities::degreesToRadians(90) * maxJointAngle;
+	double remainingZAngle = std::asin(remainingZ) / rexos_utilities::degreesToRadians(90) * stewartGoughMeasures.maxJointAngle;
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "remainingZ: " << remainingZ);
 	REXOS_DEBUG_STREAM_NAMED("sixAxisJointCheck", "remainingZAngle: " << rexos_utilities::radiansToDegrees(remainingZAngle));
 	return remainingZAngle;
@@ -143,11 +143,11 @@ Vector2 SixAxisCalculations::getIntersectionPoint(Vector2 pointA, double radiusA
 
 Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, 
 		JointPositionInGroup jointPosition, Matrix4 rotationMatrix) {
-	Vector3 offsetVector(0, -effectorRadius, 0);
+	Vector3 offsetVector(0, -stewartGoughMeasures.effectorRadius, stewartGoughMeasures.effectorHeight);
 	if(jointPosition == JointPositionInGroup::left) {
-		offsetVector.x -= effectorJointOffset;
+		offsetVector.x -= stewartGoughMeasures.effectorJointOffset;
 	} else {
-		offsetVector.x += effectorJointOffset;
+		offsetVector.x += stewartGoughMeasures.effectorJointOffset;
 	}
 	
 	Vector3 rotatedOffsetVector = rotationMatrix * offsetVector;
@@ -156,12 +156,12 @@ Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRo
 }
 
 Vector3 SixAxisCalculations::getMotorAxisPosition(JointPositionInGroup jointPosition) {
-	Vector3 offsetVector(0, -baseRadius, 0);
+	Vector3 offsetVector(0, -stewartGoughMeasures.baseRadius, 0);
 	if(jointPosition == JointPositionInGroup::left) {
-		offsetVector.x -= motorJointOffset;
+		offsetVector.x -= stewartGoughMeasures.motorJointOffset;
 	} else {
 		// right joint
-		offsetVector.x += motorJointOffset;
+		offsetVector.x += stewartGoughMeasures.motorJointOffset;
 	}
 	return offsetVector;
 }
@@ -200,11 +200,11 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	// Determine the x distance between the motorAxisPosition and the effectorJointPosition
 	double deltaX = motorAxisPosition.x - effectorJointPosition.x;
 	REXOS_DEBUG_STREAM_NAMED("sixAxisMotorAngle", "deltaX: " << deltaX);
-	double innerCircleRadius = std::sqrt(std::pow(lowerArmLength, 2) - std::pow(deltaX, 2));
+	double innerCircleRadius = std::sqrt(std::pow(stewartGoughMeasures.ankleLength, 2) - std::pow(deltaX, 2));
 	REXOS_DEBUG_STREAM_NAMED("sixAxisMotorAngle", "innerCircleRadius: " << innerCircleRadius);
 	
 	Vector2 upperArmLowerArmIntersectionPoint = getIntersectionPoint(
-			Vector2(motorAxisPosition.y, motorAxisPosition.z), upperArmLength, 
+			Vector2(motorAxisPosition.y, motorAxisPosition.z), stewartGoughMeasures.hipLength, 
 			Vector2(effectorJointPosition.y, effectorJointPosition.z), innerCircleRadius);
 	REXOS_DEBUG_STREAM_NAMED("sixAxisMotorAngle", "upperArmLowerArmIntersectionPoint: " << upperArmLowerArmIntersectionPoint);
 	

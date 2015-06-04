@@ -37,20 +37,26 @@
 
 namespace rexos_stewart_gough {
 	StewartGoughMeasures::StewartGoughMeasures(Json::Value properties) {
-		base = properties["baseRadius"].asDouble();
-		REXOS_INFO_STREAM("found baseRadius " << base);
+		baseRadius = properties["baseRadius"].asDouble();
+		REXOS_INFO_STREAM("found baseRadius " << baseRadius);
 		
-		hip = properties["hipLength"].asDouble();
-		REXOS_INFO_STREAM("found hipLength " << hip);
+		motorJointOffset = properties["motorJointOffset"].asDouble();
+		REXOS_INFO_STREAM("found motorJointOffset " << motorJointOffset);
 		
-		effector = properties["effectorRadius"].asDouble();
-		REXOS_INFO_STREAM("found effectorRadius " << effector);
+		hipLength = properties["hipLength"].asDouble();
+		REXOS_INFO_STREAM("found hipLength " << hipLength);
 		
-		ankle = properties["ankleLength"].asDouble();
-		REXOS_INFO_STREAM("found ankleLength " << ankle);
+		effectorRadius = properties["effectorRadius"].asDouble();
+		REXOS_INFO_STREAM("found effectorRadius " << effectorRadius);
 		
-		maxAngleHipAnkle = rexos_utilities::degreesToRadians(properties["hipAnleMaxAngleDegrees"].asDouble());
-		REXOS_INFO_STREAM("found maxAngleHipAnkle " << maxAngleHipAnkle);
+		effectorHeight = properties["effectorHeight"].asDouble();
+		REXOS_INFO_STREAM("found effectorHeight " << effectorHeight);
+		
+		ankleLength = properties["ankleLength"].asDouble();
+		REXOS_INFO_STREAM("found ankleLength " << ankleLength);
+		
+		maxJointAngle = rexos_utilities::degreesToRadians(properties["maxJointAngleDegrees"].asDouble());
+		REXOS_INFO_STREAM("found maxJointAngleDegrees " << maxJointAngle);
 		
 		motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(properties["motorFromZeroToTopAngleDegrees"].asDouble());
 		REXOS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);

@@ -53,13 +53,9 @@ namespace rexos_delta_robot{
 	 **/
 	class InverseKinematics : public InverseKinematicsModel{
 	private:
-		double motorAngle(const Vector3& destinationPoint, double motorLocation) const;
+		double motorAngle(Vector3 destinationPoint, double motorLocation) const;
 
 	public:
-		InverseKinematics(const double base, const double hip,
-			const double effector, const double ankle,
-			const double maxAngleHipAnkle);
-
 		InverseKinematics(rexos_delta_robot::DeltaRobotMeasures& deltaRobotMeasures);
 
 		virtual ~InverseKinematics(void);

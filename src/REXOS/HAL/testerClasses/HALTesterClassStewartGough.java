@@ -47,13 +47,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"		\"properties\":{" +
 			"			\"midPointX\" : 75.0," +
 			"			\"midPointY\" : -200.0," +
-			"			\"midPointZ\" : -35.3," +
+			"			\"midPointZ\" : -34.3," +
 			"			\"deltaRobotMeasures\" : {" +
-			"				\"baseRadius\" : 101.3," +
+			"				\"baseRadius\" : 100.0," +
+			"				\"motorJointOffset\" : 11.72," +
 			"				\"hipLength\" : 100.0," +
-			"				\"effectorRadius\" : 46.19," +
-			"				\"ankleLength\" : 250.0," +
-			"				\"hipAnleMaxAngleDegrees\" : 22.0," +
+			"				\"effectorRadius\" : 42.5," +
+			"				\"ankleLength\" : 300.0," +
+			"				\"maxJointAngle\" : 22.0," +
 			"				\"boundaryBoxMinX\" : -200.0," +
 			"				\"boundaryBoxMaxX\" : 200.0," +
 			"				\"boundaryBoxMinY\" : -200.0," +
