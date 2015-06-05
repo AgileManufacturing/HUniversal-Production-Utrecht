@@ -26,6 +26,7 @@ public class SCADAWebSocketServer extends WebSocketServer {
 	
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
+		theListener.onWebSocketOpen(conn);
 		connectionList.add(conn);
 	}
 
@@ -37,6 +38,7 @@ public class SCADAWebSocketServer extends WebSocketServer {
 	
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+		theListener.onWebSocketClose(conn);
 		connectionList.remove(conn);
 	}
 

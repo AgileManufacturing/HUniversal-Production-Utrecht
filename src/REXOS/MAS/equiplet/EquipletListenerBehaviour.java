@@ -49,8 +49,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(
 								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
 										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
-												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), 
-													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND))))), 
+												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), MessageTemplate.or(
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND),
+															MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND)))))), 
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
 		
@@ -83,6 +84,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
 					handleEquipletCommand(msg);
 				}
+				else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
+					handleListenerCommand(msg);
+				}
 				break;
 			default:
 				break;
@@ -109,6 +113,32 @@ public class EquipletListenerBehaviour extends Behaviour {
 					}else{
 						Logger.log("Error while extracting modules for reconfiguration");
 					}
+				}else{
+					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
+				}
+				
+			//Error handling
+			} catch (JSONException e) {
+				Logger.log("Invalid JSON.");
+			}
+		}		
+	}
+	
+	private void handleListenerCommand(ACLMessage msg) {
+		if(msg != null){
+			try{
+				JSONObject command = new JSONObject(msg.getContent());
+				
+				//Debug output
+				Logger.log("Content of ACL message: " + command.toString());
+				
+				//Identifying modules
+				String requestedEquipletCommand = command.getString("requested-listener-command").toString();
+				
+				// Program if statements that will appropriately handle messages sent to the equiplet agent.
+				if(requestedEquipletCommand.equals("AddDetailedListener")){
+					//equiplet.addDetailedListener(msg.getSender());
+					System.out.println("addDetailedListener "+ equiplet.toString());
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
