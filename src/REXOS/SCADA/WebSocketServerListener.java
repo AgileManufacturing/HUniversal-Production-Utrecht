@@ -1,11 +1,8 @@
 package SCADA;
 
-/*
- * 
- * @author: Pim te Slaa
- * 
- */
+import org.java_websocket.WebSocket;
 
 public interface WebSocketServerListener {
-	public void onWebSocketMessage(String message);
+	public void onWebSocketMessage(WebSocket conn, String message);
+	public void onWebSocketClose(WebSocket conn);
 }
