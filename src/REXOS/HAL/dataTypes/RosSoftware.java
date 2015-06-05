@@ -121,6 +121,10 @@ public class RosSoftware implements Serializable{
 	public static RosSoftware getRosSoftwareForModuleIdentifier(ModuleTypeIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForModuleType, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber);
 		
+		if(rows.length != 1) {
+			return null;
+		}
+		
 		int id = (Integer) rows[0].get("id");
 		int buildNumber = (Integer) rows[0].get("buildNumber");
 		String command = (String) rows[0].get("command");

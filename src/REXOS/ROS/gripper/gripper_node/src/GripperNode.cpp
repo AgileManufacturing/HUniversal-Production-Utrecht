@@ -30,18 +30,15 @@
 
 #include "gripper_node/GripperNode.h"
 #include "rexos_utilities/Utilities.h"
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <boost/bind.hpp>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <jsoncpp/json/reader.h>
 
+using namespace gripper_node;
 
-// @cond HIDE_NODE_NAME_FROM_DOXYGEN
-#define NODE_NAME "GripperNode"
-// @endcond
-
-GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-		rexos_module::ActorModule(equipletName, moduleIdentifier) {
+GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
+		rexos_module::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow) {
 	REXOS_INFO("GripperNode Constructor entering...");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
@@ -54,47 +51,45 @@ GripperNode::GripperNode(std::string equipletName, rexos_datatypes::ModuleIdenti
 	reader.parse(typeProperties, typeJsonNode);
 	
 	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
-	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+	for(uint i = 0; i < typeJsonNodeMemberNames.size(); i++) {
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 	
-	gripper = new rexos_gripper::Gripper(jsonNode);
+	gripper = new rexos_gripper::Gripper(equipletName, moduleIdentifier, isSimulated, jsonNode);
 }
 
 GripperNode::~GripperNode() {
 	REXOS_INFO_STREAM("~GripperNode" << std::endl);
 	delete gripper;
-	// Destructor of modbus will close the modbus connection!
-	delete modbus;
 }
 
-void GripperNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
+void GripperNode::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) {
 	REXOS_INFO_STREAM("handling hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
-	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
+	rexos_datatypes::HardwareStep equipletStep(equipletStepNode);
 	
-	rexos_module::SetInstructionResult result;
+	rexos_module::ExecuteHardwareStepResult result;
 	result.OID = goal->OID;
 	
 	Json::Value instructionData = equipletStep.getInstructionData();
 	if (instructionData.isMember("activate") == true){
 		gripper->activate();
 		ros::Duration(0.1).sleep();
-		setInstructionActionServer.setSucceeded(result);	
+		executeHardwareStepServer.setSucceeded(result);	
 		std::cout << "Gripper activated" << std::endl;
 		return;
 	} else if (instructionData.isMember("deactivate") == true){
 		gripper->deactivate();
 		ros::Duration(0.1).sleep();
-		setInstructionActionServer.setSucceeded(result);	
+		executeHardwareStepServer.setSucceeded(result);	
 		std::cout << "Gripper deactivated" << std::endl;
 		return;
 	}
 	
 	REXOS_ERROR_STREAM("Failed setting gripper" << std::endl);
-	setInstructionActionServer.setAborted(result);
+	executeHardwareStepServer.setAborted(result);
 }
 
 /**
@@ -189,21 +184,39 @@ void GripperNode::notifyCooledDown(){
  * Main that starts the gripper node and its statemachine.
  **/
 int main(int argc, char** argv) {
-	ros::init(argc, argv, NODE_NAME);
-	
 	if(argc < 5){
-		REXOS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: gripper_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
 	
-	REXOS_INFO("Creating GripperNode");
-
-	GripperNode gripperNode(equipletName, moduleIdentifier);
-
-	REXOS_INFO("Running StateEngine");
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
+	
+	GripperNode gripperNode(equipletName, moduleIdentifier, isSimulated, isShadow);
+	
 	ros::spin();
 	return 0;
 }

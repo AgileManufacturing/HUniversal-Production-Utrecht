@@ -5,10 +5,10 @@
 #include <cppconn/prepared_statement.h>
 
 namespace rexos_knowledge_database {
-	RosSoftware::RosSoftware(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+	RosSoftware::RosSoftware(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier) {
+		connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT id \
 		FROM RosSoftware \
 		WHERE id = ( \
@@ -16,85 +16,69 @@ namespace rexos_knowledge_database {
 			FROM ModuleType \
 			WHERE manufacturer = ? AND \
 				typeNumber = ? \
-		);");
+		);"));
 		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
 		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
-			delete result;
-			delete preparedStmt;
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
 		id = result->getInt("id");
-		
-		delete result;
-		delete preparedStmt;
 	}
 	RosSoftware::RosSoftware(std::string equipletName) {
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 		
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT id \
 		FROM RosSoftware \
 		WHERE id = ( \
 			SELECT rosSoftware \
 			FROM Equiplet \
 			WHERE name = ? \
-		);");
+		);"));
 		preparedStmt->setString(1, equipletName);
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
 		id = result->getInt("id");
-		
-		delete result;
-		delete preparedStmt;
 	}
 	
 	std::istream* RosSoftware::getRosFile() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT zipFile \
 		FROM RosSoftware \
-		WHERE id = ?;");
+		WHERE id = ?;"));
 		preparedStmt->setInt(1, id);
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::istream* rosFile = result->getBlob("zipFile");
-		
-		delete result;
-		delete preparedStmt;
-		return rosFile;
+		return result->getBlob("zipFile");
 	}
 	std::string RosSoftware::getCommand() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT command \
 		FROM RosSoftware \
-		WHERE id = ?;");
+		WHERE id = ?;"));
 		preparedStmt->setInt(1, id);
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		sql::ResultSet* result = preparedStmt->executeQuery();
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current rosSoftware (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		std::string command = result->getString("command");
-		
-		delete result;
-		delete preparedStmt;
-		return command;
+		return result->getString("command");
 	}
 	int RosSoftware::getId() {
 		return id;

@@ -76,6 +76,8 @@ class OplogMonitorThread extends Thread {
 	 * Thread used for executing callbacks.
 	 */
 	OplogCallbackThread callbackThread;
+
+	private boolean running;
 	
 	/**
 	 * Constructor of OplogMonitorThread.
@@ -135,6 +137,7 @@ class OplogMonitorThread extends Thread {
 	 */
 	@Override
 	public void run() {
+		running = true;
 		try{
 			do {
 				while (!Thread.interrupted() && tailedCursor.hasNext()) {
@@ -158,7 +161,9 @@ class OplogMonitorThread extends Thread {
 			 * MongoException.CursorNotFound indicates the cursor was killed while blocking on hasNext.
 			 * We purposely kill the cursor when the OplogMonitorThread is interrupted, thus expect this to happen.
 			 */
-			Logger.log(LogLevel.ERROR, "OplogMonitorThread ending due to exception: ", ex);
+			if(running == true) {
+				Logger.log(LogLevel.ERROR, "OplogMonitorThread ending due to exception: ", ex);
+			}
 		} finally {
 			try {
 				if (tailedCursor != null) {
@@ -171,5 +176,9 @@ class OplogMonitorThread extends Thread {
 			//
 		}
 		callbackThread.shutdown();
+	}
+	public void shutdown() {
+		running = false;
+		this.interrupt();
 	}
 }

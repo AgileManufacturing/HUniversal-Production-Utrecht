@@ -29,6 +29,8 @@
 	<run_depend>environment_communication_msgs</run_depend>
 	<build_depend>node_spawner_node</build_depend>
 	<run_depend>node_spawner_node</run_depend>
+	<build_depend>model_spawner_node</build_depend>
+	<run_depend>model_spawner_node</run_depend>
 	<build_depend>rexos_logger</build_depend>
 	<run_depend>rexos_logger</run_depend>
 	<build_depend>rexos_module</build_depend>

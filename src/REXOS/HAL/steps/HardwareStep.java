@@ -1,7 +1,7 @@
 package HAL.steps;
 
 import HAL.Module;
-import HAL.dataTypes.ModuleIdentifier;
+import HAL.ModuleIdentifier;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
+import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 
 /**
  * A HardwareStep is a step that is completely translated and can be processed by the ROS node corresponding to this HardwareStep.
@@ -38,43 +40,45 @@ public class HardwareStep implements Cloneable{
 
 	private ModuleIdentifier moduleIdentifier;
 	private CompositeStep compositeStep;
-	private HardwareStepStatus hardwareStepStatus;
+	private HardwareStepStatus status;
 
 	private JSONObject instructionData;
 	private OriginPlacement originPlacement;
 
 	
-	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JSONObject instructionData) {
-		javaIsGayConstructor(moduleIdentifier, compositeStep, hardwareStepStatus, instructionData, null);
+	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, 
+			HardwareStepStatus status, JSONObject instructionData) {
+		javaIsGayConstructor(moduleIdentifier, compositeStep, status, instructionData, null);
 	}
-	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JSONObject instructionData, OriginPlacement originPlacement) {
-		javaIsGayConstructor(moduleIdentifier, compositeStep, hardwareStepStatus, instructionData, originPlacement);
+	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, 
+			JSONObject instructionData, OriginPlacement originPlacement) {
+		javaIsGayConstructor(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement);
+	}
+	public HardwareStep(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, 
+			HardwareStepStatus status, JSONObject instructionData, OriginPlacement originPlacement) {
+		javaIsGayConstructor(moduleIdentifier, compositeStep, status, instructionData, originPlacement);
 	}
 	
-	private void javaIsGayConstructor(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus hardwareStepStatus, JSONObject instructionData, OriginPlacement originPlacement) {
+	private void javaIsGayConstructor(ModuleIdentifier moduleIdentifier, CompositeStep compositeStep, HardwareStepStatus status, JSONObject instructionData, OriginPlacement originPlacement) {
 		this.moduleIdentifier = moduleIdentifier;
 		this.compositeStep = compositeStep;
 		this.instructionData = instructionData;
-		this.hardwareStepStatus = hardwareStepStatus;
+		this.status = status;
 		this.originPlacement = originPlacement;
 	}
 	
-	/*public HardwareStep(CompositeStep compositeStep, JSONObject rosCommand, ModuleIdentifier moduleIdentifier) {
-		this.moduleIdentifier = moduleIdentifier;
-		//this.rosCommand = rosCommand;
-		this.compositeStep = compositeStep;
-	}*/
-	
-	
-
 	public ModuleIdentifier getModuleIdentifier() {
 		return this.moduleIdentifier;
 	}
 	public CompositeStep getCompositeStep() {
 		return this.compositeStep;
 	}
-	public HardwareStepStatus getHardwareStepStatus() {
-		return this.hardwareStepStatus;
+	public HardwareStepStatus getStatus() {
+		return this.status;
+	}
+	public void setStatus(HardwareStepStatus status) {
+		this.status = status;
+		
 	}
 	public JSONObject getInstructionData() {
 		return this.instructionData;
@@ -88,7 +92,7 @@ public class HardwareStep implements Cloneable{
 		JSONObject returnValue = new JSONObject();
 		try {
 			returnValue.put(MODULE_IDENTIFIER, moduleIdentifier.serialize());
-			returnValue.put(STATUS, hardwareStepStatus.toString());
+			returnValue.put(STATUS, status.toString());
 			returnValue.put(INSTRUCTION_DATA, instructionData);
 			if(originPlacement != null) {
 				returnValue.put(ORIGIN_PLACEMENT, originPlacement.toJSON());
@@ -106,7 +110,7 @@ public class HardwareStep implements Cloneable{
 	}
 	public HardwareStep clone() {
 		try {
-			return new HardwareStep(moduleIdentifier, compositeStep, hardwareStepStatus, new JSONObject(instructionData.toString()), originPlacement);
+			return new HardwareStep(moduleIdentifier, compositeStep, status, new JSONObject(instructionData.toString()), originPlacement);
 		} catch (JSONException ex) {
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occurred which is considered to be impossible", ex);
 			return null;

@@ -40,27 +40,16 @@
 #include <rexos_node_spawner/NodeSpawner.h>
 
 namespace node_spawner_node {
-
-/**
- * The equipletNode, will manage all modules and keep track of their states
- **/
-class NodeSpawnerNode : public rexos_node_spawner::NodeSpawner
-{
+class NodeSpawnerNode : public rexos_node_spawner::NodeSpawner {
 public:
-	NodeSpawnerNode(std::string equipletName, bool spawnEquipletNode);
-	virtual ~NodeSpawnerNode();
-
+	NodeSpawnerNode(std::string equipletName, bool spawnEquipletNode, bool isSimulated, bool isShadow);
+	
 private:
 	bool spawnNode(spawnNode::Request &request, spawnNode::Response &response);
-	std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
-	/**
-	 * @var int equipletId
-	 * The id of the equiplet
-	 **/
-	std::string equipletName;
-
-	ros::NodeHandle nh;
 	
+	std::string equipletName;
+	
+	ros::NodeHandle nh;
 	ros::ServiceServer spawnNodeServer;
 };
 

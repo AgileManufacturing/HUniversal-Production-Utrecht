@@ -1,5 +1,7 @@
 package HAL;
 
+import generic.Mast;
+
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -12,15 +14,15 @@ import HAL.factories.ModuleFactory;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.libraries.knowledgedb_client.Row;
-import HAL.listeners.BlackboardModuleListener;
 import HAL.listeners.ModuleListener;
+
 /**
  * Abstract representation of a module in the HAL.
  * @author Bas Voskuijlen
  * @author Lars Veenendaal
  *
  */
-public abstract class Module implements BlackboardModuleListener { 
+public abstract class Module implements ModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
@@ -193,7 +195,7 @@ public abstract class Module implements BlackboardModuleListener {
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
 		
-		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardModuleListener(this);
+		moduleFactory.getHAL().getRosInterface().addModuleListener(this);
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -266,16 +268,16 @@ public abstract class Module implements BlackboardModuleListener {
 	 * Do not call this method!
 	 */
 	@Override
-	public void onModuleStateChanged(String state){
-		moduleListener.onModuleStateChanged(state, this);
+	public void onModuleStateChanged(Module module, Mast.State state){
+		moduleListener.onModuleStateChanged(module, state);
 	}
 	/**
 	 * This method will forward the changed MAST module mode to the {@link ModuleListener}
 	 * Do not call this method!
 	 */
 	@Override
-	public void onModuleModeChanged(String mode){
-		moduleListener.onModuleModeChanged(mode, this);
+	public void onModuleModeChanged(Module module, Mast.Mode mode){
+		moduleListener.onModuleModeChanged(module, mode);
 	}
 
 	public int getMountPointX(){

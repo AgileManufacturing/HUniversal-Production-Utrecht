@@ -36,7 +36,7 @@
 #include <ros/ros.h>
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
-#include "rexos_logger/rexos_logger.h"
+#include <rexos_logger/rexos_logger.h>
 #include <vectors/Vectors.h>
 
 namespace keyboard_control_node {
@@ -44,7 +44,7 @@ namespace keyboard_control_node {
 	class KeyBoardControlNode 
 	{
 	public:
-		KeyBoardControlNode(std::string blackboardIp, std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		KeyBoardControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isShadow);
 		~KeyBoardControlNode();
 		void run();
 		

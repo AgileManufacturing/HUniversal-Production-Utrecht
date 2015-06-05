@@ -2,17 +2,21 @@
 #include <string>
 
 namespace rexos_module {
-	Module::Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier) :
+	Module::Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, bool isShadow) :
 		AbstractModule(equipletName, identifier),
 		rexos_statemachine::ModuleStateMachine(equipletName, identifier, false),
-		transitionActionClient(AbstractModule::nodeHandle, advertisementPath + "transition") 
+		transitionActionClient(AbstractModule::nodeHandle, advertisementPath + "transition"),
+		isSimulated(isSimulated),
+		isShadow(isShadow)
 	{
 		init();
 	}
-	Module::Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ActorModule* actorModule) :
+	Module::Module(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, bool isShadow, ActorModule* actorModule) :
 		AbstractModule(equipletName, identifier),
 		rexos_statemachine::ModuleStateMachine(equipletName, identifier, true),
-		transitionActionClient(AbstractModule::nodeHandle, advertisementPath + "transition") 
+		transitionActionClient(AbstractModule::nodeHandle, advertisementPath + "transition"),
+		isSimulated(isSimulated),
+		isShadow(isShadow)
 	{
 		init();
 	}

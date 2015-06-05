@@ -10,4 +10,11 @@ namespace rexos_module {
 		advertisementPath = equipletName + "/" + identifier.getManufacturer() + "/" + 
 				identifier.getTypeNumber() + "/" + identifier.getSerialNumber() + "/";
 	}
+	std::string AbstractModule::getEquipletName() {
+		return equipletName;
+	}
+	rexos_datatypes::ModuleIdentifier AbstractModule::getModuleIdentifier() {
+		return identifier;
+	}
+
 }

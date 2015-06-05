@@ -33,96 +33,95 @@
 #include <stdexcept>
 
 namespace rexos_utilities{
-    /**
-     * Get the current time in milliseconds.
-     *
-     * @return time in milliseconds.
-     **/
-    long timeNow(void){
-        boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
-        boost::posix_time::time_duration duration(time.time_of_day());
-        return duration.total_milliseconds();
-    }
-    
-    /**
-     * Sleep the current thread for a specific time. Then resume the thread.
-     *
-     * @param milliseconds time in milliseconds.
-     **/
-    void sleep(long milliseconds){
-        boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
-    }
+	/**
+	 * Get the current time in milliseconds.
+	 *
+	 * @return time in milliseconds.
+	 **/
+	long timeNow(void){
+		boost::posix_time::ptime time = boost::posix_time::microsec_clock::local_time();
+		boost::posix_time::time_duration duration(time.time_of_day());
+		return duration.total_milliseconds();
+	}
+	
+	/**
+	 * Sleep the current thread for a specific time. Then resume the thread.
+	 *
+	 * @param milliseconds time in milliseconds.
+	 **/
+	void sleep(long milliseconds){
+		boost::this_thread::sleep(boost::posix_time::milliseconds(milliseconds));
+	}
 
-    /**
-     * Converts radians to degrees.
-     *
-     * @param rad Amount of radians.
-     *
-     * @return An Amount of degrees.
-     **/
-    double radiansToDegrees(double radians){
+	/**
+	 * Converts radians to degrees.
+	 *
+	 * @param rad Amount of radians.
+	 *
+	 * @return An Amount of degrees.
+	 **/
+	double radiansToDegrees(double radians){
 		return (radians / M_PI) * 180;
 	}
 
-    /**
-     * Converts degrees to radians.
-     *
-     * @param deg Amount of degrees.
-     *
-     * @return An amount of radians.
-     **/
+	/**
+	 * Converts degrees to radians.
+	 *
+	 * @param deg Amount of degrees.
+	 *
+	 * @return An amount of radians.
+	 **/
 	double degreesToRadians(double degrees){
 		return (degrees / 180) * M_PI;
 	}
 
-    /**
-     * Converts a string to integer
-     * @param i Reference to integer to be assigned
-     * @param s String that contains the value
-     * @param base A value between 2 and 36 inclusive, which determines the base of the value in the string. Special value is 0, which takes the value as base 10 unless a prefix of 0x (hexadecimal) or 0 (octal).
-     *
-     * @return error code
-     *  - 0 is normal
-     *  - 1 is overflow
-     *  - 2 is underflow
-     *  - 3 is inconvertible
-     **/
-    int stringToInt(const std::string s, int base) {
-        char *end;
-        long  l;
-        errno = 0;
-        l = strtol(s.c_str(), &end, base);
-        if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
-            throw std::runtime_error("rexos_utilities::stringToInt: overflow");
-        } else if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
-            throw std::runtime_error("rexos_utilities::stringToInt: underflow");
-        } else if (s[0] == '\0' || *end != '\0') {
-            throw std::runtime_error("rexos_utilities::stringToInt: inconvertible");
-        }
-        return l;
-    }
+	/**
+	 * Converts a string to integer
+	 * @param i Reference to integer to be assigned
+	 * @param s String that contains the value
+	 * @param base A value between 2 and 36 inclusive, which determines the base of the value in the string. Special value is 0, which takes the value as base 10 unless a prefix of 0x (hexadecimal) or 0 (octal).
+	 *
+	 * @return error code
+	 *  - 0 is normal
+	 *  - 1 is overflow
+	 *  - 2 is underflow
+	 *  - 3 is inconvertible
+	 **/
+	int stringToInt(const std::string s, int base) {
+		char *end;
+		long  l;
+		errno = 0;
+		l = strtol(s.c_str(), &end, base);
+		if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
+			throw std::runtime_error("rexos_utilities::stringToInt: overflow");
+		} else if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
+			throw std::runtime_error("rexos_utilities::stringToInt: underflow");
+		} else if (s[0] == '\0' || *end != '\0') {
+			throw std::runtime_error("rexos_utilities::stringToInt: inconvertible");
+		}
+		return l;
+	}
 
-    /**
-     * Converts a string to a double.
-     * @param s the string to be converted
-     * 
-     * @return The converted double. Returns a 0 if the given string is not convertable.
-     **/
-    double stringToDouble(const std::string& s){
-        std::istringstream i(s);
-        double x = 0;
-        if (!(i >> x))
-            
-        return x;
-    }
+	/**
+	 * Converts a string to a double.
+	 * @param s the string to be converted
+	 * 
+	 * @return The converted double. Returns a 0 if the given string is not convertable.
+	 **/
+	double stringToDouble(const std::string& s){
+		std::istringstream i(s);
+		double x = 0;
+		if (!(i >> x)) {
+			NAN;
+		}
+		return x;
+	}
 
-    std::string doubleToString(double x){
-        std::ostringstream o;
-
-        if (!(o << x)) {
-            return "";
-        }
-
-        return o.str();
-    }
+	std::string doubleToString(double x){
+		std::ostringstream o;
+		if (!(o << x)) {
+			return "";
+		}
+		return o.str();
+	}
 }

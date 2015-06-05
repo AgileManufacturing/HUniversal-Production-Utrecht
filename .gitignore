@@ -24,17 +24,11 @@
 # Ignore the generated folders by the build system
 
 bin/
-dist/
-libraries/mongo-cxx-driver/.sconf_temp/
-libraries/mongo-cxx-driver/.sconsign.dblite
-libraries/mongo-cxx-driver/config.log
-libraries/mongo-cxx-driver/.sconsign.dblite
-libraries/mongo-cxx-driver/config.log
-libraries/blackboardJavaClient/*.jar
 build/
 devel/
-jars/
-
+generatedOutput/
+_simulation/
+simulation/
 # Ignore project file, cmake text file and editor temporary files
 
 .rexos-export

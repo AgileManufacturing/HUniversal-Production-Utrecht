@@ -56,7 +56,7 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	qrCodeDetector.detectQRCodes(frame, qrCodes);
 	
 	REXOS_DEBUG_STREAM("QrCodes detected=" << qrCodes.size());
-	for(int i = 0; i < qrCodes.size(); i++){
+	for(uint i = 0; i < qrCodes.size(); i++){
 		vision_node::QrCode qrCode;
 		qrCode.value = qrCodes[i].name;
 		
@@ -79,13 +79,13 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 		
 		message.qrCodes.push_back(qrCode);
 	
-		REXOS_INFO_STREAM("QR-code\tpointA = " << pointA << " pointB = " << pointB << " pointC = " << pointC << "Value = " << qrCode.value);
+		REXOS_DEBUG_STREAM("QR-code\tpointA = " << pointA << " pointB = " << pointB << " pointC = " << pointC << "Value = " << qrCode.value);
 	}
 	if(debugFrame != NULL && debugImagePublisher.getNumSubscribers() != 0){
 		// we are changing the image, so we need a copy
 		cv::Mat debugImage = cv::Mat(*debugFrame);
 		
-		for(int i = 0; i < qrCodes.size(); i++){
+		for(uint i = 0; i < qrCodes.size(); i++){
 			qrCodes[i].draw(debugImage);
 		}
 		

@@ -38,6 +38,7 @@
 
 #include <vectors/Vectors.h>
 #include <rexos_motor/MotorRotation.h>
+#include <rexos_delta_robot/DeltaRobotMeasures.h>
 
 namespace rexos_delta_robot{
 	/**
@@ -51,51 +52,21 @@ namespace rexos_delta_robot{
 	class InverseKinematicsModel{
 	protected:
 		/**
-		 * @var double base
-		 * Radius of the base in millimeters.
+		 * @var DeltaRobotMeasures deltaRobotMeasures
+		 * Contains all the measurements of the delta robot
 		 **/
-		const double base;
-
-		/**
-		 * @var double hip
-		 * Length of the hip in millimeters.
-		 **/
-		const double hip;
-
-		/**
-		 * @var double effector
-		 * Radius of the effector in millimeters.
-		 **/
-		const double effector;
-
-		/**
-		 * @var double ankle
-		 * Length of the ankle in millimeters.
-		 **/
-		const double ankle;
+		DeltaRobotMeasures deltaRobotMeasures;
 
 		/**
 		 * InverseKinematicsModel constructor. It is protected so that it can only be constructed by the InverseKinematics class.
 		 * 
-		 * @param base Radius of the base in millimeters.
-		 * @param hip Length of the hip in millimeters.
-		 * @param effector Radius of the effector in millimeters.
-		 * @param ankle Length of the ankle in millimeters.
-		 * @param maxAngleHipAnkle Maximum angle between hip and ankle when moving the ankle sideways in radians.
+		 * @param deltaRobotMeasures The measures.
 		 **/
-		InverseKinematicsModel(const double base, const double hip,
-				const double effector, const double ankle,
-				const double maxAngleHipAnkle) :
-				base(base), hip(hip), effector(effector), ankle(ankle), maxAngleHipAnkle(maxAngleHipAnkle){}
+		InverseKinematicsModel(const DeltaRobotMeasures deltaRobotMeasures) :
+				deltaRobotMeasures(deltaRobotMeasures){}
 
 	public:
 		virtual ~InverseKinematicsModel(void){}
-
-		/**
-		 * @var double maxAngleHipAnkle
-		 * Maximum angle between hip and ankle on x-z plane in radians.
-		 **/
-		const double maxAngleHipAnkle;
 
 		/**
 		 * Translates a point to the motor rotations.
@@ -103,7 +74,6 @@ namespace rexos_delta_robot{
 		 * @param destinationPoint The destination point.
 		 * @param rotations Array of MotorRotation objects, will be adjusted by the function to the correct rotations per motor.
 		 **/
-		virtual void destinationPointToMotorRotations(const Vector3& destinationPoint,
-				rexos_motor::MotorRotation* (&rotations)[3]) const = 0;
+		virtual std::vector<rexos_motor::MotorRotation> destinationPointToMotorRotations(const Vector3& destinationPoint) const = 0;
 	};
 }

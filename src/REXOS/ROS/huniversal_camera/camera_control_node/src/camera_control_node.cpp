@@ -48,8 +48,10 @@
 #include <string>
 #include <iostream>
 
-CameraControlNode::CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-		rexos_module::Module::Module(equipletName, moduleIdentifier), 
+using namespace camera_control_node;
+
+CameraControlNode::CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
+		rexos_module::Module::Module(equipletName, moduleIdentifier, isSimulated, isShadow), 
 		increaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::INCREASE_EXPOSURE)),
 		decreaseExposureClient(			nodeHandle.serviceClient<std_srvs::Empty>(								vision_node_services::DECREASE_EXPOSURE)),
 		autoWhiteBalanceClient(			nodeHandle.serviceClient<vision_node::autoWhiteBalance>(				vision_node_services::AUTO_WHITE_BALANCE)),
@@ -98,8 +100,8 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 
 	camera_calibration_node::calibrateLens calibrateLensServiceCall;
 	calibrateLensServiceCall.request.frameCount = 20;
-	calibrateLensServiceCall.request.boardWidth = 9;
-	calibrateLensServiceCall.request.boardHeight = 6;
+	calibrateLensServiceCall.request.boardWidth = 8;
+	calibrateLensServiceCall.request.boardHeight = 5;
 	calibrateLensClient.call(calibrateLensServiceCall);
 	
 	fishEyeServiceCall.request.enable = true;
@@ -117,7 +119,7 @@ bool CameraControlNode::mannuallyCalibrateLens(){
 	
 	// copy all the distCoeffs from the service
 	Json::Value distCoeffs;
-	for(int i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
+	for(uint i = 0; i < getCalibrationMatricesServiceCall.response.distCoeffs.size(); i++) {
 		distCoeffs.append(getCalibrationMatricesServiceCall.response.distCoeffs.at(i));
 	}
 	// copy all the distCoeffs from the service
@@ -166,16 +168,14 @@ bool CameraControlNode::transitionSetup(){
 	
 	try{
 		std::string properties = this->getCalibrationDataForModuleAndChilds();
-		REXOS_INFO(properties.c_str());
+		REXOS_INFO_STREAM(properties.c_str());
 		Json::Value jsonNode;
 		Json::Reader reader;
 		reader.parse(properties, jsonNode);
-		ROS_INFO("Trying transition setup a3");
 		
 		if(jsonNode.isMember("distCoeffs") == false || jsonNode.isMember("cameraMatrix") == false) {
-			if(mannuallyCalibrateLens() == false){
-				return false;
-			}
+			if(mannuallyCalibrateLens() == false) return false;
+			else return true;
 		}
 		
 		Json::Value cameraMatrix = jsonNode["cameraMatrix"];
@@ -189,13 +189,14 @@ bool CameraControlNode::transitionSetup(){
 		vision_node::setCorrectionMatrices serviceCall;
 		
 		// copy all the distCoeffs to the service
-		for(int i = 0; i < distCoeffs.size(); i++) {
+		for(uint i = 0; i < distCoeffs.size(); i++) {
 			serviceCall.request.distCoeffs.push_back(distCoeffs[i].asDouble());
 		}
 		// copy all the camera matrix to the service
 		for(int i = 0; i < 9; i++) {
 			serviceCall.request.cameraMatrix.values[i] = cameraMatrix[i].asDouble();
 		}
+		client.waitForExistence();
 		client.call(serviceCall);
 
 		vision_node::enableComponent fishEyeServiceCall;
@@ -232,24 +233,51 @@ bool CameraControlNode::transitionStop(){
 }
 
 int main(int argc, char* argv[]) {
-	ros::init(argc, argv, "camera_control_node");
-	
 	if(argc < 5){
-		REXOS_ERROR("Usage: gripper_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
+	int argumentOffset = 1;
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
 	
-	CameraControlNode node(equipletName, moduleIdentifier);
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+			argumentOffset++;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+			argumentOffset++;
+		}
+	}
 	
-	REXOS_INFO_STREAM("Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)."
-	        << std::endl << "A\tEnable auto white balance" << std::endl << "Z\tDisable auto white balance" << std::endl
-	        << "S\tIncrease exposure" << std::endl << "X\tDecrease exposure" << std::endl << "Q\tQuit program"
-	        << std::endl << "Enter a key and press the \"Enter\" button" << std::endl);
-
-	node.run();
+	std::string equipletName = std::string(argv[argumentOffset + 0]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argumentOffset + 1], argv[argumentOffset + 2], argv[argumentOffset + 3]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
+	
+	CameraControlNode node(equipletName, moduleIdentifier, isSimulated, isShadow);
+	
+	REXOS_INFO_STREAM("Welcome to the camera node controller. Using this tool you can adjust camera settings on the fly :)." << std::endl << 
+			"A\tEnable auto white balance" << std::endl << 
+			"Z\tDisable auto white balance" << std::endl << 
+			"S\tIncrease exposure" << std::endl << 
+			"X\tDecrease exposure" << std::endl << 
+			"Q\tQuit program" << std::endl << 
+			"Enter a key and press the \"Enter\" button" << std::endl);
+	
+	ros::spin();
 	return 0;
 }
 

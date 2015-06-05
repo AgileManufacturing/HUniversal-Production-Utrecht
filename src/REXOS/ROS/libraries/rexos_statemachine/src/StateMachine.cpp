@@ -40,9 +40,9 @@ using namespace rexos_statemachine;
  * @param moduleID the unique identifier for the module that implements the statemachine
  **/
 StateMachine::StateMachine(std::string nodeName,std::vector<rexos_statemachine::Mode> modes):
+		modes(modes),
 		currentState(STATE_OFFLINE),
 		currentMode(MODE_SERVICE),
-		modes(modes),
 		changeStateActionServer(nodeHandle, nodeName + "/change_state", boost::bind(&StateMachine::onChangeStateAction, this, _1), false),
 		changeModeActionServer(nodeHandle, nodeName + "/change_mode", boost::bind(&StateMachine::onChangeModeAction, this, _1), false),
 		changeStateActionClient(nodeHandle, nodeName + "/change_state"),
@@ -120,7 +120,7 @@ void StateMachine::changeState(State desiredState) {
  * @param changeModeActionClient = NULL when not given. By this param it is possilbe to waitForResult and getState when finished(SUCCEEDED/ABORTED)
  **/
 void StateMachine::changeMode(Mode desiredMode) {
-	REXOS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::state_txt[desiredMode]);
+	REXOS_INFO("_changeMode called with desiredMode %s",rexos_statemachine::mode_txt[desiredMode]);
 	ChangeModeGoal goal;
 	goal.desiredMode = desiredMode;
 	changeModeActionClient.sendGoal(goal);
@@ -206,7 +206,7 @@ bool StateMachine::transitionToMode(Mode newMode) {
 
 bool StateMachine::statePossibleInMode(State state, Mode mode) {
 	std::vector<State> States = modePossibleStates[mode];
-	for (int i = 0; i < States.size(); i++) {
+	for (uint i = 0; i < States.size(); i++) {
 		if (States[i] == state)
 			return true;
 	}

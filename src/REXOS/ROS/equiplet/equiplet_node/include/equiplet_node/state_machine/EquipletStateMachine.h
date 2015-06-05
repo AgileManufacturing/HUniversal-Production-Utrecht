@@ -47,14 +47,12 @@
 #include <rexos_datatypes/TransitionPhase.h>
 #include <rexos_logger/rexos_logger.h>
 
-namespace equiplet_node{
+namespace equiplet_node {
 
-class EquipletStateMachine : 
-	public rexos_statemachine::StateMachine, 
-	ModuleRegistryListener {
+class EquipletStateMachine : public rexos_statemachine::StateMachine, public ModuleRegistryListener {
 
 public:
-	EquipletStateMachine(std::string name);
+	EquipletStateMachine(std::string name, bool isSimulated);
 
 	virtual ~EquipletStateMachine();
 
@@ -70,6 +68,8 @@ protected:
 			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
 			std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase);
 	void spawnNode(rexos_module::ModuleProxy* moduleProxy);
+	void spawnModel(rexos_module::ModuleProxy* moduleProxy);
+	void removeModel(rexos_module::ModuleProxy* moduleProxy);
 private:
 	bool allModulesInDesiredState(rexos_statemachine::State desiredState);
 
@@ -83,7 +83,10 @@ private:
 	virtual bool transitionStop();
 
 protected:
-	equiplet_node::ModuleRegistry moduleRegistry; 
+	equiplet_node::ModuleRegistry moduleRegistry;
+	ros::ServiceClient spawnNodeClient;
+	ros::ServiceClient spawnModelClient;
+	ros::ServiceClient removeModelClient;
 
 private:
 	rexos_statemachine::State desiredState;

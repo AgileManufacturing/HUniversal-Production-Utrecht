@@ -53,5 +53,6 @@ namespace rexos_stewart_gough {
 		os << " rotationX: " << obj.rotationX;
 		os << " rotationY: " << obj.rotationY;
 		os << " rotationZ: " << obj.rotationZ;
+		return os;
 	}
 }

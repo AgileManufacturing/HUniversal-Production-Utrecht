@@ -31,27 +31,40 @@
 #include <node_spawner_node/NodeSpawnerNode.h>
 
 int main(int argc, char **argv) {
+	if (argc < 2) {
+		REXOS_ERROR("Usage: node_spawner_node (--isSimulated | --isShadow) (--spawnEquipletNode) equipletName");
+		return -1;
+	}
+	
 	bool spawnEquipletNode = false;
+	bool isSimulated = false;
+	bool isShadow = false;
 	
 	for (int i = 0; i < argc; i++) {
 		std::string arg = argv[i];
 		if (arg == "--spawnEquipletNode") {
 			spawnEquipletNode = true;
+		} else if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
 		}
 	}
-	if(argc < 2) {
-		REXOS_ERROR("Usage: node_spawner_node (--spawnEquipletNode) equipletName");
-		return -2;
-	}
 	
-
-	// Set the name of the Equiplet
-	std::string equipletName = argv[argc - 1];
-
-	ros::init(argc, argv, "nodeSpawner");
-	node_spawner_node::NodeSpawnerNode nodeSpawnerNode(equipletName, spawnEquipletNode);
+	std::string equipletName = std::string(argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_nodeSpawner";
+	ros::init(argc, argv, nodeName);
+	
+	node_spawner_node::NodeSpawnerNode nodeSpawnerNode(equipletName, spawnEquipletNode, isSimulated, isShadow);
 	
 	ros::spin();
-	
 	return 0;
 }

@@ -57,7 +57,7 @@ namespace hardcoded_mover_node {
 	public:
 		HardcodedMoverNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, std::vector<Movement> movements, bool loop = false);
 		~HardcodedMoverNode();
-		virtual void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed);
+		virtual void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep);
 		void startNextMovement(string id);
 		
 	private:

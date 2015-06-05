@@ -32,6 +32,7 @@
 
 #pragma once
 
+#include <rexos_motor/MotorProperties.h>
 #include <rexos_motor/MotorRotation.h>
 
 namespace rexos_motor{
@@ -40,11 +41,31 @@ namespace rexos_motor{
 	 **/
 	class MotorInterface{
 	protected:
-		MotorInterface(void){}
-			 
+		MotorInterface(MotorProperties properties);
+		virtual ~MotorInterface(void);
+		
+		MotorProperties properties;
+		/**
+		 * The current angle the motor
+		**/
+		double currentAngle;
+		/**
+		 * The angle the motor should have after move has completed
+		**/
+		double targetAngle;
+		/**
+		 * The deviation between the motors 0 degrees and the horizontal 0 degrees.
+		 **/
+		double deviation;
+		
+		bool powerStatus;
+		/**
+		 * @var bool anglesLimited
+		 * If hardware limitations are set on the angles the motor can travel.
+		 **/
+		bool anglesLimited;
+		
 	public:
-		virtual ~MotorInterface(void){}
-
 		/**
 		 * Turns on the motors.
 		 **/
@@ -54,48 +75,90 @@ namespace rexos_motor{
 		 * Shuts down the motors.
 		 **/
 		virtual void powerOff(void) = 0;
-
+		
+		/**
+		 * Start the motors.
+		 **/
+		virtual void startMovement(void) = 0;
 		/**
 		 * Stops the motors.
 		 **/
 		virtual void stop(void) = 0;
 
+		
 		/**
-		 * Rotate the motors.
-		 * 
-		 * @param motorRotation Defines the angles, speed, acceleration and deceleration of the motors.
-		 **/
-		virtual void moveTo(const rexos_motor::MotorRotation& motorRotation) = 0;
-
+		 * Write the rotation to be performed to the motor, but do NOT start the rotation
+		 */
+		virtual void writeRotationData(const rexos_motor::MotorRotation& motorRotation, bool useDeviation = true) = 0;
+		
 		/**
 		 * Wait till the motor has finished any rotations.
 		 **/
-		void waitTillReady(void);
+		virtual void waitTillReady(void) = 0;
+		
+		/**
+		 * Configures the motor to use relative positioning
+		 */
+		virtual void setRelativeMode(void) = 0;
+		
+		/**
+		 * Configures the motor to use absolute positioning
+		 */
+		virtual void setAbsoluteMode(void) = 0;
+		
+		/**
+		 * Sets the deviation in the motor class, and in hardware (if supported)
+		 */
+		virtual void setDeviation(double deviationAngle) = 0;
+		
+		/**
+		 * Enables the limitations in the motor class, and in hardware (if supported)
+		 */
+		virtual void enableAngleLimitations() = 0;
+		
+		/**
+		 * Disables the limitations in the motor class, and in hardware (if supported)
+		 */
+		virtual void disableAngleLimitations() = 0;
+		
+		/**
+		 * Gets the minimum angle, in radians, the motor can travel on the theoretical plane.
+		 **/
+		inline double getMinAngle(void) const {
+			return properties.motorMinAngle;
+		}
 
 		/**
-		 * Get the minimal angle the motors can move to.
-		 * 
-		 * @return angle in radians.
+		 * Gets the maximum angle, in radians, the motor can travel on the theoretical plane.
 		 **/
-		virtual double getMinAngle(void) const = 0;
+		inline double getMaxAngle(void) const {
+			return properties.motorMaxAngle;
+		}
 
 		/**
-		 * Get the maximum angle the motors can move to.
-		 * 
-		 * @return angle in radians.
+		 * Gets the current angle of the motor in radians.
 		 **/
-		virtual double getMaxAngle(void) const = 0;
-
+		inline double getCurrentAngle(void) const {
+			return currentAngle;
+		}
+		
+		inline bool isPoweredOn(void) {
+			return powerStatus;
+		}
+		
+		inline bool isValidAngle(double angle) {
+			return (angle >= getMinAngle() && angle <= getMaxAngle());
+		}
+		
 		/**
-		 * Sets the current angle.
+		 * Store the angle that was given for a movement after the movement is done to the local variable currentAngle.
 		 **/
-		virtual void setCurrentAngle(double angle) = 0;
-
+		inline void updateAngle(void) {
+			currentAngle = targetAngle;
+		}
 		/**
-		 * Determine if the motor driver(s) are powered on.
-		 * 
-		 * @return true of powered on, false otherwise.
+		 * Rotate the motors.
 		 **/
-		virtual bool isPoweredOn(void) = 0;
+		void moveTo(const rexos_motor::MotorRotation& motorRotation);
 	};
 }

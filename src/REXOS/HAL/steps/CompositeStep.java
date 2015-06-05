@@ -72,4 +72,7 @@ public class CompositeStep {
 			return null;
 		}
 	}
+	public String toString() {
+		return toJSON().toString();
+	}
 }

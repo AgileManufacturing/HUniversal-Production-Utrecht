@@ -45,11 +45,13 @@
  **/
 class EnvironmentCache{
 public:
-	EnvironmentCache();
+	EnvironmentCache(std::string equipletName);
 	bool getData(environment_cache::getData::Request& req, environment_cache::getData::Response& res);
 	bool setData(environment_cache::setData::Request& req, environment_cache::setData::Response& res);
 	bool removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res);
 	
+protected:
+	std::string equipletName;
 	/**
 	 * @var The enviroment cache
 	 **/

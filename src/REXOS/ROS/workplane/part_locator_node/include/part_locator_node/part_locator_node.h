@@ -72,10 +72,11 @@ namespace part_locator_node {
 		double bottomRightOffsetX, bottomRightOffsetY;
 		
 		std::map<std::string, boost::circular_buffer<QrCode> > smoothBuffer;
+		
+		ros::Subscriber qrCodeSubscriber;
 
 	public:
-		PartLocatorNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
-		void run();
+		PartLocatorNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 		
 		virtual bool transitionInitialize();
 		virtual bool transitionDeinitialize();

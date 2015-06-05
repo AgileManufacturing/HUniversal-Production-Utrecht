@@ -7,7 +7,8 @@ namespace rexos_module {
 			moduleProxyListener(moduleProxyListener),
 			transitionActionServer(AbstractModule::nodeHandle, advertisementPath + "transition", 
 				boost::bind(&ModuleProxy::onModuleTransitionGoalCallback, this, _1), false),
-			bond(NULL)
+			bond(NULL),
+			connectedWithNode(false)
 	{
 		transitionActionServer.start();
 	}
@@ -23,12 +24,12 @@ namespace rexos_module {
 				moduleProxyListener->spawnNode(this);
 				
 				// wait for the node to come online
+				boost::unique_lock<boost::mutex> lock(nodeStartupMutex);
 				if(connectedWithNode == false) {
-					boost::unique_lock<boost::mutex> lock(nodeStartupMutex);
 					nodeStartupCondition.wait(lock);
 				}
 			} else {
-				REXOS_WARN("Node has already been stated, which is not expected (did someone manually start this node?)");
+				REXOS_WARN("Node has already been started, which is not expected (did someone manually start this node?)");
 			}
 		}
 		StateMachineController::changeState(state);
@@ -77,12 +78,12 @@ namespace rexos_module {
 	void ModuleProxy::onModuleTransitionGoalCallback(const rexos_module::TransitionGoalConstPtr& goal) {
 		REXOS_INFO("Recieved a goal call");
 		std::vector<rexos_datatypes::SupportedMutation> supportedMutations;
-		for(int i = 0; i < goal->gainedSupportedMutations.size(); i++) {
+		for(uint i = 0; i < goal->gainedSupportedMutations.size(); i++) {
 			rexos_datatypes::SupportedMutation supportedMutation(goal->gainedSupportedMutations.at(i));
 			supportedMutations.push_back(supportedMutation);
 		}
 		std::vector<rexos_datatypes::RequiredMutation> requiredMutations;
-		for(int i = 0; i < goal->requiredMutationsRequiredForNextPhase.size(); i++) {
+		for(uint i = 0; i < goal->requiredMutationsRequiredForNextPhase.size(); i++) {
 			rexos_datatypes::RequiredMutation requiredMutation(
 					goal->requiredMutationsRequiredForNextPhase.at(i).mutation, 
 					goal->requiredMutationsRequiredForNextPhase.at(i).isOptional);

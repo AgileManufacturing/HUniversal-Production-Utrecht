@@ -64,7 +64,7 @@ bool CameraCalibrationNode::calibrateLens(
 	camera_calibration_node::calibrateLens::Response &response)
 {
 	REXOS_INFO("calibrateLens entered");
-	int32_t framesToCapture = request.frameCount;
+	uint framesToCapture = request.frameCount;
 	// subscribe to the camera/image feed. The buffersize of 1 is intentional.
 	image_transport::Subscriber imageSubscriber = imageTransport.subscribe("camera/image", 1, &CameraCalibrationNode::handleFrame, this);
 
@@ -78,7 +78,7 @@ bool CameraCalibrationNode::calibrateLens(
 	
 	// createMatrices
 	REXOS_INFO("Generating matrices...");
-	Camera::RectifyImage rectifier;
+	camera::RectifyImage rectifier;
 	int successes = rectifier.createMatrices(cv::Size(request.boardWidth, request.boardHeight), images);
 	REXOS_INFO("Successes: %d", successes);
 	
@@ -110,10 +110,9 @@ bool CameraCalibrationNode::calibrateLens(
 		
 		client.call(serviceCall);
 	} else {
-		REXOS_INFO("No chessboard deteced...");
+		REXOS_WARN("No chessboard detected...");
 	}
 
-	REXOS_INFO("Cleaning up...");
 	while(images.size() != 0){
 		cv::Mat* image = images.back();
 		images.pop_back();
@@ -121,7 +120,6 @@ bool CameraCalibrationNode::calibrateLens(
 	}
 	
 	response.processedFrames = successes;
-	REXOS_INFO("Done");
 	return true;
 }
 bool CameraCalibrationNode::calibrateEffector(

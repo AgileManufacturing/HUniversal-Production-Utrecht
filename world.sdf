@@ -1,0 +1,37 @@
+<sdf version='1.4'>
+	<world name="Grid">
+		<scene>
+			<ambient>0.4 0.4 0.4 1</ambient>
+			<background>0.5 0.5 1 1</background>
+			<shadows>false</shadows>
+		</scene>
+		<plugin name="acceleration" filename="libacceleration_plugin.so">
+			<rosNamespace>/</rosNamespace>
+		</plugin>
+		<plugin name="joint" filename="libjoint_plugin.so">
+			<rosNamespace>/</rosNamespace>
+		</plugin>
+		<plugin name="collision" filename="libcollision_plugin.so">
+			<rosNamespace>/</rosNamespace>
+		</plugin>
+		<include>
+			<uri>model://ground_plane/</uri>
+		</include>
+		<light name="sun" type="directional">
+			<pose>0 0 10 0 0 0</pose>
+			<diffuse>0.8 0.8 0.8 1</diffuse>
+			<specular>0.2 0.2 0.2 1</specular>
+		</light>
+		<light name="lightFor0x0" type="point">
+			<pose>0 -0.1 0.1 0 0 0</pose>
+			<diffuse>0.5 0.5 0.5 1</diffuse>
+			<specular>0.1 0.1 0.1 1</specular>
+			<attenuation>
+				<range>20.0</range>
+				<constant>0.50</constant>
+				<linear>0.01</linear>
+				<quadratic>0.00</quadratic>
+			</attenuation>
+		</light>
+	</world>
+</sdf>

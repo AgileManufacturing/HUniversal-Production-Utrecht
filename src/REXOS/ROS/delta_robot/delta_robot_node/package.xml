@@ -26,10 +26,6 @@
 	<run_depend>rexos_utilities</run_depend>
 	<build_depend>rexos_delta_robot</build_depend>
 	<run_depend>rexos_delta_robot</run_depend>
-	<build_depend>rexos_modbus</build_depend>
-	<run_depend>rexos_modbus</run_depend>
-	<build_depend>rexos_motor</build_depend>
-	<run_depend>rexos_motor</run_depend>
 	<build_depend>actionlib</build_depend>
 	<run_depend>actionlib</run_depend>
 	<build_depend>rexos_coordinates</build_depend>

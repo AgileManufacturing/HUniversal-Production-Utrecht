@@ -1,4 +1,5 @@
 string manufacturer
 string typeNumber
 string serialNumber
+bool isSimulated
 ---

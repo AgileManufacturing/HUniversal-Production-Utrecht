@@ -1,39 +1,47 @@
 package HAL.testerClasses;
 
+import generic.Mast;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
-import HAL.BlackboardHandler;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.dataTypes.ModuleIdentifier;
+import HAL.exceptions.BlackboardUpdateException;
+import HAL.exceptions.InvalidMastModeException;
+import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
+import HAL.steps.ProductStep;
 
 public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
-	static HALTesterClassDraw htc = new HALTesterClassDraw();
-	static ArrayList<HardwareStep> hardwareSteps = new ArrayList<HardwareStep>();
-	static HardwareAbstractionLayer hal;
-	static BlackboardHandler blackboardUpdated;
-	
-	static final String baseDir = "jars/";
-	
+	HardwareAbstractionLayer hal;
+	JSONObject criteria1 = new JSONObject();
+	JSONObject criteria2 = new JSONObject();
+	boolean state = false;
+
+	static String equipletName = "EQ2";
+	static final String baseDir = "generatedOutput/";
+	static boolean insertModules = true;
+	static boolean translateSteps = true;
+
 	// delta robot
 	static String moduleA_01 = "{" +
 			"	\"moduleIdentifier\":{" +
 			"		\"manufacturer\":\"HU\"," +
 			"		\"typeNumber\":\"delta_robot_type_B\"," +
-			"		\"serialNumber\":\"1\"," +
+			"		\"serialNumber\":\"1\"" +
 			"	}," +
 			"	\"type\":{" +
 			"		\"properties\":{" +
@@ -46,7 +54,6 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"				\"effectorRadius\" : 46.19," +
 			"				\"ankleLength\" : 300.0," +
 			"				\"hipAnleMaxAngleDegrees\" : 22.0," +
-			"				\"motorFromZeroToTopAngleDegrees\" : 20.0," +
 			"				\"boundaryBoxMinX\" : -200.0," +
 			"				\"boundaryBoxMaxX\" : 200.0," +
 			"				\"boundaryBoxMinY\" : -200.0," +
@@ -54,6 +61,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"				\"boundaryBoxMinZ\" : -380.0," +
 			"				\"boundaryBoxMaxZ\" : -180.0" +
 			"			}," +
+			"			\"contactSensorToZeroAngleDegrees\" : 20.0," +
 			"			\"calibrationBigStepFactor\" : 20," +
 			"			\"stepperMotorProperties\" : {" +
 			"				\"motorMinAngleDegrees\" : -18.0," +
@@ -69,7 +77,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleA_02 = "\"," +
-			"			\"command\":\"rosrun delta_robot_node delta_robot_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"			\"command\":\"rosrun delta_robot_node delta_robot_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -82,11 +90,130 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleA_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"effector\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":0.0," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"lowerArm1\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm2\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm3\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm4\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm5\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"lowerArm6\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":0.0," +
+			"					\"mayHaveContactWithChildModules\":false" +
+			"				}," +
+			"				{" +
+			"					\"linkName\":\"effector\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":10.0," +
+			"					\"maxTorque\":5.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"				{" +
+			"					\"jointName\":\"upperArm1ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm2ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"upperArm3ToBase\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm1ToUpperArm1\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm2ToUpperArm1\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm3ToUpperArm2\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm4ToUpperArm2\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm5ToUpperArm3\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm6ToUpperArm3\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm1ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm2ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm3ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm4ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm5ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}," +
+			"				{" +
+			"					\"jointName\":\"lowerArm6ToEffector\"," +
+			"					\"maxErrorPose\":0.01" +
+			"				}" +
+			"			]," +
+			"			\"links\":[" +
+			"				{" +
+			"					\"linkName\":\"effector\"," +
+			"					\"maxAcceleration\":40.0" +
+			"				}" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"			\"move\"" +
@@ -178,7 +305,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleB_02 = "\"," +
-			"			\"command\":\"rosrun gripper_node gripper_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"			\"command\":\"rosrun gripper_node gripper_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -191,8 +318,8 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleB_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
 			"			\"childLinkOffsetZ\":0.0" +
@@ -227,7 +354,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleC_02 = "\"," +
-			"			\"command\":\"roslaunch camera.launch equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" +
+			"			\"command\":\"roslaunch camera.launch isSimulated:={isSimulated} isShadow:={isShadow} equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -240,11 +367,17 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleC_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
+			"			\"childLinkOffsetX\":-25.01," +
+			"			\"childLinkOffsetY\":202.24," +
+			"			\"childLinkOffsetZ\":57.19," +
+			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -279,11 +412,17 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleD_03 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
 			"			\"childLinkOffsetX\":0.0," +
 			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"childLinkOffsetZ\":22.0," +
+			"			\"collisions\":[" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -323,7 +462,7 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"buildNumber\":1," +
 			"			\"rosFile\": \"";
 	static String moduleE_02 = "\"," +
-			"			\"command\":\"rosrun part_locator_node part_locator_node {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
+			"			\"command\":\"rosrun part_locator_node part_locator_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
 			"		\"halSoftware\":{" +
 			"			\"buildNumber\":1," +
@@ -336,11 +475,24 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 			"			\"zipFile\": \"";
 	static String moduleE_04 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"baseLink\"," +
-			"			\"childLink\":\"otherLink\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0" +
+			"			\"parentLink\":\"base\"," +
+			"			\"childLink\":\"base\"," +
+			"			\"childLinkOffsetX\":175.0," +
+			"			\"childLinkOffsetY\":-200.0," +
+			"			\"childLinkOffsetZ\":33.33," +
+			"			\"collisions\":[" +
+			"				{" +
+			"					\"linkName\":\"base\"," +
+			"					\"collisionName\":\"collision\"," +
+			"					\"maxForce\":20.0," +
+			"					\"maxTorque\":5.0," +
+			"					\"mayHaveContactWithChildModules\":true" +
+			"				}" +
+			"			]," +
+			"			\"joints\":[" +
+			"			]," +
+			"			\"links\":[" +
+			"			]" +
 			"		}," +
 			"		\"supportedMutations\": [" +
 			"		]," +
@@ -361,212 +513,266 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		if(args.length >= 2) {
+			if(args[0].equals("--noInsert")) {
+				insertModules = false;
+			} else if(args[0].equals("--noTranslate")) {
+				translateSteps = false;
+			}
+			equipletName = args[1];
+		} else if(args.length >= 1) {
+			equipletName = args[0];
+		}
+		System.out.println("Inserting equiplet " + equipletName);
+		
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
-		
-		hal = new HardwareAbstractionLayer(htc);
+		@SuppressWarnings("unused")
+		HALTesterClassDraw htc = new HALTesterClassDraw();
+		htc = null;
+	}
+	public HALTesterClassDraw() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
+		hal = new HardwareAbstractionLayer(equipletName, this);
 
-		FileInputStream fis;
-		byte[] content;
-
-		File deltaRobotHal = new File(baseDir + "DeltaRobot.jar");
-		fis = new FileInputStream(deltaRobotHal);
-		content = new byte[(int) deltaRobotHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
+		if(insertModules == true) {
+			FileInputStream fis;
+			byte[] content;
+	
+			File deltaRobotHal = new File(baseDir + "HAL/modules/" + "DeltaRobot.jar");
+			fis = new FileInputStream(deltaRobotHal);
+			content = new byte[(int) deltaRobotHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
+			
+			File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
+			fis = new FileInputStream(workplaneHal);
+			content = new byte[(int) workplaneHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+			
+			File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
+			fis = new FileInputStream(penHal);
+			content = new byte[(int) penHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64PenHal = new String(Base64.encodeBase64(content));
+			
+			File gripperHal = new File(baseDir + "HAL/modules/" + "Gripper.jar");
+			fis = new FileInputStream(gripperHal);
+			content = new byte[(int) gripperHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64GripperHal = new String(Base64.encodeBase64(content));
+			
+			File deltaRobotRos = new File(baseDir + "nodes/" + "delta_robot.zip");
+			fis = new FileInputStream(deltaRobotRos);
+			content = new byte[(int) deltaRobotRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
+			
+			File gripperRos = new File(baseDir + "nodes/" + "gripper.zip");
+			fis = new FileInputStream(gripperRos);
+			content = new byte[(int) gripperRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64GripperRos = new String(Base64.encodeBase64(content));
+			
+			File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
+			fis = new FileInputStream(cameraRos);
+			content = new byte[(int) cameraRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64CameraRos = new String(Base64.encodeBase64(content));
+			
+			File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
+			fis = new FileInputStream(workplaneRos);
+			content = new byte[(int) workplaneRos.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
+			
+			File deltaRobotGazebo = new File(baseDir + "models/" + "deltaRobot.zip");
+			fis = new FileInputStream(deltaRobotGazebo);
+			content = new byte[(int) deltaRobotGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
+			
+			File gripperGazebo = new File(baseDir + "models/" + "gripper.zip");
+			fis = new FileInputStream(gripperGazebo);
+			content = new byte[(int) gripperGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64GripperGazebo = new String(Base64.encodeBase64(content));
+			
+			File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
+			fis = new FileInputStream(cameraGazebo);
+			content = new byte[(int) cameraGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64CameraGazebo = new String(Base64.encodeBase64(content));
+			
+			File lensGazebo = new File(baseDir + "models/" + "lens.zip");
+			fis = new FileInputStream(lensGazebo);
+			content = new byte[(int) lensGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64LensGazebo = new String(Base64.encodeBase64(content));
+			
+			File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
+			fis = new FileInputStream(workplaneGazebo);
+			content = new byte[(int) workplaneGazebo.length()];
+			fis.read(content);
+			fis.close();
+			String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
+			
+			
+			File drawHal = new File(baseDir + "HAL/capabilities/" + "Draw.jar");
+			fis = new FileInputStream(drawHal);
+			content = new byte[(int) drawHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64Draw = new String(Base64.encodeBase64(content));
+			
+			File pickAndPlaceHal = new File(baseDir + "HAL/capabilities/" + "PickAndPlace.jar");
+			fis = new FileInputStream(pickAndPlaceHal);
+			content = new byte[(int) pickAndPlaceHal.length()];
+			fis.read(content);
+			fis.close();
+			String base64PickAndPlace = new String(Base64.encodeBase64(content));
+			
+			
+			// deltarobot
+			String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
+					moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlace + moduleA_06; 
+			JSONObject a = new JSONObject(new JSONTokener(moduleA));
+			
+			// gripper
+			String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
+					moduleB_03 + base64GripperGazebo + moduleB_04; 
+			JSONObject b = new JSONObject(new JSONTokener(moduleB));
+			
+			// camera
+			String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
+					moduleC_03 + base64CameraGazebo + moduleC_04;
+			JSONObject c = new JSONObject(new JSONTokener(moduleC));
+			
+			// lens
+			// TODO fix non hal software
+			String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
+			JSONObject d = new JSONObject(new JSONTokener(moduleD));
+			
+			// workplane
+			String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
+					moduleE_03 + base64WorkplaneGazebo + moduleE_04;
+			JSONObject e = new JSONObject(new JSONTokener(moduleE));
+			
+			
+			hal.insertModule(a, a);
+			hal.insertModule(b, b);
+			hal.insertModule(c, c);
+			hal.insertModule(d, d);
+			hal.insertModule(e, e);
+		}
 		
-		File workplaneHal = new File(baseDir + "Workplane.jar");
-		fis = new FileInputStream(workplaneHal);
-		content = new byte[(int) workplaneHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+		if(translateSteps == true) {
+			JSONObject target1 = new JSONObject();
+			JSONObject targetMove1 = new JSONObject();
+			targetMove1.put("x", 5.5);
+			targetMove1.put("y", -5.5);
+			targetMove1.put("z", 13.8);
+			JSONObject targetMove1Approach = new JSONObject();
+			targetMove1Approach.put("x", 0);
+			targetMove1Approach.put("y", 0);
+			targetMove1Approach.put("z", 20);
+			targetMove1.put("approach", targetMove1Approach);
+			target1.put("move", targetMove1);
+			target1.put("identifier", "GC4x4MB_1");
+	
+			JSONArray subjects1 = new JSONArray();
+			JSONObject subject1 = new JSONObject();
+			JSONObject subjectMove1 = new JSONObject();
+			subjectMove1.put("x", 5.5);
+			subjectMove1.put("y", -5.5);
+			subjectMove1.put("z", 13.8);
+			JSONObject subjectMove1Approach = new JSONObject();
+			subjectMove1Approach.put("x", 0);
+			subjectMove1Approach.put("y", 0);
+			subjectMove1Approach.put("z", 20);
+			subjectMove1.put("approach", subjectMove1Approach);
+			subject1.put("move", subjectMove1);
+			subject1.put("identifier", "GC4x4MB_6");
+			subjects1.put(subject1);
+	
+			JSONObject target2 = new JSONObject();
+			JSONObject targetMove2 = new JSONObject();
+			targetMove2.put("x", 5.5);
+			targetMove2.put("y", -5.5);
+			targetMove2.put("z", 13.8);
+			JSONObject targetMove2Approach = new JSONObject();
+			targetMove2Approach.put("x", 0);
+			targetMove2Approach.put("y", 0);
+			targetMove2Approach.put("z", 20);
+			targetMove2.put("approach", targetMove2Approach);
+			target2.put("move", targetMove2);
+			target2.put("identifier", "GC4x4MB_6");
+	
+			JSONArray subjects2 = new JSONArray();
+			JSONObject subject2 = new JSONObject();
+			JSONObject subjectMove2 = new JSONObject();
+			subjectMove2.put("x", 5.5);
+			subjectMove2.put("y", -5.5);
+			subjectMove2.put("z", 13.8);
+			JSONObject subjectMove2Approach = new JSONObject();
+			subjectMove2Approach.put("x", 0);
+			subjectMove2Approach.put("y", 0);
+			subjectMove2Approach.put("z", 20);
+			subjectMove2.put("approach", subjectMove2Approach);
+			subject2.put("move", subjectMove2);
+			subject2.put("identifier", "GC4x4MB_1");
+			subjects2.put(subject2);
+	
+			criteria1.put("target", target1);
+			criteria1.put("subjects", subjects1);
+	
+			criteria2.put("target", target2);
+			criteria2.put("subjects", subjects2);
+	
+			hal.translateProductStep("place", criteria1);
+		}
 		
-		File penHal = new File(baseDir + "Pen.jar");
-		fis = new FileInputStream(penHal);
-		content = new byte[(int) penHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64PenHal = new String(Base64.encodeBase64(content));
-		
-		File gripperHal = new File(baseDir + "Gripper.jar");
-		fis = new FileInputStream(gripperHal);
-		content = new byte[(int) gripperHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64GripperHal = new String(Base64.encodeBase64(content));
-		
-		File deltaRobotRos = new File(baseDir + "nodes.zip");
-		fis = new FileInputStream(deltaRobotRos);
-		content = new byte[(int) deltaRobotRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
-		
-		File gripperRos = new File(baseDir + "nodes.zip");
-		fis = new FileInputStream(gripperRos);
-		content = new byte[(int) gripperRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64GripperRos = new String(Base64.encodeBase64(content));
-		
-		File cameraRos = new File(baseDir + "nodes.zip");
-		fis = new FileInputStream(cameraRos);
-		content = new byte[(int) cameraRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraRos = new String(Base64.encodeBase64(content));
-		
-		File workplaneRos = new File(baseDir + "nodes.zip");
-		fis = new FileInputStream(workplaneRos);
-		content = new byte[(int) workplaneRos.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneRos = new String(Base64.encodeBase64(content));
-		
-		File deltaRobotGazebo = new File(baseDir + "model.zip");
-		fis = new FileInputStream(deltaRobotGazebo);
-		content = new byte[(int) deltaRobotGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
-		
-		File gripperGazebo = new File(baseDir + "model.zip");
-		fis = new FileInputStream(gripperGazebo);
-		content = new byte[(int) gripperGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64GripperGazebo = new String(Base64.encodeBase64(content));
-		
-		File cameraGazebo = new File(baseDir + "model.zip");
-		fis = new FileInputStream(cameraGazebo);
-		content = new byte[(int) cameraGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64CameraGazebo = new String(Base64.encodeBase64(content));
-		
-		File lenstGazebo = new File(baseDir + "model.zip");
-		fis = new FileInputStream(lenstGazebo);
-		content = new byte[(int) lenstGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64LensGazebo = new String(Base64.encodeBase64(content));
-		
-		File workplaneGazebo = new File(baseDir + "model.zip");
-		fis = new FileInputStream(workplaneGazebo);
-		content = new byte[(int) workplaneGazebo.length()];
-		fis.read(content);
-		fis.close();
-		String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
-		
-		
-		File drawHal = new File(baseDir + "Draw.jar");
-		fis = new FileInputStream(drawHal);
-		content = new byte[(int) drawHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64Draw = new String(Base64.encodeBase64(content));
-		
-		File pickAndPlaceHal = new File(baseDir + "PickAndPlace.jar");
-		fis = new FileInputStream(pickAndPlaceHal);
-		content = new byte[(int) pickAndPlaceHal.length()];
-		fis.read(content);
-		fis.close();
-		String base64PickAndPlace = new String(Base64.encodeBase64(content));
-		
-		
-		// deltarobot
-		String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
-				moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlace + moduleA_06; 
-		JSONObject a = new JSONObject(new JSONTokener(moduleA));
-		hal.insertModule(a, a);
-		
-		// gripper
-		String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
-				moduleB_03 + base64GripperGazebo + moduleB_04; 
-		JSONObject b = new JSONObject(new JSONTokener(moduleB));
-		hal.insertModule(b, b);
-		
-		// camera
-		String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
-				moduleC_03 + base64CameraGazebo + moduleC_04;
-		JSONObject c = new JSONObject(new JSONTokener(moduleC));
-		hal.insertModule(c, c);
-		
-		// lens
-		// TODO fix non hal software
-		String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
-		JSONObject d = new JSONObject(new JSONTokener(moduleD));
-		hal.insertModule(d, d);
-		
-		// workplane
-		String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
-				moduleE_03 + base64WorkplaneGazebo + moduleE_04;
-		JSONObject e = new JSONObject(new JSONTokener(moduleE));
-		hal.insertModule(e, e);
-		
-		
-		JSONObject criteria = new JSONObject();
-		JSONObject target = new JSONObject();
-		JSONObject targetMove = new JSONObject();
-		targetMove.put("x", -2.0);
-		targetMove.put("y", 1.0);
-		targetMove.put("z", 15.0);
-		target.put("move",targetMove);
-		target.put("identifier", "GC4x4MB_1");
-		
-		JSONArray subjects = new JSONArray();
-		JSONObject subject = new JSONObject();
-		JSONObject subjectMove = new JSONObject();
-		subjectMove.put("x", -3.0);
-		subjectMove.put("y", 3.0);
-		subjectMove.put("z", 35.0);
-		subject.put("move",subjectMove);
-		subject.put("identifier", "GC4x4MB_6");
-		subjects.put(subject);
-		
-		criteria.put("target",target);
-		criteria.put("subjects", subjects);
-		
-		
-		//hal.translateProductStep(new ProductStep(1, criteria, new Service("place")));
-		JSONObject staticSettings = hal.deleteModule(new ModuleIdentifier("HU", "delta_robot_type_B", "1"));
-		System.out.println(staticSettings.toString());
+		// we are done if we are not going to translate hw steps
+		if(translateSteps == false) {
+			hal.shutdown();
+		}
 	}
 	
 	@Override
-	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareStep) {
+	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
-		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
 		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
-	public void onTranslationFailed(String service, JSONObject criteria) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[]{ service, criteria });
+	public void onTranslationFailed(ProductStep productStep) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
 	}
 
 	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status, 
-			Module module, HardwareStep hardwareStep) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + hardwareStep.getStatus());
 	}
 
 	@Override
-	public void onModuleStateChanged(String state, Module module) {
+	public void onModuleStateChanged(Module module, Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
-	public void onModuleModeChanged(String mode, Module module) {
+	public void onModuleModeChanged(Module module, Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
-	}
-
-	@Override
-	public String getEquipletName() {
-		// TODO hardcoded!!!!!!
-		
-		return "EQ2";
 	}
 
 	@Override
@@ -575,28 +781,22 @@ public class HALTesterClassDraw implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onEquipletMachineStateChanged(String state) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
+	public void onEquipletStateChanged(Mast.State state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + equipletName + " has changed to " + state);
 	}
 
 	@Override
-	public void onEquipletModeChanged(String mode) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
+	public void onEquipletModeChanged(Mast.Mode mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + equipletName + " has changed to " + mode);
 	}
 
 	@Override
 	public void onExecutionFailed() {
-		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution failed");
 	}
 
-	/**
-	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
-	 * @param state [description]
-	 */
 	@Override
-	public void onReloadEquiplet(String state){
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
-
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
 	}
 }

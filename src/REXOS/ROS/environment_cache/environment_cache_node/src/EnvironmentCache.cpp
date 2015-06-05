@@ -39,11 +39,13 @@
 /**
  * The constructor of the EnvironmentCache class
  **/
-EnvironmentCache::EnvironmentCache() {
+EnvironmentCache::EnvironmentCache(std::string equipletName) :
+		equipletName(equipletName) {
 	// Initialise services
-	getDataServiceServer = nh.advertiseService("getData", &EnvironmentCache::getData, this);
-	setDataServiceServer = nh.advertiseService("setData", &EnvironmentCache::setData, this);
-	removeDataServiceServer = nh.advertiseService("removeData", &EnvironmentCache::removeData, this);
+	getDataServiceServer = nh.advertiseService(equipletName + "/getData", &EnvironmentCache::getData, this);
+	setDataServiceServer = nh.advertiseService(equipletName + "/setData", &EnvironmentCache::setData, this);
+	removeDataServiceServer = nh.advertiseService(equipletName + "/removeData", &EnvironmentCache::removeData, this);
+	REXOS_INFO("environment cache started");
 }
 
 bool EnvironmentCache::getData(environment_cache::getData::Request& req, environment_cache::getData::Response& res) {
@@ -64,18 +66,45 @@ bool EnvironmentCache::setData(environment_cache::setData::Request& req, environ
 	if(reader.parse(req.json, jsonNode) == false) return false;
 	ROS_INFO_STREAM(jsonNode);
 	cache.setItemDataInCache(req.identifier, jsonNode);
+	return true;
 }
 bool EnvironmentCache::removeData(environment_cache::removeData::Request& req, environment_cache::removeData::Response& res) {
 	ROS_INFO("Removing data");
 	cache.removeDataOfItemFromCache(req.identifier, req.paths);
+	return true;
 }
 
 /** 
  * Main that creates the environment cache
  **/
 int main(int argc, char **argv){
-	ros::init(argc, argv, "EnvironmentCache");
-	EnvironmentCache envCache;
+	if(argc < 2){
+		REXOS_ERROR("Usage: environment_cache (--isShadow) equipletName");
+		return -1;
+	}
+	
+	bool isShadow = false;
+	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isShadow") {
+			isShadow = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_environmentCache";
+	ros::init(argc, argv, nodeName);
+	
+	EnvironmentCache environmentCache(equipletName);
+	
 	ros::spin();
 	return 0;
 }

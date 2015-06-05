@@ -46,8 +46,8 @@ import jade.wrapper.AgentController;
 
 import java.util.Date;
 
-import util.configuration.ServerConfigurations;
 import MAS.equiplet.EquipletAgent;
+import util.configuration.ServerConfigurations;
 
 public class EQSpawnClass extends Agent {
 	/**

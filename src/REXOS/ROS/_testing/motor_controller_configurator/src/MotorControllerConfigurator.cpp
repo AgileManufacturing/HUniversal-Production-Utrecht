@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <rexos_utilities/Utilities.h>
-#include <rexos_modbus/ModbusController.h>
+#include <rexos_io/RtuModbusInputOutputController.h>
 #include "ros/ros.h"
 #include <rexos_motor/CRD514KD.h>
 #include "rexos_logger/rexos_logger.h"
@@ -14,14 +14,7 @@ int main(int argc, char **argv){
 	ros::Rate loop_rate(15);
 	
 	while(ros::ok()) {
-		rexos_modbus::ModbusController modbus = rexos_modbus::ModbusController(modbus_new_rtu(
-			"/dev/ttyS0",
-			rexos_motor::CRD514KD::RtuConfig::BAUDRATE,
-			rexos_motor::CRD514KD::RtuConfig::PARITY,
-			rexos_motor::CRD514KD::RtuConfig::DATA_BITS,
-			rexos_motor::CRD514KD::RtuConfig::STOP_BITS));
-		
-		
+		rexos_io::RtuModbusInputOutputController modbus;
 		
 		REXOS_INFO("Device number to configure: ");
 		std::string deviceNumberString;
@@ -44,9 +37,9 @@ int main(int argc, char **argv){
 		if(valueString.length() == 0) {
 			// reading mode
 			if(fieldLength == 16) {
-				REXOS_INFO_STREAM("@" << address + ": " << modbus.readU16(deviceNumber, address));
+				REXOS_INFO_STREAM("@" << address + ": " << modbus.readU16(deviceNumber, address, false));
 			} else if(fieldLength == 32) {
-				REXOS_INFO_STREAM("@" << address + ": " << modbus.readU32(deviceNumber, address));
+				REXOS_INFO_STREAM("@" << address + ": " << modbus.readU32(deviceNumber, address, false));
 				
 			}
 		} else {
@@ -54,10 +47,10 @@ int main(int argc, char **argv){
 			uint32_t value = rexos_utilities::stringToInt(valueString);
 			if(fieldLength == 16) {
 				modbus.writeU16(deviceNumber, address, value, false);
-				REXOS_INFO_STREAM("@" << address + "= " << modbus.readU16(deviceNumber, address));
+				REXOS_INFO_STREAM("@" << address + "= " << modbus.readU16(deviceNumber, address, false));
 			} else if(fieldLength == 32) {
 				modbus.writeU32(deviceNumber, address, value, false);
-				REXOS_INFO_STREAM("@" << address + "= " << modbus.readU32(deviceNumber, address));
+				REXOS_INFO_STREAM("@" << address + "= " << modbus.readU32(deviceNumber, address, false));
 			}
 			
 		}

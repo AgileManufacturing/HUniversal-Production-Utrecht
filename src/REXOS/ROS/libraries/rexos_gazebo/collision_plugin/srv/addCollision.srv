@@ -1,0 +1,7 @@
+string model
+string link
+string collision
+float64 maxForce
+float64 maxTorque
+---
+

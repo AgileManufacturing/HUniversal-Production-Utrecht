@@ -41,6 +41,9 @@ namespace rexos_module {
 			public rexos_coordinates::Module {
 	protected:
 		AbstractModule(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
+	public:
+		std::string getEquipletName();
+		rexos_datatypes::ModuleIdentifier getModuleIdentifier();
 	protected:
 		std::string equipletName;
 		rexos_datatypes::ModuleIdentifier identifier;

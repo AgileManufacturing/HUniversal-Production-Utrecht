@@ -29,8 +29,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifndef GRIPPERNODE_H_
-#define GRIPPERNODE_H_
+#pragma once
 
 #include "ros/ros.h"
 #include "iostream"
@@ -43,12 +42,14 @@
 
 #include <jsoncpp/json/value.h>
 
+namespace gripper_node {
+
 class GripperNode : public rexos_module::ActorModule, 
 	Observer {
 	
 public:
 
-	GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+	GripperNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 	virtual ~GripperNode();
 
 	virtual bool transitionInitialize();
@@ -61,39 +62,15 @@ public:
 	void error();
 	static void wrapperForGripperError(void* gripperNodeObject);
 
-	virtual void onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal);
+	virtual void onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal);
 	
 private:
-	/**
-	 * @var modbus_t* modbusContext
-	 * Connection to the IO modbus
-	 **/
-	modbus_t* modbusContext;
-	
 	/**
 	 * @var InputOutput::OutputDevices::Gripper* gripper
 	 * The gripper device
 	 **/
 	rexos_gripper::Gripper* gripper;
 
-	/**
-	 * @var ModbusController::ModbusController* modbus
-	 * Connection to the IO modbus controller
-	 **/
-	rexos_modbus::ModbusController* modbus;
-
-	/**
-	 * @var ros::ServiceServer gripService
-	 * The service for enabling the gripper
-	 **/
-	ros::ServiceServer gripService;
-
-	/**
-	 * @var ros::ServiceServer releaseService
-	 * The service for releasing the gripper
-	 **/
-	ros::ServiceServer releaseService;
-	
 	void notifyWarned();
 	
 	void notifyOverheated();
@@ -101,5 +78,4 @@ private:
 	void notifyCooledDown();
 	
 };
-
-#endif /* GRIPPERNODE_H_ */
+}

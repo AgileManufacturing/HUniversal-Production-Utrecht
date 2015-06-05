@@ -28,8 +28,9 @@
 **/
 
 #include <rexos_gripper/OutputDevice.h>
+#include <rexos_logger/rexos_logger.h>
 
-#include "ros/ros.h"
+#include <jsoncpp/json/value.h>
 
 namespace rexos_gripper {
 	/**
@@ -39,10 +40,9 @@ namespace rexos_gripper {
 	 * @param address Register address that contains the device boolean.
 	 * @param pin The pin (bit) that is connected to the device.
 	 **/
-	OutputDevice::OutputDevice(Json::Value node) {
+	OutputDevice::OutputDevice(Json::Value node, rexos_io::InputOutputControllerInterface* ioController) :
+			ioController(ioController) {
 		readJSONNode(node);
-		
-		ioController = new InputOutputController(node);
 	}
 	void OutputDevice::readJSONNode(const Json::Value node) {
 		address = node["modbusAddress"].asInt();
@@ -62,7 +62,7 @@ namespace rexos_gripper {
 	 **/
 	void OutputDevice::enable(){
 		std::lock_guard<std::mutex> guard(mu);
-		ioController->pinHigh(address, pin);
+		ioController->writePinHigh(address, pin, false);
 	}
 
 	/**
@@ -70,6 +70,6 @@ namespace rexos_gripper {
 	 **/
 	void OutputDevice::disable(){
 		std::lock_guard<std::mutex> guard(mu);
-		ioController->pinLow(address, pin);
+		ioController->writePinLow(address, pin, false);
 	}
 }

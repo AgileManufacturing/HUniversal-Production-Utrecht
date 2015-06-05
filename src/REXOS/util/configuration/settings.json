@@ -1,18 +1,14 @@
 {
-    "rosInterface": {
+	"rosInterface": {
 		"connectionsPerHost": {
-			"default": 50
+			"default": 10
 		},
 		"threadsAllowedToBlockForConnectionMultiplier": {
 			"default": 5
 		},
 		"hardwareSteps": {
 			"ip": {
-<<<<<<< HEAD
 				"default": "127.0.0.1"
-=======
-				"default": "10.0.1.30"
->>>>>>> origin/team_reconfig
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -27,13 +23,8 @@
 			}
 		},
 		"equipletCommands": {
-<<<<<<< HEAD
-			"ip": {
-				"default": "127.0.0.1"
-=======
 			"ip": { 
-				"default": "10.0.1.30" 
->>>>>>> origin/team_reconfig
+				"default": "127.0.0.1"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -49,11 +40,7 @@
 		},
 		"equipletState": {
 			"ip": {
-<<<<<<< HEAD
 				"default": "127.0.0.1"
-=======
-				"default": "10.0.1.30"
->>>>>>> origin/team_reconfig
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -65,6 +52,22 @@
 			},
 			"blackboardName": {
 				"default": "StateBlackboard"
+			}
+		},
+		"violations": {
+			"ip": {
+				"default": "127.0.0.1"
+			},
+			"databaseName": {
+				"default": "EQ",
+				"EQ1": "EQ1",
+				"EQ2": "EQ2",
+				"EQ3": "EQ3",
+				"EQ4": "EQ4",
+				"EQ5": "EQ5"
+			},
+			"blackboardName": {
+				"default": "ViolationsBlackboard"
 			}
 		}
 	},

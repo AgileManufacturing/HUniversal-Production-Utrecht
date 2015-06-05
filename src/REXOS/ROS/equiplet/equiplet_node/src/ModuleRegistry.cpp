@@ -2,8 +2,8 @@
  * ModuleRegistry.cpp
  *
  *  Created on: Jun 14, 2013
- *      Author: joris
- *      Author: Lars Veenendaal
+ *	  Author: joris
+ *	  Author: Lars Veenendaal
  */
 
 #include <equiplet_node/ModuleRegistry.h>
@@ -12,11 +12,10 @@
 
 namespace equiplet_node {
 
-ModuleRegistry::ModuleRegistry(
-	std::string equipletName, ModuleRegistryListener* mrl) :
+ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener* mrl) :
+		moduleRegistryListener(mrl),
 		newRegistrationsAllowed(false),
-		equipletName(equipletName),
-		moduleRegistryListener(mrl)
+		equipletName(equipletName)
 {
 	registerModuleServiceServer = rosNodeHandle.advertiseService(
 			equipletName + "/register_module",
@@ -29,7 +28,45 @@ ModuleRegistry::ModuleRegistry(
 		rexos_module::ModuleProxy* proxy = new rexos_module::ModuleProxy(equipletName, *it, this);
 		registeredModules.push_back(proxy);
 	}
+}
+void ModuleRegistry::spawnModels() {
+	// we must spawn the modules in a specifiec order (from top to bottom)
+	std::vector<rexos_module::ModuleProxy*> processedModules;
 	
+	// first spawn all the top modules
+	for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
+		auto databaseEntry = rexos_knowledge_database::Module((*it)->getModuleIdentifier());
+		if(databaseEntry.getParentModule() == NULL) {
+			moduleRegistryListener->spawnModel(*it);
+			processedModules.push_back(*it);
+		}
+	}
+	
+	// continue spawning modules if the parent has already been spawened
+	while(processedModules.size() < registeredModules.size()) {
+		uint numberOfProcessedModulesBeforeRound = processedModules.size();
+		
+		for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
+			rexos_knowledge_database::Module databaseEntry((*it)->getModuleIdentifier());
+			// has this module already a model?
+			if(std::find(processedModules.begin(), processedModules.end(), *it) == processedModules.end()) {
+				// no, determine the parent of this module
+				rexos_knowledge_database::Module* parentModuleDatabaseEntry = databaseEntry.getParentModule();
+				rexos_module::ModuleProxy* parentModule = getModule(parentModuleDatabaseEntry->getModuleIdentifier());
+				
+				// has the parent of this module already a model?
+				if(std::find(processedModules.begin(), processedModules.end(), parentModule) != processedModules.end()) {
+					// yes, and thus we can spawn it
+					moduleRegistryListener->spawnModel(*it);
+					processedModules.push_back(*it);
+				}
+			}
+		}
+		
+		if(numberOfProcessedModulesBeforeRound == processedModules.size()) {
+			throw std::runtime_error("Unable to spawn models for all the modules, is a module orphan?");
+		}
+	}
 }
 
 void ModuleRegistry::reloadModules(){
@@ -59,30 +96,26 @@ void ModuleRegistry::reloadModules(){
 	auto track = registeredModules.begin();
 	while (track != registeredModules.end()) {
 		rexos_module::ModuleProxy* proxy = *track;
-		std::string x = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier().getManufacturer().c_str(), proxy->getModuleIdentifier().getTypeNumber().c_str(), proxy->getModuleIdentifier().getSerialNumber().c_str());
-	    if(x == "0"){
-	    	REXOS_INFO("Removing a old module.");
+		bool isInDatabase = equiplet.checkIfModuleStillExistInDatabase(proxy->getModuleIdentifier());
+		if(isInDatabase == false){
+			REXOS_INFO("Removing a old module.");
 			proxy->changeState(rexos_statemachine::State::STATE_OFFLINE);
 			delete proxy;
-	        track = registeredModules.erase(track);
-	    }
-	    else {
-	        ++track;
-	    }
+			track = registeredModules.erase(track);
+		}
+		else {
+			++track;
+		}
 	}
 	REXOS_INFO("reloadModules() Succesfull.");
 }
 
 ModuleRegistry::~ModuleRegistry() {
 	for(auto it = registeredModules.begin(); it != registeredModules.end(); it++) {
+		moduleRegistryListener->removeModel(*it);
 		delete *it;
 	}
 }
-
-void ModuleRegistry::setModuleRegistryListener(ModuleRegistryListener* mrl){
-	moduleRegistryListener = mrl;
-}
-
 
 void ModuleRegistry::setNewRegistrationsAllowed(bool allowed){
 	newRegistrationsAllowed = allowed;
@@ -112,7 +145,7 @@ bool ModuleRegistry::onRegisterServiceModuleCallback(
 	}
 	
 	rexos_datatypes::ModuleIdentifier newModuleIdentifier(req.manufacturer, req.typeNumber, req.serialNumber);
-	for (int i = 0; i < registeredModules.size(); i++) {
+	for (uint i = 0; i < registeredModules.size(); i++) {
 		if(registeredModules[i]->getModuleIdentifier() == newModuleIdentifier) {
 			registeredModules[i]->bind();
 			REXOS_INFO("registration successful");
@@ -145,9 +178,9 @@ void ModuleRegistry::onModuleModeChanged(
 	}
 }
 
-void ModuleRegistry::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed) {
+void ModuleRegistry::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep) {
 	if(moduleRegistryListener != NULL) {
-		moduleRegistryListener->onHardwareStepCompleted(moduleInterface, id, completed);
+		moduleRegistryListener->onHardwareStepCompleted(moduleInterface, hardwareStep);
 	}
 }
 

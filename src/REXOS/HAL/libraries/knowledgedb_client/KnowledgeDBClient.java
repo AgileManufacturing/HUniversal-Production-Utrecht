@@ -201,6 +201,8 @@ public class KnowledgeDBClient {
 				        statement.setString(i + 1, null);
 			    	} else if(parameters[i] instanceof byte[]) {
 				        statement.setBytes(i + 1, (byte[])parameters[i]);
+			    	} else if(parameters[i] instanceof Boolean) {
+			    		statement.setBoolean(i + 1, (boolean) parameters[i]);
 			    	} else {
 			    		statement.setString(i + 1, parameters[i].toString());
 			    	}

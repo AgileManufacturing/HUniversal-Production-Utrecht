@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+	<name>sensor_manager_plugin</name>
+	<version>0.0.0</version>
+	<description>The rexos_gazebo package</description>
+	<maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+	<license>newBSD</license>
+	<url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
+	<author email="dickvandersteen@gmail.com">Dickvdsteen</author>
+	<author email="koenbraham@gmail.com">KBraham</author>
+	<buildtool_depend>catkin</buildtool_depend>
+	
+	<build_depend>roscpp</build_depend>
+	<run_depend>roscpp</run_depend>
+	<build_depend>gazebo_ros</build_depend>
+	<run_depend>gazebo_ros</run_depend>
+	<build_depend>rexos_io</build_depend>
+	<run_depend>rexos_io</run_depend>
+</package>

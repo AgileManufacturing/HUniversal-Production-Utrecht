@@ -889,7 +889,7 @@ inline Vector4 operator*(const Vector4& v, const Matrix4& m)
 
 inline Vector3 operator*(const Vector3& v, const Matrix4& m)
 {
-    Vector3 r = Vector3(v.x*m[0] + v.y*m[4] + v.z*m[8],  v.x*m[1] + v.y*m[5] + v.z*m[9],  v.x*m[2] + v.y*m[6] + v.z*m[10]);
+    return Vector3(v.x*m[0] + v.y*m[4] + v.z*m[8],  v.x*m[1] + v.y*m[5] + v.z*m[9],  v.x*m[2] + v.y*m[6] + v.z*m[10]);
 }
 
 

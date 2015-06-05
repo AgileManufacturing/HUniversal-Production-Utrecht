@@ -1,0 +1,5 @@
+string model
+string link
+float64 maxAcceleration
+---
+

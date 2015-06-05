@@ -31,9 +31,7 @@
 
 #pragma once
 
-#include <rexos_modbus/ModbusController.h>
-#include <rexos_motor/StepperMotor.h>
-#include "rexos_logger/rexos_logger.h"
+#include <rexos_motor/MotorInterface.h>
 
 #include <vector>
 
@@ -51,8 +49,7 @@ namespace rexos_motor{
 		 * @param motors Pointer array containing all motors for this manager.
 		 * @param numberOfMotors Number of motors in the pointer array.
 		 **/
-		MotorManager(rexos_modbus::ModbusController* modbus, std::vector<StepperMotor*> motors) :
-			modbus(modbus), motors(motors), poweredOn(false){}
+		MotorManager(std::vector<MotorInterface*> motors);
 
 		void powerOn(void);
 		void powerOnSingleMotor(int motorIndex);
@@ -64,20 +61,18 @@ namespace rexos_motor{
 		 * @return bool PowerOn state.
 		 **/
 		bool isPoweredOn(void){ return poweredOn; }
-		void startMovement(int motionSlot);
-
-	private:
+		
 		/**
-		 * @var ModbusController::ModbusController* modbus
-		 * Pointer to an established modbus connection.
+		 * Start simultaneously movement of all motors
 		 **/
-		rexos_modbus::ModbusController* modbus;
+		virtual void startMovement() = 0;
 
+	protected:
 		/**
 		 * @var StepperMotor** motors
 		 * Pointer array containing all motors for this manager.
 		 **/
-		std::vector<StepperMotor*> motors;
+		std::vector<MotorInterface*> motors;
 
 		/**
 		 * @var bool poweredOn
