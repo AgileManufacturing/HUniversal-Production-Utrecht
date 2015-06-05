@@ -1,18 +1,36 @@
+/**
+ * @Author Benno Zeeman
+ */
+
+function UIPanel() {
+	this.el_log = $('#log');
+}
+
+UIPanel.prototype = {
+	'writeLog': function(msg) {
+		this.el_log.append(msg);
+	},
+};
+
+
 function Server(url, id) {
 	this.websocket = new WebSocket(url);
 	this.form      = $('#' + id);
 
-	var that = this;
+	this.panel = new UIPanel();
 
-	this.websocket.onerror   = function(event) { that.onerror(event); };
-	this.websocket.onmessage = function(event) { that.onmessage(event); };
-	this.websocket.onclose   = function(event) { that.onclose(event); };
-	this.websocket.onopen    = function(event) { that.onopen(event); };
+	//var that       = this;
+
+	this.websocket.onerror   = this.onerror;
+	this.websocket.onmessage = this.onmessage;
+	this.websocket.onclose   = this.onclose;
+	this.websocket.onopen    = this.onopen;
 }
 
 Server.prototype = {
 	'onerror': function(event) {
-
+		console.log('onerror');
+		console.log(event);
 	},
 	'onmessage': function(event) {
 		var data = JSON.parse(event.data);
@@ -61,7 +79,28 @@ Server.prototype = {
 		}
 	},
 	'onclose': function(event) {
+		switch (event.code) {
+			case 1000: var desc = 'Normal Closure';             break;
+			case 1001: var desc = 'Going Away';                 break;
+			case 1002: var desc = 'Protocol error';             break;
+			case 1003: var desc = 'Unsupported Data';           break;
+			case 1005: var desc = 'No Status Rcvd';             break;
+			case 1006: var desc = 'Abnormal Closure';           break;
+			case 1007: var desc = 'Invalid frame payload data'; break;
+			case 1008: var desc = 'Policy Violation';           break;
+			case 1009: var desc = 'Message Too Big';            break;
+			case 1010: var desc = 'Mandatory Ext.';             break;
+			case 1011: var desc = 'Internal Server Error';      break;
+			case 1015: var desc = 'TLS handshake';              break;
+			default:   var desc = 'Unrecognized error code';    break;
+		}
 
+		console.log(event);
+
+		console.log(this.panel);
+		console.log(this.form);
+
+		this.panel.writeLog('onclose: "' + desc + '"');
 	},
 	'onopen': function(event) {
 		this.websocket.send('get json');
@@ -71,4 +110,4 @@ Server.prototype = {
 	},
 };
 
-var server = new Server('ws://' + window.location.hostname + ':5000', 'agent');
+var server = new Server('ws://' + window.location.hostname + ':3528', 'agent');

@@ -40,7 +40,7 @@ public class SCADAWebServer {
 				os.close();
         		return;
         	}
-        	
+
         	Headers hdrs = exchange.getResponseHeaders();
         	hdrs.add("Content-Type", Files.probeContentType(file.toPath()));
         	exchange.sendResponseHeaders(200, 0);
