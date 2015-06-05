@@ -2,6 +2,7 @@ package HAL;
 
 import generic.Mast;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -22,6 +23,7 @@ import HAL.listeners.ModuleListener;
  * @author Lars Veenendaal
  *
  */
+@SuppressWarnings("unused")
 public abstract class Module implements ModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
@@ -323,13 +325,13 @@ public abstract class Module implements ModuleListener {
 
 	public String getCalibrationDataForModuleAndChilds() {
 		System.out.println("getCalibrationDataForModuleAndChilds a1");
-		Vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
+		ArrayList<ModuleIdentifier> childs = getChildModulesIdentifiers();
 		String returnValue = getCalibrationDataForModuleAndOtherModules(childs);
 		System.out.println(returnValue);
 		return returnValue;
 	}
 
-	private Vector<ModuleIdentifier> getChildModulesIdentifiers() {
+	private ArrayList<ModuleIdentifier> getChildModulesIdentifiers() {
 		Row[] resultSet = knowledgeDBClient.executeSelectQuery(	
 					GET_CHILD_MODULES_INDENTIFIERS,
 					moduleIdentifier.manufacturer, 
@@ -339,7 +341,7 @@ public abstract class Module implements ModuleListener {
 					moduleIdentifier.typeNumber, 
 					moduleIdentifier.serialNumber);
 
-		Vector<ModuleIdentifier> childModules = null;
+		ArrayList<ModuleIdentifier> childModules = new ArrayList<ModuleIdentifier>();
 		if (resultSet.length != 0){
 			// get all the childs
 			int i = 0;
@@ -358,7 +360,7 @@ public abstract class Module implements ModuleListener {
 	}
 
 
-	public String getCalibrationDataForModuleAndOtherModules(Vector<ModuleIdentifier> moduleIdentifiers) {
+	public String getCalibrationDataForModuleAndOtherModules(ArrayList<ModuleIdentifier> moduleIdentifiers) {
 
 		int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 		String query = "SELECT properties FROM ModuleCalibration WHERE id = ?;";
@@ -371,13 +373,13 @@ public abstract class Module implements ModuleListener {
 		return (String) resultSet[0].get("properties");
 	}
 
-	private int getCalibrationGroupForModuleAndOtherModules(Vector<ModuleIdentifier> moduleIdentifiers) {
+	private int getCalibrationGroupForModuleAndOtherModules(ArrayList<ModuleIdentifier> moduleIdentifiers) {
 
 		// create a temp table for storing the modules
 		knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_TEMP_TABLE);
 
 		// Store the modules
-		Iterator itr = moduleIdentifiers.iterator();
+		Iterator<ModuleIdentifier> itr = moduleIdentifiers.iterator();
 		while(itr.hasNext()){
 			knowledgeDBClient.executeSelectQuery(GET_CALIBRATION_GROUP_FOR_MODULE_AND_OTHER_MODULES_STORE_THE_MODULES,
 				((ModuleTypeIdentifier) itr).manufacturer,
@@ -409,7 +411,7 @@ public abstract class Module implements ModuleListener {
 
 	protected void setCalibrationDataForModuleOnly(String properties){
 		
-		Vector<ModuleIdentifier> emptyList = null;
+		ArrayList<ModuleIdentifier> emptyList = new ArrayList<ModuleIdentifier>();
 		try{
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(emptyList);
 
@@ -435,11 +437,11 @@ public abstract class Module implements ModuleListener {
 	}
 
 	protected	void setCalibrationDataForModuleAndChilds(String properties){
-		Vector<ModuleIdentifier> childs = getChildModulesIdentifiers();
+		ArrayList<ModuleIdentifier> childs = getChildModulesIdentifiers();
 		setCalibrationDataForModuleAndOtherModules(childs, properties);
 	}
 
-	protected	void setCalibrationDataForModuleAndOtherModules(Vector<ModuleIdentifier> moduleIdentifiers, String properties){
+	protected	void setCalibrationDataForModuleAndOtherModules(ArrayList<ModuleIdentifier> moduleIdentifiers, String properties){
 		try{
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 			
@@ -463,7 +465,7 @@ public abstract class Module implements ModuleListener {
 				moduleIdentifier.serialNumber);
 			
 			//for(int i = 0; i < moduleIdentifiers.size(); i++){
-			Iterator itr = moduleIdentifiers.iterator();
+			Iterator<ModuleIdentifier> itr = moduleIdentifiers.iterator();
 			while(itr.hasNext()){
 			knowledgeDBClient.executeSelectQuery(
 				SET_CALIBRATION_DATA_FOR_MODULE_AND_OTHER_MODULE_INSERT_MODULE_CALIBRATION_MODULE_SET,
