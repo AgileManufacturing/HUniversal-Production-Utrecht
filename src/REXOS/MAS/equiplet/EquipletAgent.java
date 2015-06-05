@@ -1,6 +1,7 @@
 package MAS.equiplet;
 
 import generic.Mast;
+import generic.Mast.State;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -27,7 +28,6 @@ import org.json.JSONObject;
 import util.DTOModuleSettings;
 import util.log.LogLevel;
 import util.log.Logger;
-
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import HAL.dataTypes.ModuleIdentifier;
@@ -213,7 +213,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		}
 		
 		System.out.printf("EA: %s was deregistered from DF. Equiplet shutdown request sent.\n", getLocalName());
-		hal.reconfigureEquiplet();
+	
+		// TODO add reconfigigureEquiplet in HAL again
+		//hal.reconfigureEquiplet();
 	}
 	
 	/**
@@ -258,8 +260,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * @author Thomas Kok
 	 * @author Kevin Bosman
 	 */
+	
+	// TODO add getAllModules to HAL
 	public ArrayList<ModuleIdentifier> getAllModules(){
-		return hal.getAllModules();
+		//return hal.getAllModules();
+		return null;
 	}
 
 	/**
@@ -1057,12 +1062,24 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	}
 
-	@Override
+	// TODO shouldnt this be onEquipletStateChanged?
+	/*@Override
 	public void onEquipletMachineStateChanged(String state) {
 		System.out.println("Machinestate changed: " + state + ".\n");
 		if(this.reconfiguring == true && state == "SAFE"){
 			// TODO Send message to SCADA that shutdown has completed and machine is now safe.
 		}
+	}*/
+	
+	
+	@Override
+	public void onEquipletStateChanged(State state) {
+		// TODO Auto-generated method stub CHECK THIS
+		System.out.println("Machinestate changed: " + state + ".\n");
+		if(this.reconfiguring == true && state.toString() == "SAFE"){
+			// TODO Send message to SCADA that shutdown has completed and machine is now safe.
+		}
+		
 	}
 
 	@Override
@@ -1154,4 +1171,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void changeMAST(EquipletState state){
 		this.state = state ;	
 	}
+
+
 }

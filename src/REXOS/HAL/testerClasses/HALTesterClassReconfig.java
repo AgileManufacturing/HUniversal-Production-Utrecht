@@ -1,5 +1,8 @@
 package HAL.testerClasses;
 
+import generic.Mast.Mode;
+import generic.Mast.State;
+
 import java.util.ArrayList;
 
 import org.json.JSONObject;
@@ -12,6 +15,7 @@ import HAL.Module;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.HardwareStep.HardwareStepStatus;
+import HAL.steps.ProductStep;
 
 public class HALTesterClassReconfig implements HardwareAbstractionLayerListener {
 	static HALTesterClassReconfig htc = new HALTesterClassReconfig();
@@ -21,40 +25,16 @@ public class HALTesterClassReconfig implements HardwareAbstractionLayerListener 
 	public static void main(String[] args) throws Exception {
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
 		
-		hal = new HardwareAbstractionLayer(htc);
+		hal = new HardwareAbstractionLayer("HALTesterClassReconfig", htc);
 		
-		hal.reconfigureEquiplet();
+		// TODO add reconfigigureEquiplet in HAL again
+		//hal.reconfigureEquiplet();
 	}
 	
-	@Override
-	public void onTranslationFinished(String service, JSONObject criteria, ArrayList<HardwareStep> hardwareStep) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
-		hardwareSteps.addAll(hardwareStep);// = hardwareStep;
-		hal.executeHardwareSteps(hardwareSteps);
-	}
 
-	@Override
-	public void onTranslationFailed(String service, JSONObject criteria) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[] { service, criteria });
-	}
-
-	@Override
-	public void onProcessStatusChanged(HardwareStepStatus status, 
-			Module module, HardwareStep hardwareStep) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + status);
-	}
-
-	@Override
-	public void onModuleStateChanged(String state, Module module) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
-	}
-
-	@Override
-	public void onModuleModeChanged(String mode, Module module) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
-	}
-
-	@Override
+	// TODO CHANGE THIS: not available in HAL
+	
+	//@Override
 	public String getEquipletName() {
 		// TODO hardcoded!!!!!!
 		
@@ -66,29 +46,72 @@ public class HALTesterClassReconfig implements HardwareAbstractionLayerListener 
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
 	}
 
-	@Override
-	public void onEquipletMachineStateChanged(String state) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
-	}
 
-	@Override
-	public void onEquipletModeChanged(String mode) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + getEquipletName() + " has changed to " + mode);
-	}
 
 	@Override
 	public void onExecutionFailed() {
 		// TODO Auto-generated method stub
-		
+		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution FAILED!");
 	}
 
 	/**
 	 * [onReloadEquiplet -Test function W.I.P (Lars Veenendaal)]
 	 * @param state [description]
 	 */
-	@Override
+	// TODO CHANGE THIS: not available in HAL
+	
+	//@Override
 	public void onReloadEquiplet(String state){
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + state);
 
+	}
+
+	@Override
+	public void onEquipletStateChanged(State state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + getEquipletName() + " has changed to " + state);
+	}
+
+	@Override
+	public void onEquipletModeChanged(Mode mode) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + mode.name() + " has changed to " + mode);		
+	}
+
+	// TODO CHANGE THIS: empty
+	@Override
+	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onModuleStateChanged(Module module, State state) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
+	}
+
+	// TODO CHANGE THIS: empty
+	@Override
+	public void onModuleModeChanged(Module module, Mode mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTranslationFinished(ProductStep productStep,
+			ArrayList<HardwareStep> hardwareSteps) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
+		hardwareSteps.addAll(hardwareSteps);// = hardwareStep;
+		hal.executeHardwareSteps(hardwareSteps);
+	}
+
+	@Override
+	public void onTranslationFailed(ProductStep productStep) {
+		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", new Object[] { productStep.getService(), productStep.getCriteria() });
+		
+	}
+
+	// TODO CHANGE THIS: status wasn't available
+	@Override
+	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep) {
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + "CHANGE THIS TO STATUS");
 	}
 }
