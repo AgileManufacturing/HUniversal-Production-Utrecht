@@ -32,7 +32,7 @@ public class SCADAWebSocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println("WebSocketServer received: " +  message);
-		theListener.onWebSocketMessage(message);
+		theListener.onWebSocketMessage(conn, message);
 	}
 	
 	@Override
