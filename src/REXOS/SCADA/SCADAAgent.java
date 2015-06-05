@@ -47,7 +47,18 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 			AID aid = new AID(jsonObject.getString("aid"), AID.ISGUID);
 			switch(jsonObject.getString("command")) {
 			case "GETINFO":
-				connectToAgent(aid);
+				int index;
+				if((index = agentConnections.indexOf(aid)) >= 0){
+					// SCADAAgent is already connected to this agent
+					
+					// Remove connection from agent
+					removeClient(webSocketConnection);
+					// Connect to new agent
+					agentConnections.get(index).addClient(webSocketConnection);
+				}else{
+					agentConnections.add(new AgentConnection(aid, webSocketConnection));
+					connectToAgent(aid);
+				}
 				break;
 			case "UPDATE":
 				JSONArray jsonArray = jsonObject.getJSONArray("values");
@@ -68,12 +79,20 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 	
 	@Override
 	public void onWebSocketClose(WebSocket webSocketConnection){
-		// Problem which agent was the client connected to?
-		
-		for(int i = 0; i < agentConnections.size(); i++){
-			if(agentConnections.get(i).removeClient(webSocketConnection)){
+		removeClient(webSocketConnection);
+	}
+	
+	private void removeClient(WebSocket webSocketConnection){
+		int index = 0;
+		for(; index < agentConnections.size(); index++){
+			if(agentConnections.get(index).removeClient(webSocketConnection)){
 				break;
 			}
+		}
+		
+		// Remove agent if no clients are connected
+		if(agentConnections.get(index).getAmountOfClients() <= 0){
+			agentConnections.remove(index);
 		}
 	}
 	@Override
@@ -90,10 +109,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 			connectToAgent(gridAgent);
 		}
 	}	
-	
-	private void convertMessage(String message){
-		
-	}
 	
 	private void connectToAgent(AID agentID){
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);

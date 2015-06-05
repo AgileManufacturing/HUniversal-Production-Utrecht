@@ -21,4 +21,8 @@ public class AgentConnection {
 	public boolean removeClient(WebSocket client){
 		return clients.remove(client);
 	}
+	
+	public int getAmountOfClients(){
+		return clients.size();
+	}
 }
