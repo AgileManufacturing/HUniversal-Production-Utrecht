@@ -1,7 +1,6 @@
 package HAL.steps;
 
 import HAL.Module;
-import HAL.ModuleIdentifier;
 
 import org.json.JSONException;
 import org.json.JSONObject;
