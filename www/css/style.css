@@ -140,6 +140,18 @@ footer {
 	right: 0;*/
 }
 
+
+/**
+ * Log styling
+ */
+#log {
+	border: 1px solid black;
+
+	background-color: #EEEEEE;
+
+}
+
+
 /**
  * Form styling
  */
