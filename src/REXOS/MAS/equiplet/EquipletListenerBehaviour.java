@@ -64,6 +64,14 @@ public class EquipletListenerBehaviour extends Behaviour {
 			case ACLMessage.QUERY_IF:
 				handleInformationRequest(msg);
 				break;
+			case ACLMessage.PROPOSE:
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
+					//Handle equiplet command functie
+					equiplet.passEquipletCommand(msg);
+				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
+					//handle listener command functie
+				}
+				break;
 			default:
 				break;
 			}
