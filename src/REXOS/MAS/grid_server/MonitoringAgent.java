@@ -68,16 +68,11 @@ public class MonitoringAgent extends Agent {
 	protected void setup() {
 		try {
 			webSocket = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
-			boolean connected = webSocket.connectBlocking();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println(getLocalName() + " caught URISyntaxException: " + e.getMessage());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-
 		addBehaviour(new HeartBeatBehaviour(this, MONITORING_INTERVAL));
 		addBehaviour(new MonitorListener());
 

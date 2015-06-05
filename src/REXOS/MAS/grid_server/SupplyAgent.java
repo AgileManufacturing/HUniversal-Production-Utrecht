@@ -58,15 +58,7 @@ public class SupplyAgent extends Agent {
 	private static double[] lookUpTable = new double[32];
 
 	private static final long serialVersionUID = 1L;
-	private static final double maxStep = 16.5;
-	private static final double smallStep = 5.5;
 	private static String targetCrate = "GC4x4MB_6";
-	private static final int PICK_PLACE_ROTATION_SERVICE_ID = 30;
-	private static final int PICK_PLACE__SERVICE_ID = 20;
-	private static final int DRAW_SERVICE_ID = 10;
-	private static final int APPROACH_OFFSET = 75;
-	private boolean hasRotate = false;
-
 	private static String[] GC4x4MB_1 = new String[16];
 	private static String[] GC4x4MB_4 = new String[16];
 	private static String[] GC4x4MB_3 = new String[16];

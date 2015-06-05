@@ -9,16 +9,11 @@ import MAS.util.Position;
 import MAS.util.Tick;
 
 public class Product extends Agent {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Tick created;
 	private LinkedList<ProductStep> productSteps;
 	private LinkedList<ProductionStep> productionPath;
 	private Position position;
-	private Tick deadline;
 	private ProductState state;
 
 	public void init(Tick time, Tick deadline, LinkedList<ProductStep> steps, Position position) {
@@ -26,8 +21,6 @@ public class Product extends Agent {
 		this.productSteps = steps;
 		this.position = position;
 		this.productionPath = new LinkedList<>();
-
-		this.deadline = deadline;
 		this.state = ProductState.SCHEDULING;
 	}
 	public String getProductName() {
