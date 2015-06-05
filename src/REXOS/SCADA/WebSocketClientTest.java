@@ -2,7 +2,6 @@ package SCADA;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -49,7 +48,7 @@ public class WebSocketClientTest extends WebSocketClient {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			mws.send("THIS IS A TEST MESSAGE!");
+			mws.send("{\"command\":\"UPDATE\",\"aid\":\"EQ2\",\"values\":[{\"method\":\"test\",\"param\":\"100\"},{\"method\":\"test\",\"param\":\"200\"}]}");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

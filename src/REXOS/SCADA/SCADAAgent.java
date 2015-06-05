@@ -7,6 +7,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import org.java_websocket.WebSocket;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SCADAAgent extends Agent implements WebSocketServerListener{
 
@@ -35,21 +38,29 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 	public void onWebSocketMessage(WebSocket webSocketConnection, String message) {
 		// message convert to variables
 		System.out.println("SCADAAgent received: " + message);
-		
-		convertMessage(message);
-		
-		// WARNING THIS DOES NOT WORK.
-		AID agentAID = null;
-		
-		// change agent?
-		int index;
-		if((index = agentConnections.indexOf(agentAID)) >= 0){
-			// SCADAAgent is already connected to this agent
-			agentConnections.get(index).addClient(webSocketConnection);
-		}else{
-			agentConnections.add(new AgentConnection(agentAID, webSocketConnection));
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(message);
+			AID aid = new AID(jsonObject.getString("aid"), AID.ISGUID);
+			switch(jsonObject.getString("command")) {
+			case "GETINFO":
+				//connecToAgent(aid);
+				break;
+			case "UPDATE":
+				JSONArray jsonArray = jsonObject.getJSONArray("values");
+				for(int i = 0; i < jsonArray.length(); i++){
+					JSONObject o = jsonArray.getJSONObject(i);
+					String method, param;
+					method = o.getString("method");
+					param = o.getString("param");
+					executeMethodOnAgent(method, param);
+				}
+				break;
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
 	}
 	
 	@Override
@@ -59,14 +70,14 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 		for(int i = 0; i < agentConnections.size(); i++){
 			agentConnections.get(i).removeClient(webSocketConnection);
 		}
+	}	
+	
+	public void executeMethodOnAgent(String method, String param) {
+		switch(method) {
+		case "test":
+			System.out.println("Executing " + method + " with param: " + param);
+			break;
+			default:
+		}
 	}
-	
-	public void convertMessage(String message){
-		
-	}
-	
-	
-	
-	
-	
 }
