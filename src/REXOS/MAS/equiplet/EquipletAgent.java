@@ -63,6 +63,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	// Equiplet
 	private HardwareAbstractionLayer hal;
+	private EquipletReconfigureHandler reconfigHandle = new EquipletReconfigureHandler(this, hal);
 
 	/**
 	 * Equiplet agent startup
@@ -261,6 +262,17 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected int getExecuted() {
 		return history.size();
 	}
+	
+	/**
+	 * Reconfigure section
+	 */
+	public void passEquipletCommand(ACLMessage msg){
+		reconfigHandle.handleEquipletCommand(msg);
+	}
+	
+	/**
+	 * End reconfigure section
+	 */
 
 	/**
 	 * give an estimate of the duration of the service
