@@ -611,14 +611,14 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			fis.close();
 			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 			
-			File deltaRobotGazebo = new File(baseDir + "models/" + "deltaRobot.zip");
+			File deltaRobotGazebo = new File(baseDir + "models/" + "delta_robot_type_B.zip");
 			fis = new FileInputStream(deltaRobotGazebo);
 			content = new byte[(int) deltaRobotGazebo.length()];
 			fis.read(content);
 			fis.close();
 			String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
 			
-			File gripperGazebo = new File(baseDir + "models/" + "gripper.zip");
+			File gripperGazebo = new File(baseDir + "models/" + "gripper_type_A.zip");
 			fis = new FileInputStream(gripperGazebo);
 			content = new byte[(int) gripperGazebo.length()];
 			fis.read(content);
@@ -639,7 +639,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			fis.close();
 			String base64LensGazebo = new String(Base64.encodeBase64(content));
 			
-			File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
+			File workplaneGazebo = new File(baseDir + "models/" + "workplane_type_A.zip");
 			fis = new FileInputStream(workplaneGazebo);
 			content = new byte[(int) workplaneGazebo.length()];
 			fis.read(content);

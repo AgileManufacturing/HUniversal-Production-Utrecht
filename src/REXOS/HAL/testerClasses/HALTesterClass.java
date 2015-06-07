@@ -232,14 +232,14 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 			fis.close();
 			String base64DummyModuleBRos = new String(Base64.encodeBase64(content));
 			
-			File dummyModuleAGazebo = new File(baseDir + "models/" + "workplane.zip");
+			File dummyModuleAGazebo = new File(baseDir + "models/" + "workplane_type_A.zip");
 			fis = new FileInputStream(dummyModuleAGazebo);
 			content = new byte[(int) dummyModuleAGazebo.length()];
 			fis.read(content);
 			fis.close();
 			String base64DummyModuleAGazebo = new String(Base64.encodeBase64(content));
 			
-			File dummyModuleBGazebo = new File(baseDir + "models/" + "sixAxis.zip");
+			File dummyModuleBGazebo = new File(baseDir + "models/" + "six_axis_type_A.zip");
 			fis = new FileInputStream(dummyModuleBGazebo);
 			content = new byte[(int) dummyModuleBGazebo.length()];
 			fis.read(content);

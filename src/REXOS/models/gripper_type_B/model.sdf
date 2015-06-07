@@ -1,9 +1,15 @@
+<?xml version="1.0"?>
 <sdf version='1.4'>
-	<model name="Workplane">
+	<model name="Gripper">
 		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
 			<parentModel>{parentModel}</parentModel>
 			<parentLink>{parentLink}</parentLink>
 			<childLink>{childLink}</childLink>
+		</plugin>
+		<plugin name="gripper" filename="{baseDir}libgripper_plugin.so">
+			<grippers>base gripper</grippers>
+			<rosNamespace>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/</rosNamespace>
+			<address>8001</address>
 		</plugin>
 		<static>false</static>
 		<link name="base">
@@ -11,21 +17,31 @@
 			<gravity>false</gravity>
 		
 			<inertial>
-				<mass>10.000</mass>
+				<mass>.100</mass>
 			</inertial>
 			<visual name="visual">
 				<geometry>
 					<mesh>
-						<uri>file://{baseDir}workplane complex with corners.dae</uri>
+						<uri>file://{baseDir}gripper complex.dae</uri>
 					</mesh>
 				</geometry>
 			</visual>
 			<collision name="collision">
-				<pose>0.175 -0.200 0.02933 0 0 0</pose>
+				<pose>0 0 -0.00925 0 0 0</pose>
 				<geometry>
-					<box>
-						<size>0.450 0.400 0.008</size>
-					</box>
+					<cylinder>
+						<radius>0.003</radius>
+						<length>0.0125</length>
+					</cylinder>
+				</geometry>
+			</collision>
+			<collision name="gripper">
+				<pose>0 0 -0.044 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.002</radius>
+						<length>0.002</length>
+					</cylinder>
 				</geometry>
 			</collision>
 		</link>
