@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(part_follow_node)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger)
+find_package(catkin REQUIRED COMPONENTS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_configuration rexos_logger)
 find_package(Mongo)
 
 ###################################################
@@ -13,7 +13,7 @@ find_package(Mongo)
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES rexos_logger
-CATKIN_DEPENDS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_utilities rexos_logger
+CATKIN_DEPENDS roscpp rexos_blackboard_cpp_client rexos_datatypes rexos_configuration rexos_logger
 DEPENDS)
 
 ###########

@@ -58,7 +58,6 @@ KeyBoardControlNode::KeyBoardControlNode(std::string equipletName, rexos_datatyp
 {
 	REXOS_INFO("Constructing");
 
-	//DirectMoveStepsBlackBoard
 	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(
 			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
 			isShadow ? "shadow_" + equipletName : equipletName, 

@@ -119,8 +119,7 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 	}
 
 	private synchronized void removeParts() {
-		
-		
+		// TODO not implemented
 	}
 
 	/**

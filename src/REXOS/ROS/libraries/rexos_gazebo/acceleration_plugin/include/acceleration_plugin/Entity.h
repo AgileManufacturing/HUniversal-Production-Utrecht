@@ -12,6 +12,8 @@
 
 using namespace gazebo;
 
+#define NUMBER_OF_SAMPLES 51
+
 namespace acceleration_plugin {
 	class Entity {
 	public:
@@ -26,7 +28,8 @@ namespace acceleration_plugin {
 		double maxAcceleration;
 		ros::Publisher violationPublisher;
 	private:
-		double previousVelocity;
-		common::Time previousTime;
+		math::Vector3 positions[NUMBER_OF_SAMPLES];
+		common::Time times[NUMBER_OF_SAMPLES];
+		int numberOfIterations;
 	};
 }

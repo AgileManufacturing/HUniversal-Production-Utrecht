@@ -34,13 +34,14 @@
 #include <ros/ros.h>
 #include "rexos_logger/rexos_logger.h"
 #include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 namespace part_follow_node {
 
 	class PartFollowNode 
 	{
 		public:
-		PartFollowNode(std::string blackboardIp);
+		PartFollowNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isShadow);
 		virtual ~PartFollowNode();
 		void run();
 
@@ -52,6 +53,8 @@ namespace part_follow_node {
 		 * The maxAcceleration of the effector in millimeters per second.
 		 **/
 		double maxAcceleration;
+		std::string equipletName;
+		rexos_datatypes::ModuleIdentifier moduleIdentifier;
 
 		Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
 	};

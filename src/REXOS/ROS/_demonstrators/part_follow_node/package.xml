@@ -14,12 +14,12 @@
   <build_depend>roscpp</build_depend>
   <build_depend>rexos_blackboard_cpp_client</build_depend>
   <build_depend>rexos_datatypes</build_depend>
-  <build_depend>rexos_utilities</build_depend>
+  <build_depend>rexos_configuration</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rexos_blackboard_cpp_client</run_depend>
   <run_depend>rexos_datatypes</run_depend>
-  <run_depend>rexos_utilities</run_depend>
+  <run_depend>rexos_configuration</run_depend>
 
   <run_depend>rexos_logger</run_depend>
   <build_depend>rexos_logger</build_depend>
