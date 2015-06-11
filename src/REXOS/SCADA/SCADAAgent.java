@@ -7,11 +7,13 @@ import jade.lang.acl.ACLMessage;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.java_websocket.WebSocket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.configuration.ServerConfigurations;
 import MAS.util.Ontology;
 
 public class SCADAAgent extends Agent implements WebSocketServerListener{
@@ -98,8 +100,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 	@Override
 	public void onWebSocketOpen(WebSocket webSocketConnection) {
 		int index;
-		String ip = "127.0.0.1";
-		AID gridAgent = new AID("Grid@"+ip+"/JADE", AID.ISGUID);
+		AID gridAgent = new AID("Grid@"+ServerConfigurations.AGENT_ADDRESS, AID.ISGUID);
 		if((index = agentConnections.indexOf(gridAgent)) >= 0){
 			// SCADAAgent is already connected to this agent
 			agentConnections.get(index).addClient(webSocketConnection);

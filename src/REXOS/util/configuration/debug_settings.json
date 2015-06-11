@@ -53,6 +53,22 @@
 			"blackboardName": {
 				"default": "StateBlackboard"
 			}
+		},
+		"violations": {
+			"ip": {
+				"default": "127.0.0.1"
+			},
+			"databaseName": {
+				"default": "EQ",
+				"EQ1": "EQ1",
+				"EQ2": "EQ2",
+				"EQ3": "EQ3",
+				"EQ4": "EQ4",
+				"EQ5": "EQ5"
+			},
+			"blackboardName": {
+				"default": "ViolationsBlackboard"
+			}
 		}
 	},
 	"knowledgeDatabase": {
