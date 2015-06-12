@@ -25,4 +25,12 @@ public class AgentConnection {
 	public int getAmountOfClients(){
 		return clients.size();
 	}
+	
+	public AID getAgent(){
+		return agent;
+	}
+	
+	public ArrayList<WebSocket> getClients(){
+		return clients;
+	}
 }

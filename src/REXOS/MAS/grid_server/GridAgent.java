@@ -88,6 +88,8 @@ public class GridAgent extends Agent implements SCADABasicListener, SCADADetaile
 		spawnSupplyAgent();
 		addBehaviour(new GridAgentListenerBehaviour(this));
 		testGetAgents();
+		
+		subscribeByDF();
 	}
 
 //	class GridListenerBehaviour extends CyclicBehaviour {
@@ -258,6 +260,10 @@ public class GridAgent extends Agent implements SCADABasicListener, SCADADetaile
 		}
 	}
 	
+	void subscribeByDF(){
+		//DFService.
+	}
+	
 	void addBasicListener(AID agent){
 		basicListeners.add(agent);
 		System.out.println("GA: add basicListener " + agent.toString());
@@ -272,21 +278,29 @@ public class GridAgent extends Agent implements SCADABasicListener, SCADADetaile
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
 		System.out.println("GA: basicUpdate from: " + agent.toString() + "message: " + message);
+		String updateString = "{\n 'update-basic-listener': {\n 'aid': " + agent + "\n 'values': " + message + "\n}\n }";
+		for(int i = 0; i < basicListeners.size(); i++){
+			sendUpdateMessage(basicListeners.get(i), updateString);
+		}
 	}
 
 	// This might not be necessary
 	@Override
 	public void onDetailedUpdate(AID agent, String message) {
 		System.out.println("GA: detailedUpdate from: " + agent.toString() + "message: " + message);
+		String updateString = "{\n 'update-detailed-listener': {\n 'aid': " + agent + "\n 'values': " + message + "\n}\n }";
+		for(int i = 0; i < detailedListeners.size(); i++){
+			sendUpdateMessage(detailedListeners.get(i), updateString);
+		}
 	}
 	
-
-//	void addBasicListener(SCADABasicListener agent){
-//		basicListeners.add(agent);
-//		System.out.println("GA: add basicListener " + agent.toString());
-//	}
-//	void addDetailedListener(SCADADetailedListener agent){
-//		detailedListeners.add(agent);
-//		System.out.println("GA: add detailedListener " + agent.toString());
-//	}
+	private void sendUpdateMessage(AID agent, String update){
+		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+		
+		message.addReceiver(agent);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+		message.setContent(update);
+		send(message);
+	}
 }

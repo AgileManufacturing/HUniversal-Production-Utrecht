@@ -4,10 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.log.Logger;
-import MAS.equiplet.EquipletAgent;
 import MAS.util.Ontology;
-import SCADA.SCADABasicListener;
-import SCADA.SCADADetailedListener;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 

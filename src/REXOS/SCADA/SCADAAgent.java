@@ -2,13 +2,11 @@ package SCADA;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.java_websocket.WebSocket;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +26,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	private static final int webSocketServerPort = 3529;
 	
 	private ArrayList<AgentConnection> agentConnections;
+	private AgentConnection gridAgent;
 	
 	protected void setup() {
 		agentConnections = new ArrayList<AgentConnection>();
@@ -51,10 +50,18 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			switch(jsonObject.getString("command")) {
 			case "GETINFO":
 				int index;
-				if((index = agentConnections.indexOf(aid)) >= 0){
+				AgentConnection agent = null;
+				for(int i = 0; i < agentConnections.size(); i++){
+					if(agentConnections.get(i).getAgent().equals(aid)){
+						agent = agentConnections.get(i);
+						break;
+					}
+				}
+				if(agent != null){
+					index = agentConnections.indexOf(agent);
 					// SCADAAgent is already connected to this agent
-					
-					// Remove connection from agent
+						
+					// Remove old client connection from agent
 					removeClient(webSocketConnection);
 					// Connect to new agent
 					agentConnections.get(index).addClient(webSocketConnection);
@@ -101,14 +108,17 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	@Override
 	public void onWebSocketOpen(WebSocket webSocketConnection) {
 		int index;
-		AID gridAgent = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
-		if((index = agentConnections.indexOf(gridAgent)) >= 0){
-			// SCADAAgent is already connected to this agent
-			agentConnections.get(index).addClient(webSocketConnection);
+		if(gridAgent != null){
+			if((index = agentConnections.indexOf(gridAgent)) >= 0){
+				// SCADAAgent is already connected to this agent
+				agentConnections.get(index).addClient(webSocketConnection);
+			}
 		}else{
-			agentConnections.add(new AgentConnection(gridAgent, webSocketConnection));
+			AID gridAgentAID = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
+			gridAgent = new AgentConnection(gridAgentAID, webSocketConnection);
+			agentConnections.add(gridAgent);
 			
-			connectToAgent(gridAgent);
+			connectToAgent(gridAgentAID);
 		}
 	}	
 	
@@ -137,10 +147,46 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
 		System.out.println("SCADA: basicUpdate from: " + agent.toString() + "message: " + message);
+		AgentConnection agentConn = null;
+		
+		// Search AgentConnection for agent
+		for(int i = 0; i < agentConnections.size(); i++){
+			if(agentConnections.get(i).getAgent().equals(agent)){
+				agentConn = agentConnections.get(i);
+				break;
+			}
+		}
+		
+		// AgentConnection should be found
+		if(agentConn != null){
+			int index = agentConnections.indexOf(agentConn);
+			ArrayList<WebSocket> clients = agentConnections.get(index).getClients();
+			for(int i = 0; i < clients.size(); i++){
+				webSocketServer.sendMessage(clients.get(i), message);
+			}
+		}
 	}
 
 	@Override
 	public void onDetailedUpdate(AID agent, String message) {
 		System.out.println("SCADA: detailedUpdate from: " + agent.toString() + "message: " + message);
+		AgentConnection agentConn = null;
+		
+		// Search AgentConnection for agent
+		for(int i = 0; i < agentConnections.size(); i++){
+			if(agentConnections.get(i).getAgent().equals(agent)){
+				agentConn = agentConnections.get(i);
+				break;
+			}
+		}
+		
+		// AgentConnection should be found
+		if(agentConn != null){
+			int index = agentConnections.indexOf(agentConn);
+			ArrayList<WebSocket> clients = agentConnections.get(index).getClients();
+			for(int i = 0; i < clients.size(); i++){
+				webSocketServer.sendMessage(clients.get(i), message);
+			}
+		}
 	}
 }
