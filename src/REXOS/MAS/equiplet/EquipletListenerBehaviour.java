@@ -139,6 +139,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 				if(requestedEquipletCommand.equals("AddDetailedListener")){
 					//equiplet.addDetailedListener(msg.getSender());
 					System.out.println("addDetailedListener "+ equiplet.toString());
+				}else if(requestedEquipletCommand.equals("AddBasicListener")){
+					System.out.println("addBasicListener "+ equiplet.toString());
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}

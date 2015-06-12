@@ -2,6 +2,7 @@ package SCADA;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 
 import java.net.UnknownHostException;
@@ -16,7 +17,7 @@ import org.json.JSONObject;
 import util.configuration.ServerConfigurations;
 import MAS.util.Ontology;
 
-public class SCADAAgent extends Agent implements WebSocketServerListener{
+public class SCADAAgent extends Agent implements WebSocketServerListener, SCADABasicListener, SCADADetailedListener{
 
 	/**
 	 *  Default UID
@@ -100,7 +101,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 	@Override
 	public void onWebSocketOpen(WebSocket webSocketConnection) {
 		int index;
-		AID gridAgent = new AID("Grid@"+ServerConfigurations.AGENT_ADDRESS, AID.ISGUID);
+		AID gridAgent = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
 		if((index = agentConnections.indexOf(gridAgent)) >= 0){
 			// SCADAAgent is already connected to this agent
 			agentConnections.get(index).addClient(webSocketConnection);
@@ -131,5 +132,15 @@ public class SCADAAgent extends Agent implements WebSocketServerListener{
 			break;
 			default:
 		}
+	}
+
+	@Override
+	public void onBasicUpdate(AID agent, String message) {
+		System.out.println("SCADA: basicUpdate from: " + agent.toString() + "message: " + message);
+	}
+
+	@Override
+	public void onDetailedUpdate(AID agent, String message) {
+		System.out.println("SCADA: detailedUpdate from: " + agent.toString() + "message: " + message);
 	}
 }

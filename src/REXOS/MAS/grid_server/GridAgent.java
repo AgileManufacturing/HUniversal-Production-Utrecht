@@ -41,7 +41,6 @@ package MAS.grid_server;
 import generic.Criteria;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -51,6 +50,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -66,11 +66,15 @@ import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.Tick;
+import SCADA.SCADABasicListener;
+import SCADA.SCADADetailedListener;
 
-public class GridAgent extends Agent {
+public class GridAgent extends Agent implements SCADABasicListener, SCADADetailedListener{
 	private static final long serialVersionUID = -720095833750151495L;
 
 	private long productCounter = 0;
+	private ArrayList<AID> basicListeners;
+	private ArrayList<AID> detailedListeners;
 
 	public GridAgent() {
 		productCounter = 0;
@@ -80,50 +84,50 @@ public class GridAgent extends Agent {
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		addBehaviour(new GridListenerBehaviour());
+		addBehaviour(new GridAgentListenerBehaviour(this));
 		testGetAgents();
 	}
 
-	class GridListenerBehaviour extends CyclicBehaviour {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public void action() {
-			ACLMessage msg = blockingReceive();
-			if (msg != null) {
-				System.out.println(getLocalName() + ": received new request to spwan agent.");
-
-				try {
-					ContainerController cc = getContainerController();
-					String name = "PA" + productCounter++;
-
-					// parse configurations
-					LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(msg.getContent());
-
-					for (ProductStep productStep : productSteps) {
-						// replace the criteria in each productstep by the actual identifiers of crates and objects
-						productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
-					}
-
-					// TODO hard coded, need to come from arguments
-					Position startPosition = new Position(0, 0);
-					Tick deadline = new Tick().add(1000000);
-
-					Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
-					AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
-					ac.start();
-
-				} catch (StaleProxyException e) {
-					e.printStackTrace();
-				} catch (JSONException e) {
-					System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
-				}
-			}
-		}
-	};
+//	class GridListenerBehaviour extends CyclicBehaviour {
+//		/**
+//		 * 
+//		 */
+//		private static final long serialVersionUID = 1L;
+//
+//		@Override
+//		public void action() {
+//			ACLMessage msg = blockingReceive();
+//			if (msg != null) {
+//				System.out.println(getLocalName() + ": received new request to spwan agent.");
+//
+//				try {
+//					ContainerController cc = getContainerController();
+//					String name = "PA" + productCounter++;
+//
+//					// parse configurations
+//					LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(msg.getContent());
+//
+//					for (ProductStep productStep : productSteps) {
+//						// replace the criteria in each productstep by the actual identifiers of crates and objects
+//						productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
+//					}
+//
+//					// TODO hard coded, need to come from arguments
+//					Position startPosition = new Position(0, 0);
+//					Tick deadline = new Tick().add(1000000);
+//
+//					Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
+//					AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
+//					ac.start();
+//
+//				} catch (StaleProxyException e) {
+//					e.printStackTrace();
+//				} catch (JSONException e) {
+//					System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
+//				}
+//			}
+//		}
+//	};
 
 	/**
 	 * TODO replace with Parser.parseProductConfiguration!
@@ -251,4 +255,36 @@ public class GridAgent extends Agent {
 			e.printStackTrace();
 		}
 	}
+	
+	void addBasicListener(AID agent){
+		basicListeners.add(agent);
+		System.out.println("GA: add basicListener " + agent.toString());
+	}
+	
+	// This might not be necessary
+	void addDetailedListener(AID agent){
+		detailedListeners.add(agent);
+		System.out.println("GA: add detailedListener " + agent.toString());
+	}
+
+	@Override
+	public void onBasicUpdate(AID agent, String message) {
+		System.out.println("GA: basicUpdate from: " + agent.toString() + "message: " + message);
+	}
+
+	// This might not be necessary
+	@Override
+	public void onDetailedUpdate(AID agent, String message) {
+		System.out.println("GA: detailedUpdate from: " + agent.toString() + "message: " + message);
+	}
+	
+
+//	void addBasicListener(SCADABasicListener agent){
+//		basicListeners.add(agent);
+//		System.out.println("GA: add basicListener " + agent.toString());
+//	}
+//	void addDetailedListener(SCADADetailedListener agent){
+//		detailedListeners.add(agent);
+//		System.out.println("GA: add detailedListener " + agent.toString());
+//	}
 }
