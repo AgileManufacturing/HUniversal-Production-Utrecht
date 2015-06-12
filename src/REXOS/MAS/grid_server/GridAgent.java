@@ -78,6 +78,8 @@ public class GridAgent extends Agent implements SCADABasicListener, SCADADetaile
 
 	public GridAgent() {
 		productCounter = 0;
+		basicListeners = new ArrayList<AID>();
+		detailedListeners = new ArrayList<AID>();
 	}
 
 	@Override
