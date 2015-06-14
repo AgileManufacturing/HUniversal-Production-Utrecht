@@ -446,7 +446,8 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	KeyBoardControlNode keyBoardControlNode("EQ2", rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"), true);
+//	KeyBoardControlNode keyBoardControlNode("EQ2", rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"), true);
+	KeyBoardControlNode keyBoardControlNode("EQ3", rexos_datatypes::ModuleIdentifier("HU", "six_axis_type_A", "1"), false);
 	keyBoardControlNode.run();
 	
 	return 0;

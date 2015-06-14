@@ -53,21 +53,8 @@ namespace rexos_stewart_gough{
 		REXOS_INFO("StewartGough constructor entering...");
 		readJSONNode(node);
 		
-		motorMap[0] = MotorMap(0,3);
-		motorMap[1] = MotorMap(1,2);
-		motorMap[2] = MotorMap(2,1);
-		motorMap[3] = MotorMap(3,0);
-		motorMap[4] = MotorMap(4,4);
-		motorMap[5] = MotorMap(5,5);
-		
-		// TODO hardcoded
 		sixAxisCalculations = new SixAxisCalculations(stewartGoughMeasures);
 
-		REXOS_INFO_STREAM(" max angle: " << stewartGoughMeasures.maxJointAngle << std::endl); 
-	
-
-	   // kinematics = new InverseKinematics;
-		
 		REXOS_INFO("end of constructor reached");
 	}
 
@@ -141,17 +128,13 @@ namespace rexos_stewart_gough{
 
 		// Get the motor angles from the kinematics model
 		SixAxisCalculations::EffectorMove effectorMove = sixAxisCalculations->getMotorAngles(point);
+		if(effectorMove.validMove == false) {
+			throw std::out_of_range("move is not valid because joints are out of bounds or position is out of reach");
+		}
 		std::vector<rexos_motor::MotorRotation> rotations;
 		for(uint i = 0; i < motors.size(); i++){
 			rexos_motor::MotorRotation rotation;
-			//Swap 4 and 5
-			if(i == 4){
-				rotation.angle = effectorMove.angles[5];
-			} else if(i == 5){
-				rotation.angle = effectorMove.angles[4];
-			} else {
-				rotation.angle = effectorMove.angles[i];
-			}
+			rotation.angle = effectorMove.angles[i];
 			rotations.push_back(rotation);
 		}
 
@@ -301,14 +284,6 @@ namespace rexos_stewart_gough{
 	 **/
 	StewartGoughLocation StewartGough::getEffectorLocation(){
 		return effectorLocation;
-	}
-	
-	rexos_motor::MotorInterface* StewartGough::getMotor(int number){
-		return motors[getMotorIndexByNumber(number)];
-	}
-	
-	int StewartGough::getMotorIndexByNumber(int number){
-		return motorMap[number].motor;
 	}
 	
 }

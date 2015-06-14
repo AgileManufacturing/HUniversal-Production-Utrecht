@@ -283,7 +283,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	]," +
 			"	\"attachedTo\":null," +
 			"\"mountPointX\":3," +
-			"\"mountPointY\":2" +
+			"\"mountPointY\":1" +
 			"}";
 	// gripper
 	static String moduleB_01 = "{" +
@@ -348,7 +348,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"		\"capabilities\":[" +
 			"		]" +
 			"	}," +
-			"	\"properties\":{}," +
+			"	\"properties\":{" +
+			"		\"modbusIp\" : \"192.168.0.22\"," +
+			"		\"modbusPort\" : 502" +
+			"	}," +
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":{" +

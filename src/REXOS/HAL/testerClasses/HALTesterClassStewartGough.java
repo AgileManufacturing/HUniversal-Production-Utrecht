@@ -48,13 +48,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"midPointX\" : 75.0," +
 			"			\"midPointY\" : -200.0," +
 			"			\"midPointZ\" : -34.3," +
-			"			\"deltaRobotMeasures\" : {" +
+			"			\"stewartGoughMeasures\" : {" +
 			"				\"baseRadius\" : 100.0," +
-			"				\"motorJointOffset\" : 11.72," +
+			"				\"jointOffset\" : 31.72," +
 			"				\"hipLength\" : 100.0," +
 			"				\"effectorRadius\" : 42.5," +
+			"				\"effectorHeight\" : 9.50," +
 			"				\"ankleLength\" : 300.0," +
-			"				\"maxJointAngle\" : 22.0," +
+			"				\"maxJointAngleDegrees\" : 22.0," +
 			"				\"boundaryBoxMinX\" : -200.0," +
 			"				\"boundaryBoxMaxX\" : 200.0," +
 			"				\"boundaryBoxMinY\" : -200.0," +
@@ -360,7 +361,10 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"		\"capabilities\":[" +
 			"		]" +
 			"	}," +
-			"	\"properties\":{}," +
+			"	\"properties\":{" +
+			"		\"modbusIp\" : \"192.168.0.32\"," +
+			"		\"modbusPort\" : 502" +
+			"	}," +
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":{" +
