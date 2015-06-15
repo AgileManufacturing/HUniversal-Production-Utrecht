@@ -54,7 +54,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			int index = 0;
 			switch(jsonObject.getString("command")) {
 			case "GETOVERVIEW": 
-				webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"Name\":\"EQ2\",\"type\":\"EquipletAgent\"},{\"Name\":\"EQ42\",\"type\":\"EquipletAgent\"}, {\"Name\":\"PA2\",\"type\":\"ProductAgent\"}]}");
+				webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"ID\":\"EQ2\",\"type\":\"equiplet\",\"name\":\"Equiplet two\"},{\"ID\":\"EQ42\",\"type\":\"equiplet\",\"name\":\"Equiplet forty-two\"}, {\"ID\":\"PA2\",\"type\":\"product\",\"name\":\"Product two\"}]}");
 //				if(gridAgent != null){
 //					if((index = agentConnections.indexOf(gridAgent)) >= 0){
 //						// SCADAAgent is already connected to this agent
