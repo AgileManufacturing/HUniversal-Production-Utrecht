@@ -70,6 +70,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	// Equiplet
 	private HardwareAbstractionLayer hal;
+	
+	//SCADA listeners
+	private ArrayList<AID> basicListeners;
+	private ArrayList<AID> detailedListeners;
 
 	/**
 	 * Equiplet agent startup
@@ -1171,6 +1175,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void changeMAST(EquipletState state){
 		this.state = state ;	
 	}
-
+	
+	public void addSCADABasicListener(AID listener) {
+		
+	}
+	
+	public void addSCADADetailedListener(AID listener) {
+		
+	}
 
 }

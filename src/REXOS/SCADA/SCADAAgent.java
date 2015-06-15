@@ -50,18 +50,19 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			int index = 0;
 			switch(jsonObject.getString("command")) {
 			case "GETOVERVIEW": 
-				if(gridAgent != null){
-					if((index = agentConnections.indexOf(gridAgent)) >= 0){
-						// SCADAAgent is already connected to this agent
-						agentConnections.get(index).addClient(webSocketConnection);
-					}
-				}else{
-					AID gridAgentAID = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
-					gridAgent = new AgentConnection(gridAgentAID, webSocketConnection);
-					agentConnections.add(gridAgent);
-					
-					connectToAgent(gridAgentAID);
-				}
+				webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"Name\":\"EQ2\",\"type\":\"EquipletAgent\"},{\"Name\":\"EQ42\",\"type\":\"EquipletAgent\"}, {\"Name\":\"PA2\",\"type\":\"ProductAgent\"}]}");
+//				if(gridAgent != null){
+//					if((index = agentConnections.indexOf(gridAgent)) >= 0){
+//						// SCADAAgent is already connected to this agent
+//						agentConnections.get(index).addClient(webSocketConnection);
+//					}
+//				}else{
+//					AID gridAgentAID = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
+//					gridAgent = new AgentConnection(gridAgentAID, webSocketConnection);
+//					agentConnections.add(gridAgent);
+//					
+//					connectToAgent(gridAgentAID);
+//				}
 				break;
 			case "GETINFO":
 				AgentConnection agent = null;
