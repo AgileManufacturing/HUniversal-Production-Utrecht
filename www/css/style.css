@@ -142,13 +142,42 @@ footer {
 
 
 /**
+ * Grid styling
+ */
+ul#grid {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+ul#grid > li {
+	width: 33.33%;
+	display: inline-block;
+
+	box-sizing: border-box;
+
+	padding: 2px;
+
+	margin: 8px 0;
+}
+ul#grid > li > a {
+	display: block;
+}
+
+
+/**
  * Log styling
  */
-#log {
+pre#log {
 	border: 1px solid black;
 
 	background-color: #EEEEEE;
 
+	padding: 8px 16px;
+}
+pre#log .time {
+	color: rgba(0,0,0,.5);
+
+	font-size: .6em;
 }
 
 

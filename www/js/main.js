@@ -6,11 +6,42 @@
 
 function UIPanel() {
 	this.el_log = $('#log');
+	this.grid   = $('#grid');
+
+
 }
 
 UIPanel.prototype = {
-	'writeLog': function(msg) {
-		this.el_log.append(msg);
+	'println': function(msg) {
+		var date = new Date();
+
+		var hh = date.getHours();
+		var mm = date.getMinutes();
+		var ss = date.getSeconds();
+		var cc = Math.floor(date.getMilliseconds() / 10);
+
+		if (hh < 10) { hh = '0' + hh; }
+		if (mm < 10) { mm = '0' + mm; }
+		if (ss < 10) { ss = '0' + ss; }
+		if (cc < 10) { cc = '0' + cc; }
+
+		var str = hh + ':' + mm + ':' + ss + '.' + cc;
+
+		this.el_log.append('<small class="time">' + str + '</small> ' + msg + '\n');
+	},
+	'addAgent': function(ID, type, name) {
+		var $li = $('<li></li>', {'data-id': ID, 'class': type});
+		var $a  = $('<a></a>',   {'href': '#', on: {click: (this.agentClick).bind(this)}});
+
+		$li.append($a);
+		$a.text(name);
+
+		this.grid.append($li);
+	},
+	'agentClick': function(event) {
+		event.preventDefault();
+
+
 	},
 };
 
@@ -19,7 +50,7 @@ function Server(url, id) {
 	this.websocket = new WebSocket(url);
 	this.form      = $('#' + id);
 
-	this.panel = new UIPanel();
+	this.panel     = new UIPanel();
 
 	//var that       = this;
 
@@ -31,13 +62,33 @@ function Server(url, id) {
 
 Server.prototype = {
 	'onerror': function(event) {
+		this.panel.println('onerror');
 		console.log('onerror');
 		console.log(event);
 	},
 	'onmessage': function(event) {
+		this.panel.println('onmessage');
 		var data = JSON.parse(event.data);
 
-		for (key in data) {
+		switch (data['type']) {
+			case 'grid':
+				for(var i = 0; i < data['agents'].length; i++) {
+					var agent = data['agents'][i];
+
+					this.panel.addAgent(agent.ID, agent.type, agent.name);
+				}
+
+				break;
+			case 'equiplet':
+
+				break;
+			default:
+				this.panel.println('Message received with unknown type');
+				break;
+		}
+
+
+		/*for (key in data) {
 			// Type to be filled according to type of field in JSON
 			type = '';
 
@@ -78,7 +129,7 @@ Server.prototype = {
 			field.append(input);
 
 			this.form.append(field);
-		}
+		}*/
 	},
 	'onclose': function(event) {
 		switch (event.code) {
@@ -102,14 +153,27 @@ Server.prototype = {
 		console.log(this.panel);
 		console.log(this.form);
 
-		this.panel.writeLog('onclose: "' + desc + '"');
+		this.panel.println('onclose: "' + desc + '"');
 	},
 	'onopen': function(event) {
-		this.websocket.send('get json');
+		var str = JSON.stringify({
+			'command': 'GETOVERVIEW',
+			'aid':     null,
+			'values':  []
+		});
+		this.websocket.send(str);
+		this.panel.println('onopen');
+
+		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
+		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
+		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
+		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
+		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
+		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
 	},
 	'toJson': function() {
 
 	},
 };
 
-var server = new Server('ws://' + window.location.hostname + ':3528', 'agent');
+var server = new Server('ws://' + window.location.hostname + ':3529', 'agent');
