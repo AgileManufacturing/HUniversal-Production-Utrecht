@@ -17,6 +17,8 @@ import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.Tick;
 import MAS.util.Triple;
+import SCADA.SCADABasicListener;
+import SCADA.SCADADetailedListener;
 
 public class ProductAgent extends Agent {
 	/**
@@ -36,6 +38,9 @@ public class ProductAgent extends Agent {
 
 	private ScheduleBehaviour scheduleBehaviour;
 	private ProductListenerBehaviour listenerBehaviour;
+	
+	private ArrayList<AID> basicListeners;
+	private ArrayList<AID> detailedListeners;
 
 	public void setup() {
 		Object[] args = getArguments();
@@ -283,6 +288,41 @@ public class ProductAgent extends Agent {
 
 			// reschedule
 			reschedule(time, newDeadline);
+		}
+	}
+	
+	public void addSCADADetailedListener(AID listener) {
+		if(!detailedListeners.contains(listener)) {
+			detailedListeners.add(listener);
+		}
+	}
+	
+	public void addSCADABasicListener(AID listener) {
+		if(!basicListeners.contains(listener)) {
+			basicListeners.add(listener);
+		}
+	}
+	
+	private void sendUpdateMessageToBasicListeners(String update){
+		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+		for(int i = 0; i < basicListeners.size(); i++) {
+			message.addReceiver(basicListeners.get(i));
+			message.setOntology(Ontology.GRID_ONTOLOGY);
+			message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+			message.setContent(update);
+			send(message);
+		}
+		
+	}
+	
+	private void sendUpdateMessageToDetailedListeners(String update){
+		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+		for(int i = 0; i < basicListeners.size(); i++) {
+			message.addReceiver(basicListeners.get(i));
+			message.setOntology(Ontology.GRID_ONTOLOGY);
+			message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+			message.setContent(update);
+			send(message);
 		}
 	}
 }
