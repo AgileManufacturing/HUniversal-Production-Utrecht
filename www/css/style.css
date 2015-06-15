@@ -28,6 +28,11 @@ a {
 }
 
 
+h1 {
+	border-bottom: 1px solid black;
+	font-size: 1.5em;
+}
+
 
 /**
  * Major structure elements styling
@@ -142,13 +147,78 @@ footer {
 
 
 /**
+ * Grid styling
+ */
+#grid > ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#grid > ul > li {
+	width: 33.33%;
+	display: inline-block;
+
+	box-sizing: border-box;
+
+	padding: 8px;
+
+	margin: 8px 0;
+
+	position: relative;
+}
+#grid > ul > li.equiplet:before {
+	content: 'equiplet';
+}
+#grid > ul > li.product:before {
+	content: 'product';
+}
+#grid > ul > li:before {
+	content: 'equiplet';
+	font-size: .5em;
+
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+#grid > ul > li > a {
+	display: block;
+
+	border: 1px solid black;
+}
+
+
+/**
  * Log styling
  */
-#log {
+#log > pre {
 	border: 1px solid black;
 
 	background-color: #EEEEEE;
 
+	height: 256px;
+
+	overflow-y: scroll;
+}
+#log > pre > .line:nth-child(odd) {
+	background-color: rgba(0,0,0,.05);
+}
+#log > pre .time,
+#log > pre .id {
+	font-size: .6em;
+	display: inline-block;
+
+	margin: 0 2px;
+}
+#log > pre .time {
+	color: rgba(0,0,0,.5);
+}#log > pre .id {
+	color: rgba(0,191,0,.75);
+	width: 48px;
+
+	text-overflow: ellipsis;
+	overflow: hidden;
+}#log > pre .msg {
+	display: inline-block;
 }
 
 
