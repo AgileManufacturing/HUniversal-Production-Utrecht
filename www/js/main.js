@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * @Author Benno Zeeman
  */
@@ -21,10 +23,10 @@ function Server(url, id) {
 
 	//var that       = this;
 
-	this.websocket.onerror   = this.onerror;
-	this.websocket.onmessage = this.onmessage;
-	this.websocket.onclose   = this.onclose;
-	this.websocket.onopen    = this.onopen;
+	this.websocket.onerror   = (this.onerror).bind(this);
+	this.websocket.onmessage = (this.onmessage).bind(this);
+	this.websocket.onclose   = (this.onclose).bind(this);
+	this.websocket.onopen    = (this.onopen).bind(this);
 }
 
 Server.prototype = {
