@@ -5,14 +5,19 @@
  */
 
 function UIPanel() {
-	this.el_log = $('#log');
-	this.grid   = $('#grid');
+	this.el_log = $('#log pre');
+	this.grid   = $('#grid ul');
 
 
 }
 
 UIPanel.prototype = {
-	'println': function(msg) {
+	'println': function(msg, id) {
+		var id_str = '';
+		if (typeof id !== 'undefined') {
+			id_str = '<em class="id">' + id + '</em> ';
+		}
+
 		var date = new Date();
 
 		var hh = date.getHours();
@@ -27,10 +32,25 @@ UIPanel.prototype = {
 
 		var str = hh + ':' + mm + ':' + ss + '.' + cc;
 
-		this.el_log.append('<small class="time">' + str + '</small> ' + msg + '\n');
+
+
+		var bottom = this.el_log.prop('scrollHeight') - this.el_log.scrollTop() == this.el_log.innerHeight();
+
+		this.el_log.append(
+			'<em class="time">' + str + '</em> '
+			+ id_str
+			+ msg
+			+ '\n'
+		);
+
+		if (bottom === true) {
+			this.el_log.scrollTop(this.el_log.prop('scrollHeight'));
+		}
 	},
-	'addAgent': function(ID, type, name) {
-		var $li = $('<li></li>', {'data-id': ID, 'class': type});
+	'addAgent': function(id, type, name) {
+		this.println('Adding agent "' + id + '"', 'ui');
+
+		var $li = $('<li></li>', {'data-id': id, 'class': type});
 		var $a  = $('<a></a>',   {'href': '#', on: {click: (this.agentClick).bind(this)}});
 
 		$li.append($a);
@@ -41,18 +61,22 @@ UIPanel.prototype = {
 	'agentClick': function(event) {
 		event.preventDefault();
 
+		var $target = $(event.target);
+		var id      = $target.data('id');
+		this.println('Clicked agent "' + id + '"', 'ui');
+
+
 
 	},
 };
 
 
 function Server(url, id) {
+	this.id        = id;
 	this.websocket = new WebSocket(url);
-	this.form      = $('#' + id);
 
 	this.panel     = new UIPanel();
-
-	//var that       = this;
+	this.panel.println('Server instantiated', this.id);
 
 	this.websocket.onerror   = (this.onerror).bind(this);
 	this.websocket.onmessage = (this.onmessage).bind(this);
@@ -62,12 +86,12 @@ function Server(url, id) {
 
 Server.prototype = {
 	'onerror': function(event) {
-		this.panel.println('onerror');
-		console.log('onerror');
+		this.panel.println('Error occurred', this.id);
+		console.log('onerror (event next)');
 		console.log(event);
 	},
 	'onmessage': function(event) {
-		this.panel.println('onmessage');
+		this.panel.println('Received message', this.id);
 		var data = JSON.parse(event.data);
 
 		switch (data['type']) {
@@ -83,7 +107,7 @@ Server.prototype = {
 
 				break;
 			default:
-				this.panel.println('Message received with unknown type');
+				this.panel.println('Message received with unknown type', this.id);
 				break;
 		}
 
@@ -148,12 +172,10 @@ Server.prototype = {
 			default:   var desc = 'Unrecognized error code';    break;
 		}
 
+		console.log('onclose (event next)');
 		console.log(event);
 
-		console.log(this.panel);
-		console.log(this.form);
-
-		this.panel.println('onclose: "' + desc + '"');
+		this.panel.println('onclose: "' + desc + '"' + ' (' + event.code + ')', this.id);
 	},
 	'onopen': function(event) {
 		var str = JSON.stringify({
@@ -162,18 +184,18 @@ Server.prototype = {
 			'values':  []
 		});
 		this.websocket.send(str);
-		this.panel.println('onopen');
+		this.panel.println('Connected to web socket', this.id);
 
-		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
-		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
-		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
-		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
-		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
-		this.panel.addAgent('henkie', 'equiplet', 'HenkAgent');
+		this.panel.addAgent('henk',   'equiplet', 'Henk');
+		this.panel.addAgent('klaas',  'equiplet', 'Klaas');
+		this.panel.addAgent('piet',   'equiplet', 'Piet');
+		this.panel.addAgent('jan',    'equiplet', 'Jan');
+		this.panel.addAgent('gerrit', 'equiplet', 'Gerrit');
+		this.panel.addAgent('hans',   'equiplet', 'Hans');
 	},
 	'toJson': function() {
 
 	},
 };
 
-var server = new Server('ws://' + window.location.hostname + ':3529', 'agent');
+var server = new Server('ws://' + window.location.hostname + ':3529', 'SCADA');
