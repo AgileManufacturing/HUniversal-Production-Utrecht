@@ -27,7 +27,14 @@
 
 	<target name             ="all" depends="MAS, HAL, generic, util"/>
 
-	<target name             ="MAS" depends="util, generic, HAL">
+	<target name             ="SCADA" depends="util, generic">
+		<mkdir dir           ="build/REXOS/SCADA"/>
+		<rexos.javac destdir ="build/REXOS">
+			<src path        ="${rexos-src-folder}/SCADA"/>
+		</rexos.javac>
+	</target>
+	
+	<target name             ="MAS" depends="util, generic, HAL, SCADA">
 		<mkdir dir           ="build/REXOS/MAS"/>
 		<rexos.javac destdir ="build/REXOS">
 			<src path        ="${rexos-src-folder}/MAS"/>
