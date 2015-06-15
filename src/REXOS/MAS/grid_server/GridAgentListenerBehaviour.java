@@ -5,12 +5,19 @@ import org.json.JSONObject;
 
 import util.log.Logger;
 import MAS.util.Ontology;
+import jade.core.AID;
 import jade.core.behaviours.Behaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
+import jade.proto.SubscriptionInitiator;
 
 public class GridAgentListenerBehaviour extends Behaviour{
 	boolean done = false;
 	GridAgent gridAgent = null;
+	SubscriptionInitiator test  = null;
 	
 	/**
 	 * 
@@ -20,6 +27,14 @@ public class GridAgentListenerBehaviour extends Behaviour{
 	public GridAgentListenerBehaviour(GridAgent gridAgent) {
 		this.gridAgent = gridAgent;
 		this.done = false;
+		subscribeByDF();
+	}
+	
+	void subscribeByDF(){
+		DFAgentDescription description = new DFAgentDescription();
+		SearchConstraints sc = new SearchConstraints();
+		gridAgent.send(DFService.createSubscriptionMessage(gridAgent, gridAgent.getDefaultDF(), description, sc));
+		System.out.println("GA subscribed by DF");
 	}
 	
 	@Override

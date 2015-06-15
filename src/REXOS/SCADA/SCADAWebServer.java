@@ -26,7 +26,7 @@ public class SCADAWebServer {
         public void handle(HttpExchange exchange) throws IOException {
         	URI    uri  = exchange.getRequestURI();
         	String path = "www/" + uri.getPath();
-        	// If there is a directory specified, add index.html as default file to serve
+        	// If there is a directory specified, ad		d index.html as default file to serve
         	if (path.charAt(path.length() - 1) == '/') {
         		path += "index.html";
         	}
