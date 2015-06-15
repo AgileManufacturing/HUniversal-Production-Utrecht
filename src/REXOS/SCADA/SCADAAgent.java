@@ -46,7 +46,11 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(message);
-			AID aid = new AID(jsonObject.getString("aid"), AID.ISGUID);
+			AID aid = null;
+			if (!jsonObject.isNull("aid")) {
+				aid = new AID(jsonObject.getString("aid"), AID.ISGUID);
+			}
+			
 			int index = 0;
 			switch(jsonObject.getString("command")) {
 			case "GETOVERVIEW": 
