@@ -1,7 +1,5 @@
 package MAS.equiplet;
 
-import java.util.ArrayList;
-
 import generic.Mast;
 
 import org.json.JSONArray;
@@ -9,8 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
-import HAL.dataTypes.ModuleIdentifier;
-import HAL.dataTypes.StaticSettings;
 
 import util.log.Logger;
 
@@ -23,11 +19,12 @@ import jade.lang.acl.ACLMessage;
  * @author Thomas Kok
  *
  */
-public class EquipletReconfigureHandler{
+public class EquipletOnChangedHandler{
 	private EquipletAgent equiplet;
 	private HardwareAbstractionLayer hal;
 	
-	public EquipletReconfigureHandler(EquipletAgent e, HardwareAbstractionLayer h){
+	
+	public EquipletOnChangedHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
 		hal = h;
 		
@@ -35,7 +32,7 @@ public class EquipletReconfigureHandler{
 		System.out.println(equiplet.state);
 	}
 	
-	public void handleEquipletCommand(ACLMessage msg){
+	public void handleOnChangedListenerCommand(ACLMessage msg){
 		if(msg != null){
 			try{
 				JSONObject command = new JSONObject(msg.getContent());
@@ -66,6 +63,9 @@ public class EquipletReconfigureHandler{
 		}
 	}
 	
+	public void sendOnChangeMessage(OnChangedType type){
+	}
+	
 	public void changeEquipletMachineState(JSONObject command){
 		try {
 			//Get new state
@@ -86,7 +86,6 @@ public class EquipletReconfigureHandler{
 	//		if(currentState != Mast.State.SAFE){
 				//Error out
 	//		}
-			System.out.println("Insert module func");
 			
 			//Deserialize modules
 			JSONArray modules = (JSONArray) command.get("modules");
@@ -109,32 +108,8 @@ public class EquipletReconfigureHandler{
 		}
 	}
 	
-	public void deserializeModules(JSONArray moduleArray){
-		System.out.println(moduleArray.toString());
-		/*
-		ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(moduleArray);	
-		ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
-		ArrayList<DTOModuleSettings> dtoSettings = new ArrayList<DTOModuleSettings>();
-		KnowledgeDBClient kdb = new KnowledgeDBClient();
+	public void deserializeModules(JSONArray modules){
 		
-		//Get the staticSettings and push into array
-		for(int i = 0; i < modules.size(); i++){
-			//Get static settings from Grid Knowledge DB
-			staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(modules.get(i), kdb));
-			
-			DTOModuleSettings dto = new DTOModuleSettings();
-			//Create DTO staticSettings
-			dto.staticSettings = staticSettings.get(i).serialize();
-			
-			//Create DTO dynamicSettings
-			dto.dynamicSettings.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
-			dto.dynamicSettings.put(DynamicSettings.MOUNT_POINT_X, 1);
-			dto.dynamicSettings.put(DynamicSettings.MOUNT_POINT_Y, 1);
-			
-			//Add DTO to array
-			dtoSettings.add(dto);
-			
-		}*/
 	}
 
 }
