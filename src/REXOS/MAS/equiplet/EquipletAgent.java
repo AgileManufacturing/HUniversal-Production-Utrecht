@@ -994,26 +994,24 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
-		// TODO Auto-generated method stub
+		onChangeHandle.onEquipletStateChanged(state);
 
 	}
 
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
-		// TODO Auto-generated method stub
+		onChangeHandle.onEquipletModeChanged(mode);
 
 	}
 
 	@Override
 	public void onModuleStateChanged(Module module, Mast.State state) {
-		// TODO Auto-generated method stub
-
+		onChangeHandle.onModuleStateChanged(module, state);
 	}
 
 	@Override
 	public void onModuleModeChanged(Module module, Mast.Mode mode) {
-		// TODO Auto-generated method stub
-
+		// TODO make implementation
 	}
 
 	@Override
