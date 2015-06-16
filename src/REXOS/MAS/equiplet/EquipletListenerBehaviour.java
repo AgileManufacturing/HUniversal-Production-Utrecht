@@ -70,6 +70,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 					equiplet.passEquipletCommand(msg);
 				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
 					//handle listener command functie
+					equiplet.passOnChangedCommand(msg);
 				}
 				break;
 			default:

@@ -64,6 +64,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	// Equiplet
 	private HardwareAbstractionLayer hal;
 	private EquipletReconfigureHandler reconfigHandle = new EquipletReconfigureHandler(this, hal);
+	private EquipletOnChangedHandler onChangeHandle = new EquipletOnChangedHandler(this, hal);
 
 	/**
 	 * Equiplet agent startup
@@ -268,6 +269,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	public void passEquipletCommand(ACLMessage msg){
 		reconfigHandle.handleEquipletCommand(msg);
+	}
+	
+	public void passOnChangedCommand(ACLMessage msg){
+		onChangeHandle.handleOnChangedListenerCommand(msg);
 	}
 	
 	/**
