@@ -55,6 +55,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import MAS.equiplet.EquipletAgent;
 import MAS.product.ProductAgent;
 import MAS.product.ProductStep;
 import MAS.util.MASConfiguration;
@@ -76,6 +77,7 @@ public class GridAgent extends Agent {
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
+		spawnEquipletAgent("2");
 		addBehaviour(new GridListenerBehaviour());
 	}
 
@@ -222,6 +224,20 @@ public class GridAgent extends Agent {
 			ac.start();
 		} catch (StaleProxyException e) {
 			System.err.println(this.getLocalName() + ": failed to create supply agent");
+		}
+	}
+	
+	/**
+	 * Create a supply agent (for now)
+	 */
+	private void spawnEquipletAgent(String name) {
+		try {
+			ContainerController cc = getContainerController();
+			Object[] arguments = new Object[] { "hal" };
+			AgentController ac = cc.createNewAgent("EQ-" + name, EquipletAgent.class.getName(), arguments);
+			ac.start();
+		} catch (StaleProxyException e) {
+			System.err.println(this.getLocalName() + ": failed to create Equiplet agent");
 		}
 	}
 

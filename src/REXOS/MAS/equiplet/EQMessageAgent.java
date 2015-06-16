@@ -13,14 +13,14 @@ import jade.lang.acl.ACLMessage;
 
 public class EQMessageAgent extends Agent {
 	
-	private String insertJSON = "{\n\t\"requested-equiplet-command\": \"INSERT_MODULES\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
+	private String insertJSON = "{\n\t\"command\": \"INSERT_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
 	public void setup(){
-		sleep(1500);
+		sleep(2000);
 		
 		//Send message
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
@@ -28,17 +28,18 @@ public class EQMessageAgent extends Agent {
 		message.setOntology(Ontology.GRID_ONTOLOGY);
 		message.setConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND);
 		
-		Logger.log("SEND MESSAGE");
+		//Logger.log("SEND MESSAGE");
 		
-		AID[] players = searchDF(Ontology.SERVICE_SEARCH_TYPE);
-		for(int i = 0; i < players.length; i++){
-			if(!players[i].equals(this.getAID())){
-				message.addReceiver(players[i]);
-				Logger.log("Add receiver: " + players[i].getLocalName());
+		AID[] receivers = searchDF("EquipletAgent");
+		for(int i = 0; i < receivers.length; i++){
+			if(!receivers[i].equals(this.getAID())){
+				message.addReceiver(receivers[i]);
+				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
 		this.send(message);
+		Logger.log("Message was send");
 	}
 	
 	public void takeDown(){

@@ -10,8 +10,12 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.dataTypes.ModuleIdentifier;
+import HAL.dataTypes.DynamicSettings;
 import HAL.dataTypes.StaticSettings;
+import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
+import util.log.LogLevel;
+import util.log.LogSection;
 import util.log.Logger;
 
 import jade.lang.acl.ACLMessage;
@@ -59,9 +63,12 @@ public class EquipletReconfigureHandler{
 				case "DELETE_MODULE":
 					deleteModule(command);
 					break;
+					
+				default:
+					Logger.log("Invalid equiplet command: " + requestedEquipletCommand);
 				}
 			}catch(Exception e){
-				
+				Logger.log("No equiplet command specified");
 			}
 		}
 	}
@@ -72,11 +79,15 @@ public class EquipletReconfigureHandler{
 			String stateString = command.getString("state").toString();
 			Mast.State state = Mast.State.valueOf(stateString);
 			
-			//Execute action
-			hal.changeState(state);
+			if(state != null){
+				//Execute action
+				hal.changeState(state);
+			}else{
+				//Error message
+				Logger.log("Invalid Mast State: " + stateString);
+			}
 		} catch (JSONException e) {
-			//TODO error handling
-			e.printStackTrace();
+			Logger.log("No Mast State specified");
 		}
 	}
 	
@@ -90,7 +101,40 @@ public class EquipletReconfigureHandler{
 			
 			//Deserialize modules
 			JSONArray modules = (JSONArray) command.get("modules");
-			deserializeModules(modules);
+			ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
+			
+			System.out.println(moduleIdentifiers.toString());
+			
+			
+			//Get static and dynamic settings
+			ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
+			ArrayList<DynamicSettings> dynamicSettings = new ArrayList<DynamicSettings>();
+			KnowledgeDBClient kdb = new KnowledgeDBClient();
+			
+			//TODO generate JSONObjects for both settings and insert them into hal
+			
+			//Get the staticSettings and push into array
+			for(int i = 0; i < moduleIdentifiers.size(); i++){
+				//Get static settings from Grid Knowledge DB
+//				staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb));
+				
+				//Create DTO dynamicSettings
+				//TODO Get actual dynamicvalues from JSON
+//				DynamicSettings tempDynamicSettings = new DynamicSettings();
+//				tempDynamicSettings.attachedTo = null;
+//				tempDynamicSettings.mountPointX = 1;
+//				tempDynamicSettings.mountPointY = 1;
+//				dynamicSettings.add(tempDynamicSettings);
+			}
+			
+			
+			if(moduleIdentifiers != null && staticSettings != null && moduleIdentifiers.size() == staticSettings.size()){
+				for(int i = 0; i < staticSettings.size(); i++){
+//					hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
+				}
+			}else{
+				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
+			}
 		} catch (JSONException e){
 			//TODO error handling
 			e.printStackTrace();
@@ -99,42 +143,58 @@ public class EquipletReconfigureHandler{
 	
 	public void deleteModule(JSONObject command){
 		try{
+			//TODO Check for good mast state
 			
 			//Deserialize modules
 			JSONArray modules = (JSONArray) command.get("modules");
-			deserializeModules(modules);
+			ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
+			for(ModuleIdentifier mi: moduleIdentifiers){
+				hal.deleteModule(mi);
+			}
+			
+			//hal.deleteModule(moduleIdentifier);
 		} catch (JSONException e){
 			//TODO error handling
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void deserializeModules(JSONArray moduleArray){
-		System.out.println(moduleArray.toString());
-		/*
-		ArrayList<ModuleIdentifier> modules = extractModulesForReconfig(moduleArray);	
-		ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
-		ArrayList<DTOModuleSettings> dtoSettings = new ArrayList<DTOModuleSettings>();
-		KnowledgeDBClient kdb = new KnowledgeDBClient();
-		
-		//Get the staticSettings and push into array
-		for(int i = 0; i < modules.size(); i++){
-			//Get static settings from Grid Knowledge DB
-			staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(modules.get(i), kdb));
+	/**
+	 * Dedicated function to translate the reconfigure ACLMessage in JSON format received from scada.
+	 * 
+	 * @param content
+	 * @return Function returns null if anything went wrong while deserializing. If not, it returns an ArrayList of ModuleIdentifiers.
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	private ArrayList<ModuleIdentifier> deserializeModules(JSONArray modules){
+		ArrayList<ModuleIdentifier> resultArray = new ArrayList<ModuleIdentifier>();
+		boolean isDeserializationSuccessfull = true;
+		try{
+			JSONObject currentModule;
 			
-			DTOModuleSettings dto = new DTOModuleSettings();
-			//Create DTO staticSettings
-			dto.staticSettings = staticSettings.get(i).serialize();
-			
-			//Create DTO dynamicSettings
-			dto.dynamicSettings.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
-			dto.dynamicSettings.put(DynamicSettings.MOUNT_POINT_X, 1);
-			dto.dynamicSettings.put(DynamicSettings.MOUNT_POINT_Y, 1);
-			
-			//Add DTO to array
-			dtoSettings.add(dto);
-			
-		}*/
+			//Loop trough the array with modules
+			for(int i = 0; i < modules.length(); i++){
+				//Extract each data object from array
+				currentModule = modules.getJSONObject(i);
+				
+				//Extract module data and get a module ID to return 
+				resultArray.add(new ModuleIdentifier(
+					currentModule.getString("manufacturer"), 
+					currentModule.getString("typeNumber"), 
+					currentModule.getString("serialNumber")
+				));
+			}
+		}catch(JSONException ex){
+			Logger.log("An error occured while attempting to get information from the JSON. \n" + ex.getMessage());
+			isDeserializationSuccessfull = false;
+		}
+		// If something went wrong while deserializing, return null.
+		return isDeserializationSuccessfull ? resultArray : null;
 	}
+
 
 }
