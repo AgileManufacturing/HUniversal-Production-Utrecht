@@ -155,6 +155,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected void register() {
 		DFAgentDescription dfAgentDescription = new DFAgentDescription();
 		dfAgentDescription.setName(getAID());
+		//Register capabilities
 		for (Capability capability : capabilities) {
 			ServiceDescription serviceDescription = new ServiceDescription();
 			serviceDescription.setName(capability.getService());
@@ -163,6 +164,15 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
 			dfAgentDescription.addServices(serviceDescription);
 		}
+		
+		//Register as Equiplet agent
+		ServiceDescription serviceDescription = new ServiceDescription();
+		serviceDescription.setName(this.getLocalName());
+		serviceDescription.setType("EquipletAgent");
+		serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
+		serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+		dfAgentDescription.addServices(serviceDescription);
+		
 		try {
 			DFService.register(this, dfAgentDescription);
 		} catch (FIPAException fe) {

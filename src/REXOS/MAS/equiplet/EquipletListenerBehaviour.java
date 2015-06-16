@@ -39,7 +39,16 @@ public class EquipletListenerBehaviour extends Behaviour {
 		// MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
 		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
 		// MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
-		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE)))), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST));
+		MessageTemplate template = MessageTemplate.or(
+				MessageTemplate.or(
+						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(
+								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
+										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
+												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), MessageTemplate.or(
+													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND),
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND)))))),
+				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
+		);
 		ACLMessage msg = equiplet.blockingReceive(template);
 		if (msg != null) {
 			System.out.printf("EA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", equiplet.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
