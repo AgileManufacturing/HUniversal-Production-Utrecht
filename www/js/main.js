@@ -128,7 +128,7 @@ Server.prototype = {
 
 				break;
 			case 'EquipletAgent':
-
+				// this.updateAgent();
 				break;
 			default:
 				this.ui.println('Message received with unknown type', this.id);
@@ -208,14 +208,6 @@ Server.prototype = {
 
 		// Request grid overview from WS
 		this.send('GETOVERVIEW');
-
-		// Adding test agents
-		this.ui.addAgent('henk',   'equiplet', 'Henk');
-		this.ui.addAgent('klaas',  'equiplet', 'Klaas');
-		this.ui.addAgent('piet',   'product', 'Piet');
-		this.ui.addAgent('jan',    'equiplet', 'Jan');
-		this.ui.addAgent('gerrit', 'product', 'Gerrit');
-		this.ui.addAgent('hans',   'equiplet', 'Hans');
 	},
 	// Send to WS
 	'send': function(command, aid, values) {
