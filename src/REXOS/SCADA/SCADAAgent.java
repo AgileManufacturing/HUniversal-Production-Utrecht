@@ -37,7 +37,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		addBehaviour(new SCADAAgentListenerBehaviour());
+		addBehaviour(new SCADAAgentListenerBehaviour(this));
 	}
 
 	@Override
@@ -170,6 +170,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		
 		// AgentConnection should be found
 		if(agentConn != null){
+			System.out.println(agentConn.getAgent());
+			System.out.println(agentConn.getAmountOfClients());
 			int index = agentConnections.indexOf(agentConn);
 			ArrayList<WebSocket> clients = agentConnections.get(index).getClients();
 			for(int i = 0; i < clients.size(); i++){
