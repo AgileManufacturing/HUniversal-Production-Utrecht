@@ -54,6 +54,9 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				// Request of other agent to get information to schedule a job
 				// will send confirm or disconfirm message in return
 				case ACLMessage.REQUEST:
+					if(msg.getContent().equals("GETOVERVIEW")) {
+						//Get all agents and send them to the SCADA agent.
+					}
 //					handleScheduling(msg);
 					break;
 				// query for information of the GridAgent

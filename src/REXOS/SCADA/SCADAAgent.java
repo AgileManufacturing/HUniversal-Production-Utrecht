@@ -55,18 +55,22 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			switch(jsonObject.getString("command")) {
 			case "GETOVERVIEW": 
 				webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"ID\":\"EQ2\",\"type\":\"equiplet\",\"name\":\"Equiplet two\"},{\"ID\":\"EQ42\",\"type\":\"equiplet\",\"name\":\"Equiplet forty-two\"}, {\"ID\":\"PA2\",\"type\":\"product\",\"name\":\"Product two\"}]}");
-//				if(gridAgent != null){
-//					if((index = agentConnections.indexOf(gridAgent)) >= 0){
-//						// SCADAAgent is already connected to this agent
-//						agentConnections.get(index).addClient(webSocketConnection);
-//					}
-//				}else{
-//					AID gridAgentAID = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
-//					gridAgent = new AgentConnection(gridAgentAID, webSocketConnection);
-//					agentConnections.add(gridAgent);
-//					
-//					connectToAgent(gridAgentAID);
-//				}
+				if(gridAgent != null){
+					if((index = agentConnections.indexOf(gridAgent)) >= 0){
+						// SCADAAgent is already connected to this agent
+						agentConnections.get(index).addClient(webSocketConnection);		
+					}
+				}else{
+					AID gridAgentAID = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
+					gridAgent = new AgentConnection(gridAgentAID, webSocketConnection);
+					agentConnections.add(gridAgent);
+					
+					connectToAgent(gridAgentAID);
+				}
+				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+				msg.addReceiver(gridAgent.getAgent());
+				msg.setContent("GETOVERVIEW");
+				send(msg);
 				break;
 			case "GETINFO":
 				AgentConnection agent = null;
