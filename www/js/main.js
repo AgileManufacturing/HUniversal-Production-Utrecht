@@ -140,18 +140,15 @@ Server.prototype = {
 
 		// Switch what type of message is received
 		// Act accordingly
-		switch (data['type']) {
-			case 'GridAgent':
-				for(var i = 0; i < data['agents'].length; i++) {
-					var agent = data['agents'][i];
+		switch (data['command-id']) {
+			case 'overview':
+				var agent = data['content'];
 
-					this.ui.addAgent(agent.id, agent.type, agent.state);
-				}
+				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
 
 				break;
-			case 'EquipletAgent':
-				// this.updateAgent();
-				break;
+			/*case 'EquipletAgent':
+				break;*/
 			default:
 				this.ui.println('Message received with unknown type', this.id);
 				break;
@@ -247,9 +244,9 @@ Server.prototype = {
 var server = new Server(window.location.hostname, 3529, 'SCADA');
 server.connect();
 
-window.addEventListener('beforeunload', function (e) {
+/*window.addEventListener('beforeunload', function (e) {
 	var msg = 'Leaving causes acquired data to be discarded';
 
 	(e || window.event).returnValue = msg;
     return msg;
-});
+});*/

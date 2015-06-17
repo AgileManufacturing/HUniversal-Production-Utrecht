@@ -73,7 +73,20 @@ public class EquipletListenerBehaviour extends Behaviour {
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
 					ACLMessage reply = msg.createReply();
 					reply.setPerformative(ACLMessage.INFORM);
-					reply.setContent("{'id':'" + equiplet.getLocalName() + "','type':'equiplet','state':'" + equiplet.getEquipletState().name() +"'}");
+					JSONObject json = new JSONObject();
+					/*try {
+						json.accumulate("command-id", "overview");
+						
+						JSONObject content = new JSONObject();
+						content.accumulate("id",    equiplet.getLocalName());
+						content.accumulate("type",  "equiplet");
+						content.accumulate("state", equiplet.getEquipletState().name());
+	
+						json.accumulate("content", content);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}*/
+					reply.setContent("{\"content\":{\"id\":\"EQ2\",\"state\":\"IDLE\",\"type\":\"equiplet\"},\"command-id\":\"overview\"}");
 					equiplet.send(reply);
 					System.out.println("EQUIPLETAGENT: INFO REQUEST RECEIVED!");
 				} else {
