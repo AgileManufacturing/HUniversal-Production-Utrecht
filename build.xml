@@ -25,7 +25,7 @@
 		</fileset>
 	</path>
 
-	<target name             ="all" depends="MAS, HAL, generic, util"/>
+	<target name             ="all" depends="SCADA, MAS, HAL, generic, util"/>
 
 	<target name             ="SCADA" depends="util, generic">
 		<mkdir dir           ="build/REXOS/SCADA"/>

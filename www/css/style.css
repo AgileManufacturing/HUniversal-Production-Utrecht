@@ -173,7 +173,6 @@ footer {
 	content: 'product';
 }
 #grid > ul > li:before {
-	content: 'equiplet';
 	font-size: .5em;
 
 	position: absolute;
