@@ -287,6 +287,27 @@ public class GridAgent extends Agent implements SCADABasicListener,
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public void getOverview() {
+		DFAgentDescription description = new DFAgentDescription();
+		SearchConstraints sc = new SearchConstraints();
+		sc.setMaxResults((long) -1);
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		String content = "{\n 'command' : 'GET_CURRENT_STATE' \n }";
+		msg.setContent(content);
+		try {
+			DFAgentDescription listOfAgents[] = DFService.search(this,
+					description, sc);
+			for (int i = 0; i < listOfAgents.length; i++) {
+				msg.addReceiver(listOfAgents[i].getName());
+				send(msg);
+			}
+		} catch (FIPAException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	void addBasicListener(AID agent) {
 		if(!basicListeners.contains(agent)){
