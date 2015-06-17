@@ -1,5 +1,6 @@
 package MAS.equiplet;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import generic.Mast;
@@ -12,6 +13,7 @@ import HAL.HardwareAbstractionLayer;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.dataTypes.DynamicSettings;
 import HAL.dataTypes.StaticSettings;
+import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 import util.log.LogLevel;
@@ -21,7 +23,7 @@ import util.log.Logger;
 import jade.lang.acl.ACLMessage;
 
 /**
- * Handle reconfigure steps
+ * Handle reconfigure messages
  * 
  * @author Kevin Bosman
  * @author Thomas Kok
@@ -66,9 +68,11 @@ public class EquipletReconfigureHandler{
 					
 				default:
 					Logger.log("Invalid equiplet command: " + requestedEquipletCommand);
+					break;
 				}
 			}catch(Exception e){
 				Logger.log("No equiplet command specified");
+				e.printStackTrace();
 			}
 		}
 	}
@@ -107,8 +111,8 @@ public class EquipletReconfigureHandler{
 			
 			
 			//Get static and dynamic settings
-			ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
-			ArrayList<DynamicSettings> dynamicSettings = new ArrayList<DynamicSettings>();
+			ArrayList<JSONObject> staticSettings = new ArrayList<JSONObject>();
+			ArrayList<JSONObject> dynamicSettings = new ArrayList<JSONObject>();
 			KnowledgeDBClient kdb = new KnowledgeDBClient();
 			
 			//TODO generate JSONObjects for both settings and insert them into hal
@@ -116,27 +120,35 @@ public class EquipletReconfigureHandler{
 			//Get the staticSettings and push into array
 			for(int i = 0; i < moduleIdentifiers.size(); i++){
 				//Get static settings from Grid Knowledge DB
-//				staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb));
+				StaticSettings staticSetting = StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb);
+				JSONObject staticSettingJSON = staticSetting.serialize();
+				staticSettings.add(staticSettingJSON);
 				
-				//Create DTO dynamicSettings
-				//TODO Get actual dynamicvalues from JSON
-//				DynamicSettings tempDynamicSettings = new DynamicSettings();
-//				tempDynamicSettings.attachedTo = null;
-//				tempDynamicSettings.mountPointX = 1;
-//				tempDynamicSettings.mountPointY = 1;
-//				dynamicSettings.add(tempDynamicSettings);
+				//Create dynamicSetting JSONObject
+				//TODO Get actual dynamic values from JSON
+				JSONObject dynamicSetting = new JSONObject();
+				dynamicSetting.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
+				dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, 1);
+				dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, 1);
+				dynamicSettings.add(dynamicSetting);
 			}
 			
-			
+			//Insert module in hal
 			if(moduleIdentifiers != null && staticSettings != null && moduleIdentifiers.size() == staticSettings.size()){
 				for(int i = 0; i < staticSettings.size(); i++){
-//					hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
+					hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
 				}
 			}else{
 				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 			}
 		} catch (JSONException e){
 			//TODO error handling
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidMastModeException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -151,8 +163,6 @@ public class EquipletReconfigureHandler{
 			for(ModuleIdentifier mi: moduleIdentifiers){
 				hal.deleteModule(mi);
 			}
-			
-			//hal.deleteModule(moduleIdentifier);
 		} catch (JSONException e){
 			//TODO error handling
 			e.printStackTrace();
