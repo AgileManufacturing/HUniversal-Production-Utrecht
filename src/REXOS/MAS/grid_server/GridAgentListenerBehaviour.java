@@ -36,6 +36,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 		gridAgent.send(DFService.createSubscriptionMessage(gridAgent, gridAgent.getDefaultDF(), description, sc));
 		System.out.println("GA subscribed by DF");
 	}
+
 	
 	@Override
 	public void action() {
