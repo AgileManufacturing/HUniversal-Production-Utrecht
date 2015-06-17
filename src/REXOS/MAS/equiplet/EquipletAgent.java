@@ -63,8 +63,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	// Equiplet
 	private HardwareAbstractionLayer hal;
-	private EquipletReconfigureHandler reconfigHandle = new EquipletReconfigureHandler(this, hal);
-	private EquipletOnChangedHandler onChangeHandle = new EquipletOnChangedHandler(this, hal);
+	private EquipletReconfigureHandler reconfigHandler = new EquipletReconfigureHandler(this, hal);
+	private EquipletOnChangedHandler onChangeHandler = new EquipletOnChangedHandler(this, hal);
+	private EquipletGetDataHandler getRequestHandler = new EquipletGetDataHandler(this, hal);
 
 	/**
 	 * Equiplet agent startup
@@ -278,11 +279,15 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 * Reconfigure section
 	 */
 	public void passEquipletCommand(ACLMessage msg){
-		reconfigHandle.handleEquipletCommand(msg);
+		reconfigHandler.handleEquipletCommand(msg);
 	}
 	
 	public void passOnChangedCommand(ACLMessage msg){
-		onChangeHandle.handleOnChangedListenerCommand(msg);
+		onChangeHandler.handleOnChangedListenerCommand(msg);
+	}
+	
+	public void passEquipletGetRequest(ACLMessage msg){
+		getRequestHandler.handleEquipletGetRequest(msg);
 	}
 	
 	/**
@@ -1004,19 +1009,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
-		onChangeHandle.onEquipletStateChanged(state);
+		onChangeHandler.onEquipletStateChanged(state);
 
 	}
 
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
-		onChangeHandle.onEquipletModeChanged(mode);
+		onChangeHandler.onEquipletModeChanged(mode);
 
 	}
 
 	@Override
 	public void onModuleStateChanged(Module module, Mast.State state) {
-		onChangeHandle.onModuleStateChanged(module, state);
+		onChangeHandler.onModuleStateChanged(module, state);
 	}
 
 	@Override
