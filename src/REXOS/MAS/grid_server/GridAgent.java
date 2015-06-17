@@ -46,6 +46,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SubscriptionInitiator;
 import jade.wrapper.AgentController;
@@ -291,15 +292,22 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	
 	public void getOverview() {
 		DFAgentDescription description = new DFAgentDescription();
+		//ServiceDescription sd = new ServiceDescription();
+		//sd.setType("AGENT");
 		SearchConstraints sc = new SearchConstraints();
-		sc.setMaxResults((long) -1);
+		//description.addServices(sd);
+		//sc.setMaxResults((long) -1);
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-		String content = "{\n 'command' : 'GET_CURRENT_STATE' \n }";
+		msg.setOntology(Ontology.GRID_ONTOLOGY);
+		msg.setConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST);
+		String content = "{\n 'command' : 'GET_BASIC_INFO' \n }";
 		msg.setContent(content);
 		try {
 			DFAgentDescription listOfAgents[] = DFService.search(this,
 					description, sc);
+			System.out.println("LIST LENGTH: " + listOfAgents.length);
 			for (int i = 0; i < listOfAgents.length; i++) {
+				System.out.println(listOfAgents[i].getName());
 				msg.addReceiver(listOfAgents[i].getName());
 				send(msg);
 			}
@@ -332,6 +340,13 @@ public class GridAgent extends Agent implements SCADABasicListener,
 				+ agent + "\n 'values': " + message + "\n}\n }";
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), updateString);
+		}
+	}
+	
+	public void sendAgentInfo(String message){
+		System.out.println("SCADA send agentINFO " + basicListeners.size());
+		for (int i = 0; i < basicListeners.size(); i++) {
+			sendUpdateMessage(basicListeners.get(i), message);
 		}
 	}
 

@@ -70,7 +70,15 @@ public class EquipletListenerBehaviour extends Behaviour {
 			// Request of other agent to get information to schedule a job
 			// will send confirm or disconfirm message in return
 			case ACLMessage.REQUEST:
-				handleScheduling(msg);
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
+					ACLMessage reply = msg.createReply();
+					reply.setPerformative(ACLMessage.INFORM);
+					reply.setContent("{'id':'" + equiplet.getLocalName() + "','type':'equiplet','state':'" + equiplet.getEquipletState().name() +"'}");
+					equiplet.send(reply);
+					System.out.println("EQUIPLETAGENT: INFO REQUEST RECEIVED!");
+				} else {
+					handleScheduling(msg);
+				}
 				break;
 			// query for information of the equiplet
 			case ACLMessage.QUERY_REF:

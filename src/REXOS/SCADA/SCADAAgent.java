@@ -37,6 +37,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+		addBehaviour(new SCADAAgentListenerBehaviour());
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			int index = 0;
 			switch(jsonObject.getString("command")) {
 			case "GETOVERVIEW": 
-				webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"ID\":\"EQ2\",\"type\":\"equiplet\",\"name\":\"Equiplet two\"},{\"ID\":\"EQ42\",\"type\":\"equiplet\",\"name\":\"Equiplet forty-two\"}, {\"ID\":\"PA2\",\"type\":\"product\",\"name\":\"Product two\"}]}");
+				//webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"ID\":\"EQ2\",\"type\":\"equiplet\",\"name\":\"Equiplet two\"},{\"ID\":\"EQ42\",\"type\":\"equiplet\",\"name\":\"Equiplet forty-two\"}, {\"ID\":\"PA2\",\"type\":\"product\",\"name\":\"Product two\"}]}");
 				if(gridAgent != null){
 					if((index = agentConnections.indexOf(gridAgent)) >= 0){
 						// SCADAAgent is already connected to this agent
@@ -142,7 +143,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
 		message.setContent(JSONMessage);
 		send(message);
-		System.out.println("SCADAAgent message send!");
 	}
 	
 	

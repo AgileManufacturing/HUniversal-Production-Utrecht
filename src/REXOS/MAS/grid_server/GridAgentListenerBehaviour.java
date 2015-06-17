@@ -45,6 +45,10 @@ public class GridAgentListenerBehaviour extends Behaviour{
 			System.out.printf("GA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", gridAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
 				case ACLMessage.INFORM:
+					if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
+						System.out.println("GA inform conversation inform");
+						gridAgent.sendAgentInfo(msg.getContent());
+					}
 //					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
 //						handleProductArrived(msg);
 //					} else if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_RELEASE)) {
@@ -55,6 +59,8 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				// will send confirm or disconfirm message in return
 				case ACLMessage.REQUEST:
 					if(msg.getContent().equals("GETOVERVIEW")) {
+						System.out.println("Request: GetOverview received!");
+						this.gridAgent.getOverview();
 						//Get all agents and send them to the SCADA agent.
 					}
 //					handleScheduling(msg);
