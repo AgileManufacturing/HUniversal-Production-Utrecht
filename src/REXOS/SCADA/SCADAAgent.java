@@ -118,15 +118,20 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	
 	private void removeClient(WebSocket webSocketConnection){
 		int index = 0;
+		boolean clientFound = false;
 		for(; index < agentConnections.size(); index++){
 			if(agentConnections.get(index).removeClient(webSocketConnection)){
+				clientFound = true;
 				break;
 			}
 		}
 		
-		// Remove agent if no clients are connected
-		if(agentConnections.get(index).getAmountOfClients() <= 0){
-			agentConnections.remove(index);
+		if(clientFound){
+			// Remove agent if no clients are connected
+			if(agentConnections.get(index).getAmountOfClients() <= 0){
+				
+				agentConnections.remove(index);
+			}
 		}
 	}
 	@Override
