@@ -5,13 +5,24 @@
  */
 
 function UIPanel() {
-	this.el_log = $('#log pre');
-	this.grid   = $('#grid ul');
+	this.log_pre   = $('#log pre');
+	this.log_clean = $('#log #clear');
+	this.log_clean.click((this.clearLog).bind(this));
+
+	this.grid = $('#grid ul');
+
+	this.con_status_light = $('#controls #con-status .light');
+	this.con_status_text  = $('#controls #con-status .text');
+
+	this.setConStatus(this.CLOSED);
 
 	this.agentClickListener = null;
 }
 
 UIPanel.prototype = {
+	'CLOSED':      0,
+	'CONNECTING':  1,
+	'OPEN':        2,
 	'println': function(msg, id) {
 		// If argument(s) not defined, give default
 		if (typeof id === 'undefined') {
@@ -35,7 +46,7 @@ UIPanel.prototype = {
 		var time_str = hh + ':' + mm + ':' + ss + '.' + cc;
 
 		// If scrolled to bottom, remember and scroll down after new content
-		var bottom = this.el_log.prop('scrollHeight') - this.el_log.scrollTop() == this.el_log.innerHeight();
+		var bottom = this.log_pre.prop('scrollHeight') - this.log_pre.scrollTop() == this.log_pre.innerHeight();
 
 
 		var $time = $('<em></em>',     {'class': 'time'}).text(time_str);
@@ -50,23 +61,23 @@ UIPanel.prototype = {
 		;
 
 		// Write the log message in certain format
-		this.el_log.append($container);
+		this.log_pre.append($container);
 
 		// Scroll down for 'sticky' effect.
 		if (bottom === true) {
-			this.el_log.scrollTop(this.el_log.prop('scrollHeight'));
+			this.log_pre.scrollTop(this.log_pre.prop('scrollHeight'));
 		}
 	},
-	'addAgent': function(aid, type, name) {
-		this.println('Adding agent "' + aid + '"', 'ui');
+	'addAgent': function(id, type, state) {
+		this.println('Adding agent "' + id + '"', 'ui');
 
 		// Create UI elements with attributes
-		var $li = $('<li></li>', {'data': {'aid': aid}, 'class': type});
+		var $li = $('<li></li>', {'data': {'id': id}, 'class': type});
 		var $a  = $('<a></a>',   {'href': '#', on: {click: (this.agentClick).bind(this)}});
 
 		// Set structure
 		$li.append($a);
-		$a.text(name);
+		$a.text(id);
 
 		// Insert into UI
 		this.grid.append($li);
@@ -77,38 +88,49 @@ UIPanel.prototype = {
 		// Retreive elements
 		var $target = $(event.target);
 		var $parent = $target.parent();
-		var aid     = $parent.data('aid');
+		var id      = $parent.data('id');
 
-		this.println('Clicked agent "' + aid + '"', 'ui');
-		this.agentClickListener(aid);
+		this.println('Clicked agent "' + id + '"', 'ui');
+		this.agentClickListener(id);
 	},
 	'setAgentClickListener': function(listener) {
 		this.agentClickListener = listener;
-	}
+	},
+	'clearLog': function() {
+		this.log_pre.empty();
+	},
+
+	'setConStatus': function(con_status) {
+		if (con_status == this.CLOSED) {
+			this.con_status_light.css('background-color', 'red');
+			this.con_status_text.text('Closed');
+		} else if (con_status == this.CONNECTING) {
+			this.con_status_light.css('background-color', 'yellow');
+			this.con_status_text.text('Connecting');
+		} else if (con_status == this.OPEN) {
+			this.con_status_light.css('background-color', 'green');
+			this.con_status_text.text('Open');
+		}
+	},
 };
 
 
 // Constructor of Server class
-function Server(url, id) {
-	this.id        = id;
-	this.websocket = new WebSocket(url);
+function Server(host, port, id) {
+	this.id  = id;
+	this.url = host + ':' + port;
 
-	this.ui     = new UIPanel();
-	this.ui.println('Server instantiated', this.id);
+	this.connected = false;
+	this.websocket = null;
+
+	this.ui = new UIPanel();
 	this.ui.setAgentClickListener((this.requestAgent).bind(this));
-
-
-	// Callbacks with correct context (this)
-	this.websocket.onerror   = (this.onerror).bind(this);
-	this.websocket.onmessage = (this.onmessage).bind(this);
-	this.websocket.onclose   = (this.onclose).bind(this);
-	this.websocket.onopen    = (this.onopen).bind(this);
 }
 
 // Server methods
 Server.prototype = {
 	'onerror': function(event) {
-		this.ui.println('Error occurred', this.id);
+		this.ui.println('WebSocket error', this.id);
 		console.log('onerror (event next)');
 		console.log(event);
 	},
@@ -123,7 +145,7 @@ Server.prototype = {
 				for(var i = 0; i < data['agents'].length; i++) {
 					var agent = data['agents'][i];
 
-					this.ui.addAgent(agent.ID, agent.type, agent.name);
+					this.ui.addAgent(agent.id, agent.type, agent.state);
 				}
 
 				break;
@@ -134,50 +156,18 @@ Server.prototype = {
 				this.ui.println('Message received with unknown type', this.id);
 				break;
 		}
+	},
+	'onopen': function(event) {
+		this.ui.println('Connected to web socket', this.id);
 
+		// Clear potential timeout trying to reconnect
+		clearTimeout(this.timeout);
 
-		/*for (key in data) {
-			// Type to be filled according to type of field in JSON
-			type = '';
+		this.ui.setConStatus(this.ui.OPEN);
+		this.connected = true;
 
-			switch (data[key]['type']) {
-				case 'int':
-					//this.form.append($('<input type="integer" value="22132">'));
-					type = 'integer';
-				break;
-				case 'string':
-					//this.form.append($('<input type="">'));
-					type = 'text';
-				break;
-				default:
-					// Unknown type to us
-					continue;
-				break;
-			}
-
-			// Create label
-			var label = $('<label></label>');
-			label.text(key);
-
-			// Create input field
-			var input = $('<input>');
-
-			input.attr('name', key);
-			input.attr('value', data[key]['value']);
-			input.attr('type', type);
-
-			// Check if read only
-			if (data[key]['read-only'] === true) {
-				input.attr('readonly', 'readonly');
-			}
-
-			// Create the field and add it to form
-			var field = $('<div></div>');
-			field.append(label);
-			field.append(input);
-
-			this.form.append(field);
-		}*/
+		// Request grid overview from WS
+		this.send('GETOVERVIEW');
 	},
 	'onclose': function(event) {
 		// Find respective descriptions for error codes
@@ -201,36 +191,65 @@ Server.prototype = {
 		console.log('onclose (event next)');
 		console.log(event);
 
-		this.ui.println('onclose: "' + desc + '"' + ' (' + event.code + ')', this.id);
-	},
-	'onopen': function(event) {
-		this.ui.println('Connected to web socket', this.id);
+		this.ui.println('Connection closed with "' + desc + '"', this.id);
 
-		// Request grid overview from WS
-		this.send('GETOVERVIEW');
+		this.ui.setConStatus(this.ui.CLOSED);
+		this.connected = false;
+
+		this.timeout = setTimeout((this.connect).bind(this), 3000);
 	},
+
+	'connect': function() {
+		this.ui.println('Attempting to connect to "' + this.url + '"', this.id);
+		this.ui.setConStatus(this.ui.CONNECTING);
+
+		this.websocket = new WebSocket('ws://' + this.url);
+
+		// Callbacks with correct context (this)
+		this.websocket.onerror   = (this.onerror).bind(this);
+		this.websocket.onmessage = (this.onmessage).bind(this);
+		this.websocket.onclose   = (this.onclose).bind(this);
+		this.websocket.onopen    = (this.onopen).bind(this);
+
+		return this.websocket;
+	},
+
 	// Send to WS
-	'send': function(command, aid, values) {
-		if (typeof(aid)    === 'undefined') { aid    = null; }
+	'send': function(command, id, values) {
+		if (typeof(id)     === 'undefined') { id    = null; }
 		if (typeof(values) === 'undefined') { values = []; }
 
 		// Create JSON message to send over WS
 		var str = JSON.stringify({
 			'command': command,
-			'aid':     aid,
+			'id':      id,
 			'values':  values,
 		});
 		this.websocket.send(str);
 	},
+
 	'toJson': function() {
 
 	},
-	'requestAgent': function(aid) {
-		this.ui.println('Get Agent "' + aid + '" information from SCADA', this.id);
 
-		this.send('GETINFO', aid);
+	'requestAgent': function(id) {
+		if (!this.connected) {
+			return;
+		}
+
+		this.ui.println('Get Agent "' + id + '" information from SCADA', this.id);
+
+		this.send('GETINFO', id);
 	},
 };
 
-// Instantiate Server to connect with SCADA system
-var server = new Server('ws://' + window.location.hostname + ':3529', 'SCADA');
+// Server class allowing us to connect to web socket.
+var server = new Server(window.location.hostname, 3529, 'SCADA');
+server.connect();
+
+window.addEventListener('beforeunload', function (e) {
+	var msg = 'Leaving causes acquired data to be discarded';
+
+	(e || window.event).returnValue = msg;
+    return msg;
+});

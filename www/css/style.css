@@ -147,6 +147,25 @@ footer {
 
 
 /**
+ * Controls styling
+ */
+#controls #con-status .text,
+#controls #con-status .light {
+	display: inline-block;
+
+	vertical-align: middle;
+}
+#controls #con-status .light {
+	height: 16px;
+	width: 16px;
+	border-radius: 8px;
+	border: 1px solid black;
+
+	margin-right: 4px;
+}
+
+
+/**
  * Grid styling
  */
 #grid > ul {
