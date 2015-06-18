@@ -1,5 +1,6 @@
 package MAS.equiplet;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import generic.Mast;
@@ -12,6 +13,7 @@ import HAL.HardwareAbstractionLayer;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.dataTypes.DynamicSettings;
 import HAL.dataTypes.StaticSettings;
+import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 import util.log.LogLevel;
@@ -21,7 +23,7 @@ import util.log.Logger;
 import jade.lang.acl.ACLMessage;
 
 /**
- * Handle reconfigure steps
+ * Handle reconfigure messages
  * 
  * @author Kevin Bosman
  * @author Thomas Kok
@@ -34,54 +36,80 @@ public class EquipletReconfigureHandler{
 	public EquipletReconfigureHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
 		hal = h;
-		
-		//This print line is because that autistic neighbor of mine can't handle an unused warning...
-		System.out.println(equiplet.state);
 	}
 	
+	/**
+	 * Handle command messages
+	 * 
+	 * @param the message
+	 * @return 
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
 	public void handleEquipletCommand(ACLMessage msg){
 		if(msg != null){
+			boolean succes = false;
 			try{
-				JSONObject command = new JSONObject(msg.getContent());
+				JSONObject messageContent = new JSONObject(msg.getContent());
 				
 				//Debug output
-				Logger.log("Content of message: " + command.toString());
+				Logger.log("Content of message: " + messageContent.toString());
 				
 				//Identifying requested equiplet command
-				String requestedEquipletCommand = command.getString("command").toString();
+				String command = messageContent.getString("command").toString();
 				
 				//Delegate command to corresponding functions
-				switch(requestedEquipletCommand){
+				switch(command){
 				case "CHANGE_EQUIPLET_MACHINE_STATE":
-					changeEquipletMachineState(command);
+					succes = changeEquipletMachineState(messageContent);
 					break;
 					
 				case "INSERT_MODULE":
-					insertModule(command);
+					succes = insertModule(messageContent);
 					break;
 					
 				case "DELETE_MODULE":
-					deleteModule(command);
+					succes = deleteModule(messageContent);
 					break;
 					
 				default:
-					Logger.log("Invalid equiplet command: " + requestedEquipletCommand);
+					Logger.log("Invalid equiplet command: " + command);
+					break;
 				}
 			}catch(Exception e){
 				Logger.log("No equiplet command specified");
+				e.printStackTrace();
 			}
+			
+			//Send response
+			ACLMessage reply = msg.createReply();
+			if(succes){
+				reply.setPerformative(ACLMessage.CONFIRM);
+			}else{
+				reply.setPerformative(ACLMessage.FAILURE);
+			}
+			equiplet.send(reply);
 		}
 	}
 	
-	public void changeEquipletMachineState(JSONObject command){
+	/**
+	 * Change the Mast state of the equiplet
+	 * 
+	 * @param content
+	 * @return succes
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	public boolean changeEquipletMachineState(JSONObject messageContent){
 		try {
 			//Get new state
-			String stateString = command.getString("state").toString();
+			String stateString = messageContent.getString("state").toString();
 			Mast.State state = Mast.State.valueOf(stateString);
 			
 			if(state != null){
 				//Execute action
 				hal.changeState(state);
+				return true;
 			}else{
 				//Error message
 				Logger.log("Invalid Mast State: " + stateString);
@@ -89,9 +117,18 @@ public class EquipletReconfigureHandler{
 		} catch (JSONException e) {
 			Logger.log("No Mast State specified");
 		}
+		return false;
 	}
 	
-	public void insertModule(JSONObject command){
+	/**
+	 * Function to insert modules
+	 * 
+	 * @param content
+	 * @return succes
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	public boolean insertModule(JSONObject messageContent){
 		try{
 	//		hal.getState()???? where is this function??;
 	//		if(currentState != Mast.State.SAFE){
@@ -100,15 +137,15 @@ public class EquipletReconfigureHandler{
 			System.out.println("Insert module func");
 			
 			//Deserialize modules
-			JSONArray modules = (JSONArray) command.get("modules");
+			JSONArray modules = (JSONArray) messageContent.get("modules");
 			ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
 			
 			System.out.println(moduleIdentifiers.toString());
 			
 			
 			//Get static and dynamic settings
-			ArrayList<StaticSettings> staticSettings = new ArrayList<StaticSettings>();
-			ArrayList<DynamicSettings> dynamicSettings = new ArrayList<DynamicSettings>();
+			ArrayList<JSONObject> staticSettings = new ArrayList<JSONObject>();
+			ArrayList<JSONObject> dynamicSettings = new ArrayList<JSONObject>();
 			KnowledgeDBClient kdb = new KnowledgeDBClient();
 			
 			//TODO generate JSONObjects for both settings and insert them into hal
@@ -116,43 +153,60 @@ public class EquipletReconfigureHandler{
 			//Get the staticSettings and push into array
 			for(int i = 0; i < moduleIdentifiers.size(); i++){
 				//Get static settings from Grid Knowledge DB
-//				staticSettings.add(StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb));
+				StaticSettings staticSetting = StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb);
+				JSONObject staticSettingJSON = staticSetting.serialize();
+				staticSettings.add(staticSettingJSON);
 				
-				//Create DTO dynamicSettings
-				//TODO Get actual dynamicvalues from JSON
-//				DynamicSettings tempDynamicSettings = new DynamicSettings();
-//				tempDynamicSettings.attachedTo = null;
-//				tempDynamicSettings.mountPointX = 1;
-//				tempDynamicSettings.mountPointY = 1;
-//				dynamicSettings.add(tempDynamicSettings);
+				//Create dynamicSetting JSONObject
+				//TODO Get actual dynamic values from JSON
+				JSONObject dynamicSetting = new JSONObject();
+				dynamicSetting.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
+				dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, 1);
+				dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, 1);
+				dynamicSettings.add(dynamicSetting);
 			}
 			
-			
+			//Insert module in hal
 			if(moduleIdentifiers != null && staticSettings != null && moduleIdentifiers.size() == staticSettings.size()){
 				for(int i = 0; i < staticSettings.size(); i++){
-//					hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
+					hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
 				}
+				return true;
 			}else{
 				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 			}
 		} catch (JSONException e){
 			//TODO error handling
 			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidMastModeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return false;
 	}
 	
-	public void deleteModule(JSONObject command){
+	/**
+	 * Function to extract modules and remove them from HAL
+	 * 
+	 * @param content
+	 * @return succes
+	 * @author Kevin Bosman
+	 * @author Thomas Kok
+	 */
+	public boolean deleteModule(JSONObject messageContent){
 		try{
 			//TODO Check for good mast state
 			
 			//Deserialize modules
-			JSONArray modules = (JSONArray) command.get("modules");
+			JSONArray modules = (JSONArray) messageContent.get("modules");
 			ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
 			for(ModuleIdentifier mi: moduleIdentifiers){
 				hal.deleteModule(mi);
 			}
-			
-			//hal.deleteModule(moduleIdentifier);
+			return true;
 		} catch (JSONException e){
 			//TODO error handling
 			e.printStackTrace();
@@ -160,6 +214,7 @@ public class EquipletReconfigureHandler{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 	
 	/**

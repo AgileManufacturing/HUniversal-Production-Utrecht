@@ -45,8 +45,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 								MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_RELEASE), MessageTemplate.or(
 										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
 												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), MessageTemplate.or(
-													MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND),
-														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND)))))),
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_GET_DATA), MessageTemplate.or(
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND),
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND))))))),
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
 		ACLMessage msg = equiplet.blockingReceive(template);
@@ -71,7 +72,13 @@ public class EquipletListenerBehaviour extends Behaviour {
 				handleCanExecute(msg);
 				break;
 			case ACLMessage.QUERY_IF:
-				handleInformationRequest(msg);
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)){
+					//Handle get data requests
+					equiplet.passEquipletGetRequest(msg);
+				}else{
+					//Handle information (no idea what conversation id is used here, it didn't have one to begin with..)
+					handleInformationRequest(msg);
+				}
 				break;
 			case ACLMessage.PROPOSE:
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
