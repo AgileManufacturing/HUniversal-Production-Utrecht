@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import HAL.HardwareAbstractionLayer;
 import util.log.Logger;
 
 import jade.lang.acl.ACLMessage;
@@ -19,17 +18,12 @@ import jade.lang.acl.ACLMessage;
  */
 public class EquipletGetDataHandler{
 	private EquipletAgent equiplet;
-	private HardwareAbstractionLayer hal;
 	
 	protected Mast.State currentMastState = Mast.State.OFFLINE;
 	protected Mast.Mode currentMastMode = Mast.Mode.NORMAL;
 	
-	public EquipletGetDataHandler(EquipletAgent e, HardwareAbstractionLayer h){
+	public EquipletGetDataHandler(EquipletAgent e){
 		equiplet = e;
-		hal = h;
-		
-		//HAL not yet used (used to avoid not used warning)
-		hal.getEquipletName();
 	}
 	
 	/**
