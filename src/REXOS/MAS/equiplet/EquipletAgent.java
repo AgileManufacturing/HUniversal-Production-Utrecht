@@ -282,6 +282,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 	
 	public void passOnChangedCommand(ACLMessage msg){
+		
 		onChangeHandle.handleOnChangedListenerCommand(msg);
 	}
 	
