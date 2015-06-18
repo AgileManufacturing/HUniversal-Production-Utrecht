@@ -17,6 +17,8 @@ function UIPanel() {
 	this.setConStatus(this.CLOSED);
 
 	this.agentClickListener = null;
+
+	this.agents = {};
 }
 
 UIPanel.prototype = {
@@ -69,18 +71,30 @@ UIPanel.prototype = {
 		}
 	},
 	'addAgent': function(id, type, state) {
-		this.println('Adding agent "' + id + '"', 'ui');
+		var $li, $a;
 
-		// Create UI elements with attributes
-		var $li = $('<li></li>', {'data': {'id': id}, 'class': type});
-		var $a  = $('<a></a>',   {'href': '#', on: {click: (this.agentClick).bind(this)}});
+		if (id in this.agents) {
+			this.println('Updating agent "' + id + '"', 'ui');
+			$a = this.agents.$a;
+		} else {
+			this.println('Adding new agent "' + id + '"', 'ui');
+
+			// Create UI elements with attributes
+			$li = $('<li></li>', {'data': {'id': id}, 'class': type});
+			$a  = $('<a></a>',   {'href': '#', on: {click: (this.agentClick).bind(this)}});
+
+			$li.append($a);
+
+			// Insert into UI
+			this.grid.append($li);
+
+			this.agents[id] = { $a: $a, $li: $li };
+		}
+
 
 		// Set structure
-		$li.append($a);
-		$a.text(id);
+		$a.text(id + ':' + state);
 
-		// Insert into UI
-		this.grid.append($li);
 	},
 	'agentClick': function(event) {
 		event.preventDefault();
