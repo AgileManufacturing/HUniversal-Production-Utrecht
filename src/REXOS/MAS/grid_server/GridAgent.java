@@ -228,7 +228,9 @@ public class GridAgent extends Agent {
 	}
 	
 	/**
-	 * Create a supply agent (for now)
+	 * Create a Equiplet agent (for now)
+	 * 
+	 * @author Kevin Bosman
 	 */
 	private void spawnEquipletAgent(String name) {
 		try {
@@ -238,6 +240,7 @@ public class GridAgent extends Agent {
 			ac.start();
 		} catch (StaleProxyException e) {
 			System.err.println(this.getLocalName() + ": failed to create Equiplet agent");
+			e.printStackTrace();
 		}
 	}
 

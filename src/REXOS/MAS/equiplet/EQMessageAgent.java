@@ -4,6 +4,7 @@ import util.log.Logger;
 import MAS.util.Ontology;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -39,6 +40,17 @@ public class EQMessageAgent extends Agent {
 	 * @author Kevin Bosman
 	 */
 	public void setup(){
+		//Receive messages handling
+		this.addBehaviour(new CyclicBehaviour (){ 
+			private static final long serialVersionUID = 1L;
+			public void action (){ 
+				ACLMessage msg = this.myAgent.receive();
+				if(msg != null){
+					Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent());
+				}
+			}
+		});
+		
 		//Use strings to avoid warnings...
 		insertJSON.toString();
 		getAllStates.toString();
@@ -53,7 +65,7 @@ public class EQMessageAgent extends Agent {
 		//sendCommand(insertJSON);
 		
 		//Get requests
-		//sendGetData(getAllStates);
+		sendGetData(getAllStates);
 		//sendGetData(getAllModes);
 		//sendGetData(getState);
 		//sendGetData(getMode);
