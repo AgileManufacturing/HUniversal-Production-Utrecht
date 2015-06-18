@@ -11,8 +11,18 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
+/**
+ * Tester class to send messages to the Equiplet Agent for testing responses
+ * 
+ * @author Kevin Bosman
+ */
 public class EQMessageAgent extends Agent {
 	
+	/**
+	 * List of possible messages
+	 * 
+	 * @author Kevin Bosman
+	 */
 	private String insertJSON = "{\n\t\"command\": \"INSERT_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
 	private String getAllStates = "{\"command\": \"GET_ALL_POSIBLE_STATES\"}";
 	private String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
@@ -23,7 +33,20 @@ public class EQMessageAgent extends Agent {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Send the message that will be tested
+	 * 
+	 * @author Kevin Bosman
+	 */
 	public void setup(){
+		//Use strings to avoid warnings...
+		insertJSON.toString();
+		getAllStates.toString();
+		getAllModes.toString();
+		getState.toString();
+		getMode.toString();
+		
+		
 		sleep(2000);
 		
 		//Equiplet commands
@@ -40,6 +63,12 @@ public class EQMessageAgent extends Agent {
 		
 	}
 	
+	/**
+	 * Send a equiplet command
+	 * 
+	 * @param String with JSON content
+	 * @author Kevin Bosman
+	 */
 	public void sendCommand(String data){
 		//Send message
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
@@ -59,6 +88,12 @@ public class EQMessageAgent extends Agent {
 		Logger.log("(Command) Message was send: " + data);
 	}
 	
+	/**
+	 * Send a get data request
+	 * 
+	 * @param String with JSON content
+	 * @author Kevin Bosman
+	 */
 	public void sendGetData(String data){
 		//Send message
 		ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
@@ -78,6 +113,12 @@ public class EQMessageAgent extends Agent {
 		Logger.log("(GetData) Message was send: " + data);
 	}
 	
+	/**
+	 * Send a on change message
+	 * 
+	 * @param String with JSON content
+	 * @author Kevin Bosman
+	 */
 	public void sendOnChangeRequest(String data){
 		//Send message
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
@@ -97,6 +138,12 @@ public class EQMessageAgent extends Agent {
 		Logger.log("(OnChange) Message was send: " + data);
 	}
 	
+	/**
+	 * Search the DF for a service. The messages will be send to all agents that are found
+	 * 
+	 * @param String of the service to search for
+	 * @author Kevin Bosman
+	 */
 	public AID [] searchDF(String service){
         DFAgentDescription dfd = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
@@ -117,6 +164,12 @@ public class EQMessageAgent extends Agent {
         return null;
     }
 	
+	/**
+	 * Simple sleep with catch block
+	 * 
+	 * @param MS to sleep
+	 * @author Kevin Bosman
+	 */
 	public void sleep(int ms){
 		try {
 			Thread.sleep(ms);
