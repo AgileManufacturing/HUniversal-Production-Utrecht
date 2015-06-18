@@ -36,9 +36,6 @@ public class EquipletReconfigureHandler{
 	public EquipletReconfigureHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
 		hal = h;
-		
-		//This print line is because that autistic neighbor of mine can't handle an unused warning...
-		//System.out.println(equiplet.state);
 	}
 	
 	/**

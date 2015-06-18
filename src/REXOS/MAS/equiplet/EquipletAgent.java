@@ -1010,13 +1010,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
 		onChangeHandler.onEquipletStateChanged(state);
-
+		getRequestHandler.setEquipletMastState(state);
 	}
 
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
 		onChangeHandler.onEquipletModeChanged(mode);
-
+		getRequestHandler.setEquipletMastMode(mode);
 	}
 
 	@Override
