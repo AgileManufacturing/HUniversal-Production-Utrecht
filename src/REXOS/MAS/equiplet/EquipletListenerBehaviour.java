@@ -87,8 +87,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 						e.printStackTrace();
 					}*/
 					reply.setContent("{\"content\":{\"id\":\"EQ2\",\"state\":\"IDLE\",\"type\":\"equiplet\"},\"command-id\":\"overview\"}");
-					equiplet.send(reply);
 					System.out.println("EQUIPLETAGENT: INFO REQUEST RECEIVED!");
+					equiplet.send(reply);
+					System.out.println("----------------------------------------------------------");
 				} else {
 					handleScheduling(msg);
 				}

@@ -65,7 +65,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 					AID gridAgentAID = new AID(ServerConfigurations.GS_NAME, AID.ISGUID);
 					gridAgent = new AgentConnection(gridAgentAID, webSocketConnection);
 					agentConnections.add(gridAgent);
-					
 					connectToAgent(gridAgentAID);
 				}
 				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
@@ -120,7 +119,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		int index = 0;
 		boolean clientFound = false;
 		for(; index < agentConnections.size(); index++){
-			if(agentConnections.get(index).removeClient(webSocketConnection)){
+			if(agentConnections.get(index).removeClient(webSocketConnection) && agentConnections.get(index) != gridAgent){
 				clientFound = true;
 				break;
 			}
@@ -166,6 +165,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		AgentConnection agentConn = null;
 		
 		// Search AgentConnection for agent
+		System.out.println("AGENTCONNECTIONS:" + agentConnections.size());
 		for(int i = 0; i < agentConnections.size(); i++){
 			if(agentConnections.get(i).getAgent().equals(agent)){
 				agentConn = agentConnections.get(i);
@@ -182,6 +182,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			for(int i = 0; i < clients.size(); i++){
 				webSocketServer.sendMessage(clients.get(i), message);
 			}
+		} else {
+			System.out.println("agentCon == null");
 		}
 	}
 

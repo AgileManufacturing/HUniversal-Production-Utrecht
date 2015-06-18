@@ -344,7 +344,6 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	}
 	
 	public void sendAgentInfo(String message){
-		System.out.println("SCADA send agentINFO " + basicListeners.size());
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), message);
 		}
