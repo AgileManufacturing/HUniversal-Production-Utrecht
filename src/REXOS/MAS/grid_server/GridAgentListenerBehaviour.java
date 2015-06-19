@@ -57,6 +57,8 @@ public class GridAgentListenerBehaviour extends Behaviour{
 					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
 						System.out.println("GA inform conversation inform");
 						gridAgent.sendAgentInfo(msg.getContent());
+					} else {
+						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
 					}
 //					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
 //						handleProductArrived(msg);
@@ -122,10 +124,10 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				// Program if statements that will appropriately handle messages sent to the GridAgent.
 				if(requestedEquipletCommand.equals("AddDetailedListener")){
 					System.out.println("addDetailedListener "+ gridAgent.toString());
-					gridAgent.addBasicListener(msg.getSender());
+					gridAgent.addDetailedListener(msg.getSender());
 				}else if(requestedEquipletCommand.equals("AddBasicListener")){
 					System.out.println("addBasicListener "+ gridAgent.toString());
-					gridAgent.addDetailedListener(msg.getSender());
+					gridAgent.addBasicListener(msg.getSender());
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
@@ -182,6 +184,12 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				AID aid      = new AID(command.getString("id"), AID.ISGUID);
 				BasicAgentInfo bai = new BasicAgentInfo(aid,state,type);
 				gridAgent.addBasicAgentInfo(bai);
+				
+				// Update all basicListeners (add agent)
+				JSONObject object = new JSONObject(msg.getContent());
+				object.put("command", "ADDAGENT");
+				object.put("agent", bai.getJSONObject());
+				gridAgent.onBasicUpdate(msg.getSender(), object.toString());
 				break;
 			}
 		} catch (JSONException e) {

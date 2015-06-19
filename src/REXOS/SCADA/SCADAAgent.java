@@ -144,7 +144,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	
 	private void connectToAgent(AID agentID){
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
-		String JSONMessage = "{\n 'requested-listener-command': 'AddDetailedListener',\n }";
+		String JSONMessage = "{\n 'requested-listener-command': 'AddBasicListener',\n }";
 		
 		message.addReceiver(agentID);
 		message.setOntology(Ontology.GRID_ONTOLOGY);
@@ -165,11 +165,12 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
-		System.out.println("SCADA: basicUpdate from: " + agent.toString() + "message: " + message);
+		
 		AgentConnection agentConn = null;
 		
 		// Search AgentConnection for agent
 		System.out.println("AGENTCONNECTIONS:" + agentConnections.size());
+		System.out.println("SCADAAgent agent id: " + agent);
 		for(int i = 0; i < agentConnections.size(); i++){
 			if(agentConnections.get(i).getAgent().equals(agent)){
 				agentConn = agentConnections.get(i);

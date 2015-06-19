@@ -22,7 +22,7 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 			case ACLMessage.PROPOSE: 
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)) {
 					System.out.println("SCADA AGENT: "+ msg.getContent());
-					scada.onBasicUpdate(msg.getSender(), msg.getContent());
+					scada.onBasicUpdate( msg.getSender(), msg.getContent());
 				}
 				break;
 			case ACLMessage.INFORM:

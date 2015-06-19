@@ -80,13 +80,13 @@ public class EQMessageAgent extends Agent {
 		//sendGetData(getMode);
 		
 		//Listener test sequence
-//		sendOnChangeRequest(registerMastState);
-//		sleep(10000);
-//		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-//		sleep(10000);
-//		sendGetData(getState);
-//		sleep(10000);
-//		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+		sendOnChangeRequest(registerMastState);
+		sleep(10000);
+		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+		sleep(10000);
+		sendGetData(getState);
+		sleep(10000);
+		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 	}
 	
 	public void takeDown(){

@@ -345,12 +345,9 @@ public class GridAgent extends Agent implements SCADABasicListener,
 
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
-		System.out.println("GA: basicUpdate from: " + agent.toString()
-				+ "message: " + message);
-		String updateString = "{\n 'update-basic-listener': {\n 'aid': "
-				+ agent + "\n 'values': " + message + "\n}\n }";
+		System.out.println("GA onBasicUpdate " + basicListeners.size());
 		for (int i = 0; i < basicListeners.size(); i++) {
-			sendUpdateMessage(basicListeners.get(i), updateString);
+			sendUpdateMessage(basicListeners.get(i), message);
 		}
 	}
 	
@@ -380,6 +377,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
 		message.setContent(update);
 		send(message);
+		System.out.println("GA UpdateMessage");
 	}
 	
 	public void addBasicAgentInfo(BasicAgentInfo bai) {
