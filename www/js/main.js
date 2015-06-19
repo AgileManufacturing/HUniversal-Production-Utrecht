@@ -366,14 +366,6 @@ Server.prototype = {
 // Server class allowing us to connect to web socket.
 var server = new Server(window.location.hostname, 3529, 'SCADA');
 
-server.ui.addAgent('EQ1', 'EquipletAgent', 'IDLE');
-server.ui.addAgent('EQ2', 'ProductAgent', 'SLEEPING');
-server.ui.addAgent('EQ3', 'EquipletAgent', 'EATING');
-server.ui.addAgent('EQ4', 'ProductAgent', 'SLEEPING');
-server.ui.addAgent('EQ5', 'EquipletAgent', 'IDLE');
-server.ui.addAgent('EQ6', 'EquipletAgent', 'SLEEPING');
-server.ui.addAgent('EQ7', 'EquipletAgent', 'EATING');
-
 
 //server.connect();
 

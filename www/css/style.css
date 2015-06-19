@@ -111,7 +111,8 @@ nav.small > ul > li > a {
 	font-size: .75em;
 }
 
-nav > ul > li > a.current {
+nav > ul > li > a.current,
+nav > ul > li > a.current:hover {
 	background-color: #CCCCCC;
 }
 nav > ul > li > a:hover {
