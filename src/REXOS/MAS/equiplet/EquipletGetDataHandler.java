@@ -46,6 +46,11 @@ public class EquipletGetDataHandler{
 				
 				//Delegate command to corresponding functions
 				switch(command){
+				case "GET_BASIC_INFO":
+					result.put("id", equiplet.getAID().getLocalName());
+					result.put("type", "EquipletAgent");
+					result.put("state", equiplet.getEquipletState().name());
+					break;
 				case "GET_CURRENT_EQUIPLET_STATE":
 					result = getCurrentEquipletState();
 					break;

@@ -1,5 +1,8 @@
 package SCADA;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import MAS.util.Ontology;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -20,6 +23,23 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)) {
 					System.out.println("SCADA AGENT: "+ msg.getContent());
 					scada.onBasicUpdate(msg.getSender(), msg.getContent());
+				}
+				break;
+			case ACLMessage.INFORM:
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)){
+					try {
+						JSONObject content = new JSONObject(msg.getContent());
+						String command = content.getString("command");
+						switch(command){
+						case "GETOVERVIEW":
+							scada.handleGetOverview(content);
+							break;
+						}
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
 				break;
 			}
