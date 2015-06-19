@@ -92,7 +92,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("0");
+		spawnEquipletAgent("2");
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();

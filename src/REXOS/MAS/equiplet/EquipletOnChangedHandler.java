@@ -254,7 +254,8 @@ public class EquipletOnChangedHandler{
 	 * @param state mast state
 	 * @author Mitchell van Rijkom
 	 */
-	public void onEquipletStateChanged(Mast.State state){		
+	public void onEquipletStateChanged(Mast.State state){	
+		System.out.println("EQ: change state");
 		String stateString = state.toString();
 		
 		JSONObject returnMessage = new JSONObject();
@@ -341,6 +342,7 @@ public class EquipletOnChangedHandler{
 		// send message
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 		message.setContent(returnMessage.toString());
+		message.setConversationId(Ontology.GRID_ONTOLOGY);
 		message.setOntology(Ontology.GRID_ONTOLOGY);
 		
 		// sends message to equiplets with define type
