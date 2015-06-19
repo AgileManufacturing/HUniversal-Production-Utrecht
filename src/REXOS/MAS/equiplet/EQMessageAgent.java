@@ -25,6 +25,7 @@ public class EQMessageAgent extends Agent {
 	 * @author Kevin Bosman
 	 */
 	private String insertJSON = "{\n\t\"command\": \"INSERT_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
+	private String deleteJSON = "{\n\t\"command\": \"DELETE_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
 	private String getAllStates = "{\"command\": \"GET_ALL_POSIBLE_STATES\"}";
 	private String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
 	private String getState = "{\"command\": \"GET_CURRENT_EQUIPLET_STATE\"}";
@@ -54,6 +55,7 @@ public class EQMessageAgent extends Agent {
 		
 		//Use strings to avoid warnings...
 		insertJSON.toString();
+		deleteJSON.toString();
 		getAllStates.toString();
 		getAllModes.toString();
 		getState.toString();
@@ -64,7 +66,8 @@ public class EQMessageAgent extends Agent {
 		sleep(2000);
 		
 		//Equiplet commands
-		sendCommand(insertJSON);
+		sendCommand(deleteJSON);
+		//sendCommand(insertJSON);
 		
 		//Get requests
 		//sendGetData(getAllStates);

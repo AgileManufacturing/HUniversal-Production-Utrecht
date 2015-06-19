@@ -422,33 +422,33 @@ public class ReconfigHandler {
 	public StaticSettings removeModule(ModuleIdentifier moduleIdentifier) throws JSONException, ParseException {
 		StaticSettings output = new StaticSettings();
 		
-		// collect all the data
-		Module module = moduleFactory.getItemForIdentifier(moduleIdentifier);
-		
-		output.moduleIdentifier = module.getModuleIdentifier();
-		output.moduleConfigurationProperties = module.getConfigurationProperties();
-		
-		output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
-
-		ArrayList<CalibrationEntry> calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
-		for (CalibrationEntry calibrationEntry : calibrationData) {
-			output.calibrationData.add(calibrationEntry);
+		try{
+			// collect all the data
+			Module module = moduleFactory.getItemForIdentifier(moduleIdentifier);
+			output.moduleIdentifier = module.getModuleIdentifier();
+			output.moduleConfigurationProperties = module.getConfigurationProperties();output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
+			
+			ArrayList<CalibrationEntry> calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
+			
+			for (CalibrationEntry calibrationEntry : calibrationData) {
+				output.calibrationData.add(calibrationEntry);
+			}
+			
+			// remove all the data
+			for (CalibrationEntry calibrationEntry : output.calibrationData) {
+				calibrationEntry.removeFromDatabase(knowledgeDBClient);
+			}
+			knowledgeDBClient.executeUpdateQuery(removeModule, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber, moduleIdentifier.serialNumber);
+			removeSpace(moduleIdentifier);
+			
+			ModuleType.removeUnusedFromDatabase(knowledgeDBClient);
+			
+			// update the factories
+			moduleFactory.checkCache();
+			capabilityFactory.checkCache();
+		}catch(NullPointerException ex){
+			Logger.log(LogSection.HAL_FACTORIES, LogLevel.ERROR, "Error attempting to find module to be removed.");
 		}
-		
-		// remove all the data
-		for (CalibrationEntry calibrationEntry : output.calibrationData) {
-			calibrationEntry.removeFromDatabase(knowledgeDBClient);
-		}
-		
-		knowledgeDBClient.executeUpdateQuery(removeModule, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber, moduleIdentifier.serialNumber);
-		removeSpace(moduleIdentifier);
-		
-		ModuleType.removeUnusedFromDatabase(knowledgeDBClient);
-		
-		// update the factories
-		moduleFactory.checkCache();
-		capabilityFactory.checkCache();
-
 		return output;
 	}
 

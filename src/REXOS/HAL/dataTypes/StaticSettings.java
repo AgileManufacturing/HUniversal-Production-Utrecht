@@ -9,6 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.Row;
 
@@ -87,17 +90,20 @@ public class StaticSettings implements Serializable{
 	}
 	public JSONObject serialize() throws JSONException {
 		JSONObject output = new JSONObject();
-		
-		output.put(MODULE_IDENTIFIER, moduleIdentifier.serialize());
-		output.put(MODULE_CONFIGURATION_PROPERTIES, moduleConfigurationProperties);
-		
-		output.put(MODULE_TYPE, moduleType.serialize());
-		
-		JSONArray calibrationData = new JSONArray();
-		for (int i = 0; i < this.calibrationData.size(); i++) {
-			calibrationData.put(this.calibrationData.get(i).serialize());
+		try{
+			output.put(MODULE_IDENTIFIER, moduleIdentifier.serialize());
+			output.put(MODULE_CONFIGURATION_PROPERTIES, moduleConfigurationProperties);
+			
+			output.put(MODULE_TYPE, moduleType.serialize());
+			
+			JSONArray calibrationData = new JSONArray();
+			for (int i = 0; i < this.calibrationData.size(); i++) {
+				calibrationData.put(this.calibrationData.get(i).serialize());
+			}
+			output.put(MODULE_CALIBRATION_DATA, calibrationData);
+		}catch(NullPointerException ex){
+			Logger.log(LogSection.HAL_MODULES, LogLevel.EMERGENCY, "Error occured which is considered to be impossible.");
 		}
-		output.put(MODULE_CALIBRATION_DATA, calibrationData);
 		
 		return output;
 	}
