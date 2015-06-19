@@ -10,10 +10,6 @@ insert into GazeboModel
 (buildNumber, zipFile, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ)
 values(1, "", "model.sdf", "baseLink", "otherLink", 0.0, 0.0, 0.0);
 
-insert into GazeboModel
-(buildNumber, zipFile, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ)
-values(1, "", "model.sdf", "baseLink", "otherLink", 0.0, 0.0, 0.0);
-
 insert into Equiplet
 (name, mountPointsX, mountPointsY, mountPointDistanceX, mountPointDistanceY, rosSoftware, masSoftware, gazeboModel)
 values("EQ2", 10, 18, 50, 50, 1, 1, 1);

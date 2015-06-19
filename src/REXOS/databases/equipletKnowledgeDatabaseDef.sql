@@ -83,8 +83,7 @@ create table Module(
   attachedToRight int NOT NULL,
   moduleProperties text NOT NULL,
   primary key (manufacturer, typeNumber, serialNumber),
-  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE CASCADE,
-  foreign key (equiplet) references Equiplet(name) ON DELETE NO ACTION 
+  foreign key (equiplet) references Equiplet(name) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table SupportedMutation(
@@ -92,7 +91,7 @@ create table SupportedMutation(
   typeNumber char(200) NOT NULL,
   mutation char(200) NOT NULL,
   primary key (manufacturer, typeNumber, mutation),
-  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE CASCADE
+  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table RequiredCalibrationMutation(
@@ -102,7 +101,7 @@ create table RequiredCalibrationMutation(
   mutation char(200) NOT NULL,
   isOptional tinyint(1) NOT NULL,
   primary key (manufacturer, typeNumber, phase, mutation),
-  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE CASCADE
+  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table SupportedCalibrationMutation(
@@ -111,7 +110,7 @@ create table SupportedCalibrationMutation(
   phase int NOT NULL,
   mutation char(200) NOT NULL,
   primary key (manufacturer, typeNumber, phase, mutation),
-  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE CASCADE
+  foreign key (manufacturer, typeNumber) references ModuleType(manufacturer, typeNumber) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table ModuleCalibration(
@@ -128,14 +127,14 @@ create table ModuleCalibrationModuleSet(
   serialNumber char(200) NOT NULL,
   primary key (ModuleCalibration, manufacturer, typeNumber, serialNumber),
   -- foreign key (manufacturer, typeNumber, serialNumber) references Module(manufacturer, typeNumber, serialNumber) ON DELETE CASCADE ON UPDATE NO ACTION,
-  foreign key (ModuleCalibration) references ModuleCalibration(id) ON DELETE CASCADE ON UPDATE CASCADE
+  foreign key (ModuleCalibration) references ModuleCalibration(id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 create table CapabilityType(
   name char(200) NOT NULL,
   halSoftware int NOT NULL,
   primary key (name),
-  foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE CASCADE
+  foreign key (halSoftware) references JavaSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 create table CapabilityTypeRequiredMutation(
@@ -143,7 +142,7 @@ create table CapabilityTypeRequiredMutation(
   capabilityType char(200) NOT NULL,
   mutation char(200) NOT NULL,
   primary key (treeNumber, capabilityType, mutation),
-  foreign key (capabilityType) references CapabilityType(name) ON DELETE CASCADE ON UPDATE CASCADE
+  foreign key (capabilityType) references CapabilityType(name) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 create table ServiceType(
@@ -155,8 +154,8 @@ create table ServiceType_CapabilityType(
   serviceType char(200) NOT NULL,
   capabilityType char(200) NOT NULL,
   primary key (serviceType, capabilityType),
-  foreign key (serviceType) references ServiceType(name) ON DELETE CASCADE ON UPDATE CASCADE,
-  foreign key (capabilityType) references CapabilityType(name) ON DELETE CASCADE ON UPDATE CASCADE
+  foreign key (serviceType) references ServiceType(name) ON DELETE CASCADE ON UPDATE NO ACTION,
+  foreign key (capabilityType) references CapabilityType(name) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 DELIMITER $$

@@ -243,14 +243,17 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
+		System.out.println("onEquipletStateChanged() called.");
 		equipletListener.onEquipletStateChanged(state);
 	}
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
+		System.out.println("onEquipletModeChanged(0 called.");
 		equipletListener.onEquipletModeChanged(mode);
 	}
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
+		System.out.println("onEquipletCommandStatusChanged() called.");
 		equipletListener.onEquipletCommandStatusChanged(status);
 		
 	}
