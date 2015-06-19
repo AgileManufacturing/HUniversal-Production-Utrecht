@@ -37,7 +37,7 @@ public class EquipletGetDataHandler{
 			JSONObject result = new JSONObject();
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				
+				result.put("command", messageContent.getString("command"));
 				//Debug output
 				//Logger.log("Content of message: " + messageContent.toString());
 				

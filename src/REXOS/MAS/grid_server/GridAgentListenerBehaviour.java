@@ -50,7 +50,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 			switch (msg.getPerformative()) {
 				case ACLMessage.INFORM:
 					//Subscribe to newly made agent.
-					if(msg.getSender() == gridAgent.getDefaultDF()) {
+					if(msg.getSender().equals(gridAgent.getDefaultDF())) {
 						handleNewAgent(msg);
 					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
 						handleDataResponse(msg);
@@ -140,6 +140,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 	private void handleNewAgent(ACLMessage msg) {
 		try {
 			DFAgentDescription[] results = DFService.decodeNotification(msg.getContent());
+			System.out.println("AGENTS FOUND: " + results.length);
 			for(int i = 0; i < results.length; i++) {
 				DFAgentDescription dfd = results[i];
 				AID agent = dfd.getName();
@@ -151,10 +152,12 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				JSONObject object = new JSONObject();
 				object.put("command", "GET_BASIC_INFO");
 				message.setContent(object.toString());
+				message.addReceiver(agent);
 				gridAgent.send(message);
 				
 				//Subcribe on Agent Updates.
 				ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
+				reply.addReceiver(agent);
 				reply.setOntology(Ontology.GRID_ONTOLOGY);
 				reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
 				object = new JSONObject();
