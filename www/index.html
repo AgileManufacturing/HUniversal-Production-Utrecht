@@ -11,9 +11,7 @@
 		<nav id="nav" class="bottom wide">
 			<ul>
 				<li>
-					<a href="/" data-section="controls">Controls</a>
-				</li><li>
-					<a href="/" data-section="grid">Grid</a>
+					<a href="/" data-section="grid" class="default">Grid</a>
 				</li><li>
 					<a href="/" data-section="agent">Agent</a>
 				</li><!-- <li>
@@ -23,12 +21,6 @@
 		</nav>
 	</header>
 	<main>
-		<section id="controls">
-			<h1>Controls</h1>
-			<div id="con-status"><span class="light"></span><span class="text"></span></div>
-			<button type="button" id="stop" disabled="disabled">Stop</button>
-			<button type="button" id="start">Start</button>
-		</section>
 		<section id="grid">
 			<h1>Grid</h1>
 			<ul></ul>
@@ -37,8 +29,16 @@
 			<h1>Agent</h1>
 			<form></form>
 		</section>
+		<div id="controls">
+			<h4>Controls</h4>
+			<div>
+				<button type="button" id="stop" disabled="disabled">Stop</button>
+				<button type="button" id="start">Start</button>
+			</div>
+			<div id="con-status"><span class="light"></span><span class="text"></span></div>
+		</div>
 		<div id="log">
-			<em>Log</em>
+			<h4>Log</h4>
 			<pre></pre>
 			<button type="button" id="clear">Clear</button>
 		</div>
