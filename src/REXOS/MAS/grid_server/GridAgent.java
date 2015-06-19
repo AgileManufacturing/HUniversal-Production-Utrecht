@@ -69,6 +69,7 @@ import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.Tick;
+import SCADA.BasicAgentInfo;
 import SCADA.SCADABasicListener;
 import SCADA.SCADADetailedListener;
 
@@ -79,7 +80,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	private long productCounter = 0;
 	private ArrayList<AID> basicListeners;
 	private ArrayList<AID> detailedListeners;
-
+	private ArrayList<BasicAgentInfo> infolist;
 	public GridAgent() {
 		productCounter = 0;
 		basicListeners = new ArrayList<AID>();
