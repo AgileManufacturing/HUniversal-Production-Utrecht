@@ -63,9 +63,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	// Equiplet
 	private HardwareAbstractionLayer hal;
-	private EquipletReconfigureHandler reconfigHandler = new EquipletReconfigureHandler(this, hal);
-	private EquipletOnChangedHandler onChangeHandler = new EquipletOnChangedHandler(this, hal);
-	private EquipletGetDataHandler getRequestHandler = new EquipletGetDataHandler(this);
+	private EquipletReconfigureHandler reconfigHandler;
+	private EquipletOnChangedHandler onChangeHandler;
+	private EquipletGetDataHandler getRequestHandler;
 
 	/**
 	 * Equiplet agent startup
@@ -79,6 +79,11 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				try {
 					hal = new HardwareAbstractionLayer(this.getLocalName(), this);
 					System.out.println("EA:" + getLocalName() + " has created HAL");
+					
+					//Create helper classes
+					reconfigHandler = new EquipletReconfigureHandler(this, hal);
+					onChangeHandler = new EquipletOnChangedHandler(this, hal);
+					getRequestHandler = new EquipletGetDataHandler(this);
 
 					ArrayList<String> services = hal.getSupportedServices();
 

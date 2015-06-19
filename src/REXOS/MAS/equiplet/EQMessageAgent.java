@@ -29,6 +29,7 @@ public class EQMessageAgent extends Agent {
 	private String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
 	private String getState = "{\"command\": \"GET_CURRENT_EQUIPLET_STATE\"}";
 	private String getMode = "{\"command\": \"GET_CURRENT_MAST_MODE\"}";
+	private String registerMastState = "{\"command\": \"ON_EQUIPLET_STATE_CHANGED\", \"action\": \"REGISTER_LISTENER\"}";
 	/**
 	 * 
 	 */
@@ -46,7 +47,7 @@ public class EQMessageAgent extends Agent {
 			public void action (){ 
 				ACLMessage msg = this.myAgent.receive();
 				if(msg != null){
-					Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent());
+					Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
 				}
 			}
 		});
@@ -57,6 +58,7 @@ public class EQMessageAgent extends Agent {
 		getAllModes.toString();
 		getState.toString();
 		getMode.toString();
+		registerMastState.toString();
 		
 		
 		sleep(2000);
@@ -65,10 +67,19 @@ public class EQMessageAgent extends Agent {
 		//sendCommand(insertJSON);
 		
 		//Get requests
-		sendGetData(getAllStates);
+		//sendGetData(getAllStates);
 		//sendGetData(getAllModes);
-		//sendGetData(getState);
+		sendGetData(getState);
 		//sendGetData(getMode);
+		
+		//Listener test sequence
+		sendOnChangeRequest(registerMastState);
+		sleep(3000);
+		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+		sleep(3000);
+		sendGetData(getState);
+		sleep(3000);
+		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 	}
 	
 	public void takeDown(){

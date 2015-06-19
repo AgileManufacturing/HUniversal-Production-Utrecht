@@ -39,7 +39,7 @@ public class EquipletGetDataHandler{
 				JSONObject messageContent = new JSONObject(msg.getContent());
 				
 				//Debug output
-				Logger.log("Content of message: " + messageContent.toString());
+				//Logger.log("Content of message: " + messageContent.toString());
 				
 				//Identifying requested equiplet command
 				String command = messageContent.getString("command").toString();
@@ -89,6 +89,11 @@ public class EquipletGetDataHandler{
 			
 			ACLMessage reply = msg.createReply();
 			if(result != null){
+				try {
+					result.put("Request", new JSONObject(msg.getContent()));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 				reply.setPerformative(ACLMessage.INFORM);
 				reply.setContent(result.toString());
 			}else{

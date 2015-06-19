@@ -1,24 +1,18 @@
 package MAS.equiplet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import generic.Mast;
-import generic.Mast.Mode;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import MAS.util.Ontology;
-
-import util.log.Logger;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -65,13 +59,13 @@ public class EquipletOnChangedHandler{
 				JSONObject command = new JSONObject(msg.getContent());
 				
 				//Debug output
-				Logger.log("Content of message: " + command.toString());
+				//Logger.log("Content of message: " + command.toString());
 				
 				//Identifying requested equiplet command
 				String requestedEquipletCommand = command.getString("command").toString();
 				String requestedEquipletAction = command.getString("action").toString();
 				
-				Logger.log("command = " + requestedEquipletCommand + " action = " + requestedEquipletAction);
+				//Logger.log("command = " + requestedEquipletCommand + " action = " + requestedEquipletAction);
 				
 				boolean isSuccesfullyAdded = false;
 				boolean isValidOnChangedType = false;
@@ -87,21 +81,21 @@ public class EquipletOnChangedHandler{
 					if(types.toString().equals(requestedEquipletCommand)){
 						type = types;
 						isValidOnChangedType = true;
-						Logger.log("Type match with " + type.toString());
+						//Logger.log("Type match with " + type.toString());
 					}
 				}							
 				
 				if(isValidOnChangedType){
-					Logger.log("Execute (de)-registration procedure");	
+					//Logger.log("Execute (de)-registration procedure");	
 					//Execute (de)-registration procedure
 					switch(requestedEquipletAction){
 					case "REGISTER_LISTENER":						
 						isSuccesfullyAdded = registerListener(msg.getSender(),type);
-						Logger.log("case REGISTER_LISTENER == " + isSuccesfullyAdded);	
+						//Logger.log("case REGISTER_LISTENER == " + isSuccesfullyAdded);	
 						//isSuccesfullyAdded = x;
 						break;					
 					case "DEREGISTER_LISTENER":
-						Logger.log("case REGISTER_LISTENER");	
+						//Logger.log("case REGISTER_LISTENER");	
 						isSuccesfullyAdded = deregisterListener(msg.getSender(),type);
 						break;	
 					
@@ -109,6 +103,14 @@ public class EquipletOnChangedHandler{
 					
 					//Send reply
 					ACLMessage reply = msg.createReply();
+					JSONObject replyMessage = new JSONObject();
+					try {
+						replyMessage.put("Request", new JSONObject(msg.getContent()));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					reply.setContent(replyMessage.toString());
+					
 					if(isSuccesfullyAdded){					
 						reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 					}else {
@@ -118,7 +120,15 @@ public class EquipletOnChangedHandler{
 				}else {
 					// if onChangeType is not detected 
 					ACLMessage reply = msg.createReply();
-					reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);					
+					JSONObject replyMessage = new JSONObject();
+					try {
+						replyMessage.put("Request", new JSONObject(msg.getContent()));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					reply.setContent(replyMessage.toString());
+					reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);	
+					equiplet.send(reply);
 				}
 			}catch(Exception e){
 				
@@ -135,7 +145,7 @@ public class EquipletOnChangedHandler{
 	 * @return true if equiplet register was succesfull else false
 	 */	
 	private boolean registerListener(AID sender, OnChangedTypes type) {
-		Logger.log("In function registerListener");
+		//Logger.log("In function registerListener");
 		
 		boolean isAddedSuccesfully = false;
 		if(type.equals(OnChangedTypes.ALL)){
@@ -185,16 +195,16 @@ public class EquipletOnChangedHandler{
 		if(!equipletListeners.containsKey(type)){
 			equipletListeners.put(type, new HashSet<AID>());
 			equipletListeners.get(type).add(sender);
-			Logger.log("Succesfully registerd " + sender.toString() + "with type " + type.toString());
+			//Logger.log("Succesfully registerd " + sender.toString() + "with type " + type.toString());
 			return true;
 		} else {
 			if(!equipletListeners.get(type).contains(sender)){
 				equipletListeners.get(type).add(sender);
-				Logger.log("Succesfully registerd " + sender.toString() + "with type " + type.toString());
+				//Logger.log("Succesfully registerd " + sender.toString() + "with type " + type.toString());
 				return true;
 			}
 		}
-		Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
+		//Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
 		return false;
 	}
 	
@@ -209,14 +219,14 @@ public class EquipletOnChangedHandler{
 		if(equipletListeners.containsKey(type)){
 			if(equipletListeners.get(type).contains(sender)){
 				equipletListeners.get(type).remove(sender);
-				Logger.log("Succesfully deregisterd " + sender.toString() + "with type " + type.toString());
+				//Logger.log("Succesfully deregisterd " + sender.toString() + "with type " + type.toString());
 				return true;
 			}else {
-				Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
+				//Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
 				return false;
 			}
 		} else {
-			Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
+			//Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
 			return false;
 		}
 	}
@@ -226,6 +236,7 @@ public class EquipletOnChangedHandler{
 	 * @param type onChangeType
 	 * @author Mitchell van Rijkom
 	 */
+	/*
 	private void logEquipletsByType(OnChangedTypes type) {
 		// List al equiplets to test
 		for(Map.Entry<OnChangedTypes, Set<AID>> entry : equipletListeners.entrySet()){
@@ -236,6 +247,7 @@ public class EquipletOnChangedHandler{
 			}
 		}
 	}
+	*/
 	
 	/**
 	 * This function notifies all equiplets that are registered to an onChangeType when a mast state changed 
