@@ -33,4 +33,13 @@ public class AgentConnection {
 	public ArrayList<WebSocket> getClients(){
 		return clients;
 	}
+	
+	public WebSocket getClientConnection(int hash){
+		for(WebSocket w : clients){
+			if(w.hashCode() == hash){
+				return w;
+			}
+		}
+		return null;
+	}
 }

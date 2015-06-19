@@ -1,12 +1,18 @@
 package MAS.grid_server;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.log.Logger;
 import MAS.util.Ontology;
+import SCADA.BasicAgentInfo;
+import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.domain.DFService;
+import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
@@ -43,9 +49,16 @@ public class GridAgentListenerBehaviour extends Behaviour{
 			System.out.printf("GA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", gridAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
 				case ACLMessage.INFORM:
-					if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
+					//Subscribe to newly made agent.
+					if(msg.getSender().equals(gridAgent.getDefaultDF())) {
+						handleNewAgent(msg);
+					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
+						handleDataResponse(msg);
+					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
 						System.out.println("GA inform conversation inform");
 						gridAgent.sendAgentInfo(msg.getContent());
+					} else {
+						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
 					}
 //					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
 //						handleProductArrived(msg);
@@ -56,10 +69,17 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				// Request of other agent to get information to schedule a job
 				// will send confirm or disconfirm message in return
 				case ACLMessage.REQUEST:
-					if(msg.getContent().equals("GETOVERVIEW")) {
-						System.out.println("Request: GetOverview received!");
-						this.gridAgent.getOverview();
-						//Get all agents and send them to the SCADA agent.
+					try {
+						JSONObject object = new JSONObject(msg.getContent().toString());
+						if(object.getString("command").equals("GETOVERVIEW")) {
+							System.out.println("Request: GetOverview received!");
+							int clientHash = object.getInt("client");
+							sendOverviewToSCADAAgent(msg, clientHash);
+							//Get all agents and send them to the SCADA agent.
+						}
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 //					handleScheduling(msg);
 					break;
@@ -104,10 +124,10 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				// Program if statements that will appropriately handle messages sent to the GridAgent.
 				if(requestedEquipletCommand.equals("AddDetailedListener")){
 					System.out.println("addDetailedListener "+ gridAgent.toString());
-					gridAgent.addBasicListener(msg.getSender());
+					gridAgent.addDetailedListener(msg.getSender());
 				}else if(requestedEquipletCommand.equals("AddBasicListener")){
 					System.out.println("addBasicListener "+ gridAgent.toString());
-					gridAgent.addDetailedListener(msg.getSender());
+					gridAgent.addBasicListener(msg.getSender());
 				}else{
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
@@ -117,5 +137,78 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				Logger.log("Invalid JSON.");
 			}
 		}		
+	}
+	
+	private void handleNewAgent(ACLMessage msg) {
+		try {
+			DFAgentDescription[] results = DFService.decodeNotification(msg.getContent());
+			System.out.println("AGENTS FOUND: " + results.length);
+			for(int i = 0; i < results.length; i++) {
+				DFAgentDescription dfd = results[i];
+				AID agent = dfd.getName();
+				
+				//Ask Agent for BASIC INFO
+				ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
+				message.setOntology(Ontology.GRID_ONTOLOGY);
+				message.setConversationId(Ontology.CONVERSATION_GET_DATA);
+				JSONObject object = new JSONObject();
+				object.put("command", "GET_BASIC_INFO");
+				message.setContent(object.toString());
+				message.addReceiver(agent);
+				gridAgent.send(message);
+				
+				//Subcribe on Agent Updates.
+				ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
+				reply.addReceiver(agent);
+				reply.setOntology(Ontology.GRID_ONTOLOGY);
+				reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+				object = new JSONObject();
+				object.put("command","ON_EQUIPLET_STATE_CHANGED");
+				object.put("action", "REGISTER_LISTENER");
+				reply.setContent(object.toString());
+				gridAgent.send(reply);
+			}
+		} catch (FIPAException | JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void handleDataResponse(ACLMessage msg) {
+		try {
+			JSONObject command = new JSONObject(msg.getContent());
+			switch(command.getString("command").toString()){
+			case "GET_BASIC_INFO":
+				String type  = command.getString("type");
+				String state = command.getString("state");
+				AID aid      = new AID(command.getString("id"), AID.ISGUID);
+				BasicAgentInfo bai = new BasicAgentInfo(aid,state,type);
+				gridAgent.addBasicAgentInfo(bai);
+				
+				// Update all basicListeners (add agent)
+				JSONObject object = new JSONObject(msg.getContent());
+				object.put("command", "ADDAGENT");
+				object.put("agent", bai.getJSONObject());
+				gridAgent.onBasicUpdate(msg.getSender(), object.toString());
+				break;
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void sendOverviewToSCADAAgent(ACLMessage msg, int client) {
+		ACLMessage reply = msg.createReply();
+		reply.setConversationId(Ontology.CONVERSATION_GET_DATA);
+		reply.setPerformative(ACLMessage.INFORM);
+		try {
+			JSONObject o = gridAgent.getJSONOfOverview().put("client", client);
+			reply.setContent(o.toString());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		gridAgent.send(reply);
 	}
 }

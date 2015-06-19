@@ -29,6 +29,7 @@ public class EQMessageAgent extends Agent {
 	private String getAllStates = "{\"command\": \"GET_ALL_POSIBLE_STATES\"}";
 	private String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
 	private String getState = "{\"command\": \"GET_CURRENT_EQUIPLET_STATE\"}";
+	private String getSchedule = "{\"command\": \"GET_SCHEDULE\"}";
 	private String getMode = "{\"command\": \"GET_CURRENT_MAST_MODE\"}";
 	private String registerMastState = "{\"command\": \"ON_EQUIPLET_STATE_CHANGED\", \"action\": \"REGISTER_LISTENER\"}";
 	/**
@@ -61,9 +62,12 @@ public class EQMessageAgent extends Agent {
 		getState.toString();
 		getMode.toString();
 		registerMastState.toString();
+		getSchedule.toString();
 		
 		
 		sleep(2000);
+		
+		//sendGetData(getSchedule);
 		
 		//Equiplet commands
 		//sendCommand(deleteJSON);
@@ -76,13 +80,13 @@ public class EQMessageAgent extends Agent {
 		//sendGetData(getMode);
 		
 		//Listener test sequence
-		//sendOnChangeRequest(registerMastState);
-		//sleep(3000);
-		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-		//sleep(3000);
-		//sendGetData(getState);
-		//sleep(3000);
-		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+		sendOnChangeRequest(registerMastState);
+		sleep(10000);
+		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+		sleep(10000);
+		sendGetData(getState);
+		sleep(10000);
+		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 	}
 	
 	public void takeDown(){

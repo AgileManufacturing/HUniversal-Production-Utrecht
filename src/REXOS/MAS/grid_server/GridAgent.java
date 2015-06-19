@@ -68,6 +68,7 @@ import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.Tick;
+import SCADA.BasicAgentInfo;
 import SCADA.SCADABasicListener;
 import SCADA.SCADADetailedListener;
 
@@ -78,11 +79,13 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	private long productCounter = 0;
 	private ArrayList<AID> basicListeners;
 	private ArrayList<AID> detailedListeners;
+	private ArrayList<BasicAgentInfo> agentInformation;
 
 	public GridAgent() {
 		productCounter = 0;
 		basicListeners = new ArrayList<AID>();
 		detailedListeners = new ArrayList<AID>();
+		agentInformation = new ArrayList<BasicAgentInfo>();
 	}
 
 	@Override
@@ -342,12 +345,9 @@ public class GridAgent extends Agent implements SCADABasicListener,
 
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
-		System.out.println("GA: basicUpdate from: " + agent.toString()
-				+ "message: " + message);
-		String updateString = "{\n 'update-basic-listener': {\n 'aid': "
-				+ agent + "\n 'values': " + message + "\n}\n }";
+		System.out.println("GA onBasicUpdate " + basicListeners.size());
 		for (int i = 0; i < basicListeners.size(); i++) {
-			sendUpdateMessage(basicListeners.get(i), updateString);
+			sendUpdateMessage(basicListeners.get(i), message);
 		}
 	}
 	
@@ -377,5 +377,34 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
 		message.setContent(update);
 		send(message);
+		System.out.println("GA UpdateMessage");
+	}
+	
+	public void addBasicAgentInfo(BasicAgentInfo bai) {
+		if(!agentInformation.contains(bai)) {
+			agentInformation.add(bai);
+		}
+	}
+	
+	public void removeBasicAgentInfo(BasicAgentInfo bai) {
+		if(agentInformation.contains(bai)) {
+			agentInformation.remove(bai);
+		}
+	}
+	
+	public JSONObject getJSONOfOverview() {
+		JSONObject object = new JSONObject();
+		try {
+			object.put("command", "GETOVERVIEW");
+			JSONArray array = new JSONArray();
+			for(BasicAgentInfo bai : agentInformation) {
+				array.put(bai.getJSONObject());
+			}
+			object.put("agents", array);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return object;
 	}
 }

@@ -69,8 +69,12 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 				}
 				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 				msg.addReceiver(gridAgent.getAgent());
-				msg.setContent("GETOVERVIEW");
+				JSONObject object = new JSONObject();
+				object.put("command", "GETOVERVIEW");
+				object.put("client", webSocketConnection.hashCode());
+				msg.setContent(object.toString());
 				send(msg);
+				System.out.println(msg.toString());
 				break;
 			case "GETINFO":
 				AgentConnection agent = null;
@@ -140,7 +144,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	
 	private void connectToAgent(AID agentID){
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
-		String JSONMessage = "{\n 'requested-listener-command': 'AddDetailedListener',\n }";
+		String JSONMessage = "{\n 'requested-listener-command': 'AddBasicListener',\n }";
 		
 		message.addReceiver(agentID);
 		message.setOntology(Ontology.GRID_ONTOLOGY);
@@ -161,11 +165,12 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
-		System.out.println("SCADA: basicUpdate from: " + agent.toString() + "message: " + message);
+		
 		AgentConnection agentConn = null;
 		
 		// Search AgentConnection for agent
 		System.out.println("AGENTCONNECTIONS:" + agentConnections.size());
+		System.out.println("SCADAAgent agent id: " + agent);
 		for(int i = 0; i < agentConnections.size(); i++){
 			if(agentConnections.get(i).getAgent().equals(agent)){
 				agentConn = agentConnections.get(i);
@@ -207,6 +212,25 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			for(int i = 0; i < clients.size(); i++){
 				webSocketServer.sendMessage(clients.get(i), message);
 			}
+		}
+	}
+	
+	public void handleGetOverview(JSONObject content){
+		try {
+			int client = content.getInt("client");
+			JSONArray agents = content.getJSONArray("agents");
+			JSONObject object = new JSONObject();
+			object.put("agents", agents);
+			object.put("command", "GETOVERVIEW");
+			int index = 0;
+			if((index = agentConnections.indexOf(gridAgent)) >= 0){
+				// SCADAAgent is already connected to this agent
+				WebSocket clientWS = agentConnections.get(index).getClientConnection(client);
+				webSocketServer.sendMessage(clientWS, object.toString());
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

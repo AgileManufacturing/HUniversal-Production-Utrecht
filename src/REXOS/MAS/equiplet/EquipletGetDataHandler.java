@@ -37,7 +37,7 @@ public class EquipletGetDataHandler{
 			JSONObject result = new JSONObject();
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				
+				result.put("command", messageContent.getString("command"));
 				//Debug output
 				//Logger.log("Content of message: " + messageContent.toString());
 				
@@ -46,6 +46,11 @@ public class EquipletGetDataHandler{
 				
 				//Delegate command to corresponding functions
 				switch(command){
+				case "GET_BASIC_INFO":
+					result.put("id", equiplet.getAID().getLocalName());
+					result.put("type", "EquipletAgent");
+					result.put("state", equiplet.getEquipletState().name());
+					break;
 				case "GET_CURRENT_EQUIPLET_STATE":
 					result = getCurrentEquipletState();
 					break;
@@ -132,6 +137,7 @@ public class EquipletGetDataHandler{
 	public JSONObject getCurrentMastMode(){
 		JSONObject result = new JSONObject();
 		try {
+			result.put("command", "GET_CURRENT_MAST_MODE");
 			result.put("mode", currentMastMode.toString());
 		} catch (JSONException e) {
 			Logger.log("Error");
@@ -197,11 +203,37 @@ public class EquipletGetDataHandler{
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
+	 * @author Mitchell van Rijkom
 	 */
 	public JSONObject getSchedule(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("state", equiplet.state);
+			result.put("command", "GET_SCHEDULE");
+			JSONArray JSONSchedule = new JSONArray();
+			for (Job job : equiplet.schedule) {
+				Logger.log(job.toString());
+				JSONObject jobData = new JSONObject();
+				try {
+					jobData.put("product", job.getProductAgentName() 	!= null ? job.getProductAgentName().toString() 	: "null");
+					jobData.put("Name", job.getProductAgent()			!= null ? job.getProductAgent().toString() 		: "null" );
+					jobData.put("index", job.getIndex());
+					jobData.put("service", job.getService() 			!= null ? job.getService().toString() 			: "null" );
+					jobData.put("criteria", job.getCriteria()			!= null ? job.getCriteria().toString() 			: "null" );
+					jobData.put("start", job.getStartTime()				!= null ? job.getStartTime().toString() 		: "null" );
+					jobData.put("due", job.getDue()						!= null ? job.getDue().toString() 				: "null" );
+					jobData.put("deadline", job.getDeadline() 			!= null ? job.getDeadline().toString() 			: "null" );
+					jobData.put("ready", job.getDuration() 				!= null ? job.getDuration().toString() 			: "null" );
+				} catch(JSONException e){
+					Logger.log("Error");
+					return null;
+				}
+				
+				JSONSchedule.put(jobData);
+				
+			}
+			result.put("schedule", JSONSchedule);
+			
+			// loop through tree set and create json object with all data 
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -240,6 +272,7 @@ public class EquipletGetDataHandler{
 	public JSONObject getAllPosibleModes(){
 		JSONObject result = new JSONObject();
 		try {
+			result.put("command", "GET_ALL_POSIBLE_MODES");
 			Mast.Mode[] modes = Mast.Mode.values();
 			JSONArray modeStrings = new JSONArray();
 			for(Mast.Mode state : modes){

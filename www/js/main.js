@@ -5,19 +5,36 @@
  */
 
 function UIPanel() {
+	$('#nav ul > li > a').click((this.navClick).bind(this));
+
+	this.switchSection($('#nav ul > li > a.default'));
+
+	// Log section
 	this.log_pre   = $('#log pre');
 	this.log_clean = $('#log #clear');
 	this.log_clean.click((this.clearLog).bind(this));
 
+
+	// Grid section
 	this.grid = $('#grid ul');
 
+	this.clickAgentListener = null;
+
+
+	// Controls section
 	this.con_status_light = $('#controls #con-status .light');
 	this.con_status_text  = $('#controls #con-status .text');
 
+	this.btnStop  = $('#controls #stop').click((this.clickBtnStop).bind(this));
+	this.btnStart = $('#controls #start').click((this.clickBtnStart).bind(this));
+
+	this.clickBtnStopListener  = null;
+	this.clickBtnStartListener = null;
+
 	this.setConStatus(this.CLOSED);
 
-	this.agentClickListener = null;
 
+	// Agents section
 	this.agents = {};
 }
 
@@ -75,13 +92,13 @@ UIPanel.prototype = {
 
 		if (id in this.agents) {
 			this.println('Updating agent "' + id + '"', 'ui');
-			$a = this.agents.$a;
+			$a = this.agents[id].$a;
 		} else {
 			this.println('Adding new agent "' + id + '"', 'ui');
 
 			// Create UI elements with attributes
-			$li = $('<li></li>', {'data': {'id': id}, 'class': type});
-			$a  = $('<a></a>',   {'href': '#', on: {click: (this.agentClick).bind(this)}});
+			$li = $('<li></li>', {'data-id': id, 'data-type': type, 'class': type});
+			$a  = $('<a></a>', {'href': '#', on: {click: (this.clickAgent).bind(this)}});
 
 			$li.append($a);
 
@@ -91,26 +108,13 @@ UIPanel.prototype = {
 			this.agents[id] = { $a: $a, $li: $li };
 		}
 
-
-		// Set structure
 		$a.text(id + ':' + state);
-
 	},
-	'agentClick': function(event) {
-		event.preventDefault();
+	'clearLog': function(event) {
+		if (typeof(event) !== 'undefined') {
+			event.preventDefault();
+		}
 
-		// Retreive elements
-		var $target = $(event.target);
-		var $parent = $target.parent();
-		var id      = $parent.data('id');
-
-		this.println('Clicked agent "' + id + '"', 'ui');
-		this.agentClickListener(id);
-	},
-	'setAgentClickListener': function(listener) {
-		this.agentClickListener = listener;
-	},
-	'clearLog': function() {
 		this.log_pre.empty();
 	},
 
@@ -126,6 +130,60 @@ UIPanel.prototype = {
 			this.con_status_text.text('Open');
 		}
 	},
+
+	'clickAgent': function(event) {
+		event.preventDefault();
+
+		// Retreive elements
+		var $target = $(event.target);
+		var $parent = $target.parent();
+		var id      = $parent.data('id');
+
+		this.println('Clicked agent "' + id + '"', 'ui');
+
+		if (this.clickAgentListener !== null) {
+			this.clickAgentListener(id);
+		}
+	},
+	'setClickAgentListener': function(listener) { this.clickAgentListener = listener; },
+
+
+	'clickBtnStop': function(event) {
+		this.btnStop.prop('disabled', true);
+		this.btnStart.prop('disabled', false);
+
+		console.log(this.btnStart);
+
+		if (this.clickBtnStopListener !== null) {
+			this.clickBtnStopListener();
+		}
+	},
+	'setClickBtnStopListener': function(listener) { this.clickBtnStopListener = listener; },
+
+	'clickBtnStart': function(event) {
+		this.btnStop.prop('disabled', false);
+		this.btnStart.prop('disabled', true);
+
+		if (this.clickBtnStartListener !== null) {
+			this.clickBtnStartListener();
+		}
+	},
+	'setClickBtnStartListener': function(listener) { this.clickBtnStartListener = listener; },
+
+	'navClick': function(event) {
+		event.preventDefault();
+
+		var $a = $(event.target);
+
+		this.switchSection($a);
+	},
+	'switchSection': function($a) {
+		$('#nav ul > li > a').removeClass('current');
+		$a.addClass('current');
+
+		$('main > section').hide();
+		$('main > section#' + $a.data('section')).show();
+	},
 };
 
 
@@ -134,37 +192,56 @@ function Server(host, port, id) {
 	this.id  = id;
 	this.url = host + ':' + port;
 
-	this.connected = false;
-	this.websocket = null;
+	// When true will attempt reconnecting when disconnect
+	this.will_reconnect = true;
+	// Connection status
+	this.is_connected    = false;
+	// The WebSocket instance
+	this.websocket    = null;
 
+	// The UI object used to let the world know what the f*ck we're doing
 	this.ui = new UIPanel();
-	this.ui.setAgentClickListener((this.requestAgent).bind(this));
+	this.ui.setClickAgentListener((this.requestAgent).bind(this));
+	this.ui.setClickBtnStopListener((this.disconnect).bind(this));
+	this.ui.setClickBtnStartListener((this.connect).bind(this));
+
+	this.ui.println('Server("' + host + '", ' + port + ')', this.id);
 }
 
 // Server methods
 Server.prototype = {
 	'onerror': function(event) {
+		if (!this.is_connected) {
+			return;
+		}
 		this.ui.println('WebSocket error', this.id);
-		console.log('onerror (event next)');
-		console.log(event);
+		//console.log('onerror (event next)');
+		//console.log(event);
 	},
 	'onmessage': function(event) {
-		this.ui.println('Received message', this.id);
 		var data = JSON.parse(event.data);
 
 		// Switch what type of message is received
 		// Act accordingly
-		switch (data['command-id']) {
-			case 'overview':
-				var agent = data['content'];
+		switch (data['command']) {
+			case 'GETOVERVIEW':
+				this.ui.println('Received GETOVERVIEW', this.id);
 
+			 	for(var i = 0; i < data['agents'].length; i++) {
+ 					var agent = data['agents'][i];
+					this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+ 				}
+
+				break;
+			case 'ADDAGENT':
+				this.ui.println('Received ADDAGENT', this.id);
+
+ 				var agent = data['agent'];
 				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
 
 				break;
-			/*case 'EquipletAgent':
-				break;*/
 			default:
-				this.ui.println('Message received with unknown type', this.id);
+				this.ui.println('Received unknown "' + data['command'] + '"', this.id);
 				break;
 		}
 	},
@@ -175,7 +252,7 @@ Server.prototype = {
 		clearTimeout(this.timeout);
 
 		this.ui.setConStatus(this.ui.OPEN);
-		this.connected = true;
+		this.is_connected = true;
 
 		// Request grid overview from WS
 		this.send('GETOVERVIEW');
@@ -199,20 +276,28 @@ Server.prototype = {
 			default:   var desc = 'Unrecognized error code';    break;
 		}
 
-		console.log('onclose (event next)');
-		console.log(event);
+		//console.log('onclose (event next)');
+		//console.log(event);
 
-		this.ui.println('Connection closed with "' + desc + '"', this.id);
+		// If is_connected is false, connection was closed purposedly
+		if (this.is_connected) {
+			this.ui.println('Connection closed with "' + desc + '"', this.id);
+			this.is_connected = false;
+		}
 
 		this.ui.setConStatus(this.ui.CLOSED);
-		this.connected = false;
+		this.websocket    = null;
 
-		this.timeout = setTimeout((this.connect).bind(this), 3000);
+		if (this.will_reconnect) {
+			this.timeout = setTimeout((this.connect).bind(this), 3000);
+		}
 	},
 
 	'connect': function() {
 		this.ui.println('Attempting to connect to "' + this.url + '"', this.id);
 		this.ui.setConStatus(this.ui.CONNECTING);
+
+		this.will_reconnect = true;
 
 		this.websocket = new WebSocket('ws://' + this.url);
 
@@ -225,9 +310,25 @@ Server.prototype = {
 		return this.websocket;
 	},
 
+	'disconnect': function() {
+		this.ui.println('Stopping client', this.id);
+		this.ui.setConStatus(this.ui.CLOSED);
+
+		this.is_connected      = false;
+		this.will_reconnect = false;
+		if (this.timeout !== null) {
+			clearTimeout(this.timeout);
+		}
+
+		//if (this.websocket !== null) {
+			this.websocket.close();
+		//	this.websocket = null;
+		//}
+	},
+
 	// Send to WS
 	'send': function(command, id, values) {
-		if (typeof(id)     === 'undefined') { id    = null; }
+		if (typeof(id)     === 'undefined') { id     = null; }
 		if (typeof(values) === 'undefined') { values = []; }
 
 		// Create JSON message to send over WS
@@ -244,7 +345,7 @@ Server.prototype = {
 	},
 
 	'requestAgent': function(id) {
-		if (!this.connected) {
+		if (!this.is_connected) {
 			return;
 		}
 
@@ -256,7 +357,7 @@ Server.prototype = {
 
 // Server class allowing us to connect to web socket.
 var server = new Server(window.location.hostname, 3529, 'SCADA');
-server.connect();
+//server.connect();
 
 /*window.addEventListener('beforeunload', function (e) {
 	var msg = 'Leaving causes acquired data to be discarded';

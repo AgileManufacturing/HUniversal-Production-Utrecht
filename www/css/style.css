@@ -33,6 +33,10 @@ h1 {
 	font-size: 1.5em;
 }
 
+button[disabled] {
+	opacity: .5;
+}
+
 
 /**
  * Major structure elements styling
@@ -62,6 +66,9 @@ nav {
 nav.top {
 	border-top: 2px solid #BBBBBB;
 	border-bottom: none;
+}
+nav:hover {
+	border-color: #DDDDDD;
 }
 
 nav > ul {
@@ -112,11 +119,11 @@ nav.small > ul > li > a {
 	font-size: .75em;
 }
 
-nav > ul > li.current > a {
-	border-color: #0066BB;
+nav > ul > li > a.current {
+	background-color: #BBBBBB;
 }
 nav > ul > li > a:hover {
-	border-color: #000000;
+	background-color: #DDDDDD;
 }
 
 
@@ -129,9 +136,29 @@ nav > ul > li > a:hover {
  * Main styling
  */
 main {
-	padding: 16px 0;
+	padding: 32px 0;
 
 	background-color: #FFFFFF;
+}
+main > section,
+main > div {
+	box-sizing: border-box;
+	padding: 8px;
+}
+
+main > section {
+	display: none;
+
+	background-color: rgba(0,0,0,.02);
+} main > section.current {
+	display: block;
+}
+
+main > div {
+
+	margin-top: 16px;
+	margin-bottom: 16px;
+	background-color: rgba(0,0,0,.1);
 }
 
 
@@ -185,14 +212,11 @@ footer {
 
 	position: relative;
 }
-#grid > ul > li.equiplet:before {
-	content: 'equiplet';
-}
-#grid > ul > li.product:before {
-	content: 'product';
-}
 #grid > ul > li:before {
+	content: attr(data-type);
 	font-size: .5em;
+
+	font-style: italic;
 
 	position: absolute;
 	top: 0;
@@ -209,6 +233,7 @@ footer {
  * Log styling
  */
 #log > pre {
+	margin: 0;
 	border: 1px solid black;
 
 	background-color: #EEEEEE;
