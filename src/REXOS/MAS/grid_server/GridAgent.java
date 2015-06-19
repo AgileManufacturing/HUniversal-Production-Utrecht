@@ -92,7 +92,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("2");
+		spawnEquipletAgent("0");
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
@@ -320,7 +320,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		try {
 			ContainerController cc = getContainerController();
 			Object[] arguments = new Object[] { "hal" };
-			AgentController ac = cc.createNewAgent("EQ-" + name, EquipletAgent.class.getName(), arguments);
+			AgentController ac = cc.createNewAgent("EQ" + name, EquipletAgent.class.getName(), arguments);
 			ac.start();
 		} catch (StaleProxyException e) {
 			System.err.println(this.getLocalName() + ": failed to create Equiplet agent");
