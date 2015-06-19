@@ -66,7 +66,7 @@ public class EQMessageAgent extends Agent {
 		sleep(2000);
 		
 		//Equiplet commands
-		sendCommand(deleteJSON);
+		//sendCommand(deleteJSON);
 		//sendCommand(insertJSON);
 		
 		//Get requests
