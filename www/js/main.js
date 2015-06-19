@@ -7,7 +7,7 @@
 function UIPanel() {
 	$('#nav ul > li > a').click((this.navClick).bind(this));
 
-
+	this.switchSection($('#nav ul > li > a.default'));
 
 	// Log section
 	this.log_pre   = $('#log pre');
@@ -92,12 +92,12 @@ UIPanel.prototype = {
 
 		if (id in this.agents) {
 			this.println('Updating agent "' + id + '"', 'ui');
-			$a = this.agents.$a;
+			$a = this.agents[id].$a;
 		} else {
 			this.println('Adding new agent "' + id + '"', 'ui');
 
 			// Create UI elements with attributes
-			$li = $('<li></li>', {'data': {'id': id}, 'class': type});
+			$li = $('<li></li>', {'data-id': id, 'data-type': type, 'class': type});
 			$a  = $('<a></a>', {'href': '#', on: {click: (this.clickAgent).bind(this)}});
 
 			$li.append($a);
@@ -204,6 +204,8 @@ function Server(host, port, id) {
 	this.ui.setClickAgentListener((this.requestAgent).bind(this));
 	this.ui.setClickBtnStopListener((this.disconnect).bind(this));
 	this.ui.setClickBtnStartListener((this.connect).bind(this));
+
+	this.ui.println('Server("' + host + '", ' + port + ')', this.id);
 }
 
 // Server methods
@@ -217,24 +219,29 @@ Server.prototype = {
 		//console.log(event);
 	},
 	'onmessage': function(event) {
-		this.ui.println('Received message', this.id);
 		var data = JSON.parse(event.data);
 
 		// Switch what type of message is received
 		// Act accordingly
 		switch (data['command']) {
 			case 'GETOVERVIEW':
+				this.ui.println('Received GETOVERVIEW', this.id);
+
 			 	for(var i = 0; i < data['agents'].length; i++) {
  					var agent = data['agents'][i];
-
 					this.ui.addAgent(agent['id'], agent['type'], agent['state']);
  				}
 
 				break;
-			/*case 'EquipletAgent':
-				break;*/
+			case 'ADDAGENT':
+				this.ui.println('Received ADDAGENT', this.id);
+
+ 				var agent = data['agent'];
+				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+
+				break;
 			default:
-				this.ui.println('Message received with unknown type', this.id);
+				this.ui.println('Received unknown "' + data['command'] + '"', this.id);
 				break;
 		}
 	},
@@ -272,10 +279,13 @@ Server.prototype = {
 		//console.log('onclose (event next)');
 		//console.log(event);
 
-		this.ui.println('Connection closed with "' + desc + '"', this.id);
+		// If is_connected is false, connection was closed purposedly
+		if (this.is_connected) {
+			this.ui.println('Connection closed with "' + desc + '"', this.id);
+			this.is_connected = false;
+		}
 
 		this.ui.setConStatus(this.ui.CLOSED);
-		this.is_connected = false;
 		this.websocket    = null;
 
 		if (this.will_reconnect) {

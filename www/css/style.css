@@ -136,16 +136,29 @@ nav > ul > li > a:hover {
  * Main styling
  */
 main {
-	padding: 16px 0;
+	padding: 32px 0;
 
 	background-color: #FFFFFF;
+}
+main > section,
+main > div {
+	box-sizing: border-box;
+	padding: 8px;
 }
 
 main > section {
 	display: none;
-}
-main > section.current {
+
+	background-color: rgba(0,0,0,.02);
+} main > section.current {
 	display: block;
+}
+
+main > div {
+
+	margin-top: 16px;
+	margin-bottom: 16px;
+	background-color: rgba(0,0,0,.1);
 }
 
 
@@ -199,14 +212,11 @@ footer {
 
 	position: relative;
 }
-#grid > ul > li.equiplet:before {
-	content: 'equiplet';
-}
-#grid > ul > li.product:before {
-	content: 'product';
-}
 #grid > ul > li:before {
+	content: attr(data-type);
 	font-size: .5em;
+
+	font-style: italic;
 
 	position: absolute;
 	top: 0;
@@ -222,12 +232,6 @@ footer {
 /**
  * Log styling
  */
-#log {
-	padding: 8px;
-	margin-top: 16px;
-	margin-bottom: 16px;
-	background-color: #CCCCCC;
-}
 #log > pre {
 	margin: 0;
 	border: 1px solid black;
