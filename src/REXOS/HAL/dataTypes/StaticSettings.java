@@ -57,12 +57,15 @@ public class StaticSettings implements Serializable{
 		
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleForModuleIdentifier, 
 				moduleIdentifier.manufacturer, moduleIdentifier.typeNumber, moduleIdentifier.serialNumber);
-		JSONTokener tokener = new JSONTokener((String) rows[0].get("moduleProperties"));
-		output.moduleConfigurationProperties = new JSONObject(tokener);
 		
-		output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
-		
-		output.calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
+		if(rows.length > 0){
+			JSONTokener tokener = new JSONTokener((String) rows[0].get("moduleProperties"));
+			output.moduleConfigurationProperties = new JSONObject(tokener);
+			
+			output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
+			
+			output.calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
+		}
 		
 		return output;
 	}

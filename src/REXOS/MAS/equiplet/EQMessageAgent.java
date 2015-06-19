@@ -64,22 +64,22 @@ public class EQMessageAgent extends Agent {
 		sleep(2000);
 		
 		//Equiplet commands
-		//sendCommand(insertJSON);
+		sendCommand(insertJSON);
 		
 		//Get requests
 		//sendGetData(getAllStates);
 		//sendGetData(getAllModes);
-		sendGetData(getState);
+		//sendGetData(getState);
 		//sendGetData(getMode);
 		
 		//Listener test sequence
-		sendOnChangeRequest(registerMastState);
-		sleep(3000);
-		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-		sleep(3000);
-		sendGetData(getState);
-		sleep(3000);
-		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+		//sendOnChangeRequest(registerMastState);
+		//sleep(3000);
+		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+		//sleep(3000);
+		//sendGetData(getState);
+		//sleep(3000);
+		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 	}
 	
 	public void takeDown(){
