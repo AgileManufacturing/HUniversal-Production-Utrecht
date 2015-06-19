@@ -19,23 +19,22 @@
 	</javac>
 	</presetdef>
 
-	<!-- Macro for the following things:
-	- load current classpath
-	- echo the current building dir
-	- make the bin directory
-	- running javac command using the classpath
-	- adding currently build source to the classpath
-	-->
-
 	<path id                 ="master-classpath">
 		<fileset dir  		 ="${rexos-src-folder}/external_libraries/">
 		<include name 		 ="*.jar"/>
 		</fileset>
 	</path>
 
-	<target name             ="all" depends="MAS, HAL, generic, util"/>
+	<target name             ="all" depends="SCADA, MAS, HAL, generic, util"/>
 
-	<target name             ="MAS" depends="util, generic, HAL">
+	<target name             ="SCADA" depends="util, generic">
+		<mkdir dir           ="build/REXOS/SCADA"/>
+		<rexos.javac destdir ="build/REXOS">
+			<src path        ="${rexos-src-folder}/SCADA"/>
+		</rexos.javac>
+	</target>
+	
+	<target name             ="MAS" depends="util, generic, HAL, SCADA">
 		<mkdir dir           ="build/REXOS/MAS"/>
 		<rexos.javac destdir ="build/REXOS">
 			<src path        ="${rexos-src-folder}/MAS"/>

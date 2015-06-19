@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="www/|ROS/|models/|external_libraries/" kind="src" path="src/REXOS"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/apache_ws_commons-1.0.2.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/apache_xmlrpc_client-0.2.1.jar"/>
@@ -37,11 +36,13 @@
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/netty-3.2.3.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/rosgraph_msgs-1.11.0.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/rosjava-0.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/sqlite-jdbc-3.7.2.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/std_msgs-0.5.9.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-client-1.2.1.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-container-grizzly-1.2.1.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-core-1.2.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-spi-1.2.1.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-websocket-core-1.2.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

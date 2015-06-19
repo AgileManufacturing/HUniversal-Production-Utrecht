@@ -39,7 +39,7 @@ import org.json.JSONTokener;
 
 public class Configuration {
 	private static final String defaultPropertyName = "default";
-	private static final String defaultPropertiesFilePath = "src/REXOS/util/configuration/settings.json";
+	private static final String defaultPropertiesFilePath = "src/REXOS/util/configuration/debug_settings.json";
 	
 	protected static JSONObject configuration = null;
 	

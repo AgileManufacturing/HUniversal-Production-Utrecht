@@ -3,7 +3,6 @@ package MAS.equiplet;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-
 import java.util.List;
 
 import org.json.JSONException;
@@ -80,6 +79,7 @@ public class EquipletListenerBehaviour extends Behaviour {
 					handleInformationRequest(msg);
 				}
 				break;
+			// messagetype holding the requested state for the equiplet
 			case ACLMessage.PROPOSE:
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
 					//Handle equiplet command functie

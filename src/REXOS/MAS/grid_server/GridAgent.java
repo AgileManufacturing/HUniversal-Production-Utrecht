@@ -42,11 +42,16 @@ import generic.Criteria;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -63,14 +68,21 @@ import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
 import MAS.util.Tick;
+import SCADA.SCADABasicListener;
+import SCADA.SCADADetailedListener;
 
-public class GridAgent extends Agent {
+public class GridAgent extends Agent implements SCADABasicListener,
+		SCADADetailedListener {
 	private static final long serialVersionUID = -720095833750151495L;
 
 	private long productCounter = 0;
+	private ArrayList<AID> basicListeners;
+	private ArrayList<AID> detailedListeners;
 
 	public GridAgent() {
 		productCounter = 0;
+		basicListeners = new ArrayList<AID>();
+		detailedListeners = new ArrayList<AID>();
 	}
 
 	@Override
@@ -78,7 +90,9 @@ public class GridAgent extends Agent {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
 		spawnEquipletAgent("2");
-		addBehaviour(new GridListenerBehaviour());
+		addBehaviour(new GridAgentListenerBehaviour(this));
+	
+		testGetAgents();
 	}
 
 	class GridListenerBehaviour extends CyclicBehaviour {
@@ -137,11 +151,15 @@ public class GridAgent extends Agent {
 			for (int i = 0; i < jsonSteps.length(); i++) {
 				JSONObject jsonStep = jsonSteps.getJSONObject(i);
 				if (jsonStep.has("service") && jsonStep.has("criteria")) {
-					JSONObject jsonCriteria = jsonStep.getJSONObject("criteria");
+					JSONObject jsonCriteria = jsonStep
+							.getJSONObject("criteria");
 
-					if (jsonCriteria.has("subjects") && jsonCriteria.has("target")) {
-						JSONObject jsonTarget = jsonCriteria.getJSONObject("target");
-						JSONObject jsonSubjects = jsonCriteria.getJSONObject("subjects");
+					if (jsonCriteria.has("subjects")
+							&& jsonCriteria.has("target")) {
+						JSONObject jsonTarget = jsonCriteria
+								.getJSONObject("target");
+						JSONObject jsonSubjects = jsonCriteria
+								.getJSONObject("subjects");
 
 						JSONObject criteria = new JSONObject();
 						criteria.put(Criteria.TARGET, jsonTarget);
@@ -151,10 +169,12 @@ public class GridAgent extends Agent {
 						ProductStep step = new ProductStep(i, service, criteria);
 						steps.add(step);
 					} else {
-						System.err.println("no target or subject in criteria of product step");
+						System.err
+								.println("no target or subject in criteria of product step");
 					}
 				} else {
-					System.err.println("no service or criteria in product step");
+					System.err
+							.println("no service or criteria in product step");
 				}
 			}
 			return steps;
@@ -164,25 +184,30 @@ public class GridAgent extends Agent {
 	}
 
 	/**
-	 * This method makes a call to the SupplyAgent. It sends the criteria to it. In turn the SupplyAgent returns the
-	 * criteria targets and subjects with actual targets and subjects (crate codes and coordinates).
+	 * This method makes a call to the SupplyAgent. It sends the criteria to it.
+	 * In turn the SupplyAgent returns the criteria targets and subjects with
+	 * actual targets and subjects (crate codes and coordinates).
 	 */
 	// TODO Only works with the pick and place actions (the supply agent has to
 	// be completely rewritten in order to make it compatible)
-	// TODO delete completely!!!!!!!!! (because it is wrong, ugly and it should feels bad)
+	// TODO delete completely!!!!!!!!! (because it is wrong, ugly and it should
+	// feels bad)
 	private JSONObject fillProductCriteria(JSONObject criteria) {
 		if (criteria.length() > 0) {
-			AID supplyAgent = new AID(MASConfiguration.SUPPLY_AGENT, AID.ISLOCALNAME);
+			AID supplyAgent = new AID(MASConfiguration.SUPPLY_AGENT,
+					AID.ISLOCALNAME);
 
 			ACLMessage message = new ACLMessage(ACLMessage.QUERY_REF);
 			message.setOntology(Ontology.GRID_ONTOLOGY);
 			message.addReceiver(supplyAgent);
 			message.setConversationId(Ontology.CONVERSATION_SUPPLY_REQUEST);
-			message.setReplyWith(Ontology.CONVERSATION_SUPPLY_REQUEST + System.currentTimeMillis());
+			message.setReplyWith(Ontology.CONVERSATION_SUPPLY_REQUEST
+					+ System.currentTimeMillis());
 			message.setContent(criteria.toString());
 			send(message);
 
-			System.out.println(getLocalName() + ": has sent message to " + supplyAgent.getLocalName());
+			System.out.println(getLocalName() + ": has sent message to "
+					+ supplyAgent.getLocalName());
 			ACLMessage received = blockingReceive();
 			if (received != null) {
 				try {
@@ -191,15 +216,16 @@ public class GridAgent extends Agent {
 					e.printStackTrace();
 				}
 			} else {
-				System.out.println(getLocalName() + " failed to contact the supply agent");
+				System.out.println(getLocalName()
+						+ " failed to contact the supply agent");
 			}
 		}
 		return criteria;
 	}
 
 	/**
-	 * Create a traffic manager agent in the grid The traffic agent requires a map of all the equiplet with the travel
-	 * distances to each other (for now)
+	 * Create a traffic manager agent in the grid The traffic agent requires a
+	 * map of all the equiplet with the travel distances to each other (for now)
 	 */
 	private void spawnTrafficAgent() {
 		Map<String, Position> equipletMap = new HashMap<String, Position>();
@@ -207,10 +233,12 @@ public class GridAgent extends Agent {
 			TrafficManager trafficAgent = new TrafficManager(equipletMap);
 
 			ContainerController cc = getContainerController();
-			AgentController ac = cc.acceptNewAgent(MASConfiguration.TRAFFIC_AGENT, trafficAgent);
+			AgentController ac = cc.acceptNewAgent(
+					MASConfiguration.TRAFFIC_AGENT, trafficAgent);
 			ac.start();
 		} catch (StaleProxyException e) {
-			System.err.println(this.getLocalName() + ": spawnTrafficAgent fails");
+			System.err.println(this.getLocalName()
+					+ ": spawnTrafficAgent fails");
 		}
 	}
 
@@ -220,10 +248,63 @@ public class GridAgent extends Agent {
 	private void spawnSupplyAgent() {
 		try {
 			ContainerController cc = getContainerController();
-			AgentController ac = cc.createNewAgent(MASConfiguration.SUPPLY_AGENT, SupplyAgent.class.getName(), new Object[] {});
+			AgentController ac = cc.createNewAgent(
+					MASConfiguration.SUPPLY_AGENT, SupplyAgent.class.getName(),
+					new Object[] {});
 			ac.start();
 		} catch (StaleProxyException e) {
-			System.err.println(this.getLocalName() + ": failed to create supply agent");
+			System.err.println(this.getLocalName()
+					+ ": failed to create supply agent");
+		}
+	}
+
+	@Override
+	protected void takeDown() {
+		System.out.println(getLocalName() + ": terminated");
+
+	}
+
+	public void testGetAgents() {
+		DFAgentDescription description = new DFAgentDescription();
+		SearchConstraints sc = new SearchConstraints();
+		// sc.setMaxResults((long) -1);
+		// description.setType();
+		try {
+			DFAgentDescription listOfAgents[] = DFService.search(this,
+					description, sc);
+			for (int i = 0; i < listOfAgents.length; i++) {
+				System.out.println(listOfAgents[i]);
+			}
+		} catch (FIPAException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void getOverview() {
+		DFAgentDescription description = new DFAgentDescription();
+		//ServiceDescription sd = new ServiceDescription();
+		//sd.setType("AGENT");
+		SearchConstraints sc = new SearchConstraints();
+		//description.addServices(sd);
+		//sc.setMaxResults((long) -1);
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		msg.setOntology(Ontology.GRID_ONTOLOGY);
+		msg.setConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST);
+		String content = "{\n 'command' : 'GET_BASIC_INFO' \n }";
+		msg.setContent(content);
+		try {
+			DFAgentDescription listOfAgents[] = DFService.search(this,
+					description, sc);
+			System.out.println("LIST LENGTH: " + listOfAgents.length);
+			for (int i = 0; i < listOfAgents.length; i++) {
+				System.out.println(listOfAgents[i].getName());
+				msg.addReceiver(listOfAgents[i].getName());
+				send(msg);
+			}
+		} catch (FIPAException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -244,9 +325,57 @@ public class GridAgent extends Agent {
 		}
 	}
 
-	@Override
-	protected void takeDown() {
-		System.out.println(getLocalName() + ": terminated");
+	void addBasicListener(AID agent) {
+		if(!basicListeners.contains(agent)){
+			basicListeners.add(agent);
+			System.out.println("GA: add basicListener " + agent.toString());
+		}
+	}
 
+	// This might not be necessary
+	void addDetailedListener(AID agent) {
+		if(!detailedListeners.contains(agent)){
+			detailedListeners.add(agent);
+			System.out.println("GA: add detailedListener " + agent.toString());
+		}
+	}
+
+	@Override
+	public void onBasicUpdate(AID agent, String message) {
+		System.out.println("GA: basicUpdate from: " + agent.toString()
+				+ "message: " + message);
+		String updateString = "{\n 'update-basic-listener': {\n 'aid': "
+				+ agent + "\n 'values': " + message + "\n}\n }";
+		for (int i = 0; i < basicListeners.size(); i++) {
+			sendUpdateMessage(basicListeners.get(i), updateString);
+		}
+	}
+	
+	public void sendAgentInfo(String message){
+		for (int i = 0; i < basicListeners.size(); i++) {
+			sendUpdateMessage(basicListeners.get(i), message);
+		}
+	}
+
+	// This might not be necessary
+	@Override
+	public void onDetailedUpdate(AID agent, String message) {
+		System.out.println("GA: detailedUpdate from: " + agent.toString()
+				+ "message: " + message);
+		String updateString = "{\n 'update-detailed-listener': {\n 'aid': "
+				+ agent + "\n 'values': " + message + "\n}\n }";
+		for (int i = 0; i < detailedListeners.size(); i++) {
+			sendUpdateMessage(detailedListeners.get(i), updateString);
+		}
+	}
+
+	private void sendUpdateMessage(AID agent, String update) {
+		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+
+		message.addReceiver(agent);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+		message.setContent(update);
+		send(message);
 	}
 }
