@@ -25,9 +25,11 @@ public class EQMessageAgent extends Agent {
 	 * @author Kevin Bosman
 	 */
 	private String insertJSON = "{\n\t\"command\": \"INSERT_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
+	private String deleteJSON = "{\n\t\"command\": \"DELETE_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
 	private String getAllStates = "{\"command\": \"GET_ALL_POSIBLE_STATES\"}";
 	private String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
 	private String getState = "{\"command\": \"GET_CURRENT_EQUIPLET_STATE\"}";
+	private String getSchedule = "{\"command\": \"GET_SCHEDULE\"}";
 	private String getMode = "{\"command\": \"GET_CURRENT_MAST_MODE\"}";
 	private String registerMastState = "{\"command\": \"ON_EQUIPLET_STATE_CHANGED\", \"action\": \"REGISTER_LISTENER\"}";
 	/**
@@ -54,31 +56,36 @@ public class EQMessageAgent extends Agent {
 		
 		//Use strings to avoid warnings...
 		insertJSON.toString();
+		deleteJSON.toString();
 		getAllStates.toString();
 		getAllModes.toString();
 		getState.toString();
 		getMode.toString();
 		registerMastState.toString();
+		getSchedule.toString();
 		
 		
 		sleep(2000);
 		
+		//sendGetData(getSchedule);
+		
 		//Equiplet commands
+		//sendCommand(deleteJSON);
 		//sendCommand(insertJSON);
 		
 		//Get requests
 		//sendGetData(getAllStates);
 		//sendGetData(getAllModes);
-		sendGetData(getState);
+		//sendGetData(getState);
 		//sendGetData(getMode);
 		
 		//Listener test sequence
 		//sendOnChangeRequest(registerMastState);
-		sleep(3000);
+		//sleep(3000);
 		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-		sleep(3000);
+		//sleep(3000);
 		//sendGetData(getState);
-		sleep(3000);
+		//sleep(3000);
 		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 	}
 	

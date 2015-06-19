@@ -39,7 +39,7 @@ public abstract class Factory <K ,V> {
 	
 	protected abstract JavaSoftware getJavaSoftware(K identifier);
 	protected abstract V getConstuctorforThisFactory(Class<V> myClass, K key) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException;
-	public V getItemForIdentifier(K identifier) {
+	public V getItemForIdentifier(K identifier) throws NullPointerException{
 		if(instancesCache.containsKey(identifier)) {
 			return instancesCache.get(identifier);
 		}

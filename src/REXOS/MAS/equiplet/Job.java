@@ -25,7 +25,7 @@ public class Job implements Comparable<Job> {
 		this.product = null;
 		this.productName = "";
 		this.service = "";
-		this.index = -1;
+		this.index = -1; 
 		this.criteria = new JSONObject();
 		this.start = start;
 		this.due = deadline;

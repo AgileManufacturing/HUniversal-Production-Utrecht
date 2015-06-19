@@ -161,8 +161,9 @@ public class EquipletReconfigureHandler{
 			for(int i = 0; i < moduleIdentifiers.size(); i++){
 				//Get static settings from Grid Knowledge DB
 				StaticSettings staticSetting = StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb);
-				JSONObject staticSettingJSON = staticSetting.serialize();
-				staticSettings.add(staticSettingJSON);
+				if(!staticSettings.isEmpty()){
+					JSONObject staticSettingJSON = staticSetting.serialize();
+					staticSettings.add(staticSettingJSON);
 				
 				//Create dynamicSetting JSONObject
 				//TODO Get actual dynamic values from JSON
@@ -171,6 +172,9 @@ public class EquipletReconfigureHandler{
 				dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, 1);
 				dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, 1);
 				dynamicSettings.add(dynamicSetting);
+				}else{
+					Logger.log("Settings could not be retrieved from the KnowledgeDatabase");
+				}
 			}
 			
 			//Insert module in hal

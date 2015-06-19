@@ -98,8 +98,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 						// make better suggestion for the time a product step would take
 						capabilities.add(new Capability(service, new HashMap<String, Object>(), defaultServiceDuration));
 					}
-
-					init(defaultPosition, capabilities);
+					init(defaultPosition, capabilities);				
+					
 				} catch (KnowledgeException | BlackboardUpdateException e) {
 					e.printStackTrace();
 					System.err.printf("EA:%s failed to create the HAL: %s", getLocalName(), e.getMessage());

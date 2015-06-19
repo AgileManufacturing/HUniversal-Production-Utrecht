@@ -19,6 +19,10 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jade.Boot"/>
+<<<<<<< HEAD
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-gui -agents &quot;Grid:MAS.grid_server.GridAgent;EQMessage:MAS.equiplet.EQMessageAgent;SCADA:SCADA.SCADAAgent&quot;"/>
+=======
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-agents &quot;Grid:MAS.grid_server.GridAgent;EQMessage:MAS.equiplet.EQMessageAgent&quot;"/>
+>>>>>>> 6bcfb8470effdfda790b6cf15537454700ee25b3
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="HUniversal-Production-Utrecht"/>
 </launchConfiguration>
