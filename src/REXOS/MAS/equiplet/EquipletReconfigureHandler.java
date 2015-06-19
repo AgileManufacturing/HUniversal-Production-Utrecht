@@ -51,7 +51,6 @@ public class EquipletReconfigureHandler{
 			boolean succes = false;
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				
 				//Debug output
 				//Logger.log("Content of message: " + messageContent.toString());
 				

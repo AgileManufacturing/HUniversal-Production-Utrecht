@@ -254,7 +254,7 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Set new Mast state that will be send on state request
+	 * Set new Mast state that will be sent on state request
 	 * 
 	 * @param new Mast.State
 	 * @author Kevin Bosman
@@ -264,7 +264,7 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Set new Mast mode that will be send on mode request
+	 * Set new Mast mode that will be sent on mode request
 	 * 
 	 * @param new Mast.Mode
 	 * @author Kevin Bosman
