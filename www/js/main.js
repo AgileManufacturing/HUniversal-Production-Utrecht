@@ -7,7 +7,7 @@
 function UIPanel() {
 	$('#nav ul > li > a').click((this.navClick).bind(this));
 
-	this.switchSection($('#nav ul > li > a.default'));
+	//this.switchSection($('#nav ul > li > a.default'));
 
 	// Log section
 	this.log_pre   = $('#log pre');
@@ -184,6 +184,12 @@ UIPanel.prototype = {
 		$('main > section').hide();
 		$('main > section#' + $a.data('section')).show();
 	},
+
+	'clean': function() {
+		$('#grid ul').html('');
+
+		this.agents = {};
+	},
 };
 
 
@@ -314,6 +320,8 @@ Server.prototype = {
 		this.ui.println('Stopping client', this.id);
 		this.ui.setConStatus(this.ui.CLOSED);
 
+		this.ui.clean();
+
 		this.is_connected      = false;
 		this.will_reconnect = false;
 		if (this.timeout !== null) {
@@ -357,6 +365,16 @@ Server.prototype = {
 
 // Server class allowing us to connect to web socket.
 var server = new Server(window.location.hostname, 3529, 'SCADA');
+
+server.ui.addAgent('EQ1', 'EquipletAgent', 'IDLE');
+server.ui.addAgent('EQ2', 'ProductAgent', 'SLEEPING');
+server.ui.addAgent('EQ3', 'EquipletAgent', 'EATING');
+server.ui.addAgent('EQ4', 'ProductAgent', 'SLEEPING');
+server.ui.addAgent('EQ5', 'EquipletAgent', 'IDLE');
+server.ui.addAgent('EQ6', 'EquipletAgent', 'SLEEPING');
+server.ui.addAgent('EQ7', 'EquipletAgent', 'EATING');
+
+
 //server.connect();
 
 /*window.addEventListener('beforeunload', function (e) {
