@@ -1,8 +1,5 @@
 package MAS.grid_server;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
