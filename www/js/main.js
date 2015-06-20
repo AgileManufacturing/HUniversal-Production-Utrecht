@@ -246,6 +246,13 @@ Server.prototype = {
 				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
 
 				break;
+			case 'ON_EQUIPLET_STATE_CHANGED':
+				this.ui.println('Received ON_EQUIPLET_STATE_CHANGED', this.id);
+
+ 				var agent = data['agent'];
+				this.ui.addAgent(agent['id'], null, agent['state']);
+
+				break;
 			default:
 				this.ui.println('Received unknown "' + data['command'] + '"', this.id);
 				break;
