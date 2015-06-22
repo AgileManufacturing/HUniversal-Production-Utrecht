@@ -192,7 +192,6 @@ UIPanel.prototype = {
 	},
 };
 
-
 // Constructor of Server class
 function Server(host, port, id) {
 	this.id  = id;
@@ -366,7 +365,7 @@ Server.prototype = {
 
 		this.ui.println('Get Agent "' + id + '" information from SCADA', this.id);
 
-		this.send('GETINFO', id);
+		this.send('GET_AGENT_INFO', id);
 	},
 };
 

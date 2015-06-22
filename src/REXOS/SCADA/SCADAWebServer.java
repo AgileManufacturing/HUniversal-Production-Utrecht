@@ -25,7 +25,7 @@ public class SCADAWebServer {
     static class MyHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
         	URI    uri  = exchange.getRequestURI();
-        	String path = "www/" + uri.getPath();
+        	String path = "www" + uri.getPath();
         	// If there is a directory specified, ad		d index.html as default file to serve
         	if (path.charAt(path.length() - 1) == '/') {
         		path += "index.html";
@@ -39,15 +39,21 @@ public class SCADAWebServer {
 				os.write(response.getBytes());
 				os.close();
         		return;
-        	}
+        	} else {
+                System.out.println(path);
+            }
 
-        	Headers hdrs = exchange.getResponseHeaders();
-        	hdrs.add("Content-Type", Files.probeContentType(file.toPath()));
-        	exchange.sendResponseHeaders(200, 0);
+            String content_type = Files.probeContentType(file.toPath());
+            if (content_type == null) {
+                content_type = "text/plain";
+            }
+            Headers hdrs = exchange.getResponseHeaders();
+            hdrs.add("Content-Type", content_type);
+            exchange.sendResponseHeaders(200, 0);
 
             OutputStream    os     = exchange.getResponseBody();
             FileInputStream fs     = new FileInputStream(file);
-            final byte[]    buffer = new byte[0x10000];
+            final byte[]    buffer = new byte[1024];
             int             count  = 0;
             while ((count = fs.read(buffer)) >= 0) {
             	os.write(buffer, 0, count);

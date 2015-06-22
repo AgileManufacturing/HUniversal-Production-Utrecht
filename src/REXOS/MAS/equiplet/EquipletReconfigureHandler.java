@@ -143,7 +143,7 @@ public class EquipletReconfigureHandler{
 				JSONArray modules = (JSONArray) messageContent.get("modules");
 				ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
 				
-				System.out.println(moduleIdentifiers.toString());
+				//System.out.println(moduleIdentifiers.toString());
 				
 				
 				//Get static and dynamic settings
