@@ -215,7 +215,7 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	 * This method will be called by the blackboard handler when the state of the equiplet has changed. Do not call this method!
 	 */
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		moduleListener.onModuleStateChanged(module, state);
 	}
 
@@ -223,7 +223,7 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	 * This method will be called by the blackboard handler when the mode of the equiplet has changed. Do not call this method!
 	 */
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		moduleListener.onModuleModeChanged(module, mode);
 	}
 
@@ -234,7 +234,7 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		return moduleFactory;
 	}
 	
-	public ArrayList<ModuleIdentifier> getModules(){		
+	public ArrayList<Module> getModules(){		
 		return moduleFactory.getModules();		
 	}
 

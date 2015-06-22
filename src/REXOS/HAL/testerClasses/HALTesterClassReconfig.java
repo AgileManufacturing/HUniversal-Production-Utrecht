@@ -10,6 +10,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
@@ -81,13 +82,13 @@ public class HALTesterClassReconfig implements HardwareAbstractionLayerListener 
 	}
 
 	@Override
-	public void onModuleStateChanged(Module module, State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	// TODO CHANGE THIS: empty
 	@Override
-	public void onModuleModeChanged(Module module, Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mode mode) {
 		// TODO Auto-generated method stub
 		
 	}

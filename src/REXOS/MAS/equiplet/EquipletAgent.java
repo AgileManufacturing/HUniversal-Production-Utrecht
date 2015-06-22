@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
@@ -1050,12 +1051,12 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	}
 
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		onChangeHandler.onModuleStateChanged(module, state);
 	}
 
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		// TODO make implementation
 	}
 
