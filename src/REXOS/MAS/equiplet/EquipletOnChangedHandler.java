@@ -10,6 +10,9 @@ import generic.Mast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import MAS.util.Ontology;
@@ -57,44 +60,30 @@ public class EquipletOnChangedHandler{
 			try{
 				JSONObject command = new JSONObject(msg.getContent());
 				
-				//Debug output
-				//Logger.log("Content of message: " + command.toString());
-				
 				//Identifying requested equiplet command
 				String requestedEquipletCommand = command.getString("command").toString();
 				String requestedEquipletAction = command.getString("action").toString();
 				
-				//Logger.log("command = " + requestedEquipletCommand + " action = " + requestedEquipletAction);
-				
 				boolean isSuccesfullyAdded = false;
 				boolean isValidOnChangedType = false;
 				OnChangedTypes type = null;
-				
-				// test to loop through enum and print values
-//				for(OnChangedTypes types : OnChangedTypes.values()){
-//					Logger.log("OnChangedTypes: " + types.toString());
-//				}
 				
 				//Get listener type
 				for(OnChangedTypes types : OnChangedTypes.values()){
 					if(types.toString().equals(requestedEquipletCommand)){
 						type = types;
 						isValidOnChangedType = true;
-						//Logger.log("Type match with " + type.toString());
 					}
 				}							
 				
 				if(isValidOnChangedType){
-					//Logger.log("Execute (de)-registration procedure");	
 					//Execute (de)-registration procedure
 					switch(requestedEquipletAction){
 					case "REGISTER_LISTENER":						
 						isSuccesfullyAdded = registerListener(msg.getSender(),type);
-						//Logger.log("case REGISTER_LISTENER == " + isSuccesfullyAdded);	
 						//isSuccesfullyAdded = x;
 						break;					
 					case "DEREGISTER_LISTENER":
-						//Logger.log("case REGISTER_LISTENER");	
 						isSuccesfullyAdded = deregisterListener(msg.getSender(),type);
 						break;	
 					
@@ -144,8 +133,6 @@ public class EquipletOnChangedHandler{
 	 * @return true if equiplet register was succesfull else false
 	 */	
 	private boolean registerListener(AID sender, OnChangedTypes type) {
-		//Logger.log("In function registerListener");
-		
 		boolean isAddedSuccesfully = false;
 		if(type.equals(OnChangedTypes.ALL)){
 			for(OnChangedTypes types : OnChangedTypes.values()){
@@ -155,9 +142,7 @@ public class EquipletOnChangedHandler{
 			}
 		} else {		
 			isAddedSuccesfully = addEquipletToMap(sender, type);			
-		}
-		
-		
+		}		
 		return isAddedSuccesfully;			
 	}
 	
@@ -173,13 +158,12 @@ public class EquipletOnChangedHandler{
 		if(type.equals(OnChangedTypes.ALL)){
 			for(OnChangedTypes types : OnChangedTypes.values()){
 				if(!types.equals(OnChangedTypes.ALL)){
-					isRemovedSuccesfully = removeEquipletToMap(sender, types);	
+					isRemovedSuccesfully = removeEquipletFromMap(sender, types);	
 				}
 			}
 		} else {		
-			isRemovedSuccesfully = removeEquipletToMap(sender, type);			
+			isRemovedSuccesfully = removeEquipletFromMap(sender, type);			
 		}
-		
 		return isRemovedSuccesfully;		
 	}
 
@@ -191,20 +175,18 @@ public class EquipletOnChangedHandler{
 	 * @return true if equiplet register was succesfull else false
 	 */	
 	private boolean addEquipletToMap(AID sender, OnChangedTypes type) {
+		boolean result = false;
 		if(!equipletListeners.containsKey(type)){
 			equipletListeners.put(type, new HashSet<AID>());
 			equipletListeners.get(type).add(sender);
-			//Logger.log("Succesfully registerd " + sender.toString() + "with type " + type.toString());
-			return true;
+			result = true;
 		} else {
 			if(!equipletListeners.get(type).contains(sender)){
 				equipletListeners.get(type).add(sender);
-				//Logger.log("Succesfully registerd " + sender.toString() + "with type " + type.toString());
-				return true;
+				result = true;
 			}
 		}
-		//Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
-		return false;
+		return result;
 	}
 	
 	/**
@@ -214,40 +196,17 @@ public class EquipletOnChangedHandler{
 	 * @author Mitchell van Rijkom
 	 * @return true if equiplet register was succesfull else false
 	 */	
-	private boolean removeEquipletToMap(AID sender, OnChangedTypes type) {
+	private boolean removeEquipletFromMap(AID sender, OnChangedTypes type) {
+		boolean result = false;
 		if(equipletListeners.containsKey(type)){
 			if(equipletListeners.get(type).contains(sender)){
 				equipletListeners.get(type).remove(sender);
-				//Logger.log("Succesfully deregisterd " + sender.toString() + "with type " + type.toString());
-				return true;
-			}else {
-				//Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
-				return false;
+				result = true;
 			}
-		} else {
-			//Logger.log("Failed deregister " + sender.toString() + "with type " + type.toString());
-			return false;
 		}
+		return result;
 	}
 
-	/**
-	 * Test function to log all the equiplets that are registered by an onChangeType
-	 * @param type onChangeType
-	 * @author Mitchell van Rijkom
-	 */
-	/*
-	private void logEquipletsByType(OnChangedTypes type) {
-		// List al equiplets to test
-		for(Map.Entry<OnChangedTypes, Set<AID>> entry : equipletListeners.entrySet()){
-			if(entry.getKey() == type){
-				for(AID senderID : entry.getValue()){
-					Logger.log("Type: " + entry.toString() +  "    Equiplet: " + senderID);
-				}
-			}
-		}
-	}
-	*/
-	
 	/**
 	 * This function notifies all equiplets that are registered to an onChangeType when a mast state changed 
 	 * @param state mast state
@@ -267,7 +226,7 @@ public class EquipletOnChangedHandler{
 			returnMessage.put("agent", agent);
 			returnMessage.put("command", "ON_EQUIPLET_STATE_CHANGED");
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Invalid JSON:\n");
 			e.printStackTrace();
 		}
 		
