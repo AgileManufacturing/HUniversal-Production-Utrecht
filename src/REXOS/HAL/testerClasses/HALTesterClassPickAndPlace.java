@@ -18,6 +18,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
@@ -783,12 +784,12 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	}
 
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
 	}
 

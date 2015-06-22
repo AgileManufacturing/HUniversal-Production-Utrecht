@@ -9,10 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
-import HAL.dataTypes.ModuleIdentifier;
-
+import HAL.Module;
 import util.log.Logger;
-
 import jade.lang.acl.ACLMessage;
 
 /**
@@ -159,18 +157,18 @@ public class EquipletGetDataHandler{
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
-		ArrayList<ModuleIdentifier> moduleList = new ArrayList<ModuleIdentifier>();
+		ArrayList<Module> moduleList = new ArrayList<Module>();
 		moduleList = hal.getModules();		
 		
 		try {
 			result.put("command", "GET_ALL_MODULES");
 			JSONArray modulesArray = new JSONArray();
-			for(ModuleIdentifier module : moduleList){
+			for(Module module : moduleList){
 				JSONObject JSONModuleInfo = new JSONObject();
-				JSONModuleInfo.put("serialNumber", module.serialNumber);
-				JSONModuleInfo.put("typeNumber", module.typeNumber);
-				JSONModuleInfo.put("manufacturer", module.manufacturer);
-				JSONModuleInfo.put("name", module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
+				JSONModuleInfo.put("serialNumber", module.getModuleIdentifier().serialNumber);
+				JSONModuleInfo.put("typeNumber", module.getModuleIdentifier().typeNumber);
+				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);
+				JSONModuleInfo.put("name", module.getModuleIdentifier().manufacturer + " " + module.getModuleIdentifier().typeNumber + " " +  module.getModuleIdentifier().serialNumber);
 				modulesArray.put(JSONModuleInfo);				
 			}
 			result.put("modules", modulesArray);
@@ -201,16 +199,26 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request state of all connected modules [WIP][Should be added later]
-	 * This functionality is currently not included in HAL and ROS after this is done the function can be implemented
-	 * 
+	 * 	Request states from all modules
 	 * @return JSONObject with response
-	 * @author 
+	 * @author Auke de Witte
 	 */
 	public JSONObject getAllModulesStates(){
 		JSONObject result = new JSONObject();
+		ArrayList<Module> moduleList = hal.getModules();		
 		try {
-			result.put("state", equiplet.state);
+			result.put("command", "GET_ALL_MODULES_STATES");
+			JSONArray modulesArray = new JSONArray();
+			for(Module module : moduleList){
+				JSONObject JSONModuleInfo = new JSONObject();
+				JSONModuleInfo.put("serialNumber", module.getModuleIdentifier().serialNumber);
+				JSONModuleInfo.put("typeNumber", module.getModuleIdentifier().typeNumber);
+				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);  
+				JSONModuleInfo.put("state", module.getModuleState());
+				modulesArray.put(JSONModuleInfo);
+				System.out.println(JSONModuleInfo);
+			}
+			result.put("modules", modulesArray);
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;

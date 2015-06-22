@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import MAS.util.Ontology;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -285,7 +286,7 @@ public class EquipletOnChangedHandler{
 	 * @param state mast state
 	 * @author Mitchell van Rijkom
 	 */
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		String stateString = state.toString();
 		String moduleString = module.toString();
 		

@@ -47,6 +47,7 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 	AbstractHardwareAbstractionLayer hal;
 
 	public NodeRosInterface(AbstractHardwareAbstractionLayer hal) {
+		super(hal.getModuleFactory());
 		this.hal = hal;
 		this.hardwareSteps = new HashMap<Integer, HardwareStep>();
 		this.hardwareStepId = 1;
@@ -133,8 +134,7 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 						JSONObject moduleIdentifierJson = messageJson.getJSONObject("moduleIdentifier");
 						ModuleIdentifier identifier = new ModuleIdentifier(moduleIdentifierJson.getString("manufacturer"), 
 								moduleIdentifierJson.getString("typeNumber"), moduleIdentifierJson.getString("serialNumber"));
-						Module module = hal.getModuleFactory().getItemForIdentifier(identifier);
-						NodeRosInterface.this.onModuleStateChanged(module, Mast.State.valueOf(state));
+						NodeRosInterface.this.onModuleStateChanged(identifier, Mast.State.valueOf(state));
 					} else {
 						NodeRosInterface.this.onEquipletStateChanged(Mast.State.valueOf(state));
 					}
@@ -154,8 +154,7 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 						JSONObject moduleIdentifierJson = messageJson.getJSONObject("moduleIdentifier");
 						ModuleIdentifier identifier = new ModuleIdentifier(moduleIdentifierJson.getString("manufacturer"), 
 								moduleIdentifierJson.getString("typeNumber"), moduleIdentifierJson.getString("serialNumber"));
-						Module module = hal.getModuleFactory().getItemForIdentifier(identifier);
-						NodeRosInterface.this.onModuleModeChanged(module, Mast.Mode.valueOf(mode));
+						NodeRosInterface.this.onModuleModeChanged(identifier, Mast.Mode.valueOf(mode));
 					} else {
 						NodeRosInterface.this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
 					}

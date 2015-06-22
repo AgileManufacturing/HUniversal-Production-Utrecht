@@ -29,7 +29,7 @@ public abstract class Module implements ModuleListener {
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
 	protected ModuleListener moduleListener;
-	
+	private Mast.State state;
 	private static final String GET_MOUNT_POSITION = 
 		"SELECT mountPointX, mountPointY FROM Module " +
 		"	WHERE manufacturer = ?" +
@@ -196,8 +196,6 @@ public abstract class Module implements ModuleListener {
 		this.knowledgeDBClient = new KnowledgeDBClient();
 		this.moduleFactory = moduleFactory;
 		this.moduleListener = moduleListener;
-		
-		moduleFactory.getHAL().getRosInterface().addModuleListener(this);
 	}	
 	
 	public ModuleIdentifier getModuleIdentifier(){
@@ -268,9 +266,11 @@ public abstract class Module implements ModuleListener {
 	/**
 	 * This method will forward the changed MAST module state to the {@link ModuleListener}
 	 * Do not call this method!
+	 * @author Auke de Witte
 	 */
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state){
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state){
+		this.state = state;
 		moduleListener.onModuleStateChanged(module, state);
 	}
 	/**
@@ -278,8 +278,15 @@ public abstract class Module implements ModuleListener {
 	 * Do not call this method!
 	 */
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode){
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode){
 		moduleListener.onModuleModeChanged(module, mode);
+	}
+	/**
+	 * @return current state from the module
+	 * @author Auke de Witte
+	 */
+	public Mast.State getModuleState(){
+		return this.state;
 	}
 
 	public int getMountPointX(){

@@ -136,11 +136,8 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 		return modules;
 	}
 	
-	/**
-	 * This moethod will return all the modules currently connected to the equiplet.
-	 */
-	public ArrayList<ModuleIdentifier> getModules() {
-		ArrayList<ModuleIdentifier> modules = new ArrayList<ModuleIdentifier>();
+	protected ArrayList<ModuleIdentifier> getModuleIdentifiers() {
+		ArrayList<ModuleIdentifier> moduleIdentifiers = new ArrayList<ModuleIdentifier>();
 		
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModules, hal.getEquipletName());
 		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModules", rows);
@@ -148,10 +145,20 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			String manufacturer = (String) row.get("manufacturer");
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
-			
-			modules.add(new ModuleIdentifier(manufacturer, typeNumber, serialNumber));
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			moduleIdentifiers.add(identifier);
 		}
-		
+		return moduleIdentifiers;
+	}
+	/**
+	 * This moethod will return all the modules currently connected to the equiplet.
+	 */
+	public ArrayList<Module> getModules() {
+		ArrayList<Module> modules = new ArrayList<Module>();
+		ArrayList<ModuleIdentifier> moduleIdentifiers = getModuleIdentifiers();
+		for (ModuleIdentifier moduleIdentifier : moduleIdentifiers) {
+			modules.add(getItemForIdentifier(moduleIdentifier));
+		}
 		return modules;
 	}
 	
@@ -170,6 +177,6 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	
 	@Override
 	protected ArrayList<ModuleIdentifier> getKeysToKeepInCache() {
-		return getModules();
+		return getModuleIdentifiers();
 	}
 }
