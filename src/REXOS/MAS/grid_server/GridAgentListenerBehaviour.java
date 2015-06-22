@@ -114,13 +114,13 @@ public class GridAgentListenerBehaviour extends Behaviour{
 	private void handleListenerCommand(ACLMessage msg) {
 		if(msg != null){
 			try{
-				JSONObject command = new JSONObject(msg.getContent());
+				JSONObject object = new JSONObject(msg.getContent());
 				
 				//Debug output
-				Logger.log("Content of ACL message: " + command.toString());
+				Logger.log("Content of ACL message: " + object.toString());
 				
 				//Identifying modules
-				String requestedEquipletCommand = command.getString("requested-listener-command").toString();
+				String requestedEquipletCommand = object.getString("command").toString();
 				
 				// Program if statements that will appropriately handle messages sent to the GridAgent.
 				if(requestedEquipletCommand.equals("AddDetailedListener")){

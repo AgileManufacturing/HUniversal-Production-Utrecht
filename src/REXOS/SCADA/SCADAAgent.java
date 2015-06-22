@@ -48,8 +48,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		try {
 			jsonObject = new JSONObject(message);
 			AID aid = null;
-			if (!jsonObject.isNull("aid")) {
-				aid = new AID(jsonObject.getString("aid"), AID.ISGUID);
+			if (!jsonObject.isNull("id")) {
+				aid = new AID(jsonObject.getString("id"), AID.ISLOCALNAME);
 			}
 			
 			int index = 0;
@@ -95,6 +95,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 					// Connect to new agent
 					agentConnections.get(index).addClient(webSocketConnection);
 				}else{
+					System.out.println("SCADA: add agent: " + aid);
 					agentConnections.add(new AgentConnection(aid, webSocketConnection));
 					connectToAgent(aid);
 				}
@@ -265,12 +266,40 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			e.printStackTrace();
 		}
 	}
-	
+	public void handleGetDetailedInfo(JSONObject content){
+		try {
+			int client = content.getInt("client");
+			JSONObject agent = content.getJSONObject("agent");
+			AID agentID = new AID(agent.getString("id"), AID.ISLOCALNAME); 
+			JSONObject object = new JSONObject();
+			object.put("command", "GET_DETAILED_INFO");
+			object.put("agent", agent);
+			int index = 0;
+			System.out.println("Send over WS" + agentID);
+			AgentConnection agentConn = null;
+			for(int i = 0; i < agentConnections.size(); i++){
+				if(agentConnections.get(i).getAgent().equals(agentID)){
+					agentConn = agentConnections.get(i);
+					break;
+				}
+			}
+			if(agentConn != null){
+				if((index = agentConnections.indexOf(agentConn)) >= 0){
+					// SCADAAgent is already connected to this agent
+					WebSocket clientWS = agentConnections.get(index).getClientConnection(client);
+					webSocketServer.sendMessage(clientWS, object.toString());
+				}
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public void handleWebSocketGetAgentInfo(JSONObject jsonObject, WebSocket webSocketConnection){
 
 		try {
 			// Request Info
-			ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+			ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
 			AID receiver = new AID(jsonObject.getString("id"), AID.ISLOCALNAME);
 			
 			JSONObject object = new JSONObject();
@@ -278,21 +307,23 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			object.put("client", webSocketConnection.hashCode());
 			
 			msg.addReceiver(receiver);
+			msg.setOntology(Ontology.GRID_ONTOLOGY);
+			msg.setConversationId(Ontology.CONVERSATION_GET_DATA);
 			msg.setContent(object.toString());
 			send(msg);
 			
 			//Subcribe on Agent Updates.
-			ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
-			reply.addReceiver(receiver);
-			reply.setOntology(Ontology.GRID_ONTOLOGY);
-			reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+			msg  = new ACLMessage(ACLMessage.PROPOSE);
+			msg.addReceiver(receiver);
+			msg.setOntology(Ontology.GRID_ONTOLOGY);
+			msg.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
 			
 			object = new JSONObject();
 			object.put("command","ALL");
 			object.put("action", "REGISTER_LISTENER");
-			reply.setContent(object.toString());
+			msg.setContent(object.toString());
 			
-			send(reply);
+			send(msg);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

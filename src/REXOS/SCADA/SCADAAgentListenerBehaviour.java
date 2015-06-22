@@ -34,6 +34,9 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 						case "GET_OVERVIEW":
 							scada.handleGetOverview(content);
 							break;
+						case "GET_DETAILED_INFO":
+							scada.handleGetDetailedInfo(content);
+							break;
 						}
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block

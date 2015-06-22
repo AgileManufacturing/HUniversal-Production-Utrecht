@@ -45,16 +45,14 @@ public class EquipletGetDataHandler{
 				//Logger.log("Content of message: " + messageContent.toString());
 				
 				//Identifying requested equiplet command
-				String command = messageContent.getString("command").toString();
-				
+				String command = messageContent.getString("command");
 				//Delegate command to corresponding functions
 				switch(command){
 				case "GET_BASIC_INFO":
 					result = getBasicInfo();
 					break;
 				case "GET_DETAILED_INFO":
-					System.out.println("EA: detailedINFO");
-					result = getDetailedInfo();
+					result = getDetailedInfo(messageContent);
 			
 					break;
 				case "GET_CURRENT_EQUIPLET_STATE":
@@ -335,10 +333,11 @@ public class EquipletGetDataHandler{
 		return result;
 	}
 	
-	public JSONObject getDetailedInfo(){
+	public JSONObject getDetailedInfo(JSONObject content){
 		JSONObject result = new JSONObject();
 		try {
 			result.put("command", "GET_DETAILED_INFO");
+			result.put("client", content.getInt("client"));
 			JSONObject agent = new JSONObject();
 			agent.put("id", equiplet.getAID().getLocalName());
 			agent.put("type", "EquipletAgent");
