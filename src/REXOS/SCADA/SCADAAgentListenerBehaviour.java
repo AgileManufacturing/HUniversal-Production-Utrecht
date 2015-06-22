@@ -31,7 +31,7 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 						JSONObject content = new JSONObject(msg.getContent());
 						String command = content.getString("command");
 						switch(command){
-						case "GETOVERVIEW":
+						case "GET_OVERVIEW":
 							scada.handleGetOverview(content);
 							break;
 						}

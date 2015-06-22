@@ -406,7 +406,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	public JSONObject getJSONOfOverview() {
 		JSONObject object = new JSONObject();
 		try {
-			object.put("command", "GETOVERVIEW");
+			object.put("command", "GET_OVERVIEW");
 			JSONArray array = new JSONArray();
 			for(BasicAgentInfo bai : agentInformation) {
 				array.put(bai.getJSONObject());
