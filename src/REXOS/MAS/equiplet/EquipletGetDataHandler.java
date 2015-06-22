@@ -1,10 +1,15 @@
 package MAS.equiplet;
 
+import java.util.ArrayList;
+
 import generic.Mast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import HAL.HardwareAbstractionLayer;
+import HAL.dataTypes.ModuleIdentifier;
 
 import util.log.Logger;
 
@@ -18,12 +23,14 @@ import jade.lang.acl.ACLMessage;
  */
 public class EquipletGetDataHandler{
 	private EquipletAgent equiplet;
+	private HardwareAbstractionLayer hal;
 	
 	protected Mast.State currentMastState = Mast.State.OFFLINE;
 	protected Mast.Mode currentMastMode = Mast.Mode.NORMAL;
 	
-	public EquipletGetDataHandler(EquipletAgent e){
+	public EquipletGetDataHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
+		hal = h;
 	}
 	
 	/**
@@ -151,11 +158,25 @@ public class EquipletGetDataHandler{
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
+	 * @author Mitchell van Rijkom
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
+		ArrayList<ModuleIdentifier> moduleList = new ArrayList<ModuleIdentifier>();
+		moduleList = hal.getModules();		
+		
 		try {
-			result.put("state", equiplet.state);
+			result.put("command", "GET_ALL_MODULES");
+			JSONArray modulesArray = new JSONArray();
+			for(ModuleIdentifier module : moduleList){
+				JSONObject JSONModuleInfo = new JSONObject();
+				JSONModuleInfo.put("serialNumber", module.serialNumber);
+				JSONModuleInfo.put("typeNumber", module.typeNumber);
+				JSONModuleInfo.put("manufacturer", module.manufacturer);
+				JSONModuleInfo.put("name", module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
+				modulesArray.put(JSONModuleInfo);				
+			}
+			result.put("modules", modulesArray);
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -199,7 +220,7 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request total schedule[WIP]
+	 * Request total schedule
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman

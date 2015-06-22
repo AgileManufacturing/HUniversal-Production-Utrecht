@@ -83,7 +83,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 					//Create helper classes
 					reconfigHandler = new EquipletReconfigureHandler(this, hal);
 					onChangeHandler = new EquipletOnChangedHandler(this, hal);
-					getRequestHandler = new EquipletGetDataHandler(this);
+					getRequestHandler = new EquipletGetDataHandler(this, hal);
 
 					ArrayList<String> services = hal.getSupportedServices();
 

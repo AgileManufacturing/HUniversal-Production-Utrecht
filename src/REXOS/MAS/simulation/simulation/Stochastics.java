@@ -204,19 +204,21 @@ class Stochastics {
 	private Tick time(Tick time, DurationType type) {
 		if (!Settings.STOCHASTICS) {
 			return time;
+		}else {
+			switch (type) {
+			case EXP:
+				return new Tick(exp(time.doubleValue()));
+			case WEIBULL:
+				// return weibull(1, time);
+			case GAMMA:
+				// return gamma(1, time);
+			case NORMAL:
+			case DETERMINISTIC:
+			default:
+				return time;
+			}
 		}
-		switch (type) {
-		case EXP:
-			return new Tick(exp(time.doubleValue()));
-		case WEIBULL:
-			// return weibull(1, time);
-		case GAMMA:
-			// return gamma(1, time);
-		case NORMAL:
-		case DETERMINISTIC:
-		default:
-			return time;
-		}
+		
 	}
 
 	/**
