@@ -137,7 +137,7 @@ public class EquipletReconfigureHandler{
 	public boolean insertModule(JSONObject messageContent){
 		try{
 			if(equiplet.getCurrentState() == Mast.State.SAFE || equiplet.getCurrentState() == Mast.State.OFFLINE){
-				System.out.println("Insert module func");
+				//System.out.println("Insert module func");
 				
 				//Deserialize modules
 				JSONArray modules = (JSONArray) messageContent.get("modules");
