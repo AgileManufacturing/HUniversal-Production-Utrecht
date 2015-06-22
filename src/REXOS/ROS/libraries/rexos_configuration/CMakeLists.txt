@@ -14,6 +14,6 @@ DEPENDS Jsoncpp)
 
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
-include_directories(include ${catkin_INCLUDE_DIRS} ${HUNIVERSAL_ROOT)
+include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(rexos_configuration ${sources})
 target_link_libraries(rexos_configuration ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
