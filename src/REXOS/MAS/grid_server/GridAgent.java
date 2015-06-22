@@ -368,7 +368,18 @@ public class GridAgent extends Agent implements SCADABasicListener,
 			sendUpdateMessage(detailedListeners.get(i), updateString);
 		}
 	}
-
+	
+	public void onAgentTakeDown(String content) {
+		System.out.println(content);
+		for (int i = 0; i < basicListeners.size(); i++) {
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.addReceiver(basicListeners.get(i));
+			msg.setConversationId(Ontology.CONVERSATION_ON_TAKEDOWN);
+			msg.setContent(content);
+			send(msg);
+		}
+	}
+	
 	private void sendUpdateMessage(AID agent, String update) {
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
 
