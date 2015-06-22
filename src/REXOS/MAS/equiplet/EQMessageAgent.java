@@ -55,7 +55,7 @@ public class EQMessageAgent extends Agent {
 		});
 		
 		boolean testMastStateChange = false;
-		boolean getModuleList = false;
+		boolean getModuleList = true;
 		boolean getAllStateTest = false;
 		boolean scheduleTest = false;
 		boolean addRemoveModules = false;
@@ -71,7 +71,7 @@ public class EQMessageAgent extends Agent {
 			sleep(2000);
 			//Change to save
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(2000);
+			sleep(10000);//Give equiplet time to go trough init state
 			//Get state again
 			sendGetData(getState);
 			sleep(2000);
