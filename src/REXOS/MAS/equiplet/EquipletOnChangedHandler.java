@@ -13,7 +13,6 @@ import org.json.JSONObject;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
 import MAS.util.Ontology;
-
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
@@ -305,6 +304,8 @@ public class EquipletOnChangedHandler{
 		OnChangedTypes type = OnChangedTypes.ON_MODULE_STATE_CHANGED;
 		notifySubscribers(type, returnMessage);	
 	}
+	 /* @param returnMessage onChange message 
+	 * @author Mitchell van Rijkom
 
 	/**
 	 * This function notifies all equiplets that are registered to an onChangeType when a mode is changed from the equiplet
@@ -357,5 +358,42 @@ public class EquipletOnChangedHandler{
 			}
 		}		
 		equiplet.send(message);	
+	}
+	
+	/**
+	 * updateSubscribersOnTakeDown() : Creates an ACLMessage containing unique AID's for agents subscribed to this agent when it shuts down,
+	 * notifying them about its shutdown.
+	 */
+
+	public void updateSubscribersOnTakeDown() {
+		ACLMessage takeDownMessage = new ACLMessage(ACLMessage.INFORM);
+		Set<AID> agentsList = new HashSet<AID>();
+		JSONObject agent = new JSONObject();
+		JSONObject takeDownMessageContent = new JSONObject();
+		
+		// Get all unique subscribed receivers to get a message of this equiplet being shutdown
+		for(Map.Entry<OnChangedTypes, Set<AID>> entry : equipletListeners.entrySet()){
+			for(AID receiver : entry.getValue()){
+				if(!agentsList.contains(receiver)){
+					agentsList.add(receiver);
+				}
+			}
+		}
+		
+		// Add all the unique receivers to the message
+		for(AID receiver : agentsList){
+			takeDownMessage.addReceiver(receiver);
+		}
+		
+		// Create content for the message
+		try{
+			agent.put("id", equiplet.getLocalName());
+			agent.put("state", JSONObject.NULL);
+			takeDownMessageContent.put("agent", agent);
+			takeDownMessageContent.put("command", "ON_EQUIPLET_TAKEDOWN");
+		}catch(JSONException ex){ex.printStackTrace();}
+		
+		// Send the message
+		equiplet.send(takeDownMessage);
 	}
 }
