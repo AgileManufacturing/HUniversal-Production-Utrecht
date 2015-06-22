@@ -71,7 +71,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				case ACLMessage.REQUEST:
 					try {
 						JSONObject object = new JSONObject(msg.getContent().toString());
-						if(object.getString("command").equals("GETOVERVIEW")) {
+						if(object.getString("command").equals("GET_OVERVIEW")) {
 							System.out.println("Request: GetOverview received!");
 							int clientHash = object.getInt("client");
 							sendOverviewToSCADAAgent(msg, clientHash);

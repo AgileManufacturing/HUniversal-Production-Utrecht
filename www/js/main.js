@@ -230,8 +230,8 @@ Server.prototype = {
 		// Switch what type of message is received
 		// Act accordingly
 		switch (data['command']) {
-			case 'GETOVERVIEW':
-				this.ui.println('Received GETOVERVIEW', this.id);
+			case 'GET_OVERVIEW':
+				this.ui.println('Received GET_OVERVIEW', this.id);
 
 			 	for(var i = 0; i < data['agents'].length; i++) {
  					var agent = data['agents'][i];
@@ -268,7 +268,7 @@ Server.prototype = {
 		this.is_connected = true;
 
 		// Request grid overview from WS
-		this.send('GETOVERVIEW');
+		this.send('GET_OVERVIEW');
 	},
 	'onclose': function(event) {
 		// Find respective descriptions for error codes
