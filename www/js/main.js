@@ -192,7 +192,6 @@ UIPanel.prototype = {
 	},
 };
 
-
 // Constructor of Server class
 function Server(host, port, id) {
 	this.id  = id;
@@ -230,7 +229,7 @@ Server.prototype = {
 		// Switch what type of message is received
 		// Act accordingly
 		switch (data['command']) {
-			case 'GETOVERVIEW':
+			case 'GET_OVERVIEW':
 				this.ui.println('Received GETOVERVIEW', this.id);
 
 			 	for(var i = 0; i < data['agents'].length; i++) {
@@ -366,7 +365,7 @@ Server.prototype = {
 
 		this.ui.println('Get Agent "' + id + '" information from SCADA', this.id);
 
-		this.send('GETINFO', id);
+		this.send('GET_AGENT_INFO', id);
 	},
 };
 
