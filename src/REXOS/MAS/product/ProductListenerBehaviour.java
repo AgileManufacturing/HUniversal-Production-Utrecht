@@ -16,11 +16,13 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 	/**
 	 * 
 	 */
+	private ProductGetDataHandler getDataHandler;
 	private static final long serialVersionUID = 1L;
 	private ProductAgent product;
 
 	public ProductListenerBehaviour(ProductAgent product) {
-		this.product = product;
+		this.product = product;				
+		this.getDataHandler = new ProductGetDataHandler(product);
 	}
 
 	@Override
@@ -39,6 +41,10 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 					handleProductStepDelayed(msg);
 				}
 				break;
+			case ACLMessage.QUERY_IF:
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
+					this.getDataHandler.handleGetDataRequest(msg);
+				}
 			default:
 				break;
 			}

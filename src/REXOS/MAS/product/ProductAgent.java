@@ -289,6 +289,18 @@ public class ProductAgent extends Agent {
 		}
 	}
 	
+	public LinkedList<ProductStep> getProductSteps() {
+		return this.productSteps;
+	}
+	
+	public LinkedList<ProductionStep> getProductionPath() {
+		return this.productionPath;
+	}
+	
+	public ArrayList<ProductionStep> getHistory() {
+		return this.history;
+	}
+	
 	public void addSCADADetailedListener(AID listener) {
 		if(!detailedListeners.contains(listener)) {
 			detailedListeners.add(listener);
