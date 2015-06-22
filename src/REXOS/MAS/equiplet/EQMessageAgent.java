@@ -54,18 +54,63 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		//Use strings to avoid warnings...
-		insertJSON.toString();
-		deleteJSON.toString();
-		getAllStates.toString();
-		getAllModes.toString();
-		getState.toString();
-		getMode.toString();
-		registerMastState.toString();
-		getSchedule.toString();
-		
+		boolean testMastStateChange = false;
+		boolean getModuleList = false;
+		boolean getAllStateTest = false;
+		boolean scheduleTest = false;
+		boolean addRemoveModules = false;
 		
 		sleep(2000);
+		
+		//Test a state change and the listener
+		if(testMastStateChange){
+			//Register onChange listener
+			sendOnChangeRequest(registerMastState);
+			//Get current state
+			sendGetData(getState);
+			sleep(2000);
+			//Change to save
+			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+			sleep(2000);
+			//Get state again
+			sendGetData(getState);
+			sleep(2000);
+			//Return to offline
+			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+		}
+		
+		//Test get all modules
+		if(getModuleList){
+			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
+		}
+		
+		//Test get all possible states and modes
+		if(getAllStateTest){
+			sendGetData(getAllStates);
+			sendGetData(getAllModes);
+			sendGetData(getMode);
+		}
+		
+		//Test get schedule
+		if(scheduleTest){
+			sendGetData(getSchedule);
+		}
+		
+		if(addRemoveModules){
+			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"NORMAL\"}");
+			sleep(5000);
+			sendCommand(insertJSON);
+			//Should not work in normal mode
+			sleep(2000);
+			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+			sleep(2000);
+			sendCommand(insertJSON);
+			sleep(2000);
+			sendCommand(deleteJSON);
+		}		
+		
+		//sleep(2000);
 		
 		//sendGetData(getSchedule);
 		
@@ -80,13 +125,13 @@ public class EQMessageAgent extends Agent {
 		//sendGetData(getMode);
 		
 		//Listener test sequence
-		sendOnChangeRequest(registerMastState);
-		sleep(10000);
-		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-		sleep(10000);
-		sendGetData(getState);
-		sleep(10000);
-		sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+		//sendOnChangeRequest(registerMastState);
+		//sleep(10000);
+		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+		//sleep(10000);
+		//sendGetData(getState);
+		//sleep(10000);
+		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 	}
 	
 	public void takeDown(){
