@@ -262,9 +262,11 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("id", equiplet.getLocalName());
+			JSONObject agent = new JSONObject();
+			agent.put("id", equiplet.getLocalName());
+			agent.put("state", stateString);
+			returnMessage.put("agent", agent);
 			returnMessage.put("command", "ON_EQUIPLET_STATE_CHANGED");
-			returnMessage.put("state", stateString);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
