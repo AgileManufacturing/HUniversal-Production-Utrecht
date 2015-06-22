@@ -262,6 +262,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
+			returnMessage.put("id", equiplet.getLocalName());
 			returnMessage.put("command", "ON_EQUIPLET_STATE_CHANGED");
 			returnMessage.put("state", stateString);
 		} catch (JSONException e) {
