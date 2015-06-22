@@ -41,7 +41,7 @@ public class EquipletGetDataHandler{
 			JSONObject result = new JSONObject();
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				result.put("command", messageContent.getString("command"));
+				//result.put("command", messageContent.getString("command"));
 				//Debug output
 				//Logger.log("Content of message: " + messageContent.toString());
 				
@@ -109,7 +109,7 @@ public class EquipletGetDataHandler{
 				reply.setPerformative(ACLMessage.FAILURE);
 			}
 			
-			Logger.log("Get data result: " + result);
+			//Logger.log("Get data result: " + result);
 			
 			equiplet.send(reply);
 		}
@@ -182,11 +182,12 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request state of a single module [WIP][To be discussed]
+	 * Request state of a single module [WIP][Should be added later]
+	 * This functionality is currently not included in HAL and ROS after this is done the function can be implemented
 	 * 
 	 * @param Module identifier?
 	 * @return JSONObject with response
-	 * @author Kevin Bosman
+	 * @author 
 	 */
 	public JSONObject getModuleState(){
 		JSONObject result = new JSONObject();
@@ -200,10 +201,11 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request state of all connected modules [WIP][To be discussed]
+	 * Request state of all connected modules [WIP][Should be added later]
+	 * This functionality is currently not included in HAL and ROS after this is done the function can be implemented
 	 * 
 	 * @return JSONObject with response
-	 * @author Kevin Bosman
+	 * @author 
 	 */
 	public JSONObject getAllModulesStates(){
 		JSONObject result = new JSONObject();
