@@ -367,7 +367,7 @@ public class EquipletOnChangedHandler{
 
 	public void updateSubscribersOnTakeDown() {
 		ACLMessage takeDownMessage = new ACLMessage(ACLMessage.INFORM);
-		takeDownMessage.setConversationId(Ontology.CONVERSATION_ON_TAKEDOWN);
+		takeDownMessage.setConversationId(Ontology.CONVERSATION_AGENT_TAKEDOWN);
 		Set<AID> agentsList = new HashSet<AID>();
 		JSONObject agent = new JSONObject();
 		JSONObject takeDownMessageContent = new JSONObject();
@@ -393,6 +393,8 @@ public class EquipletOnChangedHandler{
 			takeDownMessageContent.put("agent", agent);
 			takeDownMessageContent.put("command", "ON_EQUIPLET_TAKEDOWN");
 		}catch(JSONException ex){ex.printStackTrace();}
+		
+		takeDownMessage.setContent(takeDownMessageContent.toString());
 		
 		// Send the message
 		takeDownMessage.setContent(takeDownMessageContent.toString());

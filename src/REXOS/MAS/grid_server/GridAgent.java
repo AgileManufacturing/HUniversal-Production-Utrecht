@@ -92,7 +92,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("0");
+		spawnEquipletAgent("2");
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
@@ -374,7 +374,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		for (int i = 0; i < basicListeners.size(); i++) {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.addReceiver(basicListeners.get(i));
-			msg.setConversationId(Ontology.CONVERSATION_ON_TAKEDOWN);
+			msg.setConversationId(Ontology.CONVERSATION_AGENT_TAKEDOWN);
 			msg.setContent(content);
 			send(msg);
 		}

@@ -66,6 +66,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	private EquipletReconfigureHandler reconfigHandler;
 	private EquipletOnChangedHandler onChangeHandler;
 	private EquipletGetDataHandler getRequestHandler;
+	
+	//States
+	protected Mast.State currentMastState = Mast.State.OFFLINE;
+	protected Mast.Mode currentMastMode = Mast.Mode.NORMAL;
 
 	/**
 	 * Equiplet agent startup
@@ -1016,13 +1020,33 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
 		onChangeHandler.onEquipletStateChanged(state);
-		getRequestHandler.setEquipletMastState(state);
+		currentMastState = state;
 	}
 
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
 		onChangeHandler.onEquipletModeChanged(mode);
-		getRequestHandler.setEquipletMastMode(mode);
+		currentMastMode = mode;
+	}
+	
+	/**
+	 * Get current Mast State
+	 * 
+	 * @return Mast.State
+	 * @author Kevin Bosman
+	 */
+	public Mast.State getCurrentState(){
+		return currentMastState;
+	}
+	
+	/**
+	 * Get current Mast Mode
+	 * 
+	 * @return Mast.Mode
+	 * @author Kevin Bosman
+	 */
+	public Mast.Mode getCurrentMode(){
+		return currentMastMode;
 	}
 
 	@Override

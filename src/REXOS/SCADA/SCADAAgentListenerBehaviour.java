@@ -40,7 +40,7 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 						e.printStackTrace();
 					}
 					
-				} else if(msg.getConversationId().equals(Ontology.CONVERSATION_ON_TAKEDOWN)) {
+				} else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)) {
 					System.out.println("ON TAKEDOWN");
 					scada.removeAgentConnection(msg);
 				}
