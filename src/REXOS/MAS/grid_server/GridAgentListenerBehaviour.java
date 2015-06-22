@@ -55,7 +55,8 @@ public class GridAgentListenerBehaviour extends Behaviour{
 						System.out.println("GA inform conversation inform");
 						gridAgent.sendAgentInfo(msg.getContent());
 					}else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)){
-					// DOE JE WERK EENS PIM
+						System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
+						gridAgent.onAgentTakeDown(msg.getContent());
 					} else {
 						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
 					}

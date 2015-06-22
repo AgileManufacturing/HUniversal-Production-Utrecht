@@ -394,6 +394,7 @@ public class EquipletOnChangedHandler{
 		takeDownMessage.setContent(takeDownMessageContent.toString());
 		
 		// Send the message
+		takeDownMessage.setContent(takeDownMessageContent.toString());
 		equiplet.send(takeDownMessage);
 	}
 }

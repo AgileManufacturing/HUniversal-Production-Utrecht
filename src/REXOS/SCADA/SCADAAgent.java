@@ -137,6 +137,13 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			}
 		}
 	}
+	
+	public void removeAgentConnection(ACLMessage msg) {
+		for(WebSocket ws : gridAgent.getClients()) {
+			ws.send(msg.getContent().toString());	
+		}
+	}
+	
 	@Override
 	public void onWebSocketOpen(WebSocket webSocketConnection) {
 		System.out.println("SCADA agent: new socket opened!");
