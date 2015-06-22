@@ -93,6 +93,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		spawnTrafficAgent();
 		spawnSupplyAgent();
 		spawnEquipletAgent("2");
+		spawnProductAgent();
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
@@ -258,6 +259,37 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		} catch (StaleProxyException e) {
 			System.err.println(this.getLocalName()
 					+ ": failed to create supply agent");
+		}
+	}
+	
+	/**
+	 * Create a product agent (for now)
+	 */
+	private void spawnProductAgent(){
+		try {
+			ContainerController cc = getContainerController();
+			String name = "PA" + productCounter++;
+
+			// parse configurations
+			LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(null);
+
+			for (ProductStep productStep : productSteps) {
+				// replace the criteria in each productstep by the actual identifiers of crates and objects
+				productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
+			}
+
+			// TODO hard coded, need to come from arguments
+			Position startPosition = new Position(0, 0);
+			Tick deadline = new Tick().add(1000000);
+
+			Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
+			AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
+			ac.start();
+
+		} catch (StaleProxyException e) {
+			e.printStackTrace();
+		}catch (JSONException e) {
+			System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
 		}
 	}
 

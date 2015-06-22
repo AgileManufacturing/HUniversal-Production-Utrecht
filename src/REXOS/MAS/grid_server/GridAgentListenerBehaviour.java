@@ -71,7 +71,8 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				case ACLMessage.REQUEST:
 					try {
 						JSONObject object = new JSONObject(msg.getContent().toString());
-						if(object.getString("command").equals("GET_OVERVIEW")) {
+						String command = object.getString("command");
+						if(command.equals("GET_OVERVIEW")) {
 							System.out.println("Request: GetOverview received!");
 							int clientHash = object.getInt("client");
 							sendOverviewToSCADAAgent(msg, clientHash);
@@ -176,17 +177,19 @@ public class GridAgentListenerBehaviour extends Behaviour{
 	
 	private void handleDataResponse(ACLMessage msg) {
 		try {
-			JSONObject command = new JSONObject(msg.getContent());
-			switch(command.getString("command").toString()){
+			System.out.println(msg);
+			JSONObject object = new JSONObject(msg.getContent());
+			switch(object.getString("command").toString()){
 			case "GET_BASIC_INFO":
-				String type  = command.getString("type");
-				String state = command.getString("state");
-				AID aid      = new AID(command.getString("id"), AID.ISGUID);
+				JSONObject agent = object.getJSONObject("agent");
+				String type  = agent.getString("type");
+				String state = agent.getString("state");
+				AID aid      = new AID(agent.getString("id"), AID.ISGUID);
 				BasicAgentInfo bai = new BasicAgentInfo(aid,state,type);
 				gridAgent.addBasicAgentInfo(bai);
 				
 				// Update all basicListeners (add agent)
-				JSONObject object = new JSONObject(msg.getContent());
+				object = new JSONObject(msg.getContent());
 				object.put("command", "ADDAGENT");
 				object.put("agent", bai.getJSONObject());
 				gridAgent.onBasicUpdate(msg.getSender(), object.toString());

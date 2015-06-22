@@ -41,7 +41,6 @@ public class EquipletGetDataHandler{
 			JSONObject result = new JSONObject();
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				result.put("command", messageContent.getString("command"));
 				//Debug output
 				//Logger.log("Content of message: " + messageContent.toString());
 				
@@ -51,9 +50,12 @@ public class EquipletGetDataHandler{
 				//Delegate command to corresponding functions
 				switch(command){
 				case "GET_BASIC_INFO":
-					result.put("id", equiplet.getAID().getLocalName());
-					result.put("type", "EquipletAgent");
-					result.put("state", equiplet.getEquipletState().name());
+					result = getBasicInfo();
+					break;
+				case "GET_DETAILED_INFO":
+					System.out.println("EA: detailedINFO");
+					result = getDetailedInfo();
+			
 					break;
 				case "GET_CURRENT_EQUIPLET_STATE":
 					result = getCurrentEquipletState();
@@ -303,6 +305,64 @@ public class EquipletGetDataHandler{
 			result.put("modes", modeStrings);
 		} catch (JSONException e) {
 			Logger.log("Error");
+			return null;
+		}
+		return result;
+	}
+	
+	public JSONObject getBasicInfo(){
+		JSONObject result = new JSONObject();
+		try {
+			result.put("command", "GET_BASIC_INFO");
+			JSONObject agent = new JSONObject();
+			agent.put("id", equiplet.getAID().getLocalName());
+			agent.put("type", "EquipletAgent");
+			agent.put("state", equiplet.getEquipletState().name());
+			result.put("agent", agent);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return result;
+	}
+	
+	public JSONObject getDetailedInfo(){
+		JSONObject result = new JSONObject();
+		try {
+			result.put("command", "GET_DETAILED_INFO");
+			JSONObject agent = new JSONObject();
+			agent.put("id", equiplet.getAID().getLocalName());
+			agent.put("type", "EquipletAgent");
+			agent.put("state", equiplet.getEquipletState().name());
+			agent.put("mode", equiplet.state);
+			JSONArray JSONSchedule = new JSONArray();
+			for (Job job : equiplet.schedule) {
+				Logger.log(job.toString());
+				JSONObject jobData = new JSONObject();
+				try {
+					jobData.put("product", job.getProductAgentName() 	!= null ? job.getProductAgentName().toString() 	: "null");
+					jobData.put("Name", job.getProductAgent()			!= null ? job.getProductAgent().toString() 		: "null" );
+					jobData.put("index", job.getIndex());
+					jobData.put("service", job.getService() 			!= null ? job.getService().toString() 			: "null" );
+					jobData.put("criteria", job.getCriteria()			!= null ? job.getCriteria().toString() 			: "null" );
+					jobData.put("start", job.getStartTime()				!= null ? job.getStartTime().toString() 		: "null" );
+					jobData.put("due", job.getDue()						!= null ? job.getDue().toString() 				: "null" );
+					jobData.put("deadline", job.getDeadline() 			!= null ? job.getDeadline().toString() 			: "null" );
+					jobData.put("ready", job.getDuration() 				!= null ? job.getDuration().toString() 			: "null" );
+				} catch(JSONException e){
+					Logger.log("Error");
+					return null;
+				}
+				
+				JSONSchedule.put(jobData);
+				
+			}
+			agent.put("schedule", JSONSchedule);
+			result.put("agent", agent);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 			return null;
 		}
 		return result;

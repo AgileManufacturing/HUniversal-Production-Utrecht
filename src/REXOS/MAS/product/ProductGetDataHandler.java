@@ -15,6 +15,7 @@ public class ProductGetDataHandler {
 	}
 	
 	public void handleGetDataRequest(ACLMessage msg) {
+		System.out.println("PRODUCTAGENT BASICINFO");
 		if(msg != null) {
 			JSONObject reply = new JSONObject();
 			try {
@@ -27,7 +28,7 @@ public class ProductGetDataHandler {
 				switch(command) {
 					case ProductCommand.COMMAND_GET_BASIC_INFO: 
 						agent.put("type", "ProductAgent");
-						agent.put("state", this.productAgent.getProductState().name());
+						agent.put("state", "TestState");
 						break;
 					case ProductCommand.COMMAND_GET_DETAILED_INFO:
 						agent = this.getDetailedInfo();

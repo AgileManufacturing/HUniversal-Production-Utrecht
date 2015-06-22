@@ -2,6 +2,11 @@ package MAS.product;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -64,6 +69,27 @@ public class ProductAgent extends Agent {
 			System.err.printf("PA:%s Failed to receive correct arguments\n", getLocalName());
 			state = ProductState.ERROR;
 		}
+		
+		
+		DFAgentDescription dfAgentDescription = new DFAgentDescription();
+		dfAgentDescription.setName(getAID());
+		//Register as Product agent
+		ServiceDescription serviceDescription = new ServiceDescription();
+		serviceDescription.setName(this.getLocalName());
+		serviceDescription.setType("ProductAgent");
+		serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
+		serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+		dfAgentDescription.addServices(serviceDescription);
+		
+		try {
+			DFService.register(this, dfAgentDescription);
+		} catch (FIPAException fe) {
+			System.err.printf("EA:%s Failed to register services\n", getLocalName());
+			fe.printStackTrace();
+		}
+		
+		listenerBehaviour = new ProductListenerBehaviour(this);
+		addBehaviour(listenerBehaviour);
 	}
 
 	protected void setup(LinkedList<ProductStep> productSteps, Position startPosition, Tick deadline) {
