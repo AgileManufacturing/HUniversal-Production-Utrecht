@@ -17,4 +17,5 @@ public class Ontology {
 	public static final String CONVERSATION_EQUIPLET_COMMAND = "equiplet-command";
 	public static final String CONVERSATION_LISTENER_COMMAND = "listener-command";
 	public static final String CONVERSATION_GET_DATA = "get-data";
+	public static final String CONVERSATION_ON_TAKEDOWN = "equiplet-takedown";
 }

@@ -203,7 +203,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	@Override
 	protected void takeDown() {
-		onChangeHandler.sendTakeDown();
+		onChangeHandler.updateSubscribersOnTakeDown();
 		if (!reconfiguring) {
 			deregister();
 		}
