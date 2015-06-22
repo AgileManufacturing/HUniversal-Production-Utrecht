@@ -41,7 +41,7 @@ public class EquipletGetDataHandler{
 			JSONObject result = new JSONObject();
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				//result.put("command", messageContent.getString("command"));
+				result.put("command", messageContent.getString("command"));
 				//Debug output
 				//Logger.log("Content of message: " + messageContent.toString());
 				
@@ -161,7 +161,7 @@ public class EquipletGetDataHandler{
 		JSONObject result = new JSONObject();
 		ArrayList<ModuleIdentifier> moduleList = new ArrayList<ModuleIdentifier>();
 		moduleList = hal.getModules();		
-		Logger.log("get all modules, size = " + moduleList.size());
+		//Logger.log("get all modules, size = " + moduleList.size());
 		try {
 			result.put("command", "GET_ALL_MODULES");
 			JSONArray modulesArray = new JSONArray();
@@ -172,7 +172,7 @@ public class EquipletGetDataHandler{
 				JSONModuleInfo.put("manufacturer", module.manufacturer);
 				JSONModuleInfo.put("name", module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
 				
-				Logger.log("module: " + module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
+				//Logger.log("module: " + module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
 				modulesArray.put(JSONModuleInfo);				
 			}
 			result.put("modules", modulesArray);
