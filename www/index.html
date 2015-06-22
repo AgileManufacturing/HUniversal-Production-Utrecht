@@ -11,7 +11,7 @@
 		<nav id="nav" class="bottom wide">
 			<ul>
 				<li>
-					<a href="/" data-section="grid" class="default">Grid</a>
+					<a href="/" data-section="grid" class="current">Grid</a>
 				</li><li>
 					<a href="/" data-section="agent">Agent</a>
 				</li><!-- <li>
@@ -21,11 +21,11 @@
 		</nav>
 	</header>
 	<main>
-		<section id="grid">
+		<section id="grid" style="display: block;">
 			<h1>Grid</h1>
 			<ul></ul>
 		</section>
-		<section id="agent">
+		<section id="agent" style="display: none;">
 			<h1>Agent</h1>
 			<form></form>
 		</section>
@@ -45,12 +45,15 @@
 	</main>
 
 	<footer>
-		<nav class="top small">
+		<div style="text-align: right">
+			<small><em>Made with love</em></small>
+		</div>
+		<!-- <nav class="top small">
 			<ul>
 				<li><a href="/">contact</a></li>
 				<li><a href="/">help</a></li>
 			</ul>
-		</nav>
+		</nav> -->
 	</footer>
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>

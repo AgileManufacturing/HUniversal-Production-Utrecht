@@ -60,11 +60,7 @@ nav > ul {
 /**
  * Header and footer styling
  */
-nav {
-	border-bottom: 2px solid #BBBBBB;
-}
 nav.top {
-	border-top: 2px solid #BBBBBB;
 	border-bottom: none;
 }
 nav:hover {
@@ -99,15 +95,11 @@ nav > ul > li > a {
 	font-weight: bold;
 
 	border-bottom: 2px solid transparent;
-	bottom: -2px;
-	margin-top: -2px;
 
 	padding: 16px 32px;
 }
 nav.top > ul > li > a {
 	border-top: 2px solid transparent;
-	top: -2px;
-	margin-bottom: -2px;
 
 	border-bottom: none;
 	bottom: auto;
@@ -119,8 +111,9 @@ nav.small > ul > li > a {
 	font-size: .75em;
 }
 
-nav > ul > li > a.current {
-	background-color: #BBBBBB;
+nav > ul > li > a.current,
+nav > ul > li > a.current:hover {
+	background-color: #CCCCCC;
 }
 nav > ul > li > a:hover {
 	background-color: #DDDDDD;
@@ -136,8 +129,6 @@ nav > ul > li > a:hover {
  * Main styling
  */
 main {
-	padding: 32px 0;
-
 	background-color: #FFFFFF;
 }
 main > section,
@@ -149,16 +140,17 @@ main > div {
 main > section {
 	display: none;
 
-	background-color: rgba(0,0,0,.02);
+	margin-bottom: 16px;
+
+	background-color: #CCCCCC;
 } main > section.current {
 	display: block;
 }
 
 main > div {
-
-	margin-top: 16px;
-	margin-bottom: 16px;
-	background-color: rgba(0,0,0,.1);
+	margin-top: 8px;
+	margin-bottom: 8px;
+	background-color: #EEEEEE;
 }
 
 
@@ -171,6 +163,39 @@ footer {
 	left: 0;
 	right: 0;*/
 }
+
+
+/**
+ * Grid styling
+ */
+#grid > ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#grid > ul > li {
+	width: 33.33%;
+	display: inline-block;
+
+	box-sizing: border-box;
+
+	padding: 8px;
+
+	position: relative;
+}
+#grid > ul > li:before {
+	content: attr(data-type);
+	font-size: .8em;
+}
+#grid > ul > li > a {
+	display: block;
+
+	padding: 16px 8px;
+
+	background-color: #EEEEEE;
+}
+
+
 
 
 /**
@@ -191,42 +216,6 @@ footer {
 	margin-right: 4px;
 }
 
-
-/**
- * Grid styling
- */
-#grid > ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-#grid > ul > li {
-	width: 33.33%;
-	display: inline-block;
-
-	box-sizing: border-box;
-
-	padding: 8px;
-
-	margin: 8px 0;
-
-	position: relative;
-}
-#grid > ul > li:before {
-	content: attr(data-type);
-	font-size: .5em;
-
-	font-style: italic;
-
-	position: absolute;
-	top: 0;
-	right: 0;
-}
-#grid > ul > li > a {
-	display: block;
-
-	border: 1px solid black;
-}
 
 
 /**

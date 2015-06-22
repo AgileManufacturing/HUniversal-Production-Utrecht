@@ -7,7 +7,7 @@
 function UIPanel() {
 	$('#nav ul > li > a').click((this.navClick).bind(this));
 
-	this.switchSection($('#nav ul > li > a.default'));
+	//this.switchSection($('#nav ul > li > a.default'));
 
 	// Log section
 	this.log_pre   = $('#log pre');
@@ -184,6 +184,12 @@ UIPanel.prototype = {
 		$('main > section').hide();
 		$('main > section#' + $a.data('section')).show();
 	},
+
+	'clean': function() {
+		$('#grid ul').html('');
+
+		this.agents = {};
+	},
 };
 
 
@@ -238,6 +244,13 @@ Server.prototype = {
 
  				var agent = data['agent'];
 				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+
+				break;
+			case 'ON_EQUIPLET_STATE_CHANGED':
+				this.ui.println('Received ON_EQUIPLET_STATE_CHANGED', this.id);
+
+ 				var agent = data['agent'];
+				this.ui.addAgent(agent['id'], null, agent['state']);
 
 				break;
 			default:
@@ -314,6 +327,8 @@ Server.prototype = {
 		this.ui.println('Stopping client', this.id);
 		this.ui.setConStatus(this.ui.CLOSED);
 
+		this.ui.clean();
+
 		this.is_connected      = false;
 		this.will_reconnect = false;
 		if (this.timeout !== null) {
@@ -357,6 +372,8 @@ Server.prototype = {
 
 // Server class allowing us to connect to web socket.
 var server = new Server(window.location.hostname, 3529, 'SCADA');
+
+
 //server.connect();
 
 /*window.addEventListener('beforeunload', function (e) {
