@@ -394,6 +394,8 @@ public class EquipletOnChangedHandler{
 			takeDownMessageContent.put("command", "ON_EQUIPLET_TAKEDOWN");
 		}catch(JSONException ex){ex.printStackTrace();}
 		
+		takeDownMessage.setContent(takeDownMessageContent.toString());
+		
 		// Send the message
 		equiplet.send(takeDownMessage);
 	}
