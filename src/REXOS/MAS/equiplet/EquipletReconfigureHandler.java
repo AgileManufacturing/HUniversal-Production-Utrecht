@@ -136,54 +136,54 @@ public class EquipletReconfigureHandler{
 	 */
 	public boolean insertModule(JSONObject messageContent){
 		try{
-	//		hal.getState()???? where is this function??;
-	//		if(currentState != Mast.State.SAFE){
-				//Error out
-	//		}
-			System.out.println("Insert module func");
-			
-			//Deserialize modules
-			JSONArray modules = (JSONArray) messageContent.get("modules");
-			ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
-			
-			System.out.println(moduleIdentifiers.toString());
-			
-			
-			//Get static and dynamic settings
-			ArrayList<JSONObject> staticSettings = new ArrayList<JSONObject>();
-			ArrayList<JSONObject> dynamicSettings = new ArrayList<JSONObject>();
-			KnowledgeDBClient kdb = new KnowledgeDBClient();
-			
-			//TODO generate JSONObjects for both settings and insert them into hal
-			
-			//Get the staticSettings and push into array
-			for(int i = 0; i < moduleIdentifiers.size(); i++){
-				//Get static settings from Grid Knowledge DB
-				StaticSettings staticSetting = StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb);
-				if(!staticSettings.isEmpty()){
-					JSONObject staticSettingJSON = staticSetting.serialize();
-					staticSettings.add(staticSettingJSON);
+			if(equiplet.getCurrentState() == Mast.State.SAFE || equiplet.getCurrentState() == Mast.State.OFFLINE){
+				System.out.println("Insert module func");
 				
-				//Create dynamicSetting JSONObject
-				//TODO Get actual dynamic values from JSON
-				JSONObject dynamicSetting = new JSONObject();
-				dynamicSetting.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
-				dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, 1);
-				dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, 1);
-				dynamicSettings.add(dynamicSetting);
+				//Deserialize modules
+				JSONArray modules = (JSONArray) messageContent.get("modules");
+				ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
+				
+				System.out.println(moduleIdentifiers.toString());
+				
+				
+				//Get static and dynamic settings
+				ArrayList<JSONObject> staticSettings = new ArrayList<JSONObject>();
+				ArrayList<JSONObject> dynamicSettings = new ArrayList<JSONObject>();
+				KnowledgeDBClient kdb = new KnowledgeDBClient();
+				
+				//TODO generate JSONObjects for both settings and insert them into hal
+				
+				//Get the staticSettings and push into array
+				for(int i = 0; i < moduleIdentifiers.size(); i++){
+					//Get static settings from Grid Knowledge DB
+					StaticSettings staticSetting = StaticSettings.getStaticSettingsForModuleIdentifier(moduleIdentifiers.get(i), kdb);
+					if(!staticSettings.isEmpty()){
+						JSONObject staticSettingJSON = staticSetting.serialize();
+						staticSettings.add(staticSettingJSON);
+					
+					//Create dynamicSetting JSONObject
+					//TODO Get actual dynamic values from JSON
+					JSONObject dynamicSetting = new JSONObject();
+					dynamicSetting.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
+					dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, 1);
+					dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, 1);
+					dynamicSettings.add(dynamicSetting);
+					}else{
+						Logger.log("Settings could not be retrieved from the KnowledgeDatabase");
+					}
+				}
+				
+				//Insert module in hal
+				if(moduleIdentifiers != null && staticSettings != null && moduleIdentifiers.size() == staticSettings.size()){
+					for(int i = 0; i < staticSettings.size(); i++){
+						hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
+					}
+					return true;
 				}else{
-					Logger.log("Settings could not be retrieved from the KnowledgeDatabase");
+					Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 				}
-			}
-			
-			//Insert module in hal
-			if(moduleIdentifiers != null && staticSettings != null && moduleIdentifiers.size() == staticSettings.size()){
-				for(int i = 0; i < staticSettings.size(); i++){
-					hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
-				}
-				return true;
-			}else{
-				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
+			} else {
+				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAVE or OFFLINE state for reconfiguration");
 			}
 		} catch (JSONException e){
 			//TODO error handling
@@ -208,15 +208,17 @@ public class EquipletReconfigureHandler{
 	 */
 	public boolean deleteModule(JSONObject messageContent){
 		try{
-			//TODO Check for good mast state
-			
-			//Deserialize modules
-			JSONArray modules = (JSONArray) messageContent.get("modules");
-			ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
-			for(ModuleIdentifier mi: moduleIdentifiers){
-				hal.deleteModule(mi);
+			if(equiplet.getCurrentState() == Mast.State.SAFE || equiplet.getCurrentState() == Mast.State.OFFLINE){
+				//Deserialize modules
+				JSONArray modules = (JSONArray) messageContent.get("modules");
+				ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
+				for(ModuleIdentifier mi: moduleIdentifiers){
+					hal.deleteModule(mi);
+				}
+				return true;
+			}else{
+				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAVE or OFFLINE state for reconfiguration");
 			}
-			return true;
 		} catch (JSONException e){
 			//TODO error handling
 			e.printStackTrace();

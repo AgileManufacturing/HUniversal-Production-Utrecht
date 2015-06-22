@@ -25,9 +25,6 @@ public class EquipletGetDataHandler{
 	private EquipletAgent equiplet;
 	private HardwareAbstractionLayer hal;
 	
-	protected Mast.State currentMastState = Mast.State.OFFLINE;
-	protected Mast.Mode currentMastMode = Mast.Mode.NORMAL;
-	
 	public EquipletGetDataHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
 		hal = h;
@@ -127,7 +124,7 @@ public class EquipletGetDataHandler{
 	public JSONObject getCurrentEquipletState(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("state", currentMastState.toString());
+			result.put("state", equiplet.getCurrentState().toString());
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -145,7 +142,7 @@ public class EquipletGetDataHandler{
 		JSONObject result = new JSONObject();
 		try {
 			result.put("command", "GET_CURRENT_MAST_MODE");
-			result.put("mode", currentMastMode.toString());
+			result.put("mode", equiplet.getCurrentMode().toString());
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -305,26 +302,6 @@ public class EquipletGetDataHandler{
 			return null;
 		}
 		return result;
-	}
-	
-	/**
-	 * Set new Mast state that will be sent on state request
-	 * 
-	 * @param new Mast.State
-	 * @author Kevin Bosman
-	 */
-	public void setEquipletMastState(Mast.State state){
-		currentMastState = state;
-	}
-	
-	/**
-	 * Set new Mast mode that will be sent on mode request
-	 * 
-	 * @param new Mast.Mode
-	 * @author Kevin Bosman
-	 */
-	public void setEquipletMastMode(Mast.Mode mode){
-		currentMastMode = mode;
 	}
 
 }
