@@ -81,6 +81,12 @@ public class EQMessageAgent extends Agent {
 		
 		//Test get all modules
 		if(getModuleList){
+			sendCommand(insertJSON);
+			sleep(3000);
+			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
+			sleep(3000);
+			sendCommand(deleteJSON);
+			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 		}
 		

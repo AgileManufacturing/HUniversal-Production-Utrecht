@@ -151,7 +151,7 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request all currently connected modules [WIP]
+	 * Request all currently connected modules
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
@@ -161,7 +161,7 @@ public class EquipletGetDataHandler{
 		JSONObject result = new JSONObject();
 		ArrayList<ModuleIdentifier> moduleList = new ArrayList<ModuleIdentifier>();
 		moduleList = hal.getModules();		
-		
+		Logger.log("get all modules, size = " + moduleList.size());
 		try {
 			result.put("command", "GET_ALL_MODULES");
 			JSONArray modulesArray = new JSONArray();
@@ -171,6 +171,8 @@ public class EquipletGetDataHandler{
 				JSONModuleInfo.put("typeNumber", module.typeNumber);
 				JSONModuleInfo.put("manufacturer", module.manufacturer);
 				JSONModuleInfo.put("name", module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
+				
+				Logger.log("module: " + module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
 				modulesArray.put(JSONModuleInfo);				
 			}
 			result.put("modules", modulesArray);
