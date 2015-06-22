@@ -71,7 +71,7 @@ public class EQMessageAgent extends Agent {
 			sleep(2000);
 			//Change to save
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(2000);
+			sleep(10000);//Give equiplet time to go trough init state
 			//Get state again
 			sendGetData(getState);
 			sleep(2000);
@@ -81,6 +81,12 @@ public class EQMessageAgent extends Agent {
 		
 		//Test get all modules
 		if(getModuleList){
+			sendCommand(insertJSON);
+			sleep(3000);
+			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
+			sleep(3000);
+			sendCommand(deleteJSON);
+			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 		}
 		

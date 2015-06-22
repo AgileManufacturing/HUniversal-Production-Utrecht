@@ -54,6 +54,9 @@ public class GridAgentListenerBehaviour extends Behaviour{
 					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
 						System.out.println("GA inform conversation inform");
 						gridAgent.sendAgentInfo(msg.getContent());
+					}else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)){
+						System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
+						gridAgent.onAgentTakeDown(msg.getContent());
 					} else {
 						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
 					}
@@ -68,7 +71,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				case ACLMessage.REQUEST:
 					try {
 						JSONObject object = new JSONObject(msg.getContent().toString());
-						if(object.getString("command").equals("GETOVERVIEW")) {
+						if(object.getString("command").equals("GET_OVERVIEW")) {
 							System.out.println("Request: GetOverview received!");
 							int clientHash = object.getInt("client");
 							sendOverviewToSCADAAgent(msg, clientHash);

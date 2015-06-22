@@ -1,10 +1,15 @@
 package MAS.equiplet;
 
+import java.util.ArrayList;
+
 import generic.Mast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import HAL.HardwareAbstractionLayer;
+import HAL.dataTypes.ModuleIdentifier;
 
 import util.log.Logger;
 
@@ -18,12 +23,11 @@ import jade.lang.acl.ACLMessage;
  */
 public class EquipletGetDataHandler{
 	private EquipletAgent equiplet;
+	private HardwareAbstractionLayer hal;
 	
-	protected Mast.State currentMastState = Mast.State.OFFLINE;
-	protected Mast.Mode currentMastMode = Mast.Mode.NORMAL;
-	
-	public EquipletGetDataHandler(EquipletAgent e){
+	public EquipletGetDataHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
+		hal = h;
 	}
 	
 	/**
@@ -105,7 +109,7 @@ public class EquipletGetDataHandler{
 				reply.setPerformative(ACLMessage.FAILURE);
 			}
 			
-			Logger.log("Get data result: " + result);
+			//Logger.log("Get data result: " + result);
 			
 			equiplet.send(reply);
 		}
@@ -120,7 +124,7 @@ public class EquipletGetDataHandler{
 	public JSONObject getCurrentEquipletState(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("state", currentMastState.toString());
+			result.put("state", equiplet.getCurrentState().toString());
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -138,7 +142,7 @@ public class EquipletGetDataHandler{
 		JSONObject result = new JSONObject();
 		try {
 			result.put("command", "GET_CURRENT_MAST_MODE");
-			result.put("mode", currentMastMode.toString());
+			result.put("mode", equiplet.getCurrentMode().toString());
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -147,15 +151,31 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request all currently connected modules [WIP]
+	 * Request all currently connected modules
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
+	 * @author Mitchell van Rijkom
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
+		ArrayList<ModuleIdentifier> moduleList = new ArrayList<ModuleIdentifier>();
+		moduleList = hal.getModules();		
+		//Logger.log("get all modules, size = " + moduleList.size());
 		try {
-			result.put("state", equiplet.state);
+			result.put("command", "GET_ALL_MODULES");
+			JSONArray modulesArray = new JSONArray();
+			for(ModuleIdentifier module : moduleList){
+				JSONObject JSONModuleInfo = new JSONObject();
+				JSONModuleInfo.put("serialNumber", module.serialNumber);
+				JSONModuleInfo.put("typeNumber", module.typeNumber);
+				JSONModuleInfo.put("manufacturer", module.manufacturer);
+				JSONModuleInfo.put("name", module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
+				
+				//Logger.log("module: " + module.manufacturer + " " + module.typeNumber + " " +  module.serialNumber);
+				modulesArray.put(JSONModuleInfo);				
+			}
+			result.put("modules", modulesArray);
 		} catch (JSONException e) {
 			Logger.log("Error");
 			return null;
@@ -164,11 +184,12 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request state of a single module [WIP][To be discussed]
+	 * Request state of a single module [WIP][Should be added later]
+	 * This functionality is currently not included in HAL and ROS after this is done the function can be implemented
 	 * 
 	 * @param Module identifier?
 	 * @return JSONObject with response
-	 * @author Kevin Bosman
+	 * @author 
 	 */
 	public JSONObject getModuleState(){
 		JSONObject result = new JSONObject();
@@ -182,10 +203,11 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request state of all connected modules [WIP][To be discussed]
+	 * Request state of all connected modules [WIP][Should be added later]
+	 * This functionality is currently not included in HAL and ROS after this is done the function can be implemented
 	 * 
 	 * @return JSONObject with response
-	 * @author Kevin Bosman
+	 * @author 
 	 */
 	public JSONObject getAllModulesStates(){
 		JSONObject result = new JSONObject();
@@ -199,7 +221,7 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request total schedule[WIP]
+	 * Request total schedule
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
@@ -284,26 +306,6 @@ public class EquipletGetDataHandler{
 			return null;
 		}
 		return result;
-	}
-	
-	/**
-	 * Set new Mast state that will be sent on state request
-	 * 
-	 * @param new Mast.State
-	 * @author Kevin Bosman
-	 */
-	public void setEquipletMastState(Mast.State state){
-		currentMastState = state;
-	}
-	
-	/**
-	 * Set new Mast mode that will be sent on mode request
-	 * 
-	 * @param new Mast.Mode
-	 * @author Kevin Bosman
-	 */
-	public void setEquipletMastMode(Mast.Mode mode){
-		currentMastMode = mode;
 	}
 
 }

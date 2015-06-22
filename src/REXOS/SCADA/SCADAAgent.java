@@ -54,7 +54,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			
 			int index = 0;
 			switch(jsonObject.getString("command")) {
-			case "GETOVERVIEW": 
+			case "GET_OVERVIEW": 
 				//webSocketServer.sendMessage(webSocketConnection, "{\"type\":\"GridAgent\",\"agents\":[{\"ID\":\"EQ2\",\"type\":\"equiplet\",\"name\":\"Equiplet two\"},{\"ID\":\"EQ42\",\"type\":\"equiplet\",\"name\":\"Equiplet forty-two\"}, {\"ID\":\"PA2\",\"type\":\"product\",\"name\":\"Product two\"}]}");
 				if(gridAgent != null){
 					if((index = agentConnections.indexOf(gridAgent)) >= 0){
@@ -70,13 +70,13 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 				ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 				msg.addReceiver(gridAgent.getAgent());
 				JSONObject object = new JSONObject();
-				object.put("command", "GETOVERVIEW");
+				object.put("command", "GET_OVERVIEW");
 				object.put("client", webSocketConnection.hashCode());
 				msg.setContent(object.toString());
 				send(msg);
 				System.out.println(msg.toString());
 				break;
-			case "GETINFO":
+			case "GET_AGENT_INFO":
 				AgentConnection agent = null;
 				for(int i = 0; i < agentConnections.size(); i++){
 					if(agentConnections.get(i).getAgent().equals(aid)){
@@ -137,6 +137,13 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			}
 		}
 	}
+	
+	public void removeAgentConnection(ACLMessage msg) {
+		for(WebSocket ws : gridAgent.getClients()) {
+			ws.send(msg.getContent().toString());	
+		}
+	}
+	
 	@Override
 	public void onWebSocketOpen(WebSocket webSocketConnection) {
 		System.out.println("SCADA agent: new socket opened!");
@@ -221,7 +228,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			JSONArray agents = content.getJSONArray("agents");
 			JSONObject object = new JSONObject();
 			object.put("agents", agents);
-			object.put("command", "GETOVERVIEW");
+			object.put("command", "GET_OVERVIEW");
 			int index = 0;
 			if((index = agentConnections.indexOf(gridAgent)) >= 0){
 				// SCADAAgent is already connected to this agent

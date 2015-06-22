@@ -233,6 +233,10 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	public ModuleFactory getModuleFactory() {
 		return moduleFactory;
 	}
+	
+	public ArrayList<ModuleIdentifier> getModules(){		
+		return moduleFactory.getModules();		
+	}
 
 	/**
 	 * Do not call this method!
