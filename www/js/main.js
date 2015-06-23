@@ -21,6 +21,15 @@ function UIPanel() {
 	this.clickAgentListener = null;
 
 
+	// Agent section
+	this.agent = {
+		'id':       $('#agent .id'),
+		'schedule': $('#agent .schedule'),
+		'state':    $('#agent .state'),
+		'type':     $('#agent .type'),
+		'mode':     $('#agent .mode'),
+	};
+
 	// Controls section
 	this.con_status_light = $('#controls #con-status .light');
 	this.con_status_text  = $('#controls #con-status .text');
@@ -87,29 +96,74 @@ UIPanel.prototype = {
 			this.log_pre.scrollTop(this.log_pre.prop('scrollHeight'));
 		}
 	},
-	'addAgent': function(id, type, state) {
-		var $li, $a;
+	'addAgent': function(agent) {
+		agent['id'   ] = 'id'    in agent ? agent['id'   ] : null;
+		agent['type' ] = 'type'  in agent ? agent['type' ] : null;
+		agent['state'] = 'state' in agent ? agent['state'] : null;
+
+		if (agent['id'] === null) {
+			this.println('No ID to work with', 'ui');
+			return;
+		}
+
+		var id   = agent['id'];
+		var type = agent['type'];
 
 		if (id in this.agents) {
 			this.println('Updating agent "' + id + '"', 'ui');
-			$a = this.agents[id].$a;
 		} else {
 			this.println('Adding new agent "' + id + '"', 'ui');
 
 			// Create UI elements with attributes
-			$li = $('<li></li>', {'data-id': id, 'data-type': type, 'class': type});
-			$a  = $('<a></a>', {'href': '#', on: {click: (this.clickAgent).bind(this)}});
+			var $li = $('<li></li>', {'data-id': id, 'data-type': type});
+			var $a  = $('<a></a>', {'href': '#', on: {click: (this.clickAgent).bind(this)}});
+
+			var $id    = $('<div></div>', {'class': 'id'});
+			var $type  = $('<div></div>', {'class': 'type'});
+			var $state = $('<div></div>', {'class': 'state'});
 
 			$li.append($a);
+			$a
+				.append($id)
+				.append($type)
+				.append($state)
+			;
 
 			// Insert into UI
 			this.grid.append($li);
 
-			this.agents[id] = { $a: $a, $li: $li };
+			this.agents[id] = {
+				'li':    $li,
+				'a':     $a,
+				'id':    $id,
+				'type':  $type,
+				'state': $state,
+			};
 		}
 
-		$a.text(id + ':' + state);
+		// Obtuse syntax, but clean
+		agent['id'   ] === null || this.agents[id]['id'   ].text(agent['id'   ]);
+		agent['type' ] === null || this.agents[id]['type' ].text(agent['type' ]);
+		agent['state'] === null || this.agents[id]['state'].text(agent['state']);
 	},
+
+	'setAgent': function(agent) {
+		agent['id'      ] = ('id'       in agent) ? agent['id'      ] : null;
+		agent['schedule'] = ('schedule' in agent) ? agent['schedule'] : null;
+		agent['state'   ] = ('state'    in agent) ? agent['state'   ] : null;
+		agent['type'    ] = ('type'     in agent) ? agent['type'    ] : null;
+		agent['mode'    ] = ('mode'     in agent) ? agent['mode'    ] : null;
+
+		// Obtuse syntax, but clean
+		agent['id'      ] === null || this.agent['id'      ].text('').text(agent['id'      ]);
+		agent['schedule'] === null || this.agent['schedule'].text('').text(agent['schedule']);
+		agent['state'   ] === null || this.agent['state'   ].text('').text(agent['state'   ]);
+		agent['type'    ] === null || this.agent['type'    ].text('').text(agent['type'    ]);
+		agent['mode'    ] === null || this.agent['mode'    ].text('').text(agent['mode'    ]);
+
+		this.switchSection('agent');
+	},
+
 	'clearLog': function(event) {
 		if (typeof(event) !== 'undefined') {
 			event.preventDefault();
@@ -135,9 +189,9 @@ UIPanel.prototype = {
 		event.preventDefault();
 
 		// Retreive elements
-		var $target = $(event.target);
-		var $parent = $target.parent();
-		var id      = $parent.data('id');
+		var $a  = $(event.currentTarget);
+		var $li = $a.parent('li');
+		var id  = $li.data('id');
 
 		this.println('Clicked agent "' + id + '"', 'ui');
 
@@ -151,8 +205,6 @@ UIPanel.prototype = {
 	'clickBtnStop': function(event) {
 		this.btnStop.prop('disabled', true);
 		this.btnStart.prop('disabled', false);
-
-		console.log(this.btnStart);
 
 		if (this.clickBtnStopListener !== null) {
 			this.clickBtnStopListener();
@@ -177,12 +229,21 @@ UIPanel.prototype = {
 
 		this.switchSection($a);
 	},
-	'switchSection': function($a) {
-		$('#nav ul > li > a').removeClass('current');
-		$a.addClass('current');
-
+	'switchSection': function(section) {
 		$('main > section').hide();
-		$('main > section#' + $a.data('section')).show();
+		$('#nav ul > li > a').removeClass('current');
+
+		var $a;
+
+		if (section instanceof jQuery) {
+			$a      = section;
+			section = $a.data('section');
+		} else {
+			$a = $('#nav ul > li > a[data-section=' + section + ']');
+		}
+
+		$a.addClass('current');
+		$('main > section#' + section).show();
 	},
 
 	'clean': function() {
@@ -234,15 +295,20 @@ Server.prototype = {
 
 			 	for(var i = 0; i < data['agents'].length; i++) {
  					var agent = data['agents'][i];
-					this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+					this.ui.addAgent(agent);
  				}
 
 				break;
 			case 'ADDAGENT':
 				this.ui.println('Received ADDAGENT', this.id);
 
- 				var agent = data['agent'];
-				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+				this.ui.addAgent(data['agent']);
+
+				break;
+			case 'GET_DETAILED_INFO':
+				this.ui.println('Received GET_DETAILED_INFO', this.id);
+
+				this.ui.setAgent(data['agent']);
 
 				break;
 			case 'ON_EQUIPLET_STATE_CHANGED':
