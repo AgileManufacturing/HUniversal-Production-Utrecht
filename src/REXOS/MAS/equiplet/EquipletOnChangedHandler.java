@@ -14,7 +14,6 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
-import HAL.Module;
 import HAL.dataTypes.ModuleIdentifier;
 import MAS.util.Ontology;
 import jade.core.AID;
