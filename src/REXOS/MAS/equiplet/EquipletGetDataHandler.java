@@ -74,7 +74,11 @@ public class EquipletGetDataHandler{
 				case "GET_ALL_MODULES_STATES":
 					result = getAllModulesStates();
 					break;
-					
+				
+				case "GET ALL_MODULES_MODES":
+					result = getAllModulesModes();
+					break;
+				
 				case "GET_SCHEDULE":
 					result = getSchedule();
 					break;
@@ -228,6 +232,33 @@ public class EquipletGetDataHandler{
 		return result;
 	}
 	
+	/**
+	 * 	Request modes from all modules
+	 * @return JSONObject with response
+	 * @author Auke de Witte
+	 */
+	public JSONObject getAllModulesModes(){
+		JSONObject result = new JSONObject();
+		ArrayList<Module> moduleList = hal.getModules();		
+		try {
+			result.put("command", "GET_ALL_MODULES_MODES");
+			JSONArray modulesArray = new JSONArray();
+			for(Module module : moduleList){
+				JSONObject JSONModuleInfo = new JSONObject();
+				JSONModuleInfo.put("serialNumber", module.getModuleIdentifier().serialNumber);
+				JSONModuleInfo.put("typeNumber", module.getModuleIdentifier().typeNumber);
+				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);  
+				JSONModuleInfo.put("mode", module.getModuleMode());
+				modulesArray.put(JSONModuleInfo);
+				System.out.println(JSONModuleInfo);
+			}
+			result.put("modules", modulesArray);
+		} catch (JSONException e) {
+			Logger.log("Error");
+			return null;
+		}
+		return result;
+	}
 	/**
 	 * Request total schedule
 	 * 
