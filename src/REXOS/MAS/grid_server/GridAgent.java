@@ -61,7 +61,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import MAS.equiplet.EquipletAgent;
-import MAS.product.Node;
 import MAS.product.ProductAgent;
 import MAS.product.ProductStep;
 import MAS.simulation.config.Config;
@@ -72,7 +71,6 @@ import MAS.util.MASConfiguration;
 import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
-import MAS.util.SchedulingAlgorithm;
 import MAS.util.Tick;
 import SCADA.BasicAgentInfo;
 import SCADA.SCADABasicListener;

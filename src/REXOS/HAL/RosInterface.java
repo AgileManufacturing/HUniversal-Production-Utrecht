@@ -11,7 +11,6 @@ import HAL.dataTypes.ModuleIdentifier;
 import HAL.factories.ModuleFactory;
 import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
 import HAL.listeners.EquipletListener;
-import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.listeners.ViolationListener;
 import HAL.listeners.ViolationListener.ViolationType;

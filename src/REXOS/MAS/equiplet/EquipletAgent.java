@@ -1057,7 +1057,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
-		// TODO make implementation
+		onChangeHandler.onModuleModeChanged(module, mode);
 	}
 
 	@Override
