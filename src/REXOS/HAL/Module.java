@@ -30,6 +30,7 @@ public abstract class Module implements ModuleListener {
 	protected ModuleFactory moduleFactory;
 	protected ModuleListener moduleListener;
 	private Mast.State state;
+	private Mast.Mode mode;
 	private static final String GET_MOUNT_POSITION = 
 		"SELECT mountPointX, mountPointY FROM Module " +
 		"	WHERE manufacturer = ?" +
@@ -279,6 +280,7 @@ public abstract class Module implements ModuleListener {
 	 */
 	@Override
 	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode){
+		this.mode = mode;
 		moduleListener.onModuleModeChanged(module, mode);
 	}
 	/**
@@ -287,6 +289,14 @@ public abstract class Module implements ModuleListener {
 	 */
 	public Mast.State getModuleState(){
 		return this.state;
+	}
+	
+	/**
+	 * @return current state from the module
+	 * @author Auke de Witte
+	 */
+	public Mast.Mode getModuleMode(){
+		return this.mode;
 	}
 
 	public int getMountPointX(){

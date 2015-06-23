@@ -14,7 +14,6 @@ import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
-import HAL.Module;
 import HAL.dataTypes.ModuleIdentifier;
 import MAS.util.Ontology;
 import jade.core.AID;
@@ -35,6 +34,7 @@ public class EquipletOnChangedHandler{
 		ON_EQUIPLET_STATE_CHANGED,
 		ON_SCHEDULE_CHANGED,
 		ON_MODULE_STATE_CHANGED,
+		ON_MODULE_MODE_CHANGED,
 		ON_EQUIPLET_MODE_CHANGED
 	}
 	private Map<OnChangedTypes, Set<AID>> equipletListeners;
@@ -264,7 +264,30 @@ public class EquipletOnChangedHandler{
 		OnChangedTypes type = OnChangedTypes.ON_MODULE_STATE_CHANGED;
 		notifySubscribers(type, returnMessage);	
 	}
-	
+	/**
+	 * This function notifies all equiplets that are registered to an onChangeType when a mast mode changed from a certain module
+	 * @param module module that changed from mast mode 
+	 * @param mode mast mode
+	 * @author Auke de Witte
+	 */
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
+		String modeString = mode.toString();
+		String moduleString = module.toString();
+		
+		JSONObject returnMessage = new JSONObject();
+		
+		// create message for listeners
+		try {
+			returnMessage.put("command", "ON_MODULE_MODE_CHANGED");
+			returnMessage.put("module", moduleString);
+			returnMessage.put("moduleMode", modeString);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		OnChangedTypes type = OnChangedTypes.ON_MODULE_MODE_CHANGED;
+		notifySubscribers(type, returnMessage);	
+	}
 	/**
 	 * This function notifies all equiplets that are registered to an onChangeType when a mode is changed from the equiplet
 	 * @param mode mode of equiplet
