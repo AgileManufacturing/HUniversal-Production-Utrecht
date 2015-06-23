@@ -61,16 +61,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import MAS.equiplet.EquipletAgent;
+import MAS.product.Node;
 import MAS.product.ProductAgent;
 import MAS.product.ProductStep;
+import MAS.simulation.config.Config;
+import MAS.simulation.config.Configuration;
+import MAS.simulation.config.Configuration.ConfigException;
+import MAS.simulation.config.IConfig;
 import MAS.util.MASConfiguration;
 import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
+import MAS.util.SchedulingAlgorithm;
 import MAS.util.Tick;
 import SCADA.BasicAgentInfo;
 import SCADA.SCADABasicListener;
 import SCADA.SCADADetailedListener;
+import SCADA.StochasticsTemp;
 
 public class GridAgent extends Agent implements SCADABasicListener,
 		SCADADetailedListener {
@@ -80,6 +87,8 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	private ArrayList<AID> basicListeners;
 	private ArrayList<AID> detailedListeners;
 	private ArrayList<BasicAgentInfo> agentInformation;
+	
+	private boolean fakeSimulate = false;
 
 	public GridAgent() {
 		productCounter = 0;
@@ -93,7 +102,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		spawnTrafficAgent();
 		spawnSupplyAgent();
 		spawnEquipletAgent("2");
-		//spawnProductAgent();
+		spawnProductAgent();
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
@@ -269,29 +278,49 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		try {
 			ContainerController cc = getContainerController();
 			String name = "PA" + productCounter++;
+			if(fakeSimulate){
+				Config con = Config.read();
+				IConfig config;
+					config = Configuration.read(con);
+	
+				System.out.println("Simulation: configuration: " + config);
+	
+				StochasticsTemp stochastics = new StochasticsTemp(config);
+				// parse configurations
+				//LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(null);
+				LinkedList<ProductStep> productSteps = stochastics.generateProductSteps();
+	
+				for (ProductStep productStep : productSteps) {
+					// replace the criteria in each productstep by the actual identifiers of crates and objects
+					productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
+				}
 
-			// parse configurations
-			LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(null);
-
-			for (ProductStep productStep : productSteps) {
-				// replace the criteria in each productstep by the actual identifiers of crates and objects
-				productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
+				// TODO hard coded, need to come from arguments
+				Position startPosition = new Position(0, 0);
+				Tick deadline = new Tick().add(1000000);
+	
+				Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
+				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
+				ac.start();
+			}else{
+				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
+				ac.start();
 			}
-
-			// TODO hard coded, need to come from arguments
-			Position startPosition = new Position(0, 0);
-			Tick deadline = new Tick().add(1000000);
-
-			Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
-			AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
-			ac.start();
+				
 
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
 		}catch (JSONException e) {
 			System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
+			
+		} catch (ConfigException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		
 		}
+		
 	}
+
 
 	@Override
 	protected void takeDown() {
