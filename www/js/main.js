@@ -97,6 +97,7 @@ UIPanel.prototype = {
 		}
 	},
 	'addAgent': function(agent) {
+		// Make sure properties are defined
 		agent['id'   ] = 'id'    in agent ? agent['id'   ] : null;
 		agent['type' ] = 'type'  in agent ? agent['type' ] : null;
 		agent['state'] = 'state' in agent ? agent['state'] : null;
@@ -148,6 +149,7 @@ UIPanel.prototype = {
 	},
 
 	'setAgent': function(agent) {
+		// Define properties when inexistent
 		agent['id'      ] = ('id'       in agent) ? agent['id'      ] : null;
 		agent['schedule'] = ('schedule' in agent) ? agent['schedule'] : null;
 		agent['state'   ] = ('state'    in agent) ? agent['state'   ] : null;
@@ -160,7 +162,7 @@ UIPanel.prototype = {
 		agent['state'   ] === null || this.agent['state'   ].text('').text(agent['state'   ]);
 		agent['type'    ] === null || this.agent['type'    ].text('').text(agent['type'    ]);
 		agent['mode'    ] === null || this.agent['mode'    ].text('').text(agent['mode'    ]);
-
+		// Switch to the agent tab after we set the new data to the Agent section
 		this.switchSection('agent');
 	},
 
