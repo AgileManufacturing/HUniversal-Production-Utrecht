@@ -100,6 +100,8 @@ public class ProductGetDataHandler {
 			agent.put("id", this.productAgent.getAID().getLocalName());
 			agent.put("type", "ProductAgent");
 			agent.put("state", this.productAgent.getProductState().name());
+			
+			// Nullpointer here.
 			agent.put("deadline", this.productAgent.getDeadline().toString());
 			agent.put("position", this.productAgent.getPosition().toString());
 			agent.put("current-step", this.productAgent.getCurrentStep().toString());

@@ -322,7 +322,7 @@ public class EquipletOnChangedHandler{
 		// send message
 		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 		message.setContent(returnMessage.toString());
-		message.setConversationId(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_SCADA_COMMAND);
 		message.setOntology(Ontology.GRID_ONTOLOGY);
 		
 		// sends message to equiplets with define type

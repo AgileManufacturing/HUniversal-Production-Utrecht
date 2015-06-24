@@ -343,33 +343,6 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		}
 	}
 	
-	public void getOverview() {
-		DFAgentDescription description = new DFAgentDescription();
-		//ServiceDescription sd = new ServiceDescription();
-		//sd.setType("AGENT");
-		SearchConstraints sc = new SearchConstraints();
-		//description.addServices(sd);
-		//sc.setMaxResults((long) -1);
-		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-		msg.setOntology(Ontology.GRID_ONTOLOGY);
-		msg.setConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST);
-		String content = "{\n 'command' : 'GET_BASIC_INFO' \n }";
-		msg.setContent(content);
-		try {
-			DFAgentDescription listOfAgents[] = DFService.search(this,
-					description, sc);
-			System.out.println("LIST LENGTH: " + listOfAgents.length);
-			for (int i = 0; i < listOfAgents.length; i++) {
-				System.out.println(listOfAgents[i].getName());
-				msg.addReceiver(listOfAgents[i].getName());
-				send(msg);
-			}
-		} catch (FIPAException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	/**
 	 * Create a Equiplet agent (for now)
 	 * 
@@ -405,6 +378,23 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
 		System.out.println("GA onBasicUpdate " + basicListeners.size());
+		
+		String state = "";
+		try {
+			JSONObject object = new JSONObject(message);
+			state = object.getString("state");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// update local agent info state
+		for(int i = 0; i < agentInformation.size(); i++){
+			if(agentInformation.get(i).getAID().equals(agent)){
+				agentInformation.get(i).updateState(state);
+				break;
+			}
+		}
+		
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), message);
 		}
