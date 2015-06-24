@@ -188,6 +188,7 @@ footer {
 	font-size: .8em;
 }
 #grid > ul > li > a {
+	text-decoration: none;
 	display: block;
 
 	padding: 16px 8px;
@@ -195,6 +196,27 @@ footer {
 	background-color: #EEEEEE;
 }
 
+
+#agent table {
+    border-collapse: collapse;
+
+    width: 100%;
+    border: 1px solid black;
+}
+#agent thead {
+	background-color: #DDDDDD;
+}
+
+#agent th,
+#agent td {
+    border: 1px solid black;
+	padding: 8px;
+}
+
+#agent th {
+	font-style: italic;
+
+}
 
 
 
