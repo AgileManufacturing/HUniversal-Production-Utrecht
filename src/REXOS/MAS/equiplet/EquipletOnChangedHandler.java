@@ -75,7 +75,20 @@ public class EquipletOnChangedHandler{
 						type = types;
 						isValidOnChangedType = true;
 					}
-				}							
+				}
+				
+				//Create basic message
+				ACLMessage reply = msg.createReply();
+				JSONObject replyMessage = new JSONObject();
+				try {
+					replyMessage.put("Request", new JSONObject(msg.getContent()));
+					replyMessage.put("command", new JSONObject(msg.getContent()).getString("command"));
+					replyMessage.put("action", new JSONObject(msg.getContent()).getString("action"));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				reply.setContent(replyMessage.toString());
+				
 				
 				if(isValidOnChangedType){
 					//Execute (de)-registration procedure
@@ -90,35 +103,19 @@ public class EquipletOnChangedHandler{
 					
 					}
 					
-					//Send reply
-					ACLMessage reply = msg.createReply();
-					JSONObject replyMessage = new JSONObject();
-					try {
-						replyMessage.put("Request", new JSONObject(msg.getContent()));
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					reply.setContent(replyMessage.toString());
-					
+					//Set performative
 					if(isSuccesfullyAdded){					
 						reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 					}else {
 						reply.setPerformative(ACLMessage.REJECT_PROPOSAL);					
 					}
-					equiplet.send(reply);
 				}else {
 					// if onChangeType is not detected 
-					ACLMessage reply = msg.createReply();
-					JSONObject replyMessage = new JSONObject();
-					try {
-						replyMessage.put("Request", new JSONObject(msg.getContent()));
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					reply.setContent(replyMessage.toString());
 					reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);	
-					equiplet.send(reply);
 				}
+				
+				//Send message
+				equiplet.send(reply);
 			}catch(Exception e){
 				
 			}

@@ -54,7 +54,7 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		boolean testMastStateChange = false;
+		boolean testMastStateChange = true;
 		boolean getModuleList = false;
 		boolean getAllStateTest = false;
 		boolean scheduleTest = false;
@@ -143,7 +143,7 @@ public class EQMessageAgent extends Agent {
 		}
 		
 		this.send(message);
-		Logger.log("(Command) Message was send: " + data);
+		Logger.log("Equiplet setter test message: " + data);
 	}
 	
 	/**
@@ -168,7 +168,7 @@ public class EQMessageAgent extends Agent {
 		}
 		
 		this.send(message);
-		Logger.log("(GetData) Message was send: " + data);
+		Logger.log("Equiplet getter test message: " + data);
 	}
 	
 	/**
@@ -193,7 +193,7 @@ public class EQMessageAgent extends Agent {
 		}
 		
 		this.send(message);
-		Logger.log("(OnChange) Message was send: " + data);
+		Logger.log("Equiplet listner test message: " + data);
 	}
 	
 	/**

@@ -51,9 +51,7 @@ public class EquipletReconfigureHandler{
 			boolean succes = false;
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				//Debug output
-				//Logger.log("Content of message: " + messageContent.toString());
-				
+
 				//Identifying requested equiplet command
 				String command = messageContent.getString("command").toString();
 				
@@ -85,6 +83,7 @@ public class EquipletReconfigureHandler{
 			JSONObject replyMessage = new JSONObject();
 			try {
 				replyMessage.put("Request", new JSONObject(msg.getContent()));
+				replyMessage.put("command", new JSONObject(msg.getContent()).getString("command"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
