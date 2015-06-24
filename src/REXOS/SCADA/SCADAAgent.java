@@ -78,6 +78,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 				System.out.println(msg.toString());
 				break;
 			case "GET_AGENT_INFO":
+				removeClient(webSocketConnection);
+				
 				AgentConnection agent = null;
 				for(int i = 0; i < agentConnections.size(); i++){
 					if(agentConnections.get(i).getAgent().equals(aid)){
@@ -90,7 +92,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 					// SCADAAgent is already connected to this agent
 						
 					// Remove old client connection from agent
-					removeClient(webSocketConnection);
 					
 					// Connect to new agent
 					agentConnections.get(index).addClient(webSocketConnection);
