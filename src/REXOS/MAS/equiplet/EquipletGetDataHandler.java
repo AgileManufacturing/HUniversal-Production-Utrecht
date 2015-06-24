@@ -10,8 +10,8 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import SCADA.JSONTypeBuilder;
 import util.log.Logger;
-
 import jade.lang.acl.ACLMessage;
 
 /**
@@ -370,10 +370,11 @@ public class EquipletGetDataHandler{
 			result.put("command", "GET_DETAILED_INFO");
 			result.put("client", content.getInt("client"));
 			JSONObject agent = new JSONObject();
-			agent.put("id", equiplet.getAID().getLocalName());
-			agent.put("type", "EquipletAgent");
-			agent.put("state", equiplet.getEquipletState().name());
-			agent.put("mode", equiplet.state);
+			JSONTypeBuilder typeBuilder = new JSONTypeBuilder();
+			agent.put("id", typeBuilder.getStringObject(equiplet.getAID().getLocalName(), true, true));
+			agent.put("type", typeBuilder.getStringObject("EquipletAgent", true, true));
+			agent.put("state", typeBuilder.getStringObject(equiplet.getEquipletState().name(), false, true));
+			agent.put("mode", typeBuilder.getStringObject(equiplet.getCurrentMode().toString(), false, true));
 			JSONArray JSONSchedule = new JSONArray();
 			for (Job job : equiplet.schedule) {
 				Logger.log(job.toString());
