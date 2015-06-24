@@ -57,8 +57,11 @@ public class GridAgentListenerBehaviour extends Behaviour{
 					}else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)){
 						System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
 						gridAgent.onAgentTakeDown(msg.getContent());
-					} else {
+					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_SCADA_COMMAND)) {
+						gridAgent.updateStateInfo(msg.getSender(), msg.getContent());
 						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
+					}else{
+						System.err.println("GA: Unkown message" + msg.getContent());
 					}
 //					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
 //						handleProductArrived(msg);
