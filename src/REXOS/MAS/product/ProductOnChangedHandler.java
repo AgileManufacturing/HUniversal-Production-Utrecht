@@ -6,10 +6,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import MAS.equiplet.EquipletOnChangedHandler.OnChangedTypes;
+import MAS.util.Ontology;
 import MAS.util.Position;
 import MAS.util.Tick;
 import jade.core.AID;
@@ -26,7 +28,7 @@ public class ProductOnChangedHandler {
 		ON_HISTORY_CHANGED,
 		ON_PRODUCTIONPATH_CHANGED
 	}
-	
+	private static final String UPDATE_AGENT = "UPDATE_AGENT";
 	private static final String REGISTER = "REGISTER_LISTENER";
 	private static final String DEREGISTER = "DEREGISTER_LISTENER";
 	
@@ -127,33 +129,99 @@ public class ProductOnChangedHandler {
 	}
 	
 	public void onProductStepChanged(ACLMessage msg, String stepType){
-		switch(stepType){
-		case "finished":
+		JSONObject responseObject = new JSONObject();
+		try {
+			responseObject.put("command", UPDATE_AGENT);
+			JSONObject agent = new JSONObject();
+			agent.put("id", this.productAgent.getLocalName());
 			//TODO Implement what SCADA wants to know when this happens
-			break;
-		case "update":
-			//TODO Implement what SCADA wants to know when this happens
-			break;
-		case "delayed":
-			//TODO Implement what SCADA wants to know when this happens
-			break;
+			agent.put("productstep", stepType);
+			responseObject.put("agent", agent);
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
+		this.notifySubscribers(changeType.ON_PRODUCTSTEPS_CHANGED, responseObject);
 	}
 	
 	public void onProductStateChanged(ProductState state){
-		//TODO Implement what SCADA wants to know when this happens
+		JSONObject responseObject = new JSONObject();
+		try {
+			responseObject.put("command", UPDATE_AGENT);
+			JSONObject agent = new JSONObject();
+			agent.put("id", this.productAgent.getAID().getLocalName());
+			agent.put("state", this.productAgent.getProductState().name());
+			responseObject.put("agent", agent);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.notifySubscribers(changeType.ON_PRODUCT_STATE_CHANGED, responseObject);
 	}
 	
 	public void onProductPositionChanged(Position pos){
 		//TODO Implement what SCADA wants to know when this happens
+		JSONObject responseObject = new JSONObject();
+		try {
+			responseObject.put("command", UPDATE_AGENT);
+			JSONObject agent = new JSONObject();
+			agent.put("id", this.productAgent.getAID().getLocalName());
+			agent.put("position", pos.toString());
+			responseObject.put("agent", agent);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		this.notifySubscribers(changeType.ON_POSITION_CHANGED, responseObject);
 	}
 	
 	public void onProductDeadlineChanged(Tick deadline){
 		//TODO Implement what SCADA wants to know when this happens
+		JSONObject responseObject = new JSONObject();
+		try {
+			responseObject.put("command", UPDATE_AGENT);
+			JSONObject agent = new JSONObject();
+			agent.put("id", this.productAgent.getAID().getLocalName());
+			agent.put("deadline", this.productAgent.getDeadline().toString());
+			responseObject.put("agent", agent);
+		}catch (JSONException e) {
+			e.printStackTrace();
+		}
+		this.notifySubscribers(changeType.ON_DEADLINE_CHANGED, responseObject);
 	}
 	
 	public void onProductHistoryChanged(ArrayList<ProductionStep> history){
 		//TODO Implement what SCADA wants to know when this happens
+		JSONObject responseObject = new JSONObject();
+		try {
+			responseObject.put("command", UPDATE_AGENT);
+			JSONObject agent = new JSONObject();
+			agent.put("id", this.productAgent.getAID().getLocalName());
+			JSONArray array = new JSONArray();
+			for(ProductionStep ps : history) {
+				array.put(ps.toString());
+			}
+			agent.put("history", array);
+			responseObject.put("agent", agent);
+		}catch (JSONException e) {
+			e.printStackTrace();
+		}
+		this.notifySubscribers(changeType.ON_HISTORY_CHANGED, responseObject);
+	}
+	
+	public void notifySubscribers(changeType type, JSONObject returnMessage) {
+		ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+		message.setContent(returnMessage.toString());
+		message.setConversationId(Ontology.CONVERSATION_SCADA_COMMAND);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		
+		// sends message to agents with define type
+		for(Map.Entry<changeType, Set<AID>> entry : productListeners.entrySet()){
+			if(entry.getKey() == type){
+				for(AID sender : entry.getValue()){
+					message.addReceiver(sender);
+				}
+			}
+		}		
+		this.productAgent.send(message);	
 	}
 	
 	private boolean addProductToMap(AID sender, changeType type) {
