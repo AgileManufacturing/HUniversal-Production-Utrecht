@@ -2,8 +2,11 @@ package SCADA;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /*
  * 
@@ -48,8 +51,19 @@ public class WebSocketClientTest extends WebSocketClient {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			mws.send("{\"command\":\"UPDATE\",\"aid\":\"EQ2\",\"values\":[{\"method\":\"test\",\"param\":\"100\"},{\"method\":\"test\",\"param\":\"200\"}]}");
+			JSONObject object = new JSONObject();
+			object.put("command", "CREATE_AGENT");
+			JSONObject agent = new JSONObject();
+			agent.put("id", "EQ12345");
+			agent.put("type", "EquipletAgent");
+			agent.put("arguments", "hal");
+			object.put("agent", agent);
+			//mws.send("{\"command\":\"UPDATE\",\"aid\":\"EQ2\",\"values\":[{\"method\":\"test\",\"param\":\"100\"},{\"method\":\"test\",\"param\":\"200\"}]}");
+			mws.send(object.toString());
 		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -99,8 +99,8 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("0");
-		//spawnProductAgent();
+		spawnEquipletAgent("EQ0", "hal");
+		spawnProductAgent("PA1", null );
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
@@ -272,10 +272,9 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	/**
 	 * Create a product agent (for now)
 	 */
-	private void spawnProductAgent(){
+	public void spawnProductAgent(String name, String inputArguments){
 		try {
 			ContainerController cc = getContainerController();
-			String name = "PA" + productCounter++;
 			if(fakeSimulate){
 				Config con = Config.read();
 				IConfig config;
@@ -301,7 +300,8 @@ public class GridAgent extends Agent implements SCADABasicListener,
 				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
 				ac.start();
 			}else{
-				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
+				Object[]arguments = new Object[]{ inputArguments };
+				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
 				ac.start();
 			}
 				
@@ -348,11 +348,12 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	 * 
 	 * @author Kevin Bosman
 	 */
-	private void spawnEquipletAgent(String name) {
+	public void spawnEquipletAgent(String name, String inputArguments) {
 		try {
 			ContainerController cc = getContainerController();
-			Object[] arguments = new Object[] { "hal" };
-			AgentController ac = cc.createNewAgent("EQ" + name, EquipletAgent.class.getName(), arguments);
+			// TODO check for other inputArguments instead of a string
+			Object[] arguments = new Object[] { inputArguments };
+			AgentController ac = cc.createNewAgent(name, EquipletAgent.class.getName(), arguments);
 			ac.start();
 		} catch (StaleProxyException e) {
 			System.err.println(this.getLocalName() + ": failed to create Equiplet agent");
