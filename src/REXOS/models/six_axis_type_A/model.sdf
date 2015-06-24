@@ -292,7 +292,7 @@
 			<gravity>true</gravity>
 			
 			<velocity_decay>
-				<angular>2</angular>
+				<angular>1</angular>
 			</velocity_decay>
 			<inertial>
 				<mass>0.050</mass>

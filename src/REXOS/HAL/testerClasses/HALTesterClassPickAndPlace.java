@@ -35,6 +35,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
+	static int serialNumber = 1;
 
 	// delta robot
 	static String moduleA_01 = "{" +
@@ -534,12 +535,18 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 2) {
+		if(args.length >= 1) {
 			if(args[0].equals("--noInsert")) {
 				insertModules = false;
 			} else if(args[0].equals("--noTranslate")) {
 				translateSteps = false;
 			}
+		}
+		
+		if(args.length >= 3) {
+			equipletName = args[1];
+			serialNumber = Integer.parseInt(args[2]);
+		} if(args.length >= 2) {
 			equipletName = args[1];
 		} else if(args.length >= 1) {
 			equipletName = args[0];
@@ -689,6 +696,13 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 					moduleE_03 + base64WorkplaneGazebo + moduleE_04;
 			JSONObject e = new JSONObject(new JSONTokener(moduleE));
 			
+			a.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
+			c.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			d.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			d.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
+			e.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
 			
 			hal.insertModule(a, a);
 			hal.insertModule(b, b);
@@ -702,7 +716,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove1 = new JSONObject();
 			targetMove1.put("x", 5.5);
 			targetMove1.put("y", -5.5);
-			targetMove1.put("z", 13.1);
+			targetMove1.put("z", 14.025);
 			JSONObject targetMove1Approach = new JSONObject();
 			targetMove1Approach.put("x", 0);
 			targetMove1Approach.put("y", 0);
@@ -716,7 +730,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject subjectMove1 = new JSONObject();
 			subjectMove1.put("x", 5.5);
 			subjectMove1.put("y", -5.5);
-			subjectMove1.put("z", 13.1);
+			subjectMove1.put("z", 14.025);
 			JSONObject subjectMove1Approach = new JSONObject();
 			subjectMove1Approach.put("x", 0);
 			subjectMove1Approach.put("y", 0);
@@ -730,7 +744,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove2 = new JSONObject();
 			targetMove2.put("x", 5.5);
 			targetMove2.put("y", -5.5);
-			targetMove2.put("z", 13.1);
+			targetMove2.put("z", 14.025);
 			JSONObject targetMove2Approach = new JSONObject();
 			targetMove2Approach.put("x", 0);
 			targetMove2Approach.put("y", 0);
@@ -744,7 +758,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject subjectMove2 = new JSONObject();
 			subjectMove2.put("x", 5.5);
 			subjectMove2.put("y", -5.5);
-			subjectMove2.put("z", 13.1);
+			subjectMove2.put("z", 14.025);
 			JSONObject subjectMove2Approach = new JSONObject();
 			subjectMove2Approach.put("x", 0);
 			subjectMove2Approach.put("y", 0);
@@ -772,8 +786,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
-		//hal.executeHardwareSteps(hardwareSteps);
-		hal.translateProductStep("place", criteria2);
+		hal.executeHardwareSteps(hardwareSteps);
+		//hal.translateProductStep("place", criteria2);
 	}
 
 	@Override
@@ -799,6 +813,13 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
+		if(state == false) {
+			hal.translateProductStep("place", criteria2);
+			state = true;
+		} else {
+			hal.translateProductStep("place", criteria1);
+			state = false;
+		}
 	}
 
 	@Override

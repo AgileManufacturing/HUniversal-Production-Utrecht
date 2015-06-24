@@ -60,12 +60,16 @@ public class ShadowHardwareAbstractionLayer extends AbstractHardwareAbstractionL
 		executionProcess.start();
 	}
 	public void spawnPartModel(JSONObject equipletCommand, EquipletCommandListener listener) {
-		this.forwardTarget = listener;
-		this.getRosInterface().postEquipletCommand(equipletCommand);
+		synchronized(this) {
+			this.forwardTarget = listener;
+			this.getRosInterface().postEquipletCommand(equipletCommand);
+		}
 	}
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
-		this.forwardTarget.onEquipletCommandStatusChanged(status);
-		this.forwardTarget = null;
+		synchronized(this) {
+			this.forwardTarget.onEquipletCommandStatusChanged(status);
+			this.forwardTarget = null;
+		}
 	}
 }
