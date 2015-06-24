@@ -43,13 +43,8 @@ import MAS.util.Tuple;
 import MAS.util.Util;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	// private static final double SAFETY_FACTOR = 1;
-
+	private static final long serialVersionUID = 6193498304780325791L;
+	
 	// Equiplet knowledge
 	protected Position position;
 	protected List<Capability> capabilities;
@@ -208,7 +203,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	@Override
 	protected void takeDown() {
-		onChangeHandler.updateSubscribersOnTakeDown();
+		onChangeHandler.notifySubscribersOnTakeDown();
 		if (!reconfiguring) {
 			deregister();
 		}
@@ -286,9 +281,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		return history.size();
 	}
 	
-	/**
-	 * Reconfigure section
-	 */
 	public void passEquipletCommand(ACLMessage msg){
 		reconfigHandler.handleEquipletCommand(msg);
 	}
@@ -301,10 +293,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		getRequestHandler.handleEquipletGetRequest(msg);
 	}
 	
-	/**
-	 * End reconfigure section
-	 */
-
 	/**
 	 * give an estimate of the duration of the service
 	 * 
@@ -617,8 +605,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 *            of the job
 	 * @return if it succeeded to schedule the job
 	 */
-	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service,
-			JSONObject criteria) {
+	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, JSONObject criteria) {
 		// do not schedule a job when going to be reconfigured
 		if (reconfiguring) {
 			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
@@ -1076,6 +1063,5 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		// TODO Auto-generated method stub
-		
 	}
 }

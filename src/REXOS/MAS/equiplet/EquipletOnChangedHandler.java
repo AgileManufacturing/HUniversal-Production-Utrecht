@@ -345,7 +345,7 @@ public class EquipletOnChangedHandler{
 	 * @author Mitchell van Rijkom
 	 */
 
-	public void updateSubscribersOnTakeDown() {
+	public void notifySubscribersOnTakeDown() {
 		ACLMessage takeDownMessage = new ACLMessage(ACLMessage.INFORM);
 		takeDownMessage.setConversationId(Ontology.CONVERSATION_AGENT_TAKEDOWN);
 		Set<AID> agentsList = new HashSet<AID>();

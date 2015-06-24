@@ -1,5 +1,6 @@
 package MAS.product;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import MAS.equiplet.EquipletOnChangedHandler.OnChangedTypes;
+import MAS.util.Position;
+import MAS.util.Tick;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
@@ -106,7 +109,7 @@ public class ProductOnChangedHandler {
 		} else {
 			result = addProductToMap(aid, t);
 		}
-		return true;
+		return result;
 	}
 	
 	public boolean deregisterListener(AID aid, changeType t) {
@@ -121,6 +124,36 @@ public class ProductOnChangedHandler {
 			isRemovedSuccesfully = removeProductFromMap(aid, t);			
 		}
 		return isRemovedSuccesfully;	
+	}
+	
+	public void onProductStepChanged(ACLMessage msg, String stepType){
+		switch(stepType){
+		case "finished":
+			//TODO Implement what SCADA wants to know when this happens
+			break;
+		case "update":
+			//TODO Implement what SCADA wants to know when this happens
+			break;
+		case "delayed":
+			//TODO Implement what SCADA wants to know when this happens
+			break;
+		}
+	}
+	
+	public void onProductStateChanged(ProductState state){
+		//TODO Implement what SCADA wants to know when this happens
+	}
+	
+	public void onProductPositionChanged(Position pos){
+		//TODO Implement what SCADA wants to know when this happens
+	}
+	
+	public void onProductDeadlineChanged(Tick deadline){
+		//TODO Implement what SCADA wants to know when this happens
+	}
+	
+	public void onProductHistoryChanged(ArrayList<ProductionStep> history){
+		//TODO Implement what SCADA wants to know when this happens
 	}
 	
 	private boolean addProductToMap(AID sender, changeType type) {

@@ -24,11 +24,7 @@ import MAS.util.Tick;
 import MAS.util.Triple;
 
 public class ProductAgent extends Agent {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = -7419809733484399023L;
 	private Tick created;
 	protected LinkedList<ProductStep> productSteps;
 	private LinkedList<ProductionStep> productionPath;
@@ -41,6 +37,7 @@ public class ProductAgent extends Agent {
 
 	private ScheduleBehaviour scheduleBehaviour;
 	private ProductListenerBehaviour listenerBehaviour;
+	protected ProductOnChangedHandler onChangedHandler;
 	
 	private ArrayList<AID> basicListeners;
 	private ArrayList<AID> detailedListeners;
@@ -57,6 +54,7 @@ public class ProductAgent extends Agent {
 
 				scheduleBehaviour = new ScheduleBehaviour(this, productSteps);
 				listenerBehaviour = new ProductListenerBehaviour(this);
+				onChangedHandler = new ProductOnChangedHandler(this);
 				addBehaviour(scheduleBehaviour);
 				addBehaviour(listenerBehaviour);
 
@@ -155,6 +153,7 @@ public class ProductAgent extends Agent {
 		}
 
 		Tick newDeadline = time.add(deadline.minus(getCreated()).multiply(2));
+		this.onChangedHandler.onProductDeadlineChanged(newDeadline);
 		addBehaviour(new ScheduleBehaviour(this, steps, time, newDeadline));
 	}
 
@@ -200,7 +199,7 @@ public class ProductAgent extends Agent {
 	 * @param path
 	 */
 	protected void schedulingFinished(Tick time, boolean succeeded, LinkedList<ProductionStep> path) {
-		productionPath = path;
+		this.productionPath = path;
 		schedulingFinished(time, succeeded);
 	}
 
@@ -211,7 +210,8 @@ public class ProductAgent extends Agent {
 	 */
 	protected void schedulingFinished(Tick time, boolean succeeded) {
 		if (!succeeded) {
-			state = ProductState.ERROR;
+			this.state = ProductState.ERROR;
+			this.onChangedHandler.onProductStateChanged(this.state);
 		} else {
 			performNextStep();
 		}
@@ -228,10 +228,12 @@ public class ProductAgent extends Agent {
 	 */
 	protected void onProductArrived(Tick time) {
 		// change state from travelling to ready
-		state = ProductState.WAITING;
+		this.state = ProductState.WAITING;
+		this.onChangedHandler.onProductStateChanged(this.state);
 
 		ProductionStep productionStep = productionPath.peek();
-		position = productionStep.getPosition();
+		this.position = productionStep.getPosition();
+		this.onChangedHandler.onProductPositionChanged(this.position);
 
 		try {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -260,11 +262,14 @@ public class ProductAgent extends Agent {
 		ProductionStep step = productionPath.pop();
 		step.setFinished(time);
 		history.add(step);
+		this.onChangedHandler.onProductHistoryChanged(history);
 
 		if (productionPath.isEmpty()) {
-			state = ProductState.FINISHED;
+			this.state = ProductState.FINISHED;
+			this.onChangedHandler.onProductStateChanged(this.state);
 		} else {
-			state = ProductState.TRAVELING;
+			this.state = ProductState.TRAVELING;
+			this.onChangedHandler.onProductStateChanged(this.state);
 			performNextStep();
 		}
 	}
@@ -276,7 +281,8 @@ public class ProductAgent extends Agent {
 	}
 
 	protected void onProductProcessing(Tick time) {
-		state = ProductState.PROCESSING;
+		this.state = ProductState.PROCESSING;
+		this.onChangedHandler.onProductStateChanged(this.state);
 	}
 
 	/**
@@ -285,7 +291,7 @@ public class ProductAgent extends Agent {
 	 * @param start
 	 */
 	protected void onProductDelayed(Tick start) {
-
+		this.onChangedHandler.onProductDeadlineChanged(start);
 	}
 
 	/**
@@ -299,7 +305,8 @@ public class ProductAgent extends Agent {
 	 */
 	protected void onProductStarted(Tick time, int index) {
 		Tick newDeadline = deadline.add(deadline.minus(getCreated()));
-
+		this.onChangedHandler.onProductDeadlineChanged(newDeadline);
+		
 		System.out.printf("PA:%s on product started event [time=%s, index=%d, state=%s, deadline=%s, new deadline=%s, current step=%s, productionPath].\n", getLocalName(), time, index, state, deadline, newDeadline, getCurrentStep(), productionPath);
 		// Check if the equiplet is in the correct state, if Processing everything is correct.
 		// When product is waiting check whether the index of current product steps matches
