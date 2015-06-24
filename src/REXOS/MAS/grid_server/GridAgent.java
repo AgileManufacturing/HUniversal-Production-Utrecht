@@ -378,23 +378,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
 		System.out.println("GA onBasicUpdate " + basicListeners.size());
-		
-		String state = "";
-		try {
-			JSONObject object = new JSONObject(message);
-			state = object.getString("state");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// update local agent info state
-		for(int i = 0; i < agentInformation.size(); i++){
-			if(agentInformation.get(i).getAID().equals(agent)){
-				agentInformation.get(i).updateState(state);
-				break;
-			}
-		}
-		
+
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), message);
 		}
@@ -466,5 +450,25 @@ public class GridAgent extends Agent implements SCADABasicListener,
 			e.printStackTrace();
 		}
 		return object;
+	}
+	
+	public void updateStateInfo(AID agent, String message){
+		System.out.println(message);
+		
+		String state = "";
+		try {
+			JSONObject object = new JSONObject(message);
+			state = object.getString("state");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// update local agent info state
+		for(int i = 0; i < agentInformation.size(); i++){
+			if(agentInformation.get(i).getAID().equals(agent)){
+				agentInformation.get(i).updateState(state);
+				break;
+			}
+		}
 	}
 }
