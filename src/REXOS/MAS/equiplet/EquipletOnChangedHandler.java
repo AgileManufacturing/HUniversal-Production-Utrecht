@@ -7,6 +7,7 @@ import java.util.Set;
 
 import generic.Mast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -232,8 +233,41 @@ public class EquipletOnChangedHandler{
 		notifySubscribers(type, returnMessage);	
 	}	
 	
-	public void onScheduleChanged(JSONObject command) {
-		//TODO Make implementation
+	public void onScheduleChanged() {
+		JSONObject result = new JSONObject();
+		try {
+			JSONArray JSONSchedule = new JSONArray();
+			for (Job job : equiplet.schedule) {
+				Logger.log(job.toString());
+				JSONObject jobData = new JSONObject();
+				try {
+					jobData.put("product", job.getProductAgentName() 	!= null ? job.getProductAgentName().toString() 	: "null");
+					jobData.put("Name", job.getProductAgent()			!= null ? job.getProductAgent().toString() 		: "null" );
+					jobData.put("index", job.getIndex());
+					jobData.put("service", job.getService() 			!= null ? job.getService().toString() 			: "null" );
+					jobData.put("criteria", job.getCriteria()			!= null ? job.getCriteria().toString() 			: "null" );
+					jobData.put("start", job.getStartTime()				!= null ? job.getStartTime().toString() 		: "null" );
+					jobData.put("due", job.getDue()						!= null ? job.getDue().toString() 				: "null" );
+					jobData.put("deadline", job.getDeadline() 			!= null ? job.getDeadline().toString() 			: "null" );
+					jobData.put("ready", job.getDuration() 				!= null ? job.getDuration().toString() 			: "null" );
+				} catch(JSONException e){
+					Logger.log("Error");
+					e.printStackTrace();
+				}
+				
+				JSONSchedule.put(jobData);
+				
+			}
+			result.put("schedule", JSONSchedule);
+			
+			// loop through tree set and create json object with all data 
+		} catch (JSONException e) {
+			Logger.log("Error");
+			e.printStackTrace();
+		}
+		
+		OnChangedTypes type = OnChangedTypes.ON_SCHEDULE_CHANGED;
+		notifySubscribers(type, result);	
 	}
 	
 	/**

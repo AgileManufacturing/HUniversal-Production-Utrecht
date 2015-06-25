@@ -1,7 +1,14 @@
 package MAS.equiplet;
 
+import java.util.ArrayList;
+
+import org.json.JSONException;
+
 import util.log.Logger;
+import MAS.product.ProductionStep;
 import MAS.util.Ontology;
+import MAS.util.Parser;
+import MAS.util.Tick;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -54,11 +61,11 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		boolean testMastStateChange = true;
-		boolean getModuleList = true;
-		boolean getAllStateTest = true;
+		boolean testMastStateChange = false;
+		boolean getModuleList = false;
+		boolean getAllStateTest = false;
 		boolean scheduleTest = true;
-		boolean addRemoveModules = true;
+		boolean addRemoveModules = false;
 		
 		sleep(20000);
 		
@@ -102,9 +109,18 @@ public class EQMessageAgent extends Agent {
 		
 		//Test get schedule
 		if(scheduleTest){
+			
+			try {
+				addScheduleJob(Parser.parseScheduleRequest(new ArrayList<ProductionStep>(), new Tick(50)));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}	
+			sleep(5000);
 			sendGetData(getSchedule);
 			sleep(5000);
 		}
+
+			
 		
 		//Add and remove modules
 		if(addRemoveModules){
@@ -226,6 +242,32 @@ public class EQMessageAgent extends Agent {
         catch (FIPAException fe) { fe.printStackTrace(); }
         return null;
     }
+	
+	/**
+	 * Send a get data request
+	 * 
+	 * @param String with JSON content
+	 * @author Kevin Bosman
+	 */
+	public void addScheduleJob(String data){
+		//Send message
+		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.setContent(data);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
+		message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
+		
+		AID[] receivers = searchDF("EquipletAgent");
+		for(int i = 0; i < receivers.length; i++){
+			if(!receivers[i].equals(this.getAID())){
+				message.addReceiver(receivers[i]);
+				//Logger.log("Add receiver: " + receivers[i].getLocalName());
+			}
+		}
+		
+		this.send(message);
+		Logger.log("Equiplet getter test message: " + data);
+	}
 	
 	/**
 	 * Simple sleep with catch block

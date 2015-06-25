@@ -706,6 +706,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		for (Job job : possible) {
 			schedule.add(job);
 		}
+		onScheduleChanged();
 
 		return true;
 
@@ -734,6 +735,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				}
 			}
 		}
+		onScheduleChanged();
 	}
 
 	@Override
@@ -997,6 +999,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		} else {
 			state = EquipletState.IDLE;
 		}
+		onScheduleChanged();
 	}
 
 	@Override
@@ -1015,6 +1018,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onEquipletModeChanged(Mast.Mode mode) {
 		onChangeHandler.onEquipletModeChanged(mode);
 		currentMastMode = mode;
+	}
+	
+	public void onScheduleChanged(){
+		onChangeHandler.onScheduleChanged();
 	}
 	
 	/**
