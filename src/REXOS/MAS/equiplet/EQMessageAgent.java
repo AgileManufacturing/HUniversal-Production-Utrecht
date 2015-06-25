@@ -54,7 +54,7 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		boolean testMastStateChange = false;
+		boolean testMastStateChange = true;
 		boolean getModuleList = false;
 		boolean getAllStateTest = false;
 		boolean scheduleTest = false;
@@ -114,30 +114,7 @@ public class EQMessageAgent extends Agent {
 			sendCommand(insertJSON);
 			sleep(2000);
 			sendCommand(deleteJSON);
-		}		
-		
-		//sleep(2000);
-		
-		//sendGetData(getSchedule);
-		
-		//Equiplet commands
-		//sendCommand(deleteJSON);
-		//sendCommand(insertJSON);
-		
-		//Get requests
-		//sendGetData(getAllStates);
-		//sendGetData(getAllModes);
-		//sendGetData(getState);
-		//sendGetData(getMode);
-		
-		//Listener test sequence
-		//sendOnChangeRequest(registerMastState);
-		//sleep(10000);
-		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-		//sleep(10000);
-		//sendGetData(getState);
-		//sleep(10000);
-		//sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+		}
 	}
 	
 	public void takeDown(){
@@ -166,7 +143,7 @@ public class EQMessageAgent extends Agent {
 		}
 		
 		this.send(message);
-		Logger.log("(Command) Message was send: " + data);
+		Logger.log("Equiplet setter test message: " + data);
 	}
 	
 	/**
@@ -191,7 +168,7 @@ public class EQMessageAgent extends Agent {
 		}
 		
 		this.send(message);
-		Logger.log("(GetData) Message was send: " + data);
+		Logger.log("Equiplet getter test message: " + data);
 	}
 	
 	/**
@@ -216,7 +193,7 @@ public class EQMessageAgent extends Agent {
 		}
 		
 		this.send(message);
-		Logger.log("(OnChange) Message was send: " + data);
+		Logger.log("Equiplet listner test message: " + data);
 	}
 	
 	/**

@@ -18,18 +18,23 @@ public class SCADAWebServer {
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/", new MyHandler());
-        server.setExecutor(null); // creates a default executor
+        server.setExecutor(null);
         server.start();
+        
+        System.out.println("SCADA web server started");
     }
 
     static class MyHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
         	URI    uri  = exchange.getRequestURI();
         	String path = "www" + uri.getPath();
-        	// If there is a directory specified, ad		d index.html as default file to serve
+        	// If there is a directory specified, add index.html as default file to serve
         	if (path.charAt(path.length() - 1) == '/') {
         		path += "index.html";
         	}
+        	
+        	System.out.print(exchange.getRemoteAddress().getAddress().toString() + " ");
+        	
         	File file = new File(path);
 
         	if (!file.isFile()) {
@@ -38,10 +43,13 @@ public class SCADAWebServer {
 				OutputStream os = exchange.getResponseBody();
 				os.write(response.getBytes());
 				os.close();
+				
+				System.out.println("File '" + path + "' not found - 404.");
+				
         		return;
         	} else {
-                System.out.println(path);
-            }
+				System.out.println("File '" + path + "' sent.");
+        	}
 
             String content_type = Files.probeContentType(file.toPath());
             if (content_type == null) {

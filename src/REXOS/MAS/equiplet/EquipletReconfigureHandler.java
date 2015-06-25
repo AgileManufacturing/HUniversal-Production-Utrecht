@@ -51,9 +51,7 @@ public class EquipletReconfigureHandler{
 			boolean succes = false;
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				//Debug output
-				//Logger.log("Content of message: " + messageContent.toString());
-				
+
 				//Identifying requested equiplet command
 				String command = messageContent.getString("command").toString();
 				
@@ -85,6 +83,7 @@ public class EquipletReconfigureHandler{
 			JSONObject replyMessage = new JSONObject();
 			try {
 				replyMessage.put("Request", new JSONObject(msg.getContent()));
+				replyMessage.put("command", new JSONObject(msg.getContent()).getString("command"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -135,9 +134,9 @@ public class EquipletReconfigureHandler{
 	 * @author Thomas Kok
 	 */
 	public boolean insertModule(JSONObject messageContent){
+		boolean result = false;
 		try{
 			if(equiplet.getCurrentState() == Mast.State.SAFE || equiplet.getCurrentState() == Mast.State.OFFLINE){
-				//System.out.println("Insert module func");
 				
 				//Deserialize modules
 				JSONArray modules = (JSONArray) messageContent.get("modules");
@@ -151,8 +150,6 @@ public class EquipletReconfigureHandler{
 				ArrayList<JSONObject> dynamicSettings = new ArrayList<JSONObject>();
 				KnowledgeDBClient kdb = new KnowledgeDBClient();
 				
-				//TODO generate JSONObjects for both settings and insert them into hal
-				
 				//Get the staticSettings and push into array
 				for(int i = 0; i < moduleIdentifiers.size(); i++){
 					//Get static settings from Grid Knowledge DB
@@ -161,13 +158,12 @@ public class EquipletReconfigureHandler{
 						JSONObject staticSettingJSON = staticSetting.serialize();
 						staticSettings.add(staticSettingJSON);
 					
-					//Create dynamicSetting JSONObject
-					//TODO Get actual dynamic values from JSON
-					JSONObject dynamicSetting = new JSONObject();
-					dynamicSetting.put(DynamicSettings.ATTACHED_TO, JSONObject.NULL);
-					dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, 1);
-					dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, 1);
-					dynamicSettings.add(dynamicSetting);
+						//Create dynamicSetting JSONObject
+						JSONObject dynamicSetting = new JSONObject();
+						dynamicSetting.put(DynamicSettings.ATTACHED_TO, messageContent.get("attached-to").toString());
+						dynamicSetting.put(DynamicSettings.MOUNT_POINT_X, messageContent.get("mount-point-x").toString());
+						dynamicSetting.put(DynamicSettings.MOUNT_POINT_Y, messageContent.get("mount-point-y").toString());
+						dynamicSettings.add(dynamicSetting);
 					}else{
 						Logger.log("Settings could not be retrieved from the KnowledgeDatabase");
 					}
@@ -178,7 +174,7 @@ public class EquipletReconfigureHandler{
 					for(int i = 0; i < staticSettings.size(); i++){
 						hal.insertModule(staticSettings.get(i), dynamicSettings.get(i));
 					}
-					return true;
+					result = true;
 				}else{
 					Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 				}
@@ -186,16 +182,13 @@ public class EquipletReconfigureHandler{
 				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAVE or OFFLINE state for reconfiguration");
 			}
 		} catch (JSONException e){
-			//TODO error handling
-			e.printStackTrace();
+			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while parsing JSON argument");
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 		} catch (InvalidMastModeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "InsertModule cannot be executed in current MAST mode: " + equiplet.getCurrentState());
 		}
-		return false;
+		return result;
 	}
 	
 	/**
@@ -220,11 +213,9 @@ public class EquipletReconfigureHandler{
 				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAVE or OFFLINE state for reconfiguration");
 			}
 		} catch (JSONException e){
-			//TODO error handling
-			e.printStackTrace();
+			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error occured while parsing JSON containing information on the module to be deleted.");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "An error occured while attempting to delete a module.");
 		}
 		return false;
 	}
@@ -242,7 +233,6 @@ public class EquipletReconfigureHandler{
 		boolean isDeserializationSuccessfull = true;
 		try{
 			JSONObject currentModule;
-			
 			//Loop trough the array with modules
 			for(int i = 0; i < modules.length(); i++){
 				//Extract each data object from array
@@ -262,6 +252,4 @@ public class EquipletReconfigureHandler{
 		// If something went wrong while deserializing, return null.
 		return isDeserializationSuccessfull ? resultArray : null;
 	}
-
-
 }

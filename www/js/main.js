@@ -1,5 +1,22 @@
 "use strict";
 
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
 /**
  * @Author Benno Zeeman
  */
@@ -16,20 +33,37 @@ function UIPanel() {
 
 
 	// Grid section
-	this.grid = $('#grid ul');
+	this.grid           = $('#grid ul');
+	$('#grid #create-agent-btn').magnificPopup({
+		'items': {
+			'src':  '#create-agent-form',
+			'type': 'inline'
+		}
+	});
+	$('#grid #create-agent-form').submit((this.submitCreateAgent).bind(this));
+	this.create_agent_listener  = null;
 
-	this.clickAgentListener = null;
+	this.click_agent_listener   = null;
 
+
+	// Agent section
+	this.agent = {
+		'id':       $('#agent .id'),
+		'schedule': $('#agent .schedule'),
+		'state':    $('#agent .state'),
+		'type':     $('#agent .type'),
+		'mode':     $('#agent .mode'),
+	};
 
 	// Controls section
 	this.con_status_light = $('#controls #con-status .light');
 	this.con_status_text  = $('#controls #con-status .text');
 
-	this.btnStop  = $('#controls #stop').click((this.clickBtnStop).bind(this));
-	this.btnStart = $('#controls #start').click((this.clickBtnStart).bind(this));
+	this.btn_stop  = $('#controls #stop').click((this.clickStop).bind(this));
+	this.btn_start = $('#controls #start').click((this.clickStart).bind(this));
 
-	this.clickBtnStopListener  = null;
-	this.clickBtnStartListener = null;
+	this.click_btn_stop_listener  = null;
+	this.click_btn_start_listener = null;
 
 	this.setConStatus(this.CLOSED);
 
@@ -44,9 +78,7 @@ UIPanel.prototype = {
 	'OPEN':        2,
 	'println': function(msg, id) {
 		// If argument(s) not defined, give default
-		if (typeof id === 'undefined') {
-			id = '';
-		}
+		id = (typeof id === 'undefined') ? '' : id;
 
 		// Collect date variables
 		var date = new Date();
@@ -87,29 +119,76 @@ UIPanel.prototype = {
 			this.log_pre.scrollTop(this.log_pre.prop('scrollHeight'));
 		}
 	},
-	'addAgent': function(id, type, state) {
-		var $li, $a;
+	'addAgent': function(agent) {
+		// Make sure properties are defined
+		agent['id'   ] = 'id'    in agent ? agent['id'   ] : null;
+		agent['type' ] = 'type'  in agent ? agent['type' ] : null;
+		agent['state'] = 'state' in agent ? agent['state'] : null;
+
+		if (agent['id'] === null) {
+			this.println('No ID to work with', 'ui');
+			return;
+		}
+
+		var id   = agent['id'];
+		var type = agent['type'];
 
 		if (id in this.agents) {
 			this.println('Updating agent "' + id + '"', 'ui');
-			$a = this.agents[id].$a;
 		} else {
 			this.println('Adding new agent "' + id + '"', 'ui');
 
 			// Create UI elements with attributes
-			$li = $('<li></li>', {'data-id': id, 'data-type': type, 'class': type});
-			$a  = $('<a></a>', {'href': '#', on: {click: (this.clickAgent).bind(this)}});
+			var $li = $('<li></li>', {'data-id': id, 'data-type': type});
+			var $a  = $('<a></a>', {'href': '#', on: {click: (this.clickAgent).bind(this)}});
+
+			var $id    = $('<div></div>', {'class': 'id'});
+			var $type  = $('<div></div>', {'class': 'type'});
+			var $state = $('<div></div>', {'class': 'state'});
 
 			$li.append($a);
+			$a
+				.append($id)
+				.append($type)
+				.append($state)
+			;
 
 			// Insert into UI
 			this.grid.append($li);
 
-			this.agents[id] = { $a: $a, $li: $li };
+			this.agents[id] = {
+				'li':    $li,
+				'a':     $a,
+				'id':    $id,
+				'type':  $type,
+				'state': $state,
+			};
 		}
 
-		$a.text(id + ':' + state);
+		// Obtuse syntax, but clean
+		agent['id'   ] === null || this.agents[id]['id'   ].text(agent['id'   ]);
+		agent['type' ] === null || this.agents[id]['type' ].text(agent['type' ]);
+		agent['state'] === null || this.agents[id]['state'].text(agent['state']);
 	},
+
+	'setAgent': function(agent) {
+		// Define properties when inexistent
+		agent['id'      ] = ('id'       in agent) ? agent['id'      ] : null;
+		agent['schedule'] = ('schedule' in agent) ? agent['schedule'] : null;
+		agent['state'   ] = ('state'    in agent) ? agent['state'   ] : null;
+		agent['type'    ] = ('type'     in agent) ? agent['type'    ] : null;
+		agent['mode'    ] = ('mode'     in agent) ? agent['mode'    ] : null;
+
+		// Obtuse syntax, but clean
+		agent['id'      ] === null || this.agent['id'      ].text('').text(agent['id'      ]);
+		agent['schedule'] === null || this.agent['schedule'].text('').text(agent['schedule']);
+		agent['state'   ] === null || this.agent['state'   ].text('').text(agent['state'   ]);
+		agent['type'    ] === null || this.agent['type'    ].text('').text(agent['type'    ]);
+		agent['mode'    ] === null || this.agent['mode'    ].text('').text(agent['mode'    ]);
+		// Switch to the agent tab after we set the new data to the Agent section
+		this.switchSection('agent');
+	},
+
 	'clearLog': function(event) {
 		if (typeof(event) !== 'undefined') {
 			event.preventDefault();
@@ -135,40 +214,46 @@ UIPanel.prototype = {
 		event.preventDefault();
 
 		// Retreive elements
-		var $target = $(event.target);
-		var $parent = $target.parent();
-		var id      = $parent.data('id');
+		var $a  = $(event.currentTarget);
+		var $li = $a.parent('li');
+		var id  = $li.data('id');
 
 		this.println('Clicked agent "' + id + '"', 'ui');
 
-		if (this.clickAgentListener !== null) {
-			this.clickAgentListener(id);
+		if (this.click_agent_listener !== null) {
+			this.click_agent_listener(id);
 		}
 	},
-	'setClickAgentListener': function(listener) { this.clickAgentListener = listener; },
+	'clickStop': function(event) {
+		this.btn_stop.prop('disabled', true);
+		this.btn_start.prop('disabled', false);
 
-
-	'clickBtnStop': function(event) {
-		this.btnStop.prop('disabled', true);
-		this.btnStart.prop('disabled', false);
-
-		console.log(this.btnStart);
-
-		if (this.clickBtnStopListener !== null) {
-			this.clickBtnStopListener();
+		if (this.click_btn_stop_listener !== null) {
+			this.click_btn_stop_listener();
 		}
 	},
-	'setClickBtnStopListener': function(listener) { this.clickBtnStopListener = listener; },
+	'clickStart': function(event) {
+		this.btn_stop.prop('disabled', false);
+		this.btn_start.prop('disabled', true);
 
-	'clickBtnStart': function(event) {
-		this.btnStop.prop('disabled', false);
-		this.btnStart.prop('disabled', true);
-
-		if (this.clickBtnStartListener !== null) {
-			this.clickBtnStartListener();
+		if (this.click_btn_start_listener !== null) {
+			this.click_btn_start_listener();
 		}
 	},
-	'setClickBtnStartListener': function(listener) { this.clickBtnStartListener = listener; },
+	'setClickAgentListener':  function(listener) { this.click_agent_listener      = listener; },
+	'setClickStopListener':   function(listener) { this.click_btn_stop_listener   = listener; },
+	'setClickStartListener':  function(listener) { this.click_btn_start_listener  = listener; },
+	'setCreateAgentListener': function(listener) { this.create_agent_listener     = listener; },
+
+	'submitCreateAgent': function(event) {
+		event.preventDefault();
+
+		$.magnificPopup.close();
+
+		if (this.create_agent_listener !== null) {
+			this.create_agent_listener($('#create-agent-form').serializeObject());
+		}
+	},
 
 	'navClick': function(event) {
 		event.preventDefault();
@@ -177,12 +262,21 @@ UIPanel.prototype = {
 
 		this.switchSection($a);
 	},
-	'switchSection': function($a) {
-		$('#nav ul > li > a').removeClass('current');
-		$a.addClass('current');
-
+	'switchSection': function(section) {
 		$('main > section').hide();
-		$('main > section#' + $a.data('section')).show();
+		$('#nav ul > li > a').removeClass('current');
+
+		var $a;
+
+		if (section instanceof jQuery) {
+			$a      = section;
+			section = $a.data('section');
+		} else {
+			$a = $('#nav ul > li > a[data-section=' + section + ']');
+		}
+
+		$a.addClass('current');
+		$('main > section#' + section).show();
 	},
 
 	'clean': function() {
@@ -207,8 +301,9 @@ function Server(host, port, id) {
 	// The UI object used to let the world know what the f*ck we're doing
 	this.ui = new UIPanel();
 	this.ui.setClickAgentListener((this.requestAgent).bind(this));
-	this.ui.setClickBtnStopListener((this.disconnect).bind(this));
-	this.ui.setClickBtnStartListener((this.connect).bind(this));
+	this.ui.setClickStopListener((this.disconnect).bind(this));
+	this.ui.setClickStartListener((this.connect).bind(this));
+	this.ui.setCreateAgentListener((this.createAgent).bind(this));
 
 	this.ui.println('Server("' + host + '", ' + port + ')', this.id);
 }
@@ -226,34 +321,29 @@ Server.prototype = {
 	'onmessage': function(event) {
 		var data = JSON.parse(event.data);
 
+		this.ui.println('Received "' + data['command'] + '"', this.id);
+
 		// Switch what type of message is received
 		// Act accordingly
 		switch (data['command']) {
 			case 'GET_OVERVIEW':
-				this.ui.println('Received GET_OVERVIEW', this.id);
-
 			 	for(var i = 0; i < data['agents'].length; i++) {
  					var agent = data['agents'][i];
-					this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+					this.ui.addAgent(agent);
  				}
 
 				break;
+			case 'UPDATEAGENT':
 			case 'ADDAGENT':
-				this.ui.println('Received ADDAGENT', this.id);
-
- 				var agent = data['agent'];
-				this.ui.addAgent(agent['id'], agent['type'], agent['state']);
+				this.ui.addAgent(data['agent']);
 
 				break;
-			case 'ON_EQUIPLET_STATE_CHANGED':
-				this.ui.println('Received ON_EQUIPLET_STATE_CHANGED', this.id);
-
- 				var agent = data['agent'];
-				this.ui.addAgent(agent['id'], null, agent['state']);
+			case 'GET_DETAILED_INFO':
+				this.ui.setAgent(data['agent']);
 
 				break;
 			default:
-				this.ui.println('Received unknown "' + data['command'] + '"', this.id);
+				this.ui.println('Unknown "' + data['command'] + '"', this.id);
 				break;
 		}
 	},
@@ -341,16 +431,15 @@ Server.prototype = {
 	},
 
 	// Send to WS
-	'send': function(command, id, values) {
-		if (typeof(id)     === 'undefined') { id     = null; }
-		if (typeof(values) === 'undefined') { values = []; }
+	'send': function(command, agent) {
+		var json = {'command': command};
+		if (typeof(agent) !== 'undefined' ) {
+			json['agent'] = agent;
+		}
 
 		// Create JSON message to send over WS
-		var str = JSON.stringify({
-			'command': command,
-			'id':      id,
-			'values':  values,
-		});
+		var str = JSON.stringify(json);
+
 		this.websocket.send(str);
 	},
 
@@ -358,6 +447,15 @@ Server.prototype = {
 
 	},
 
+	'createAgent': function(agent) {
+		if (!this.is_connected) {
+			return;
+		}
+
+		this.ui.println('Create Agent "' + agent['id'] + '"', this.id);
+
+		this.send('CREATE_AGENT', agent);
+	},
 	'requestAgent': function(id) {
 		if (!this.is_connected) {
 			return;
@@ -365,19 +463,11 @@ Server.prototype = {
 
 		this.ui.println('Get Agent "' + id + '" information from SCADA', this.id);
 
-		this.send('GET_AGENT_INFO', id);
+		var agent = {'id': id};
+		this.send('GET_AGENT_INFO', agent);
 	},
 };
 
 // Server class allowing us to connect to web socket.
 var server = new Server(window.location.hostname, 3529, 'SCADA');
-
-
 //server.connect();
-
-/*window.addEventListener('beforeunload', function (e) {
-	var msg = 'Leaving causes acquired data to be discarded';
-
-	(e || window.event).returnValue = msg;
-    return msg;
-});*/

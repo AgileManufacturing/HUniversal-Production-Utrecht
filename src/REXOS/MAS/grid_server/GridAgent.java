@@ -61,7 +61,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import MAS.equiplet.EquipletAgent;
-import MAS.product.Node;
 import MAS.product.ProductAgent;
 import MAS.product.ProductStep;
 import MAS.simulation.config.Config;
@@ -72,7 +71,6 @@ import MAS.util.MASConfiguration;
 import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Position;
-import MAS.util.SchedulingAlgorithm;
 import MAS.util.Tick;
 import SCADA.BasicAgentInfo;
 import SCADA.SCADABasicListener;
@@ -101,8 +99,8 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("2");
-		spawnProductAgent();
+		spawnEquipletAgent("EQ0", "hal");
+		spawnProductAgent("PA1", null );
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
@@ -274,10 +272,9 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	/**
 	 * Create a product agent (for now)
 	 */
-	private void spawnProductAgent(){
+	public void spawnProductAgent(String name, String inputArguments){
 		try {
 			ContainerController cc = getContainerController();
-			String name = "PA" + productCounter++;
 			if(fakeSimulate){
 				Config con = Config.read();
 				IConfig config;
@@ -303,7 +300,8 @@ public class GridAgent extends Agent implements SCADABasicListener,
 				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
 				ac.start();
 			}else{
-				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
+				Object[]arguments = new Object[]{ inputArguments };
+				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
 				ac.start();
 			}
 				
@@ -345,43 +343,17 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		}
 	}
 	
-	public void getOverview() {
-		DFAgentDescription description = new DFAgentDescription();
-		//ServiceDescription sd = new ServiceDescription();
-		//sd.setType("AGENT");
-		SearchConstraints sc = new SearchConstraints();
-		//description.addServices(sd);
-		//sc.setMaxResults((long) -1);
-		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-		msg.setOntology(Ontology.GRID_ONTOLOGY);
-		msg.setConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST);
-		String content = "{\n 'command' : 'GET_BASIC_INFO' \n }";
-		msg.setContent(content);
-		try {
-			DFAgentDescription listOfAgents[] = DFService.search(this,
-					description, sc);
-			System.out.println("LIST LENGTH: " + listOfAgents.length);
-			for (int i = 0; i < listOfAgents.length; i++) {
-				System.out.println(listOfAgents[i].getName());
-				msg.addReceiver(listOfAgents[i].getName());
-				send(msg);
-			}
-		} catch (FIPAException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	/**
 	 * Create a Equiplet agent (for now)
 	 * 
 	 * @author Kevin Bosman
 	 */
-	private void spawnEquipletAgent(String name) {
+	public void spawnEquipletAgent(String name, String inputArguments) {
 		try {
 			ContainerController cc = getContainerController();
-			Object[] arguments = new Object[] { "hal" };
-			AgentController ac = cc.createNewAgent("EQ" + name, EquipletAgent.class.getName(), arguments);
+			// TODO check for other inputArguments instead of a string
+			Object[] arguments = new Object[] { inputArguments };
+			AgentController ac = cc.createNewAgent(name, EquipletAgent.class.getName(), arguments);
 			ac.start();
 		} catch (StaleProxyException e) {
 			System.err.println(this.getLocalName() + ": failed to create Equiplet agent");
@@ -407,6 +379,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
 		System.out.println("GA onBasicUpdate " + basicListeners.size());
+
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), message);
 		}
@@ -478,5 +451,27 @@ public class GridAgent extends Agent implements SCADABasicListener,
 			e.printStackTrace();
 		}
 		return object;
+	}
+	
+	public void updateStateInfo(AID agent, String message){
+		System.out.println(message);
+		
+		String state = "";
+		try {
+			JSONObject object = new JSONObject(message);
+			JSONObject a = new JSONObject();
+			a = object.getJSONObject("agent");
+			state = a.getString("state");
+		} catch (JSONException e) { 
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// update local agent info state
+		for(int i = 0; i < agentInformation.size(); i++){
+			if(agentInformation.get(i).getAID().equals(agent)){
+				agentInformation.get(i).updateState(state);
+				break;
+			}
+		}
 	}
 }

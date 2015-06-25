@@ -5,6 +5,7 @@
 	<link rel="icon" href="favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" type="text/css" href="css/normalize.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" href="css/vendor/magnific-popup.css">
 	<script src="js/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 <body>
@@ -25,10 +26,48 @@
 		<section id="grid" style="display: block;">
 			<h1>Grid</h1>
 			<ul></ul>
+			<form id="create-agent-form" class="white-popup mfp-hide">
+				<h2>Create agent</h2>
+				<div>
+					<label>ID</label>
+					<input type="text" name="id">
+				</div>
+				<div>
+					<label>Type</label>
+					<select name="type">
+						<option value="EquipletAgent">Equiplet</option>
+						<option value="ProductAgent">Product</option>
+					</select>
+				</div>
+				<div>
+					<button type="submit">Submit</button>
+				</div>
+			</form>
+			<button id="create-agent-btn" type="button">Create agent</button>
 		</section>
 		<section id="agent" style="display: none;">
 			<h1>Agent</h1>
-			<form></form>
+
+			<table>
+				<thead>
+					<tr>
+						<th>id</th>
+						<th>schedule</th>
+						<th>state</th>
+						<th>type</th>
+						<th>mode</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><div class="id"></div></td>
+						<td><div class="schedule"></div></td>
+						<td><div class="state"></div></td>
+						<td><div class="type"></div></td>
+						<td><div class="mode"></div></td>
+					</tr>
+				</tbody>
+			</table>
 		</section>
 		<div id="controls">
 			<h4>Controls</h4>
@@ -59,6 +98,7 @@
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="js/vendor/jquery-2.1.3.min.js"><\/script>')</script>
+	<script src="js/vendor/jquery.magnific-popup.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

@@ -10,8 +10,8 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import SCADA.JSONTypeBuilder;
 import util.log.Logger;
-
 import jade.lang.acl.ACLMessage;
 
 /**
@@ -40,12 +40,10 @@ public class EquipletGetDataHandler{
 			JSONObject result = new JSONObject();
 			try{
 				JSONObject messageContent = new JSONObject(msg.getContent());
-				//result.put("command", messageContent.getString("command"));
-				//Debug output
-				//Logger.log("Content of message: " + messageContent.toString());
 				
 				//Identifying requested equiplet command
 				String command = messageContent.getString("command");
+				
 				//Delegate command to corresponding functions
 				switch(command){
 				case "GET_BASIC_INFO":
@@ -65,10 +63,6 @@ public class EquipletGetDataHandler{
 					
 				case "GET_ALL_MODULES":
 					result = getAllModules();
-					break;
-				
-				case "GET_MODULE_STATE":
-					result = getModuleState();
 					break;
 					
 				case "GET_ALL_MODULES_STATES":
@@ -95,6 +89,7 @@ public class EquipletGetDataHandler{
 					Logger.log("Invalid equiplet getRequest: " + command);
 					break;
 				}
+				result.put("command", command);
 			}catch(Exception e){
 				Logger.log("No equiplet command specified");
 				e.printStackTrace();
@@ -145,7 +140,6 @@ public class EquipletGetDataHandler{
 	public JSONObject getCurrentMastMode(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("command", "GET_CURRENT_MAST_MODE");
 			result.put("mode", equiplet.getCurrentMode().toString());
 		} catch (JSONException e) {
 			Logger.log("Error");
@@ -155,7 +149,7 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request all currently connected modules [WIP]
+	 * Request all currently connected modules
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
@@ -167,7 +161,6 @@ public class EquipletGetDataHandler{
 		moduleList = hal.getModules();		
 		
 		try {
-			result.put("command", "GET_ALL_MODULES");
 			JSONArray modulesArray = new JSONArray();
 			for(Module module : moduleList){
 				JSONObject JSONModuleInfo = new JSONObject();
@@ -186,25 +179,6 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request state of a single module [WIP][Should be added later]
-	 * This functionality is currently not included in HAL and ROS after this is done the function can be implemented
-	 * 
-	 * @param Module identifier?
-	 * @return JSONObject with response
-	 * @author 
-	 */
-	public JSONObject getModuleState(){
-		JSONObject result = new JSONObject();
-		try {
-			result.put("state", equiplet.state);
-		} catch (JSONException e) {
-			Logger.log("Error");
-			return null;
-		}
-		return result;
-	}
-	
-	/**
 	 * 	Request states from all modules
 	 * @return JSONObject with response
 	 * @author Auke de Witte
@@ -213,7 +187,6 @@ public class EquipletGetDataHandler{
 		JSONObject result = new JSONObject();
 		ArrayList<Module> moduleList = hal.getModules();		
 		try {
-			result.put("command", "GET_ALL_MODULES_STATES");
 			JSONArray modulesArray = new JSONArray();
 			for(Module module : moduleList){
 				JSONObject JSONModuleInfo = new JSONObject();
@@ -241,7 +214,6 @@ public class EquipletGetDataHandler{
 		JSONObject result = new JSONObject();
 		ArrayList<Module> moduleList = hal.getModules();		
 		try {
-			result.put("command", "GET_ALL_MODULES_MODES");
 			JSONArray modulesArray = new JSONArray();
 			for(Module module : moduleList){
 				JSONObject JSONModuleInfo = new JSONObject();
@@ -269,7 +241,6 @@ public class EquipletGetDataHandler{
 	public JSONObject getSchedule(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("command", "GET_SCHEDULE");
 			JSONArray JSONSchedule = new JSONArray();
 			for (Job job : equiplet.schedule) {
 				Logger.log(job.toString());
@@ -333,7 +304,6 @@ public class EquipletGetDataHandler{
 	public JSONObject getAllPosibleModes(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("command", "GET_ALL_POSIBLE_MODES");
 			Mast.Mode[] modes = Mast.Mode.values();
 			JSONArray modeStrings = new JSONArray();
 			for(Mast.Mode state : modes){
@@ -350,7 +320,6 @@ public class EquipletGetDataHandler{
 	public JSONObject getBasicInfo(){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("command", "GET_BASIC_INFO");
 			JSONObject agent = new JSONObject();
 			agent.put("id", equiplet.getAID().getLocalName());
 			agent.put("type", "EquipletAgent");
@@ -367,13 +336,13 @@ public class EquipletGetDataHandler{
 	public JSONObject getDetailedInfo(JSONObject content){
 		JSONObject result = new JSONObject();
 		try {
-			result.put("command", "GET_DETAILED_INFO");
 			result.put("client", content.getInt("client"));
 			JSONObject agent = new JSONObject();
-			agent.put("id", equiplet.getAID().getLocalName());
-			agent.put("type", "EquipletAgent");
-			agent.put("state", equiplet.getEquipletState().name());
-			agent.put("mode", equiplet.state);
+			JSONTypeBuilder typeBuilder = new JSONTypeBuilder();
+			agent.put("id", typeBuilder.getStringObject(equiplet.getAID().getLocalName(), true, true));
+			agent.put("type", typeBuilder.getStringObject("EquipletAgent", true, true));
+			agent.put("state", typeBuilder.getStringObject(equiplet.getEquipletState().name(), false, true));
+			agent.put("mode", typeBuilder.getStringObject(equiplet.getCurrentMode().toString(), false, true));
 			JSONArray JSONSchedule = new JSONArray();
 			for (Job job : equiplet.schedule) {
 				Logger.log(job.toString());

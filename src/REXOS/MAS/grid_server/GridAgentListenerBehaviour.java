@@ -46,7 +46,6 @@ public class GridAgentListenerBehaviour extends Behaviour{
 			System.out.printf("GA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", gridAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
 				case ACLMessage.INFORM:
-					//Subscribe to newly made agent.
 					if(msg.getSender().equals(gridAgent.getDefaultDF())) {
 						handleNewAgent(msg);
 					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
@@ -54,11 +53,14 @@ public class GridAgentListenerBehaviour extends Behaviour{
 					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
 						System.out.println("GA inform conversation inform");
 						gridAgent.sendAgentInfo(msg.getContent());
-					}else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)){
+					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)){
 						System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
 						gridAgent.onAgentTakeDown(msg.getContent());
-					} else {
+					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_SCADA_COMMAND)) {
+						gridAgent.updateStateInfo(msg.getSender(), msg.getContent());
 						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
+					}  else{
+						System.err.println("GA: Unkown message" + msg.getContent());
 					}
 //					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
 //						handleProductArrived(msg);
@@ -95,6 +97,9 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				case ACLMessage.PROPOSE:
 					if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
 						handleListenerCommand(msg);
+					}
+					else if(msg.getConversationId().equals(Ontology.CONVERSATION_CREATE_AGENT)){
+						handleCreateAgent(msg);
 					}
 					break;
 				default:
@@ -170,6 +175,34 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				gridAgent.send(reply);
 			}
 		} catch (FIPAException | JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void handleCreateAgent(ACLMessage msg) {
+		try{
+			JSONObject object = new JSONObject(msg.getContent());
+			JSONObject agent = object.getJSONObject("agent");
+			String id = agent.getString("id");
+			String type = agent.getString("type");
+			// TODO shouldn't this be a json object with something?
+			String arguments = agent.getString("arguments");
+			
+			switch(type){
+			case "EquipletAgent":
+				gridAgent.spawnEquipletAgent(id, arguments);
+				break;
+			case "ProductAgent":
+				gridAgent.spawnProductAgent(id, arguments);
+				break;
+			//not sure if these agent should be an option
+			case "TrafficAgent":
+				break;
+			case "SupplyAgent":
+				break;
+			}
+		}catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
