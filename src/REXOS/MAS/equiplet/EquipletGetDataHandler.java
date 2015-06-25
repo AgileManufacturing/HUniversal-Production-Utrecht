@@ -346,29 +346,8 @@ public class EquipletGetDataHandler{
 			agent.put("type", typeBuilder.getStringObject("EquipletAgent", true, true));
 			agent.put("state", typeBuilder.getStringObject(equiplet.getEquipletState().name(), false, true));
 			agent.put("mode", typeBuilder.getStringObject(equiplet.getCurrentMode().toString(), false, true));
-			JSONArray JSONSchedule = new JSONArray();
-			for (Job job : equiplet.schedule) {
-				Logger.log(job.toString());
-				JSONObject jobData = new JSONObject();
-				try {
-					jobData.put("product", job.getProductAgentName() 	!= null ? job.getProductAgentName().toString() 	: "null");
-					jobData.put("Name", job.getProductAgent()			!= null ? job.getProductAgent().toString() 		: "null" );
-					jobData.put("index", job.getIndex());
-					jobData.put("service", job.getService() 			!= null ? job.getService().toString() 			: "null" );
-					jobData.put("criteria", job.getCriteria()			!= null ? job.getCriteria().toString() 			: "null" );
-					jobData.put("start", job.getStartTime()				!= null ? job.getStartTime().toString() 		: "null" );
-					jobData.put("due", job.getDue()						!= null ? job.getDue().toString() 				: "null" );
-					jobData.put("deadline", job.getDeadline() 			!= null ? job.getDeadline().toString() 			: "null" );
-					jobData.put("ready", job.getDuration() 				!= null ? job.getDuration().toString() 			: "null" );
-				} catch(JSONException e){
-					Logger.log("Error");
-					return null;
-				}
-				
-				JSONSchedule.put(jobData);
-				
-			}
-			agent.put("schedule", JSONSchedule);
+			agent.put("schedule", this.getSchedule());
+			agent.put("modules", this.getAllModules());
 			result.put("agent", agent);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

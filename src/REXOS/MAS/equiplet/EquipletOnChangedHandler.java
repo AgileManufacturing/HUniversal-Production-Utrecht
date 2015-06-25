@@ -223,7 +223,7 @@ public class EquipletOnChangedHandler{
 			agent.put("id", equiplet.getLocalName());
 			agent.put("state", stateString);
 			returnMessage.put("agent", agent);
-			returnMessage.put("command", "ON_EQUIPLET_STATE_CHANGED");
+			returnMessage.put("command", "UPDATEAGENT");
 		} catch (JSONException e) {
 			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Invalid JSON:\n");
 			e.printStackTrace();
