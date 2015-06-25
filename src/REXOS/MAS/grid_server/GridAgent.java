@@ -458,8 +458,10 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		String state = "";
 		try {
 			JSONObject object = new JSONObject(message);
-			state = object.getString("state");
-		} catch (JSONException e) {
+			JSONObject a = new JSONObject();
+			a = object.getJSONObject("agent");
+			state = a.getString("state");
+		} catch (JSONException e) { 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
