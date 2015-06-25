@@ -285,12 +285,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			System.out.println("Send over WS" + agentID);
 			AgentConnection agentConn = null;
 			for(int i = 0; i < agentConnections.size(); i++){
-				if(agentConnections.get(i).getAgent() != null){
-					System.err.println("not null " + agentConnections.get(i).getAgent());
-				}
-				if(agentID != null){
-					System.err.println("not null aID " + agentID);
-				}
 				if(agentConnections.get(i).getAgent().equals(agentID)){
 					agentConn = agentConnections.get(i);
 					break;
