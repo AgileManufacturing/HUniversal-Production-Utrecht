@@ -149,11 +149,12 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request all currently connected modules
+	 * Request all currently connected modules with states and modes
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
 	 * @author Mitchell van Rijkom
+	 * @author Auke de Witte
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
