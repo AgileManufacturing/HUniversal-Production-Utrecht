@@ -431,16 +431,15 @@ Server.prototype = {
 	},
 
 	// Send to WS
-	'send': function(command, id, values) {
-		if (typeof(id)     === 'undefined') { id     = null; }
-		if (typeof(values) === 'undefined') { values = []; }
+	'send': function(command, agent) {
+		var json = {'command': command};
+		if (typeof(agent) !== 'undefined' ) {
+			json['agent'] = agent;
+		}
 
 		// Create JSON message to send over WS
-		var str = JSON.stringify({
-			'command': command,
-			'id':      id,
-			'values':  values,
-		});
+		var str = JSON.stringify(json);
+
 		this.websocket.send(str);
 	},
 
@@ -453,11 +452,9 @@ Server.prototype = {
 			return;
 		}
 
-		this.ui.println('Create Agent', this.id);
+		this.ui.println('Create Agent "' + agent['id'] + '"', this.id);
 
-		var json = {'command': 'CREATE_AGENT', 'agent': agent};
-
-		this.websocket.send(JSON.stringify(json));
+		this.send('CREATE_AGENT', agent);
 	},
 	'requestAgent': function(id) {
 		if (!this.is_connected) {
@@ -466,7 +463,8 @@ Server.prototype = {
 
 		this.ui.println('Get Agent "' + id + '" information from SCADA', this.id);
 
-		this.send('GET_AGENT_INFO', id);
+		var agent = {'id': id};
+		this.send('GET_AGENT_INFO', agent);
 	},
 };
 
