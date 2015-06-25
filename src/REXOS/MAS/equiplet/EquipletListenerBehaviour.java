@@ -45,8 +45,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 										MessageTemplate.MatchConversationId(Ontology.CONVERSATION_CAN_EXECUTE), MessageTemplate.or(
 												MessageTemplate.MatchConversationId(Ontology.CONVERSATION_SCHEDULE), MessageTemplate.or(
 														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_GET_DATA), MessageTemplate.or(
-														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND),
-														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND))))))),
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_EQUIPLET_COMMAND),MessageTemplate.or(
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_LISTENER_COMMAND),
+														MessageTemplate.MatchConversationId(Ontology.CONVERSATION_MODIFY_AGENT)))))))),
 				MessageTemplate.MatchConversationId(Ontology.CONVERSATION_INFORMATION_REQUEST)
 		);
 		ACLMessage msg = equiplet.blockingReceive(template);
@@ -87,6 +88,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
 					//handle listener command functie
 					equiplet.passOnChangedCommand(msg);
+				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_MODIFY_AGENT)){
+					handleModifyAgent(msg.getContent());
 				}
 				break;
 			default:
@@ -234,6 +237,25 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 		} catch (JSONException e) {
 			System.err.println("EA: " + myAgent.getLocalName() + " something wrong with sending information update");
+		}
+	}
+	
+	private void handleModifyAgent(String content){
+		try {
+			JSONObject object = new JSONObject(content);
+			JSONObject agent = object.getJSONObject("agent");
+			//String state = agent.getString("state");
+			//String mode = agent.getString("mode");
+			
+			EquipletReconfigureHandler reconfigHandler = equiplet.getReconfigureHandler();
+			reconfigHandler.changeEquipletMachineState(agent);
+			
+			// equiplet change state( state)
+			// equiplet change mode (mode)
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

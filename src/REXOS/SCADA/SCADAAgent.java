@@ -104,15 +104,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 				}
 				handleWebSocketGetAgentInfo(jsonObject, webSocketConnection);
 				break;
-			case "UPDATE":
-				JSONArray jsonArray = jsonObject.getJSONArray("values");
-				for(int i = 0; i < jsonArray.length(); i++){
-					JSONObject o = jsonArray.getJSONObject(i);
-					String method, param;
-					method = o.getString("method");
-					param = o.getString("param");
-					executeMethodOnAgent(method, param);
-				}
+			case "MODIFY_AGENT":
+				handleModifyAgent(jsonObject);
 				break;
 			case "CREATE_AGENT":
 				handleCreateAgent(jsonObject);
@@ -359,5 +352,25 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		
 		send(msg);
 		
+	}
+	
+	private void handleModifyAgent(JSONObject object){
+		JSONObject agent;
+		try {
+			agent = object.getJSONObject("agent");
+			AID aid = new AID(agent.getString("id"), AID.ISLOCALNAME);
+			
+			ACLMessage msg = new ACLMessage(ACLMessage.PROPOSE);
+			msg.addReceiver(aid);
+			msg.setOntology(Ontology.GRID_ONTOLOGY);
+			msg.setConversationId(Ontology.CONVERSATION_MODIFY_AGENT);
+			msg.setContent(object.toString());
+			send(msg);
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

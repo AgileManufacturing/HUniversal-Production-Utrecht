@@ -1064,4 +1064,9 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		// TODO Auto-generated method stub
 	}
+	
+	
+	public EquipletReconfigureHandler getReconfigureHandler(){
+		return reconfigHandler;
+	}
 }
