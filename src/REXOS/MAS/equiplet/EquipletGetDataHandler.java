@@ -149,11 +149,12 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request all currently connected modules
+	 * Request all currently connected modules with states and modes
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
 	 * @author Mitchell van Rijkom
+	 * @author Auke de Witte
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
@@ -168,6 +169,8 @@ public class EquipletGetDataHandler{
 				JSONModuleInfo.put("typeNumber", module.getModuleIdentifier().typeNumber);
 				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);
 				JSONModuleInfo.put("name", module.getModuleIdentifier().manufacturer + " " + module.getModuleIdentifier().typeNumber + " " +  module.getModuleIdentifier().serialNumber);
+				JSONModuleInfo.put("state", module.getModuleState());
+				JSONModuleInfo.put("mode", module.getModuleMode());
 				modulesArray.put(JSONModuleInfo);				
 			}
 			result.put("modules", modulesArray);
