@@ -55,12 +55,12 @@ public class EQMessageAgent extends Agent {
 		});
 		
 		boolean testMastStateChange = true;
-		boolean getModuleList = false;
-		boolean getAllStateTest = false;
-		boolean scheduleTest = false;
-		boolean addRemoveModules = false;
+		boolean getModuleList = true;
+		boolean getAllStateTest = true;
+		boolean scheduleTest = true;
+		boolean addRemoveModules = true;
 		
-		sleep(2000);
+		sleep(20000);
 		
 		//Test a state change and the listener
 		if(testMastStateChange){
@@ -68,13 +68,13 @@ public class EQMessageAgent extends Agent {
 			sendOnChangeRequest(registerMastState);
 			//Get current state
 			sendGetData(getState);
-			sleep(2000);
+			sleep(5000);
 			//Change to save
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(10000);//Give equiplet time to go trough init state
+			sleep(3500);//Give equiplet time to go trough init state
 			//Get state again
 			sendGetData(getState);
-			sleep(2000);
+			sleep(3000);
 			//Return to offline
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 		}
@@ -82,9 +82,9 @@ public class EQMessageAgent extends Agent {
 		//Test get all modules
 		if(getModuleList){
 			sendCommand(insertJSON);
-			sleep(3000);
+			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
-			sleep(3000);
+			sleep(5000);
 			sendCommand(deleteJSON);
 			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
@@ -93,26 +93,31 @@ public class EQMessageAgent extends Agent {
 		//Test get all possible states and modes
 		if(getAllStateTest){
 			sendGetData(getAllStates);
+			sleep(5000);
 			sendGetData(getAllModes);
+			sleep(5000);
 			sendGetData(getMode);
+			sleep(5000);
 		}
 		
 		//Test get schedule
 		if(scheduleTest){
 			sendGetData(getSchedule);
+			sleep(5000);
 		}
 		
+		//Add and remove modules
 		if(addRemoveModules){
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"NORMAL\"}");
 			sleep(5000);
 			sendCommand(insertJSON);
 			//Should not work in normal mode
-			sleep(2000);
+			sleep(5000);
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(2000);
+			sleep(5000);
 			sendCommand(insertJSON);
-			sleep(2000);
+			sleep(5000);
 			sendCommand(deleteJSON);
 		}
 	}
