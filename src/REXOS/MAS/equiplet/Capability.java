@@ -7,11 +7,20 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import MAS.util.Tick;
 
 public class Capability {
+	public String name;
 	private String service;
 	private Map<String, Object> limitations;
 	private Tick duration;
-
+	
 	public Capability(String service, Map<String, Object> limitations, Tick duration) {
+		this.name = service;
+		this.service = service;
+		this.limitations = limitations;
+		this.duration = duration;
+	}
+
+	public Capability(String capability, String service, Map<String, Object> limitations, Tick duration) {
+		this.name = capability;
 		this.service = service;
 		this.limitations = limitations;
 		this.duration = duration;
@@ -19,6 +28,10 @@ public class Capability {
 
 	public String getService() {
 		return service;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	public Map<String, Object> getLimitations() {

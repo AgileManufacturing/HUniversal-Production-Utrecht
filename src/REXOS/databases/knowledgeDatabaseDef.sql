@@ -96,7 +96,7 @@ create table ModuleType(
   typeNumber char(200) NOT NULL,
   moduleTypeProperties text NOT NULL,
   rosSoftware int NULL,
-  halSoftware int NOT NULL,
+  halSoftware int NULL,
   gazeboModel int NOT NULL,
   primary key (manufacturer, typeNumber),
   foreign key (rosSoftware) references RosSoftware(id) ON DELETE NO ACTION ON UPDATE NO ACTION,

@@ -114,7 +114,7 @@ public class CapabilityFactory extends Factory<String, Capability> {
 	 * @throws KnowledgeException
 	 */
 	public CapabilityFactory(AbstractHardwareAbstractionLayer hal) throws KnowledgeException {
-		super(new KnowledgeDBClient());
+		super(Capability.class, new KnowledgeDBClient());
 		this.hal = hal;
 	}
 	/**

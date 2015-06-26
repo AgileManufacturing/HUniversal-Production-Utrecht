@@ -199,7 +199,6 @@ public class EquipletGetDataHandler{
 				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);  
 				JSONModuleInfo.put("state", module.getModuleState());
 				modulesArray.put(JSONModuleInfo);
-				System.out.println(JSONModuleInfo);
 			}
 			result.put("modules", modulesArray);
 		} catch (JSONException e) {
@@ -226,7 +225,6 @@ public class EquipletGetDataHandler{
 				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);  
 				JSONModuleInfo.put("mode", module.getModuleMode());
 				modulesArray.put(JSONModuleInfo);
-				System.out.println(JSONModuleInfo);
 			}
 			result.put("modules", modulesArray);
 		} catch (JSONException e) {
