@@ -36,7 +36,7 @@ h1 {
 
 button {
 	width: auto;
-	background-color: #FAFAFA;
+	background-color: #F8F8F8;
 	border: 1px solid #CCCCCC;
 
 	font-weight: bold;
@@ -50,7 +50,7 @@ button:focus {
 button[disabled] {
 	opacity: .5;
 }
-button:hover {
+button:not([disabled]):hover {
 	background-color: #FFFFFF;
 }
 
@@ -147,6 +147,8 @@ nav > ul > li > a:hover {
  */
 main {
 	background-color: #FFFFFF;
+
+	padding: 0;
 }
 main > section,
 main > div {
@@ -203,6 +205,8 @@ footer {
 #grid > ul > li:before {
 	content: attr(data-type);
 	font-size: .8em;
+
+	font-style: italic;
 }
 #grid > ul > li > a {
 	text-decoration: none;
@@ -211,6 +215,9 @@ footer {
 	padding: 16px 8px;
 
 	background-color: #EEEEEE;
+}
+#grid > ul > li > a:hover {
+	background-color: #FFFFFF;
 }
 
 
@@ -310,9 +317,11 @@ form > div {
 	box-sizing: border-box;
 
 	min-width: 192px;
-	width: 33.33%;
+	width: 50%;
 	padding: 4px;
 	margin: 4px 0;
+
+	vertical-align: bottom;
 }
 form > div > label {
 	display: block;
@@ -330,13 +339,16 @@ form > div > input {
 
 	border: 1px solid #BBBBBB;
 }
-button:hover, button:focus,
-form > div > select:hover, form > div > select:focus,
-form > div > input:hover, form > div > input:focus {
+button:not([disabled]):hover, button:not([disabled]):focus,
+form > div > select:not([disabled]):hover, form > div > select:focus,
+form > div > input:not([disabled]):hover, form > div > input:focus {
 	border-color: #0066BB;
 }
 form > div > input:focus {
 	border-right-width: 4px;
+}
+form > div > input[required] {
+	border-left-width: 4px;
 }
 
 

@@ -31,15 +31,16 @@
 				<div>
 					<label>ID</label>
 					<input type="text" name="id">
-				</div>
-				<div>
+				</div><div>
 					<label>Type</label>
 					<select name="type">
 						<option value="EquipletAgent">Equiplet</option>
 						<option value="ProductAgent">Product</option>
 					</select>
-				</div>
-				<div>
+				</div><div>
+					<label>Arguments</label>
+					<input type="text" name="arguments">
+				</div><div>
 					<button type="submit">Submit</button>
 				</div>
 			</form>
@@ -47,27 +48,7 @@
 		</section>
 		<section id="agent" style="display: none;">
 			<h1>Agent</h1>
-
-			<table>
-				<thead>
-					<tr>
-						<th>id</th>
-						<th>schedule</th>
-						<th>state</th>
-						<th>type</th>
-						<th>mode</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td><div class="id"></div></td>
-						<td><div class="schedule"></div></td>
-						<td><div class="state"></div></td>
-						<td><div class="type"></div></td>
-						<td><div class="mode"></div></td>
-					</tr>
-				</tbody>
-			</table>
+			<form></form>
 		</section>
 		<div id="controls">
 			<h4>Controls</h4>
@@ -98,7 +79,11 @@
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script>window.jQuery || document.write('<script src="js/vendor/jquery-2.1.3.min.js"><\/script>')</script>
-	<script src="js/vendor/jquery.magnific-popup.js"></script>
+	<script src="js/vendor/jquery.magnific-popup.min.js"></script>
+	<script src="js/vendor/jquery.serialize-object.min.js"></script>
+	<script src="js/vendor/moment.js"></script>
+	<script type="text/javascript" src="js/UIPanel.js"></script>
+	<script type="text/javascript" src="js/Server.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>
