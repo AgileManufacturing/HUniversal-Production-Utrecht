@@ -45,9 +45,6 @@ public class EquipletOnChangedHandler{
 	public EquipletOnChangedHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
 		equipletListeners = new HashMap<OnChangedTypes, Set<AID>>();
-		
-		//This print line is because that autistic neighbor of mine can't handle an unused warning...
-		System.out.println(equiplet.state);
 	}
 	
 	/**
@@ -96,7 +93,6 @@ public class EquipletOnChangedHandler{
 					switch(requestedEquipletAction){
 					case "REGISTER_LISTENER":
 						isSuccesfullyAdded = registerListener(msg.getSender(),type);
-						//isSuccesfullyAdded = x;
 						break;					
 					case "DEREGISTER_LISTENER":
 						isSuccesfullyAdded = deregisterListener(msg.getSender(),type);
@@ -167,7 +163,7 @@ public class EquipletOnChangedHandler{
 	}
 
 	/**
-	 * This function adds an equiplet in a Map 
+	 * This function adds an equiplet in a subscriber list, the agent is mapped to the changes that are being subscribed to
 	 * @param sender an equiplet
 	 * @param type an onChangeType where an equiplet wants to listen
 	 * @author Mitchell van Rijkom
@@ -189,7 +185,7 @@ public class EquipletOnChangedHandler{
 	}
 	
 	/**
-	 * This function removes an equiplet in a Map 
+	 * This function removes an equiplet from the subscriberslist.
 	 * @param sender an equiplet
 	 * @param type an onChangeType where an equiplet wants to listen
 	 * @author Mitchell van Rijkom
@@ -299,7 +295,7 @@ public class EquipletOnChangedHandler{
 	 * This function notifies all equiplets that are registered to an onChangeType when a mast mode changed from a certain module
 	 * @param module module that changed from mast mode 
 	 * @param mode mast mode
-	 * @author Auke de Witte
+	 * @author Tommas Bakker
 	 */
 	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		String modeString = mode.toString();
@@ -348,6 +344,7 @@ public class EquipletOnChangedHandler{
 	 * @param returnMessage onChange message 
 	 * @author Mitchell van Rijkom
 	 * @author Kevin Bosman
+	 * @author Thomas Kok
 	 */
 	private void notifySubscribers(OnChangedTypes type, JSONObject returnMessage){
 		// send message

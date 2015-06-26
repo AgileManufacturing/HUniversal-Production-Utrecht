@@ -17,11 +17,7 @@ import MAS.util.Triple;
 import MAS.util.Tuple;
 
 public class EquipletListenerBehaviour extends Behaviour {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 9066477082264420749L;
 	private EquipletAgent equiplet;
 	private boolean done;
 
@@ -32,12 +28,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
-		// Listen only possible incoming conversation ids, note that otherwise the simulation would jam as the listener
-		// receives messages that else where is waited upon
-		// MessageTemplate template =
-		// MessageTemplate.not(MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM),
-		// MessageTemplate.or(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
-		// MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED))));
+		// Create a template of message conversation ids that should be handled, otherwise agents would get clogged
+		// while attempting to handle messages that were not meant for it.
 		MessageTemplate template = MessageTemplate.or(
 				MessageTemplate.or(
 						MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_ARRIVED), MessageTemplate.or(
@@ -83,10 +75,8 @@ public class EquipletListenerBehaviour extends Behaviour {
 			// messagetype holding the requested state for the equiplet
 			case ACLMessage.PROPOSE:
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
-					//Handle equiplet command functie
 					equiplet.passEquipletCommand(msg);
 				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
-					//handle listener command functie
 					equiplet.passOnChangedCommand(msg);
 				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_MODIFY_AGENT)){
 					handleModifyAgent(msg.getContent());
@@ -244,14 +234,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 		try {
 			JSONObject object = new JSONObject(content);
 			JSONObject agent = object.getJSONObject("agent");
-			//String state = agent.getString("state");
-			//String mode = agent.getString("mode");
 			
 			EquipletReconfigureHandler reconfigHandler = equiplet.getReconfigureHandler();
 			reconfigHandler.changeEquipletMachineState(agent);
-			
-			// equiplet change state( state)
-			// equiplet change mode (mode)
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

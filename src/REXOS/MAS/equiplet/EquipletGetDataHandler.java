@@ -18,6 +18,8 @@ import jade.lang.acl.ACLMessage;
  * Handle get data messages
  * 
  * @author Kevin Bosman
+ * @author Thomas Kok
+ * @author Mitchell van Rijkom
  *
  */
 public class EquipletGetDataHandler{
@@ -107,8 +109,6 @@ public class EquipletGetDataHandler{
 			}else{
 				reply.setPerformative(ACLMessage.FAILURE);
 			}
-			
-			//Logger.log("Get data result: " + result);
 			
 			equiplet.send(reply);
 		}
@@ -359,5 +359,4 @@ public class EquipletGetDataHandler{
 		}
 		return result;
 	}
-
 }

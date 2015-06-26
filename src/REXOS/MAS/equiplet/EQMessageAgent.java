@@ -20,9 +20,10 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 /**
- * Tester class to send messages to the Equiplet Agent for testing responses
+ * Tester class to send messages to the Equiplet Agent for testing responses and message handling
  * 
  * @author Kevin Bosman
+ * @author Thomas Kok
  */
 public class EQMessageAgent extends Agent {
 	
@@ -77,7 +78,7 @@ public class EQMessageAgent extends Agent {
 			sleep(5000);
 			//Change to save
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(3500);//Give equiplet time to go trough init state
+			sleep(3500);//Give equiplet time to go through init state
 			//Get state again
 			sendGetData(getState);
 			sleep(3000);
@@ -87,11 +88,11 @@ public class EQMessageAgent extends Agent {
 		
 		//Test get all modules
 		if(getModuleList){
-			//sendCommand(insertJSON);
+			sendCommand(insertJSON);
 			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 			sleep(5000);
-			//sendCommand(deleteJSON);
+			sendCommand(deleteJSON);
 			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 		}
@@ -158,7 +159,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -183,7 +183,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -192,7 +191,7 @@ public class EQMessageAgent extends Agent {
 	}
 	
 	/**
-	 * Send a on change message
+	 * Send an onchange message
 	 * 
 	 * @param String with JSON content
 	 * @author Kevin Bosman
@@ -208,7 +207,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -260,7 +258,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -278,9 +275,7 @@ public class EQMessageAgent extends Agent {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }
