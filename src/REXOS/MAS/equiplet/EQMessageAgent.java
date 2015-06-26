@@ -61,8 +61,8 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		boolean testMastStateChange = true;
-		boolean getModuleList = false;
+		boolean testMastStateChange = false;
+		boolean getModuleList = true;
 		boolean getAllStateTest = false;
 		boolean scheduleTest = false;
 		boolean addRemoveModules = false;
@@ -88,11 +88,11 @@ public class EQMessageAgent extends Agent {
 		
 		//Test get all modules
 		if(getModuleList){
-			sendCommand(insertJSON);
+			//sendCommand(insertJSON);
 			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 			sleep(5000);
-			sendCommand(deleteJSON);
+			//sendCommand(deleteJSON);
 			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 		}
