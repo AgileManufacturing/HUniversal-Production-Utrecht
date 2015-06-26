@@ -167,9 +167,12 @@ main > section {
 }
 
 main > div {
-	margin-top: 8px;
-	margin-bottom: 8px;
+	/* margin-top: 8px;
+	margin-bottom: 8px; */
 	background-color: #EEEEEE;
+}
+main > div + div {
+	border-top: 1px solid #888888;
 }
 
 
@@ -289,13 +292,13 @@ footer {
 }
 #log > pre .time {
 	color: rgba(0,0,0,.5);
-}#log > pre .id {
+} #log > pre .id {
 	color: rgba(0,191,0,.75);
-	width: 48px;
+	width: 64px;
 
 	text-overflow: ellipsis;
 	overflow: hidden;
-}#log > pre .msg {
+} #log > pre .msg {
 	display: inline-block;
 }
 

@@ -7,28 +7,38 @@ function Server(host, port, id) {
     this.id  = id;
     this.url = host + ':' + port;
 
+
     // When true will attempt reconnecting when disconnect
-    this.will_reconnect = true;
+    this.retry = true;
     // Connection status
-    this.is_connected    = false;
+    this.is_connected = false;
     // The WebSocket instance
-    this.websocket    = null;
+    this.websocket = null;
 
-    // The UI object used to let the world know what the f*ck we're doing
-    this.ui = new UIPanel();
-    this.ui.click_agent_listener  = (this.requestAgent).bind(this);
-    this.ui.click_stop_listener   = (this.disconnect).bind(this);
-    this.ui.click_start_listener  = (this.connect).bind(this);
-    this.ui.create_agent_listener = (this.createAgent).bind(this);
-    this.ui.switch_listener       = (this.switch).bind(this);
+    // The UI object that calls our listening methods, and lets us visualize our actions
+    this.ui = new UIPanel(this);
 
-    this.ui.println('Server("' + host + '", ' + port + ')', this.id);
+    this.ui.println('Server instantiated', this.id);
 
-    this.section = this.SECTION_GRID;
+    this.connected_to = null;
 }
 
 // Server methods
 Server.prototype = {
+    // Entities we can be connected with (internally)
+    'ENTITY_GRID':  'grid',
+    'ENTITY_AGENT': 'agent',
+
+    // Commands
+    'CMD_GET_OVERVIEW':      'GET_OVERVIEW',
+    'CMD_ADD_AGENT':         'ADD_AGENT',
+    'CMD_GET_DETAILED_INFO': 'GET_DETAILED_INFO',
+    'CMD_UPDATE_AGENT':      'UPDATE_AGENT',
+    'CMD_ON_TAKEDOWN':       'ON_TAKEDOWN',
+
+    'CMD_GET_AGENT_INFO':    'GET_AGENT_INFO',
+    'CMD_CREATE_AGENT':      'CREATE_AGENT',
+
     'onerror': function(event) {
         if (!this.is_connected) {
             return;
@@ -45,22 +55,41 @@ Server.prototype = {
         // Switch what type of message is received
         // Act accordingly
         switch (data['command']) {
-            case 'GET_OVERVIEW':
+            // All agents that need to be added to Grid
+            case this.CMD_GET_OVERVIEW:
+                this.setConnectedTo(this.ENTITY_GRID);
+
                 for(var i = 0; i < data['agents'].length; i++) {
                     var agent = data['agents'][i];
-                    this.ui.addAgent(agent);
+                    this.ui.addToGrid(agent);
                 }
 
                 break;
-            case 'ADD_AGENT':
-                this.ui.addAgent(data['agent']);
+            // Specific agent that needs to be added to Grid
+            case this.CMD_ADD_AGENT:
+                this.ui.addToGrid(data['agent']);
                 break;
-            case 'UPDATE_AGENT':
-                this.ui.updateAgent(data['agent']);
-                break;
-            case 'GET_DETAILED_INFO':
-                this.ui.setAgent(data['agent']);
+            // Information about specific agent
+            case this.CMD_GET_DETAILED_INFO:
+                this.setConnectedTo(this.ENTITY_AGENT);
 
+                this.ui.setAgent(data['agent']);
+                break;
+            // Update information for specific agent
+            case this.CMD_UPDATE_AGENT:
+                if (this.connected_to === this.ENTITY_GRID) {
+                    this.ui.updateGrid(data['agent']);
+                } else {
+                    this.ui.updateAgent(data['agent']);
+                }
+                break;
+            // Remove a specific agent
+            case this.CMD_ON_TAKEDOWN:
+                if (this.connected_to === this.ENTITY_GRID) {
+                    this.ui.removeFromGrid(data['agent']);
+                } else {
+                    this.ui.disconnectAgent();
+                }
                 break;
             default:
                 this.ui.println('Unknown "' + data['command'] + '"', this.id);
@@ -77,7 +106,7 @@ Server.prototype = {
         this.is_connected = true;
 
         // Request grid overview from WS
-        this.send('GET_OVERVIEW');
+        this.send(this.CMD_GET_OVERVIEW);
     },
     'onclose': function(event) {
         // Find respective descriptions for error codes
@@ -110,16 +139,18 @@ Server.prototype = {
         this.ui.setConStatus(this.ui.CLOSED);
         this.websocket    = null;
 
-        if (this.will_reconnect) {
+        if (this.retry) {
             this.timeout = setTimeout((this.connect).bind(this), 3000);
         }
     },
+
+
 
     'connect': function() {
         this.ui.println('Attempting to connect to "' + this.url + '"', this.id);
         this.ui.setConStatus(this.ui.CONNECTING);
 
-        this.will_reconnect = true;
+        this.retry = true;
 
         this.websocket = new WebSocket('ws://' + this.url);
 
@@ -131,7 +162,6 @@ Server.prototype = {
 
         return this.websocket;
     },
-
     'disconnect': function() {
         this.ui.println('Stopping client', this.id);
         this.ui.setConStatus(this.ui.CLOSED);
@@ -139,7 +169,7 @@ Server.prototype = {
         this.ui.cleanGrid();
 
         this.is_connected      = false;
-        this.will_reconnect = false;
+        this.retry = false;
         if (this.timeout !== null) {
             clearTimeout(this.timeout);
         }
@@ -163,20 +193,17 @@ Server.prototype = {
         this.websocket.send(str);
     },
 
-    'toJson': function() {
 
-    },
-
-    'createAgent': function(agent) {
+    'UICreateAgent': function(agent) {
         if (!this.is_connected) {
             return;
         }
 
         this.ui.println('Create Agent "' + agent['id'] + '"', this.id);
 
-        this.send('CREATE_AGENT', agent);
+        this.send(this.CMD_CREATE_AGENT, agent);
     },
-    'requestAgent': function(id) {
+    'UIGetAgent': function(id) {
         if (!this.is_connected) {
             return;
         }
@@ -184,16 +211,51 @@ Server.prototype = {
         this.ui.println('Get Agent "' + id + '" information from SCADA', this.id);
 
         var agent = {'id': id};
-        this.send('GET_AGENT_INFO', agent);
+        this.send(this.CMD_GET_AGENT_INFO, agent);
     },
 
-    'switch': function(agent) {
+    'UIStart': function() {
+        this.connect();
+    },
+    'UIStop': function() {
+        this.disconnect();
+    },
+
+    'UIEntity': function(entity) {
+        this.ui.cleanEntities();
+
+        // If switchting entities is not 'allowed'
+        if (!this.is_connected) {
+            this.ui.popup('Not connected');
+            return false;
+        } else if (entity === this.ENTITY_AGENT) {
+            this.ui.popup('Select an Agent from Grid');
+            return false;
+        }
+
+        if (entity === this.ENTITY_GRID) {
+            // Request grid overview from WS
+            this.send(this.CMD_GET_OVERVIEW);
+        }
+
+        return true;
+    },
+
+
+    'setConnectedTo': function(entity) {
+        this.ui.cleanEntities();
+        this.ui.showEntity(entity);
+
+        this.connected_to = entity;
+    },
+
+    /*'switch': function(agent) {
         // Re-request overview, and clean grid when leaving section
         if (agent === 'grid') {
-            this.send('GET_OVERVIEW');
+            this.send(this.CMD_GET_OVERVIEW);
             this.ui.cleanAgent();
         } else if (agent === 'agent') {
             this.ui.cleanGrid();
         }
-    },
+    },*/
 };
