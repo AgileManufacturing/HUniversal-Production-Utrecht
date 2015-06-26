@@ -284,7 +284,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("command", "ON_MODULE_STATE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 			returnMessage.put("module", moduleString);
 			returnMessage.put("moduleState", stateString);
 		} catch (JSONException e) {
@@ -309,7 +309,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("command", "ON_MODULE_MODE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 			returnMessage.put("module", moduleString);
 			returnMessage.put("moduleMode", modeString);
 		} catch (JSONException e) {
@@ -330,7 +330,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("command", "ON_EQUIPLET_MODE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 			returnMessage.put("mode", modeString);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

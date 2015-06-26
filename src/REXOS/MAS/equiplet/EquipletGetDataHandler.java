@@ -326,7 +326,7 @@ public class EquipletGetDataHandler{
 			JSONObject agent = new JSONObject();
 			agent.put("id", equiplet.getAID().getLocalName());
 			agent.put("type", "EquipletAgent");
-			agent.put("state", equiplet.getEquipletState().name());
+			agent.put("state", equiplet.getCurrentState().name());
 			result.put("agent", agent);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -344,7 +344,7 @@ public class EquipletGetDataHandler{
 			JSONTypeBuilder typeBuilder = new JSONTypeBuilder();
 			agent.put("id", typeBuilder.getStringObject(equiplet.getAID().getLocalName(), true, true));
 			agent.put("type", typeBuilder.getStringObject("EquipletAgent", true, true));
-			agent.put("state", typeBuilder.getStringObject(equiplet.getEquipletState().name(), false, true));
+			agent.put("state", typeBuilder.getStringObject(equiplet.getCurrentState().name(), false, true));
 			agent.put("mode", typeBuilder.getStringObject(equiplet.getCurrentMode().toString(), false, true));
 			agent.put("schedule", this.getSchedule());
 			agent.put("modules", this.getAllModules());
