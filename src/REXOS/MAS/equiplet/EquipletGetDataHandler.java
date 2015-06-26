@@ -155,6 +155,7 @@ public class EquipletGetDataHandler{
 	 * @author Kevin Bosman
 	 * @author Mitchell van Rijkom
 	 * @author Auke de Witte
+	 * @author Thomas Kok
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
@@ -240,6 +241,7 @@ public class EquipletGetDataHandler{
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
 	 * @author Mitchell van Rijkom
+	 * @author Thomas Kok
 	 */
 	public JSONObject getSchedule(){
 		JSONObject result = new JSONObject();
@@ -281,6 +283,7 @@ public class EquipletGetDataHandler{
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
+	 * @author Thomas Kok
 	 */
 	public JSONObject getAllPosibleStates(){
 		JSONObject result = new JSONObject();
