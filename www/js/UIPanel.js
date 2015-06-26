@@ -19,7 +19,7 @@ function UIPanel() {
 
     // Grid section
     this.grid_list = $('#grid ul');
-    this.agents     = {};
+    this.cleanGrid();
 
     // MagnificPopup opens form on pressing button
     this.btn_create_agent  = $('#grid #create-agent-btn');
@@ -36,7 +36,7 @@ function UIPanel() {
 
     // Agent section
     this.agent_form = $('#agent > form');
-    this.agent      = {};
+    this.cleanAgent();
 
 
 
@@ -93,11 +93,13 @@ UIPanel.prototype = {
 
 
     'addAgent': function(agent) {
-        if (!agent['id']) {
+        var id = agent['id'];
+        if (!id) {
             this.println('No ID to work with', 'ui');
             return;
+        } else {
+            this.println('Adding Agent "' + id + '" to Grid section', 'ui');
         }
-        var id = agent['id'];
 
         this.println('Adding "' + id + '"', 'ui');
 
@@ -123,13 +125,15 @@ UIPanel.prototype = {
     },
 
     'updateAgent': function(agent) {
-        if (!agent['id']) {
+        var id = agent['id'];
+        if (!id) {
             this.println('No ID to work with', 'ui');
             return;
+        } else {
+            this.println('Updating Agent "' + id + '"', 'ui');
         }
-        var id = agent['id'];
 
-        // Check if
+        // Check where agent is in UI
         if (this.agent['id'] === id) {
             for (var p in agent) {
                 if (p === 'id') {
@@ -138,10 +142,10 @@ UIPanel.prototype = {
 
 
                 // CHeck if form element exists that we want to update.
-                if (p in this.agent) {
+                if (p in this.agent['fields']) {
                     var value = agent[p];
 
-                    this.agent[p].val(value);
+                    this.agent['fields'][p].val(value);
                 } else {
                     this.println('Could not update value "' + p + '" Agent "' + id + '"', 'ui');
                 }
@@ -164,30 +168,37 @@ UIPanel.prototype = {
 
                     this.agents[id][p].text(value);
                 } else {
-                    this.println('Could not update value "' + p + '" Agent "' + id + '" in grid section', 'ui');
+                    this.println('Could not update value "' + p + '" Agent "' + id + '" in Grid section', 'ui');
                 }
             }
         } else {
-            this.println('Agent not found in grid nor agent section', 'ui');
+            this.println('Agent not found in Grid nor Agent section', 'ui');
         }
     },
 
     'setAgent': function(agent) {
-        if (!agent['id']) {
+        var id = agent['id'] ? agent['id']['value'] : null;
+        if (!id) {
             this.println('No ID to work with', 'ui');
             return;
+        } else {
+            this.println('Setting Agent "' + id + '" to Agent section', 'ui');
         }
-        var id = agent['id'];
 
         // Clear form
         this.agent_form.text('');
-        this.agent_form.data('id', id);
+        this.agent = {'id': id, 'fields': {}};
 
         // Create 'div > input|select' for all properties
         for (var name in agent) {
             var $div     = $('<div></div>');
             var $label   = $('<label></label>');
             var $element = null;
+
+            if (!('type' in agent[name])) {
+                this.println('No type given', 'ui');
+                continue;
+            }
 
             switch (agent[name]['type']) {
                 case 'string':
@@ -212,7 +223,7 @@ UIPanel.prototype = {
 
                 this.agent_form.append($div);
 
-                this.agent[name] = $element;
+                this.agent['fields'][name] = $element;
             }
         }
 
@@ -316,6 +327,6 @@ UIPanel.prototype = {
         this.agent_form.html();
         this.agent_form.removeAttr('id');
 
-        this.agent = {};
+        this.agent = {'id': null, 'fields': {}};
     },
 };

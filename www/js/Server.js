@@ -191,6 +191,7 @@ Server.prototype = {
         // Re-request overview, and clean grid when leaving section
         if (agent === 'grid') {
             this.send('GET_OVERVIEW');
+            this.ui.cleanAgent();
         } else if (agent === 'agent') {
             this.ui.cleanGrid();
         }
