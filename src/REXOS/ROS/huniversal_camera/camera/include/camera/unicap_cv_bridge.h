@@ -87,7 +87,7 @@ namespace unicap_cv_bridge {
 	/**
 	 * @brief handle to unicap camera
 	 **/
-	class UnicapCvCamera : public Camera{
+	class UnicapCvCamera : public Camera {
 	private:
 		unicap_handle_t handle;
 		unicap_device_t device;

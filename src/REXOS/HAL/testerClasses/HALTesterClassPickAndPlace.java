@@ -36,6 +36,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
+	static int serialNumber = 1;
 
 	// delta robot
 	static String moduleA_01 = "{" +
@@ -284,7 +285,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	]," +
 			"	\"attachedTo\":null," +
 			"\"mountPointX\":3," +
-			"\"mountPointY\":2" +
+			"\"mountPointY\":1" +
 			"}";
 	// gripper
 	static String moduleB_01 = "{" +
@@ -349,7 +350,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"		\"capabilities\":[" +
 			"		]" +
 			"	}," +
-			"	\"properties\":{}," +
+			"	\"properties\":{" +
+			"		\"modbusIp\" : \"192.168.0.22\"," +
+			"		\"modbusPort\" : 502" +
+			"	}," +
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":{" +
@@ -532,12 +536,18 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 2) {
+		if(args.length >= 1) {
 			if(args[0].equals("--noInsert")) {
 				insertModules = false;
 			} else if(args[0].equals("--noTranslate")) {
 				translateSteps = false;
 			}
+		}
+		
+		if(args.length >= 3) {
+			equipletName = args[1];
+			serialNumber = Integer.parseInt(args[2]);
+		} if(args.length >= 2) {
 			equipletName = args[1];
 		} else if(args.length >= 1) {
 			equipletName = args[0];
@@ -612,14 +622,14 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			fis.close();
 			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 			
-			File deltaRobotGazebo = new File(baseDir + "models/" + "deltaRobot.zip");
+			File deltaRobotGazebo = new File(baseDir + "models/" + "delta_robot_type_B.zip");
 			fis = new FileInputStream(deltaRobotGazebo);
 			content = new byte[(int) deltaRobotGazebo.length()];
 			fis.read(content);
 			fis.close();
 			String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
 			
-			File gripperGazebo = new File(baseDir + "models/" + "gripper.zip");
+			File gripperGazebo = new File(baseDir + "models/" + "gripper_type_A.zip");
 			fis = new FileInputStream(gripperGazebo);
 			content = new byte[(int) gripperGazebo.length()];
 			fis.read(content);
@@ -640,7 +650,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			fis.close();
 			String base64LensGazebo = new String(Base64.encodeBase64(content));
 			
-			File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
+			File workplaneGazebo = new File(baseDir + "models/" + "workplane_type_A.zip");
 			fis = new FileInputStream(workplaneGazebo);
 			content = new byte[(int) workplaneGazebo.length()];
 			fis.read(content);
@@ -687,6 +697,13 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 					moduleE_03 + base64WorkplaneGazebo + moduleE_04;
 			JSONObject e = new JSONObject(new JSONTokener(moduleE));
 			
+			a.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
+			c.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			d.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			d.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
+			e.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
 			
 			hal.insertModule(a, a);
 			hal.insertModule(b, b);
@@ -700,56 +717,56 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove1 = new JSONObject();
 			targetMove1.put("x", 5.5);
 			targetMove1.put("y", -5.5);
-			targetMove1.put("z", 13.8);
+			targetMove1.put("z", 14.025);
 			JSONObject targetMove1Approach = new JSONObject();
 			targetMove1Approach.put("x", 0);
 			targetMove1Approach.put("y", 0);
 			targetMove1Approach.put("z", 20);
 			targetMove1.put("approach", targetMove1Approach);
 			target1.put("move", targetMove1);
-			target1.put("identifier", "GC4x4MB_1");
+			target1.put("identifier", "GC4x4MB_6");
 	
 			JSONArray subjects1 = new JSONArray();
 			JSONObject subject1 = new JSONObject();
 			JSONObject subjectMove1 = new JSONObject();
 			subjectMove1.put("x", 5.5);
 			subjectMove1.put("y", -5.5);
-			subjectMove1.put("z", 13.8);
+			subjectMove1.put("z", 14.025);
 			JSONObject subjectMove1Approach = new JSONObject();
 			subjectMove1Approach.put("x", 0);
 			subjectMove1Approach.put("y", 0);
 			subjectMove1Approach.put("z", 20);
 			subjectMove1.put("approach", subjectMove1Approach);
 			subject1.put("move", subjectMove1);
-			subject1.put("identifier", "GC4x4MB_6");
+			subject1.put("identifier", "GC4x4MB_1");
 			subjects1.put(subject1);
 	
 			JSONObject target2 = new JSONObject();
 			JSONObject targetMove2 = new JSONObject();
 			targetMove2.put("x", 5.5);
 			targetMove2.put("y", -5.5);
-			targetMove2.put("z", 13.8);
+			targetMove2.put("z", 14.025);
 			JSONObject targetMove2Approach = new JSONObject();
 			targetMove2Approach.put("x", 0);
 			targetMove2Approach.put("y", 0);
 			targetMove2Approach.put("z", 20);
 			targetMove2.put("approach", targetMove2Approach);
 			target2.put("move", targetMove2);
-			target2.put("identifier", "GC4x4MB_6");
+			target2.put("identifier", "GC4x4MB_1");
 	
 			JSONArray subjects2 = new JSONArray();
 			JSONObject subject2 = new JSONObject();
 			JSONObject subjectMove2 = new JSONObject();
 			subjectMove2.put("x", 5.5);
 			subjectMove2.put("y", -5.5);
-			subjectMove2.put("z", 13.8);
+			subjectMove2.put("z", 14.025);
 			JSONObject subjectMove2Approach = new JSONObject();
 			subjectMove2Approach.put("x", 0);
 			subjectMove2Approach.put("y", 0);
 			subjectMove2Approach.put("z", 20);
 			subjectMove2.put("approach", subjectMove2Approach);
 			subject2.put("move", subjectMove2);
-			subject2.put("identifier", "GC4x4MB_1");
+			subject2.put("identifier", "GC4x4MB_6");
 			subjects2.put(subject2);
 	
 			criteria1.put("target", target1);
@@ -771,6 +788,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
 		hal.executeHardwareSteps(hardwareSteps);
+		//hal.translateProductStep("place", criteria2);
 	}
 
 	@Override
@@ -796,6 +814,13 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
+		if(state == false) {
+			hal.translateProductStep("place", criteria2);
+			state = true;
+		} else {
+			hal.translateProductStep("place", criteria1);
+			state = false;
+		}
 	}
 
 	@Override

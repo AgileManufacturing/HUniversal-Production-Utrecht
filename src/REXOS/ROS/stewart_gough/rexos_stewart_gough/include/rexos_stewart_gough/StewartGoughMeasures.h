@@ -48,7 +48,7 @@ namespace rexos_stewart_gough{
 		 * @var double base
 		 * Offset of the base to the motor joint perpendicular to the radius in millimeters.
 		 **/
-		double motorJointOffset;
+		double jointOffset;
 
 		/**
 		 * @var double hip
@@ -67,12 +67,6 @@ namespace rexos_stewart_gough{
 		 * Height of the effector in millimeters.
 		 **/
 		double effectorHeight; 
-
-		/**
-		 * @var double effector
-		 * Offset of the effector to the jointin millimeters.
-		 **/
-		double effectorJointOffset; 
 
 		/**
 		 * @var double ankle

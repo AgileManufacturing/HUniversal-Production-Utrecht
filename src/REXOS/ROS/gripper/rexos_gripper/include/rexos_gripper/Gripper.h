@@ -101,9 +101,9 @@ namespace rexos_gripper {
 		private:
 			void readJSONNode(Json::Value node);
 			
-			long gripperEnabledMax;
-			long gripperEnabledWarning;
-			long gripperEnabledCooldown;
+			ros::Duration gripperEnabledMax;
+			ros::Duration gripperEnabledWarning;
+			ros::Duration gripperEnabledCooldown;
 			int watchdogInterval;
 			
 			/**
@@ -152,13 +152,13 @@ namespace rexos_gripper {
 			 * @var unsigned long timeEnabled
 			 * Timestamp of the moment when the gripper was enabled.
 			 **/
-			long timeEnabled;
+			ros::Time timeEnabled;
 
 			/**
 			 * @var unsigned long timeCooldownStarted
 			 * Timestamp of the moment when cooldown period has started.
 			 **/
-			long timeCooldownStarted;
+			ros::Time timeCooldownStarted;
 
 			static void watchdogFunction(Gripper* device);
 

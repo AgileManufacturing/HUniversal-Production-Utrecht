@@ -86,7 +86,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	private ArrayList<AID> detailedListeners;
 	private ArrayList<BasicAgentInfo> agentInformation;
 	
-	private boolean fakeSimulate = false;
+	//private boolean fakeSimulate = false;
 
 	public GridAgent() {
 		productCounter = 0;
@@ -275,7 +275,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	public void spawnProductAgent(String name, String inputArguments){
 		try {
 			ContainerController cc = getContainerController();
-			if(fakeSimulate){
+			if(inputArguments != null){
 				Config con = Config.read();
 				IConfig config;
 					config = Configuration.read(con);
@@ -300,8 +300,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
 				ac.start();
 			}else{
-				Object[]arguments = new Object[]{ inputArguments };
-				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
+				AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
 				ac.start();
 			}
 				

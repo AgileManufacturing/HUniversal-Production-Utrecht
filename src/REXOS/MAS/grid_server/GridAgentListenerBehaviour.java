@@ -223,7 +223,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 				
 				// Update all basicListeners (add agent)
 				object = new JSONObject(msg.getContent());
-				object.put("command", "ADDAGENT");
+				object.put("command", "ADD_AGENT");
 				object.put("agent", bai.getJSONObject());
 				gridAgent.onBasicUpdate(msg.getSender(), object.toString());
 				break;

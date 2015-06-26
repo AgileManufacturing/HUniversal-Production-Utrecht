@@ -229,6 +229,9 @@ namespace unicap_cv_bridge {
 			throw UnicapCvException("Invalid bits per pixel");
 		}
 
+		// set these values for the camFrame, enabeling direct copying the frame into the buffer
+		camFrame = cv::Mat(format.size.height, format.size.width, getFrameFormat());
+
 		unicap_register_callback(handle, UNICAP_EVENT_NEW_FRAME, (unicap_callback_t) (unicap_cv_bridge::newFrameCallback),
 		        this);
 		if (!SUCCESS(unicap_start_capture(handle))) {
@@ -288,7 +291,16 @@ namespace unicap_cv_bridge {
 
 	void UnicapCvCamera::handleFrame(unicap_data_buffer_t* buffer) {
 		if(isNewFrameRequired() == true) {
-			if (camFrame.cols == format.size.width && camFrame.rows == format.size.height && camFrame.type() == CV_8UC3) {
+			if (camFrame.cols != format.size.width) {
+				REXOS_ERROR_STREAM("Got frame with incorrect width, expecting " << format.size.width << ", got " << camFrame.cols);
+				return;
+			} else if (camFrame.rows != format.size.height) {
+				REXOS_ERROR_STREAM("Got frame with incorrect height, expecting " << format.size.height << ", got " << camFrame.rows);
+				return;
+			} else if (camFrame.type() != getFrameFormat()) {
+				REXOS_ERROR_STREAM("Got frame with incorrect format, expecting " << getFrameFormat() << ", got " << camFrame.type());
+				return;
+			} else {
 				uint8_t* dest = camFrame.ptr();
 				uint8_t* source = buffer->data;
 				//memcpy(dest, source, 3 * (mat->cols * mat->rows));
@@ -297,8 +309,6 @@ namespace unicap_cv_bridge {
 					dest[n + 1] = source[n + 1];
 					dest[n + 2] = source[n];
 				}
-			} else {
-				REXOS_ERROR("Got frame with incorrect size or format");
 			}
 			onNewFrame();
 		}

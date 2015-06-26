@@ -51,7 +51,7 @@ namespace rexos_motor {
 		 * @param motors Pointer array containing all motors for this manager.
 		 * @param numberOfMotors Number of motors in the pointer array.
 		 **/
-		StepperMotorManager(rexos_io::InputOutputControllerInterface* ioController, std::vector<MotorInterface*> motors);
+		StepperMotorManager(rexos_io::RtuModbusInputOutputController* ioController, std::vector<MotorInterface*> motors);
 		virtual void startMovement();
 		void startMovement(int motionSlot);
 
@@ -60,6 +60,6 @@ namespace rexos_motor {
 		 * @var ModbusController::ModbusController* modbus
 		 * Pointer to an established modbus connection.
 		 **/
-		rexos_io::InputOutputControllerInterface* ioController;
+		rexos_io::RtuModbusInputOutputController* ioController;
 	};
 }

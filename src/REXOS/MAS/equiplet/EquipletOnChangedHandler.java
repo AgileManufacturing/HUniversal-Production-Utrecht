@@ -7,6 +7,7 @@ import java.util.Set;
 
 import generic.Mast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,9 +45,6 @@ public class EquipletOnChangedHandler{
 	public EquipletOnChangedHandler(EquipletAgent e, HardwareAbstractionLayer h){
 		equiplet = e;
 		equipletListeners = new HashMap<OnChangedTypes, Set<AID>>();
-		
-		//This print line is because that autistic neighbor of mine can't handle an unused warning...
-		System.out.println(equiplet.state);
 	}
 	
 	/**
@@ -93,9 +91,8 @@ public class EquipletOnChangedHandler{
 				if(isValidOnChangedType){
 					//Execute (de)-registration procedure
 					switch(requestedEquipletAction){
-					case "REGISTER_LISTENER":						
+					case "REGISTER_LISTENER":
 						isSuccesfullyAdded = registerListener(msg.getSender(),type);
-						//isSuccesfullyAdded = x;
 						break;					
 					case "DEREGISTER_LISTENER":
 						isSuccesfullyAdded = deregisterListener(msg.getSender(),type);
@@ -166,7 +163,7 @@ public class EquipletOnChangedHandler{
 	}
 
 	/**
-	 * This function adds an equiplet in a Map 
+	 * This function adds an equiplet in a subscriber list, the agent is mapped to the changes that are being subscribed to
 	 * @param sender an equiplet
 	 * @param type an onChangeType where an equiplet wants to listen
 	 * @author Mitchell van Rijkom
@@ -188,7 +185,7 @@ public class EquipletOnChangedHandler{
 	}
 	
 	/**
-	 * This function removes an equiplet in a Map 
+	 * This function removes an equiplet from the subscriberslist.
 	 * @param sender an equiplet
 	 * @param type an onChangeType where an equiplet wants to listen
 	 * @author Mitchell van Rijkom
@@ -222,7 +219,7 @@ public class EquipletOnChangedHandler{
 			agent.put("id", equiplet.getLocalName());
 			agent.put("state", stateString);
 			returnMessage.put("agent", agent);
-			returnMessage.put("command", "ON_EQUIPLET_STATE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 		} catch (JSONException e) {
 			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Invalid JSON:\n");
 			e.printStackTrace();
@@ -232,8 +229,41 @@ public class EquipletOnChangedHandler{
 		notifySubscribers(type, returnMessage);	
 	}	
 	
-	public void onScheduleChanged(JSONObject command) {
-		//TODO Make implementation
+	public void onScheduleChanged() {
+		JSONObject result = new JSONObject();
+		try {
+			JSONArray JSONSchedule = new JSONArray();
+			for (Job job : equiplet.schedule) {
+				Logger.log(job.toString());
+				JSONObject jobData = new JSONObject();
+				try {
+					jobData.put("product", job.getProductAgentName() 	!= null ? job.getProductAgentName().toString() 	: "null");
+					jobData.put("Name", job.getProductAgent()			!= null ? job.getProductAgent().toString() 		: "null" );
+					jobData.put("index", job.getIndex());
+					jobData.put("service", job.getService() 			!= null ? job.getService().toString() 			: "null" );
+					jobData.put("criteria", job.getCriteria()			!= null ? job.getCriteria().toString() 			: "null" );
+					jobData.put("start", job.getStartTime()				!= null ? job.getStartTime().toString() 		: "null" );
+					jobData.put("due", job.getDue()						!= null ? job.getDue().toString() 				: "null" );
+					jobData.put("deadline", job.getDeadline() 			!= null ? job.getDeadline().toString() 			: "null" );
+					jobData.put("ready", job.getDuration() 				!= null ? job.getDuration().toString() 			: "null" );
+				} catch(JSONException e){
+					Logger.log("Error");
+					e.printStackTrace();
+				}
+				
+				JSONSchedule.put(jobData);
+				
+			}
+			result.put("schedule", JSONSchedule);
+			
+			// loop through tree set and create json object with all data 
+		} catch (JSONException e) {
+			Logger.log("Error");
+			e.printStackTrace();
+		}
+		
+		OnChangedTypes type = OnChangedTypes.ON_SCHEDULE_CHANGED;
+		notifySubscribers(type, result);	
 	}
 	
 	/**
@@ -250,7 +280,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("command", "ON_MODULE_STATE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 			returnMessage.put("module", moduleString);
 			returnMessage.put("moduleState", stateString);
 		} catch (JSONException e) {
@@ -265,7 +295,7 @@ public class EquipletOnChangedHandler{
 	 * This function notifies all equiplets that are registered to an onChangeType when a mast mode changed from a certain module
 	 * @param module module that changed from mast mode 
 	 * @param mode mast mode
-	 * @author Auke de Witte
+	 * @author Tommas Bakker
 	 */
 	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		String modeString = mode.toString();
@@ -275,7 +305,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("command", "ON_MODULE_MODE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 			returnMessage.put("module", moduleString);
 			returnMessage.put("moduleMode", modeString);
 		} catch (JSONException e) {
@@ -296,7 +326,7 @@ public class EquipletOnChangedHandler{
 		
 		// create message for listeners
 		try {
-			returnMessage.put("command", "ON_EQUIPLET_MODE_CHANGED");
+			returnMessage.put("command", "UPDATE_AGENT");
 			returnMessage.put("mode", modeString);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -314,6 +344,7 @@ public class EquipletOnChangedHandler{
 	 * @param returnMessage onChange message 
 	 * @author Mitchell van Rijkom
 	 * @author Kevin Bosman
+	 * @author Thomas Kok
 	 */
 	private void notifySubscribers(OnChangedTypes type, JSONObject returnMessage){
 		// send message
@@ -368,7 +399,7 @@ public class EquipletOnChangedHandler{
 			agent.put("id", equiplet.getLocalName());
 			agent.put("state", JSONObject.NULL);
 			takeDownMessageContent.put("agent", agent);
-			takeDownMessageContent.put("command", "ON_EQUIPLET_TAKEDOWN");
+			takeDownMessageContent.put("command", "ON_TAKEDOWN");
 		}catch(JSONException ex){ex.printStackTrace();}
 		
 		takeDownMessage.setContent(takeDownMessageContent.toString());

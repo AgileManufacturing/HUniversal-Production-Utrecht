@@ -70,7 +70,7 @@ namespace rexos_delta_robot{
 		void generateBoundaries(double voxelSize);
 		bool checkPath(const Vector3& begin, const Vector3& end);
 
-		void moveTo(const Vector3& point, double maxAcceleration);
+		void moveTo(const Vector3& point, double maxAcceleration, bool waitForCompletion = true);
 		virtual bool calibrateMotors();
 		Vector3 getEffectorLocation();
 

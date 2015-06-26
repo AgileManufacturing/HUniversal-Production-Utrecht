@@ -20,4 +20,5 @@ public class Ontology {
 	public static final String CONVERSATION_AGENT_TAKEDOWN = "agent-takedown";
 	public static final String CONVERSATION_SCADA_COMMAND = "scada-command";
 	public static final String CONVERSATION_CREATE_AGENT = "create-agent";
+	public static final String CONVERSATION_MODIFY_AGENT = "modify-agent";
 }

@@ -39,7 +39,7 @@ extern "C"{
 }
 
 namespace rexos_motor{
-	StepperMotorManager::StepperMotorManager(rexos_io::InputOutputControllerInterface* ioController, std::vector<MotorInterface*> motors):
+	StepperMotorManager::StepperMotorManager(rexos_io::RtuModbusInputOutputController* ioController, std::vector<MotorInterface*> motors):
 			MotorManager(motors), ioController(ioController) {
 	}
 	
@@ -60,9 +60,9 @@ namespace rexos_motor{
 		
 		// Start movement
 		ioController->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
-				motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
+				motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START, false);
 		ioController->writeU16(CRD514KD::SlaveAddresses::BROADCAST, CRD514KD::Registers::CMD_1, 
-				CRD514KD::CMD1Bits::EXCITEMENT_ON);
+				CRD514KD::CMD1Bits::EXCITEMENT_ON, false);
 		
 		for(uint i = 0; i < motors.size(); i++) {
 			if(motors[i]->isPoweredOn()) {

@@ -9,17 +9,19 @@ cp devel/lib/libacceleration_plugin.so generatedOutput/worlds/ ;
 cp devel/lib/libcollision_plugin.so generatedOutput/worlds/ ; 
 cp devel/lib/libjoint_plugin.so generatedOutput/worlds/ ; 
 # copy compiled plugins to the models
-cp devel/lib/libattach_plugin.so src/REXOS/models/camera/ ; 
-cp devel/lib/libattach_plugin.so src/REXOS/models/deltaRobot/ ; 
-cp devel/lib/libattach_plugin.so src/REXOS/models/gripper/ ; 
-cp devel/lib/libattach_plugin.so src/REXOS/models/lens/ ; 
-cp devel/lib/libattach_plugin.so src/REXOS/models/sixAxis/ ; 
-cp devel/lib/libattach_plugin.so src/REXOS/models/workplane/ ; 
-cp devel/lib/libmotor_manager_plugin.so src/REXOS/models/deltaRobot/ ; 
-cp devel/lib/libmotor_manager_plugin.so src/REXOS/models/sixAxis/ ; 
-cp devel/lib/libsensor_manager_plugin.so src/REXOS/models/deltaRobot/ ; 
-cp devel/lib/libsensor_manager_plugin.so src/REXOS/models/sixAxis/ ; 
-cp devel/lib/libgripper_plugin.so src/REXOS/models/gripper/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/camera/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/delta_robot_type_B/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/gripper_type_A/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/gripper_type_B/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/lens/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/six_axis_type_A/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/models/workplane_type_A/ ; 
+cp devel/lib/libmotor_manager_plugin.so 	src/REXOS/models/delta_robot_type_B/ ; 
+cp devel/lib/libmotor_manager_plugin.so 	src/REXOS/models/six_axis_type_A/ ; 
+cp devel/lib/libsensor_manager_plugin.so 	src/REXOS/models/delta_robot_type_B/ ; 
+cp devel/lib/libsensor_manager_plugin.so 	src/REXOS/models/six_axis_type_A/ ; 
+cp devel/lib/libgripper_plugin.so 		src/REXOS/models/gripper_type_A/ ; 
+cp devel/lib/libgripper_plugin.so 		src/REXOS/models/gripper_type_B/ ; 
 # export everything
 ant generate-all ;
 # insert parts

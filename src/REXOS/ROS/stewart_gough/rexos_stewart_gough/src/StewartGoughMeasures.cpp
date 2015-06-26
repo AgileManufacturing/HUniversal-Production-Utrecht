@@ -40,8 +40,8 @@ namespace rexos_stewart_gough {
 		baseRadius = properties["baseRadius"].asDouble();
 		REXOS_INFO_STREAM("found baseRadius " << baseRadius);
 		
-		motorJointOffset = properties["motorJointOffset"].asDouble();
-		REXOS_INFO_STREAM("found motorJointOffset " << motorJointOffset);
+		jointOffset = properties["jointOffset"].asDouble();
+		REXOS_INFO_STREAM("found jointOffset " << jointOffset);
 		
 		hipLength = properties["hipLength"].asDouble();
 		REXOS_INFO_STREAM("found hipLength " << hipLength);
@@ -58,8 +58,8 @@ namespace rexos_stewart_gough {
 		maxJointAngle = rexos_utilities::degreesToRadians(properties["maxJointAngleDegrees"].asDouble());
 		REXOS_INFO_STREAM("found maxJointAngleDegrees " << maxJointAngle);
 		
-		motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(properties["motorFromZeroToTopAngleDegrees"].asDouble());
-		REXOS_INFO_STREAM("found motorFromZeroToTopAngle " << motorFromZeroToTopAngle);
+		motorFromZeroToTopAngle = rexos_utilities::degreesToRadians(properties["contactSensorToZeroAngleDegrees"].asDouble());
+		REXOS_INFO_STREAM("found contactSensorToZeroAngleDegrees " << motorFromZeroToTopAngle);
 		
 		boundaryBoxMinX = properties["boundaryBoxMinX"].asDouble();
 		REXOS_INFO_STREAM("found boundaryBoxMinX " << boundaryBoxMinX);

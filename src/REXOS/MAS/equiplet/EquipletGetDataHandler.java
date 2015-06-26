@@ -18,6 +18,8 @@ import jade.lang.acl.ACLMessage;
  * Handle get data messages
  * 
  * @author Kevin Bosman
+ * @author Thomas Kok
+ * @author Mitchell van Rijkom
  *
  */
 public class EquipletGetDataHandler{
@@ -108,8 +110,6 @@ public class EquipletGetDataHandler{
 				reply.setPerformative(ACLMessage.FAILURE);
 			}
 			
-			//Logger.log("Get data result: " + result);
-			
 			equiplet.send(reply);
 		}
 	}
@@ -149,11 +149,13 @@ public class EquipletGetDataHandler{
 	}
 	
 	/**
-	 * Request all currently connected modules
+	 * Request all currently connected modules with states and modes
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
 	 * @author Mitchell van Rijkom
+	 * @author Auke de Witte
+	 * @author Thomas Kok
 	 */
 	public JSONObject getAllModules(){
 		JSONObject result = new JSONObject();
@@ -168,6 +170,8 @@ public class EquipletGetDataHandler{
 				JSONModuleInfo.put("typeNumber", module.getModuleIdentifier().typeNumber);
 				JSONModuleInfo.put("manufacturer", module.getModuleIdentifier().manufacturer);
 				JSONModuleInfo.put("name", module.getModuleIdentifier().manufacturer + " " + module.getModuleIdentifier().typeNumber + " " +  module.getModuleIdentifier().serialNumber);
+				JSONModuleInfo.put("state", module.getModuleState());
+				JSONModuleInfo.put("mode", module.getModuleMode());
 				modulesArray.put(JSONModuleInfo);				
 			}
 			result.put("modules", modulesArray);
@@ -237,6 +241,7 @@ public class EquipletGetDataHandler{
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
 	 * @author Mitchell van Rijkom
+	 * @author Thomas Kok
 	 */
 	public JSONObject getSchedule(){
 		JSONObject result = new JSONObject();
@@ -278,6 +283,7 @@ public class EquipletGetDataHandler{
 	 * 
 	 * @return JSONObject with response
 	 * @author Kevin Bosman
+	 * @author Thomas Kok
 	 */
 	public JSONObject getAllPosibleStates(){
 		JSONObject result = new JSONObject();
@@ -323,7 +329,7 @@ public class EquipletGetDataHandler{
 			JSONObject agent = new JSONObject();
 			agent.put("id", equiplet.getAID().getLocalName());
 			agent.put("type", "EquipletAgent");
-			agent.put("state", equiplet.getEquipletState().name());
+			agent.put("state", equiplet.getCurrentState().name());
 			result.put("agent", agent);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -341,31 +347,10 @@ public class EquipletGetDataHandler{
 			JSONTypeBuilder typeBuilder = new JSONTypeBuilder();
 			agent.put("id", typeBuilder.getStringObject(equiplet.getAID().getLocalName(), true, true));
 			agent.put("type", typeBuilder.getStringObject("EquipletAgent", true, true));
-			agent.put("state", typeBuilder.getStringObject(equiplet.getEquipletState().name(), false, true));
+			agent.put("state", typeBuilder.getStringObject(equiplet.getCurrentState().name(), false, true));
 			agent.put("mode", typeBuilder.getStringObject(equiplet.getCurrentMode().toString(), false, true));
-			JSONArray JSONSchedule = new JSONArray();
-			for (Job job : equiplet.schedule) {
-				Logger.log(job.toString());
-				JSONObject jobData = new JSONObject();
-				try {
-					jobData.put("product", job.getProductAgentName() 	!= null ? job.getProductAgentName().toString() 	: "null");
-					jobData.put("Name", job.getProductAgent()			!= null ? job.getProductAgent().toString() 		: "null" );
-					jobData.put("index", job.getIndex());
-					jobData.put("service", job.getService() 			!= null ? job.getService().toString() 			: "null" );
-					jobData.put("criteria", job.getCriteria()			!= null ? job.getCriteria().toString() 			: "null" );
-					jobData.put("start", job.getStartTime()				!= null ? job.getStartTime().toString() 		: "null" );
-					jobData.put("due", job.getDue()						!= null ? job.getDue().toString() 				: "null" );
-					jobData.put("deadline", job.getDeadline() 			!= null ? job.getDeadline().toString() 			: "null" );
-					jobData.put("ready", job.getDuration() 				!= null ? job.getDuration().toString() 			: "null" );
-				} catch(JSONException e){
-					Logger.log("Error");
-					return null;
-				}
-				
-				JSONSchedule.put(jobData);
-				
-			}
-			agent.put("schedule", JSONSchedule);
+			agent.put("schedule", this.getSchedule());
+			agent.put("modules", this.getAllModules());
 			result.put("agent", agent);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -374,5 +359,4 @@ public class EquipletGetDataHandler{
 		}
 		return result;
 	}
-
 }

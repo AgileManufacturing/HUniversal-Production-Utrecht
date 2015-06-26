@@ -60,7 +60,7 @@ namespace gripper_plugin {
 					// no contacts with the collision were recorded previous iteration, remove it
 					it = collisionTimes.erase(it);
 					// do not increment it, as erase points it to the next position
-				} else if(currentTime - it->second >= 0.1 && collisionContactCount[it->first] >= 1) {
+				} else if(currentTime - it->second >= 0.0 && collisionContactCount[it->first] >= 1) {
 					attachToCollision(it->first);
 					break;
 				} else {
@@ -68,7 +68,7 @@ namespace gripper_plugin {
 				}
 			}
 		}
-		collisionContactCount.empty();
+		collisionContactCount.clear();
 	}
 	physics::CollisionPtr Gripper::getCollision() {
 		return collision;

@@ -25,8 +25,8 @@ public:
 			std::vector<rexos_datatypes::SupportedMutation> gainedSupportedMutations, 
 			std::vector<rexos_datatypes::RequiredMutation> requiredMutationsRequiredForNextPhase) = 0;
 	virtual void spawnNode(rexos_module::ModuleProxy* moduleProxy) = 0;
-	virtual void spawnModel(rexos_module::ModuleProxy* moduleProxy) = 0;
-	virtual void removeModel(rexos_module::ModuleProxy* moduleProxy) = 0;
+	virtual void spawnModel(rexos_datatypes::ModuleIdentifier identifier) = 0;
+	virtual void removeModel(rexos_datatypes::ModuleIdentifier identifier) = 0;
 };
 
 

@@ -1,7 +1,14 @@
 package MAS.equiplet;
 
+import java.util.ArrayList;
+
+import org.json.JSONException;
+
 import util.log.Logger;
+import MAS.product.ProductionStep;
 import MAS.util.Ontology;
+import MAS.util.Parser;
+import MAS.util.Tick;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -13,9 +20,10 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 /**
- * Tester class to send messages to the Equiplet Agent for testing responses
+ * Tester class to send messages to the Equiplet Agent for testing responses and message handling
  * 
  * @author Kevin Bosman
+ * @author Thomas Kok
  */
 public class EQMessageAgent extends Agent {
 	
@@ -60,7 +68,6 @@ public class EQMessageAgent extends Agent {
 		boolean scheduleTest = false;
 		boolean addRemoveModules = false;
 		
-		sleep(2000);
 		
 		//Test a state change and the listener
 		if(testMastStateChange){
@@ -68,13 +75,13 @@ public class EQMessageAgent extends Agent {
 			sendOnChangeRequest(registerMastState);
 			//Get current state
 			sendGetData(getState);
-			sleep(2000);
+			sleep(5000);
 			//Change to save
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(10000);//Give equiplet time to go trough init state
+			sleep(3500);//Give equiplet time to go through init state
 			//Get state again
 			sendGetData(getState);
-			sleep(2000);
+			sleep(3000);
 			//Return to offline
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 		}
@@ -82,9 +89,9 @@ public class EQMessageAgent extends Agent {
 		//Test get all modules
 		if(getModuleList){
 			sendCommand(insertJSON);
-			sleep(3000);
+			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
-			sleep(3000);
+			sleep(5000);
 			sendCommand(deleteJSON);
 			sleep(5000);
 			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
@@ -93,26 +100,40 @@ public class EQMessageAgent extends Agent {
 		//Test get all possible states and modes
 		if(getAllStateTest){
 			sendGetData(getAllStates);
+			sleep(5000);
 			sendGetData(getAllModes);
+			sleep(5000);
 			sendGetData(getMode);
+			sleep(5000);
 		}
 		
 		//Test get schedule
 		if(scheduleTest){
+			
+			try {
+				addScheduleJob(Parser.parseScheduleRequest(new ArrayList<ProductionStep>(), new Tick(50)));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}	
+			sleep(5000);
 			sendGetData(getSchedule);
+			sleep(5000);
 		}
+
+			
 		
+		//Add and remove modules
 		if(addRemoveModules){
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"NORMAL\"}");
 			sleep(5000);
 			sendCommand(insertJSON);
 			//Should not work in normal mode
-			sleep(2000);
+			sleep(5000);
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(2000);
+			sleep(5000);
 			sendCommand(insertJSON);
-			sleep(2000);
+			sleep(5000);
 			sendCommand(deleteJSON);
 		}
 	}
@@ -138,7 +159,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -163,7 +183,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -172,7 +191,7 @@ public class EQMessageAgent extends Agent {
 	}
 	
 	/**
-	 * Send a on change message
+	 * Send an onchange message
 	 * 
 	 * @param String with JSON content
 	 * @author Kevin Bosman
@@ -188,7 +207,6 @@ public class EQMessageAgent extends Agent {
 		for(int i = 0; i < receivers.length; i++){
 			if(!receivers[i].equals(this.getAID())){
 				message.addReceiver(receivers[i]);
-				//Logger.log("Add receiver: " + receivers[i].getLocalName());
 			}
 		}
 		
@@ -223,6 +241,31 @@ public class EQMessageAgent extends Agent {
     }
 	
 	/**
+	 * Send a get data request
+	 * 
+	 * @param String with JSON content
+	 * @author Kevin Bosman
+	 */
+	public void addScheduleJob(String data){
+		//Send message
+		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.setContent(data);
+		message.setOntology(Ontology.GRID_ONTOLOGY);
+		message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
+		message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
+		
+		AID[] receivers = searchDF("EquipletAgent");
+		for(int i = 0; i < receivers.length; i++){
+			if(!receivers[i].equals(this.getAID())){
+				message.addReceiver(receivers[i]);
+			}
+		}
+		
+		this.send(message);
+		Logger.log("Equiplet getter test message: " + data);
+	}
+	
+	/**
 	 * Simple sleep with catch block
 	 * 
 	 * @param MS to sleep
@@ -232,9 +275,7 @@ public class EQMessageAgent extends Agent {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }
