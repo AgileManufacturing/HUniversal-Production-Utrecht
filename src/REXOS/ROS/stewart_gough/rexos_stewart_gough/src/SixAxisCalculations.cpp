@@ -79,10 +79,10 @@ double SixAxisCalculations::getRemainingZAngle(double yAngle) {
 	return remainingZAngle;
 }
 	
-double SixAxisCalculations::getAngleForGroup(int jointIndex) {
+double SixAxisCalculations::getAngleForGroup(int motorIndex) {
 	// intentional int devision
-	int jointGroup = jointIndex / 2;
-	return rexos_utilities::degreesToRadians(360 / numberOfGroups * jointGroup);
+	int jointGroup = motorIndex / 2;
+	return rexos_utilities::degreesToRadians(360 / numberOfGroups * -jointGroup + 120);
 }
 
 Matrix4 SixAxisCalculations::getEffectorRotationMatrix(StewartGoughLocation preRotatedEffectorLocation, double groupAngle){
@@ -145,11 +145,12 @@ Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRo
 		JointPositionInGroup jointPosition, Matrix4 rotationMatrix) {
 	Vector3 offsetVector(0, -stewartGoughMeasures.effectorRadius, stewartGoughMeasures.effectorHeight);
 	if(jointPosition == JointPositionInGroup::left) {
-		offsetVector.x -= stewartGoughMeasures.effectorJointOffset;
+		offsetVector.x -= stewartGoughMeasures.jointOffset;
 	} else {
-		offsetVector.x += stewartGoughMeasures.effectorJointOffset;
+		offsetVector.x += stewartGoughMeasures.jointOffset;
 	}
 	
+	REXOS_DEBUG_STREAM_NAMED("sixAxisEffectorLocation", "offsetVector: " << offsetVector);
 	Vector3 rotatedOffsetVector = rotationMatrix * offsetVector;
 	REXOS_DEBUG_STREAM_NAMED("sixAxisEffectorLocation", "rotatedOffsetVector: " << rotatedOffsetVector);
 	return preRotatedEffectorLocation.location + rotatedOffsetVector;
@@ -158,10 +159,9 @@ Vector3 SixAxisCalculations::getEffectorJointPosition(StewartGoughLocation preRo
 Vector3 SixAxisCalculations::getMotorAxisPosition(JointPositionInGroup jointPosition) {
 	Vector3 offsetVector(0, -stewartGoughMeasures.baseRadius, 0);
 	if(jointPosition == JointPositionInGroup::left) {
-		offsetVector.x -= stewartGoughMeasures.motorJointOffset;
+		offsetVector.x -= stewartGoughMeasures.jointOffset;
 	} else {
-		// right joint
-		offsetVector.x += stewartGoughMeasures.motorJointOffset;
+		offsetVector.x += stewartGoughMeasures.jointOffset;
 	}
 	return offsetVector;
 }
@@ -182,9 +182,9 @@ double SixAxisCalculations::getMotorAngle(StewartGoughLocation effectorLocation,
 	
 	JointPositionInGroup jointPosition;
 	if((motorIndex % 2) == 0) {
-		jointPosition = JointPositionInGroup::left;
-	} else {
 		jointPosition = JointPositionInGroup::right;
+	} else {
+		jointPosition = JointPositionInGroup::left;
 	}
 	REXOS_DEBUG_STREAM_NAMED("sixAxisMotorAngle", "jointPosition: " << jointPosition);
 	

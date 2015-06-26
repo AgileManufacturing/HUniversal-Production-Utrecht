@@ -26,9 +26,8 @@ class SixAxisCalculations {
 		
 		SixAxisCalculations(StewartGoughMeasures stewartGoughMeasures) :
 			stewartGoughMeasures(stewartGoughMeasures) {
-				//maxJointAngle = 15.0 * 3.141592 / 180;
 				sphereCircleRadius = std::sin(stewartGoughMeasures.maxJointAngle);
-				REXOS_INFO_STREAM("sphereCircleRadius: " << sphereCircleRadius);
+				
 	
 				//hasValidJointAngles(Vector4(20, -50 - 100, 0, 1), Vector4(-23.81, -51.82, -264.14, 1), Vector4(-23.81 - -37.10, -51.82 - -46.98, -264.14 - -250.00, 1));
 				//hasValidJointAngles(Vector4(20, -50 - 100, 0, 1), Vector4(20, -50 - 100, -200, 1), Vector4(1, 0, 0, 1));
@@ -46,7 +45,7 @@ class SixAxisCalculations {
 		
 		bool hasValidJointAngles(Vector3 upperArmLowerArmJoint, Vector3 lowerArmEffectorJoint, Vector3 effectorJointAxis);
 		double getRemainingZAngle(double yAngle);
-		double getAngleForGroup(int jointIndex);
+		double getAngleForGroup(int motorIndex);
 		Matrix4 getEffectorRotationMatrix(StewartGoughLocation preRotatedEffectorLocation, double groupAngle);
 		Vector2 getIntersectionPoint(Vector2 pointA, double radiusA, Vector2 pointB, double radiusB);
 		Vector3 getEffectorJointPosition(StewartGoughLocation preRotatedEffectorLocation, JointPositionInGroup jointPosition, Matrix4 rotationMatrix);

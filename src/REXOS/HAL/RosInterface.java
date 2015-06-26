@@ -26,6 +26,7 @@ public abstract class RosInterface {
 		this.moduleFactory = moduleFactory;
 		equipletSubscribers = new ArrayList<EquipletListener>();
 		processSubscribers = new ArrayList<ProcessListener>();
+		violationSubscribers = new ArrayList<ViolationListener>();
 	}
 	
 	public void addProcessListener(ProcessListener listener) {

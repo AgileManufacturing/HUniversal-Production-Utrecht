@@ -40,15 +40,6 @@
 #include <vector>
 
 namespace rexos_stewart_gough {
-	struct MotorMap {
-		int motor;
-		int sensor;
-		
-		MotorMap(int motor = 0, int sensor = 0):
-				motor(motor),
-				sensor(sensor){}
-	};
-	
 	struct MotorGroup {
 		int motorIndex1;
 		int motorIndex2;
@@ -76,9 +67,6 @@ namespace rexos_stewart_gough {
 		StewartGoughLocation getEffectorLocation();
 		
 	private:
-		// the inital motors and sensors are positioned on the wrong locations
-		// this is used to map them on the right locations
-		MotorMap motorMap[6];
 		
 		//SixAxisCalculations * sixAxisCalculations;
 		
@@ -95,9 +83,5 @@ namespace rexos_stewart_gough {
 		
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
-		
-		rexos_motor::MotorInterface* getMotor(int number);
-		int getMotorIndexByNumber(int number);
-		
 	};
 }

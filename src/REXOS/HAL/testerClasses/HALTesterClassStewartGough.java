@@ -49,13 +49,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"			\"midPointX\" : 75.0," +
 			"			\"midPointY\" : -200.0," +
 			"			\"midPointZ\" : -34.3," +
-			"			\"deltaRobotMeasures\" : {" +
+			"			\"stewartGoughMeasures\" : {" +
 			"				\"baseRadius\" : 100.0," +
-			"				\"motorJointOffset\" : 11.72," +
+			"				\"jointOffset\" : 31.72," +
 			"				\"hipLength\" : 100.0," +
 			"				\"effectorRadius\" : 42.5," +
+			"				\"effectorHeight\" : 9.50," +
 			"				\"ankleLength\" : 300.0," +
-			"				\"maxJointAngle\" : 22.0," +
+			"				\"maxJointAngleDegrees\" : 22.0," +
 			"				\"boundaryBoxMinX\" : -200.0," +
 			"				\"boundaryBoxMaxX\" : 200.0," +
 			"				\"boundaryBoxMinY\" : -200.0," +
@@ -361,7 +362,10 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"		\"capabilities\":[" +
 			"		]" +
 			"	}," +
-			"	\"properties\":{}," +
+			"	\"properties\":{" +
+			"		\"modbusIp\" : \"192.168.0.32\"," +
+			"		\"modbusPort\" : 502" +
+			"	}," +
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":{" +
@@ -624,14 +628,14 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			fis.close();
 			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
 			
-			File stewartGoughGazebo = new File(baseDir + "models/" + "sixAxis.zip");
+			File stewartGoughGazebo = new File(baseDir + "models/" + "six_axis_type_A.zip");
 			fis = new FileInputStream(stewartGoughGazebo);
 			content = new byte[(int) stewartGoughGazebo.length()];
 			fis.read(content);
 			fis.close();
 			String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
 			
-			File gripperGazebo = new File(baseDir + "models/" + "gripper.zip");
+			File gripperGazebo = new File(baseDir + "models/" + "gripper_type_A.zip");
 			fis = new FileInputStream(gripperGazebo);
 			content = new byte[(int) gripperGazebo.length()];
 			fis.read(content);
@@ -652,7 +656,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			fis.close();
 			String base64LensGazebo = new String(Base64.encodeBase64(content));
 			
-			File workplaneGazebo = new File(baseDir + "models/" + "workplane.zip");
+			File workplaneGazebo = new File(baseDir + "models/" + "workplane_type_A.zip");
 			fis = new FileInputStream(workplaneGazebo);
 			content = new byte[(int) workplaneGazebo.length()];
 			fis.read(content);
@@ -675,7 +679,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			String base64PickAndPlaceWithRotation = new String(Base64.encodeBase64(content));
 			
 			
-			// six axsi
+			// six axis
 			String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
 					moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlaceWithRotation + moduleA_06; 
 			JSONObject a = new JSONObject(new JSONTokener(moduleA));

@@ -129,7 +129,7 @@ namespace rexos_delta_robot {
 	 * @param point 3-dimensional point to move to.
 	 * @param maxAcceleration the acceleration in radians/s² that the motor with the biggest motion will accelerate at.
 	 **/
-	void DeltaRobot::moveTo(const Vector3& point, double maxAcceleration) {
+	void DeltaRobot::moveTo(const Vector3& point, double maxAcceleration, bool waitForCompletion) {
 		// check whether the motors are powered on.
 		if(!motorManager->isPoweredOn()) {
 			throw std::runtime_error("motor drivers are not powered on");
@@ -253,6 +253,11 @@ namespace rexos_delta_robot {
 		}
 
 		motorManager->startMovement();
+		if(waitForCompletion == true) {
+			for(uint i = 0; i < motors.size(); i++) {
+				motors[i]->waitTillReady();
+			}
+		}
 		
 		effectorLocation = point;
 	}

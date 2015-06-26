@@ -76,14 +76,14 @@ public class PartRecordLoader {
 			JSONObject gazeboCollisionJson = new JSONObject();
 			gazeboCollisionJson.put(GazeboCollision.LINK_NAME, "base");
 			gazeboCollisionJson.put(GazeboCollision.COLLISION_NAME, "collision");
-			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 30.0);
 			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
 			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
 			gazeboCollisions.put(gazeboCollisionJson);
 			
 			JSONObject gazeboLinkJson = new JSONObject();
 			gazeboLinkJson.put(GazeboLink.LINK_NAME, "base");
-			gazeboLinkJson.put(GazeboLink.MAX_ACCELERATION, 10.0);
+			gazeboLinkJson.put(GazeboLink.MAX_ACCELERATION, 20.0);
 			gazeboLinks.put(gazeboLinkJson);
 		} else if(partTypeNumber.equals("chessboard")) {
 			// we are dealing with a chessboard
@@ -99,7 +99,7 @@ public class PartRecordLoader {
 			JSONObject gazeboCollisionJson = new JSONObject();
 			gazeboCollisionJson.put(GazeboCollision.LINK_NAME, "base");
 			gazeboCollisionJson.put(GazeboCollision.COLLISION_NAME, "collision");
-			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 20.0);
+			gazeboCollisionJson.put(GazeboCollision.MAX_FORCE, 30.0);
 			gazeboCollisionJson.put(GazeboCollision.MAX_TORQUE, 20.0);
 			gazeboCollisionJson.put(GazeboCollision.MAY_HAVE_CONTACT_WITH_CHILD_MODULES, true);
 			gazeboCollisions.put(gazeboCollisionJson);

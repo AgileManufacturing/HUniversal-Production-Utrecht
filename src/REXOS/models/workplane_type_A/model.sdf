@@ -1,0 +1,45 @@
+<sdf version='1.4'>
+	<model name="Workplane">
+		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
+			<parentModel>{parentModel}</parentModel>
+			<parentLink>{parentLink}</parentLink>
+			<childLink>{childLink}</childLink>
+		</plugin>
+		<static>false</static>
+		<link name="base">
+			<pose>0 0 0 0 0 0</pose>
+			<gravity>false</gravity>
+		
+			<inertial>
+				<mass>10.000</mass>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>file://{baseDir}workplane.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0.175 -0.200 0.02933 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.450 0.400 0.008</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+		<joint type="prismatic" name="baseToParent">
+			<pose>0 0 0 0 0 0</pose>
+			<child>base</child>
+			<parent>world</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<limit>
+					<upper>0.0</upper>
+					<lower>0.0</lower>
+				</limit>
+			</axis>
+		</joint>
+	</model>
+</sdf>

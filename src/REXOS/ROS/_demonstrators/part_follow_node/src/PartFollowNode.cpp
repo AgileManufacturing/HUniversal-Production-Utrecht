@@ -35,11 +35,13 @@
 #include <signal.h>
 #include <string.h>
 #include <cstdlib>
+
 #include <part_follow_node/PartFollowNode.h>
 #include <ros/ros.h>
 #include <jsoncpp/json/value.h>
 #include <jsoncpp/json/writer.h>
 #include <rexos_datatypes/HardwareStep.h>
+#include <rexos_configuration/Configuration.h>
 
 // @cond HIDE_NODE_NAME_FROM_DOXYGEN
 #define NODE_NAME "part_follow_node"
@@ -48,13 +50,14 @@
 using namespace part_follow_node;
 
 
-PartFollowNode::PartFollowNode(std::string blackboardIp) :
-	maxAcceleration(5.0) {
-
+PartFollowNode::PartFollowNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isShadow) :
+		equipletName(equipletName), moduleIdentifier(moduleIdentifier), maxAcceleration(5.0) {
 	REXOS_INFO("Constructing");
 
-	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(blackboardIp, "EQ2", "HardwareStepsBlackBoard");
-	//equipletStepBlackboardClient->removeDocuments("");
+	equipletStepBlackboardClient = new Blackboard::BlackboardCppClient(
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/ip", equipletName).asString(), 
+			isShadow ? "shadow_" + equipletName : equipletName, 
+			rexos_configuration::Configuration::getProperty("rosInterface/hardwareSteps/blackboardName", equipletName).asString());
 }
 
 PartFollowNode::~PartFollowNode(){
@@ -66,33 +69,46 @@ void PartFollowNode::run(){
 
 	while (ros::ok()) {
 		writeToBlackBoard(maxAcceleration);
+	REXOS_INFO("A");
 		rate.sleep();
+	REXOS_INFO("B");
 		ros::spinOnce();
+	REXOS_INFO("C");
 	}
 }
 
 void PartFollowNode::writeToBlackBoard(double acceleration){
+	REXOS_INFO("1");
 	rexos_datatypes::HardwareStep equipletStep;
 	Json::Value instructionData;
 	Json::Value moveCommand;
 	
 	moveCommand["x"] = 0;
 	moveCommand["y"] = 0;
-	moveCommand["z"] = 30;
+	moveCommand["z"] = 40;
 	moveCommand["maxAcceleration"] = acceleration;
 	
+	REXOS_INFO("2");
 	instructionData["move"] = moveCommand;
 	equipletStep.setInstructionData(instructionData);
 	
 	rexos_datatypes::OriginPlacement originPlacement = equipletStep.getOriginPlacement();
 	originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN);
 	Json::Value parameters;
-	parameters["identifier"] = "GC4x4MB_2";
+	REXOS_INFO("3");
+	parameters["identifier"] = "GC4x4MB_4";
 	originPlacement.setParameters(parameters);
+	equipletStep.setOriginPlacement(originPlacement);
 	
+	REXOS_INFO("4");
+	equipletStep.setModuleIdentifier(moduleIdentifier);
+	REXOS_INFO("5");
+	equipletStep.setStatus(rexos_datatypes::HardwareStep::WAITING);
+	
+	REXOS_INFO_STREAM("hardware step: " << equipletStep.toJSON());
 	Json::StyledWriter writer;
-	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON()))) {
-		REXOS_INFO_STREAM("printed: " << equipletStep.toJSON() << "to blackboard.");
+	if(equipletStepBlackboardClient->insertDocument(writer.write(equipletStep.toJSON())) == false) {
+		REXOS_WARN("insertion of hardware step on blackboard failed!");
 	}
 }
 
@@ -109,7 +125,7 @@ int main(int argc, char** argv){
 	ros::init(argc, argv, NODE_NAME);
 	ros::NodeHandle nodeHandle;
 
-	PartFollowNode pfn("145.89.191.131");
+	PartFollowNode pfn("EQ2", rexos_datatypes::ModuleIdentifier("HU", "delta_robot_type_B", "1"), false);
 
 	pfn.run();
 

@@ -10,7 +10,7 @@ import HAL.steps.HardwareStep;
  */
 public interface ViolationListener {
 	public enum ViolationType {
-		COLLISTION, JOINT, ACCELERATION, UNDEFINED
+		COLLISION, JOINT, ACCELERATION, UNDEFINED
 	}
 	
 	public void onViolationOccured(ViolationType violationType, String message);
