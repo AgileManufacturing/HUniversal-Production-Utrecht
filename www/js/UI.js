@@ -46,9 +46,9 @@ Grid.prototype = {
         if (id in this.agents) {
 
             // Loop through values in agent, so we can update them (usually just 1)
-            for (var p in agent) {
+            for (var key in agent) {
                 // ID is the ID that we used to find the agent, so updating it makes no sense.
-                if (p === 'id') {
+                if (key === 'id') {
                     continue;
                 }
 
