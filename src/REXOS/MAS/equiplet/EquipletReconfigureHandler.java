@@ -142,9 +142,6 @@ public class EquipletReconfigureHandler{
 				JSONArray modules = (JSONArray) messageContent.get("modules");
 				ArrayList<ModuleIdentifier> moduleIdentifiers = deserializeModules(modules);
 				
-				//System.out.println(moduleIdentifiers.toString());
-				
-				
 				//Get static and dynamic settings
 				ArrayList<JSONObject> staticSettings = new ArrayList<JSONObject>();
 				ArrayList<JSONObject> dynamicSettings = new ArrayList<JSONObject>();
@@ -179,7 +176,7 @@ public class EquipletReconfigureHandler{
 					Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while extracting modules for reconfiguration");
 				}
 			} else {
-				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAVE or OFFLINE state for reconfiguration");
+				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAFE or OFFLINE state for reconfiguration");
 			}
 		} catch (JSONException e){
 			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error while parsing JSON argument");
@@ -210,7 +207,7 @@ public class EquipletReconfigureHandler{
 				}
 				return true;
 			}else{
-				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAVE or OFFLINE state for reconfiguration");
+				Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.WARNING, "Equiplet must be in SAFE or OFFLINE state for reconfiguration");
 			}
 		} catch (JSONException e){
 			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Error occured while parsing JSON containing information on the module to be deleted.");
