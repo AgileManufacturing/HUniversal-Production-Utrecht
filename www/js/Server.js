@@ -222,7 +222,6 @@ Server.prototype = {
     },
 
     'UIEntity': function(entity) {
-        this.ui.cleanEntities();
 
         // If switchting entities is not 'allowed'
         if (!this.is_connected) {
@@ -232,6 +231,8 @@ Server.prototype = {
             this.ui.popup('Select an Agent from Grid');
             return false;
         }
+
+        this.ui.cleanEntities();
 
         if (entity === this.ENTITY_GRID) {
             // Request grid overview from WS
