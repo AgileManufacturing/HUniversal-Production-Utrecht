@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.configuration.ServerConfigurations;
+import MAS.equiplet.EquipletOnChangedHandler;
 import MAS.util.Ontology;
 
 public class SCADAAgent extends Agent implements WebSocketServerListener, SCADABasicListener, SCADADetailedListener{
@@ -158,7 +159,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
 		JSONObject object = new JSONObject();
 		try {
-			object.put("command", "AddDetailedListener");
+			object.put("command", EquipletOnChangedHandler.OnChangedTypes.ALL);
+			object.put("action", "REGISTER_LISTENER");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -372,6 +374,5 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 }

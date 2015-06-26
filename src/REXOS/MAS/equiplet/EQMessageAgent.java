@@ -61,13 +61,13 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		boolean testMastStateChange = false;
+		boolean testMastStateChange = true;
 		boolean getModuleList = false;
 		boolean getAllStateTest = false;
-		boolean scheduleTest = true;
+		boolean scheduleTest = false;
 		boolean addRemoveModules = false;
 		
-		sleep(20000);
+		sleep(10000);
 		
 		//Test a state change and the listener
 		if(testMastStateChange){

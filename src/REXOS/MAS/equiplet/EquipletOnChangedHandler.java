@@ -94,7 +94,7 @@ public class EquipletOnChangedHandler{
 				if(isValidOnChangedType){
 					//Execute (de)-registration procedure
 					switch(requestedEquipletAction){
-					case "REGISTER_LISTENER":						
+					case "REGISTER_LISTENER":
 						isSuccesfullyAdded = registerListener(msg.getSender(),type);
 						//isSuccesfullyAdded = x;
 						break;					
@@ -223,7 +223,7 @@ public class EquipletOnChangedHandler{
 			agent.put("id", equiplet.getLocalName());
 			agent.put("state", stateString);
 			returnMessage.put("agent", agent);
-			returnMessage.put("command", "UPDATEAGENT");
+			returnMessage.put("command", "UPDATE_AGENT");
 		} catch (JSONException e) {
 			Logger.log(LogSection.MAS_EQUIPLET_AGENT, LogLevel.ERROR, "Invalid JSON:\n");
 			e.printStackTrace();
@@ -402,7 +402,7 @@ public class EquipletOnChangedHandler{
 			agent.put("id", equiplet.getLocalName());
 			agent.put("state", JSONObject.NULL);
 			takeDownMessageContent.put("agent", agent);
-			takeDownMessageContent.put("command", "ON_EQUIPLET_TAKEDOWN");
+			takeDownMessageContent.put("command", "ON_TAKEDOWN");
 		}catch(JSONException ex){ex.printStackTrace();}
 		
 		takeDownMessage.setContent(takeDownMessageContent.toString());
