@@ -86,7 +86,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	private ArrayList<AID> detailedListeners;
 	private ArrayList<BasicAgentInfo> agentInformation;
 	
-	private boolean fakeSimulate = false;
+	//private boolean fakeSimulate = false;
 
 	public GridAgent() {
 		productCounter = 0;
@@ -99,7 +99,7 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("EQ2", "hal");
+		spawnEquipletAgent("EQ0", "hal");
 		spawnProductAgent("PA1", null );
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
