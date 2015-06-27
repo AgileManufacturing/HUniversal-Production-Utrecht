@@ -146,37 +146,43 @@ public class GridAgentListenerBehaviour extends Behaviour{
 	}
 	
 	private void handleNewAgent(ACLMessage msg) {
-		try {
-			DFAgentDescription[] results = DFService.decodeNotification(msg.getContent());
-			System.out.println("AGENTS FOUND: " + results.length);
-			for(int i = 0; i < results.length; i++) {
-				DFAgentDescription dfd = results[i];
-				AID agent = dfd.getName();
-				
-				//Ask Agent for BASIC INFO
-				ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
-				message.setOntology(Ontology.GRID_ONTOLOGY);
-				message.setConversationId(Ontology.CONVERSATION_GET_DATA);
-				JSONObject object = new JSONObject();
-				object.put("command", "GET_BASIC_INFO");
-				message.setContent(object.toString());
-				message.addReceiver(agent);
-				gridAgent.send(message);
-				
-				//Subcribe on Agent Updates.
-				ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
-				reply.addReceiver(agent);
-				reply.setOntology(Ontology.GRID_ONTOLOGY);
-				reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
-				object = new JSONObject();
-				object.put("command","ON_EQUIPLET_STATE_CHANGED");
-				object.put("action", "REGISTER_LISTENER");
-				reply.setContent(object.toString());
-				gridAgent.send(reply);
+		// Ugly hack to see if a new agent is registered or the agent is deregistered
+		if(msg.getContent().contains(":services")){
+			try {
+				DFAgentDescription[] results = DFService.decodeNotification(msg.getContent());
+				System.out.println("AGENTS FOUND: " + results.length);
+				for(int i = 0; i < results.length; i++) {
+					DFAgentDescription dfd = results[i];
+					AID agent = dfd.getName();
+					
+					//Ask Agent for BASIC INFO
+					ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
+					message.setOntology(Ontology.GRID_ONTOLOGY);
+					message.setConversationId(Ontology.CONVERSATION_GET_DATA);
+					JSONObject object = new JSONObject();
+					object.put("command", "GET_BASIC_INFO");
+					message.setContent(object.toString());
+					message.addReceiver(agent);
+					gridAgent.send(message);
+					
+					//Subcribe on Agent Updates.
+					ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
+					reply.addReceiver(agent);
+					reply.setOntology(Ontology.GRID_ONTOLOGY);
+					reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+					object = new JSONObject();
+					object.put("command","ON_EQUIPLET_STATE_CHANGED");
+					object.put("action", "REGISTER_LISTENER");
+					reply.setContent(object.toString());
+					gridAgent.send(reply);
+				}
+			} catch (FIPAException | JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (FIPAException | JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}else{
+			// Agent is removed
+			System.err.println("Agent removed");
 		}
 	}
 	
