@@ -42,6 +42,13 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM Module \n" + 
 			"WHERE equiplet = ?;";
+	private static final String getModulesWithHalSoftware = 
+			"SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \n" + 
+			"FROM Module \n" +
+			"JOIN ModuleType ON ModuleType.manufacturer = Module.manufacturer AND " + 
+			"	ModuleType.typeNumber = Module.typeNumber \n" +
+			"WHERE equiplet = ? AND \n" + 
+			"	halSoftware IS NOT NULL";
 	/**
 	 * SQL query for selecting the moduleIdentifiers of the physicalModuleTrees for a functionalModuleTree of a capabilityType on an equiplet
 	 * Input: capabilityTypeName, capabilityTypeFunctionalTreeNumber, equipletName
@@ -86,7 +93,7 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	 * @throws KnowledgeException
 	 */
 	public ModuleFactory(ModuleListener moduleListener, AbstractHardwareAbstractionLayer hal) throws KnowledgeException{
-		super(new KnowledgeDBClient());
+		super(Module.class, new KnowledgeDBClient());
 		this.moduleListener = moduleListener;
 		this.hal = hal;
 	}
@@ -155,9 +162,15 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	 */
 	public ArrayList<Module> getModules() {
 		ArrayList<Module> modules = new ArrayList<Module>();
-		ArrayList<ModuleIdentifier> moduleIdentifiers = getModuleIdentifiers();
-		for (ModuleIdentifier moduleIdentifier : moduleIdentifiers) {
-			modules.add(getItemForIdentifier(moduleIdentifier));
+		
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getModulesWithHalSoftware, hal.getEquipletName());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModules", rows);
+		for (Row row : rows) {
+			String manufacturer = (String) row.get("manufacturer");
+			String typeNumber = (String) row.get("typeNumber");
+			String serialNumber = (String) row.get("serialNumber");
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			modules.add(getItemForIdentifier(identifier));
 		}
 		return modules;
 	}

@@ -48,6 +48,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	// Equiplet knowledge
 	protected Position position;
 	protected List<Capability> capabilities;
+	protected List<String> services;
 
 	// Equiplet state
 	protected TreeSet<Job> schedule;
@@ -85,18 +86,22 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 					onChangeHandler = new EquipletOnChangedHandler(this, hal);
 					getRequestHandler = new EquipletGetDataHandler(this, hal);
 
-					ArrayList<String> services = hal.getSupportedServices();
+					this.services = hal.getSupportedServices();
 
 					// these can't be default, all equiplets are different
 					Tick defaultServiceDuration = new Tick(10);
 					Position defaultPosition = new Position(0, 0);
 
 					// services has to be translated capabilities
-					List<Capability> capabilities = new ArrayList<Capability>();
+					ArrayList<Capability> capabilities = new ArrayList<Capability>();
 					for (String service : services) {
 						// TODO Tick Duration: How long will it be estimated and by who?????????
 						// make better suggestion for the time a product step would take
-						capabilities.add(new Capability(service, new HashMap<String, Object>(), defaultServiceDuration));
+						List<String> capabilitiesFromService = hal.getSupportedCapabilitiesForService(service);
+						for (String capability : capabilitiesFromService){
+							Capability newCapability = new Capability(capability, service, new HashMap<String, Object>(), defaultServiceDuration);
+							capabilities.add(newCapability);
+						}
 					}
 					init(defaultPosition, capabilities);				
 					
@@ -108,7 +113,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			} else {
 				// simulation
 				try {
-					Pair<Position, List<Capability>> configuration = Parser.parseEquipletConfiguration(args[0].toString());
+					Pair <Position, List<Capability>> configuration = Parser.parseEquipletConfiguration(args[0].toString());
 
 					init(configuration.first, configuration.second);
 
@@ -142,7 +147,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected void init(Position position, List<Capability> capabilities) {
 		this.position = position;
 		this.capabilities = capabilities;
-
 		this.state = EquipletState.IDLE;
 		this.reconfiguring = false;
 		this.executing = null;
@@ -394,7 +398,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		// System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
 		// " - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
 
-		// not availale when going to be reconfigured
+		// not available when going to be reconfigured
 		if (reconfiguring) {
 			return available;
 		}

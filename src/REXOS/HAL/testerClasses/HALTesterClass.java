@@ -30,7 +30,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 	JSONObject criteria1 = new JSONObject();
 	
-	static String equipletName = "EQ1";
+	static String equipletName = "EQ0";
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;

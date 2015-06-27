@@ -41,6 +41,34 @@ public class ParserPrimitives {
 		return list;
 	}
 
+	protected static JSONArray parseServices(List<String> services) throws JSONException {
+		JSONArray list = new JSONArray();
+		for (String service : services) {
+			list.put(parseService(service));
+		}
+		return list;
+	}
+	
+	protected static JSONObject parseService(String service) throws JSONException{
+		JSONObject json = new JSONObject();
+		json.put("service", service);
+		return json;
+	}
+	
+	protected static List<String> parseServices(JSONArray list) throws JSONException {
+		List<String> services = new ArrayList<>();
+		for (int i = 0; i < list.length(); i++) {
+			JSONObject json = list.getJSONObject(i);
+			if (json.has("key") && json.has("value")) {
+				String service = json.getString("value");
+				services.add(service);
+			} else {
+				throw new JSONException("Parser: parsing map failed to parse " + list);
+			}
+		}
+		return services;
+	}
+
 	protected static List<Capability> parseCapabilties(JSONArray list) throws JSONException {
 		List<Capability> capabilties = new ArrayList<>();
 		for (int i = 0; i < list.length(); i++) {
@@ -49,6 +77,7 @@ public class ParserPrimitives {
 		}
 		return capabilties;
 	}
+	
 
 	protected static JSONObject parseCapabilty(Capability capability) throws JSONException {
 		JSONObject json = new JSONObject();
@@ -64,7 +93,8 @@ public class ParserPrimitives {
 			Map<String, Object> limitations = parseMap(json.getJSONArray("limitations"));
 			
 			Tick duration = parseTick(json.getJSONObject("duration"));
-			return new Capability(service, limitations, duration);
+			//TODO get capability name for this service
+			return new Capability(service, service, limitations, duration);
 		} else {
 			throw new JSONException("Parser: parsing capability missing arguments service and/or limitations in " + json);
 		}

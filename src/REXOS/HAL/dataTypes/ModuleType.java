@@ -94,9 +94,8 @@ public class ModuleType implements Serializable {
 		JSONTokener tokener = new JSONTokener((String) rows[0].get("moduleTypeProperties"));
 		output.properties = new JSONObject(tokener);
 		
-		output.halSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
-		// TODO what if null?
 		output.rosSoftware = RosSoftware.getRosSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
+		output.halSoftware = JavaSoftware.getJavaSoftwareForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 		output.gazeboModel = GazeboModel.getGazeboModelForModuleIdentifier(moduleIdentifier, knowledgeDBClient);
 
 		output.supportedMutations = Mutation.getSupportedMutations(moduleIdentifier, knowledgeDBClient);
@@ -114,8 +113,12 @@ public class ModuleType implements Serializable {
 		if(input.isNull(ROS_SOFTWARE) == false) {
 			output.rosSoftware = RosSoftware.deSerialize(input.getJSONObject(ROS_SOFTWARE));
 		}
-		output.halSoftware = JavaSoftware.deSerialize(input.getJSONObject(HAL_SOFTWARE));
-		output.gazeboModel = GazeboModel.deSerialize(input.getJSONObject(GAZEBO_MODEL));
+		if(input.isNull(HAL_SOFTWARE) == false) {
+			output.halSoftware = JavaSoftware.deSerialize(input.getJSONObject(HAL_SOFTWARE));
+		}
+		if(input.isNull(GAZEBO_MODEL) == false) {
+			output.gazeboModel = GazeboModel.deSerialize(input.getJSONObject(GAZEBO_MODEL));
+		}
 		
 		JSONArray supportedMutations = input.getJSONArray(SUPPORTED_MUTATIONS);
 		for (int i = 0; i < supportedMutations.length(); i++) {
@@ -133,9 +136,14 @@ public class ModuleType implements Serializable {
 		JSONObject output = new JSONObject();
 		
 		output.put(PROPERTIES, properties);
-		output.put(ROS_SOFTWARE, rosSoftware.serialize());
-		output.put(HAL_SOFTWARE, halSoftware.serialize());
-		output.put(GAZEBO_MODEL, gazeboModel.serialize());
+		if(rosSoftware != null) output.put(ROS_SOFTWARE, rosSoftware.serialize());
+		else output.put(ROS_SOFTWARE, JSONObject.NULL);
+		
+		if(halSoftware != null) output.put(HAL_SOFTWARE, halSoftware.serialize());
+		else output.put(HAL_SOFTWARE, JSONObject.NULL);
+		
+		if(gazeboModel != null) output.put(GAZEBO_MODEL, gazeboModel.serialize());
+		else output.put(GAZEBO_MODEL, JSONObject.NULL);
 		
 		JSONArray supportedMutations = new JSONArray();
 		for (int i = 0; i < this.supportedMutations.size(); i++) {
@@ -165,15 +173,20 @@ public class ModuleType implements Serializable {
 		if(existsInDatabase(knowledgeDBClient) == true) {
 			updateModuleType(knowledgeDBClient);
 		} else {
-			int halSoftwareId = halSoftware.insertIntoDatabase(knowledgeDBClient);
+			Integer halSoftwareId = null;
+			if(halSoftware != null) {
+				halSoftwareId = halSoftware.insertIntoDatabase(knowledgeDBClient);
+			}
 			
-			// not every module has rosSoftware
 			Integer rosSoftwareId = null;
 			if(rosSoftware != null) {
 				rosSoftwareId = rosSoftware.insertIntoDatabase(knowledgeDBClient);
 			}
 			
-			int gazeboModelId = gazeboModel.insertIntoDatabase(knowledgeDBClient);
+			Integer gazeboModelId = null;
+			if(gazeboModel != null) {
+				gazeboModelId = gazeboModel.insertIntoDatabase(knowledgeDBClient);
+			}
 			
 			knowledgeDBClient.executeUpdateQuery(addModuleType, 
 					moduleTypeIdentifier.manufacturer, moduleTypeIdentifier.typeNumber, 
@@ -248,9 +261,9 @@ public class ModuleType implements Serializable {
 		
 		knowledgeDBClient.executeUpdateQuery(removeModuleType, moduleTypeIdentifier.manufacturer, moduleTypeIdentifier.typeNumber);
 		
-		halSoftware.removeFromDatabase(knowledgeDBClient);
-		rosSoftware.removeFromDatabase(knowledgeDBClient);
-		gazeboModel.removeFromDatabase(knowledgeDBClient);
+		if(halSoftware != null) halSoftware.removeFromDatabase(knowledgeDBClient);
+		if(rosSoftware != null) rosSoftware.removeFromDatabase(knowledgeDBClient);
+		if(gazeboModel != null) gazeboModel.removeFromDatabase(knowledgeDBClient);
 	}
 	public static void removeUnusedFromDatabase(KnowledgeDBClient knowledgeDBClient) throws JSONException {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleTypesWithNoModules);

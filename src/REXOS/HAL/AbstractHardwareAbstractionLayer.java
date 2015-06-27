@@ -26,6 +26,7 @@ import HAL.factories.ModuleFactory;
 import HAL.factories.ReconfigHandler;
 import HAL.libraries.dynamicloader.JarFileLoaderException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
+import HAL.libraries.knowledgedb_client.Row;
 import HAL.listeners.EquipletCommandListener;
 import HAL.listeners.EquipletListener;
 import HAL.listeners.ExecutionProcessListener;
@@ -209,6 +210,21 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	 */
 	public ArrayList<String> getSupportedServices() {
 		return reconfigHandler.getAllSupportedServices();
+	}
+	
+	/**
+	 * This method will return all the (most likely) supported capabilities from services
+	 * @return ArrayList Capabilities
+	 */
+	public ArrayList<String> getSupportedCapabilitiesForService(String service){
+		ArrayList<Capability> capabilities = new ArrayList<Capability>();
+		ArrayList<String> supportedCapabilities = new ArrayList<String>();
+		capabilities = capabilityFactory.getCapabilitiesForService(service);
+		for (Capability capibility : capabilities) {
+			String capabilityName = capibility.getName();
+			supportedCapabilities.add(capabilityName);
+		}
+		return supportedCapabilities;
 	}
 
 	/**

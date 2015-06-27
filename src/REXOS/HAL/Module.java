@@ -24,7 +24,7 @@ import HAL.listeners.ModuleListener;
  *
  */
 @SuppressWarnings("unused")
-public abstract class Module implements ModuleListener { 
+public class Module implements ModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
