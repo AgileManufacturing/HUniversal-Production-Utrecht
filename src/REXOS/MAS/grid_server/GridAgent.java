@@ -403,13 +403,34 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	}
 	
 	public void onAgentTakeDown(String content) {
-		System.out.println(content);
 		for (int i = 0; i < basicListeners.size(); i++) {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.addReceiver(basicListeners.get(i));
 			msg.setConversationId(Ontology.CONVERSATION_AGENT_TAKEDOWN);
 			msg.setContent(content);
 			send(msg);
+		}
+		boolean found = false;
+		int index = 0;
+		String agentName = "";
+		try {
+			JSONObject object =new JSONObject(content);
+			agentName = object.getJSONObject("agent").getString("id");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(agentName != null){
+			AID aid = new AID(agentName, AID.ISLOCALNAME);
+			for(index = 0; index < agentInformation.size(); index++){
+				if(agentInformation.get(index).getAID().equals(aid)){
+					found = true;
+					break;
+				}
+			}
+		}
+		if(found){
+			agentInformation.remove(index);
 		}
 	}
 	

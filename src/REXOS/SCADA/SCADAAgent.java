@@ -152,7 +152,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		if(clientFound){
 			// Remove agent if no clients are connected
 			if(agentConnections.get(index).getAmountOfClients() <= 0){
-				
+				AID aid = agentConnections.get(index).getAgent();
+				deregister(aid);
 				agentConnections.remove(index);
 			}
 		}
@@ -172,6 +173,24 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			}
 			agentConnections.remove(agentconnection);
 		}
+	}
+	
+	private void deregister(AID aid){
+		ACLMessage msg  = new ACLMessage(ACLMessage.PROPOSE);
+		msg.addReceiver(aid);
+		msg.setOntology(Ontology.GRID_ONTOLOGY);
+		msg.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+		
+		JSONObject object = new JSONObject();
+		try {
+			object.put("command","ALL");
+			object.put("action", "REGISTER_LISTENER");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		msg.setContent(object.toString());
+		send(msg);
 	}
 	
 	@Override
@@ -341,17 +360,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			send(msg);
 			
 			//Subcribe on Agent Updates.
-			msg  = new ACLMessage(ACLMessage.PROPOSE);
-			msg.addReceiver(receiver);
-			msg.setOntology(Ontology.GRID_ONTOLOGY);
-			msg.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
-			
-			object = new JSONObject();
-			object.put("command","ALL");
-			object.put("action", "REGISTER_LISTENER");
-			msg.setContent(object.toString());
-			
-			send(msg);
+			connectToAgent(receiver);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

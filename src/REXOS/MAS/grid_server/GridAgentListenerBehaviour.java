@@ -15,11 +15,11 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SubscriptionInitiator;
 
-public class GridAgentListenerBehaviour extends Behaviour{
+public class GridAgentListenerBehaviour extends Behaviour {
 	boolean done = false;
 	GridAgent gridAgent = null;
-	SubscriptionInitiator test  = null;
-	
+	SubscriptionInitiator test = null;
+
 	/**
 	 * 
 	 */
@@ -30,83 +30,103 @@ public class GridAgentListenerBehaviour extends Behaviour{
 		this.done = false;
 		subscribeByDF();
 	}
-	
-	void subscribeByDF(){
+
+	void subscribeByDF() {
 		DFAgentDescription description = new DFAgentDescription();
 		SearchConstraints sc = new SearchConstraints();
-		gridAgent.send(DFService.createSubscriptionMessage(gridAgent, gridAgent.getDefaultDF(), description, sc));
+		gridAgent.send(DFService.createSubscriptionMessage(gridAgent,
+				gridAgent.getDefaultDF(), description, sc));
 		System.out.println("GA subscribed by DF");
 	}
 
-	
 	@Override
 	public void action() {
 		ACLMessage msg = gridAgent.blockingReceive();
 		if (msg != null) {
-			System.out.printf("GA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", gridAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
+			System.out
+					.printf("GA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n",
+							gridAgent.getLocalName(), msg.getSender()
+									.getLocalName(), msg.getPerformative(), msg
+									.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
-				case ACLMessage.INFORM:
-					if(msg.getSender().equals(gridAgent.getDefaultDF())) {
+			case ACLMessage.INFORM:
+				if (msg.getSender().equals(gridAgent.getDefaultDF())) {
+					// Ugly hack to see if a new agent is registered or the agent is deregistered
+					if (msg.getContent().contains(":services")) {
 						handleNewAgent(msg);
-					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
-						handleDataResponse(msg);
-					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_INFORMATION_REQUEST)) {
-						System.out.println("GA inform conversation inform");
-						gridAgent.sendAgentInfo(msg.getContent());
-					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)){
-						System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
-						gridAgent.onAgentTakeDown(msg.getContent());
-					} else if(msg.getConversationId().equals(Ontology.CONVERSATION_SCADA_COMMAND)) {
-						gridAgent.updateStateInfo(msg.getSender(), msg.getContent());
-						gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
-					}  else{
-						System.err.println("GA: Unkown message" + msg.getContent());
+					}else{
+						// The agent is deregistered
 					}
-//					if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED)) {
-//						handleProductArrived(msg);
-//					} else if (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_RELEASE)) {
-//						handleProductRelease(msg);
-//					}
-					break;
-				// Request of other agent to get information to schedule a job
-				// will send confirm or disconfirm message in return
-				case ACLMessage.REQUEST:
-					try {
-						JSONObject object = new JSONObject(msg.getContent().toString());
-						String command = object.getString("command");
-						if(command.equals("GET_OVERVIEW")) {
-							System.out.println("Request: GetOverview received!");
-							int clientHash = object.getInt("client");
-							sendOverviewToSCADAAgent(msg, clientHash);
-							//Get all agents and send them to the SCADA agent.
-						}
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				} else if (msg.getConversationId().equals(
+						Ontology.CONVERSATION_GET_DATA)) {
+					handleDataResponse(msg);
+				} else if (msg.getConversationId().equals(
+						Ontology.CONVERSATION_INFORMATION_REQUEST)) {
+					System.out.println("GA inform conversation inform");
+					gridAgent.sendAgentInfo(msg.getContent());
+				} else if (msg.getConversationId().equals(
+						Ontology.CONVERSATION_AGENT_TAKEDOWN)) {
+					System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
+					gridAgent.onAgentTakeDown(msg.getContent());
+				} else if (msg.getConversationId().equals(
+						Ontology.CONVERSATION_SCADA_COMMAND)) {
+					gridAgent
+							.updateStateInfo(msg.getSender(), msg.getContent());
+					gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
+				} else {
+					System.err.println("GA: Unkown message" + msg.getContent());
+				}
+				// if
+				// (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED))
+				// {
+				// handleProductArrived(msg);
+				// } else if
+				// (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_RELEASE))
+				// {
+				// handleProductRelease(msg);
+				// }
+				break;
+			// Request of other agent to get information to schedule a job
+			// will send confirm or disconfirm message in return
+			case ACLMessage.REQUEST:
+				try {
+					JSONObject object = new JSONObject(msg.getContent()
+							.toString());
+					String command = object.getString("command");
+					if (command.equals("GET_OVERVIEW")) {
+						System.out.println("Request: GetOverview received!");
+						int clientHash = object.getInt("client");
+						sendOverviewToSCADAAgent(msg, clientHash);
+						// Get all agents and send them to the SCADA agent.
 					}
-//					handleScheduling(msg);
-					break;
-				// query for information of the GridAgent
-				case ACLMessage.QUERY_REF:
-					//handleCanExecute(msg);
-					break;
-				case ACLMessage.QUERY_IF:
-//					handleInformationRequest(msg);
-					break;
-				// messagetype holding the requested state for the equiplet
-				case ACLMessage.PROPOSE:
-					if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
-						handleListenerCommand(msg);
-					}
-					else if(msg.getConversationId().equals(Ontology.CONVERSATION_CREATE_AGENT)){
-						handleCreateAgent(msg);
-					}
-					break;
-				default:
-					break;
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// handleScheduling(msg);
+				break;
+			// query for information of the GridAgent
+			case ACLMessage.QUERY_REF:
+				// handleCanExecute(msg);
+				break;
+			case ACLMessage.QUERY_IF:
+				// handleInformationRequest(msg);
+				break;
+			// messagetype holding the requested state for the equiplet
+			case ACLMessage.PROPOSE:
+				if (msg.getConversationId().equals(
+						Ontology.CONVERSATION_LISTENER_COMMAND)) {
+					handleListenerCommand(msg);
+				} else if (msg.getConversationId().equals(
+						Ontology.CONVERSATION_CREATE_AGENT)) {
+					handleCreateAgent(msg);
+				}
+				break;
+			default:
+				break;
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -115,118 +135,116 @@ public class GridAgentListenerBehaviour extends Behaviour{
 		return done;
 	}
 
-	
 	private void handleListenerCommand(ACLMessage msg) {
-		if(msg != null){
-			try{
+		if (msg != null) {
+			try {
 				JSONObject object = new JSONObject(msg.getContent());
-				
-				//Debug output
+
+				// Debug output
 				Logger.log("Content of ACL message: " + object.toString());
-				
-				//Identifying modules
-				String requestedEquipletCommand = object.getString("command").toString();
-				
-				// Program if statements that will appropriately handle messages sent to the GridAgent.
-				if(requestedEquipletCommand.equals("AddDetailedListener")){
-					System.out.println("addDetailedListener "+ gridAgent.toString());
+
+				// Identifying modules
+				String requestedEquipletCommand = object.getString("command")
+						.toString();
+
+				// Program if statements that will appropriately handle messages
+				// sent to the GridAgent.
+				if (requestedEquipletCommand.equals("AddDetailedListener")) {
+					System.out.println("addDetailedListener "
+							+ gridAgent.toString());
 					gridAgent.addDetailedListener(msg.getSender());
-				}else if(requestedEquipletCommand.equals("AddBasicListener")){
-					System.out.println("addBasicListener "+ gridAgent.toString());
+				} else if (requestedEquipletCommand.equals("AddBasicListener")) {
+					System.out.println("addBasicListener "
+							+ gridAgent.toString());
 					gridAgent.addBasicListener(msg.getSender());
-				}else{
+				} else {
 					Logger.log("An error occured while deserializing the ACLMessage, missing info or command not recognized.");
 				}
-				
-			//Error handling
+
+				// Error handling
 			} catch (JSONException e) {
 				Logger.log("Invalid JSON.");
 			}
-		}		
-	}
-	
-	private void handleNewAgent(ACLMessage msg) {
-		// Ugly hack to see if a new agent is registered or the agent is deregistered
-		if(msg.getContent().contains(":services")){
-			try {
-				DFAgentDescription[] results = DFService.decodeNotification(msg.getContent());
-				System.out.println("AGENTS FOUND: " + results.length);
-				for(int i = 0; i < results.length; i++) {
-					DFAgentDescription dfd = results[i];
-					AID agent = dfd.getName();
-					
-					//Ask Agent for BASIC INFO
-					ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
-					message.setOntology(Ontology.GRID_ONTOLOGY);
-					message.setConversationId(Ontology.CONVERSATION_GET_DATA);
-					JSONObject object = new JSONObject();
-					object.put("command", "GET_BASIC_INFO");
-					message.setContent(object.toString());
-					message.addReceiver(agent);
-					gridAgent.send(message);
-					
-					//Subcribe on Agent Updates.
-					ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
-					reply.addReceiver(agent);
-					reply.setOntology(Ontology.GRID_ONTOLOGY);
-					reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
-					object = new JSONObject();
-					object.put("command","ON_EQUIPLET_STATE_CHANGED");
-					object.put("action", "REGISTER_LISTENER");
-					reply.setContent(object.toString());
-					gridAgent.send(reply);
-				}
-			} catch (FIPAException | JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}else{
-			// Agent is removed
-			System.err.println("Agent removed");
 		}
 	}
-	
+
+	private void handleNewAgent(ACLMessage msg) {
+		try {
+			DFAgentDescription[] results = DFService.decodeNotification(msg
+					.getContent());
+			System.out.println("AGENTS FOUND: " + results.length);
+			for (int i = 0; i < results.length; i++) {
+				DFAgentDescription dfd = results[i];
+				AID agent = dfd.getName();
+
+				// Ask Agent for BASIC INFO
+				ACLMessage message = new ACLMessage(ACLMessage.QUERY_IF);
+				message.setOntology(Ontology.GRID_ONTOLOGY);
+				message.setConversationId(Ontology.CONVERSATION_GET_DATA);
+				JSONObject object = new JSONObject();
+				object.put("command", "GET_BASIC_INFO");
+				message.setContent(object.toString());
+				message.addReceiver(agent);
+				gridAgent.send(message);
+
+				// Subcribe on Agent Updates.
+				ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
+				reply.addReceiver(agent);
+				reply.setOntology(Ontology.GRID_ONTOLOGY);
+				reply.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
+				object = new JSONObject();
+				object.put("command", "ON_EQUIPLET_STATE_CHANGED");
+				object.put("action", "REGISTER_LISTENER");
+				reply.setContent(object.toString());
+				gridAgent.send(reply);
+			}
+		} catch (FIPAException | JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private void handleCreateAgent(ACLMessage msg) {
-		try{
+		try {
 			JSONObject object = new JSONObject(msg.getContent());
 			JSONObject agent = object.getJSONObject("agent");
 			String id = agent.getString("id");
 			String type = agent.getString("type");
 			// TODO shouldn't this be a json object with something?
 			String arguments = agent.getString("arguments");
-			
-			switch(type){
+
+			switch (type) {
 			case "EquipletAgent":
 				gridAgent.spawnEquipletAgent(id, arguments);
 				break;
 			case "ProductAgent":
 				gridAgent.spawnProductAgent(id, arguments);
 				break;
-			//not sure if these agent should be an option
+			// not sure if these agent should be an option
 			case "TrafficAgent":
 				break;
 			case "SupplyAgent":
 				break;
 			}
-		}catch (JSONException e) {
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void handleDataResponse(ACLMessage msg) {
 		try {
 			System.out.println(msg);
 			JSONObject object = new JSONObject(msg.getContent());
-			switch(object.getString("command").toString()){
+			switch (object.getString("command").toString()) {
 			case "GET_BASIC_INFO":
 				JSONObject agent = object.getJSONObject("agent");
-				String type  = agent.getString("type");
+				String type = agent.getString("type");
 				String state = agent.getString("state");
-				AID aid      = new AID(agent.getString("id"), AID.ISGUID);
-				BasicAgentInfo bai = new BasicAgentInfo(aid,state,type);
+				AID aid = new AID(agent.getString("id"), AID.ISGUID);
+				BasicAgentInfo bai = new BasicAgentInfo(aid, state, type);
 				gridAgent.addBasicAgentInfo(bai);
-				
+
 				// Update all basicListeners (add agent)
 				object = new JSONObject(msg.getContent());
 				object.put("command", "ADD_AGENT");
@@ -239,7 +257,7 @@ public class GridAgentListenerBehaviour extends Behaviour{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void sendOverviewToSCADAAgent(ACLMessage msg, int client) {
 		ACLMessage reply = msg.createReply();
 		reply.setConversationId(Ontology.CONVERSATION_GET_DATA);
