@@ -62,7 +62,7 @@ public class EQMessageAgent extends Agent {
 			}
 		});
 		
-		boolean testMastStateChange = true;
+		boolean testMastStateChange = false;
 		boolean getModuleList = false;
 		boolean getAllStateTest = false;
 		boolean scheduleTest = false;
