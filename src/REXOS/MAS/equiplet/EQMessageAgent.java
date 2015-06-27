@@ -71,6 +71,7 @@ public class EQMessageAgent extends Agent {
 		
 		//Test a state change and the listener
 		if(testMastStateChange){
+			sleep(15000);
 			//Register onChange listener
 			sendOnChangeRequest(registerMastState);
 			//Get current state

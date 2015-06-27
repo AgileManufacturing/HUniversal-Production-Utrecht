@@ -98,12 +98,26 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 					
 					// Connect to new agent
 					agentConnections.get(index).addClient(webSocketConnection);
+					handleWebSocketGetAgentInfo(jsonObject, webSocketConnection);
+
 				}else{
 					System.out.println("SCADA: add agent: " + aid);
 					agentConnections.add(new AgentConnection(aid, webSocketConnection));
+					ACLMessage m = new ACLMessage(ACLMessage.QUERY_IF);
+					JSONObject agent = jsonObject.getJSONObject("agent");
+					AID receiver = new AID(agent.getString("id"), AID.ISLOCALNAME);
+					
+					JSONObject o = new JSONObject();
+					o.put("command", "GET_DETAILED_INFO");
+					o.put("client", webSocketConnection.hashCode());
+					
+					m.addReceiver(receiver);
+					m.setOntology(Ontology.GRID_ONTOLOGY);
+					m.setConversationId(Ontology.CONVERSATION_GET_DATA);
+					m.setContent(o.toString());
+					send(m);
 					connectToAgent(aid);
 				}
-				handleWebSocketGetAgentInfo(jsonObject, webSocketConnection);
 				break;
 			case "MODIFY_AGENT":
 				handleModifyAgent(jsonObject);
