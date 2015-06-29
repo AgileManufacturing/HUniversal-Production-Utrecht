@@ -410,10 +410,10 @@ public class GridAgent extends Agent implements SCADABasicListener {
 	/**
 	 * Whenever an agent is killed, GridAgents needs to update clients and the list
 	 * 
-	 * TODO SCADA not completely working
 	 * @param content information about the agent which is taken down
 	 */
 	public void onAgentTakeDown(String content) {
+		System.err.println("onAgentTakeDown");
 		// Inform all listeners about take down off the agent in the grid
 		for (int i = 0; i < basicListeners.size(); i++) {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -430,11 +430,11 @@ public class GridAgent extends Agent implements SCADABasicListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.err.println(agentName);
 		// Search for the agent in agentInformation
 		if(agentName != null){
-			AID aid = new AID(agentName, AID.ISLOCALNAME);
 			for(int index = 0; index < agentInformation.size(); index++){
-				if(agentInformation.get(index).getAID().equals(aid)){
+				if(agentInformation.get(index).getAID().getLocalName().equals(agentName)){
 					// Remove the agent from the agentInformation arraylist
 					agentInformation.remove(index);
 					break;
