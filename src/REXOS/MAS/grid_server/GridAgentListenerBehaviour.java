@@ -20,34 +20,32 @@ public class GridAgentListenerBehaviour extends Behaviour {
 	GridAgent gridAgent = null;
 	SubscriptionInitiator test = null;
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public GridAgentListenerBehaviour(GridAgent gridAgent) {
 		this.gridAgent = gridAgent;
 		this.done = false;
-		subscribeByDF();
+		subscribeToDF();
 	}
 
-	void subscribeByDF() {
+	/**
+	 * Subscribe to the DF
+	 * All registered/registering agents will be given to the GridAgent
+	 */
+	void subscribeToDF() {
 		DFAgentDescription description = new DFAgentDescription();
 		SearchConstraints sc = new SearchConstraints();
 		gridAgent.send(DFService.createSubscriptionMessage(gridAgent,
 				gridAgent.getDefaultDF(), description, sc));
-		System.out.println("GA subscribed by DF");
 	}
 
+	/**
+	 * This method is used for receiving ACLMessages
+	 */
 	@Override
 	public void action() {
 		ACLMessage msg = gridAgent.blockingReceive();
 		if (msg != null) {
-			System.out
-					.printf("GA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n",
-							gridAgent.getLocalName(), msg.getSender()
-									.getLocalName(), msg.getPerformative(), msg
-									.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
 			case ACLMessage.INFORM:
 				if (msg.getSender().equals(gridAgent.getDefaultDF())) {
@@ -62,11 +60,9 @@ public class GridAgentListenerBehaviour extends Behaviour {
 					handleDataResponse(msg);
 				} else if (msg.getConversationId().equals(
 						Ontology.CONVERSATION_INFORMATION_REQUEST)) {
-					System.out.println("GA inform conversation inform");
 					gridAgent.sendAgentInfo(msg.getContent());
 				} else if (msg.getConversationId().equals(
 						Ontology.CONVERSATION_AGENT_TAKEDOWN)) {
-					System.out.println("GA: ON TAKEDOWN: " + msg.getContent());
 					gridAgent.onAgentTakeDown(msg.getContent());
 				} else if (msg.getConversationId().equals(
 						Ontology.CONVERSATION_SCADA_COMMAND)) {
@@ -76,6 +72,9 @@ public class GridAgentListenerBehaviour extends Behaviour {
 				} else {
 					System.err.println("GA: Unkown message" + msg.getContent());
 				}
+				/**
+				 * TODO SCADA check this
+				 */
 				// if
 				// (msg.getConversationId().equals(Ontology.CONVERSATION_PRODUCT_ARRIVED))
 				// {
@@ -86,25 +85,26 @@ public class GridAgentListenerBehaviour extends Behaviour {
 				// handleProductRelease(msg);
 				// }
 				break;
-			// Request of other agent to get information to schedule a job
-			// will send confirm or disconfirm message in return
 			case ACLMessage.REQUEST:
 				try {
 					JSONObject object = new JSONObject(msg.getContent()
 							.toString());
 					String command = object.getString("command");
+					
 					if (command.equals("GET_OVERVIEW")) {
-						System.out.println("Request: GetOverview received!");
 						int clientHash = object.getInt("client");
 						sendOverviewToSCADAAgent(msg, clientHash);
-						// Get all agents and send them to the SCADA agent.
+					}else{
+						System.err.println("GA: Unkown request " + msg.getContent());
 					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				// handleScheduling(msg);
 				break;
+			/**
+			 * TODO SCADA check this
+			 */
 			// query for information of the GridAgent
 			case ACLMessage.QUERY_REF:
 				// handleCanExecute(msg);
@@ -128,32 +128,31 @@ public class GridAgentListenerBehaviour extends Behaviour {
 		}
 
 	}
-
+	/**
+	 * done, default
+	 * TODO implement method
+	 * @return done 
+	 */
 	@Override
 	public boolean done() {
 		// TODO Auto-generated method stub
 		return done;
 	}
 
+	/**
+	 * Handle messages with conversationID: CONVERSATION_LISTENER_COMMAND
+	 * This is used for adding basiListeners
+	 * @param msg ACLMessage
+	 */
 	private void handleListenerCommand(ACLMessage msg) {
 		if (msg != null) {
 			try {
 				JSONObject object = new JSONObject(msg.getContent());
 
-				// Debug output
-				Logger.log("Content of ACL message: " + object.toString());
+				// Get the command
+				String command = object.getString("command").toString();
 
-				// Identifying modules
-				String requestedEquipletCommand = object.getString("command")
-						.toString();
-
-				// Program if statements that will appropriately handle messages
-				// sent to the GridAgent.
-				if (requestedEquipletCommand.equals("AddDetailedListener")) {
-					System.out.println("addDetailedListener "
-							+ gridAgent.toString());
-					gridAgent.addDetailedListener(msg.getSender());
-				} else if (requestedEquipletCommand.equals("AddBasicListener")) {
+				if (command.equals("AddBasicListener")) {
 					System.out.println("addBasicListener "
 							+ gridAgent.toString());
 					gridAgent.addBasicListener(msg.getSender());
@@ -168,11 +167,15 @@ public class GridAgentListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Handle the message for a new Agent in the grid
+	 * 
+	 * @param msg contain information about the new agent (name)
+	 */
 	private void handleNewAgent(ACLMessage msg) {
 		try {
 			DFAgentDescription[] results = DFService.decodeNotification(msg
 					.getContent());
-			System.out.println("AGENTS FOUND: " + results.length);
 			for (int i = 0; i < results.length; i++) {
 				DFAgentDescription dfd = results[i];
 				AID agent = dfd.getName();
@@ -204,15 +207,20 @@ public class GridAgentListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Create an agent in the grid
+	 * @param msg contain agent information, id, type and arguments
+	 */
 	private void handleCreateAgent(ACLMessage msg) {
 		try {
 			JSONObject object = new JSONObject(msg.getContent());
 			JSONObject agent = object.getJSONObject("agent");
 			String id = agent.getString("id");
 			String type = agent.getString("type");
-			// TODO shouldn't this be a json object with something?
+			// TODO SCADA shouldn't this be a json object with something?
 			String arguments = agent.getString("arguments");
-
+			
+			// select type of agent which should be spawned
 			switch (type) {
 			case "EquipletAgent":
 				gridAgent.spawnEquipletAgent(id, arguments);
@@ -220,7 +228,7 @@ public class GridAgentListenerBehaviour extends Behaviour {
 			case "ProductAgent":
 				gridAgent.spawnProductAgent(id, arguments);
 				break;
-			// not sure if these agent should be an option
+			// TODO SCADA not sure if these agent should be an option
 			case "TrafficAgent":
 				break;
 			case "SupplyAgent":
@@ -232,9 +240,12 @@ public class GridAgentListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Handle the responds of the agent for the GET_BASIC_INFO message
+	 * @param msg
+	 */
 	private void handleDataResponse(ACLMessage msg) {
 		try {
-			System.out.println(msg);
 			JSONObject object = new JSONObject(msg.getContent());
 			switch (object.getString("command").toString()) {
 			case "GET_BASIC_INFO":
@@ -242,6 +253,8 @@ public class GridAgentListenerBehaviour extends Behaviour {
 				String type = agent.getString("type");
 				String state = agent.getString("state");
 				AID aid = new AID(agent.getString("id"), AID.ISGUID);
+				
+				// Add basic info of the agent to the list
 				BasicAgentInfo bai = new BasicAgentInfo(aid, state, type);
 				gridAgent.addBasicAgentInfo(bai);
 
@@ -258,6 +271,11 @@ public class GridAgentListenerBehaviour extends Behaviour {
 		}
 	}
 
+	/**
+	 * Send the basic info gridoverview as reply to the message
+	 * @param msg message containing the GET_OVERVIEW request
+	 * @param client websocket identifier used in SCADAAgent
+	 */
 	private void sendOverviewToSCADAAgent(ACLMessage msg, int client) {
 		ACLMessage reply = msg.createReply();
 		reply.setConversationId(Ontology.CONVERSATION_GET_DATA);
