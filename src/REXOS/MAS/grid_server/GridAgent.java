@@ -77,35 +77,40 @@ import SCADA.SCADABasicListener;
 import SCADA.SCADADetailedListener;
 import SCADA.StochasticsTemp;
 
-public class GridAgent extends Agent implements SCADABasicListener,
-		SCADADetailedListener {
+public class GridAgent extends Agent implements SCADABasicListener {
 	private static final long serialVersionUID = -720095833750151495L;
 
 	private long productCounter = 0;
 	private ArrayList<AID> basicListeners;
-	private ArrayList<AID> detailedListeners;
 	private ArrayList<BasicAgentInfo> agentInformation;
-	
-	//private boolean fakeSimulate = false;
 
 	public GridAgent() {
 		productCounter = 0;
 		basicListeners = new ArrayList<AID>();
-		detailedListeners = new ArrayList<AID>();
 		agentInformation = new ArrayList<BasicAgentInfo>();
 	}
 
+	/**
+	 * Setup the GridAgent and spawn some agents
+	 */
 	@Override
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
 		spawnEquipletAgent("EQ0", "hal");
+		// TODO No arguments are given
 		spawnProductAgent("PA1", null );
+		
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
 		testGetAgents();
 	}
 
+	/**
+	 * This isn't used by GridAgent anymore but might need to be added into GridAgentListenerBehaviour
+	 * TODO check this
+	 *
+	 */
 	class GridListenerBehaviour extends CyclicBehaviour {
 		/**
 		 * 
@@ -319,6 +324,9 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	}
 
 
+	/**
+	 * Take this agent down
+	 */
 	@Override
 	protected void takeDown() {
 		System.out.println(getLocalName() + ": terminated");
@@ -328,8 +336,6 @@ public class GridAgent extends Agent implements SCADABasicListener,
 	public void testGetAgents() {
 		DFAgentDescription description = new DFAgentDescription();
 		SearchConstraints sc = new SearchConstraints();
-		// sc.setMaxResults((long) -1);
-		// description.setType();
 		try {
 			DFAgentDescription listOfAgents[] = DFService.search(this,
 					description, sc);
@@ -351,7 +357,12 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		try {
 			ContainerController cc = getContainerController();
 			// TODO check for other inputArguments instead of a string
-			Object[] arguments = new Object[] { inputArguments };
+			Object[] arguments;
+			if(inputArguments != null){
+				arguments = new Object[] { inputArguments };
+			}else{
+				arguments = new Object[] { "hal" };
+			}
 			AgentController ac = cc.createNewAgent(name, EquipletAgent.class.getName(), arguments);
 			ac.start();
 		} catch (StaleProxyException e) {
@@ -360,49 +371,50 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		}
 	}
 
-	void addBasicListener(AID agent) {
+	/**
+	 * Add agent as listener for update messages from the GridAgent
+	 * 
+	 * @param agent AID of agent which will be added as listener
+	 */
+	public void addBasicListener(AID agent) {
 		if(!basicListeners.contains(agent)){
 			basicListeners.add(agent);
-			System.out.println("GA: add basicListener " + agent.toString());
 		}
 	}
 
-	// This might not be necessary
-	void addDetailedListener(AID agent) {
-		if(!detailedListeners.contains(agent)){
-			detailedListeners.add(agent);
-			System.out.println("GA: add detailedListener " + agent.toString());
-		}
-	}
-
+	/**
+	 * Receive an update message, send this to all basicListeners
+	 * 
+	 * TODO SCADA
+	 * @param agent AID of agent which update, this is not needed?
+	 * @param message message containing information about the agent and the update
+	 */
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
-		System.out.println("GA onBasicUpdate " + basicListeners.size());
-
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), message);
 		}
 	}
 	
+	/**
+	 * Send information to all listeners.
+	 * 
+	 * @param message  message containing information about the agent
+	 */
 	public void sendAgentInfo(String message){
 		for (int i = 0; i < basicListeners.size(); i++) {
 			sendUpdateMessage(basicListeners.get(i), message);
 		}
 	}
-
-	// This might not be necessary
-	@Override
-	public void onDetailedUpdate(AID agent, String message) {
-		System.out.println("GA: detailedUpdate from: " + agent.toString()
-				+ "message: " + message);
-		String updateString = "{\n 'update-detailed-listener': {\n 'aid': "
-				+ agent + "\n 'values': " + message + "\n}\n }";
-		for (int i = 0; i < detailedListeners.size(); i++) {
-			sendUpdateMessage(detailedListeners.get(i), updateString);
-		}
-	}
 	
+	/**
+	 * Whenever an agent is killed, GridAgents needs to update clients and the list
+	 * 
+	 * TODO SCADA not completely working
+	 * @param content information about the agent which is taken down
+	 */
 	public void onAgentTakeDown(String content) {
+		// Inform all listeners about take down off the agent in the grid
 		for (int i = 0; i < basicListeners.size(); i++) {
 			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 			msg.addReceiver(basicListeners.get(i));
@@ -410,30 +422,35 @@ public class GridAgent extends Agent implements SCADABasicListener,
 			msg.setContent(content);
 			send(msg);
 		}
-		boolean found = false;
-		int index = 0;
 		String agentName = "";
 		try {
-			JSONObject object =new JSONObject(content);
+			JSONObject object = new JSONObject(content);
 			agentName = object.getJSONObject("agent").getString("id");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Search for the agent in agentInformation
 		if(agentName != null){
 			AID aid = new AID(agentName, AID.ISLOCALNAME);
-			for(index = 0; index < agentInformation.size(); index++){
+			for(int index = 0; index < agentInformation.size(); index++){
 				if(agentInformation.get(index).getAID().equals(aid)){
-					found = true;
+					// Remove the agent from the agentInformation arraylist
+					agentInformation.remove(index);
 					break;
 				}
 			}
 		}
-		if(found){
-			agentInformation.remove(index);
-		}
 	}
 	
+	
+	/**
+	 * Send update message to the agent
+	 * 
+	 * TODO SCADA is this used?
+	 * @param agent receiver
+	 * @param update message containing the update
+	 */
 	private void sendUpdateMessage(AID agent, String update) {
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
 
@@ -442,21 +459,35 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		message.setConversationId(Ontology.CONVERSATION_LISTENER_COMMAND);
 		message.setContent(update);
 		send(message);
-		System.out.println("GA UpdateMessage");
 	}
 	
+	/** 
+	 * Add new basic agent information to agentInformation arraylist 
+	 * 
+	 * @param bai BasicAgentInfo
+	 */
 	public void addBasicAgentInfo(BasicAgentInfo bai) {
 		if(!agentInformation.contains(bai)) {
 			agentInformation.add(bai);
 		}
 	}
 	
+	/** 
+	 * Remove basic agent information from agentInformation arraylist 
+	 * 
+	 * @param bai BasicAgentInfo
+	 */
 	public void removeBasicAgentInfo(BasicAgentInfo bai) {
 		if(agentInformation.contains(bai)) {
 			agentInformation.remove(bai);
 		}
 	}
 	
+	/**
+	 * Create a JSONObject containing all basicInformation about the agents in the grid 
+	 * 
+	 * @return JSONObject containing agentInformation
+	 */
 	public JSONObject getJSONOfOverview() {
 		JSONObject object = new JSONObject();
 		try {
@@ -473,9 +504,12 @@ public class GridAgent extends Agent implements SCADABasicListener,
 		return object;
 	}
 	
+	/**
+	 * Update the state of an agent in agentInformation arraylist
+	 * @param agent
+	 * @param message
+	 */
 	public void updateStateInfo(AID agent, String message){
-		System.out.println(message);
-		
 		String state = "";
 		try {
 			JSONObject object = new JSONObject(message);
