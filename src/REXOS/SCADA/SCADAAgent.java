@@ -19,7 +19,7 @@ import MAS.util.Ontology;
 public class SCADAAgent extends Agent implements WebSocketServerListener, SCADABasicListener, SCADADetailedListener{
 
 	/**
-	 *  Default UID
+	 *  Translates the client input from the WebSocketServer to messages in the JADE framework.
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -29,6 +29,9 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	private ArrayList<AgentConnection> agentConnections;
 	private AgentConnection gridAgent;
 	
+	/**
+	 * Basic agent setup. WebSocketServer starts and behaviours are added.
+	 */
 	protected void setup() {
 		agentConnections = new ArrayList<AgentConnection>();
 		try {
@@ -40,11 +43,14 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		}
 		addBehaviour(new SCADAAgentListenerBehaviour(this));
 	}
-
+	
+	/**
+	 * This method receives the messages from the WebSocketServer and determines what should 
+	 * happen and what agent in the grid should be contacted.
+	 */
 	@Override
 	public void onWebSocketMessage(WebSocket webSocketConnection, String message) {
 		// message convert to variables
-		System.out.println("SCADAAgent received: " + message);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(message);
@@ -78,7 +84,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 				object.put("client", webSocketConnection.hashCode());
 				msg.setContent(object.toString());
 				send(msg);
-				System.out.println(msg.toString());
 				break;
 			case "GET_AGENT_INFO":
 				removeClient(webSocketConnection);
@@ -101,7 +106,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 					handleWebSocketGetAgentInfo(jsonObject, webSocketConnection);
 
 				}else{
-					System.out.println("SCADA: add agent: " + aid);
 					agentConnections.add(new AgentConnection(aid, webSocketConnection));
 					ACLMessage m = new ACLMessage(ACLMessage.QUERY_IF);
 					JSONObject agent = jsonObject.getJSONObject("agent");
@@ -116,7 +120,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 					m.setConversationId(Ontology.CONVERSATION_GET_DATA);
 					m.setContent(o.toString());
 					send(m);
-					connectToAgent(aid);
+					register(aid);
 				}
 				break;
 			case "MODIFY_AGENT":
@@ -134,11 +138,19 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		}
 	}
 	
+	/**
+	 * When the WebSocketServer onClose method is called this method gets called and removes 
+	 * the client from the AgentConnection
+	 */
 	@Override
 	public void onWebSocketClose(WebSocket webSocketConnection){
 		removeClient(webSocketConnection);
 	}
 	
+	/**
+	 * Removes a WebSocket connection from an AgentConnection
+	 * @param webSocketConnection - WebSocket to be removed form AgentConnection
+	 */
 	private void removeClient(WebSocket webSocketConnection){
 		int index = 0;
 		boolean clientFound = false;
@@ -159,6 +171,10 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		}
 	}
 	
+	/**
+	 * Remove an AgentConnection from the agentConnection list.
+	 * @param msg - Based on this ACLMessage the to be removed AgentConnection get removed from the agentConnection list.
+	 */
 	public void removeAgentConnection(ACLMessage msg) {
 		AgentConnection agentconnection = null;
 		if(msg.getSender().equals(gridAgent.getAgent())){
@@ -184,6 +200,10 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		}
 	}
 	
+	/**
+	 * Deregister the SCADA Agent as subscriber from an agent
+	 * @param aid - The AID of the agent to be deregistered to
+	 */
 	private void deregister(AID aid){
 		ACLMessage msg  = new ACLMessage(ACLMessage.PROPOSE);
 		msg.addReceiver(aid);
@@ -192,8 +212,8 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		
 		JSONObject object = new JSONObject();
 		try {
-			object.put("command","ALL");
-			object.put("action", "REGISTER_LISTENER");
+			object.put("command",EquipletOnChangedHandler.OnChangedTypes.ALL);
+			object.put("action", "DEREGISTER_LISTENER");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -202,12 +222,17 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		send(msg);
 	}
 	
+	
 	@Override
 	public void onWebSocketOpen(WebSocket webSocketConnection) {
-		System.out.println("SCADA agent: new socket opened!");
+
 	}	
 	
-	private void connectToAgent(AID agentID){
+	/**
+	 * Register the SCADA Agent as subscriber to an agent.
+	 * @param agentID - The AID of the agent to be subscribed to
+	 */
+	private void register(AID agentID){
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
 		JSONObject object = new JSONObject();
 		try {
@@ -225,6 +250,10 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		send(message);
 	}
 	
+	/**
+	 * Connect the SCADA Agent as a basicListener to the gridAgent.
+	 * @param gridAgentID - AID of the gridAgent
+	 */
 	private void connectToGridAgent(AID gridAgentID){
 		ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
 		JSONObject object = new JSONObject();
@@ -242,23 +271,17 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		send(message);
 	}
 	
-	public void executeMethodOnAgent(String method, String param) {
-		switch(method) {
-		case "test":
-			System.out.println("Executing " + method + " with param: " + param);
-			break;
-			default:
-		}
-	}
-
+	/**
+	 * Method to handle basic updates from agents
+	 * @param agent - The AID of the agent. The AID will be used to look up the agents clients in the AgentConnection.
+	 * @param message - The message to be send to the found clients in the AgentConnection.
+	 */
 	@Override
 	public void onBasicUpdate(AID agent, String message) {
 		
 		AgentConnection agentConn = null;
 		
 		// Search AgentConnection for agent
-		System.out.println("AGENTCONNECTIONS:" + agentConnections.size());
-		System.out.println("SCADAAgent agent id: " + agent);
 		for(int i = 0; i < agentConnections.size(); i++){
 			if(agentConnections.get(i).getAgent().equals(agent)){
 				agentConn = agentConnections.get(i);
@@ -268,22 +291,23 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		
 		// AgentConnection should be found
 		if(agentConn != null){
-			System.out.println(agentConn.getAgent());
-			System.out.println(agentConn.getAmountOfClients());
 			int index = agentConnections.indexOf(agentConn);
 			ArrayList<WebSocket> clients = agentConnections.get(index).getClients();
-			System.out.println(clients.size());
 			for(int i = 0; i < clients.size(); i++){
 				webSocketServer.sendMessage(clients.get(i), message);
 			}
 		} else {
-			System.out.println("agentCon == null");
+			System.out.println("AgentConnection is null");
 		}
 	}
-
+	
+	/**
+	 * Method to handle the detailed update of an agent
+	 * @param agent - The AID of the agent. The AID will be used to look up the agents clients in the AgentConnection.
+	 * @param message - The message to be send to the found clients in the AgentConnection.
+	 */
 	@Override
 	public void onDetailedUpdate(AID agent, String message) {
-		System.out.println("SCADA: detailedUpdate from: " + agent.toString() + "message: " + message);
 		AgentConnection agentConn = null;
 		
 		// Search AgentConnection for agent
@@ -304,6 +328,10 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		}
 	}
 	
+	/**
+	 * Method handles the gridAgent response on the GET_OVERVIEW command
+	 * @param content - The JSONObject recevied from the gridAgent
+	 */
 	public void handleGetOverview(JSONObject content){
 		try {
 			int client = content.getInt("client");
@@ -322,6 +350,11 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Method handles the GetDetailedInfo response from an agent
+	 * @param content - The JSONObject received from the agent
+	 */
 	public void handleGetDetailedInfo(JSONObject content){
 		try {
 			int client = content.getInt("client");
@@ -330,7 +363,6 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			JSONObject agent = content.getJSONObject("agent");
 			AID agentID = new AID(agent.getJSONObject("id").getString("value"), AID.ISLOCALNAME); 
 			int index = 0;
-			System.out.println("Send over WS" + agentID);
 			AgentConnection agentConn = null;
 			for(int i = 0; i < agentConnections.size(); i++){
 				if(agentConnections.get(i).getAgent().equals(agentID)){
@@ -350,6 +382,12 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * This method handles the clients request to view an agent in detailed view.
+	 * @param jsonObject - The JSONObject sent by the client containing the agents info
+	 * @param webSocketConnection - The clients websocket connection.
+	 */
 	public void handleWebSocketGetAgentInfo(JSONObject jsonObject, WebSocket webSocketConnection){
 
 		try {
@@ -369,7 +407,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			send(msg);
 			
 			//Subcribe on Agent Updates.
-			connectToAgent(receiver);
+			register(receiver);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -378,6 +416,10 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 	
 	}
 	
+	/**
+	 * Method handles the clients request to spawn a new agent
+	 * @param object - JSONObject containing the information given by the client.
+	 */
 	private void handleCreateAgent(JSONObject object){
 		ACLMessage msg = new ACLMessage(ACLMessage.PROPOSE);
 		msg.setOntology(Ontology.GRID_ONTOLOGY);
@@ -388,6 +430,11 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		send(msg);
 		
 	}
+	
+	/**
+	 * Handles the clients request to get all types of agents to show it on the website.
+	 * @param object - JSONObject containing the infomormation given by the client
+	 */
 	private void handleGetAllAgentTypes(JSONObject object){
 		ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
 		msg.setOntology(Ontology.GRID_ONTOLOGY);
@@ -399,6 +446,10 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 		
 	}
 	
+	/**
+	 * Handles the clients request to modify an agent based on the data filled in the form.
+	 * @param object - JSONObject containing the filled in form.
+	 */
 	private void handleModifyAgent(JSONObject object){
 		JSONObject agent;
 		try {
