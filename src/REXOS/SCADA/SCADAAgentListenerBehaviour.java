@@ -14,6 +14,10 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 	public SCADAAgentListenerBehaviour(SCADAAgent scada){
 		this.scada = scada;
 	}
+	
+	/**
+	 * Handles the incoming ACLMessage on the SCADA agent.
+	 */
 	@Override
 	public void action() {
 		ACLMessage msg = myAgent.blockingReceive();
@@ -21,7 +25,6 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 			switch(msg.getPerformative()) {
 			case ACLMessage.PROPOSE: 
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)) {
-					System.out.println("SCADA AGENT: "+ msg.getContent());
 					scada.onBasicUpdate( msg.getSender(), msg.getContent());
 				}
 				break;
@@ -44,7 +47,6 @@ public class SCADAAgentListenerBehaviour extends CyclicBehaviour {
 					}
 					
 				} else if(msg.getConversationId().equals(Ontology.CONVERSATION_AGENT_TAKEDOWN)) {
-					System.out.println("ON TAKEDOWN");
 					scada.removeAgentConnection(msg);
 				} else if(msg.getConversationId().equals(Ontology.CONVERSATION_SCADA_COMMAND)) {
 					scada.onDetailedUpdate(msg.getSender(), msg.getContent());
