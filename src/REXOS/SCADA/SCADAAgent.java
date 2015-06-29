@@ -191,7 +191,7 @@ public class SCADAAgent extends Agent implements WebSocketServerListener, SCADAB
 			for(WebSocket ws : agentconnection.getClients()) {
 				this.webSocketServer.sendMessage(ws, msg.getContent().toString());
 				if(agentconnection != gridAgent){
-					ws.close();
+					gridAgent.addClient(ws);
 				}
 			}
 			if(agentconnection != gridAgent){
