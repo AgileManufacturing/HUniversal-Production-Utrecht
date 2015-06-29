@@ -102,7 +102,9 @@ Server.prototype.onmessage = function(event) {
             if (this.connected_to === this.ENTITY_GRID) {
                 this.ui.removeFromGrid(data['agent']);
             } else {
-                this.ui.disconnectAgent();
+                //this.ui.disconnectAgent();
+                this.setConnectedTo(this.ENTITY_GRID);
+                this.send(this.CMD_GET_OVERVIEW);
             }
             break;
         default:
