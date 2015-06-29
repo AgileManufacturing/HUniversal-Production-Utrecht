@@ -104,6 +104,7 @@ Server.prototype.onmessage = function(event) {
             } else {
                 //this.ui.disconnectAgent();
                 this.setConnectedTo(this.ENTITY_GRID);
+                this.send(this.CMD_GET_OVERVIEW);
             }
             break;
         default:
