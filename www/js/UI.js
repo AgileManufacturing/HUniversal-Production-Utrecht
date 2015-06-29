@@ -88,7 +88,7 @@ Grid.prototype.update = function(agent) {
 };
 /**
  * Remove an Agent from the Grid
- * @param  {[type]} agent Agent object containing id used to find Agent to remove
+ * @param  {object} agent Agent object containing id used to find Agent to remove
  */
 Grid.prototype.remove = function(agent) {
     var id = agent['id'];
@@ -286,23 +286,46 @@ UIPanel.prototype.CLOSED      = 0;
 UIPanel.prototype.CONNECTING  = 1;
 UIPanel.prototype.OPEN        = 2;
 
+/**
+ * Set the information of the Agent entity
+ * @param {object} agent Agent object from which entity is built
+ */
 UIPanel.prototype.setAgent = function(agent) {
     this.agent.set(agent);
 };
+/**
+ * Update the information of the Agent entity
+ * @param {object} agent Agent object from which entity is updated
+ */
 UIPanel.prototype.updateAgent = function(agent) {
     this.agent.update(agent);
 };
 
+/**
+ * Add an Agent to the Grid entity
+ * @param {object} agent Agent object to be added to Grid
+ */
 UIPanel.prototype.addToGrid = function(agent) {
     this.grid.add(agent, (this.clickAgent).bind(this));
 };
+/**
+ * Update an Agent in the Grid entity
+ * @param {object} agent Agent object to be updated in the Grid
+ */
 UIPanel.prototype.updateGrid = function(agent) {
     this.grid.update(agent);
 };
+/**
+ * Remove an Agent from the Grid
+ * @param {object} agent Agent object having id that is to be removed
+ */
 UIPanel.prototype.removeFromGrid = function(agent) {
     this.grid.remove(agent);
 };
 
+/**
+ * This method is called when a navigation button is clicked.
+ */
 UIPanel.prototype.clickNav = function(event) {
     event.preventDefault();
 
@@ -313,6 +336,10 @@ UIPanel.prototype.clickNav = function(event) {
     }
 };
 
+/**
+ * Method that will show the entity matching the string given.
+ * @param  {event} event Event from click event
+ */
 UIPanel.prototype.showEntity = function(entity) {
     $('main > section').hide();
     $('#nav ul > li > a').removeClass('current');
@@ -320,13 +347,18 @@ UIPanel.prototype.showEntity = function(entity) {
     $('#nav ul > li > a[data-entity=' + entity + ']').addClass('current');
     $('main > section#' + entity).show();
 };
-
+/**
+ * Clean the entities, getting rid of Agent and Grid.
+ */
 UIPanel.prototype.cleanEntities = function() {
     this.grid.clean();
     this.agent.clean();
 };
 
-
+/**
+ * Method wrapping the Magnific Popup so a message can be popupped
+ * @param  {string} msg Message to show
+ */
 UIPanel.prototype.popup = function(msg) {
     var $div = $('<div></div>');
     $div.addClass('white-popup');
@@ -336,7 +368,11 @@ UIPanel.prototype.popup = function(msg) {
 };
 
 
-
+/**
+ * Log a message with an identifier in the log window
+ * @param  {string} msg Message to be printed
+ * @param  {string} id  Identifier shown in front of message
+ */
 UIPanel.prototype.println = function(msg, id) {
     // If argument(s) not defined, give default
     id = id || '';
@@ -363,6 +399,10 @@ UIPanel.prototype.println = function(msg, id) {
         this.log_pre.scrollTop(this.log_pre.prop('scrollHeight'));
     }
 };
+/**
+ * Clear the log window.
+ * @param  {event} event Event from click event from clear button
+ */
 UIPanel.prototype.clearLog = function(event) {
     if (typeof(event) !== 'undefined') {
         event.preventDefault();
@@ -371,7 +411,10 @@ UIPanel.prototype.clearLog = function(event) {
     this.log_pre.empty();
 };
 
-
+/**
+ * Set the connection status in the control panel
+ * @param {string} con_status Status, which is one of CLOSED, CONNECTING or OPEN
+ */
 UIPanel.prototype.setConStatus = function(con_status) {
     if (con_status == this.CLOSED) {
         this.con_status_light.css('background-color', 'red');
@@ -389,6 +432,10 @@ UIPanel.prototype.setConStatus = function(con_status) {
     }
 };
 
+/**
+ * Method called wen an Agent is clicked in the Grid entity.
+ * @param  {event} event Click event object
+ */
 UIPanel.prototype.clickAgent = function(event) {
     event.preventDefault();
 
@@ -399,12 +446,22 @@ UIPanel.prototype.clickAgent = function(event) {
 
     this.listener.UIGetAgent(id);
 };
+
+/**
+ * Method called wen stop button is clicked in the control panel.
+ * @param  {event} event Click event object
+ */
 UIPanel.prototype.clickStop = function(event) {
     this.btn_stop.prop('disabled', true);
     this.btn_start.prop('disabled', false);
 
     this.listener.UIStop();
 };
+
+/**
+ * Method called wen start button is clicked in the control panel.
+ * @param  {event} event Click event object
+ */
 UIPanel.prototype.clickStart = function(event) {
     this.btn_stop.prop('disabled', false);
     this.btn_start.prop('disabled', true);
@@ -412,6 +469,10 @@ UIPanel.prototype.clickStart = function(event) {
     this.listener.UIStart();
 };
 
+/**
+ * Method called wen submit button is clicked in the create agent form.
+ * @param  {event} event Submit event object
+ */
 UIPanel.prototype.submitCreateAgent = function(event) {
     event.preventDefault();
 
