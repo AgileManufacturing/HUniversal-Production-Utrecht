@@ -77,7 +77,7 @@ import SCADA.SCADABasicListener;
 import SCADA.SCADADetailedListener;
 import SCADA.StochasticsTemp;
 
-public class GridAgent extends Agent implements SCADABasicListener {
+public class GridAgent extends Agent{
 	private static final long serialVersionUID = -720095833750151495L;
 
 	private long productCounter = 0;
@@ -382,20 +382,6 @@ public class GridAgent extends Agent implements SCADABasicListener {
 		}
 	}
 
-	/**
-	 * Receive an update message, send this to all basicListeners
-	 * 
-	 * TODO SCADA
-	 * @param agent AID of agent which update, this is not needed?
-	 * @param message message containing information about the agent and the update
-	 */
-	@Override
-	public void onBasicUpdate(AID agent, String message) {
-		for (int i = 0; i < basicListeners.size(); i++) {
-			sendUpdateMessage(basicListeners.get(i), message);
-		}
-	}
-	
 	/**
 	 * Send information to all listeners.
 	 * 

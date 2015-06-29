@@ -68,7 +68,7 @@ public class GridAgentListenerBehaviour extends Behaviour {
 						Ontology.CONVERSATION_SCADA_COMMAND)) {
 					gridAgent
 							.updateStateInfo(msg.getSender(), msg.getContent());
-					gridAgent.onBasicUpdate(msg.getSender(), msg.getContent());
+					gridAgent.sendAgentInfo(msg.getContent());
 				} else {
 					System.err.println("GA: Unkown message" + msg.getContent());
 				}
@@ -262,7 +262,7 @@ public class GridAgentListenerBehaviour extends Behaviour {
 				object = new JSONObject(msg.getContent());
 				object.put("command", "ADD_AGENT");
 				object.put("agent", bai.getJSONObject());
-				gridAgent.onBasicUpdate(msg.getSender(), object.toString());
+				gridAgent.sendAgentInfo(object.toString());
 				break;
 			}
 		} catch (JSONException e) {
