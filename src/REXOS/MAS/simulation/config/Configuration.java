@@ -187,7 +187,8 @@ public class Configuration implements IConfig {
 			Position position = new Position(e.getPosition().getX(), e.getPosition().getY());
 			List<Capability> capabilities = new ArrayList<>();
 			for (CapabilityConfig c : e.getCapabilities()) {
-				capabilities.add(new Capability(c.getName(), new HashMap<String, Object>(), new Tick(c.getDuration())));
+				//TODO Get services instead of c.getName()
+				capabilities.add(new Capability(c.getName(), c.getName(), new HashMap<String, Object>(), new Tick(c.getDuration())));
 			}
 			equiplets.put(e.getName(), new Pair<Position, List<Capability>>(position, capabilities));
 		}

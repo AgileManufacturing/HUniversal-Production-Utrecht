@@ -77,6 +77,7 @@ public class ParserPrimitives {
 		}
 		return capabilties;
 	}
+	
 
 	protected static JSONObject parseCapabilty(Capability capability) throws JSONException {
 		JSONObject json = new JSONObject();
@@ -92,7 +93,8 @@ public class ParserPrimitives {
 			Map<String, Object> limitations = parseMap(json.getJSONArray("limitations"));
 			
 			Tick duration = parseTick(json.getJSONObject("duration"));
-			return new Capability(service, limitations, duration);
+			//TODO get capability name for this service
+			return new Capability(service, service, limitations, duration);
 		} else {
 			throw new JSONException("Parser: parsing capability missing arguments service and/or limitations in " + json);
 		}

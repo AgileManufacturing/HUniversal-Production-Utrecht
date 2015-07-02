@@ -1,12 +1,13 @@
 package HAL.steps;
 
+import HAL.Module;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
-import HAL.Module;
 import HAL.dataTypes.ModuleIdentifier;
 
 /**

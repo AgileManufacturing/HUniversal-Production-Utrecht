@@ -24,7 +24,7 @@ import HAL.listeners.ModuleListener;
  *
  */
 @SuppressWarnings("unused")
-public class Module implements ModuleListener {
+public class Module implements ModuleListener { 
 	protected KnowledgeDBClient knowledgeDBClient;
 	protected ModuleIdentifier moduleIdentifier;
 	protected ModuleFactory moduleFactory;
@@ -283,10 +283,18 @@ public class Module implements ModuleListener {
 		this.mode = mode;
 		moduleListener.onModuleModeChanged(module, mode);
 	}
+	/**
+	 * @return current state from the module
+	 * @author Auke de Witte
+	 */
 	public Mast.State getModuleState(){
 		return this.state;
 	}
 	
+	/**
+	 * @return current state from the module
+	 * @author Auke de Witte
+	 */
 	public Mast.Mode getModuleMode(){
 		return this.mode;
 	}
@@ -450,7 +458,7 @@ public class Module implements ModuleListener {
 		setCalibrationDataForModuleAndOtherModules(childs, properties);
 	}
 
-	protected void setCalibrationDataForModuleAndOtherModules(ArrayList<ModuleIdentifier> moduleIdentifiers, String properties){
+	protected	void setCalibrationDataForModuleAndOtherModules(ArrayList<ModuleIdentifier> moduleIdentifiers, String properties){
 		try{
 			int calibrationId = getCalibrationGroupForModuleAndOtherModules(moduleIdentifiers);
 			

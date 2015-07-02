@@ -1,7 +1,7 @@
 package HAL.listeners;
 
 import generic.Mast;
-import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.steps.HardwareStep;
 /**
  * A ModuleListener listens to changes in the {@link Module}s.

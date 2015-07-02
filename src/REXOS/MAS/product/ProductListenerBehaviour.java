@@ -21,7 +21,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 	private ProductAgent product;
 
 	public ProductListenerBehaviour(ProductAgent product) {
-		this.product = product;
+		this.product = product;				
 		this.getDataHandler = new ProductGetDataHandler(product);
 	}
 
@@ -30,6 +30,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED)), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_GET_DATA)));
 		ACLMessage msg = myAgent.receive(template);
 		if (msg != null) {
+			
 			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
 			switch (msg.getPerformative()) {
 			case ACLMessage.INFORM:
@@ -43,6 +44,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 				break;
 			case ACLMessage.QUERY_IF:
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
+					System.out.println("PRODUCTAGENT BASICINFO");
 					this.getDataHandler.handleGetDataRequest(msg);
 				}
 			default:

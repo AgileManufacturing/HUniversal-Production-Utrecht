@@ -685,7 +685,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove1 = new JSONObject();
 			targetMove1.put("x", 5.5);
 			targetMove1.put("y", -5.5);
-			targetMove1.put("z", 14.0);
+			targetMove1.put("z", 14.025);
 			JSONObject targetMove1Approach = new JSONObject();
 			targetMove1Approach.put("x", 0);
 			targetMove1Approach.put("y", 0);
@@ -699,7 +699,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject subjectMove1 = new JSONObject();
 			subjectMove1.put("x", 5.5);
 			subjectMove1.put("y", -5.5);
-			subjectMove1.put("z", 14.0);
+			subjectMove1.put("z", 14.025);
 			JSONObject subjectMove1Approach = new JSONObject();
 			subjectMove1Approach.put("x", 0);
 			subjectMove1Approach.put("y", 0);
@@ -713,7 +713,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove2 = new JSONObject();
 			targetMove2.put("x", 5.5);
 			targetMove2.put("y", -5.5);
-			targetMove2.put("z", 14.0);
+			targetMove2.put("z", 14.025);
 			JSONObject targetMove2Approach = new JSONObject();
 			targetMove2Approach.put("x", 0);
 			targetMove2Approach.put("y", 0);
@@ -727,7 +727,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject subjectMove2 = new JSONObject();
 			subjectMove2.put("x", 5.5);
 			subjectMove2.put("y", -5.5);
-			subjectMove2.put("z", 14.0);
+			subjectMove2.put("z", 14.025);
 			JSONObject subjectMove2Approach = new JSONObject();
 			subjectMove2Approach.put("x", 0);
 			subjectMove2Approach.put("y", 0);

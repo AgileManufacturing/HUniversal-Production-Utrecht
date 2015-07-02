@@ -77,7 +77,7 @@ import SCADA.SCADABasicListener;
 import SCADA.SCADADetailedListener;
 import SCADA.StochasticsTemp;
 
-public class GridAgent extends Agent {
+public class GridAgent extends Agent{
 	private static final long serialVersionUID = -720095833750151495L;
 
 	private long productCounter = 0;
@@ -185,10 +185,12 @@ public class GridAgent extends Agent {
 						ProductStep step = new ProductStep(i, service, criteria);
 						steps.add(step);
 					} else {
-						System.err.println("no target or subject in criteria of product step");
+						System.err
+								.println("no target or subject in criteria of product step");
 					}
 				} else {
-					System.err.println("no service or criteria in product step");
+					System.err
+							.println("no service or criteria in product step");
 				}
 			}
 			return steps;
@@ -230,7 +232,8 @@ public class GridAgent extends Agent {
 					e.printStackTrace();
 				}
 			} else {
-				System.out.println(getLocalName() + " failed to contact the supply agent");
+				System.out.println(getLocalName()
+						+ " failed to contact the supply agent");
 			}
 		}
 		return criteria;
@@ -246,10 +249,12 @@ public class GridAgent extends Agent {
 			TrafficManager trafficAgent = new TrafficManager(equipletMap);
 
 			ContainerController cc = getContainerController();
-			AgentController ac = cc.acceptNewAgent(MASConfiguration.TRAFFIC_AGENT, trafficAgent);
+			AgentController ac = cc.acceptNewAgent(
+					MASConfiguration.TRAFFIC_AGENT, trafficAgent);
 			ac.start();
 		} catch (StaleProxyException e) {
-			System.err.println(this.getLocalName() + ": spawnTrafficAgent fails");
+			System.err.println(this.getLocalName()
+					+ ": spawnTrafficAgent fails");
 		}
 	}
 

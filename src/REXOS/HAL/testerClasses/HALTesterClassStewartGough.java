@@ -18,6 +18,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
@@ -459,7 +460,7 @@ public class HALTesterClassStewartGough implements HardwareAbstractionLayerListe
 			"	\"attachedTo\":{" +
 			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
 			"		\"typeNumber\":\"DFK_22AUC03\"," +
-			"		\"serialNumber\":\"2\"" +
+			"		\"serialNumber\":\"1\"" +
 			"	}," +
 			"	\"mountPointX\":null," +
 			"	\"mountPointY\":null" +

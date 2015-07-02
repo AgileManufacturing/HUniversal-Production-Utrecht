@@ -9,6 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import util.log.LogLevel;
+import util.log.LogSection;
+import util.log.Logger;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 import HAL.libraries.knowledgedb_client.Row;
 
@@ -58,16 +61,14 @@ public class StaticSettings implements Serializable{
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleForModuleIdentifier, 
 				moduleIdentifier.manufacturer, moduleIdentifier.typeNumber, moduleIdentifier.serialNumber);
 		
-		if(rows.length != 1) {
-			throw new NotFoundException();
+		if(rows.length > 0){
+			JSONTokener tokener = new JSONTokener((String) rows[0].get("moduleProperties"));
+			output.moduleConfigurationProperties = new JSONObject(tokener);
+			
+			output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
+			
+			output.calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
 		}
-		JSONTokener tokener = new JSONTokener((String) rows[0].get("moduleProperties"));
-		output.moduleConfigurationProperties = new JSONObject(tokener);
-		
-		output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
-		
-		output.calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
-		
 		
 		return output;
 	}

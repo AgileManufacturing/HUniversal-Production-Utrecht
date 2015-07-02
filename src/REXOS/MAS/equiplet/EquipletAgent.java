@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
@@ -102,7 +103,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 							capabilities.add(newCapability);
 						}
 					}
-					init(defaultPosition, capabilities);
+					init(defaultPosition, capabilities);				
 					
 				} catch (KnowledgeException | BlackboardUpdateException e) {
 					e.printStackTrace();
@@ -112,7 +113,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			} else {
 				// simulation
 				try {
-					Pair<Position, List<Capability>> configuration = Parser.parseEquipletConfiguration(args[0].toString());
+					Pair <Position, List<Capability>> configuration = Parser.parseEquipletConfiguration(args[0].toString());
 
 					init(configuration.first, configuration.second);
 
@@ -288,8 +289,8 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		reconfigHandler.handleEquipletCommand(msg);
 	}
 	
-	public void passOnChangeCommand(ACLMessage msg){
-		onChangeHandler.handleOnChangeListenerCommand(msg);
+	public void passOnChangedCommand(ACLMessage msg){
+		onChangeHandler.handleOnChangedListenerCommand(msg);
 	}
 	
 	public void passEquipletGetRequest(ACLMessage msg){
@@ -1027,10 +1028,22 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		onChangeHandler.onScheduleChanged();
 	}
 	
+	/**
+	 * Get current Mast State
+	 * 
+	 * @return Mast.State
+	 * @author Kevin Bosman
+	 */
 	public Mast.State getCurrentState(){
 		return currentMastState;
 	}
 	
+	/**
+	 * Get current Mast Mode
+	 * 
+	 * @return Mast.Mode
+	 * @author Kevin Bosman
+	 */
 	public Mast.Mode getCurrentMode(){
 		return currentMastMode;
 	}

@@ -82,6 +82,7 @@ public class EQSpawnClass extends Agent {
 
 		Object[] arguments = new Object[] { "hal" };
 		AgentController ac = container.createNewAgent("EQ2", EquipletAgent.class.getName(), arguments);
+		
 		ac.start();
 	}
 }

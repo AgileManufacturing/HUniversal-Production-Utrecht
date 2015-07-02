@@ -249,8 +249,8 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		return moduleFactory;
 	}
 	
-	public ArrayList<Module> getModules() {
-		return moduleFactory.getModules();
+	public ArrayList<Module> getModules(){		
+		return moduleFactory.getModules();		
 	}
 
 	/**
@@ -271,11 +271,9 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		equipletListener.onEquipletCommandStatusChanged(status);
-		
 	}
 
 	public void shutdown() {
-		Logger.log(LogSection.HAL, LogLevel.DEBUG, "HAL is shutting down");
 		rosInterface.shutdown();
 	}
 	
