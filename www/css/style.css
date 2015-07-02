@@ -1,0 +1,367 @@
+html {
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+	font-size: 1em;
+
+	height: 100%;
+}
+
+body {
+	min-height: 100%;
+
+	background-color: #EEEEEE;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+
+/**
+ * Generic class and element styling
+ */
+a {
+	/*font-weight: bold;*/
+	color: inherit;
+}
+
+
+h1 {
+	border-bottom: 1px solid black;
+	font-size: 1.5em;
+}
+
+
+button {
+	width: auto;
+	background-color: #F8F8F8;
+	border: 1px solid #CCCCCC;
+
+	font-weight: bold;
+
+	padding: 8px 16px;
+}
+button:focus {
+	outline: none;
+	border-color: #000000;
+}
+button[disabled] {
+	opacity: .5;
+}
+button:not([disabled]):hover {
+	background-color: #FFFFFF;
+}
+
+
+/**
+ * Major structure elements styling
+ */
+header,
+main,
+footer,
+nav {
+	width: 100%;
+}
+
+main > section, main > div,
+footer > div,
+nav > ul {
+	margin: 0 auto;
+
+	width: 768px;
+}
+
+
+/**
+ * Header and footer styling
+ */
+nav.top {
+	border-bottom: none;
+}
+nav:hover {
+	border-color: #DDDDDD;
+}
+
+nav > ul {
+	list-style: none;
+	padding: 0;
+}
+
+nav > ul > li {
+	display: inline-block;
+	vertical-align: top;
+}
+nav > ul > li {
+	min-width: 25%;
+}
+nav.small > ul > li {
+	min-width: 0;
+}
+
+nav > ul > li > a {
+	display: block;
+
+	text-align: center;
+	text-transform: uppercase;
+	text-decoration: none;
+
+	position: relative;
+
+	font-weight: bold;
+
+	border-bottom: 2px solid transparent;
+
+	padding: 16px 32px;
+}
+nav.top > ul > li > a {
+	border-top: 2px solid transparent;
+
+	border-bottom: none;
+	bottom: auto;
+	margin-top: auto;
+}
+
+nav.small > ul > li > a {
+	padding: 8px 16px;
+	font-size: .75em;
+}
+
+nav > ul > li > a.current,
+nav > ul > li > a.current:hover {
+	background-color: #CCCCCC;
+}
+nav > ul > li > a:hover {
+	background-color: #DDDDDD;
+}
+
+
+/**
+ * Header styling
+ */
+
+
+/**
+ * Main styling
+ */
+main {
+	background-color: #FFFFFF;
+
+	padding: 0;
+}
+main > section,
+main > div {
+	box-sizing: border-box;
+	padding: 8px;
+}
+
+main > section {
+	display: none;
+
+	margin-bottom: 16px;
+
+	background-color: #CCCCCC;
+} main > section.current {
+	display: block;
+}
+
+main > div {
+	/* margin-top: 8px;
+	margin-bottom: 8px; */
+	background-color: #EEEEEE;
+}
+main > div + div {
+	border-top: 1px solid #888888;
+}
+
+
+/**
+ * Footer styling
+ */
+footer {
+	/*position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;*/
+}
+
+
+/**
+ * Grid styling
+ */
+#grid > ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#grid > ul > li {
+	width: 33.33%;
+	display: inline-block;
+
+	box-sizing: border-box;
+
+	padding: 8px;
+
+	position: relative;
+}
+#grid > ul > li:before {
+	content: attr(data-type);
+	font-size: .8em;
+
+	font-style: italic;
+}
+#grid > ul > li > a {
+	text-decoration: none;
+	display: block;
+
+	padding: 16px 8px;
+
+	background-color: #EEEEEE;
+}
+#grid > ul > li > a:hover {
+	background-color: #FFFFFF;
+}
+
+
+#agent table {
+    border-collapse: collapse;
+
+    width: 100%;
+    border: 1px solid black;
+}
+#agent thead {
+	background-color: #DDDDDD;
+}
+
+#agent th,
+#agent td {
+    border: 1px solid black;
+	padding: 8px;
+}
+
+#agent th {
+	font-style: italic;
+
+}
+
+
+
+/**
+ * Controls styling
+ */
+#controls #con-status .text,
+#controls #con-status .light {
+	display: inline-block;
+
+	vertical-align: middle;
+}
+#controls #con-status .light {
+	height: 16px;
+	width: 16px;
+	border-radius: 8px;
+	border: 1px solid black;
+
+	margin-right: 4px;
+}
+
+
+
+/**
+ * Log styling
+ */
+#log > pre {
+	margin: 0;
+	border: 1px solid black;
+
+	background-color: #EEEEEE;
+
+	height: 256px;
+
+	overflow-y: scroll;
+}
+#log > pre > .line:nth-child(odd) {
+	background-color: rgba(0,0,0,.05);
+}
+#log > pre .time,
+#log > pre .id {
+	font-size: .6em;
+	display: inline-block;
+
+	margin: 0 2px;
+}
+#log > pre .time {
+	color: rgba(0,0,0,.5);
+} #log > pre .id {
+	color: rgba(0,191,0,.75);
+	width: 64px;
+
+	text-overflow: ellipsis;
+	overflow: hidden;
+} #log > pre .msg {
+	display: inline-block;
+}
+
+
+/**
+ * Form styling
+ */
+form input {
+	outline: none;
+	border-radius: 0;
+}
+form input {
+	-webkit-appearance: none;
+}
+
+form > div {
+	vertical-align: top;
+	display: inline-block;
+	box-sizing: border-box;
+
+	min-width: 192px;
+	width: 50%;
+	padding: 4px;
+	margin: 4px 0;
+
+	vertical-align: bottom;
+}
+form > div > label {
+	display: block;
+	font-style: italic;
+}
+form > div > button,
+form > div > select,
+form > div > input {
+	display: block;
+	box-sizing: border-box;
+
+	padding: 4px 8px;
+	width: 100%;
+	height: 32px;
+
+	border: 1px solid #BBBBBB;
+}
+button:not([disabled]):hover, button:not([disabled]):focus,
+form > div > select:not([disabled]):hover, form > div > select:focus,
+form > div > input:not([disabled]):hover, form > div > input:focus {
+	border-color: #0066BB;
+}
+form > div > input:focus {
+	border-right-width: 4px;
+}
+form > div > input[required] {
+	border-left-width: 4px;
+}
+
+
+
+
+.white-popup {
+	position: relative;
+	background: #FFF;
+	padding: 20px;
+	width: auto;
+	max-width: 500px;
+	margin: 20px auto;
+}
