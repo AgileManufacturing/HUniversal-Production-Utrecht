@@ -18,6 +18,7 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
@@ -35,6 +36,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
+	static int serialNumber = 1;
 
 	// delta robot
 	static String moduleA_01 = "{" +
@@ -283,7 +285,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	]," +
 			"	\"attachedTo\":null," +
 			"\"mountPointX\":3," +
-			"\"mountPointY\":2" +
+			"\"mountPointY\":1" +
 			"}";
 	// gripper
 	static String moduleB_01 = "{" +
@@ -348,7 +350,10 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"		\"capabilities\":[" +
 			"		]" +
 			"	}," +
-			"	\"properties\":{}," +
+			"	\"properties\":{" +
+			"		\"modbusIp\" : \"192.168.0.22\"," +
+			"		\"modbusPort\" : 502" +
+			"	}," +
 			"	\"calibrationData\":[" +
 			"	]," +
 			"	\"attachedTo\":{" +
@@ -374,16 +379,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static String moduleC_02 = "\"," +
 			"			\"command\":\"roslaunch camera.launch isSimulated:={isSimulated} isShadow:={isShadow} equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" +
 			"		}," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleC_03 = "\"," +
-			"			\"className\":\"HAL.modules.Camera\"" +
-			"		}," +
+			"		\"halSoftware\":null," +
 			"		\"gazeboModel\":{" +
 			"			\"buildNumber\":1," +
 			"			\"zipFile\": \"";
-	static String moduleC_04 = "\"," +
+	static String moduleC_03 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"base\"," +
 			"			\"childLink\":\"base\"," +
@@ -419,16 +419,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			"	\"type\":{" +
 			"		\"properties\":{}," +
 			"		\"rosSoftware\":null," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleD_02 = "\"," +
-			"			\"className\":\"HAL.modules.Lens\"" +
-			"		}," +
+			"		\"halSoftware\":null," +
 			"		\"gazeboModel\":{" +
 			"			\"buildNumber\":1," +
 			"			\"zipFile\": \"";
-	static String moduleD_03 = "\"," +
+	static String moduleD_02 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"base\"," +
 			"			\"childLink\":\"base\"," +
@@ -482,16 +477,11 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static String moduleE_02 = "\"," +
 			"			\"command\":\"rosrun part_locator_node part_locator_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
 			"		}," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleE_03 = "\"," +
-			"			\"className\":\"HAL.modules.Workplane\"" +
-			"		}," +
+			"		\"halSoftware\":null," +
 			"		\"gazeboModel\":{" +
 			"			\"buildNumber\":1," +
 			"			\"zipFile\": \"";
-	static String moduleE_04 = "\"," +
+	static String moduleE_03 = "\"," +
 			"			\"sdfFilename\":\"model.sdf\"," +
 			"			\"parentLink\":\"base\"," +
 			"			\"childLink\":\"base\"," +
@@ -531,12 +521,18 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length >= 2) {
+		if(args.length >= 1) {
 			if(args[0].equals("--noInsert")) {
 				insertModules = false;
 			} else if(args[0].equals("--noTranslate")) {
 				translateSteps = false;
 			}
+		}
+		
+		if(args.length >= 3) {
+			equipletName = args[1];
+			serialNumber = Integer.parseInt(args[2]);
+		} if(args.length >= 2) {
 			equipletName = args[1];
 		} else if(args.length >= 1) {
 			equipletName = args[0];
@@ -561,20 +557,6 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			fis.read(content);
 			fis.close();
 			String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
-			
-			File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
-			fis = new FileInputStream(workplaneHal);
-			content = new byte[(int) workplaneHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64WorkplaneHal = new String(Base64.encodeBase64(content));
-			
-			File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
-			fis = new FileInputStream(penHal);
-			content = new byte[(int) penHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64PenHal = new String(Base64.encodeBase64(content));
 			
 			File gripperHal = new File(baseDir + "HAL/modules/" + "Gripper.jar");
 			fis = new FileInputStream(gripperHal);
@@ -672,20 +654,24 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject b = new JSONObject(new JSONTokener(moduleB));
 			
 			// camera
-			String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
-					moduleC_03 + base64CameraGazebo + moduleC_04;
+			String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64CameraGazebo + moduleC_03;
 			JSONObject c = new JSONObject(new JSONTokener(moduleC));
 			
 			// lens
-			// TODO fix non hal software
-			String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
+			String moduleD = moduleD_01 + base64LensGazebo + moduleD_02;
 			JSONObject d = new JSONObject(new JSONTokener(moduleD));
 			
 			// workplane
-			String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
-					moduleE_03 + base64WorkplaneGazebo + moduleE_04;
+			String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneGazebo + moduleE_03;
 			JSONObject e = new JSONObject(new JSONTokener(moduleE));
 			
+			a.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			b.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
+			c.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			d.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
+			d.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
+			e.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
 			
 			hal.insertModule(a, a);
 			hal.insertModule(b, b);
@@ -699,7 +685,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove1 = new JSONObject();
 			targetMove1.put("x", 5.5);
 			targetMove1.put("y", -5.5);
-			targetMove1.put("z", 13.1);
+			targetMove1.put("z", 14.0);
 			JSONObject targetMove1Approach = new JSONObject();
 			targetMove1Approach.put("x", 0);
 			targetMove1Approach.put("y", 0);
@@ -713,7 +699,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject subjectMove1 = new JSONObject();
 			subjectMove1.put("x", 5.5);
 			subjectMove1.put("y", -5.5);
-			subjectMove1.put("z", 13.1);
+			subjectMove1.put("z", 14.0);
 			JSONObject subjectMove1Approach = new JSONObject();
 			subjectMove1Approach.put("x", 0);
 			subjectMove1Approach.put("y", 0);
@@ -727,7 +713,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject targetMove2 = new JSONObject();
 			targetMove2.put("x", 5.5);
 			targetMove2.put("y", -5.5);
-			targetMove2.put("z", 13.1);
+			targetMove2.put("z", 14.0);
 			JSONObject targetMove2Approach = new JSONObject();
 			targetMove2Approach.put("x", 0);
 			targetMove2Approach.put("y", 0);
@@ -741,7 +727,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 			JSONObject subjectMove2 = new JSONObject();
 			subjectMove2.put("x", 5.5);
 			subjectMove2.put("y", -5.5);
-			subjectMove2.put("z", 13.1);
+			subjectMove2.put("z", 14.0);
 			JSONObject subjectMove2Approach = new JSONObject();
 			subjectMove2Approach.put("x", 0);
 			subjectMove2Approach.put("y", 0);
@@ -769,8 +755,8 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
-		//hal.executeHardwareSteps(hardwareSteps);
-		hal.translateProductStep("place", criteria2);
+		hal.executeHardwareSteps(hardwareSteps);
+		//hal.translateProductStep("place", criteria2);
 	}
 
 	@Override
@@ -784,18 +770,25 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	}
 
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
 	}
 
 	@Override
 	public void onExecutionFinished() {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
+		if(state == false) {
+			hal.translateProductStep("place", criteria2);
+			state = true;
+		} else {
+			hal.translateProductStep("place", criteria1);
+			state = false;
+		}
 	}
 
 	@Override

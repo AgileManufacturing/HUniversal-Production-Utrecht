@@ -68,7 +68,7 @@ namespace gripper_plugin {
 				}
 			}
 		}
-		collisionContactCount.empty();
+		collisionContactCount.clear();
 	}
 	physics::CollisionPtr Gripper::getCollision() {
 		return collision;

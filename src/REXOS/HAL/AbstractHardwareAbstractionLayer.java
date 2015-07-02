@@ -210,12 +210,27 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	public ArrayList<String> getSupportedServices() {
 		return reconfigHandler.getAllSupportedServices();
 	}
+	
+	/**
+	 * This method will return all the (most likely) supported capabilities from services
+	 * @return ArrayList Capabilities
+	 */
+	public ArrayList<String> getSupportedCapabilitiesForService(String service){
+		ArrayList<Capability> capabilities = new ArrayList<Capability>();
+		ArrayList<String> supportedCapabilities = new ArrayList<String>();
+		capabilities = capabilityFactory.getCapabilitiesForService(service);
+		for (Capability capibility : capabilities) {
+			String capabilityName = capibility.getName();
+			supportedCapabilities.add(capabilityName);
+		}
+		return supportedCapabilities;
+	}
 
 	/**
 	 * This method will be called by the blackboard handler when the state of the equiplet has changed. Do not call this method!
 	 */
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		moduleListener.onModuleStateChanged(module, state);
 	}
 
@@ -223,7 +238,7 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	 * This method will be called by the blackboard handler when the mode of the equiplet has changed. Do not call this method!
 	 */
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		moduleListener.onModuleModeChanged(module, mode);
 	}
 
@@ -232,6 +247,10 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 	 */
 	public ModuleFactory getModuleFactory() {
 		return moduleFactory;
+	}
+	
+	public ArrayList<Module> getModules() {
+		return moduleFactory.getModules();
 	}
 
 	/**

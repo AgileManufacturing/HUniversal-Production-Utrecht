@@ -57,12 +57,17 @@ public class StaticSettings implements Serializable{
 		
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModuleForModuleIdentifier, 
 				moduleIdentifier.manufacturer, moduleIdentifier.typeNumber, moduleIdentifier.serialNumber);
+		
+		if(rows.length != 1) {
+			throw new NotFoundException();
+		}
 		JSONTokener tokener = new JSONTokener((String) rows[0].get("moduleProperties"));
 		output.moduleConfigurationProperties = new JSONObject(tokener);
 		
 		output.moduleType = ModuleType.getSerializedModuleTypeByModuleTypeIdentifier(moduleIdentifier, knowledgeDBClient);
 		
 		output.calibrationData = CalibrationEntry.getCalibrationDataForModule(moduleIdentifier, knowledgeDBClient);
+		
 		
 		return output;
 	}
@@ -84,17 +89,20 @@ public class StaticSettings implements Serializable{
 	}
 	public JSONObject serialize() throws JSONException {
 		JSONObject output = new JSONObject();
-		
-		output.put(MODULE_IDENTIFIER, moduleIdentifier.serialize());
-		output.put(MODULE_CONFIGURATION_PROPERTIES, moduleConfigurationProperties);
-		
-		output.put(MODULE_TYPE, moduleType.serialize());
-		
-		JSONArray calibrationData = new JSONArray();
-		for (int i = 0; i < this.calibrationData.size(); i++) {
-			calibrationData.put(this.calibrationData.get(i).serialize());
+		try{
+			output.put(MODULE_IDENTIFIER, moduleIdentifier.serialize());
+			output.put(MODULE_CONFIGURATION_PROPERTIES, moduleConfigurationProperties);
+			
+			output.put(MODULE_TYPE, moduleType.serialize());
+			
+			JSONArray calibrationData = new JSONArray();
+			for (int i = 0; i < this.calibrationData.size(); i++) {
+				calibrationData.put(this.calibrationData.get(i).serialize());
+			}
+			output.put(MODULE_CALIBRATION_DATA, calibrationData);
+		}catch(NullPointerException ex){
+			Logger.log(LogSection.HAL_MODULES, LogLevel.EMERGENCY, "Error occured which is considered to be impossible.");
 		}
-		output.put(MODULE_CALIBRATION_DATA, calibrationData);
 		
 		return output;
 	}

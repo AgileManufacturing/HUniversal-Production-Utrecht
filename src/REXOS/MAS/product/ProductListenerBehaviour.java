@@ -16,16 +16,18 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 	/**
 	 * 
 	 */
+	private ProductGetDataHandler getDataHandler;
 	private static final long serialVersionUID = 1L;
 	private ProductAgent product;
 
 	public ProductListenerBehaviour(ProductAgent product) {
 		this.product = product;
+		this.getDataHandler = new ProductGetDataHandler(product);
 	}
 
 	@Override
 	public void action() {
-		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED)), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED));
+		MessageTemplate template = MessageTemplate.or(MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_PROCESSING), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_FINISHED)), MessageTemplate.or(MessageTemplate.MatchConversationId(Ontology.CONVERSATION_PRODUCT_DELAYED), MessageTemplate.MatchConversationId(Ontology.CONVERSATION_GET_DATA)));
 		ACLMessage msg = myAgent.receive(template);
 		if (msg != null) {
 			System.out.printf("PA:%s received message [sender=%s, performative=%s, conversation=%s, content=%s]\n", myAgent.getLocalName(), msg.getSender().getLocalName(), msg.getPerformative(), msg.getConversationId(), msg.getContent());
@@ -39,6 +41,10 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 					handleProductStepDelayed(msg);
 				}
 				break;
+			case ACLMessage.QUERY_IF:
+				if(msg.getConversationId().equals(Ontology.CONVERSATION_GET_DATA)) {
+					this.getDataHandler.handleGetDataRequest(msg);
+				}
 			default:
 				break;
 			}
@@ -67,6 +73,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(confirmation));
+			product.onChangedHandler.onProductStepChanged(message, "update");
 			myAgent.send(reply);
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse product processing information\n", myAgent.getLocalName());
@@ -97,6 +104,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(confirmation));
+			product.onChangedHandler.onProductStepChanged(message, "finished");
 			myAgent.send(reply);
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse product step finished information\n", myAgent.getLocalName());
@@ -117,6 +125,7 @@ public class ProductListenerBehaviour extends CyclicBehaviour {
 			ACLMessage reply = message.createReply();
 			reply.setPerformative(ACLMessage.CONFIRM);
 			reply.setContent(Parser.parseConfirmation(true));
+			product.onChangedHandler.onProductStepChanged(message, "delayed");
 			product.send(reply);
 		} catch (JSONException e) {
 			System.err.printf("PA:%s failed to parse step delayed\n", myAgent.getLocalName());

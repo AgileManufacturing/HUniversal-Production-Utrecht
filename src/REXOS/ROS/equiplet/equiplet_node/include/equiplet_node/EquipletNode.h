@@ -96,7 +96,10 @@ private:
 	
 	virtual void onHardwareStep(rexos_datatypes::HardwareStep hardwareStep);
 	virtual void onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand);
-	
+	void onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, 
+		rexos_statemachine::Mode newMode, rexos_statemachine::Mode prevMode);
+	void onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, 
+		rexos_statemachine::State newState, rexos_statemachine::State prevState);
 	void onAccelerationViolation(std_msgs::String message);
 	void onCollisionViolation(std_msgs::String message);
 	void onJointViolation(std_msgs::String message);

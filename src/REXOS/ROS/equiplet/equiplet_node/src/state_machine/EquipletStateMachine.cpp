@@ -149,21 +149,21 @@ void EquipletStateMachine::spawnNode(rexos_module::ModuleProxy* moduleProxy) {
 	spawnNodeClient.waitForExistence();
 	spawnNodeClient.call(spawnNodeCall);
 }
-void EquipletStateMachine::spawnModel(rexos_module::ModuleProxy* moduleProxy) {
-	ROS_INFO_STREAM("Spawning model for " << moduleProxy->getModuleIdentifier());
+void EquipletStateMachine::spawnModel(rexos_datatypes::ModuleIdentifier identifier) {
+	ROS_INFO_STREAM("Spawning model for " << identifier);
 	model_spawner_node::spawnModule spawnModuleCall;
-	spawnModuleCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
-	spawnModuleCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
-	spawnModuleCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	spawnModuleCall.request.manufacturer = identifier.getManufacturer();
+	spawnModuleCall.request.typeNumber = identifier.getTypeNumber();
+	spawnModuleCall.request.serialNumber = identifier.getSerialNumber();
 	spawnModelClient.waitForExistence();
 	spawnModelClient.call(spawnModuleCall);
 }
-void EquipletStateMachine::removeModel(rexos_module::ModuleProxy* moduleProxy) {
-	ROS_INFO_STREAM("Removing model for " << moduleProxy->getModuleIdentifier());
+void EquipletStateMachine::removeModel(rexos_datatypes::ModuleIdentifier identifier) {
+	ROS_INFO_STREAM("Removing model for " << identifier);
 	model_spawner_node::removeModule removeModuleCall;
-	removeModuleCall.request.manufacturer = moduleProxy->getModuleIdentifier().getManufacturer();
-	removeModuleCall.request.typeNumber = moduleProxy->getModuleIdentifier().getTypeNumber();
-	removeModuleCall.request.serialNumber = moduleProxy->getModuleIdentifier().getSerialNumber();
+	removeModuleCall.request.manufacturer = identifier.getManufacturer();
+	removeModuleCall.request.typeNumber = identifier.getTypeNumber();
+	removeModuleCall.request.serialNumber = identifier.getSerialNumber();
 	removeModelClient.waitForExistence();
 	removeModelClient.call(removeModuleCall);
 }

@@ -34,7 +34,6 @@ namespace equiplet_node {
 		equipletCommandStatusChangedPublisher.publish(message);
 	}
 	void NodeHalInterface::postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) {
-		ROS_INFO("State changed");
 		Json::Value messageJson;
 		messageJson["moduleIdentifier"]["manufacturer"] = identifier.getManufacturer();
 		messageJson["moduleIdentifier"]["typeNumber"] = identifier.getTypeNumber();
@@ -82,7 +81,6 @@ namespace equiplet_node {
 		blackBoardMessage.data = jsonWriter.write(messageJson);
 		violationOccuredPublisher.publish(blackBoardMessage);
 	}
-	
 	void NodeHalInterface::onHardwareStepMessage(const std_msgs::StringConstPtr& message) {
 		Json::Value hardwareStepJson;
 		if(jsonReader.parse(message->data, hardwareStepJson) == true) {

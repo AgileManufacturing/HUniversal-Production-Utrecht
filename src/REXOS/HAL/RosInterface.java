@@ -7,22 +7,23 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import HAL.dataTypes.ModuleIdentifier;
+import HAL.factories.ModuleFactory;
 import HAL.listeners.EquipletCommandListener.EquipletCommandStatus;
 import HAL.listeners.EquipletListener;
-import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.listeners.ViolationListener;
 import HAL.listeners.ViolationListener.ViolationType;
 import HAL.steps.HardwareStep;
 
 public abstract class RosInterface {
-	private ArrayList<ModuleListener> moduleSubscribers;
 	private ArrayList<EquipletListener> equipletSubscribers;
 	private ArrayList<ProcessListener> processSubscribers;
 	private ArrayList<ViolationListener> violationSubscribers;
+	protected ModuleFactory moduleFactory;
 	
-	protected RosInterface() {
-		moduleSubscribers = new ArrayList<ModuleListener>();
+	protected RosInterface(ModuleFactory moduleFactory) {
+		this.moduleFactory = moduleFactory;
 		equipletSubscribers = new ArrayList<EquipletListener>();
 		processSubscribers = new ArrayList<ProcessListener>();
 		violationSubscribers = new ArrayList<ViolationListener>();
@@ -78,29 +79,11 @@ public abstract class RosInterface {
 		}
 	}
 
-	public void addModuleListener(ModuleListener listener) {
-		synchronized (moduleSubscribers) {
-			moduleSubscribers.add(listener);
-		}
+	protected void onModuleStateChanged(ModuleIdentifier module, State state) {
+		moduleFactory.getItemForIdentifier(module).onModuleStateChanged(module, state);
 	}
-	public void removeModuleListener(ModuleListener listener) {
-		synchronized (moduleSubscribers) {
-			moduleSubscribers.remove(listener);
-		}
-	}
-	protected void onModuleStateChanged(Module module, State state) {
-		synchronized (moduleSubscribers) {
-			for (ModuleListener moduleListener : moduleSubscribers) {
-				moduleListener.onModuleStateChanged(module, state);
-			}
-		}
-	}
-	protected void onModuleModeChanged(Module module, Mode mode) {
-		synchronized (moduleSubscribers) {
-			for (ModuleListener moduleListener : moduleSubscribers) {
-				moduleListener.onModuleModeChanged(module, mode);
-			}
-		}
+	protected void onModuleModeChanged(ModuleIdentifier module, Mode mode) {
+		moduleFactory.getItemForIdentifier(module).onModuleModeChanged(module, mode);
 	}
 	
 	public void addViolationListener(ViolationListener listener) {

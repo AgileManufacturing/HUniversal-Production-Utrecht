@@ -34,7 +34,7 @@
 		</link>
 		<!-- Upper arms --> 
 		<link name="upperArm1"> 
-			<pose>0.1726 -0.1399 -0.0343 0 0 2.0943951</pose>
+			<pose>0.1557 -0.1399 -0.0343 0 0 2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
@@ -55,7 +55,7 @@
 			</visual>
 		</link>
 		<link name="upperArm2"> 
-			<pose>0.1505 -0.1601 -0.0343 0 3.14159265 2.0943951</pose>
+			<pose>0.1675 -0.1601 -0.0343 0 3.14159265 2.0943951</pose>
 			<gravity>true</gravity>
 			
 			<inertial>
@@ -292,15 +292,15 @@
 			<gravity>true</gravity>
 			
 			<velocity_decay>
-				<angular>2</angular>
+				<angular>1</angular>
 			</velocity_decay>
 			<inertial>
 				<mass>0.050</mass>
 				<pose>0 0 0 0 0 0</pose>
 				<inertia>
-					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
-										<iyy>1000</iyy>	<iyz>0.00</iyz>
-															<izz>1000</izz>
+					<ixx>0.1</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>0.1</iyy>	<iyz>0.00</iyz>
+															<izz>0.1</izz>
 				</inertia>
 			</inertial>
 			<visual name="visual">

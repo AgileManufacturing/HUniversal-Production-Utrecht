@@ -30,40 +30,43 @@ ModuleRegistry::ModuleRegistry(std::string equipletName, ModuleRegistryListener*
 	}
 }
 void ModuleRegistry::spawnModels() {
+	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
+	std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModules();
+	
 	// we must spawn the modules in a specifiec order (from top to bottom)
-	std::vector<rexos_module::ModuleProxy*> processedModules;
+	std::vector<rexos_datatypes::ModuleIdentifier> processedIdentifiers;
 	
 	// first spawn all the top modules
-	for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
-		auto databaseEntry = rexos_knowledge_database::Module((*it)->getModuleIdentifier());
+	for(auto it = identifiers.begin(); it < identifiers.end(); it++) {
+		auto databaseEntry = rexos_knowledge_database::Module(*it);
 		if(databaseEntry.getParentModule() == NULL) {
 			moduleRegistryListener->spawnModel(*it);
-			processedModules.push_back(*it);
+			processedIdentifiers.push_back(*it);
 		}
 	}
 	
 	// continue spawning modules if the parent has already been spawened
-	while(processedModules.size() < registeredModules.size()) {
-		uint numberOfProcessedModulesBeforeRound = processedModules.size();
+	while(processedIdentifiers.size() < identifiers.size()) {
+		uint numberOfProcessedModulesBeforeRound = processedIdentifiers.size();
 		
-		for(auto it = registeredModules.begin(); it < registeredModules.end(); it++) {
-			rexos_knowledge_database::Module databaseEntry((*it)->getModuleIdentifier());
+		for(auto it = identifiers.begin(); it < identifiers.end(); it++) {
+			rexos_knowledge_database::Module databaseEntry(*it);
 			// has this module already a model?
-			if(std::find(processedModules.begin(), processedModules.end(), *it) == processedModules.end()) {
+			if(std::find(processedIdentifiers.begin(), processedIdentifiers.end(), *it) == processedIdentifiers.end()) {
 				// no, determine the parent of this module
 				rexos_knowledge_database::Module* parentModuleDatabaseEntry = databaseEntry.getParentModule();
 				rexos_module::ModuleProxy* parentModule = getModule(parentModuleDatabaseEntry->getModuleIdentifier());
 				
 				// has the parent of this module already a model?
-				if(std::find(processedModules.begin(), processedModules.end(), parentModule) != processedModules.end()) {
+				if(std::find(processedIdentifiers.begin(), processedIdentifiers.end(), parentModule->getModuleIdentifier()) != processedIdentifiers.end()) {
 					// yes, and thus we can spawn it
 					moduleRegistryListener->spawnModel(*it);
-					processedModules.push_back(*it);
+					processedIdentifiers.push_back(*it);
 				}
 			}
 		}
 		
-		if(numberOfProcessedModulesBeforeRound == processedModules.size()) {
+		if(numberOfProcessedModulesBeforeRound == processedIdentifiers.size()) {
 			throw std::runtime_error("Unable to spawn models for all the modules, is a module orphan?");
 		}
 	}
@@ -111,8 +114,12 @@ void ModuleRegistry::reloadModules(){
 }
 
 ModuleRegistry::~ModuleRegistry() {
-	for(auto it = registeredModules.begin(); it != registeredModules.end(); it++) {
+	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
+	std::vector<rexos_datatypes::ModuleIdentifier> identifiers = equiplet.getModuleIdentifiersOfAttachedModulesWithRosSoftware();
+	for(auto it = identifiers.begin(); it < identifiers.end(); it++) {
 		moduleRegistryListener->removeModel(*it);
+	}
+	for(auto it = registeredModules.begin(); it != registeredModules.end(); it++) {
 		delete *it;
 	}
 }

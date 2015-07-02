@@ -82,12 +82,12 @@ public class PickAndPlace extends Capability {
 			JSONArray subjects = criteria.getJSONArray(Criteria.SUBJECTS);
 			
 			if(service.equals(SERVICE_IDENTIFIER) == false) {
-				String message = "Recieved a service (" + service + "which is not supported by this capability.";
+				String message = "Received a service (" + service + "which is not supported by this capability.";
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);	
 			}
 			if(subjects.length() == 0) {
-				String message = "Recieved a job which has no subjects: " + service + " with criteria " + criteria;
+				String message = "Received a job which has no subjects: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}

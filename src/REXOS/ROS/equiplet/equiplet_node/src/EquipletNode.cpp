@@ -81,19 +81,27 @@ void EquipletNode::onStateChanged(rexos_statemachine::State state){
 	halInterface.postStateChange(state);
 }
 
+
 void EquipletNode::onModeChanged(rexos_statemachine::Mode mode){
 	EquipletStateMachine::onModeChanged(mode);
 	halInterface.postModeChange(mode);
 }
-
+void EquipletNode::onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, 
+		rexos_statemachine::Mode newMode, rexos_statemachine::Mode prevMode) {
+	EquipletStateMachine::onModuleModeChanged(moduleProxy, newMode, prevMode);
+	halInterface.postModeChange(moduleProxy->getModuleIdentifier(), newMode);
+}
+void EquipletNode::onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, 
+	rexos_statemachine::State newState, rexos_statemachine::State prevState) {
+	EquipletStateMachine::onModuleStateChanged(moduleProxy, newState, prevState);
+	halInterface.postStateChange(moduleProxy->getModuleIdentifier(), newState);
+}
 std::string EquipletNode::getEquipletName() {
 	return equipletName;
 }
-
 ros::NodeHandle& EquipletNode::getNodeHandle() {
 	return nh;
 }
-
 /**
  * Call the lookuphandler with the data from the blackboard to get data
  *

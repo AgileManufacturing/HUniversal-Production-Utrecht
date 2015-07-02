@@ -42,16 +42,12 @@ import MAS.util.Tuple;
 import MAS.util.Util;
 
 public class EquipletAgent extends Agent implements HardwareAbstractionLayerListener {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	// private static final double SAFETY_FACTOR = 1;
-
+	private static final long serialVersionUID = 6193498304780325791L;
+	
 	// Equiplet knowledge
 	protected Position position;
 	protected List<Capability> capabilities;
+	protected List<String> services;
 
 	// Equiplet state
 	protected TreeSet<Job> schedule;
@@ -63,6 +59,13 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	// Equiplet
 	private HardwareAbstractionLayer hal;
+	private EquipletReconfigureHandler reconfigHandler;
+	private EquipletOnChangedHandler onChangeHandler;
+	private EquipletGetDataHandler getRequestHandler;
+	
+	//States
+	protected Mast.State currentMastState = Mast.State.OFFLINE;
+	protected Mast.Mode currentMastMode = Mast.Mode.NORMAL;
 
 	/**
 	 * Equiplet agent startup
@@ -76,22 +79,31 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				try {
 					hal = new HardwareAbstractionLayer(this.getLocalName(), this);
 					System.out.println("EA:" + getLocalName() + " has created HAL");
+					
+					//Create helper classes
+					reconfigHandler = new EquipletReconfigureHandler(this, hal);
+					onChangeHandler = new EquipletOnChangedHandler(this, hal);
+					getRequestHandler = new EquipletGetDataHandler(this, hal);
 
-					ArrayList<String> services = hal.getSupportedServices();
+					this.services = hal.getSupportedServices();
 
 					// these can't be default, all equiplets are different
 					Tick defaultServiceDuration = new Tick(10);
 					Position defaultPosition = new Position(0, 0);
 
 					// services has to be translated capabilities
-					List<Capability> capabilities = new ArrayList<Capability>();
+					ArrayList<Capability> capabilities = new ArrayList<Capability>();
 					for (String service : services) {
 						// TODO Tick Duration: How long will it be estimated and by who?????????
 						// make better suggestion for the time a product step would take
-						capabilities.add(new Capability(service, new HashMap<String, Object>(), defaultServiceDuration));
+						List<String> capabilitiesFromService = hal.getSupportedCapabilitiesForService(service);
+						for (String capability : capabilitiesFromService){
+							Capability newCapability = new Capability(capability, service, new HashMap<String, Object>(), defaultServiceDuration);
+							capabilities.add(newCapability);
+						}
 					}
-
 					init(defaultPosition, capabilities);
+					
 				} catch (KnowledgeException | BlackboardUpdateException e) {
 					e.printStackTrace();
 					System.err.printf("EA:%s failed to create the HAL: %s", getLocalName(), e.getMessage());
@@ -134,7 +146,6 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected void init(Position position, List<Capability> capabilities) {
 		this.position = position;
 		this.capabilities = capabilities;
-
 		this.state = EquipletState.IDLE;
 		this.reconfiguring = false;
 		this.executing = null;
@@ -153,6 +164,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected void register() {
 		DFAgentDescription dfAgentDescription = new DFAgentDescription();
 		dfAgentDescription.setName(getAID());
+		//Register capabilities
 		for (Capability capability : capabilities) {
 			ServiceDescription serviceDescription = new ServiceDescription();
 			serviceDescription.setName(capability.getService());
@@ -161,6 +173,15 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 			serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
 			dfAgentDescription.addServices(serviceDescription);
 		}
+		
+		//Register as Equiplet agent
+		ServiceDescription serviceDescription = new ServiceDescription();
+		serviceDescription.setName(this.getLocalName());
+		serviceDescription.setType("EquipletAgent");
+		serviceDescription.addOntologies(Ontology.GRID_ONTOLOGY);
+		serviceDescription.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+		dfAgentDescription.addServices(serviceDescription);
+		
 		try {
 			DFService.register(this, dfAgentDescription);
 		} catch (FIPAException fe) {
@@ -185,6 +206,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 */
 	@Override
 	protected void takeDown() {
+		onChangeHandler.notifySubscribersOnTakeDown();
 		if (!reconfiguring) {
 			deregister();
 		}
@@ -261,7 +283,19 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	protected int getExecuted() {
 		return history.size();
 	}
-
+	
+	public void passEquipletCommand(ACLMessage msg){
+		reconfigHandler.handleEquipletCommand(msg);
+	}
+	
+	public void passOnChangeCommand(ACLMessage msg){
+		onChangeHandler.handleOnChangeListenerCommand(msg);
+	}
+	
+	public void passEquipletGetRequest(ACLMessage msg){
+		getRequestHandler.handleEquipletGetRequest(msg);
+	}
+	
 	/**
 	 * give an estimate of the duration of the service
 	 * 
@@ -363,7 +397,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		// System.err.println("fix: "+ deadline + " - (" + time + " - "+ (schedule.isEmpty() ? "null" : schedule.first().getStartTime()) + ") = " + deadline +
 		// " - "+(schedule.isEmpty() ? "null" : (time.minus(schedule.first().getStartTime()))) + " = "+ window);
 
-		// not availale when going to be reconfigured
+		// not available when going to be reconfigured
 		if (reconfiguring) {
 			return available;
 		}
@@ -574,8 +608,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	 *            of the job
 	 * @return if it succeeded to schedule the job
 	 */
-	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service,
-			JSONObject criteria) {
+	protected synchronized boolean schedule(AID product, int index, Tick start, Tick deadline, String service, JSONObject criteria) {
 		// do not schedule a job when going to be reconfigured
 		if (reconfiguring) {
 			throw new IllegalArgumentException("not able to schedule job when reconfiguring");
@@ -676,6 +709,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		for (Job job : possible) {
 			schedule.add(job);
 		}
+		onScheduleChanged();
 
 		return true;
 
@@ -704,6 +738,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 				}
 			}
 		}
+		onScheduleChanged();
 	}
 
 	@Override
@@ -967,6 +1002,7 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 		} else {
 			state = EquipletState.IDLE;
 		}
+		onScheduleChanged();
 	}
 
 	@Override
@@ -977,26 +1013,36 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 
 	@Override
 	public void onEquipletStateChanged(Mast.State state) {
-		// TODO Auto-generated method stub
-
+		onChangeHandler.onEquipletStateChanged(state);
+		currentMastState = state;
 	}
 
 	@Override
 	public void onEquipletModeChanged(Mast.Mode mode) {
-		// TODO Auto-generated method stub
-
+		onChangeHandler.onEquipletModeChanged(mode);
+		currentMastMode = mode;
+	}
+	
+	public void onScheduleChanged(){
+		onChangeHandler.onScheduleChanged();
+	}
+	
+	public Mast.State getCurrentState(){
+		return currentMastState;
+	}
+	
+	public Mast.Mode getCurrentMode(){
+		return currentMastMode;
 	}
 
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
-		// TODO Auto-generated method stub
-
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
+		onChangeHandler.onModuleStateChanged(module, state);
 	}
 
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
-		// TODO Auto-generated method stub
-
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
+		onChangeHandler.onModuleModeChanged(module, mode);
 	}
 
 	@Override
@@ -1015,6 +1061,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		// TODO Auto-generated method stub
-		
+	}
+	
+	
+	public EquipletReconfigureHandler getReconfigureHandler(){
+		return reconfigHandler;
 	}
 }
