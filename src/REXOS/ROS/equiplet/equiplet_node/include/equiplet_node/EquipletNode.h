@@ -88,8 +88,8 @@ private:
 	
 	equiplet_node::scada::EquipletScada scada;
 	
-	BlackBoardHalInterface halInterface;
-//	NodeHalInterface halInterface;
+//	BlackBoardHalInterface halInterface;
+	NodeHalInterface halInterface;
 	
 	virtual void onHardwareStep(rexos_datatypes::HardwareStep hardwareStep);
 	virtual void onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand);

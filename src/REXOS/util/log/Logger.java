@@ -87,7 +87,7 @@ public class Logger {
 	
 	protected static LogSection[] includedLogSections = new LogSection[] {LogSection.NONE, LogSection.HAL};
 	protected static LogSection[] excludedLogSections = new LogSection[] {LogSection.HAL_MODULE_FACTORY_SQL, LogSection.HAL_CAPABILITY_FACTORY_SQL};
-	protected static LogLevel loglevelThreshold = LogLevel.DEBUG;
+	protected static LogLevel loglevelThreshold = LogLevel.WARNING;
 	
 	
 	public static void log(String message) {
