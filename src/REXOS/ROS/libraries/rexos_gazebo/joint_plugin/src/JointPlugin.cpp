@@ -3,6 +3,7 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/ContactManager.hh>
 #include <gazebo/physics/PhysicsEngine.hh>
+#include <rexos_logger/rexos_logger.h>
 #include <ros/callback_queue.h>
 #include <boost/algorithm/string.hpp>
 #include <map>
@@ -26,7 +27,7 @@ namespace joint_plugin {
 			return;
 		}
 		std::string rosNamespace = _sdf->GetElement("rosNamespace")->GetValue()->GetAsString();
-		ROS_INFO_STREAM("Advertising services at " << rosNamespace);
+		REXOS_INFO_STREAM("Advertising services at " << rosNamespace);
 		
 		if (!ros::isInitialized()) {
 			ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
@@ -52,7 +53,7 @@ namespace joint_plugin {
 	
 	bool JointPlugin::addJoint(joint_plugin::addJoint::Request& request, 
 			joint_plugin::addJoint::Response& response) {
-		ROS_INFO_STREAM("Adding joint " << request.model << "::" << request.joint);
+		REXOS_INFO_STREAM("Adding joint " << request.model << "::" << request.joint);
 		physics::ModelPtr model = world->GetModel(request.model);
 		if(model == NULL) return false;
 		physics::JointPtr joint = model->GetJoint(request.joint);
@@ -64,7 +65,7 @@ namespace joint_plugin {
 	}
 	bool JointPlugin::removeJoint(joint_plugin::removeJoint::Request& request, 
 			joint_plugin::removeJoint::Response& response) {
-		ROS_INFO_STREAM("Removing joint " << request.model << "::" << request.joint);
+		REXOS_INFO_STREAM("Removing joint " << request.model << "::" << request.joint);
 		for(auto it = joints.begin(); it < joints.end(); it++) {
 			joints.erase(it);
 			return true;

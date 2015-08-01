@@ -1,6 +1,7 @@
 #include "joint_plugin/Joint.h"
 
 #include <std_msgs/String.h>
+#include <rexos_logger/rexos_logger.h>
 
 using namespace gazebo;
 
@@ -18,7 +19,7 @@ namespace joint_plugin {
 		double errorPosition = errorPositionVector.GetLength();
 		
 		if(std::abs(errorPosition) > maxErrorPose) {
-			ROS_INFO_STREAM("Exceeded joint limitations: " << 
+			REXOS_INFO_STREAM("Exceeded joint limitations: " << 
 					joint->GetParent()->GetModel()->GetName() << "::" << joint->GetName() << 
 					" went " << errorPosition << " instead of " << maxErrorPose);
 			std_msgs::String message;

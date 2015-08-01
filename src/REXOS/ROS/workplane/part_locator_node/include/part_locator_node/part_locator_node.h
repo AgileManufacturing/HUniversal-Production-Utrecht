@@ -199,6 +199,8 @@ namespace part_locator_node {
 		 * @return The shear matrix
 		 **/
 		
+		void generateTotalCalibrationMatrix(Vector2 topLeftOffset, Vector2 topRightOffset, Vector2 bottomRightOffset);
+		
 		Matrix3 calculateOffsetMatrix();
 		
 		Matrix3 calculateRotationMatrix(double rotationAngle);

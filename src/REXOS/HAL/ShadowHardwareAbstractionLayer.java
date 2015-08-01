@@ -65,6 +65,12 @@ public class ShadowHardwareAbstractionLayer extends AbstractHardwareAbstractionL
 			this.getRosInterface().postEquipletCommand(equipletCommand);
 		}
 	}
+	public void removePartModel(JSONObject equipletCommand, EquipletCommandListener listener) {
+		synchronized(this) {
+			this.forwardTarget = listener;
+			this.getRosInterface().postEquipletCommand(equipletCommand);
+		}
+	}
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		synchronized(this) {

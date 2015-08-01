@@ -119,7 +119,24 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 	}
 
 	private synchronized void removeParts() {
-		// TODO not implemented
+		try {
+			JSONObject[] parts = retrieveParts();
+			
+			for (JSONObject part : parts) {
+				JSONObject equipletCommand = new JSONObject();
+				equipletCommand.put("command", "spawnPartModel");
+				equipletCommand.put("status", "WAITING");
+				
+				JSONObject parameters = new JSONObject();
+				parameters.put("partName", part.getString("identifier"));
+				equipletCommand.put("parameters", parameters);
+				
+				hal.removePartModel(equipletCommand, this);
+				Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Waiting for part model to be removed");
+			}
+		} catch(JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
+		}
 	}
 
 	/**

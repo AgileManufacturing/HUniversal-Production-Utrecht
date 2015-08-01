@@ -2,6 +2,7 @@
 
 #include <gazebo/physics/PhysicsEngine.hh>
 #include <std_msgs/String.h>
+#include <rexos_logger/rexos_logger.h>
 
 using namespace gazebo;
 
@@ -61,7 +62,7 @@ namespace collision_plugin {
 		}
 		
 		if(maxExposedForce > maxForce || maxExposedTorque > maxTorque) {
-			ROS_INFO_STREAM("Illigal contact between " << contact.collision1() << " AND " << contact.collision2()
+			REXOS_INFO_STREAM("Illigal contact between " << contact.collision1() << " AND " << contact.collision2()
 					<< " EXPOSED_FORCE " << maxExposedForce << " EXPOSED_TORQUE " << maxExposedTorque
 					<< " FORCE " << maxForce << " TORQUE " << maxTorque);
 			

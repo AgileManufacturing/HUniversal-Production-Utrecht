@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(acceleration_plugin)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS std_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS std_msgs message_generation rexos_logger)
 find_package(gazebo REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
@@ -24,7 +24,7 @@ generate_messages (
 catkin_package(
 INCLUDE_DIRS include 
 LIBRARIES 
-CATKIN_DEPENDS message_runtime roscpp
+CATKIN_DEPENDS message_runtime roscpp rexos_logger
 DEPENDS Boost gazebo
 )
 

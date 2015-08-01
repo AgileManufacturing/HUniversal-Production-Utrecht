@@ -393,77 +393,11 @@ namespace part_locator_node {
 		std::cin >> bottomRightOffsetX;
 		REXOS_INFO("enter diff to Y");
 		std::cin >> bottomRightOffsetY;
-///////////////////////////////////////////////////////UP HERE FIRST ITTERATION////////////////////////////////////////////////////////////////////		
-		Vector3 A = Vector3(0					, 0						, 1);
-		Vector3 B = Vector3(0 + workPlaneWidth	, 0						, 1);
-		Vector3 C = Vector3(0 + workPlaneWidth	, 0 - workPlaneHeight	, 1);
-		
-		Vector3 Aprojected = Vector3(A.x + topLeftOffsetX, A.y + topLeftOffsetY, 1);
-		Vector3 Bprojected = Vector3(B.x + topRightOffsetX, B.y + topRightOffsetY, 1);
-		Vector3 Cprojected = Vector3(C.x + bottomRightOffsetX, C.y + bottomRightOffsetY, 1);
-		
-		REXOS_INFO_STREAM("workPlaneWidth " << workPlaneWidth << " workPlaneHeight " << workPlaneHeight);
-		REXOS_INFO_STREAM("A " << A << " B " << B << " C " << C);
-		REXOS_INFO_STREAM("Aprojected " << Aprojected << " Bprojected " << Bprojected << " Cprojected " << Cprojected);
-		REXOS_WARN_STREAM("--------------------------------------------------------------");
-//////////////////////////////////////////////////////////////////FROM HERE STARTS MATRIX CALC//////////////////////////////////////////////////////////////////////////////////////////		
-		// first translate so that A' matches A
-		REXOS_INFO_STREAM("x " << -topLeftOffsetX << " y " << -topLeftOffsetY);
-		
-		Matrix3 postCorrectionTranslationMatrix = calculateOffsetMatrix();
-		
-		Aprojected = postCorrectionTranslationMatrix * Aprojected;
-		Bprojected = postCorrectionTranslationMatrix * Bprojected;
-		Cprojected = postCorrectionTranslationMatrix * Cprojected;
-		
-		// second rotate so that normalize(A'B') matches normalize(AB)
-		// calulate the angle between A' and B'
-		double angleAprojectedBprojected = std::atan2(Bprojected.y - Aprojected.y, Bprojected.x - Aprojected.x);
-		// calulate the angle between A and B
-		double angleAB = std::atan2(B.y - A.y, B.x - A.x);
-		double rotationAngle = angleAB - angleAprojectedBprojected;
-		
-		Matrix3 postCorrectionRotationMatrix = calculateRotationMatrix(rotationAngle);
 
-		Aprojected = postCorrectionRotationMatrix * Aprojected;
-		Bprojected = postCorrectionRotationMatrix * Bprojected;
-		Cprojected = postCorrectionRotationMatrix * Cprojected;
-		
-		// third shear so that normalize(B'C') mathces normalize(BC)
-		// calulate the angle between A' and B'
-		double angleBprojectedCprojected = std::atan2(Cprojected.y - Bprojected.y, Cprojected.x - Bprojected.x);
-		// calulate the angle between A and B
-		double angleBC = std::atan2(C.y - B.y, C.x - B.x);
-		double shearAngle = angleBprojectedCprojected - angleBC;
-		double shearFactor = tan(shearAngle);
-		
-		Matrix3 postCorrectionShearMatrix = calculateShearMatrix(shearFactor);
-		
-		Aprojected = postCorrectionShearMatrix * Aprojected;
-		Bprojected = postCorrectionShearMatrix * Bprojected;
-		Cprojected = postCorrectionShearMatrix * Cprojected;
-		
-		REXOS_INFO_STREAM(postCorrectionShearMatrix);
-		REXOS_INFO_STREAM("sheared: Aprojected " << Aprojected << " Bprojected " << Bprojected << " Cprojected " << Cprojected);
-		REXOS_WARN_STREAM("--------------------------------------------------------------");
-		
-		// fourth scale so that A'B' matches AB and B'C' matches BC
-
-		double scaleX = (B - A).length() / (Bprojected - Aprojected).length();
-		double scaleY = (C - B).length() / (Cprojected - Bprojected).length();
-
-		Matrix3 postCorrectionScaleMatrix = calculateScaleMatrix(scaleX, scaleY);
-				
-		Aprojected = postCorrectionScaleMatrix * Aprojected;
-		Bprojected = postCorrectionScaleMatrix * Bprojected;
-		Cprojected = postCorrectionScaleMatrix * Cprojected;
-	
-		Matrix3 translateToA = Matrix3(1, 0, workPlaneWidth / 2, 0, 1, -workPlaneHeight / 2, 0, 0, 1);
-		Matrix3 translateFromA = Matrix3(1, 0, -workPlaneWidth / 2, 0, 1, workPlaneHeight / 2, 0, 0, 1);
-		
-		postCorrectionTotalMatrix = translateFromA * postCorrectionScaleMatrix * 
-				postCorrectionShearMatrix * postCorrectionRotationMatrix * 
-				postCorrectionTranslationMatrix * translateToA;
+		Vector2 tl(topLeftOffsetX, topLeftOffsetY);
+		Vector2 tr(topRightOffsetX, topRightOffsetY);
+		Vector2 br(bottomRightOffsetX, bottomRightOffsetY);
+		generateTotalCalibrationMatrix(tl, tr, br);
 		
 		REXOS_INFO("Moving to top left corner");
 		v = Vector3(0 - workPlaneWidth / 2, 0 + workPlaneHeight / 2, 1);
@@ -530,6 +464,67 @@ namespace part_locator_node {
 		this->setCalibrationDataForModuleAndOtherModules(modules, writer.write(jsonNode));
 		return true;
 	}
+	
+	void PartLocatorNode::generateTotalCalibrationMatrix(Vector2 topLeftOffset, Vector2 topRightOffset, Vector2 bottomRightOffset) {
+		// the location of the workplane corners
+		Vector3 A = Vector3(0					, 0						, 1);
+		Vector3 B = Vector3(0 + workPlaneWidth	, 0						, 1);
+		Vector3 C = Vector3(0 + workPlaneWidth	, 0 - workPlaneHeight	, 1);
+		
+		// the location of the mover
+		Vector3 Aprojected = Vector3(A.x + topLeftOffset.x, A.y + topLeftOffset.y, 1);
+		Vector3 Bprojected = Vector3(B.x + topRightOffset.x, B.y + topRightOffset.y, 1);
+		Vector3 Cprojected = Vector3(C.x + bottomRightOffset.x, C.y + bottomRightOffset.y, 1);
+		
+		// first translate so that A' matches A
+		Matrix3 postCorrectionTranslationMatrix = calculateOffsetMatrix();
+		Aprojected = postCorrectionTranslationMatrix * Aprojected;
+		Bprojected = postCorrectionTranslationMatrix * Bprojected;
+		Cprojected = postCorrectionTranslationMatrix * Cprojected;
+		
+		// second rotate so that normalize(A'B') matches normalize(AB)
+		// calulate the angle between A' and B'
+		double angleAprojectedBprojected = std::atan2(Bprojected.y - Aprojected.y, Bprojected.x - Aprojected.x);
+		// calulate the angle between A and B
+		double angleAB = std::atan2(B.y - A.y, B.x - A.x);
+		double rotationAngle = angleAB - angleAprojectedBprojected;
+		
+		Matrix3 postCorrectionRotationMatrix = calculateRotationMatrix(rotationAngle);
+		Aprojected = postCorrectionRotationMatrix * Aprojected;
+		Bprojected = postCorrectionRotationMatrix * Bprojected;
+		Cprojected = postCorrectionRotationMatrix * Cprojected;
+		
+		// third shear so that normalize(B'C') matches normalize(BC)
+		// calulate the angle between A' and B'
+		double angleBprojectedCprojected = std::atan2(Cprojected.y - Bprojected.y, Cprojected.x - Bprojected.x);
+		// calulate the angle between A and B
+		double angleBC = std::atan2(C.y - B.y, C.x - B.x);
+		double shearAngle = angleBprojectedCprojected - angleBC;
+		double shearFactor = tan(shearAngle);
+		
+		Matrix3 postCorrectionShearMatrix = calculateShearMatrix(shearFactor);
+		Aprojected = postCorrectionShearMatrix * Aprojected;
+		Bprojected = postCorrectionShearMatrix * Bprojected;
+		Cprojected = postCorrectionShearMatrix * Cprojected;
+		
+		// fourth scale so that A'B' matches AB and B'C' matches BC
+		double scaleX = (B - A).length() / (Bprojected - Aprojected).length();
+		double scaleY = (C - B).length() / (Cprojected - Bprojected).length();
+
+		Matrix3 postCorrectionScaleMatrix = calculateScaleMatrix(scaleX, scaleY);
+		Aprojected = postCorrectionScaleMatrix * Aprojected;
+		Bprojected = postCorrectionScaleMatrix * Bprojected;
+		Cprojected = postCorrectionScaleMatrix * Cprojected;
+		
+		// fifth generate the entire matrix
+		Matrix3 translateToA = Matrix3(1, 0, workPlaneWidth / 2, 0, 1, -workPlaneHeight / 2, 0, 0, 1);
+		Matrix3 translateFromA = Matrix3(1, 0, -workPlaneWidth / 2, 0, 1, workPlaneHeight / 2, 0, 0, 1);
+		
+		postCorrectionTotalMatrix = translateFromA * postCorrectionScaleMatrix * 
+				postCorrectionShearMatrix * postCorrectionRotationMatrix * 
+				postCorrectionTranslationMatrix * translateToA;
+	}
+	
 	bool PartLocatorNode::transitionInitialize() {
 		REXOS_INFO("Initialize transition called");
 		return true;
@@ -585,7 +580,12 @@ namespace part_locator_node {
 				if(mannuallyCalibrate(moverIdentifier) == false){
 					return false;
 				}
-			}	
+			} else {
+				Vector2 tl(jsonNode["TL"]["x"].asDouble(), jsonNode["TL"]["y"].asDouble());
+				Vector2 tr(jsonNode["TR"]["x"].asDouble(), jsonNode["TR"]["y"].asDouble());
+				Vector2 br(jsonNode["BR"]["x"].asDouble(), jsonNode["BR"]["y"].asDouble());
+				generateTotalCalibrationMatrix(tl, tr, br);
+			}
 			return true;
 		} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
 			if(mannuallyCalibrate(moverIdentifier) == false) return false;

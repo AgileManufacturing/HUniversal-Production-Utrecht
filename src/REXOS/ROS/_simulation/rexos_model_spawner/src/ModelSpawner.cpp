@@ -49,9 +49,13 @@
 #include <rexos_knowledge_database/GazeboLink.h>
 #include <rexos_zip/ZipExtractor.h>
 #include <acceleration_plugin/addEntity.h>
+#include <acceleration_plugin/removeEntity.h>
 #include <joint_plugin/addJoint.h>
+#include <joint_plugin/removeJoint.h>
 #include <collision_plugin/addCollision.h>
+#include <collision_plugin/removeCollision.h>
 #include <collision_plugin/addContactExclusion.h>
+#include <collision_plugin/removeContactExclusion.h>
 #include <gazebo_msgs/SpawnModel.h>
 #include <gazebo_msgs/DeleteModel.h>
 
@@ -60,8 +64,8 @@ namespace rexos_model_spawner {
 		equipletName(equipletName), isShadow(isShadow), equiplet(equipletName)
 	{
 	}
-	void ModelSpawner::spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
-		REXOS_INFO_STREAM("Spawning model for " << moduleIdentifier);
+	bool ModelSpawner::spawnModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
+		REXOS_INFO_STREAM("Spawning module model for " << moduleIdentifier);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
 		
 		std::string modelName = moduleIdentifier.getManufacturer() + "|" + 
@@ -122,10 +126,11 @@ namespace rexos_model_spawner {
 		std::string robotNamespace = "";
 		if(isShadow == true) robotNamespace = "shadow";
 		
-		spawnModel(&gazeboModel, parentGazeboModel, modelName, gazeboSdfFileString, pose, parentModelName, parentGazeboModel->getChildLink());
+		bool success = spawnModel(&gazeboModel, modelName, gazeboSdfFileString, pose, parentGazeboModel, parentModelName);
 		delete parentGazeboModel;
+		return success;
 	}
-	void ModelSpawner::spawnEquipletModel(double gridPositionX, double gridPositionY) {
+	bool ModelSpawner::spawnEquipletModel(double gridPositionX, double gridPositionY) {
 		REXOS_INFO_STREAM("Spawning model for " << equipletName << " at " << gridPositionX << " " << gridPositionY);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(equipletName);
 		
@@ -146,12 +151,12 @@ namespace rexos_model_spawner {
 		pose.position.x = gridPositionX;
 		pose.position.y = gridPositionY;
 		
-		spawnModel(&gazeboModel, NULL, equipletName, gazeboSdfFileString, pose);
+		return spawnModel(&gazeboModel, equipletName, gazeboSdfFileString, pose);
 	}
-	void ModelSpawner::spawnPartModel(std::string partName, rexos_datatypes::OriginPlacement originPlacement, 
+	bool ModelSpawner::spawnPartModel(std::string partName, rexos_datatypes::OriginPlacement originPlacement, 
 			double positionX, double positionY, double positionZ, 
 			double rotationX, double rotationY, double rotationZ, bool spawnChildParts) {
-		REXOS_INFO_STREAM("Spawning model for " << partName);
+		REXOS_INFO_STREAM("Spawning part model for " << partName);
 		rexos_knowledge_database::Part part = rexos_knowledge_database::Part(partName);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(part);
 		
@@ -233,7 +238,8 @@ namespace rexos_model_spawner {
 		pose.orientation.y = rotationY;
 		pose.orientation.z = rotationZ;
 		
-		spawnModel(&gazeboModel, parentGazeboModel, partName, gazeboSdfFileString, pose, relativeTo, referenceLink);
+		bool success = spawnModel(&gazeboModel, partName, gazeboSdfFileString, pose, parentGazeboModel, relativeTo);
+		if(success == false) return success;
 		
 		// spawn child parts
 		if(spawnChildParts == true) {
@@ -246,27 +252,74 @@ namespace rexos_model_spawner {
 				childOriginPlacementParameters["relativeTo"] = partName;
 				childOriginPlacement.setParameters(childOriginPlacementParameters);
 				
-				spawnPartModel(childPart.getPartName(), childOriginPlacement, 
+				success = spawnPartModel(childPart.getPartName(), childOriginPlacement, 
 						childPart.getPositionX(), childPart.getPositionY(), childPart.getPositionZ(),
 						childPart.getRotationX(), childPart.getRotationY(), childPart.getRotationZ(), true);
+				if(success == false) return success;
 			}
 		}
 		if(parentGazeboModel != NULL) {
 			delete parentGazeboModel;
 		}
+		return success;
 	}
 	
-	void ModelSpawner::removeModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
+	bool ModelSpawner::removeModuleModel(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
+		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(moduleIdentifier);
+		
 		std::string modelName = moduleIdentifier.getManufacturer() + "|" + 
 				moduleIdentifier.getTypeNumber() + "|" + 
 				moduleIdentifier.getSerialNumber();
-		removeModel(modelName);
+		
+		// acquire parent module
+		rexos_knowledge_database::GazeboModel* parentGazeboModel = NULL;
+		std::string parentModelName;
+		
+		rexos_knowledge_database::Module module(moduleIdentifier);
+		rexos_knowledge_database::Module* parentModule = module.getParentModule();
+		if(parentModule == NULL) {
+			// parent is equiplet
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(equipletName);
+			parentModelName = equipletName;
+		} else {
+			// parent is other module
+			rexos_datatypes::ModuleIdentifier parentModuleIdentifier = parentModule->getModuleIdentifier();
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(parentModuleIdentifier);
+			
+			parentModelName = parentModuleIdentifier.getManufacturer() + "|" + 
+					parentModuleIdentifier.getTypeNumber() + "|" + 
+					parentModuleIdentifier.getSerialNumber();
+		}
+		
+		return removeModel(&gazeboModel, modelName, parentGazeboModel, parentModelName);
 	}
-	void ModelSpawner::removeEquipletModel() {
-		removeModel(equipletName);
+	bool ModelSpawner::removeEquipletModel() {
+		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(equipletName);
+		return removeModel(&gazeboModel, equipletName);
 	}
-	void ModelSpawner::removePartModel(std::string partName) {
-		removeModel(partName);
+	bool ModelSpawner::removePartModel(std::string partName) {
+		rexos_knowledge_database::Part part = rexos_knowledge_database::Part(partName);
+		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(part);
+		
+		bool success;
+		std::vector<std::string> childNames = part.getChildPartNames();
+		for(uint i = 0; i < childNames.size(); i++) {
+			rexos_knowledge_database::Part childPart(childNames[i]);
+			success = removePartModel(childPart.getPartName());
+			if(success == false) return success;
+		}
+		
+		rexos_knowledge_database::Part* parentPart = part.getParentPart();
+		rexos_knowledge_database::GazeboModel* parentGazeboModel = NULL;
+		if(parentPart != NULL) {
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(*parentPart);
+		}
+		success = removeModel(&gazeboModel, partName, parentGazeboModel, parentPart->getPartName());
+		
+		if(parentGazeboModel != NULL) {
+			delete parentGazeboModel;
+		}
+		return success;
 	}
 	
 	std::string ModelSpawner::getSdfFileContents(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName) {
@@ -279,20 +332,23 @@ namespace rexos_model_spawner {
 		std::string output((std::istreambuf_iterator<char>(gazeboSdfFile)), (std::istreambuf_iterator<char>()));
 		return output;
 	}
-	void ModelSpawner::spawnModel(rexos_knowledge_database::GazeboModel* model, rexos_knowledge_database::GazeboModel* parentModel, 
-				std::string& modelName, std::string& sdf, geometry_msgs::Pose& pose, 
-				std::string referenceModel, std::string referenceLink, std::string robotNamespace) {
+	bool ModelSpawner::spawnModel(rexos_knowledge_database::GazeboModel* model, std::string& modelName, 
+				std::string& sdf, geometry_msgs::Pose& pose, 
+				rexos_knowledge_database::GazeboModel* parentModel, std::string parentModelName, 
+				std::string robotNamespace) {
 		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model/");
 		gazebo_msgs::SpawnModel serviceCall;
 		serviceCall.request.model_name = modelName;
 		serviceCall.request.model_xml = sdf;
 		serviceCall.request.initial_pose = pose;
-		if(referenceModel.empty() == false && referenceLink.empty() == false) {
-			serviceCall.request.reference_frame = referenceModel + "::" + referenceLink;
+		
+		if(parentModel != NULL && parentModelName.empty() == false) {
+			serviceCall.request.reference_frame = parentModelName + "::" + parentModel->getChildLink();
 		}
 		serviceCall.request.robot_namespace = robotNamespace;
 		client.waitForExistence();
-		client.call(serviceCall);
+		bool success = client.call(serviceCall);
+		if(success == false) return false;
 		
 		if(isShadow == true) {
 			// also add safety checks
@@ -322,7 +378,7 @@ namespace rexos_model_spawner {
 							addExclusionCall.request.model1 = modelName;
 							addExclusionCall.request.link1 = collision->getLinkName();
 							addExclusionCall.request.collision1 = collision->getCollisionName();
-							addExclusionCall.request.model2 = referenceModel;
+							addExclusionCall.request.model2 = parentModelName;
 							addExclusionCall.request.link2 = parentCollision->getLinkName();
 							addExclusionCall.request.collision2 = parentCollision->getCollisionName();
 							addExclusionClient.call(addExclusionCall);
@@ -357,12 +413,76 @@ namespace rexos_model_spawner {
 				addLinkClient.call(addLinkCall);
 			}
 		}
+		return success;
 	}
-	void ModelSpawner::removeModel(std::string modelName) {
+	bool ModelSpawner::removeModel(rexos_knowledge_database::GazeboModel* model, std::string& modelName, 
+			rexos_knowledge_database::GazeboModel* parentModel, std::string parentModelName) {
 		ros::ServiceClient client = nodeHandle.serviceClient<gazebo_msgs::DeleteModel>("/gazebo/delete_model/");
-		gazebo_msgs::DeleteModel call;
-		call.request.model_name = modelName;
-		client.call(call);
+		gazebo_msgs::DeleteModel serviceCall;
+		serviceCall.request.model_name = modelName;
+		bool success = client.call(serviceCall);
+		if(success == false) return false;
+		
+		if(isShadow == true) {
+			// also remove safety checks
+			
+			// collisions
+			ros::ServiceClient removeCollisionClient = nodeHandle.serviceClient<collision_plugin::removeCollision>("/collision/removeCollision/");
+			removeCollisionClient.waitForExistence();
+			collision_plugin::removeCollision removeCollisionCall;
+			ros::ServiceClient removeExclusionClient = nodeHandle.serviceClient<collision_plugin::removeContactExclusion>("/collision/removeContactExclusion/");
+			removeExclusionClient.waitForExistence();
+			collision_plugin::removeContactExclusion removeExclusionCall;
+			
+			auto collisions = rexos_knowledge_database::GazeboCollision::getCollisionsForModel(*model);
+			for(auto collision = collisions.begin(); collision < collisions.end(); collision++) {
+				removeCollisionCall.request.model = modelName;
+				removeCollisionCall.request.link = collision->getLinkName();
+				removeCollisionCall.request.collision = collision->getCollisionName();
+				removeCollisionClient.call(removeCollisionCall);
+				
+				if(parentModel != NULL) {
+					// remove contact exclusions for the parent collisions
+					auto collisionsParent = rexos_knowledge_database::GazeboCollision::getCollisionsForModel(*parentModel);
+					for(auto parentCollision = collisionsParent.begin(); parentCollision < collisionsParent.end(); parentCollision++) {
+						if(parentCollision->getMayHaveContactWithChildModules() == true) {
+							removeExclusionCall.request.model1 = modelName;
+							removeExclusionCall.request.link1 = collision->getLinkName();
+							removeExclusionCall.request.collision1 = collision->getCollisionName();
+							removeExclusionCall.request.model2 = parentModelName;
+							removeExclusionCall.request.link2 = parentCollision->getLinkName();
+							removeExclusionCall.request.collision2 = parentCollision->getCollisionName();
+							removeExclusionClient.call(removeExclusionCall);
+						}
+					}
+				}
+			}
+			
+			// joints
+			ros::ServiceClient removeJointClient = nodeHandle.serviceClient<joint_plugin::removeJoint>("/joint/removeJoint/");
+			removeJointClient.waitForExistence();
+			joint_plugin::removeJoint removeJointCall;
+			
+			auto joints = rexos_knowledge_database::GazeboJoint::getJointsForModel(*model);
+			for(auto joint = joints.begin(); joint < joints.end(); joint++) {
+				removeJointCall.request.model = modelName;
+				removeJointCall.request.joint = joint->getJointName();
+				removeJointClient.call(removeJointCall);
+			}
+			
+			// links
+			ros::ServiceClient removeLinkClient = nodeHandle.serviceClient<acceleration_plugin::removeEntity>("/acceleration/removeEntity/");
+			removeLinkClient.waitForExistence();
+			acceleration_plugin::removeEntity removeLinkCall;
+			
+			auto links = rexos_knowledge_database::GazeboLink::getLinksForModel(*model);
+			for(auto link = links.begin(); link < links.end(); link++) {
+				removeLinkCall.request.model = modelName;
+				removeLinkCall.request.link = link->getLinkName();
+				removeLinkClient.call(removeLinkCall);
+			}
+		}
+		return success;
 	}
 	
 	void ModelSpawner::extractGazeboModel(rexos_knowledge_database::GazeboModel& gazeboModel, std::string uniqueName) {

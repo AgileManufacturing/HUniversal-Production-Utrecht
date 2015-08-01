@@ -16,4 +16,6 @@
 	<run_depend>gazebo_ros</run_depend>
 	<build_depend>rexos_io</build_depend>
 	<run_depend>rexos_io</run_depend>
+	<build_depend>rexos_logger</build_depend>
+	<run_depend>rexos_logger</run_depend>
 </package>

@@ -3,6 +3,7 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/ContactManager.hh>
 #include <gazebo/physics/PhysicsEngine.hh>
+#include <rexos_logger/rexos_logger.h>
 #include <ros/callback_queue.h>
 #include <boost/algorithm/string.hpp>
 #include <map>
@@ -26,10 +27,10 @@ namespace acceleration_plugin {
 			return;
 		}
 		std::string rosNamespace = _sdf->GetElement("rosNamespace")->GetValue()->GetAsString();
-		ROS_INFO_STREAM("Advertising services at " << rosNamespace);
+		REXOS_INFO_STREAM("Advertising services at " << rosNamespace);
 		
 		if (!ros::isInitialized()) {
-			ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
+			REXOS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
 			<< "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
 			return;
 		}
@@ -58,7 +59,7 @@ namespace acceleration_plugin {
 	
 	bool AccelerationPlugin::addEntity(acceleration_plugin::addEntity::Request& request, 
 			acceleration_plugin::addEntity::Response& response) {
-		ROS_INFO_STREAM("Adding entity " << request.model << "::" << request.link);
+		REXOS_INFO_STREAM("Adding entity " << request.model << "::" << request.link);
 		physics::ModelPtr model = world->GetModel(request.model);
 		if(model == NULL) return false;
 		physics::LinkPtr link = model->GetLink(request.link);
@@ -70,7 +71,7 @@ namespace acceleration_plugin {
 	}
 	bool AccelerationPlugin::removeEntity(acceleration_plugin::removeEntity::Request& request, 
 			acceleration_plugin::removeEntity::Response& response) {
-		ROS_INFO_STREAM("Removing entity " << request.model << "::" << request.link);
+		REXOS_INFO_STREAM("Removing entity " << request.model << "::" << request.link);
 		physics::ModelPtr model = world->GetModel(request.model);
 		if(model == NULL) return false;
 		physics::LinkPtr link = model->GetLink(request.link);

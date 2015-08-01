@@ -1,6 +1,7 @@
 #include "gripper_plugin/Gripper.h"
 
 #include <gazebo/physics/PhysicsEngine.hh>
+#include <rexos_logger/rexos_logger.h>
 
 using namespace gazebo;
 
@@ -60,7 +61,7 @@ namespace gripper_plugin {
 					// no contacts with the collision were recorded previous iteration, remove it
 					it = collisionTimes.erase(it);
 					// do not increment it, as erase points it to the next position
-				} else if(currentTime - it->second >= 0.0 && collisionContactCount[it->first] >= 1) {
+				} else if(currentTime - it->second >= MIN_CONTACT_DURATION && collisionContactCount[it->first] >= MIN_CONTACT_POINTS) {
 					attachToCollision(it->first);
 					break;
 				} else {
@@ -74,7 +75,7 @@ namespace gripper_plugin {
 		return collision;
 	}
 	void Gripper::attachToCollision(physics::CollisionPtr collision) {
-		std::cout << "Attaching to " << collision->GetLink()->GetModel()->GetName() << "::" << collision->GetLink()->GetName() << std::endl;
+		REXOS_INFO_STREAM("Attaching to " << collision->GetLink()->GetModel()->GetName() << "::" << collision->GetLink()->GetName());
 		
 		attachJoint->Load(link, collision->GetLink(), math::Pose());
 		attachJoint->Init();
@@ -84,7 +85,7 @@ namespace gripper_plugin {
 		isAttached = true;
 	}
 	void Gripper::detach() {
-		std::cout << "Detaching" << std::endl;
+		REXOS_INFO_STREAM("Detaching");
 		attachJoint->Detach();
 		isAttached = false;
 	}

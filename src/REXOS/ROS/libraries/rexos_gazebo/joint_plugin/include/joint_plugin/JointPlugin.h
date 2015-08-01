@@ -21,8 +21,10 @@ namespace joint_plugin {
 		~JointPlugin();
 	public: 
 		void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+		/**
+		 * This method is called just BEFORE the world in gazebo is updated
+		 */
 		void onUpdate(const common::UpdateInfo & info);
-		
 	protected:
 		ros::NodeHandle* nodeHandle;
 		event::ConnectionPtr updateConnection;

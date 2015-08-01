@@ -46,7 +46,7 @@ ModelSpawnerNode::ModelSpawnerNode(std::string equipletName, bool isShadow) :
 		equipletName(equipletName)
 {
 	spawnModelServer = 	nodeHandle.advertiseService(equipletName + "/model/spawnModule", &ModelSpawnerNode::spawnModule, this);
-	removeModelServer = 	nodeHandle.advertiseService(equipletName + "/model/removeModule", &ModelSpawnerNode::removeModule, this);
+	removeModelServer = nodeHandle.advertiseService(equipletName + "/model/removeModule", &ModelSpawnerNode::removeModule, this);
 	spawnPartServer = 	nodeHandle.advertiseService(equipletName + "/model/spawnPart", &ModelSpawnerNode::spawnPart, this);
 	removePartServer = 	nodeHandle.advertiseService(equipletName + "/model/removePart", &ModelSpawnerNode::removePart, this);
 	
@@ -55,13 +55,11 @@ ModelSpawnerNode::ModelSpawnerNode(std::string equipletName, bool isShadow) :
 
 bool ModelSpawnerNode::spawnModule(spawnModule::Request &request, spawnModule::Response &response) {
 	rexos_datatypes::ModuleIdentifier identifier(request.manufacturer, request.typeNumber, request.serialNumber);
-	ModelSpawner::spawnModuleModel(identifier);
-	return true;
+	return ModelSpawner::spawnModuleModel(identifier);
 }
 bool ModelSpawnerNode::removeModule(removeModule::Request &request, removeModule::Response &response) {
 	rexos_datatypes::ModuleIdentifier identifier(request.manufacturer, request.typeNumber, request.serialNumber);
-	ModelSpawner::removeModuleModel(identifier);
-	return true;
+	return ModelSpawner::removeModuleModel(identifier);
 }
 bool ModelSpawnerNode::spawnPart(spawnPart::Request &request, spawnPart::Response &response) {
 	rexos_datatypes::OriginPlacement originPlacement;
@@ -70,13 +68,11 @@ bool ModelSpawnerNode::spawnPart(spawnPart::Request &request, spawnPart::Respons
 	originPlacementParameters["relativeTo"] = request.relativeTo;
 	originPlacement.setParameters(originPlacementParameters);
 	
-	ModelSpawner::spawnPartModel(request.partName, originPlacement, 
+	return ModelSpawner::spawnPartModel(request.partName, originPlacement, 
 			request.positionX, request.positionY, request.positionZ,
 			request.rotationX, request.rotationY, request.rotationZ, 
 			request.spawnChildParts);
-	return true;
 }
 bool ModelSpawnerNode::removePart(removePart::Request &request, removePart::Response &response) {
-	ModelSpawner::removePartModel(request.partName);
-	return true;
+	return ModelSpawner::removePartModel(request.partName);
 }

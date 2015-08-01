@@ -6,6 +6,7 @@
 #include <ros/callback_queue.h>
 #include <boost/algorithm/string.hpp>
 #include <map>
+#include <rexos_logger/rexos_logger.h>
 
 using namespace gazebo;
 
@@ -36,10 +37,10 @@ namespace collision_plugin {
 			return;
 		}
 		std::string rosNamespace = _sdf->GetElement("rosNamespace")->GetValue()->GetAsString();
-		ROS_INFO_STREAM("Advertising services at " << rosNamespace);
+		REXOS_INFO_STREAM("Advertising services at " << rosNamespace);
 		
 		if (!ros::isInitialized()) {
-			ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
+			REXOS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
 			<< "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
 			return;
 		}
@@ -94,7 +95,7 @@ namespace collision_plugin {
 	}
 	bool CollisionPlugin::addCollision(collision_plugin::addCollision::Request& request, 
 			collision_plugin::addCollision::Response& response) {
-		ROS_INFO_STREAM("Adding collision " << request.model << "::" << request.link << "::" << request.collision);
+		REXOS_INFO_STREAM("Adding collision " << request.model << "::" << request.link << "::" << request.collision);
 		physics::ModelPtr modelPtr = world->GetModel(request.model);
 		if(modelPtr == NULL) return false;
 		physics::LinkPtr linkPtr = modelPtr->GetLink(request.link);
@@ -108,7 +109,7 @@ namespace collision_plugin {
 	}
 	bool CollisionPlugin::removeCollision(collision_plugin::removeCollision::Request& request, 
 			collision_plugin::removeCollision::Response& response) {
-		ROS_INFO_STREAM("Removing collision " << request.model << "::" << request.link << "::" << request.collision);
+		REXOS_INFO_STREAM("Removing collision " << request.model << "::" << request.link << "::" << request.collision);
 		physics::ModelPtr modelPtr = world->GetModel(request.model);
 		if(modelPtr == NULL) return false;
 		physics::LinkPtr linkPtr = modelPtr->GetLink(request.link);
@@ -126,7 +127,7 @@ namespace collision_plugin {
 	}
 	bool CollisionPlugin::addContactExclusion(collision_plugin::addContactExclusion::Request& request, 
 			collision_plugin::addContactExclusion::Response& response) {
-		ROS_INFO_STREAM("Adding contactExclusion " << request.model1 << "::" << request.link1 << "::" << request.collision1 << "\n"
+		REXOS_INFO_STREAM("Adding contactExclusion " << request.model1 << "::" << request.link1 << "::" << request.collision1 << "\n"
 				<< request.model2 << "::" << request.link2 << "::" << request.collision2);
 		physics::ModelPtr modelPtr1 = world->GetModel(request.model1);
 		if(modelPtr1 == NULL) return false;
@@ -159,7 +160,7 @@ namespace collision_plugin {
 	}
 	bool CollisionPlugin::removeContactExclusion(collision_plugin::removeContactExclusion::Request& request, 
 			collision_plugin::removeContactExclusion::Response& response) {
-		ROS_INFO_STREAM("Removing contactExclusion " << request.model1 << "::" << request.link1 << "::" << request.collision1 << "\n"
+		REXOS_INFO_STREAM("Removing contactExclusion " << request.model1 << "::" << request.link1 << "::" << request.collision1 << "\n"
 				<< request.model2 << "::" << request.link2 << "::" << request.collision2);
 		physics::ModelPtr modelPtr1 = world->GetModel(request.model1);
 		if(modelPtr1 == NULL) return false;

@@ -219,6 +219,18 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		halInterface.postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "removePartModel") {
 		if(isSimulated == false) {
+			REXOS_WARN("Unable to spawn part because not simulated");
+			return;
+		}
+		model_spawner_node::removePart call;
+		call.request.partName = parameters["partName"].asString();
+		removePartClient.waitForExistence();
+		removePartClient.call(call);
+		
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
+		halInterface.postEquipletCommandStatus(equipletCommand);
+	} else if(equipletCommand.getCommand() == "removePartModel") {
+		if(isSimulated == false) {
 			REXOS_WARN("Unable to remove part because not simulated");
 			return;
 		}

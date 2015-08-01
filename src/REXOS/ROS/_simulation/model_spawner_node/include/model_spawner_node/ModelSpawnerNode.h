@@ -1,10 +1,10 @@
 /**
- * @file EquipletNode.h
- * @brief Symbolizes an entire EquipletNode.
- * @date Created: 2012-10-12
+ * @file ModelSpawnerNode.h
+ * @brief The ROS node component of the model_spawner. 
+ * This allows REXOS to interface with gazebo by adding and removing models of modules, equiplets and parts.
+ * @date Created: 2015-06-00
  *
- * @author Dennis Koole
- * @author Gerben Boot & Joris Vergeer
+ * @author Tommas Bakker
  *
  * @section LICENSE
  * License: newBSD
@@ -43,22 +43,39 @@
 #include <rexos_model_spawner/ModelSpawner.h>
 
 namespace model_spawner_node {
-class ModelSpawnerNode : public rexos_model_spawner::ModelSpawner {
-public:
-	ModelSpawnerNode(std::string equipletName, bool isShadow);
-	
-private:
-	bool spawnModule(spawnModule::Request &request, spawnModule::Response &response);
-	bool removeModule(removeModule::Request &request, removeModule::Response &response);
-	bool spawnPart(spawnPart::Request &request, spawnPart::Response &response);
-	bool removePart(removePart::Request &request, removePart::Response &response);
-	
-	std::string equipletName;
-	
-	ros::ServiceServer spawnModelServer;
-	ros::ServiceServer removeModelServer;
-	ros::ServiceServer spawnPartServer;
-	ros::ServiceServer removePartServer;
-};
-
+	class ModelSpawnerNode : public rexos_model_spawner::ModelSpawner {
+	public:
+		/**
+		 * @param equipletName: The name of the equiplet to which this model spawner node belong to. 
+		 * This will influence the advertisement paths of the services
+		 * @param isShadow: Set to true if the equiplet being simulated is acting as the shadow (counter part) of the real equiplet. 
+		 * This will influence the advertisement paths of the services
+		 */
+		ModelSpawnerNode(std::string equipletName, bool isShadow);
+		
+	private:
+		/**
+		 * Service callback for <equipletName>/model/spawnModule
+		 */
+		bool spawnModule(spawnModule::Request &request, spawnModule::Response &response);
+		/**
+		 * Service callback for <equipletName>/model/removeModule
+		 */
+		bool removeModule(removeModule::Request &request, removeModule::Response &response);
+		/**
+		 * Service callback for <equipletName>/model/spawnPart
+		 */
+		bool spawnPart(spawnPart::Request &request, spawnPart::Response &response);
+		/**
+		 * Service callback for <equipletName>/model/removePart
+		 */
+		bool removePart(removePart::Request &request, removePart::Response &response);
+		
+		std::string equipletName;
+		
+		ros::ServiceServer spawnModelServer;
+		ros::ServiceServer removeModelServer;
+		ros::ServiceServer spawnPartServer;
+		ros::ServiceServer removePartServer;
+	};
 }
