@@ -62,7 +62,7 @@ public class Draw extends Capability {
 			
 			JSONObject drawOriginPlacementParameters = new JSONObject();
 			drawOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
-			OriginPlacement drawOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, drawOriginPlacementParameters);
+			OriginPlacement drawOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_PART_ORIGIN, drawOriginPlacementParameters);
 			
 			CompositeStep draw = new CompositeStep(service, drawCommand, drawOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "draw: " + draw);

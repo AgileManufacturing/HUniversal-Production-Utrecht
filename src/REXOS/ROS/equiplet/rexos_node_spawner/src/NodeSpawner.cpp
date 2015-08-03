@@ -32,55 +32,81 @@
 
 #include <unistd.h>
 #include <zip.h>
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
+#include <rexos_zip/ZipExtractor.h>
+
 #include "ros/ros.h"
 
 namespace rexos_node_spawner {
-	NodeSpawner::NodeSpawner(std::string equipletName) :
-		equipletName(equipletName)
+	NodeSpawner::NodeSpawner(std::string equipletName, bool isSimulated, bool isShadow) :
+		equipletName(equipletName),
+		isSimulated(isSimulated),
+		isShadow(isShadow)
 	{
 		
 	}
 	void NodeSpawner::spawnNode(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
-		REXOS_INFO("Spawning new node");
 		int pid = fork();
 		if(pid == 0) {
 			// we are the new child
 			rexos_knowledge_database::RosSoftware rosSoftware = rexos_knowledge_database::RosSoftware(moduleIdentifier);
-			extractZipArchive(rosSoftware);
+			extractRosSoftware(rosSoftware);
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
+			std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(rosSoftware.getId()) + "/";
+			boost::algorithm::replace_all(command, "{baseDir}", baseDir);
+			if(isSimulated == true) {
+				boost::algorithm::replace_all(command, "{isSimulated}", "--isSimulated");
+			} else {
+				boost::algorithm::replace_all(command, "{isSimulated}", "");
+			}
+			if(isShadow == true) {
+				boost::algorithm::replace_all(command, "{isShadow}", "--isShadow");
+			} else {
+				boost::algorithm::replace_all(command, "{isShadow}", "");
+			}
+			
 			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
 			boost::algorithm::replace_all(command, "{manufacturer}", moduleIdentifier.getManufacturer());
 			boost::algorithm::replace_all(command, "{typeNumber}", moduleIdentifier.getTypeNumber());
 			boost::algorithm::replace_all(command, "{serialNumber}", moduleIdentifier.getSerialNumber());
 		
-			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
+			REXOS_INFO_STREAM("Spawning node with command " << command);
 			execl("/bin/bash", "/bin/bash", "-c", command.c_str(), NULL);
 			REXOS_ERROR("Unable to execl");
 			throw std::runtime_error("Unable to execl");
 		} else {
 			// we are the old parent
-			REXOS_INFO("node has been spawned");
 		}
 	}
 	void NodeSpawner::spawnEquipletNode() {
-		REXOS_INFO("Spawning new node");
 		int pid = fork();
 		if(pid == 0) {
 			// we are the new child
 			rexos_knowledge_database::RosSoftware rosSoftware = rexos_knowledge_database::RosSoftware(equipletName);
-			extractZipArchive(rosSoftware);
+			extractRosSoftware(rosSoftware);
 			
 			// start the new node
 			std::string command = rosSoftware.getCommand();
+			std::string baseDir = ZIP_ARCHIVE_PATH + boost::lexical_cast<std::string>(rosSoftware.getId()) + "/";
+			boost::algorithm::replace_all(command, "{baseDir}", baseDir);
+			if(isSimulated == true) {
+				boost::algorithm::replace_all(command, "{isSimulated}", "--isSimulated");
+			} else {
+				boost::algorithm::replace_all(command, "{isSimulated}", "");
+			}
+			if(isShadow == true) {
+				boost::algorithm::replace_all(command, "{isShadow}", "--isShadow");
+			} else {
+				boost::algorithm::replace_all(command, "{isShadow}", "");
+			}
+			
 			boost::algorithm::replace_all(command, "{equipletName}", equipletName);
 			
 			REXOS_INFO_STREAM("Spawning node with command " << rosSoftware.getCommand());
@@ -92,62 +118,8 @@ namespace rexos_node_spawner {
 			REXOS_INFO("node has been spawned");
 		}
 	}
-	void NodeSpawner::extractZipArchive(rexos_knowledge_database::RosSoftware& rosSoftware) {
-		char buf[100];
-			
-		std::istream* rosFile = rosSoftware.getRosFile();
-		std::ofstream zipFileOutputStream;
-		std::string zipArchiveFileName = boost::lexical_cast<std::string>(rosSoftware.getId()) + ".zip";
-		std::string zipArchivePath = std::string("/tmp/rexos_node_spawner/");
-		zipFileOutputStream.open(zipArchivePath + zipArchiveFileName, 
-				std::ios::out | std::ios::binary); 
-		
-		while(rosFile->good() == true) {
-			rosFile->read(buf, sizeof(buf));
-			zipFileOutputStream.write(buf, rosFile->gcount());
-		}
-		zipFileOutputStream.close();
-		REXOS_INFO_STREAM("zip archive has been written at " << zipArchiveFileName);
-		
-		int err = 0;
-		zip* zipArchive = zip_open((zipArchivePath + zipArchiveFileName).c_str(), 0, &err);
-		REXOS_INFO_STREAM("zip archive opened with " << err);
-		
-		struct zip_stat zipStat;
-		for (int i = 0; i < zip_get_num_entries(zipArchive, 0); i++) {
-			if (zip_stat_index(zipArchive, i, 0, &zipStat) == 0) {
-				// is directory or file entry?
-				if (zipStat.name[strlen(zipStat.name) - 1] == '/') {
-					boost::filesystem::create_directories(zipStat.name);
-				} else {
-					// files could be specified before the upper directories. create these directories
-					boost::filesystem::path path = boost::filesystem::path(zipArchivePath + std::string(zipStat.name));
-					boost::filesystem::create_directories(path.parent_path());
-					
-					struct zip_file* zipFile;
-					zipFile = zip_fopen_index(zipArchive, i, 0);
-					if (!zipFile) {
-						throw std::runtime_error("Unable to open zipFile in zipArchive");
-					}
-					
-					std::ofstream fs;
-					fs.open((zipArchivePath + std::string(zipStat.name)).c_str(), std::ios::out | std::ios::binary); 
-					if (fs.good() != true) {
-						throw std::runtime_error("Unable to open fstream with path" + (zipArchivePath + std::string(zipStat.name)));
-					}
-					
-					int sum = 0;
-					while (sum != zipStat.size) {
-						int len = zip_fread(zipFile, buf, 100);
-						fs.write(buf, sizeof(buf));
-						sum += len;
-					}
-					
-					fs.close();
-					zip_fclose(zipFile);
-				}
-			}
-		}
-		REXOS_INFO("zipArchive has been extracted");
+	void NodeSpawner::extractRosSoftware(rexos_knowledge_database::RosSoftware& rosSoftware) {
+		std::string baseName = boost::lexical_cast<std::string>(rosSoftware.getId());
+		rexos_zip::ZipExtractor::extractZipArchive(rosSoftware.getRosFile(), baseName, boost::filesystem::path(ZIP_ARCHIVE_PATH), false);
 	}
 }

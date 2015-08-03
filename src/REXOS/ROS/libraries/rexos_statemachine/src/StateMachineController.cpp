@@ -15,8 +15,8 @@ namespace rexos_statemachine{
 		
 		REXOS_INFO_STREAM("Setting state action client: " 	<< advertisementPath << "change_state");
 		REXOS_INFO_STREAM("Setting mode action client: " 		<< advertisementPath << "change_mode");
-		REXOS_INFO_STREAM("Setting state update server: " 	<< advertisementPath + "state_update");
-		REXOS_INFO_STREAM("Setting mode update server: " 		<< advertisementPath + "mode_update");
+		REXOS_INFO_STREAM("Setting state update server: " 	<< advertisementPath << "state_update");
+		REXOS_INFO_STREAM("Setting mode update server: " 		<< advertisementPath << "mode_update");
 	}
 	
 	rexos_statemachine::State StateMachineController::getCurrentState(){

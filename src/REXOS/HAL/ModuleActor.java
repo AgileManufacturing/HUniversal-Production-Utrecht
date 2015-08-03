@@ -3,6 +3,9 @@ package HAL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -15,25 +18,18 @@ import HAL.exceptions.ModuleExecutingException;
 import HAL.exceptions.ModuleTranslatingException;
 import HAL.factories.ModuleFactory;
 import HAL.libraries.blackboard_client.data_classes.GeneralMongoException;
-import HAL.libraries.blackboard_client.data_classes.InvalidDBNamespaceException;
-import HAL.libraries.blackboard_client.data_classes.InvalidJSONException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
-import HAL.listeners.BlackboardProcessListener;
 import HAL.listeners.ModuleListener;
 import HAL.listeners.ProcessListener;
 import HAL.steps.CompositeStep;
 import HAL.steps.HardwareStep;
-import HAL.steps.HardwareStep.HardwareStepStatus;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 /**
  * Abstract representation of a actor module in HAL 
  * @author Bas Voskuijlen
  * @author Lars Veenendaal
  * 
  */
-public abstract class ModuleActor extends Module implements BlackboardProcessListener {
+public abstract class ModuleActor extends Module implements ProcessListener {
 	protected static final String MODULE_COMMAND = "module_command";
 	protected static final String APPROACH = "approach";
 	protected static final String DESTINATION = "destination";
@@ -52,7 +48,7 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	protected static final String MOVE = "move";
 	protected static final String ROTATE = "rotate";
 	
-	protected ProcessListener processListener;
+	protected ArrayList<ProcessListener> processListeners;
 	
 	
 	/**
@@ -67,43 +63,11 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	public ModuleActor(ModuleIdentifier moduleIdentifier, ModuleFactory moduleFactory, ModuleListener moduleListener) 
 			throws KnowledgeException {
 		super(moduleIdentifier, moduleFactory,moduleListener);
-		moduleFactory.getHAL().getBlackBoardHandler().addBlackboardProcessListener(this);
+		processListeners = new ArrayList<ProcessListener>();
+		moduleFactory.getHAL().getRosInterface().addProcessListener(this);
 	}
 	public void setModuleListener(ModuleListener moduleListener){
 		this.moduleListener = moduleListener;
-	}
-	/**
-	 * Executes a command by inserting it in the blackboard.
-	 * @param command
-	 * @throws ModuleExecutingException
-	 */
-	protected void executeMongoCommand(JSONObject command){
-		try {
-			moduleFactory.getHAL().getBlackBoardHandler().postHardwareStep(command);
-		} catch (InvalidJSONException ex) {
-			throw new RuntimeException("Executing invalid JSON", ex);
-		} catch (InvalidDBNamespaceException ex) {
-			throw new RuntimeException("Executing invalid DBNamespace", ex);
-		} catch (GeneralMongoException ex) {
-			throw new RuntimeException("General mongo exception while trying to execute", ex);
-		}
-	}
-
-	/**
-	 * [executeReloadEquipletCommand This function fires a 'ReloadEquiplet' message.]
-	 */
-	protected void executeReloadEquipletCommand(){
-		try{
-			moduleFactory.getHAL().getBlackBoardHandler().postReloadEquiplet();
-		} catch (JSONException ex) {
- 			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()");
-		} catch (InvalidJSONException ex) {
-			throw new RuntimeException("Executing invalid JSON - executeReloadEquipletCommand()", ex);
-		} catch (InvalidDBNamespaceException ex) {
-			throw new RuntimeException("Executing invalid DBNamespace - executeReloadEquipletCommand()", ex);
-		} catch (GeneralMongoException ex) {
-			throw new RuntimeException("General mongo exception while trying to execute - executeReloadEquipletCommand()", ex);
-		}
 	}
 	
 	/**
@@ -127,9 +91,8 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 		} else {
 			// root module, no more parents			
 			// if commands remain then the modules were not able to fully translate the compositeStep
-			// TODO better comparison method
-			if (!compositeStep.getCommand().toString().trim().equalsIgnoreCase("{}")){
-				throw new ModuleTranslatingException("The compositestep isn't completely empty: " + 
+			if (compositeStep.getCommand().keys().hasNext() == true){
+				throw new ModuleTranslatingException("The compositestep isn't completely empty: \n" + 
 						compositeStep.getCommand(), compositeStep);
 			} else {
 				Logger.log(LogSection.HAL_MODULES, LogLevel.DEBUG, "Root of the module tree has been reached, composite step succesfully translated");
@@ -143,10 +106,8 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 	 * @param hardwareStep
 	 * @throws ModuleExecutingException
 	 */
-	public void executeHardwareStep(ProcessListener processListener, HardwareStep hardwareStep) {
-		this.processListener = processListener;
-		JSONObject command = hardwareStep.toJSON();
-		executeMongoCommand(command);
+	public void executeHardwareStep(HardwareStep hardwareStep) {
+		moduleFactory.getHAL().getRosInterface().postHardwareStep(hardwareStep);
 	}
 	/**
 	 * This method will translate the {@link CompositeStep} and forward the remainder to its parent.
@@ -210,16 +171,24 @@ public abstract class ModuleActor extends Module implements BlackboardProcessLis
 		return compositeCommand;
 	}
 	
-
-
-	public void onProcessStatusChanged(HardwareStepStatus status, String hardwareStepSerialId) {
-		if(processListener != null) {
-			// the listener might reset the processListener, and therefore the listener must be set before calling the listener
-			ProcessListener temp = processListener;
-			if(status.equals(HardwareStepStatus.DONE) || status.equals(HardwareStepStatus.FAILED)){
-				processListener = null;
+	public void addProcessListener(ProcessListener processListener) {
+		synchronized (processListeners) {
+			processListeners.add(processListener);
+		}
+	}
+	public void removeProcessListener(ProcessListener processListener) {
+		synchronized (processListeners) {
+			processListeners.remove(processListener);
+		}
+	}
+	@Override
+	public void onProcessStatusChanged(HardwareStep hardwareStep) {
+		synchronized (processListeners) {
+			if(hardwareStep.getModuleIdentifier() == this.moduleIdentifier) {
+				for (ProcessListener processListener : processListeners) {
+					processListener.onProcessStatusChanged(hardwareStep);
+				}
 			}
-			temp.onProcessStatusChanged(status, hardwareStepSerialId, this);
 		}
 	}
 }

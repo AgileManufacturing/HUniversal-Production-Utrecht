@@ -196,7 +196,7 @@ public class SupplyAgent extends Agent {
 				if (GC4x4MB_3[i].equals("red")) {
 					subjectMove.put("x", (lookUpTable[(i * 2)]));
 					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
-					subjectMove.put("z", "-26.5");
+					subjectMove.put("z", "13.8");
 					subjectMoveApproach.put("x", 0);
 					subjectMoveApproach.put("y", 0);
 					subjectMoveApproach.put("z", 20);
@@ -215,7 +215,7 @@ public class SupplyAgent extends Agent {
 					subjectMove.put("identifier", "GC4x4MB_1");
 					subjectMove.put("x", (lookUpTable[(i * 2)]));
 					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
-					subjectMove.put("z", "-26.5");
+					subjectMove.put("z", "13.8");
 					subjectMoveApproach.put("x", 0);
 					subjectMoveApproach.put("y", 0);
 					subjectMoveApproach.put("z", 20);
@@ -234,7 +234,7 @@ public class SupplyAgent extends Agent {
 					subjectMove.put("identifier", "GC4x4MB_4");
 					subjectMove.put("x", (lookUpTable[(i * 2)]));
 					subjectMove.put("y", (lookUpTable[(i * 2) + 1]));
-					subjectMove.put("z", "-26.5");
+					subjectMove.put("z", "13.8");
 					subjectMoveApproach.put("x", 0);
 					subjectMoveApproach.put("y", 0);
 					subjectMoveApproach.put("z", 20);

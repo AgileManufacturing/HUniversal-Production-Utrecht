@@ -41,7 +41,7 @@ public:
 protected:
 	std::string equipletName;
 public:
-	DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+	DummyModuleA(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 	void run();
 	
 	virtual bool transitionInitialize();
@@ -68,4 +68,5 @@ public:
 	virtual bool transitionStop();
 private:
 	ros::NodeHandle nodeHandle;
+	ros::ServiceClient environmentCacheClient;
 };

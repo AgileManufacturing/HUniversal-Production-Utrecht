@@ -42,36 +42,37 @@ namespace rexos_delta_robot{
 		 * @var double base
 		 * Radius of the base in millimeters.
 		 **/
-		double base;
+		double baseRadius;
 
 		/**
 		 * @var double hip
 		 * Length of the hip in millimeters.
 		 **/
-		double hip;
+		double hipLength;
 
 		/**
 		 * @var double effector
 		 * Radius of the effector in millimeters.
 		 **/
-		double effector; 
+		double effectorRadius; 
+
+		/**
+		 * @var double effector
+		 * Height of the effector in millimeters.
+		 **/
+		double effectorHeight; 
 
 		/**
 		 * @var double ankle
 		 * Length of the ankle in millimeters.
 		 **/
-		double ankle; 
+		double ankleLength; 
 
 		/**
 		 * @var double maxAngleHipAnkle
 		 * Maximum angle between hip and ankle when moving the ankle sideways.
 		 **/
 		double maxAngleHipAnkle;
-		/**
-		 * @var double MOTORS_FROM_ZERO_TO_TOP_POSITION
-		 * The angle from zero (horizontal) to the top position in radians.
-		 **/
-		double motorFromZeroToTopAngle;
 		
 		/**
 		 * @var double boundaryBoxMinX

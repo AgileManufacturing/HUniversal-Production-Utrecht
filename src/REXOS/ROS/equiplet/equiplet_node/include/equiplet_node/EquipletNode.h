@@ -39,15 +39,15 @@
 #include <vector>
 
 #include <rexos_node_spawner/NodeSpawner.h>
-#include <rexos_blackboard_cpp_client/BlackboardCppClient.h>
-#include <rexos_blackboard_cpp_client/BlackboardSubscriber.h>
-#include <rexos_blackboard_cpp_client/FieldUpdateSubscription.h>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <rexos_utilities/Utilities.h>
 
 #include <equiplet_node/state_machine/EquipletStateMachine.h>
 #include <equiplet_node/ModuleRegistry.h>
 #include <equiplet_node/scada/EquipletScada.h>
+#include <equiplet_node/NodeHalInterface.h>
+#include <equiplet_node/BlackBoardHalInterface.h>
+#include <equiplet_node/HalInterfaceListener.h>
 
 #include <jsoncpp/json/value.h>
 
@@ -58,62 +58,48 @@ namespace equiplet_node {
 /**
  * The equipletNode, will manage all modules and keep track of their states
  **/
-class EquipletNode : public EquipletStateMachine, public Blackboard::BlackboardSubscriber
+class EquipletNode : public EquipletStateMachine, protected HalInterfaceListener
 {
 public:
-	EquipletNode(std::string equipletName, std::string blackboardIp, bool spawnNodesForModules);
-	virtual ~EquipletNode();
+	EquipletNode(std::string equipletName, bool isSimulated, bool isShadow, std::string blackboardIp, int scadaPort);
 	
 	std::string getEquipletName();
 	ros::NodeHandle& getNodeHandle();
-
+	
 private:
-	void onMessage(Blackboard::BlackboardSubscription & subscription, const Blackboard::OplogEntry & oplogEntry);
-	void handleHardwareStep(rexos_datatypes::EquipletStep& step, mongo::OID targetObjectId);
-	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, std::string id, bool completed);
-
+	void handleHardwareStep(rexos_datatypes::HardwareStep& step, mongo::OID targetObjectId);
+	void onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep);
+	
 	virtual void onStateChanged(rexos_statemachine::State state);
 	virtual void onModeChanged(rexos_statemachine::Mode mode);
-
+	
 	Json::Value callLookupHandler(Json::Value originPlacementParameters);
-
-
+	
 	bool setTransitionDone(rexos_statemachine::State transitionState);
-
-	void updateEquipletStateOnBlackboard();
-
+	
 	void handleEquipletCommand(Json::Value n);
-
-
-	/**
-	 * @var int equipletId
-	 * The id of the equiplet
-	 **/
+	
 	std::string equipletName;
-
-	/**
-	 * @var BlackboardCppClient  *blackboardClient
-	 * Client to read from blackboard
-	 **/
-	Blackboard::BlackboardCppClient *directMoveBlackBoardClient;
-	Blackboard::BlackboardSubscription* directMoveSubscription;
-
-
-	Blackboard::BlackboardCppClient *equipletStepBlackboardClient;
-	Blackboard::BlackboardSubscription* equipletStepSubscription;
-	//Blackboard::FieldUpdateSubscription* equipletStepSubscription;
-	Blackboard::BlackboardSubscription* directEquipletStepSubscription;
-
-	Blackboard::BlackboardCppClient *equipletCommandBlackboardClient;
-	Blackboard::BlackboardSubscription* equipletCommandSubscription; 
-
-	Blackboard::BlackboardCppClient *equipletStateBlackboardClient;
-	std::vector<Blackboard::BlackboardSubscription *> subscriptions; 
-
+	bool isSimulated;
+	bool isShadow;
+	
 	ros::NodeHandle nh;
-
 	equiplet_node::scada::EquipletScada scada;
-
+	BlackBoardHalInterface halInterface;
+	//NodeHalInterface halInterface;
+	ros::ServiceClient spawnPartClient;
+	ros::ServiceClient removePartClient;
+	
+	ros::Subscriber accelerationViolationSubscriber;
+	ros::Subscriber collisionViolationSubscriber;
+	ros::Subscriber jointViolationSubscriber;
+	
+	virtual void onHardwareStep(rexos_datatypes::HardwareStep hardwareStep);
+	virtual void onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand);
+	
+	void onAccelerationViolation(std_msgs::String message);
+	void onCollisionViolation(std_msgs::String message);
+	void onJointViolation(std_msgs::String message);
 };
 
 }

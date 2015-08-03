@@ -28,8 +28,7 @@
  *
  **/
 
-#ifndef CAMERACONTROLNODE_H_
-#define CAMERACONTROLNODE_H_
+#pragma once
 
 #include "ros/ros.h"
 #include <std_msgs/Header.h>
@@ -38,11 +37,11 @@
 #include <rexos_module/Module.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
 
-
+namespace camera_control_node {
 
 class CameraControlNode : public rexos_module::Module{
 public:
-	CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier);
+	CameraControlNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow);
 	
 	/**
 	 * calls increaseExposure service of the camera_node
@@ -101,5 +100,5 @@ private:
 	std_srvs::Empty emptyService;
 };
 
-#endif /* CAMERACONTROLNODE_H_ */
+}
 

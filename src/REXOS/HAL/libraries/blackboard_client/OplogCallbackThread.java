@@ -29,7 +29,8 @@
  **/
 package HAL.libraries.blackboard_client;
 
-import java.util.Stack;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import HAL.libraries.blackboard_client.data_classes.BlackboardSubscriber;
 import HAL.libraries.blackboard_client.data_classes.OplogEntry;
@@ -88,7 +89,7 @@ public class OplogCallbackThread extends Thread {
 	 * @var Stack<Callback> callbacks
 	 * List of callbacks that need to be handled.
 	 */
-	private Stack<Callback> callbacks;
+	private Queue<Callback> callbacks;
 	
 	/**
 	 * @var boolean running
@@ -100,7 +101,7 @@ public class OplogCallbackThread extends Thread {
 	 * Constructs and starts a new thread.
 	 */
 	public OplogCallbackThread() {
-		callbacks = new Stack<Callback>();
+		callbacks = new LinkedList<Callback>();
 		start();
 	}
 	
@@ -113,7 +114,7 @@ public class OplogCallbackThread extends Thread {
 	 */
 	public synchronized void addCallback(BlackboardSubscriber subscriber, OplogEntry entry) {
 		Callback callback = new Callback(subscriber, entry);
-		callbacks.push(callback);
+		callbacks.add(callback);
 		notifyAll();
 	}
 	
@@ -131,13 +132,13 @@ public class OplogCallbackThread extends Thread {
 	@Override
 	public synchronized void run() {
 		while (running) {
-			if (callbacks.empty()) {
+			if (callbacks.isEmpty()) {
 				try {
 					wait();
 				} catch (InterruptedException ex) {}
 			} else {
-				while (!callbacks.empty()) {
-					Callback callback = callbacks.pop();
+				while (!callbacks.isEmpty()) {
+					Callback callback = callbacks.poll();
 					
 					callback.getSubscriber().onMessage(callback.getEntry().getOperation(), callback.getEntry());
 				}

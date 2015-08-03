@@ -31,28 +31,30 @@
 
 #include <actionlib/client/simple_action_client.h>
 #include <string>
+#include <map>
 #include <jsoncpp/json/value.h>
 
 #include <rexos_module/ModuleInterfaceListener.h>
-#include <rexos_module/SetInstructionAction.h>
+#include <rexos_module/ExecuteHardwareStepAction.h>
 #include <rexos_module/AbstractModule.h>
 #include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_datatypes/HardwareStep.h>
 
 namespace rexos_module {
-	typedef actionlib::SimpleActionClient<rexos_module::SetInstructionAction> SetInstructionActionClient;
+	typedef actionlib::SimpleActionClient<rexos_module::ExecuteHardwareStepAction> ExecuteHardwareStepClient;
 	
 	class ModuleInterface : public rexos_module::AbstractModule {
 	public:
 		ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier);
 		ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleInterfaceListener* moduleInterfaceListener);
 		
-		void setInstruction(std::string OID, Json::Value n);
+		void executeHardwareStep(rexos_datatypes::HardwareStep hardwareStep);
 	protected:
-		void onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, 
-				const rexos_module::SetInstructionResultConstPtr& result);
+		void onExecuteHardwareStepCallback(const actionlib::SimpleClientGoalState& state, 
+				const rexos_module::ExecuteHardwareStepResultConstPtr& result);
 	protected:
+		std::map<std::string, rexos_datatypes::HardwareStep> hardwareSteps;
 		ModuleInterfaceListener* moduleInterfaceListener;
-	protected:
-		SetInstructionActionClient setInstructionActionClient;
+		ExecuteHardwareStepClient executeHardwareStepClient;
 	};
 }

@@ -27,23 +27,36 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include <iostream>
 #include <rexos_gripper/Gripper.h>
-#include <rexos_utilities/Utilities.h>
+
+#include <iostream>
 #include "ros/ros.h"
+
+#include <rexos_utilities/Utilities.h>
+#include <rexos_io/TcpModbusInputOutputController.h>
+#include <rexos_io/SimulatedInputOutputController.h>
 
 namespace rexos_gripper {
 		
-		Gripper::Gripper(Json::Value node) : OutputDevice(node), watchdogRunning(false), isActivated(false), wasActivated(false), warned(false), overheated(false) {
-				readJSONNode(node);
+		Gripper::Gripper(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node) : 
+				watchdogRunning(false), isActivated(false), wasActivated(false), warned(false), overheated(false) {
+			readJSONNode(node);
+			
+			if(isSimulated) {
+				ioController = new rexos_io::SimulatedInputOutputController(equipletName, moduleIdentifier);
+				valveOutputDevice = new OutputDevice(node, ioController);
+			} else {
+				ioController = new rexos_io::TcpModbusInputOutputController(node);
+				valveOutputDevice = new OutputDevice(node, ioController);
+			}
 		}
 
 		void Gripper::readJSONNode(const Json::Value node) {
-			gripperEnabledMax = node["gripperEnabledMaxSeconds"].asInt() * 1000;
+			gripperEnabledMax = ros::Duration(node["gripperEnabledMaxSeconds"].asInt());
 			REXOS_INFO_STREAM("found gripperEnabledMaxSeconds " << gripperEnabledMax);
-			gripperEnabledWarning = node["gripperEnabledWarningSeconds"].asInt() * 1000;
+			gripperEnabledWarning = ros::Duration(node["gripperEnabledWarningSeconds"].asInt());
 			REXOS_INFO_STREAM("found gripperEnabledWarningSeconds " << gripperEnabledWarning);
-			gripperEnabledCooldown = node["gripperEnabledCooldownSeconds"].asInt() * 1000;
+			gripperEnabledCooldown = ros::Duration(node["gripperEnabledCooldownSeconds"].asInt());
 			REXOS_INFO_STREAM("found gripperEnabledCooldownSeconds " << gripperEnabledCooldown);
 			watchdogInterval = node["watchdogInterval"].asInt();
 			REXOS_INFO_STREAM("found watchdogInterval " << watchdogInterval);
@@ -87,18 +100,20 @@ namespace rexos_gripper {
 			observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
 		}
 		
-		void Gripper::activate() {	
+		void Gripper::activate() {
 			if (overheated == false) {
-				enable();
+				valveOutputDevice->enable();
 				isActivated = true;
+				REXOS_INFO("activated gripper");
 			} else {
 				throw std::runtime_error("Gripper activated while it was overheated");
 			}
 		}
 			
 		void Gripper::deactivate() {
-			disable();
+			valveOutputDevice->disable();
 			isActivated = false;
+			REXOS_INFO("deactivated gripper");
 		}
 		
 		void Gripper::notifyObservers(Notify n){
@@ -133,9 +148,9 @@ namespace rexos_gripper {
 					// Spam the IO with the current isActivated to keep the pin alive :)
 					// TODO: what is X amount of time? Amount of time is probably about 500ms, still the thread can run at 100ms, this will not reduce the preformance
 					if (device->isActivated) {
-						device->enable();
+						device->valveOutputDevice->enable();
 					} else {
-						device->disable();
+						device->valveOutputDevice->disable();
 					}
 					
 					// Semi correcting the loop time by calculating the run time of the loop.
@@ -143,31 +158,31 @@ namespace rexos_gripper {
 
 					// The device has been turned on
 					if (!device->wasActivated && device->isActivated) {
-						device->timeEnabled = rexos_utilities::timeNow();
+						device->timeEnabled = ros::Time::now();
 						device->warned = false;
 
 					// If devices stays on
 					} else if (device->wasActivated && device->isActivated) {
-						long timeEnabled = rexos_utilities::timeNow() - device->timeEnabled;
+						ros::Duration enabledDuration = ros::Time::now() - device->timeEnabled;
 
 						// Test for max time, and close valve when reached.
-						if (timeEnabled > device->gripperEnabledMax) {
+						if (enabledDuration > device->gripperEnabledMax) {
 							REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve open time has reached the limit of " << device->gripperEnabledMax << " milliseconds. Gripper will go in cooldown mode now." << std::endl);
 							device->overheated = true;
 							device->notifyObservers(Overheated);
-							device->timeCooldownStarted = rexos_utilities::timeNow();
-							device->disable();
+							device->timeCooldownStarted = ros::Time::now();
+							device->valveOutputDevice->disable();
 							device->wasActivated = device->isActivated = false;
 
 						// Test for warning time. Send warning to the warning handler.
-						} else if (!device->warned && timeEnabled > device->gripperEnabledWarning) {
+						} else if (!device->warned && enabledDuration > device->gripperEnabledWarning) {
 							REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve open time has reached the warning limit of " << device->gripperEnabledWarning << " milliseconds." << std::endl);
 							device->warned = true;
 							device->notifyObservers(Warned);
 						}
 
 					// If device was cooling down, check if the time has been passed.
-					} else if (device->overheated && ((rexos_utilities::timeNow() - device->timeCooldownStarted) > device->gripperEnabledCooldown)) {
+					} else if (device->overheated && ((ros::Time::now() - device->timeCooldownStarted) > device->gripperEnabledCooldown)) {
 						REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve cooled down. Returning to normal mode." << std::endl);
 						device->overheated = false;
 						device->notifyObservers(CooledDown);

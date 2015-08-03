@@ -1,0 +1,20 @@
+{
+	"ID": {
+		"value":     3,
+		"read-only": false,
+		"type":      "int",
+		"required":  true,
+	},
+	"name": {
+		"value":     null,
+		"read-only": false,
+		"type":      "string",
+		"required":  false,
+	},
+	"test": {
+		"value":     "Mallehenkie",
+		"read-only": false,
+		"type":      "string",
+		"required":  false,
+	},
+}

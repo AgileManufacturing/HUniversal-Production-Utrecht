@@ -4,36 +4,44 @@
 namespace rexos_module {
 	ModuleInterface::ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier) :
 			AbstractModule(equipletName, identifier),
-			setInstructionActionClient(nodeHandle, advertisementPath + "set_instruction"),
-			moduleInterfaceListener(NULL)
+			moduleInterfaceListener(NULL),
+			executeHardwareStepClient(nodeHandle, advertisementPath + "executeHardwareStep")
 	{
 	}
 	ModuleInterface::ModuleInterface(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, ModuleInterfaceListener* moduleInterfaceListener) :
 			AbstractModule(equipletName, identifier),
-			setInstructionActionClient(nodeHandle, advertisementPath + "set_instruction"),
-			moduleInterfaceListener(moduleInterfaceListener)
+			moduleInterfaceListener(moduleInterfaceListener),
+			executeHardwareStepClient(nodeHandle, advertisementPath + "executeHardwareStep")
 	{
 	}
-	void ModuleInterface::setInstruction(std::string OID, Json::Value n) {
+	void ModuleInterface::executeHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 		ROS_INFO_STREAM("Sending instruction to module: " << identifier);
-		if(setInstructionActionClient.waitForServer(ros::Duration(30)) == false) {
+		if(executeHardwareStepClient.waitForServer(ros::Duration(30)) == false) {
 			throw std::runtime_error("setInstructionActionServer took too long to respond");
 		}
-		rexos_module::SetInstructionGoal goal;
+		rexos_module::ExecuteHardwareStepGoal goal;
 		Json::StyledWriter writer;
-		goal.json = writer.write(n);
-		goal.OID = OID;
+		goal.json = writer.write(hardwareStep.toJSON());
+		goal.OID = hardwareStep.getId();
 		
-		setInstructionActionClient.sendGoal(goal, boost::bind(&ModuleInterface::onInstructionServiceCallback, this, _1, _2), NULL, NULL);
+		hardwareSteps[hardwareStep.getId()] = hardwareStep;
+		
+		executeHardwareStepClient.sendGoal(goal, boost::bind(&ModuleInterface::onExecuteHardwareStepCallback, this, _1, _2), NULL, NULL);
 	}
-	void ModuleInterface::onInstructionServiceCallback(const actionlib::SimpleClientGoalState& state, 
-			const rexos_module::SetInstructionResultConstPtr& result) {
+	void ModuleInterface::onExecuteHardwareStepCallback(const actionlib::SimpleClientGoalState& state, 
+			const rexos_module::ExecuteHardwareStepResultConstPtr& result) {
+		ROS_INFO_STREAM(result->OID);
+		
 		if(moduleInterfaceListener != NULL) {
+			rexos_datatypes::HardwareStep hardwareStep = hardwareSteps[result->OID];
+			hardwareSteps.erase(result->OID);
+			
 			if(state == actionlib::SimpleClientGoalState::SUCCEEDED) {
-				moduleInterfaceListener->onHardwareStepCompleted(this, result->OID, true);
+				hardwareStep.setStatus(rexos_datatypes::HardwareStep::DONE);
 			} else {
-				moduleInterfaceListener->onHardwareStepCompleted(this, result->OID, false);
+				hardwareStep.setStatus(rexos_datatypes::HardwareStep::FAILED);
 			}
+			moduleInterfaceListener->onHardwareStepCompleted(this, hardwareStep);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="ROS/|www/|databases/" kind="src" path="src/REXOS"/>
+	<classpathentry excluding="www/|ROS/|models/|external_libraries/" kind="src" path="src/REXOS"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/commons-codec-1.3.jar"/>
@@ -12,5 +12,36 @@
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/java-json.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="lib" path="src/REXOS/external_libraries/jcommon-1.0.21.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/apache_ws_commons-1.0.2.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/apache_xmlrpc_client-0.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/apache_xmlrpc_common-0.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/apache_xmlrpc_server-0.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/commons-pool-1.6.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/dnsjava-2.1.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/fluent-hc-4.4.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/grizzly-framework-2.3.3.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/grizzly-http-2.3.3.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/grizzly-http-server-2.3.5.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/grizzly-rcm-2.3.3.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/javax.json-1.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/javax.websocket-api-1.0-rc4.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/javax.websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/jrosbridge-0.2.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/message_generation-0.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/netty-3.2.3.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/rosgraph_msgs-1.11.0.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/rosjava-0.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/std_msgs-0.5.9.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-client-1.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-container-grizzly-1.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-core-1.2.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-spi-1.2.1.jar"/>
+	<classpathentry kind="lib" path="src/REXOS/external_libraries/tyrus-websocket-core-1.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -32,38 +32,29 @@
 #include <unistd.h>
 #include <node_spawner_node/NodeSpawnerNode.h>
 #include <rexos_knowledge_database/Equiplet.h>
-using namespace node_spawner_node;
 
+using namespace node_spawner_node;
 
 /**
  * Create a new EquipletNode
  * @param id The unique identifier of the Equiplet
  **/
-NodeSpawnerNode::NodeSpawnerNode(std::string equipletName, bool spawnEquipletNode) :
-		equipletName(equipletName),
-		NodeSpawner(equipletName)
+NodeSpawnerNode::NodeSpawnerNode(std::string equipletName, bool spawnEquipletNode, bool isSimulated, bool isShadow) :
+		rexos_node_spawner::NodeSpawner(equipletName, isSimulated, isShadow), 
+		equipletName(equipletName)
 {
 	if(spawnEquipletNode == true) {
 		REXOS_INFO("spawning equiplet node");
 		NodeSpawner::spawnEquipletNode();
 	}
-	spawnNodeServer = nh.advertiseService("spawnNode", &NodeSpawnerNode::spawnNode, this);
+	
+	spawnNodeServer = nh.advertiseService(equipletName + "/spawnNode", &NodeSpawnerNode::spawnNode, this);
 	
 	REXOS_INFO("node_spawner_node has been started");
-}
-
-/**
- * Destructor for the NodeSpawnerNode
- **/
-NodeSpawnerNode::~NodeSpawnerNode(){
 }
 
 bool NodeSpawnerNode::spawnNode(spawnNode::Request &request, spawnNode::Response &response) {
 	rexos_datatypes::ModuleIdentifier identifier(request.manufacturer, request.typeNumber, request.serialNumber);
 	NodeSpawner::spawnNode(identifier);
 	return true;
-}
-std::vector<rexos_datatypes::ModuleIdentifier> NodeSpawnerNode::getModuleIdentifiersOfAttachedModules() {
-	rexos_knowledge_database::Equiplet equiplet = rexos_knowledge_database::Equiplet(equipletName);
-	return equiplet.getModuleIdentifiersOfAttachedModules();
 }

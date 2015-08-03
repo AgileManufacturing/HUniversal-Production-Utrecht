@@ -31,141 +31,116 @@
 
 #pragma once
 
-#include <queue>
-#include <boost/thread.hpp>
-#include "rexos_logger/rexos_logger.h"
+#define DEFAULT_MOTION_SLOT 1
 
 #include <rexos_motor/MotorRotation.h>
-#include <rexos_modbus/ModbusException.h>
-#include <rexos_modbus/ModbusController.h>
+#include <rexos_io/RtuModbusInputOutputController.h>
 #include <rexos_motor/CRD514KD.h>
 #include <rexos_motor/MotorInterface.h>
 #include <rexos_motor/StepperMotorProperties.h>
 
 namespace rexos_motor{
-	/**
-	 * Steppermotor driver
-	 **/
 	class StepperMotor : public MotorInterface{
 	public:
-		StepperMotor(rexos_modbus::ModbusController* modbusController, CRD514KD::Slaves::t motorIndex, StepperMotorProperties properties);
-
-		virtual ~StepperMotor(void);
-
-		void powerOn(void);
-		void powerOff(void);
-		void stop(void);
-
-		void resetCounter(void);
-
-		void moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot);
-		void moveTo(const rexos_motor::MotorRotation& motorRotation);
-
-		void writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
-
-		void startMovement(int motionSlot);
-		void waitTillReady(void);
-
-		bool isPoweredOn(void){ return poweredOn; }
-		
-		bool isValidAngle(double angle);
-		bool isReady();
+		StepperMotor(rexos_io::RtuModbusInputOutputController* ioController, uint16_t motorAddress, StepperMotorProperties properties);
 
 		/**
-		 * Returns the minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
-		 * 
-		 * @return The minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
+		 * Deconstructor of StepperMotor. Tries to turn to power off.
 		 **/
-		inline double getMinAngle(void) const{ return properties.motorMinAngle; }
+		virtual ~StepperMotor(void);
+
+		/**
+		 * If the motor is not powered on yet, try to configure the motor and turn on excitement. Also reset any alarms.
+		 **/
+		virtual void powerOn(void);
+		/**
+		 * If the motor is powered on, try to turn off excitement.
+		 **/
+		virtual void powerOff(void);
+		
+		/**
+		 * Stops the motors & clears the motion queue.
+		 * 
+		 **/
+		virtual void stop(void);
+
+		/**
+		 * Sets the motors step count to 0.
+		 *
+		 * @note This method requires excitement to be briefly turned off, so in real life scenarios could cause movement to go undetected.
+		 **/
+		virtual void resetCounter(void);
+
+		void moveTo(const rexos_motor::MotorRotation& motorRotation, int motionSlot);
+		
+		virtual void writeRotationData(const rexos_motor::MotorRotation& motorRotation, bool useDeviation);
+		void writeRotationData(const rexos_motor::MotorRotation& motorRotation, int motionSlot, bool useDeviation = true);
+		
+		/**
+		 * Start the motor to move according to the set registers. Will wait for the motor to be ready before moving.
+		 **/
+		virtual void startMovement();
+		void startMovement(int motionSlot);
+		/**
+		 * Wait untill the motor indicates that the end location is reached.
+		 **/
+		virtual void waitTillReady(void);
+
+		
+		virtual bool isReady();
+
+		/**
+		 * Sets the motor controller to incremental mode.
+		 * @param motionSlot The motion slot to be set to incremental.
+		 **/
+		virtual void setRelativeMode();
+		/**
+		 * Sets the motor controller to absolute mode.
+		 * @param motionSlot The motion slot to be set to absolute.
+		 **/
+		virtual void setAbsoluteMode();
+		
+		/**
+		 * Sets the deviation in the motor class, and in hardware (if supported)
+		 */
+		virtual void setDeviation(double deviationAngle);
+		
+		/**
+		 * Enables the limitations in the motor class, and in hardware (if supported)
+		 */
+		virtual void enableAngleLimitations();
+		
+		/**
+		 * Disables the limitations in the motor class, and in hardware (if supported)
+		 */
+		virtual void disableAngleLimitations();
 		
 		/**
 		 * Returns the angle per microstep, in radians.
 		 * 
 		 * @return The minimum angle, in radians, the StepperMotor can travel on the theoretical plane.
 		 **/
-		inline double getMicroStepAngle(void) const{ return properties.microStepAngle; }
-
-		/**
-		 * Returns the maximum angle, in radians, the StepperMotor can travel on the theoretical plane.
-		 * 
-		 * @return The maximum angle, in radians, the StepperMotor can travel on the theoretical plane. 
-		 **/
-		inline double getMaxAngle(void) const{ return properties.motorMaxAngle; }
-
-		/**
-		 * Gets the current angle of the motor in radians.
-		 *
-		 * @return the current angle of the motor in radians.
-		 **/
-		inline double getCurrentAngle(void) const{ return currentAngle; }
-
-		/**
-		 * Stores the angle that was given to the motor in the local variable currentAngle.
-		 *
-		 * @param angle The angle that is the current location of the motor.
-		 **/
-		void setCurrentAngle(double angle){ currentAngle = angle; }
-
-		/**
-		 * Returns the deviation between the motors 0 degrees and the horizontal 0 degrees.
-		 *
-		 * @return The deviation between the hardware and theoretical 0 degrees.
-		 **/
-		double getDeviation(void){ return deviation; }
-
-		void setDeviationAndWriteMotorLimits(double deviation);
-
-		void enableAngleLimitations(void);
-		void disableAngleLimitations(void);
-		void updateAngle(void);
-
-		void setIncrementalMode(int motionSlot);
-		void setAbsoluteMode(int motionSlot);
-
+		//inline double getMicroStepAngle(void) const{ return properties.microStepAngle; }
+		
 	private:
 		StepperMotorProperties properties;
-		/**
-		 * @var double currentAngle
-		 * The angle most recently written to the motors since the most recently executed movement.
-		 **/
-		double currentAngle;
-
-		/**
-		 * @var double setAngle
-		 * The angle most recently written to the motors. This does not mean the movement is executed.
-		 **/
-		double setAngle;
-
-		/**
-		 * @var double deviation
-		 * The deviation between the motors 0 degrees and the horizontal 0 degrees.
-		 **/
-		double deviation;
 		
 		/**
 		 * @var ModbusController* modbus
 		 * Controller for the modbus communication.
 		 **/
-		rexos_modbus::ModbusController* modbus;
+		rexos_io::RtuModbusInputOutputController* ioController;
 
 		/**
-		 * @var Slaves::t motorIndex
-		 * Index for the motor in the CRD514KD slaves enum.
+		 * @var Slaves::t motorAddress
+		 * The address of the slave on the modbus
 		 **/
-		CRD514KD::Slaves::t motorIndex;
+		uint16_t motorAddress;
 
 		/**
-		 * @var bool anglesLimited
-		 * If hardware limitations are set on the angles the motor can travel.
+		 * Checks whether the motion slot is used. Throws an std::out_of_range exception if not.
+		 * @param motionSlot the motion slot to be checked.
 		 **/
-		bool anglesLimited;
-
-		/**
-		 * @var volatile bool poweredOn
-		 * If the motor is already powered on.
-		 **/
-		volatile bool poweredOn;
-
 		void checkMotionSlot(int motionSlot);
 	};
 }

@@ -1,5 +1,6 @@
 package HAL.listeners;
 
+import generic.Mast;
 import HAL.Module;
 import HAL.steps.HardwareStep;
 /**
@@ -14,11 +15,11 @@ public interface ModuleListener {
 	 * @param state
 	 * @param module
 	 */
-	public void onModuleStateChanged(String state, Module module);
+	public void onModuleStateChanged(Module module, Mast.State state);
 	/**
 	 * This method is called when the MAST mode of the module changes
 	 * @param mode
 	 * @param module
 	 */
-	public void onModuleModeChanged(String mode, Module module);
+	public void onModuleModeChanged(Module module, Mast.Mode mode);
 }

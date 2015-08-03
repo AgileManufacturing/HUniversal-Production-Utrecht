@@ -121,6 +121,10 @@ public class RosSoftware implements Serializable{
 	public static RosSoftware getRosSoftwareForModuleIdentifier(ModuleTypeIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getRosSoftwareForModuleType, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber);
 		
+		if(rows.length != 1) {
+			return null;
+		}
+		
 		int id = (Integer) rows[0].get("id");
 		int buildNumber = (Integer) rows[0].get("buildNumber");
 		String command = (String) rows[0].get("command");
@@ -137,7 +141,11 @@ public class RosSoftware implements Serializable{
 		RosSoftware output = new RosSoftware();
 		
 		output.buildNumber = input.getInt(BUILD_NUMBER);
-		output.rosFile = Base64.decodeBase64(input.getString(ROS_FILE).getBytes());
+		if(input.isNull(ROS_FILE) == false) {
+			output.rosFile = Base64.decodeBase64(input.getString(ROS_FILE).getBytes());
+		} else {
+			output.rosFile = null;
+		}
 		output.command = input.getString(COMMAND);
 		
 		return output;
@@ -146,7 +154,11 @@ public class RosSoftware implements Serializable{
 		JSONObject output = new JSONObject();
 		
 		output.put(BUILD_NUMBER, buildNumber);
-		output.put(ROS_FILE, new String(Base64.encodeBase64(rosFile)));
+		if(rosFile != null) {
+			output.put(ROS_FILE, new String(Base64.encodeBase64(rosFile)));
+		} else {
+			output.put(ROS_FILE, JSONObject.NULL);
+		}
 		output.put(COMMAND, command);
 		
 		return output;

@@ -48,9 +48,9 @@ namespace rexos_knowledge_database {
 		double getMountPointDistanceY();
 		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModules();
 		std::vector<rexos_datatypes::ModuleIdentifier> getModuleIdentifiersOfAttachedModulesWithRosSoftware();
-		std::string checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber);
+		bool checkIfModuleStillExistInDatabase(rexos_datatypes::ModuleIdentifier moduleIdentifier);
 	private:
 		std::string name;
-		std::unique_ptr<sql::Connection> connection;
+		std::shared_ptr<sql::Connection> connection;
 	};
 }

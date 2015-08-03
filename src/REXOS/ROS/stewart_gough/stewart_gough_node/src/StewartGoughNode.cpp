@@ -39,21 +39,18 @@
 
 #include <matrices/Matrices.h>
 
-// @cond HIDE_NODE_NAME_FROM_DOXYGEN
-#define NODE_NAME "StewartGoughNode"
-// @endcond
-
+using namespace stewart_gough_node;
 /**
  * Constructor 
  * @param equipletID identifier for the equiplet
  * @param moduleID identifier for the deltarobot
  **/
-stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier) :
-		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier),
-		stewartGough(NULL),
+StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow) :
+		rexos_module::ActorModule::ActorModule(equipletName, moduleIdentifier, isSimulated, isShadow),
 		lastX(0.0),
 		lastY(0.0),
-		lastZ(0.0){
+		lastZ(0.0),
+		stewartGough(NULL) {
 	REXOS_INFO("StewartGoughNode Constructor entering...");
 	// get the properties and combine them for the deltarobot
 	std::string properties = this->getModuleProperties();
@@ -67,7 +64,7 @@ stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipl
 	reader.parse(typeProperties, typeJsonNode);
 	
 	std::vector<std::string> typeJsonNodeMemberNames = typeJsonNode.getMemberNames();
-	for(int i = 0; i < typeJsonNodeMemberNames.size(); i++) {
+	for(uint i = 0; i < typeJsonNodeMemberNames.size(); i++) {
 		jsonNode[typeJsonNodeMemberNames[i]] = typeJsonNode[typeJsonNodeMemberNames[i]];
 	}
 
@@ -75,33 +72,32 @@ stewartGoughNodeNamespace::StewartGoughNode::StewartGoughNode(std::string equipl
 	ROS_INFO("%s", writer.write(jsonNode).c_str());
 		
 	// Create a stewart gough robot
-	stewartGough = new rexos_stewart_gough::StewartGough(jsonNode);
+	stewartGough = new rexos_stewart_gough::StewartGough(equipletName, moduleIdentifier, isSimulated, jsonNode);
 }
 
 
-
-stewartGoughNodeNamespace::StewartGoughNode::~StewartGoughNode() {
+StewartGoughNode::~StewartGoughNode() {
 	delete stewartGough;
 }
 
 
-void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_module::SetInstructionGoalConstPtr &goal){
+void StewartGoughNode::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) {
 	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
 	reader.parse(goal->json, equipletStepNode);
-	rexos_datatypes::EquipletStep equipletStep(equipletStepNode);
+	rexos_datatypes::HardwareStep equipletStep(equipletStepNode);
 	
-	rexos_module::SetInstructionResult result;
+	rexos_module::ExecuteHardwareStepResult result;
 	result.OID = goal->OID;
 	
 	rexos_stewart_gough::StewartGoughLocation origin;
 	// the rotation of the axis of the tangent space against the normal space in radians
-	double rotationX, rotationY, rotationZ = 0;
+	double rotationX = 0, rotationY = 0, rotationZ = 0;
 	
 	// determine the position of the origin and the rotation of the axis
 	switch(equipletStep.getOriginPlacement().getOriginPlacementType()) {
-		case rexos_datatypes::OriginPlacement::RELATIVE_TO_IDENTIFIER: {
+		case rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN: {
 			// set the origin to the result of the lookup
 			if(equipletStep.getOriginPlacement().getLookupResult().isMember("location") == false) {
 				throw std::runtime_error("lookup result does not contain location");
@@ -140,6 +136,9 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_m
 			origin.rotationZ = 0;
 			break;
 		}
+		default: {
+			throw std::invalid_argument("equipletStep::originPlacement was of unknown type");
+		}
 	}
 	
 	// get the vector from the instruction data
@@ -159,24 +158,28 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_m
 	// get the max acceleration
 	double maxAcceleration;
 	if(moveCommand.isMember("maxAcceleration") == false) {
-		REXOS_WARN("move command does not contain maxAcceleration, assuming ");
+		REXOS_WARN("move command does not contain maxAcceleration, assuming 50.0");
 		maxAcceleration = 50.0;
 	} else {
 		maxAcceleration = moveCommand["maxAcceleration"].asDouble();
 	}
 	
+	double targetRotationX, targetRotationY, targetRotationZ;
 	// get the rotation from the instruction data
 	if(instructionData.isMember("rotate") == false) {
-		throw std::runtime_error("instruction data does not contain rotate");
+		REXOS_WARN("instruction data does not contain rotate, assuming 0 0");
+		targetRotationX = 0;
+		targetRotationY = 0;
+		targetRotationZ = 0;
+	} else {
+		Json::Value rotateCommand = equipletStep.getInstructionData()["rotate"];
+		if(rotateCommand.isMember("x")) targetRotationX = rotateCommand["x"].asDouble();
+		else targetRotationX = stewartGough->getEffectorLocation().rotationX;
+		if(rotateCommand.isMember("y")) targetRotationY = rotateCommand["y"].asDouble();
+		else targetRotationY = stewartGough->getEffectorLocation().rotationY;
+		if(rotateCommand.isMember("z")) targetRotationZ = rotateCommand["z"].asDouble();
+		else targetRotationZ = stewartGough->getEffectorLocation().rotationZ;
 	}
-	Json::Value rotateCommand = equipletStep.getInstructionData()["rotate"];
-	double targetRotationX, targetRotationY, targetRotationZ;
-	if(rotateCommand.isMember("x")) targetRotationX = rotateCommand["x"].asDouble();
-	else targetRotationX = stewartGough->getEffectorLocation().rotationX;
-	if(rotateCommand.isMember("y")) targetRotationY = rotateCommand["y"].asDouble();
-	else targetRotationY = stewartGough->getEffectorLocation().rotationY;
-	if(rotateCommand.isMember("z")) targetRotationZ = rotateCommand["z"].asDouble();
-	else targetRotationZ = stewartGough->getEffectorLocation().rotationZ;
 	
 	// calculate the target vector
 	Matrix4 rotationMatrix;
@@ -195,10 +198,10 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_m
 	
   	// finally move to point
 	if(moveToPoint(targetLocation, maxAcceleration)) {
-		setInstructionActionServer.setSucceeded(result);
+		executeHardwareStepServer.setSucceeded(result);
 	} else {
 		REXOS_WARN("Failed moving to point");
-		setInstructionActionServer.setAborted(result);
+		executeHardwareStepServer.setAborted(result);
 	}
 }
 
@@ -209,7 +212,7 @@ void stewartGoughNodeNamespace::StewartGoughNode::onSetInstruction(const rexos_m
  *
  * @return true if the calibration was successful else false 
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::calibrate(){
+bool StewartGoughNode::calibrate(){
 	if(!stewartGough->calibrateMotors()){
 		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
@@ -231,7 +234,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::calibrate(){
  * 
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration){
+bool StewartGoughNode::moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration){
 	if(maxAcceleration > 20){
 		maxAcceleration = 20;
 	}
@@ -253,12 +256,12 @@ bool stewartGoughNodeNamespace::StewartGoughNode::moveToPoint(rexos_stewart_goug
 	
 }
 
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionInitialize(){
+bool StewartGoughNode::transitionInitialize(){
 	REXOS_INFO("Initialize transition called");
 	return true;
 }
 
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(){
+bool StewartGoughNode::transitionDeinitialize(){
 	REXOS_INFO("Deinitialize transition called");
 	ros::shutdown();
 	return true;
@@ -268,7 +271,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionDeinitialize(){
  * Transition from Safe to Standby state
  * @return 0 if everything went OK else error
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(){
+bool StewartGoughNode::transitionSetup(){
 	REXOS_INFO("Setup transition called");
 
 	// Power on the deltarobot and calibrate the motors.
@@ -278,9 +281,12 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(){
 	if(!stewartGough->calibrateMotors()){
 		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
-	} else {
-		return true;
 	}
+	rexos_module::TransitionGoal goal;
+	goal.gainedSupportedMutations.push_back("move");
+	
+	transitionActionClient.sendGoal(goal);
+	return true;
 }
 
 /**
@@ -288,7 +294,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionSetup(){
  * Will turn power off the motor 
  * @return will be 0 if everything went ok else error
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionShutdown(){
+bool StewartGoughNode::transitionShutdown(){
 	REXOS_INFO("Shutdown transition called");
 	// Should have information about the workspace, calculate a safe spot and move towards it
 	stewartGough->powerOff();
@@ -299,7 +305,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionShutdown(){
  * Transition from Standby to Normal state
  * @return will be 0 if everything went ok else error 
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionStart(){
+bool StewartGoughNode::transitionStart(){
 	REXOS_INFO("Start transition called");
 	//The service servers should be set, to provide the normal methods for the equiplet
 	return true;
@@ -308,7 +314,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStart(){
  * Transition from Normal to Standby state
  * @return will be 0 if everything went ok else error
  **/
-bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
+bool StewartGoughNode::transitionStop(){
 	REXOS_INFO("Stop transition called");
 	//The service servers should be set off, so the equiplet isn't able to set tasks for the module
 		return true;
@@ -320,7 +326,7 @@ bool stewartGoughNodeNamespace::StewartGoughNode::transitionStop(){
  * Main that creates the deltaRobotNode and starts the statemachine
  **/
 int main(int argc, char **argv){
-	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
+	/*	rexos_stewart_gough::SixAxisCalculations sc(100.00, 300.00, 
 				50, 50, 
 				20, 20,
 				0.46);
@@ -348,20 +354,42 @@ int main(int argc, char **argv){
 		REXOS_INFO_STREAM(movement.angles[3] / (2 * 3.14159263) * 360);
 		REXOS_INFO_STREAM(movement.angles[4] / (2 * 3.14159263) * 360);
 		REXOS_INFO_STREAM(movement.angles[5] / (2 * 3.14159263) * 360);
-	}
+	}*/
 	
-	ros::init(argc, argv, NODE_NAME);
 	
 	if(argc < 5){
-		REXOS_ERROR("Usage: stewart_gough_node equipletName manufacturer typeNumber serialNumber");
+		REXOS_ERROR("Usage: stewart_gough_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
 		return -1;
 	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
+	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
 	
 	REXOS_INFO("Creating StewartGoughNode");
-	stewartGoughNodeNamespace::StewartGoughNode drn(equipletName, moduleIdentifier);
+	StewartGoughNode drn(equipletName, moduleIdentifier, isSimulated, isShadow);
 
 	ros::spin();
 	return 0;

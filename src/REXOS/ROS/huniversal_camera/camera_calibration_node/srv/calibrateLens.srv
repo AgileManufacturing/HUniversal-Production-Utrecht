@@ -1,5 +1,5 @@
-int32 frameCount
-int32 boardWidth
-int32 boardHeight
+uint32 frameCount
+uint32 boardWidth
+uint32 boardHeight
 ---
-int32 processedFrames
+uint32 processedFrames

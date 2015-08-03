@@ -1,0 +1,70 @@
+<sdf version='1.4'>
+	<model name="Camera">
+		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
+			<parentModel>{parentModel}</parentModel>
+			<parentLink>{parentLink}</parentLink>
+			<childLink>{childLink}</childLink>
+		</plugin>
+		<static>false</static>
+		<link name="base">
+			<pose>0 0 0 0 0 0</pose>
+			<gravity>false</gravity>
+		
+			<inertial>
+				<mass>1.000</mass>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>file://{baseDir}camera complex.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<sensor type="camera" name="camera">
+				<pose>0.07500 -0.2000 -0.0420 0 -1.57079633 -1.57079633</pose>
+				<always_on>false</always_on>
+				<update_rate>2.0</update_rate>
+				<visualize>false</visualize>
+				<camera>
+					<horizontal_fov>0.698131701</horizontal_fov>
+					<image>
+						<!--<width>640</width>
+						<height>480</height>-->
+						<width>1280</width>
+						<height>960</height>
+					</image>
+					<clip>
+						<near>0.02</near>
+						<far>300</far>
+					</clip>
+				</camera>
+				<plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+					<alwaysOn>true</alwaysOn>
+					<updateRate>2.0</updateRate>
+					<cameraName>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/camera</cameraName>
+					<imageTopicName>image_raw</imageTopicName>
+					<cameraInfoTopicName>camera_info</cameraInfoTopicName>
+					<frameName>camera_link</frameName>
+					<hackBaseline>0.07</hackBaseline>
+					<distortionK1>0.0</distortionK1>
+					<distortionK2>0.0</distortionK2>
+					<distortionK3>0.0</distortionK3>
+					<distortionT1>0.0</distortionT1>
+					<distortionT2>0.0</distortionT2>
+				</plugin>
+			</sensor>
+		</link>
+		<joint type="prismatic" name="baseToParent">
+			<pose>0 0 0 0 0 0</pose>
+			<child>base</child>
+			<parent>world</parent>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<limit>
+					<upper>0.0</upper>
+					<lower>0.0</lower>
+				</limit>
+			</axis>
+		</joint>
+	</model>
+</sdf>

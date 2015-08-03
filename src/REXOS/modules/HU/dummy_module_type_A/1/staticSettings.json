@@ -1,0 +1,56 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "HU",
+        "typeNumber": "dummy_module_type_A",
+        "serialNumber": "1"
+    },
+    "type": {
+        "properties": {
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": "",
+            "command": "rosrun dummy_module_a dummy_module_a {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}"
+        },
+        "halSoftware": {
+            "buildNumber": 1,
+            "jarFile": "",
+            "className": "HAL.modules.DummyModuleA"
+        },
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": null,
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "base",
+            "childLinkOffsetX": 0,
+            "childLinkOffsetY": 0,
+            "childLinkOffsetZ": 0,
+            "collisions": [
+                {
+                    "linkName": "base",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 5,
+                    "mayHaveContactWithChildModules": true
+                }
+            ],
+            "joints": [
+            ],
+            "links": [
+                {
+                    "linkName": "base",
+                    "maxAcceleration": 20
+                }
+            ]
+        },
+        "supportedMutations": [
+        ],
+        "capabilities": [
+        ]
+    },
+    "properties": {
+    },
+    "calibrationData": [
+    ]
+}

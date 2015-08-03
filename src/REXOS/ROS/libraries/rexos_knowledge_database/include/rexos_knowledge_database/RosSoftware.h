@@ -32,14 +32,14 @@
 #include <string>
 #include <memory>
 
-#include <rexos_datatypes/ModuleIdentifier.h>
+#include <rexos_datatypes/ModuleTypeIdentifier.h>
 
 #include "mysql_connection.h"
 
 namespace rexos_knowledge_database {
 	class RosSoftware {
 	public:
-		RosSoftware(rexos_datatypes::ModuleIdentifier moduleIdentifier);
+		RosSoftware(rexos_datatypes::ModuleTypeIdentifier moduleIdentifier);
 		RosSoftware(std::string equipletName);
 		
 		std::istream* getRosFile();
@@ -47,6 +47,6 @@ namespace rexos_knowledge_database {
 		int getId();
 	private:
 		int id;
-		std::unique_ptr<sql::Connection> connection;
+		std::shared_ptr<sql::Connection> connection;
 	};
 }

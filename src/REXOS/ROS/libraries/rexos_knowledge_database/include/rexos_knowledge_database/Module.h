@@ -62,7 +62,11 @@ namespace rexos_knowledge_database {
 		void setMountPointY(int mountPointY);
 	private:
 		rexos_datatypes::ModuleIdentifier moduleIdentifier;
-		std::unique_ptr<sql::Connection> connection;
+		std::shared_ptr<sql::Connection> connection;
+		
+		int mountPointX;
+		int mountPointY;
+		
 		int getCalibrationGroupForModuleAndOtherModules(std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiers);
 		
 	};

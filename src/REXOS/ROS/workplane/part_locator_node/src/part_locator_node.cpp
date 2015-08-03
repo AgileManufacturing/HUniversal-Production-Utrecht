@@ -8,7 +8,7 @@
 
 #include <environment_cache/EnvironmentCache.h>
 #include <rexos_utilities/Utilities.h>
-#include <rexos_datatypes/EquipletStep.h>
+#include <rexos_datatypes/HardwareStep.h>
 #include <rexos_knowledge_database/KnowledgeDatabaseException.h>
 
 namespace part_locator_node {
@@ -18,9 +18,9 @@ namespace part_locator_node {
 	const int PartLocatorNode::minItemSamples = 11;
 	const int PartLocatorNode::workSpaceHeight = 35;
 
-	PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier):
-			rexos_module::Module(equipletName, moduleIdentifier),
-			environmentCacheClient(rexos_module::AbstractModule::nodeHandle.serviceClient<environment_cache::setData>("setData")),
+	PartLocatorNode::PartLocatorNode(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, bool isShadow):
+			rexos_module::Module(equipletName, moduleIdentifier, isSimulated, isShadow),
+			environmentCacheClient(rexos_module::AbstractModule::nodeHandle.serviceClient<environment_cache::setData>(equipletName + "/setData")),
 			samplesTopLeft(minCornerSamples),
 			samplesTopRight(minCornerSamples),
 			samplesBottomRight(minCornerSamples)
@@ -48,6 +48,8 @@ namespace part_locator_node {
 				topLeftValue.length() == 0 || topRightValue.length() == 0 || bottomRightValue.length() == 0) {
 			throw std::runtime_error("The properties do not contain the top/bottom left/right values or do not contain the workplane width/height");
 		}
+		
+		qrCodeSubscriber = rexos_module::AbstractModule::nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
 	}
 
 	void PartLocatorNode::qrCodeCallback(const vision_node::QrCodes & message) {
@@ -341,7 +343,8 @@ namespace part_locator_node {
 	void PartLocatorNode::MoveToPoint(Vector3 v, std::string hardwarestepId, rexos_module::ModuleInterface& moverInterface){
 		int acceleration = 20;
 		
-		rexos_datatypes::EquipletStep equipletStep;
+		rexos_datatypes::HardwareStep equipletStep;
+		equipletStep.setStatus(rexos_datatypes::HardwareStep::WAITING);
 		equipletStep.setModuleIdentifier(moverInterface.getModuleIdentifier());
 		rexos_datatypes::OriginPlacement originPlacement;
 		originPlacement.setOriginPlacementType(rexos_datatypes::OriginPlacement::OriginPlacementType::RELATIVE_TO_EQUIPLET_ORIGIN);
@@ -355,39 +358,10 @@ namespace part_locator_node {
 		instructionData["move"]["y"] = v.y;
 		instructionData["move"]["z"] = v.z;
 		equipletStep.setInstructionData(instructionData);
-		moverInterface.setInstruction(hardwarestepId, equipletStep.toJSON());
+		moverInterface.executeHardwareStep(equipletStep);
 	}
 	
 	bool PartLocatorNode::mannuallyCalibrate(rexos_datatypes::ModuleIdentifier moverIdentifier){
-		
-		rexos_module::TransitionGoal transitionGoal;
-		
-		std::vector<rexos_module::RequiredMutation> requiredMutations;
-		rexos_module::RequiredMutation requiredMutation;
-		requiredMutation.mutation = "move";
-		requiredMutation.isOptional = false;
-		requiredMutations.push_back(requiredMutation); 
-		transitionGoal.requiredMutationsRequiredForNextPhase = requiredMutations;
-		
-		REXOS_INFO("Waiting for mover");
-		transitionActionClient.sendGoal(transitionGoal);
-		transitionActionClient.waitForResult();
-		rexos_module::TransitionResultConstPtr result = transitionActionClient.getResult();
-		
-		bool foundCandidate = false;
-
-		for(rexos_module::CandidateModules candidates : result->candidates) {
-			if(candidates.mutation == "move") {
-				moverIdentifier = rexos_datatypes::ModuleIdentifier(
-						candidates.manufacturer[0], candidates.typeNumber[0], candidates.serialNumber[0]);
-				foundCandidate = true;
-			}
-		}
-		if(foundCandidate == false) {
-			REXOS_ERROR("Did not acquire mover");
-			return false;
-		}
-		
 		REXOS_INFO_STREAM("Accuired mover " << moverIdentifier);
 		rexos_module::ModuleInterface moverInterface(rexos_module::AbstractModule::equipletName, moverIdentifier);
 		// Go to every corner and ask the userinput for the difference in mm to the corner of the QR code (thus the black corner)
@@ -419,77 +393,11 @@ namespace part_locator_node {
 		std::cin >> bottomRightOffsetX;
 		REXOS_INFO("enter diff to Y");
 		std::cin >> bottomRightOffsetY;
-///////////////////////////////////////////////////////UP HERE FIRST ITTERATION////////////////////////////////////////////////////////////////////		
-		Vector3 A = Vector3(0					, 0						, 1);
-		Vector3 B = Vector3(0 + workPlaneWidth	, 0						, 1);
-		Vector3 C = Vector3(0 + workPlaneWidth	, 0 - workPlaneHeight	, 1);
-		
-		Vector3 Aprojected = Vector3(A.x + topLeftOffsetX, A.y + topLeftOffsetY, 1);
-		Vector3 Bprojected = Vector3(B.x + topRightOffsetX, B.y + topRightOffsetY, 1);
-		Vector3 Cprojected = Vector3(C.x + bottomRightOffsetX, C.y + bottomRightOffsetY, 1);
-		
-		REXOS_INFO_STREAM("workPlaneWidth " << workPlaneWidth << " workPlaneHeight " << workPlaneHeight);
-		REXOS_INFO_STREAM("A " << A << " B " << B << " C " << C);
-		REXOS_INFO_STREAM("Aprojected " << Aprojected << " Bprojected " << Bprojected << " Cprojected " << Cprojected);
-		REXOS_WARN_STREAM("--------------------------------------------------------------");
-//////////////////////////////////////////////////////////////////FROM HERE STARTS MATRIX CALC//////////////////////////////////////////////////////////////////////////////////////////		
-		// first translate so that A' matches A
-		REXOS_INFO_STREAM("x " << -topLeftOffsetX << " y " << -topLeftOffsetY);
-		
-		Matrix3 postCorrectionTranslationMatrix = calculateOffsetMatrix();
-		
-		Aprojected = postCorrectionTranslationMatrix * Aprojected;
-		Bprojected = postCorrectionTranslationMatrix * Bprojected;
-		Cprojected = postCorrectionTranslationMatrix * Cprojected;
-		
-		// second rotate so that normalize(A'B') matches normalize(AB)
-		// calulate the angle between A' and B'
-		double angleAprojectedBprojected = std::atan2(Bprojected.y - Aprojected.y, Bprojected.x - Aprojected.x);
-		// calulate the angle between A and B
-		double angleAB = std::atan2(B.y - A.y, B.x - A.x);
-		double rotationAngle = angleAB - angleAprojectedBprojected;
-		
-		Matrix3 postCorrectionRotationMatrix = calculateRotationMatrix(rotationAngle);
 
-		Aprojected = postCorrectionRotationMatrix * Aprojected;
-		Bprojected = postCorrectionRotationMatrix * Bprojected;
-		Cprojected = postCorrectionRotationMatrix * Cprojected;
-		
-		// third shear so that normalize(B'C') mathces normalize(BC)
-		// calulate the angle between A' and B'
-		double angleBprojectedCprojected = std::atan2(Cprojected.y - Bprojected.y, Cprojected.x - Bprojected.x);
-		// calulate the angle between A and B
-		double angleBC = std::atan2(C.y - B.y, C.x - B.x);
-		double shearAngle = angleBprojectedCprojected - angleBC;
-		double shearFactor = tan(shearAngle);
-		
-		Matrix3 postCorrectionShearMatrix = calculateShearMatrix(shearFactor);
-		
-		Aprojected = postCorrectionShearMatrix * Aprojected;
-		Bprojected = postCorrectionShearMatrix * Bprojected;
-		Cprojected = postCorrectionShearMatrix * Cprojected;
-		
-		REXOS_INFO_STREAM(postCorrectionShearMatrix);
-		REXOS_INFO_STREAM("sheared: Aprojected " << Aprojected << " Bprojected " << Bprojected << " Cprojected " << Cprojected);
-		REXOS_WARN_STREAM("--------------------------------------------------------------");
-		
-		// fourth scale so that A'B' matches AB and B'C' matches BC
-
-		double scaleX = (B - A).length() / (Bprojected - Aprojected).length();
-		double scaleY = (C - B).length() / (Cprojected - Bprojected).length();
-
-		Matrix3 postCorrectionScaleMatrix = calculateScaleMatrix(scaleX, scaleY);
-				
-		Aprojected = postCorrectionScaleMatrix * Aprojected;
-		Bprojected = postCorrectionScaleMatrix * Bprojected;
-		Cprojected = postCorrectionScaleMatrix * Cprojected;
-	
-		Matrix3 translateToA = Matrix3(1, 0, workPlaneWidth / 2, 0, 1, -workPlaneHeight / 2, 0, 0, 1);
-		Matrix3 translateFromA = Matrix3(1, 0, -workPlaneWidth / 2, 0, 1, workPlaneHeight / 2, 0, 0, 1);
-		
-		postCorrectionTotalMatrix = translateFromA * postCorrectionScaleMatrix * 
-				postCorrectionShearMatrix * postCorrectionRotationMatrix * 
-				postCorrectionTranslationMatrix * translateToA;
+		Vector2 tl(topLeftOffsetX, topLeftOffsetY);
+		Vector2 tr(topRightOffsetX, topRightOffsetY);
+		Vector2 br(bottomRightOffsetX, bottomRightOffsetY);
+		generateTotalCalibrationMatrix(tl, tr, br);
 		
 		REXOS_INFO("Moving to top left corner");
 		v = Vector3(0 - workPlaneWidth / 2, 0 + workPlaneHeight / 2, 1);
@@ -556,11 +464,67 @@ namespace part_locator_node {
 		this->setCalibrationDataForModuleAndOtherModules(modules, writer.write(jsonNode));
 		return true;
 	}
-	void PartLocatorNode::run() {
-		REXOS_INFO("waiting for camera/qr_codes");
-		ros::Subscriber sub = rexos_module::AbstractModule::nodeHandle.subscribe("camera/qr_codes", 10, &PartLocatorNode::qrCodeCallback, this);
-		ros::spin();
+	
+	void PartLocatorNode::generateTotalCalibrationMatrix(Vector2 topLeftOffset, Vector2 topRightOffset, Vector2 bottomRightOffset) {
+		// the location of the workplane corners
+		Vector3 A = Vector3(0					, 0						, 1);
+		Vector3 B = Vector3(0 + workPlaneWidth	, 0						, 1);
+		Vector3 C = Vector3(0 + workPlaneWidth	, 0 - workPlaneHeight	, 1);
+		
+		// the location of the mover
+		Vector3 Aprojected = Vector3(A.x + topLeftOffset.x, A.y + topLeftOffset.y, 1);
+		Vector3 Bprojected = Vector3(B.x + topRightOffset.x, B.y + topRightOffset.y, 1);
+		Vector3 Cprojected = Vector3(C.x + bottomRightOffset.x, C.y + bottomRightOffset.y, 1);
+		
+		// first translate so that A' matches A
+		Matrix3 postCorrectionTranslationMatrix = calculateOffsetMatrix();
+		Aprojected = postCorrectionTranslationMatrix * Aprojected;
+		Bprojected = postCorrectionTranslationMatrix * Bprojected;
+		Cprojected = postCorrectionTranslationMatrix * Cprojected;
+		
+		// second rotate so that normalize(A'B') matches normalize(AB)
+		// calulate the angle between A' and B'
+		double angleAprojectedBprojected = std::atan2(Bprojected.y - Aprojected.y, Bprojected.x - Aprojected.x);
+		// calulate the angle between A and B
+		double angleAB = std::atan2(B.y - A.y, B.x - A.x);
+		double rotationAngle = angleAB - angleAprojectedBprojected;
+		
+		Matrix3 postCorrectionRotationMatrix = calculateRotationMatrix(rotationAngle);
+		Aprojected = postCorrectionRotationMatrix * Aprojected;
+		Bprojected = postCorrectionRotationMatrix * Bprojected;
+		Cprojected = postCorrectionRotationMatrix * Cprojected;
+		
+		// third shear so that normalize(B'C') matches normalize(BC)
+		// calulate the angle between A' and B'
+		double angleBprojectedCprojected = std::atan2(Cprojected.y - Bprojected.y, Cprojected.x - Bprojected.x);
+		// calulate the angle between A and B
+		double angleBC = std::atan2(C.y - B.y, C.x - B.x);
+		double shearAngle = angleBprojectedCprojected - angleBC;
+		double shearFactor = tan(shearAngle);
+		
+		Matrix3 postCorrectionShearMatrix = calculateShearMatrix(shearFactor);
+		Aprojected = postCorrectionShearMatrix * Aprojected;
+		Bprojected = postCorrectionShearMatrix * Bprojected;
+		Cprojected = postCorrectionShearMatrix * Cprojected;
+		
+		// fourth scale so that A'B' matches AB and B'C' matches BC
+		double scaleX = (B - A).length() / (Bprojected - Aprojected).length();
+		double scaleY = (C - B).length() / (Cprojected - Bprojected).length();
+
+		Matrix3 postCorrectionScaleMatrix = calculateScaleMatrix(scaleX, scaleY);
+		Aprojected = postCorrectionScaleMatrix * Aprojected;
+		Bprojected = postCorrectionScaleMatrix * Bprojected;
+		Cprojected = postCorrectionScaleMatrix * Cprojected;
+		
+		// fifth generate the entire matrix
+		Matrix3 translateToA = Matrix3(1, 0, workPlaneWidth / 2, 0, 1, -workPlaneHeight / 2, 0, 0, 1);
+		Matrix3 translateFromA = Matrix3(1, 0, -workPlaneWidth / 2, 0, 1, workPlaneHeight / 2, 0, 0, 1);
+		
+		postCorrectionTotalMatrix = translateFromA * postCorrectionScaleMatrix * 
+				postCorrectionShearMatrix * postCorrectionRotationMatrix * 
+				postCorrectionTranslationMatrix * translateToA;
 	}
+	
 	bool PartLocatorNode::transitionInitialize() {
 		REXOS_INFO("Initialize transition called");
 		return true;
@@ -573,11 +537,37 @@ namespace part_locator_node {
 
 	bool PartLocatorNode::transitionSetup() {
 		REXOS_INFO("Setup transition called");
-		
 		rexos_datatypes::ModuleIdentifier moverIdentifier;
 		
+		// accuire a mover for the second transition phase
+		rexos_module::TransitionGoal transitionGoal;
+		
+		std::vector<rexos_module::RequiredMutation> requiredMutations;
+		rexos_module::RequiredMutation requiredMutation;
+		requiredMutation.mutation = "move";
+		requiredMutation.isOptional = false;
+		requiredMutations.push_back(requiredMutation); 
+		transitionGoal.requiredMutationsRequiredForNextPhase = requiredMutations;
+		
+		transitionActionClient.sendGoal(transitionGoal);
+		REXOS_INFO("Waiting for mover");
+		transitionActionClient.waitForResult();
+		rexos_module::TransitionResultConstPtr result = transitionActionClient.getResult();
+		
+		bool foundCandidate = false;
+		for(rexos_module::CandidateModules candidates : result->candidates) {
+			if(candidates.mutation == "move") {
+				moverIdentifier = rexos_datatypes::ModuleIdentifier(
+						candidates.manufacturer[0], candidates.typeNumber[0], candidates.serialNumber[0]);
+				foundCandidate = true;
+			}
+		}
+		if(foundCandidate == false) {
+			REXOS_ERROR("Did not acquire mover");
+			return false;
+		}
+		
 		std::vector<rexos_datatypes::ModuleIdentifier> modules;
-		modules.push_back(this->getModuleIdentifier());
 		modules.push_back(moverIdentifier);
 		
 		try {
@@ -590,7 +580,12 @@ namespace part_locator_node {
 				if(mannuallyCalibrate(moverIdentifier) == false){
 					return false;
 				}
-			}	
+			} else {
+				Vector2 tl(jsonNode["TL"]["x"].asDouble(), jsonNode["TL"]["y"].asDouble());
+				Vector2 tr(jsonNode["TR"]["x"].asDouble(), jsonNode["TR"]["y"].asDouble());
+				Vector2 br(jsonNode["BR"]["x"].asDouble(), jsonNode["BR"]["y"].asDouble());
+				generateTotalCalibrationMatrix(tl, tr, br);
+			}
 			return true;
 		} catch(rexos_knowledge_database::KnowledgeDatabaseException ex) {
 			if(mannuallyCalibrate(moverIdentifier) == false) return false;
@@ -612,14 +607,40 @@ namespace part_locator_node {
 }
 
 int main(int argc, char* argv[]) {
-	ros::init(argc, argv, "part_locator_node");
+	if(argc < 5){
+		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber");
+		return -1;
+	}
 	
-	std::string equipletName = argv[1];
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[2], argv[3], argv[4]);
+	bool isSimulated = false;
+	bool isShadow = false;
+	
+	for (int i = 0; i < argc; i++) {
+		std::string arg = argv[i];
+		if (arg == "--isSimulated") {
+			isSimulated = true;
+		} else if (arg == "--isShadow") {
+			isShadow = true;
+			isSimulated = true;
+		}
+	}
+	
+	std::string equipletName = std::string(argv[argc - 4]);
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argc - 3], argv[argc - 2], argv[argc - 1]);
+	
+	// set up node namespace and name
+	if(isShadow == true) {
+		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
+			REXOS_ERROR("Unable to set environment variable");
+		}
+	}
+	std::string nodeName = equipletName + "_" + moduleIdentifier.getManufacturer() + "_" + 
+			moduleIdentifier.getTypeNumber() + "_" + moduleIdentifier.getSerialNumber();
+	ros::init(argc, argv, nodeName);
 	
 	REXOS_INFO("Creating PartLocatorNode");
-	part_locator_node::PartLocatorNode node(equipletName, moduleIdentifier);
-	node.run();
+	part_locator_node::PartLocatorNode node(equipletName, moduleIdentifier, isSimulated, isShadow);
 	
+	ros::spin();
 	return 0;
 }

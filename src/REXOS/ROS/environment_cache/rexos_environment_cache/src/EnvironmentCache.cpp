@@ -34,7 +34,7 @@
 #include <jsoncpp/json/reader.h>
 #include <boost/algorithm/string.hpp>
 
-#define ENVIRONMENT_CACHE_DEBUG
+//#define ENVIRONMENT_CACHE_DEBUG
 
 namespace rexos_environment_cache {
 	std::string EnvironmentCache::printEnvironmentCache() {
@@ -54,7 +54,7 @@ namespace rexos_environment_cache {
 #endif
 		Json::Value output;
 		
-		for(int i = 0; i < paths.size(); i++) {
+		for(uint i = 0; i < paths.size(); i++) {
 #ifdef ENVIRONMENT_CACHE_DEBUG
 		ROS_DEBUG_STREAM("Processing path " << paths[i]);
 #endif
@@ -63,7 +63,7 @@ namespace rexos_environment_cache {
 			
 			Json::Value currentNode = getJsonNodeForItem(identifier);
 			bool pathExists = true;
-			for(int j = 0; j < pathElements.size(); j++) {
+			for(uint j = 0; j < pathElements.size(); j++) {
 #ifdef ENVIRONMENT_CACHE_DEBUG
 		ROS_DEBUG_STREAM("Processing pathElement " << paths[i]);
 #endif
@@ -106,13 +106,13 @@ namespace rexos_environment_cache {
 		mergeJsonNode(data, currentNode);
 	}
 	void EnvironmentCache::removeDataOfItemFromCache(std::string identifier, std::vector<std::string> paths) {
-		for(int i = 0; i < paths.size(); i++) {
+		for(uint i = 0; i < paths.size(); i++) {
 			std::vector<std::string> pathElements;
 			boost::split(pathElements, paths[i], boost::is_any_of("\t/"));
 			
 			Json::Value& currentNode = getJsonNodeForItem(identifier);
 			bool pathExists = true;
-			for(int j = 0; j < pathElements.size() - 1; j++) {
+			for(uint j = 0; j < pathElements.size() - 1; j++) {
 				if(currentNode.isMember(pathElements[j]) == false) {
 					pathExists = false;
 					break;
@@ -120,7 +120,9 @@ namespace rexos_environment_cache {
 					currentNode = currentNode[pathElements[j]];
 				}
 			}
-			currentNode.removeMember(pathElements[pathElements.size() - 1]);
+			if(pathExists == true) {
+				currentNode.removeMember(pathElements[pathElements.size() - 1]);
+			}
 		}
 		if(getJsonNodeForItem(identifier) == Json::Value(Json::ValueType::objectValue)) {
 			// this item no longer has any properties in the cache and thus should be removed
@@ -139,7 +141,7 @@ namespace rexos_environment_cache {
 #endif
 		std::vector<std::string> memberNames = toBeMerged.getMemberNames();
 		
-		for(int i = 0; i < memberNames.size(); i++) {
+		for(uint i = 0; i < memberNames.size(); i++) {
 #ifdef ENVIRONMENT_CACHE_DEBUG
 		ROS_DEBUG_STREAM("Merging member " << memberNames[i]);
 #endif

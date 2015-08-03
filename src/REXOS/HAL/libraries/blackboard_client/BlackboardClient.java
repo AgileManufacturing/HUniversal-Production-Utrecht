@@ -581,7 +581,7 @@ public class BlackboardClient {
 		
 		// Stop the monitor thread.
 		if (oplogMonitorThread != null) {
-			oplogMonitorThread.interrupt();
+			oplogMonitorThread.shutdown();
 		}
 	}
 
@@ -632,5 +632,9 @@ public class BlackboardClient {
 		oplogMonitorThread.start();
 		
 		return true;
+	}
+	public void finalize() {
+		this.close();
+		System.out.println("bbc finalize called");
 	}
 }

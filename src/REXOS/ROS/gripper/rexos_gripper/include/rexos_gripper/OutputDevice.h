@@ -27,8 +27,7 @@
 * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <rexos_gripper/InputOutputController.h>
-
+#include <rexos_io/InputOutputControllerInterface.h>
 #include <jsoncpp/json/value.h>
 #include <mutex>
 
@@ -41,12 +40,13 @@ namespace rexos_gripper
 	class OutputDevice {
 	
 	public:
-		OutputDevice(Json::Value node);
-		void readJSONNode(const Json::Value node);
+		OutputDevice(Json::Value node, rexos_io::InputOutputControllerInterface* ioController);
 		virtual ~OutputDevice();
+		
+		void readJSONNode(const Json::Value node);
 
-		virtual void enable();
-		virtual void disable();
+		void enable();
+		void disable();
 
 	private:
 		/**
@@ -59,7 +59,7 @@ namespace rexos_gripper
 		 * @var InputOutputController& ioController
 		 * The InputOutput interface
 		 **/
-		InputOutputController* ioController;
+		rexos_io::InputOutputControllerInterface* ioController;
 
 		/**
 		 * @var uint32_t address;

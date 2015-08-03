@@ -1,0 +1,232 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "HU",
+        "typeNumber": "delta_robot_type_B",
+        "serialNumber": "1"
+    },
+    "type": {
+        "properties": {
+            "midPointX": 75,
+            "midPointY": -200,
+            "midPointZ": -34.3,
+            "deltaRobotMeasures": {
+                "baseRadius": 100,
+                "hipLength": 100,
+                "effectorRadius": 42.5,
+                "effectorHeight": 9.5,
+                "ankleLength": 300,
+                "hipAnleMaxAngleDegrees": 22,
+                "boundaryBoxMinX": -200,
+                "boundaryBoxMaxX": 200,
+                "boundaryBoxMinY": -200,
+                "boundaryBoxMaxY": 200,
+                "boundaryBoxMinZ": -380,
+                "boundaryBoxMaxZ": -180
+            },
+            "contactSensorToZeroAngleDegrees": 20,
+            "calibrationBigStepFactor": 20,
+            "stepperMotorProperties": {
+                "motorMinAngleDegrees": -18,
+                "motorMaxAngleDegrees": 90,
+                "microStepAngleDegrees": 0.036,
+                "minAccelerationDegrees": 36,
+                "maxAccelerationDegrees": 36000,
+                "minSpeedDegrees": 0.036,
+                "maxSpeedDegrees": 18000
+            }
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": null,
+            "command": "rosrun delta_robot_node delta_robot_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}"
+        },
+        "halSoftware": {
+            "buildNumber": 1,
+            "jarFile": null,
+            "className": "HAL.modules.DeltaRobot"
+        },
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": null,
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "effector",
+            "childLinkOffsetX": 0,
+            "childLinkOffsetY": 0,
+            "childLinkOffsetZ": 0,
+            "collisions": [
+                {
+                    "linkName": "lowerArm1",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm2",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm3",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm4",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm5",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm6",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "effector",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 5,
+                    "mayHaveContactWithChildModules": true
+                }
+            ],
+            "joints": [
+                {
+                    "jointName": "upperArm1ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm2ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm3ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm1ToUpperArm1",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm2ToUpperArm1",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm3ToUpperArm2",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm4ToUpperArm2",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm5ToUpperArm3",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm6ToUpperArm3",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm1ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm2ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm3ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm4ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm5ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm6ToEffector",
+                    "maxErrorPose": 0.01
+                }
+            ],
+            "links": [
+                {
+                    "linkName": "effector",
+                    "maxAcceleration": 40
+                }
+            ]
+        },
+        "supportedMutations": [
+            "move"
+        ],
+        "capabilities": [
+            {
+                "name": "Draw",
+                "treeNumber": 1,
+                "halSoftware": {
+                    "buildNumber": 1,
+                    "jarFile": null,
+                    "className": "HAL.capabilities.Draw"
+                },
+                "requiredMutationsTrees": [
+                    {
+                        "treeNumber": 1,
+                        "mutations": [
+                            "move",
+                            "draw"
+                        ]
+                    }
+                ],
+                "services": [
+                    "draw"
+                ]
+            },
+            {
+                "name": "PickAndPlace",
+                "treeNumber": 1,
+                "halSoftware": {
+                    "buildNumber": 1,
+                    "jarFile": null,
+                    "className": "HAL.capabilities.PickAndPlace"
+                },
+                "requiredMutationsTrees": [
+                    {
+                        "treeNumber": 1,
+                        "mutations": [
+                            "move",
+                            "pick",
+                            "place"
+                        ]
+                    }
+                ],
+                "services": [
+                    "place"
+                ]
+            }
+        ]
+    },
+    "properties": {
+        "modbusIp": "192.168.0.22",
+        "modbusPort": 502
+    },
+    "calibrationData": [
+    ]
+}

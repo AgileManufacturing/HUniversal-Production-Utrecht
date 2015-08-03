@@ -42,12 +42,12 @@ extern "C"{
 }
 
 namespace rexos_motor{
-	/**
-	 * Powers on all motors by doing a broadcast to turn on all excitement for the motors.
-	 **/
+	MotorManager::MotorManager(std::vector<MotorInterface*> motors) :
+			motors(motors), poweredOn(false) {
+	}
 	void MotorManager::powerOn(void){
 		if(!poweredOn){
-			for(int i = 0; i < motors.size(); ++i){
+			for(uint i = 0; i < motors.size(); ++i){
 				motors[i]->powerOn();
 			}
 		}
@@ -64,48 +64,12 @@ namespace rexos_motor{
 		}
 	}
 
-	/**
-	 * Powers off all motors by broadcasting a clear for the excitement.
-	 **/
 	void MotorManager::powerOff(void){
 		if(poweredOn){
-			for(int i = 0; i < motors.size(); ++i){
+			for(uint i = 0; i < motors.size(); ++i){
 				motors[i]->powerOff();
 			}
 		}
 		poweredOn = false;
-	}
-
-	/**
-	 * Start simultaneously movement of all motors
-	 **/
-	void MotorManager::startMovement(int motionSlot){
-		if(!poweredOn){
-			throw MotorException("motor manager is not powered on");
-		}
-
-		// Execute motion.
-		for(int i = 0; i < motors.size(); ++i){
-			if(motors[i]->isPoweredOn())
-			{
-				motors[i]->waitTillReady();
-			}
-				
-		}
-		
-		
-		long timer2 = rexos_utilities::timeNow();
-		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, motionSlot | CRD514KD::CMD1Bits::EXCITEMENT_ON | CRD514KD::CMD1Bits::START);
-		modbus->writeU16(CRD514KD::Slaves::BROADCAST, CRD514KD::Registers::CMD_1, CRD514KD::CMD1Bits::EXCITEMENT_ON);
-		
-		//REXOS_INFO_STREAM("modbus writeU16 time: " << (rexos_utilities::timeNow()-timer2));
-		
-		for(int i = 0; i < motors.size(); ++i){
-			if(motors[i]->isPoweredOn())
-			{
-				motors[i]->updateAngle();
-			}
-		}
-
 	}
 }

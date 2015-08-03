@@ -2,18 +2,33 @@
 <package>
   <name>camera</name>
   <version>0.0.0</version>
-  <description>The rexos_utilities package</description>
-  <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
+  <description>The vision_node package, doing all the magical vision stuff</description>  <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
   <license>newBSD</license>
   <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
-  <author email="dickvandersteen@gmail.com">Dickvdsteen</author>
-  <author email="koenbraham@gmail.com">KBraham</author>
+  <author>Tommas Bakker</author>
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <run_depend>roscpp</run_depend>
+
+  <build_depend>cv_bridge</build_depend>
+  <run_depend>cv_bridge</run_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <run_depend>std_msgs</run_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+
+  <build_depend>rexos_utilities</build_depend>
+  <run_depend>rexos_utilities</run_depend>
+
+  <build_depend>rexos_datatypes</build_depend>
+  <run_depend>rexos_datatypes</run_depend>
+
+  <build_depend>image_transport</build_depend>
+  <run_depend>image_transport</run_depend>
 
   <run_depend>rexos_logger</run_depend>
   <build_depend>rexos_logger</build_depend>
-
   <export>
-     <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lrexos_utilities"/>
   </export>
 </package>

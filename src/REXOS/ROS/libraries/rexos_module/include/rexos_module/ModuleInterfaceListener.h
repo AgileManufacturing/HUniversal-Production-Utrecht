@@ -31,10 +31,12 @@
 
 #include <string.h>
 
+#include <rexos_datatypes/HardwareStep.h>
+
 namespace rexos_module {
 	class ModuleInterface;
 	class ModuleInterfaceListener {
 	public:
-		virtual void onHardwareStepCompleted(ModuleInterface* moduleInterface, std::string id, bool completed) = 0;
+		virtual void onHardwareStepCompleted(ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep) = 0;
 	};
 }

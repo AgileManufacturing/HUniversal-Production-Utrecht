@@ -9,97 +9,80 @@ namespace rexos_knowledge_database{
 	Equiplet::Equiplet(std::string name) :
 		name(name)
 	{
-		connection = std::unique_ptr<sql::Connection>(rexos_knowledge_database::connect());
+		connection = rexos_knowledge_database::connect();
 	}
 	
 	int Equiplet::getMountPointsX() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT mountPointsX \
 		FROM Equiplet \
-		WHERE name = ?;");
+		WHERE name = ?;"));
 		preparedStmt->setString(1, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current equiplet (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		int mountPointsX = result->getInt("mountPointsX");
-		
-		delete result;
-		delete preparedStmt;
-		return mountPointsX;
+		return result->getInt("mountPointsX");
 	}
 
 	int Equiplet::getMountPointsY() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT mountPointsY \
 		FROM Equiplet \
-		WHERE name = ?;");
+		WHERE name = ?;"));
 		preparedStmt->setString(1, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current equiplet (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		int mountPointsY = result->getInt("mountPointsY");
-		
-		delete result;
-		delete preparedStmt;
-		return mountPointsY;
+		return result->getInt("mountPointsY");
 	}
 	
 	double Equiplet::getMountPointDistanceX() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mountPointsDistanceX \
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
+		SELECT mountPointDistanceX \
 		FROM Equiplet \
-		WHERE name = ?;");
+		WHERE name = ?;"));
 		preparedStmt->setString(1, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current equiplet (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		int mountPointDistanceX = result->getDouble("mountPointDistanceX");
-		
-		delete result;
-		delete preparedStmt;
-		return mountPointDistanceX;
+		return result->getDouble("mountPointDistanceX");
 	}
 
 	double Equiplet::getMountPointDistanceY() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT mountPoinstDistanceY \
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
+		SELECT mountPointDistanceY \
 		FROM Equiplet \
-		WHERE name = ?;");
+		WHERE name = ?;"));
 		preparedStmt->setString(1, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
+		
 		if(result->rowsCount() != 1){
 			throw std::runtime_error("Unable to find current equiplet (someone deleted this instance in the database)");
 		}
 		// set the cursor at the first result
 		result->next();
-		int mountPointDistanceY = result->getDouble("mountPointDistanceY");
-		
-		delete result;
-		delete preparedStmt;
-		return mountPointDistanceY;
+		return result->getDouble("mountPointDistanceY");
 	}
 
 	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModules() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT manufacturer, typeNumber, serialNumber \
 		FROM Module \
-		WHERE equiplet = ?;");
+		WHERE equiplet = ?;"));
 		preparedStmt->setString(1, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
 		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiersOfAttachedModules;
 		while(result->next()) {
@@ -108,22 +91,19 @@ namespace rexos_knowledge_database{
 			moduleIdentifiersOfAttachedModules.push_back(identifier);
 		}
 		
-		delete result;
-		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
 	}
 
 	std::vector<rexos_datatypes::ModuleIdentifier> Equiplet::getModuleIdentifiersOfAttachedModulesWithRosSoftware() {
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
 		SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \
 		FROM Module \
 		JOIN ModuleType ON Module.manufacturer = ModuleType.manufacturer AND \
 			Module.typeNumber = ModuleType.typeNumber \
 		WHERE Module.equiplet = ? AND \
-			ModuleType.rosSoftware IS NOT NULL;");
+			ModuleType.rosSoftware IS NOT NULL;"));
 		preparedStmt->setString(1, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
 		std::vector<rexos_datatypes::ModuleIdentifier> moduleIdentifiersOfAttachedModules;
 		while(result->next()) {
@@ -132,27 +112,24 @@ namespace rexos_knowledge_database{
 			moduleIdentifiersOfAttachedModules.push_back(identifier);
 		}
 		
-		delete result;
-		delete preparedStmt;
 		return moduleIdentifiersOfAttachedModules;
 	}
 
-	std::string Equiplet::checkIfModuleStillExistInDatabase(std::string manufacturer, std::string typeNumber, std::string serialNumber){
-		sql::PreparedStatement* preparedStmt = connection->prepareStatement("\
-		SELECT count(*) \
-		FROM Module WHERE manufacturer = ? AND \
+	bool Equiplet::checkIfModuleStillExistInDatabase(rexos_datatypes::ModuleIdentifier moduleIdentifier) {
+		std::unique_ptr<sql::PreparedStatement> preparedStmt(connection->prepareStatement("\
+		SELECT * \
+		FROM Module \
+		WHERE manufacturer = ? AND \
 			typeNumber = ? AND \
 			serialNumber = ? AND \
-			Module.equiplet = ?");
-		preparedStmt->setString(1, manufacturer);
-		preparedStmt->setString(2, typeNumber);
-		preparedStmt->setString(3, serialNumber);
+			equiplet = ?;"));
+		preparedStmt->setString(1, moduleIdentifier.getManufacturer());
+		preparedStmt->setString(2, moduleIdentifier.getTypeNumber());
+		preparedStmt->setString(3, moduleIdentifier.getSerialNumber());
 		preparedStmt->setString(4, name);
-
-		sql::ResultSet* result = preparedStmt->executeQuery();
-		result->next();
-
+		std::unique_ptr<sql::ResultSet> result(preparedStmt->executeQuery());
 		
-		return result->getString("count(*)");
+		if(result->rowsCount() == 1) return true;
+		else return false;
 	}
 }

@@ -105,7 +105,7 @@ public class PickAndPlaceWithRotation extends Capability {
 
 			JSONObject pickOriginPlacementParameters = new JSONObject();
 			pickOriginPlacementParameters.put("identifier", subject.getString(CompositeStep.IDENTIFIER));
-			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, pickOriginPlacementParameters);
+			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_PART_ORIGIN, pickOriginPlacementParameters);
 
 			CompositeStep pick = new CompositeStep(service, pickCommand, pickOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
@@ -121,7 +121,7 @@ public class PickAndPlaceWithRotation extends Capability {
 
 			JSONObject placeOriginPlacementParameters = new JSONObject();
 			placeOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
-			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_IDENTIFIER, placeOriginPlacementParameters);
+			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_PART_ORIGIN, placeOriginPlacementParameters);
 
 			CompositeStep place = new CompositeStep(service, placeCommand, placeOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + place);

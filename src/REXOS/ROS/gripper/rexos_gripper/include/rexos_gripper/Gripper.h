@@ -26,32 +26,33 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **/
-#ifndef GRIPPER_H
-#define GRIPPER_H
+#pragma once
 
 #include <rexos_gripper/OutputDevice.h>
-#include "rexos_logger/rexos_logger.h"
-//#include "REXOS/nodes/gripper/gripper_node/include/gripper_node/Observer.h"
-#include "rexos_gripper/Observer.h"
+#include <rexos_logger/rexos_logger.h>
+#include <rexos_gripper/Observer.h>
+#include <rexos_io/InputOutputControllerInterface.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 
 #include <jsoncpp/json/value.h>
 #include <vector>
 #include <typeinfo>
 #include <string>
+#include <boost/thread.hpp>
 
 namespace rexos_gripper {
 		/**
 		 * Gripper device
 		 * Gripper valve could be overheated. A watchdog is running to check the valve is not opened for too long.
 		 **/
-		class Gripper: public OutputDevice {
+		class Gripper {
 			
 		public:
 			/**
 			* Constructor for Gripper
 			* @param ioController Output controller for the ouput device (controller contains the registers)
 			**/
-			Gripper(Json::Value node);
+			Gripper(std::string equipletName, rexos_datatypes::ModuleIdentifier moduleIdentifier, bool isSimulated, Json::Value node);
 			
 			/**
 			* Destructor to interrupt the watchdogThread
@@ -94,15 +95,15 @@ namespace rexos_gripper {
 			
 			enum Notify
 			{
-				Warned, CooledDown, Overheated			
+				Warned, CooledDown, Overheated
 			};
 			
 		private:
 			void readJSONNode(Json::Value node);
 			
-			int gripperEnabledMax;
-			int gripperEnabledWarning;
-			int gripperEnabledCooldown;
+			ros::Duration gripperEnabledMax;
+			ros::Duration gripperEnabledWarning;
+			ros::Duration gripperEnabledCooldown;
 			int watchdogInterval;
 			
 			/**
@@ -151,19 +152,19 @@ namespace rexos_gripper {
 			 * @var unsigned long timeEnabled
 			 * Timestamp of the moment when the gripper was enabled.
 			 **/
-			unsigned long timeEnabled;
+			ros::Time timeEnabled;
 
 			/**
 			 * @var unsigned long timeCooldownStarted
 			 * Timestamp of the moment when cooldown period has started.
 			 **/
-			unsigned long timeCooldownStarted;
+			ros::Time timeCooldownStarted;
 
 			static void watchdogFunction(Gripper* device);
 
 			void notifyObservers(Notify n);
 			
+			rexos_io::InputOutputControllerInterface* ioController;
+			OutputDevice* valveOutputDevice;
 		};
 }
-
-#endif

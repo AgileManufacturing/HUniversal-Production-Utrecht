@@ -1,0 +1,11 @@
+string partName
+string originPlacementType
+string relativeTo
+float64 positionX
+float64 positionY
+float64 positionZ
+float64 rotationX
+float64 rotationY
+float64 rotationZ
+bool spawnChildParts
+---

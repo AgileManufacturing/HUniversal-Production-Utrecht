@@ -98,7 +98,7 @@ class CirclewithoffsetandrotationCanvas extends Canvas {
 			}
 			var target = productStepHandler.getProperty("target");
 			target.move = {};
-			target.move.z = 2.0; //-26.5
+			target.move.z = 13.8; //-26.5
 			target.move.x = tx;
 			target.move.y = ty;	
 			target.move.approach = {};

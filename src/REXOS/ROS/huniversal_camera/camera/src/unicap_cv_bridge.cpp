@@ -35,6 +35,8 @@
 
 #include <boost/interprocess/sync/scoped_lock.hpp>
 
+namespace camera {
+
 namespace unicap_cv_bridge {
 	std::vector<std::string> listDevices() {
 		std::vector<std::string> devices;
@@ -75,7 +77,7 @@ namespace unicap_cv_bridge {
 		if (!SUCCESS(unicap_close(handle))) {
 			throw UnicapCvException("Failed to close the device");
 		}
-return formats;
+		return formats;
 	}
 
 	std::vector<std::string> listProperties(int deviceIndex) {
@@ -191,11 +193,12 @@ return formats;
 	}
 
 	static void newFrameCallback(unicap_event_t event, unicap_handle_t handle, unicap_data_buffer_t* buffer, void *owner) {
-		((UnicapCvCamera*) owner)->newFrameCallback(buffer);
+		((UnicapCvCamera*) owner)->handleFrame(buffer);
 	}
 
-	UnicapCvCamera::UnicapCvCamera(int deviceIndex, int formatIndex) :
-			tripmode(false) {
+	UnicapCvCamera::UnicapCvCamera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps, 
+			int deviceIndex, int formatIndex) :
+			Camera(equipletName, identifier, listener, fps) {
 		if (!SUCCESS(unicap_enumerate_devices(NULL, &device, deviceIndex))) {
 			throw UnicapCvException("Failed to get device info");
 		}
@@ -226,6 +229,9 @@ return formats;
 			throw UnicapCvException("Invalid bits per pixel");
 		}
 
+		// set these values for the camFrame, enabeling direct copying the frame into the buffer
+		camFrame = cv::Mat(format.size.height, format.size.width, getFrameFormat());
+
 		unicap_register_callback(handle, UNICAP_EVENT_NEW_FRAME, (unicap_callback_t) (unicap_cv_bridge::newFrameCallback),
 		        this);
 		if (!SUCCESS(unicap_start_capture(handle))) {
@@ -244,10 +250,7 @@ return formats;
 		}
 	}
 
-	void UnicapCvCamera::setTripMode(bool tripmode) {
-		this->tripmode = tripmode;
-	}
-
+	
 	void UnicapCvCamera::getWhiteBalance(double& blue, double& red) {
 		if (!SUCCESS(unicap_get_property_value(handle, "White Balance Blue", &blue))) {
 			throw UnicapCvException("Failed to get property \"White Balance Blue\"");
@@ -286,56 +289,48 @@ return formats;
 		}
 	}
 
-	int UnicapCvCamera::getImgWidth(void) {
-		return format.size.width;
-	}
-
-	int UnicapCvCamera::getImgHeight(void) {
-		return format.size.height;
-	}
-
-	int UnicapCvCamera::getImgFormat(void) {
-		return CV_8UC3;
-	}
-
-	void UnicapCvCamera::newFrameCallback(unicap_data_buffer_t* buffer) {
-		boost::unique_lock<boost::mutex> lock(mut);
-		if (state == FCSTATE_COPY) {
-			if (mat->cols == format.size.width && mat->rows == format.size.height && mat->type() == CV_8UC3) {
-				uint8_t* dest = mat->ptr();
+	void UnicapCvCamera::handleFrame(unicap_data_buffer_t* buffer) {
+		if(isNewFrameRequired() == true) {
+			if (camFrame.cols != format.size.width) {
+				REXOS_ERROR_STREAM("Got frame with incorrect width, expecting " << format.size.width << ", got " << camFrame.cols);
+				return;
+			} else if (camFrame.rows != format.size.height) {
+				REXOS_ERROR_STREAM("Got frame with incorrect height, expecting " << format.size.height << ", got " << camFrame.rows);
+				return;
+			} else if (camFrame.type() != getFrameFormat()) {
+				REXOS_ERROR_STREAM("Got frame with incorrect format, expecting " << getFrameFormat() << ", got " << camFrame.type());
+				return;
+			} else {
+				uint8_t* dest = camFrame.ptr();
 				uint8_t* source = buffer->data;
 				//memcpy(dest, source, 3 * (mat->cols * mat->rows));
 				for (int n = 0; n < format.size.width * format.size.height * 3; n += 3) {
-					if (tripmode) {
-						dest[n] = (source[n] % 33) * (255 / 33);
-						dest[n + 1] = (source[n + 1] % 40) * (255 / 40);
-						dest[n + 2] = (source[n + 2] % 18) * (255 / 18);
-					} else {
-						dest[n] = source[n + 2];
-						dest[n + 1] = source[n + 1];
-						dest[n + 2] = source[n];
-					}
+					dest[n] = source[n + 2];
+					dest[n + 1] = source[n + 1];
+					dest[n + 2] = source[n];
 				}
-
-				state = FCSTATE_SUCCESS;
-			} else {
-				state = FCSTATE_FAILURE;
 			}
-			cond.notify_all();
+			onNewFrame();
 		}
 		unicap_set_property_auto(handle, (char*) "Shutter");
 	}
-
-	void UnicapCvCamera::getFrame(cv::Mat* mat) {
-		boost::unique_lock<boost::mutex> lock(mut);
-		state = FCSTATE_COPY;
-		this->mat = mat;
-		cond.wait(lock);
-		frameCapState _state = state;
-		state = FCSTATE_DONT_COPY;
-		if (_state == FCSTATE_FAILURE) {
-			throw UnicapCvException("Failed to get frame");
+	cv::Size UnicapCvCamera::getFrameSize() {
+		return cv::Size(format.size.width, format.size.height);
+	}
+	int UnicapCvCamera::getFrameFormat() {
+		return CV_8UC3;
+	}
+	void UnicapCvCamera::enableCamera(bool enabled) {
+		Camera::enableCamera(enabled);
+		if(enabled == true) {
+			if (!SUCCESS(unicap_start_capture(handle))) {
+				throw UnicapCvException("Failed to start capture");
+			}
+		} else {
+			if (!SUCCESS( unicap_stop_capture(handle))) {
+				throw UnicapCvException("Failed to stop capture");
+			}
 		}
 	}
 }
-
+}

@@ -1,0 +1,6 @@
+uint32 motorIndex
+float64 maxAcceleration
+float64 maxDecelleration
+float64 maxSpeed
+float64 angle
+---

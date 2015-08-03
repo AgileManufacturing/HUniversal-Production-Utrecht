@@ -1,0 +1,695 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+	<model name="DeltaRobot">
+		<plugin name="attachModule" filename="{baseDir}libattach_plugin.so">
+			<parentModel>{parentModel}</parentModel>
+			<parentLink>{parentLink}</parentLink>
+			<childLink>{childLink}</childLink>
+		</plugin>
+		<plugin name="motorManager" filename="{baseDir}libmotor_manager_plugin.so">
+			<motors>upperArm1ToBase upperArm2ToBase upperArm3ToBase</motors>
+			<rosNamespace>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/</rosNamespace>
+		</plugin>
+		<plugin name="sensorManager" filename="{baseDir}libsensor_manager_plugin.so">
+			<contactSensors>upperArm1ToBase -0.34906585 upperArm2ToBase -0.34906585 upperArm3ToBase -0.34906585</contactSensors>
+			<rosNamespace>{isShadow}/{equipletName}/{manufacturer}/{typeNumber}/{serialNumber}/</rosNamespace>
+			<address>8000</address>
+		</plugin>
+		<static>false</static>
+		<!--==================== Links ====================-->
+		<link name="base">
+			<pose>0 0 0 0 0 0</pose>
+			<gravity>false</gravity>
+			
+			<inertial>
+				<mass>20.000</mass>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}base.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+		<!-- Upper arms --> 
+		<link name="upperArm1"> 
+			<pose>0.1616 -0.1500 -0.0343 0 0 2.0943951</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.200</mass>
+				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}upperArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+		<link name="upperArm2"> 
+			<pose>0.0750 -0.3000 -0.0343 0 0 0</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.200</mass>
+				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}upperArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+		<link name="upperArm3"> 
+			<pose>-0.0116 -0.1500 -0.0343 0 0 -2.0943951</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.200</mass>
+				<pose>0 -0.050 0 0 0 0</pose>
+				<!--<inertia>
+					<ixx>1000</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>1000</izz>
+				</inertia>-->
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}upperArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+		</link>
+		<!-- Lower arms --> 
+		<link name="lowerArm1"> 
+			<pose>0.2382 -0.0827 -0.0343 0.5527151 0 2.0943951</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.040</mass>
+				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}lowerArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.309</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="lowerArm2"> 
+			<pose>0.2582 -0.1173 -0.0343 0.5527151 0 2.0943951</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.040</mass>
+				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}lowerArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.309</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="lowerArm3"> 
+			<pose>0.0950 -0.4000 -0.0343 0.5527151 0 0</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.040</mass>
+				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}lowerArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.309</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="lowerArm4"> 
+			<pose>0.0550 -0.4000 -0.0343 0.5527151 0 0</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.040</mass>
+				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}lowerArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.309</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="lowerArm5"> 
+			<pose>-0.1082 -0.1173 -0.0343 0.5527151 0 -2.0943951</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.040</mass>
+				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}lowerArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.309</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<link name="lowerArm6"> 
+			<pose>-0.0882 -0.0827 -0.0343 0.5527151 0 -2.0943951</pose>
+			<gravity>true</gravity>
+			
+			<inertial>
+				<mass>0.040</mass>
+				<pose>0 0 -0.150 0 0 0</pose>
+				<inertia>
+					<!--<ixx>500</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>500</iyy>	<iyz>0.00</iyz>
+															<izz>10</izz>-->
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}lowerArm.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 -0.150 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.0025</radius>
+						<length>0.309</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		<!-- Effector --> 
+		<link name="effector"> 
+			<pose>0.0750 -0.2000 -0.2991 0 0 0</pose>
+			<gravity>true</gravity>
+			
+			<velocity_decay>
+				<angular>2</angular>
+			</velocity_decay>
+			<inertial>
+				<mass>0.050</mass>
+				<pose>0 0 0 0 0 0</pose>
+				<inertia>
+					<ixx>0.1</ixx>	<ixy>0.00</ixy>	<ixz>0.00</ixz>
+										<iyy>0.1</iyy>	<iyz>0.00</iyz>
+															<izz>0.1</izz>
+				</inertia>
+			</inertial>
+			<visual name="visual">
+				<geometry>
+					<mesh>
+						<uri>{baseDir}effector.dae</uri>
+					</mesh>
+				</geometry>
+			</visual>
+			<collision name="collision">
+				<pose>0 0 0.0025 0 0 0</pose>
+				<geometry>
+					<cylinder>
+						<radius>0.039</radius>
+						<length>0.005</length>
+					</cylinder>
+				</geometry>
+			</collision>
+		</link>
+		
+		<!--==================== Joints ====================-->
+		<joint type="prismatic" name="baseToParent">
+			<pose>0 0 0 0 0 0</pose>
+			<parent>world</parent>
+			<child>base</child>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<limit>
+					<lower>0.0</lower>
+					<upper>0.0</upper>
+				</limit>
+			</axis>
+		</joint>
+		<!-- Upper arms --> 
+		<joint type="revolute" name="upperArm1ToBase"> 
+			<parent>base</parent>
+			<child>upperArm1</child>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
+				</limit>
+			</axis>
+		</joint>
+		<joint type="revolute" name="upperArm2ToBase"> 
+			<parent>base</parent>
+			<child>upperArm2</child>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
+				</limit>
+			</axis>
+		</joint>
+		<joint type="revolute" name="upperArm3ToBase"> 
+			<parent>base</parent>
+			<child>upperArm3</child>
+			<axis>
+				<xyz>1 0 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.15</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.366519143</lower>
+					<upper>1.57079633</upper>
+				</limit>
+			</axis>
+		</joint>
+		<!-- Lower arms --> 
+		<joint type="ball" name="lowerArm1ToUpperArm1"> 
+			<parent>upperArm1</parent>
+			<child>lowerArm1</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm2ToUpperArm1"> 
+			<parent>upperArm1</parent>
+			<child>lowerArm2</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm3ToUpperArm2"> 
+			<parent>upperArm2</parent>
+			<child>lowerArm3</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm4ToUpperArm2"> 
+			<parent>upperArm2</parent>
+			<child>lowerArm4</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm5ToUpperArm3"> 
+			<parent>upperArm3</parent>
+			<child>lowerArm5</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm6ToUpperArm3"> 
+			<parent>upperArm3</parent>
+			<child>lowerArm6</child>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<!-- Effector -->
+		<joint type="ball" name="lowerArm1ToEffector"> 
+			<parent>effector</parent>
+			<child>lowerArm1</child>
+			<pose>0 0 -0.300 0 0 0</pose>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm2ToEffector"> 
+			<parent>effector</parent>
+			<child>lowerArm2</child>
+			<pose>0 0 -0.300 0 0 0</pose>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm3ToEffector"> 
+			<parent>effector</parent>
+			<child>lowerArm3</child>
+			<pose>0 0 -0.300 0 0 0</pose>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm4ToEffector"> 
+			<parent>effector</parent>
+			<child>lowerArm4</child>
+			<pose>0 0 -0.300 0 0 0</pose>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm5ToEffector"> 
+			<parent>effector</parent>
+			<child>lowerArm5</child>
+			<pose>0 0 -0.300 0 0 0</pose>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+		<joint type="ball" name="lowerArm6ToEffector"> 
+			<parent>effector</parent>
+			<child>lowerArm6</child>
+			<pose>0 0 -0.300 0 0 0</pose>
+			<axis>
+				<xyz>0 1 0</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis>
+			<axis2>
+				<xyz>0 0 1</xyz>
+				<dynamics>
+					<friction>0.15</friction>
+					<damping>0.25</damping>
+				</dynamics>
+				<limit>
+					<lower>-0.34906585</lower>
+					<upper>0.34906585</upper>
+				</limit>
+			</axis2>
+		</joint>
+	</model>
+</sdf>

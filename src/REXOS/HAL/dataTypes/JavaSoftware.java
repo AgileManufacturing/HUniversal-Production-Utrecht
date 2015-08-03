@@ -126,6 +126,10 @@ public class JavaSoftware implements JarFileLoader, Serializable{
 	public static JavaSoftware getJavaSoftwareForModuleIdentifier(ModuleTypeIdentifier moduleIdentifier, KnowledgeDBClient knowledgeDBClient) {
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getJavaSoftwareForModuleType, moduleIdentifier.manufacturer, moduleIdentifier.typeNumber);
 		
+		if(rows.length != 1) {
+			return null;
+		}
+		
 		int id = (Integer) rows[0].get("id");
 		int buildNumber = (Integer) rows[0].get("buildNumber");
 		String className = (String) rows[0].get("className");
@@ -164,7 +168,11 @@ public class JavaSoftware implements JarFileLoader, Serializable{
 		JavaSoftware output = new JavaSoftware();
 		
 		output.buildNumber = input.getInt(BUILD_NUMBER);
-		output.jarFile = Base64.decodeBase64(input.getString(JAR_FILE).getBytes());
+		if(input.isNull(JAR_FILE) == false) {
+			output.jarFile = Base64.decodeBase64(input.getString(JAR_FILE).getBytes());
+		} else {
+			output.jarFile = null;
+		}
 		output.className = input.getString(CLASS_NAME);
 		
 		return output;
@@ -173,7 +181,11 @@ public class JavaSoftware implements JarFileLoader, Serializable{
 		JSONObject output = new JSONObject();
 		
 		output.put(BUILD_NUMBER, buildNumber);
-		output.put(JAR_FILE, new String(Base64.encodeBase64(jarFile)));
+		if(jarFile != null) {
+			output.put(JAR_FILE, new String(Base64.encodeBase64(jarFile)));
+		} else {
+			output.put(JAR_FILE, JSONObject.NULL);
+		}
 		output.put(CLASS_NAME, className);
 		
 		return output;

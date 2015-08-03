@@ -29,29 +29,17 @@
 
 #pragma once
 
-#include <modbus/modbus.h>
+#include <rexos_motorized_actor/MotorizedActor.h>
 #include <rexos_stewart_gough/StewartGoughMeasures.h>
 #include <rexos_stewart_gough/StewartGoughLocation.h>
-#include <rexos_motor/MotorInterface.h>
-#include <rexos_motor/StepperMotor.h>
-#include <rexos_motor/MotorManager.h>
-#include <rexos_motor/StepperMotorProperties.h>
 #include <rexos_stewart_gough/SixAxisCalculations.h>
+#include <rexos_datatypes/ModuleIdentifier.h>
 #include <jsoncpp/json/value.h>
 #include "rexos_logger/rexos_logger.h"
 
 #include <vector>
 
-namespace rexos_stewart_gough{
-	struct MotorMap {
-		int motor;
-		int sensor;
-		
-		MotorMap(int motor = 0, int sensor = 0):
-				motor(motor),
-				sensor(sensor){}
-	};
-	
+namespace rexos_stewart_gough {
 	struct MotorGroup {
 		int motorIndex1;
 		int motorIndex2;
@@ -64,60 +52,25 @@ namespace rexos_stewart_gough{
 	/**
 	 * A class that symbolizes an entire deltarobot.
 	 **/
-	class StewartGough{
+	class StewartGough : public rexos_motorized_actor::MotorizedActor {
 	public:
-		StewartGough(Json::Value node);
-		~StewartGough();
+		StewartGough(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, Json::Value node);
+		virtual ~StewartGough();
 		
 		void readJSONNode(Json::Value node);
 		
 		bool checkPath(const StewartGoughLocation& begin, const StewartGoughLocation& end);
 		void moveTo(StewartGoughLocation point, double maxAcceleration);
 		
-		void calibrateMotor(int motorIndex1,int motorIndex2);
-		bool checkSensor(int sensorIndex);
-		bool calibrateMotors();
-		void powerOff();
-		void powerOn();
+		virtual bool calibrateMotors();
 		
 		StewartGoughLocation getEffectorLocation();
 		
 	private:
-		/**
-		 * @var StepperMotor* motors
-		 * An array holding pointers to the three StepperMotors that are connected to the DeltaRobot. This array HAS to be of size 3.
-		 **/
-		std::vector<rexos_motor::StepperMotor*> motors;
-		
-                /**
-                 *
-                 * @var ModbusController::ModbusController* modbus
-                 * the modbuscontroller
-                 **/
-                rexos_modbus::ModbusController modbus;
-                rexos_modbus::ModbusController createModbus();
-		
-		// the inital motors and sensors are positioned on the wrong locations
-		// this is used to map them on the right locations
-		MotorMap motorMap[6];
 		
 		//SixAxisCalculations * sixAxisCalculations;
 		
 		rexos_stewart_gough::StewartGoughMeasures stewartGoughMeasures;
-		rexos_motor::StepperMotorProperties stepperMotorProperties;
-		
-		/**
-		 * @var MotorManager* motorManager
-		 * A pointer to the MotorManager that handles the movement for the DeltaRobot.
-		 **/
-		rexos_motor::MotorManager motorManager;
-		rexos_motor::MotorManager createMotorManager();
-		
-		/**
-		 * @var modbus_t* modbusIO
-		 * A pointer to the TCP modbus connection for the IO controller.
-		 **/
-		modbus_t* modbusIO;
 		
 		SixAxisCalculations* sixAxisCalculations;
 		
@@ -128,26 +81,7 @@ namespace rexos_stewart_gough{
 		 **/
 		StewartGoughLocation effectorLocation;
 		
-
-		int calibrationBigStepFactor;
-		std::string modbusIp;
-		int modbusPort;
-		
-		
-		/**
-		 * @var int currentMotionSlot
-		 * The motion slot currently in use. The deltarobot switches between these slots when moving.
-		 **/
-		int currentMotionSlot;
-		
-		bool isValidAngle(int motorIndex, double angle);
-		MotorGroup moveMotorUntilSensorIsOfValue(int motorIndex1,int motorIndex2, rexos_motor::MotorRotation motorRotation1 ,rexos_motor::MotorRotation motorRotation2, bool sensorValue);
 		double getSpeedForRotation(double relativeAngle, double moveTime, double acceleration);
 		double getAccelerationForRotation(double relativeAngle, double moveTime);
-		
-		rexos_motor::StepperMotor* getMotor(int number);
-		int getMotorIndexByNumber(int number);
-		
-		void deleteMotorRotationObjects(rexos_motor::MotorRotation* rotations[6]);
 	};
 }

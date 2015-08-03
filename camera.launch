@@ -1,10 +1,12 @@
 <launch>
+	<arg name="isSimulated" default=""/>
+	<arg name="isShadow" default=""/>
 	<arg name="equipletName" />
 	<arg name="manufacturer" />
 	<arg name="typeNumber" />
 	<arg name="serialNumber" />
 	<group>
-		<node pkg="vision_node" type="vision_node" name="vision_node" args="0 1" required="true" output="screen"/>
+		<node pkg="vision_node" type="vision_node" name="vision_node" args="$(arg isSimulated) $(arg isShadow) $(arg equipletName) $(arg manufacturer) $(arg typeNumber) $(arg serialNumber) 0 1" required="true" output="screen"/>
 		
 		<node pkg="camera_calibration_node" type="camera_calibration_node" name="camera_calibration_node"/>
 

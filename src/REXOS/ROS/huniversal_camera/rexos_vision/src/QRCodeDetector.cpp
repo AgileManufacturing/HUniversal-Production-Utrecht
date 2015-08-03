@@ -84,7 +84,7 @@ namespace rexos_vision{
 					// 455 px distance = (7 x 7) windowsSize > (15 x 15) window
 					// 520 px distance = (8 x 8) windowsSize > (17 x 17) window
 					// etc...
-					 float windowsSize = 2.0 * (rexos_datatypes::QrCode::distance(corners[0], corners[2]) / 130.0);
+					float windowsSize = 2.0 * (rexos_datatypes::QrCode::distance(corners[0], corners[2]) / 130.0);
 
 					// The cornerSubPix function iterates to find the sub-pixel accurate location of corners or radial saddle points. Corners is now updated!
 					cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
