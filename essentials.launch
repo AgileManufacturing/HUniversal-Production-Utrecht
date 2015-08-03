@@ -1,7 +1,0 @@
-<launch>
-	<group>
-		<node pkg="equiplet_node" type="equiplet_node" name="equiplet_node" args="0" output="screen" launch-prefix="gnome-terminal -e"/>
-		<node pkg="lookup_handler" type="lookup_handler" name="lookup_handler" output="screen" launch-prefix="gnome-terminal -e"/>
-		<node pkg="environment_cache" type="environment_cache" name="environment_cache" output="screen" launch-prefix="gnome-terminal -e"/>
-	</group>
-</launch>

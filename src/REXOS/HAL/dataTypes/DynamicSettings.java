@@ -27,5 +27,26 @@ public class DynamicSettings {
 		
 		return output;
 	}
+	public JSONObject serialize() throws JSONException {
+		JSONObject output = new JSONObject();
+		
+		if(attachedTo != null) {
+			output.put(ATTACHED_TO, attachedTo.serialize());
+		} else {
+			output.put(ATTACHED_TO, JSONObject.NULL);
+		}
+		if(mountPointX != null) {
+			output.put(MOUNT_POINT_X, mountPointX);
+		} else {
+			output.put(MOUNT_POINT_X, JSONObject.NULL);
+		}
+		if(mountPointY != null) {
+			output.put(MOUNT_POINT_Y, mountPointY);
+		} else {
+			output.put(MOUNT_POINT_Y, JSONObject.NULL);
+		}
+		
+		return output;
+	}
 
 }

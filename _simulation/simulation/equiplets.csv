@@ -1,6 +1,0 @@
-// name;	position;	capabilities;	breakdown;	repaired
-E1;	(0,0);	screw=exp(10);	exp(1000);	exp(20)
-E2;	(1,1);	unscrew=exp(10), unscrew=exp(10);	exp(1000);	exp(20)
-E3;	(3,3);	saw=exp(40);	exp(1000);	exp(20)
-E4;	(5,5);	a=exp(50);	exp(1000);	exp(20)
-

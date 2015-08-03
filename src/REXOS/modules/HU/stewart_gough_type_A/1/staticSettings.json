@@ -1,0 +1,247 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "HU",
+        "typeNumber": "six_axis_type_A",
+        "serialNumber": "1"
+    },
+    "type": {
+        "properties": {
+            "midPointX": 75,
+            "midPointY": -200,
+            "midPointZ": -34.3,
+            "stewartGoughMeasures": {
+                "baseRadius": 100,
+                "jointOffset": 31.72,
+                "hipLength": 100,
+                "effectorRadius": 42.5,
+                "effectorHeight": 9.5,
+                "ankleLength": 300,
+                "maxJointAngleDegrees": 22,
+                "boundaryBoxMinX": -200,
+                "boundaryBoxMaxX": 200,
+                "boundaryBoxMinY": -200,
+                "boundaryBoxMaxY": 200,
+                "boundaryBoxMinZ": -330,
+                "boundaryBoxMaxZ": -180
+            },
+            "contactSensorToZeroAngleDegrees": 20,
+            "calibrationBigStepFactor": 20,
+            "stepperMotorProperties": {
+                "motorMinAngleDegrees": -18,
+                "motorMaxAngleDegrees": 80,
+                "microStepAngleDegrees": 0.036,
+                "minAccelerationDegrees": 36,
+                "maxAccelerationDegrees": 36000,
+                "minSpeedDegrees": 0.036,
+                "maxSpeedDegrees": 18000
+            }
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": null,
+            "command": "rosrun stewart_gough_node stewart_gough_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}"
+        },
+        "halSoftware": {
+            "buildNumber": 1,
+            "jarFile": null,
+            "className": "HAL.modules.StewartGough"
+        },
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": null,
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "effector",
+            "childLinkOffsetX": 0,
+            "childLinkOffsetY": 0,
+            "childLinkOffsetZ": 0,
+            "collisions": [
+                {
+                    "linkName": "lowerArm1",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm2",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm3",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm4",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm5",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "lowerArm6",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 0,
+                    "mayHaveContactWithChildModules": false
+                },
+                {
+                    "linkName": "effector",
+                    "collisionName": "collision",
+                    "maxForce": 10,
+                    "maxTorque": 5,
+                    "mayHaveContactWithChildModules": true
+                }
+            ],
+            "joints": [
+                {
+                    "jointName": "upperArm1ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm2ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm3ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm4ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm5ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "upperArm6ToBase",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm1ToUpperArm1",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm2ToUpperArm2",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm3ToUpperArm3",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm4ToUpperArm4",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm5ToUpperArm5",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm6ToUpperArm6",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm1ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm2ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm3ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm4ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm5ToEffector",
+                    "maxErrorPose": 0.01
+                },
+                {
+                    "jointName": "lowerArm6ToEffector",
+                    "maxErrorPose": 0.01
+                }
+            ],
+            "links": [
+                {
+                    "linkName": "effector",
+                    "maxAcceleration": 40
+                }
+            ]
+        },
+        "supportedMutations": [
+            "move",
+            "rotate"
+        ],
+        "capabilities": [
+            {
+                "name": "Draw",
+                "treeNumber": 1,
+                "halSoftware": {
+                    "buildNumber": 1,
+                    "jarFile": null,
+                    "className": "HAL.capabilities.Draw"
+                },
+                "requiredMutationsTrees": [
+                    {
+                        "treeNumber": 1,
+                        "mutations": [
+                            "move",
+                            "draw"
+                        ]
+                    }
+                ],
+                "services": [
+                    "draw"
+                ]
+            },
+            {
+                "name": "PickAndPlaceWithRotation",
+                "treeNumber": 1,
+                "halSoftware": {
+                    "buildNumber": 1,
+                    "jarFile": null,
+                    "className": "HAL.capabilities.PickAndPlaceWithRotation"
+                },
+                "requiredMutationsTrees": [
+                    {
+                        "treeNumber": 1,
+                        "mutations": [
+                            "move",
+                            "rotate",
+                            "pick",
+                            "place"
+                        ]
+                    }
+                ],
+                "services": [
+                    "place"
+                ]
+            }
+        ]
+    },
+    "properties": {
+        "modbusIp": "192.168.0.32",
+        "modbusPort": 502
+    },
+    "calibrationData": [
+    ]
+}

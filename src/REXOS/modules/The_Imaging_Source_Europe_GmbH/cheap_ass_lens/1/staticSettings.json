@@ -1,0 +1,37 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "The_Imaging_Source_Europe_GmbH",
+        "typeNumber": "Cheap_ass_lens",
+        "serialNumber": "1"
+    },
+    "type": {
+        "properties": {
+        },
+        "rosSoftware": null,
+        "halSoftware": null,
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": "",
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "base",
+            "childLinkOffsetX": 0,
+            "childLinkOffsetY": 0,
+            "childLinkOffsetZ": 22,
+            "collisions": [
+            ],
+            "joints": [
+            ],
+            "links": [
+            ]
+        },
+        "supportedMutations": [
+        ],
+        "capabilities": [
+        ]
+    },
+    "properties": {
+    },
+    "calibrationData": [
+    ],
+}

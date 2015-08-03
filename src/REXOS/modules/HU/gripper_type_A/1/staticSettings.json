@@ -1,0 +1,68 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "HU",
+        "typeNumber": "gripper_type_A",
+        "serialNumber": "1",
+        
+    },
+    "type": {
+        "properties": {
+            "modbusAddress": 8001,
+            "modbusDevicePin": 0,
+            "gripperSize": 18.5,
+            "gripperEnabledMaxSeconds": 60,
+            "gripperEnabledWarningSeconds": 50,
+            "gripperEnabledCooldownSeconds": 180,
+            "watchdogInterval": 100
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": null,
+            "command": "rosrun gripper_node gripper_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}"
+        },
+        "halSoftware": {
+            "buildNumber": 1,
+            "jarFile": null,
+            "className": "HAL.modules.Gripper"
+        },
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": null,
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "base",
+            "childLinkOffsetX": 0.0,
+            "childLinkOffsetY": 0.0,
+            "childLinkOffsetZ": 0.0,
+            "collisions": [
+                {
+                    "linkName": "base",
+                    "collisionName": "collision",
+                    "maxForce": 20.0,
+                    "maxTorque": 5.0,
+                    "mayHaveContactWithChildModules": true
+                }
+            ],
+            "joints": [
+            ],
+            "links": [
+                {
+                    "linkName": "base",
+                    "maxAcceleration": 40.0
+                }
+            ]
+        },
+        "supportedMutations": [
+            "pick",
+            "place"
+        ],
+        "capabilities": [
+        ]
+    },
+    "properties": {
+        "modbusIp": "192.168.0.22",
+        "modbusPort": 502
+    },
+    "calibrationData": [
+    ]
+}

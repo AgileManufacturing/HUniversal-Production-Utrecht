@@ -1,0 +1,41 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "The_Imaging_Source_Europe_GmbH",
+        "typeNumber": "DFK_22AUC03",
+        "serialNumber": "1"
+    },
+    "type": {
+        "properties": {
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": null,
+            "command": "roslaunch camera.launch isSimulated:={isSimulated} isShadow:={isShadow} equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}"
+        },
+        "halSoftware": null,
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": null,
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "base",
+            "childLinkOffsetX": -25.01,
+            "childLinkOffsetY": 202.24,
+            "childLinkOffsetZ": 57.19,
+            "collisions": [
+            ],
+            "joints": [
+            ],
+            "links": [
+            ]
+        },
+        "supportedMutations": [
+        ],
+        "capabilities": [
+        ]
+    },
+    "properties": {
+    },
+    "calibrationData": [
+    ]
+}

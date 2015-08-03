@@ -1,0 +1,70 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "HU",
+        "typeNumber": "dummy_module_type_B",
+        "serialNumber": "1"
+    },
+    "type": {
+        "properties": {
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": "",
+            "command": "rosrun dummy_module_b dummy_module_b {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}"
+        },
+        "halSoftware": {
+            "buildNumber": 1,
+            "jarFile": "",
+            "className": "HAL.modules.DummyModuleB"
+        },
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": "",
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "effector",
+            "childLinkOffsetX": 0,
+            "childLinkOffsetY": 0,
+            "childLinkOffsetZ": 0,
+            "collisions": [
+            ],
+            "joints": [
+            ],
+            "links": [
+            ]
+        },
+        "supportedMutations": [
+            "move",
+            "pick",
+            "place"
+        ],
+        "capabilities": [
+            {
+                "name": "PickAndPlace",
+                "treeNumber": 1,
+                "halSoftware": {
+                    "buildNumber": 1,
+                    "jarFile": "",
+                    "className": "HAL.capabilities.PickAndPlace"
+                },
+                "requiredMutationsTrees": [
+                    {
+                        "treeNumber": 1,
+                        "mutations": [
+                            "move",
+                            "pick",
+                            "place"
+                        ]
+                    }
+                ],
+                "services": [
+                    "place"
+                ]
+            }
+        ]
+    },
+    "properties": {
+    },
+    "calibrationData": [
+    ]
+}

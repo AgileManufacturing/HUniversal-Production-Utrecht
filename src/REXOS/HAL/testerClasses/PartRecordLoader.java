@@ -17,6 +17,7 @@ import HAL.dataTypes.PartType;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 public class PartRecordLoader {
+	static final String baseDir = "generatedOutput/";
 	
 	static String partName = "GC4x4MB_1";
 	static String partTypeNumber = "GC4x4MB";
@@ -54,7 +55,7 @@ public class PartRecordLoader {
 		
 		JSONObject gazeboModelJson = new JSONObject();
 		gazeboModelJson.put(GazeboModel.BUILD_NUMBER, 1);
-		File modelZipFile = new File("generatedOutput/models/" + partTypeNumber + ".zip");
+		File modelZipFile = new File(baseDir + "models/parts/" + partTypeNumber + ".zip");
 		FileInputStream modelZipFileStream = new FileInputStream(modelZipFile);
 		byte[] modelZipFileContent = new byte[(int) modelZipFile.length()];
 		modelZipFileStream.read(modelZipFileContent);

@@ -1,29 +1,37 @@
+#! /bin/bash
+
 # clean everything up
 mysql -u rexos -p equiplet < src/REXOS/databases/knowledgeDatabaseDef.sql ; 
-#rm -r generatedOutput/ ; 
+rm -r generatedOutput/ ; 
 rm -r /tmp/rexos_model_spawner/ ; 
 rm -r /tmp/rexos_node_spawner/ ; 
+
+trap 'echo "ERROR"; trap - SIGQUIT SIGTERM SIGINT; trap - ERR; return;' ERR ; 
+trap 'echo "Exiting"; cleanUp; trap - SIGQUIT SIGTERM SIGINT; trap - ERR; return;' SIGQUIT SIGTERM SIGINT ; 
+
 # copy compiled plugins to the worlds
 mkdir -p generatedOutput/worlds/ ; 
 cp devel/lib/libacceleration_plugin.so generatedOutput/worlds/ ; 
 cp devel/lib/libcollision_plugin.so generatedOutput/worlds/ ; 
 cp devel/lib/libjoint_plugin.so generatedOutput/worlds/ ; 
 # copy compiled plugins to the models
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/camera/ ; 
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/delta_robot_type_B/ ; 
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/gripper_type_A/ ; 
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/gripper_type_B/ ; 
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/lens/ ; 
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/six_axis_type_A/ ; 
-cp devel/lib/libattach_plugin.so 		src/REXOS/models/workplane_type_A/ ; 
-cp devel/lib/libmotor_manager_plugin.so 	src/REXOS/models/delta_robot_type_B/ ; 
-cp devel/lib/libmotor_manager_plugin.so 	src/REXOS/models/six_axis_type_A/ ; 
-cp devel/lib/libsensor_manager_plugin.so 	src/REXOS/models/delta_robot_type_B/ ; 
-cp devel/lib/libsensor_manager_plugin.so 	src/REXOS/models/six_axis_type_A/ ; 
-cp devel/lib/libgripper_plugin.so 		src/REXOS/models/gripper_type_A/ ; 
-cp devel/lib/libgripper_plugin.so 		src/REXOS/models/gripper_type_B/ ; 
-# export everything
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/HU/delta_robot_type_B/_model/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/HU/gripper_type_A/_model/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/HU/gripper_type_B/_model/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/HU/workplane_type_A/_model/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/HU/stewart_gough_type_A/_model/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/The_Imaging_Source_Europe_GmbH/cheap_ass_lens/_model/ ; 
+cp devel/lib/libattach_plugin.so 		src/REXOS/modules/The_Imaging_Source_Europe_GmbH/DFK_22AUC03/_model/ ; 
+cp devel/lib/libmotor_manager_plugin.so 	src/REXOS/modules/HU/delta_robot_type_B/_model/ ; 
+cp devel/lib/libmotor_manager_plugin.so 	src/REXOS/modules/HU/stewart_gough_type_A/_model/ ; 
+cp devel/lib/libsensor_manager_plugin.so 	src/REXOS/modules/HU/delta_robot_type_B/_model/ ; 
+cp devel/lib/libsensor_manager_plugin.so 	src/REXOS/modules/HU/stewart_gough_type_A/_model/ ; 
+cp devel/lib/libgripper_plugin.so 		src/REXOS/modules/HU/gripper_type_A/_model/ ; 
+cp devel/lib/libgripper_plugin.so 		src/REXOS/modules/HU/gripper_type_B/_model/ ; 
+# export rosSoftware, halSoftware, models
 ant generate-all ;
+# export staticSettings
+java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.ModuleRecordGenerator ;
 # insert parts
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.PartRecordLoader chessboard_1 chessboard ;
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.PartRecordLoader GC4x4MB_1	GC4x4MB ;
@@ -74,3 +82,5 @@ java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTester
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassPickAndPlace --noTranslate EQ2;
 java -cp build/REXOS/:src/REXOS/external_libraries/* HAL.testerClasses.HALTesterClassStewartGough --noTranslate EQ3;
 
+trap - SIGQUIT SIGTERM SIGINT; 
+trap - ERR; 

@@ -1,0 +1,57 @@
+{
+    "moduleIdentifier": {
+        "manufacturer": "HU",
+        "typeNumber": "workplane_type_A",
+        "serialNumber": "2"
+        
+    },
+    "type": {
+        "properties": {
+            "midPointX": 175.0,
+            "midPointY": -200.0,
+            "midPointZ": 33.33,
+            "topLeftValue": "_WP_TL",
+            "topRightValue": "_WP_TR",
+            "bottomRightValue": "_WP_BR",
+            "workPlaneWidth": 80.0,
+            "workPlaneHeight": 80.0
+        },
+        "rosSoftware": {
+            "buildNumber": 1,
+            "rosFile": null,
+            "command": "rosrun part_locator_node part_locator_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}"
+        },
+        "halSoftware": null,
+        "gazeboModel": {
+            "buildNumber": 1,
+            "zipFile": null,
+            "sdfFilename": "model.sdf",
+            "parentLink": "base",
+            "childLink": "base",
+            "childLinkOffsetX": 175.0,
+            "childLinkOffsetY": -200.0,
+            "childLinkOffsetZ": 33.33,
+            "collisions": [
+                {
+                    "linkName": "base",
+                    "collisionName": "collision",
+                    "maxForce": 20.0,
+                    "maxTorque": 5.0,
+                    "mayHaveContactWithChildModules": true
+                }
+            ],
+            "joints": [
+            ],
+            "links": [
+            ]
+        },
+        "supportedMutations": [
+        ],
+        "capabilities": [
+        ]
+    },
+    "properties": {
+    },
+    "calibrationData": [
+    ]
+}

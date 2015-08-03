@@ -173,7 +173,11 @@ public class GazeboModel implements Serializable {
 		GazeboModel output = new GazeboModel();
 		
 		output.buildNumber = input.getInt(BUILD_NUMBER);
-		output.zipFile = Base64.decodeBase64(input.getString(ZIP_FILE).getBytes());
+		if(input.isNull(ZIP_FILE) == false) {
+			output.zipFile = Base64.decodeBase64(input.getString(ZIP_FILE).getBytes());
+		} else {
+			output.zipFile = null;
+		}
 		output.sdfFilename = input.getString(SDF_FILE_NAME);
 		output.parentLink = input.getString(PARENT_LINK);
 		output.childLink = input.getString(CHILD_LINK);
@@ -200,7 +204,11 @@ public class GazeboModel implements Serializable {
 		JSONObject output = new JSONObject();
 		
 		output.put(BUILD_NUMBER, buildNumber);
-		output.put(ZIP_FILE, new String(Base64.encodeBase64(zipFile)));
+		if(zipFile != null) {
+			output.put(ZIP_FILE, new String(Base64.encodeBase64(zipFile)));
+		} else {
+			output.put(ZIP_FILE, JSONObject.NULL);
+		}
 		output.put(SDF_FILE_NAME, sdfFilename);
 		output.put(PARENT_LINK, parentLink);
 		output.put(CHILD_LINK, childLink);

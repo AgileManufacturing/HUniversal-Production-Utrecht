@@ -1,23 +1,20 @@
 package HAL.testerClasses;
 
-import generic.Mast;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 
-import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
-import HAL.Module;
+import HAL.dataTypes.DynamicSettings;
+import HAL.dataTypes.ModuleIdentifier;
+import HAL.dataTypes.StaticSettings;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
@@ -25,7 +22,7 @@ import HAL.listeners.HardwareAbstractionLayerListener;
 import HAL.steps.HardwareStep;
 import HAL.steps.ProductStep;
 
-public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListener {
+public class HALTesterClassPickAndPlace extends HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 	JSONObject criteria1 = new JSONObject();
 	JSONObject criteria2 = new JSONObject();
@@ -36,500 +33,7 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
 	static int serialNumber = 1;
-
-	// delta robot
-	static String moduleA_01 = "{" +
-			"	\"moduleIdentifier\":{" +
-			"		\"manufacturer\":\"HU\"," +
-			"		\"typeNumber\":\"delta_robot_type_B\"," +
-			"		\"serialNumber\":\"1\"" +
-			"	}," +
-			"	\"type\":{" +
-			"		\"properties\":{" +
-			"			\"midPointX\" : 75.0," +
-			"			\"midPointY\" : -200.0," +
-			"			\"midPointZ\" : -34.3," +
-			"			\"deltaRobotMeasures\" : {" +
-			"				\"baseRadius\" : 100.0," +
-			"				\"hipLength\" : 100.0," +
-			"				\"effectorRadius\" : 42.5," +
-			"				\"effectorHeight\" : 9.50," +
-			"				\"ankleLength\" : 300.0," +
-			"				\"hipAnleMaxAngleDegrees\" : 22.0," +
-			"				\"boundaryBoxMinX\" : -200.0," +
-			"				\"boundaryBoxMaxX\" : 200.0," +
-			"				\"boundaryBoxMinY\" : -200.0," +
-			"				\"boundaryBoxMaxY\" : 200.0," +
-			"				\"boundaryBoxMinZ\" : -380.0," +
-			"				\"boundaryBoxMaxZ\" : -180.0" +
-			"			}," +
-			"			\"contactSensorToZeroAngleDegrees\" : 20.0," +
-			"			\"calibrationBigStepFactor\" : 20," +
-			"			\"stepperMotorProperties\" : {" +
-			"				\"motorMinAngleDegrees\" : -18.0," +
-			"				\"motorMaxAngleDegrees\" : 90.0," +
-			"				\"microStepAngleDegrees\" : 0.036," +
-			"				\"minAccelerationDegrees\" : 36," +
-			"				\"maxAccelerationDegrees\" : 36000," +
-			"				\"minSpeedDegrees\" : 0.036," +
-			"				\"maxSpeedDegrees\" : 18000" +
-			"			}" +
-			"		}," +
-			"		\"rosSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"rosFile\": \"";
-	static String moduleA_02 = "\"," +
-			"			\"command\":\"rosrun delta_robot_node delta_robot_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
-			"		}," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleA_03 = "\"," +
-			"			\"className\":\"HAL.modules.DeltaRobot\"" +
-			"		}," +
-			"		\"gazeboModel\":{" +
-			"			\"buildNumber\":1," +
-			"			\"zipFile\": \"";
-	static String moduleA_04 = "\"," +
-			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"base\"," +
-			"			\"childLink\":\"effector\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0," +
-			"			\"collisions\":[" +
-			"				{" +
-			"					\"linkName\":\"lowerArm1\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
-			"					\"mayHaveContactWithChildModules\":false" +
-			"				}," +
-			"				{" +
-			"					\"linkName\":\"lowerArm2\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
-			"					\"mayHaveContactWithChildModules\":false" +
-			"				}," +
-			"				{" +
-			"					\"linkName\":\"lowerArm3\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
-			"					\"mayHaveContactWithChildModules\":false" +
-			"				}," +
-			"				{" +
-			"					\"linkName\":\"lowerArm4\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
-			"					\"mayHaveContactWithChildModules\":false" +
-			"				}," +
-			"				{" +
-			"					\"linkName\":\"lowerArm5\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
-			"					\"mayHaveContactWithChildModules\":false" +
-			"				}," +
-			"				{" +
-			"					\"linkName\":\"lowerArm6\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":0.0," +
-			"					\"mayHaveContactWithChildModules\":false" +
-			"				}," +
-			"				{" +
-			"					\"linkName\":\"effector\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":10.0," +
-			"					\"maxTorque\":5.0," +
-			"					\"mayHaveContactWithChildModules\":true" +
-			"				}" +
-			"			]," +
-			"			\"joints\":[" +
-			"				{" +
-			"					\"jointName\":\"upperArm1ToBase\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"upperArm2ToBase\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"upperArm3ToBase\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm1ToUpperArm1\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm2ToUpperArm1\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm3ToUpperArm2\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm4ToUpperArm2\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm5ToUpperArm3\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm6ToUpperArm3\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm1ToEffector\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm2ToEffector\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm3ToEffector\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm4ToEffector\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm5ToEffector\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}," +
-			"				{" +
-			"					\"jointName\":\"lowerArm6ToEffector\"," +
-			"					\"maxErrorPose\":0.01" +
-			"				}" +
-			"			]," +
-			"			\"links\":[" +
-			"				{" +
-			"					\"linkName\":\"effector\"," +
-			"					\"maxAcceleration\":40.0" +
-			"				}" +
-			"			]" +
-			"		}," +
-			"		\"supportedMutations\": [" +
-			"			\"move\"" +
-			"		]," +
-			"		\"capabilities\":[" +
-			"			{" +
-			"				\"name\":\"Draw\"," +
-			"				\"treeNumber\":1," +
-			"				\"halSoftware\":{" +
-			"					\"buildNumber\":1," +
-			"					\"jarFile\": \"";
-	static String moduleA_05 = "\"," +
-			"					\"className\":\"HAL.capabilities.Draw\"" +
-			"				}," +
-			"				\"requiredMutationsTrees\":[" +
-			"					{" +
-			"						\"treeNumber\":1," +
-			"						\"mutations\":[" +
-			"							\"move\", \"draw\"" +
-			"						]" +
-			"					}" +
-			"				]," +
-			"				\"services\":[" +
-			"					\"draw\"" +
-			"				]" +
-			"			}," +
-			"			{" +
-			"				\"name\":\"PickAndPlace\"," +
-			"				\"treeNumber\":1," +
-			"				\"halSoftware\":{" +
-			"					\"buildNumber\":1," +
-			"					\"jarFile\": \"";
-	static String moduleA_06 = "\"," +
-			"					\"className\":\"HAL.capabilities.PickAndPlace\"" +
-			"				}," +
-			"				\"requiredMutationsTrees\":[" +
-			"					{" +
-			"						\"treeNumber\":1," +
-			"						\"mutations\":[" +
-			"							\"move\", \"pick\", \"place\"" +
-			"						]" +
-			"					}" +
-			"				]," +
-			"				\"services\":[" +
-			"					\"place\"" +
-			"				]" +
-			"			}" +
-			"		]" +
-			"	}," +
-			"	\"properties\":{" +
-			"		\"modbusIp\" : \"192.168.0.22\"," +
-			"		\"modbusPort\" : 502" +
-			"	}," +
-			"	\"calibrationData\":[" +
-			"		{" +
-			"			\"date\":\"2014-01-01 00:00:00\"," +
-			"			\"data\":{}," +
-			"			\"moduleSet\":[" +
-			"				{" +
-			"					\"manufacturer\":\"manA\"," +
-			"					\"typeNumber\":\"typeA\"," +
-			"					\"serialNumber\":\"serA\"" +
-			"				}" +
-			"			]" +
-			"		}" +
-			"	]," +
-			"	\"attachedTo\":null," +
-			"\"mountPointX\":3," +
-			"\"mountPointY\":1" +
-			"}";
-	// gripper
-	static String moduleB_01 = "{" +
-			"	\"moduleIdentifier\":{" +
-			"		\"manufacturer\":\"HU\"," +
-			"		\"typeNumber\":\"gripper_type_A\"," +
-			"		\"serialNumber\":\"1\"," +
-			"	}," +
-			"	\"type\":{" +
-			"		\"properties\":{" +
-			"			\"modbusAddress\" : 8001," +
-			"			\"modbusDevicePin\" : 0," +
-			" 			\"gripperSize\" : 18.5," +
-			"			\"gripperEnabledMaxSeconds\" : 60," +
-			"			\"gripperEnabledWarningSeconds\" : 50," +
-			"			\"gripperEnabledCooldownSeconds\" : 180," +
-			"			\"watchdogInterval\" : 100" +
-			"		}," +
-			"		\"rosSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"rosFile\": \"";
-	static String moduleB_02 = "\"," +
-			"			\"command\":\"rosrun gripper_node gripper_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
-			"		}," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleB_03 = "\"," +
-			"			\"className\":\"HAL.modules.Gripper\"" +
-			"		}," +
-			"		\"gazeboModel\":{" +
-			"			\"buildNumber\":1," +
-			"			\"zipFile\": \"";
-	static String moduleB_04 = "\"," +
-			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"base\"," +
-			"			\"childLink\":\"base\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":0.0," +
-			"			\"collisions\":[" +
-			"				{" +
-			"					\"linkName\":\"base\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":20.0," +
-			"					\"maxTorque\":5.0," +
-			"					\"mayHaveContactWithChildModules\":true" +
-			"				}" +
-			"			]," +
-			"			\"joints\":[" +
-			"			]," +
-			"			\"links\":[" +
-			"				{" +
-			"					\"linkName\":\"base\"," +
-			"					\"maxAcceleration\":40.0" +
-			"				}" +
-			"			]" +
-			"		}," +
-			"		\"supportedMutations\": [" +
-			"			\"pick\", \"place\"" +
-			"		]," +
-			"		\"capabilities\":[" +
-			"		]" +
-			"	}," +
-			"	\"properties\":{" +
-			"		\"modbusIp\" : \"192.168.0.22\"," +
-			"		\"modbusPort\" : 502" +
-			"	}," +
-			"	\"calibrationData\":[" +
-			"	]," +
-			"	\"attachedTo\":{" +
-			"		\"manufacturer\":\"HU\"," +
-			"		\"typeNumber\":\"delta_robot_type_B\"," +
-			"		\"serialNumber\":\"1\"" +
-			"	}," +
-			"	\"mountPointX\":null," +
-			"	\"mountPointY\":null" +
-			"}";
-	// camera
-	static String moduleC_01 = "{" +
-			"	\"moduleIdentifier\":{" +
-			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
-			"		\"typeNumber\":\"DFK_22AUC03\"," +
-			"		\"serialNumber\":\"1\"," +
-			"	}," +
-			"	\"type\":{" +
-			"		\"properties\":{}," +
-			"		\"rosSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"rosFile\": \"";
-	static String moduleC_02 = "\"," +
-			"			\"command\":\"roslaunch camera.launch isSimulated:={isSimulated} isShadow:={isShadow} equipletName:={equipletName} manufacturer:={manufacturer} typeNumber:={typeNumber} serialNumber:={serialNumber}\"" +
-			"		}," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleC_03 = "\"," +
-			"			\"className\":\"HAL.modules.Camera\"" +
-			"		}," +
-			"		\"gazeboModel\":{" +
-			"			\"buildNumber\":1," +
-			"			\"zipFile\": \"";
-	static String moduleC_04 = "\"," +
-			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"base\"," +
-			"			\"childLink\":\"base\"," +
-			"			\"childLinkOffsetX\":-25.01," +
-			"			\"childLinkOffsetY\":202.24," +
-			"			\"childLinkOffsetZ\":57.19," +
-			"			\"collisions\":[" +
-			"			]," +
-			"			\"joints\":[" +
-			"			]," +
-			"			\"links\":[" +
-			"			]" +
-			"		}," +
-			"		\"supportedMutations\": [" +
-			"		]," +
-			"		\"capabilities\":[" +
-			"		]" +
-			"	}," +
-			"	\"properties\":{}," +
-			"	\"calibrationData\":[" +
-			"	]," +
-			"	\"attachedTo\":null," +
-			"	\"mountPointX\":3," +
-			"	\"mountPointY\":16" +
-			"}";
-	// lens
-	static String moduleD_01 = "{" +
-			"	\"moduleIdentifier\":{" +
-			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
-			"		\"typeNumber\":\"Cheap_ass_lens\"," +
-			"		\"serialNumber\":\"1\"," +
-			"	}," +
-			"	\"type\":{" +
-			"		\"properties\":{}," +
-			"		\"rosSoftware\":null," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleD_02 = "\"," +
-			"			\"className\":\"HAL.modules.Lens\"" +
-			"		}," +
-			"		\"gazeboModel\":{" +
-			"			\"buildNumber\":1," +
-			"			\"zipFile\": \"";
-	static String moduleD_03 = "\"," +
-			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"base\"," +
-			"			\"childLink\":\"base\"," +
-			"			\"childLinkOffsetX\":0.0," +
-			"			\"childLinkOffsetY\":0.0," +
-			"			\"childLinkOffsetZ\":22.0," +
-			"			\"collisions\":[" +
-			"			]," +
-			"			\"joints\":[" +
-			"			]," +
-			"			\"links\":[" +
-			"			]" +
-			"		}," +
-			"		\"supportedMutations\": [" +
-			"		]," +
-			"		\"capabilities\":[" +
-			"		]" +
-			"	}," +
-			"	\"properties\":{}," +
-			"	\"calibrationData\":[" +
-			"	]," +
-			"	\"attachedTo\":{" +
-			"		\"manufacturer\":\"The_Imaging_Source_Europe_GmbH\"," +
-			"		\"typeNumber\":\"DFK_22AUC03\"," +
-			"		\"serialNumber\":\"1\"" +
-			"	}," +
-			"	\"mountPointX\":null," +
-			"	\"mountPointY\":null" +
-			"}";
-	// workplane
-	static String moduleE_01 = "{" +
-			"	\"moduleIdentifier\":{" +
-			"		\"manufacturer\":\"HU\"," +
-			"		\"typeNumber\":\"workplane_type_A\"," +
-			"		\"serialNumber\":\"1\"," +
-			"	}," +
-			"	\"type\":{" +
-			"		\"properties\":{" +
-			"			\"midPointX\" : 175.0," +
-			"			\"midPointY\" : -200.0," +
-			"			\"midPointZ\" : 33.33," +
-			"			\"topLeftValue\" : \"_WP_TL\"," +
-			"			\"topRightValue\" : \"_WP_TR\"," +
-			"			\"bottomRightValue\" : \"_WP_BR\"," +
-			"			\"workPlaneWidth\" : 80.0," +
-			"			\"workPlaneHeight\" : 80.0" +
-			"		}," +
-			"		\"rosSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"rosFile\": \"";
-	static String moduleE_02 = "\"," +
-			"			\"command\":\"rosrun part_locator_node part_locator_node {isSimulated} {isshadow} {equipletName} {manufacturer} {typeNumber} {serialNumber}\"" +
-			"		}," +
-			"		\"halSoftware\":{" +
-			"			\"buildNumber\":1," +
-			"			\"jarFile\": \"";
-	static String moduleE_03 = "\"," +
-			"			\"className\":\"HAL.modules.Workplane\"" +
-			"		}," +
-			"		\"gazeboModel\":{" +
-			"			\"buildNumber\":1," +
-			"			\"zipFile\": \"";
-	static String moduleE_04 = "\"," +
-			"			\"sdfFilename\":\"model.sdf\"," +
-			"			\"parentLink\":\"base\"," +
-			"			\"childLink\":\"base\"," +
-			"			\"childLinkOffsetX\":175.0," +
-			"			\"childLinkOffsetY\":-200.0," +
-			"			\"childLinkOffsetZ\":33.33," +
-			"			\"collisions\":[" +
-			"				{" +
-			"					\"linkName\":\"base\"," +
-			"					\"collisionName\":\"collision\"," +
-			"					\"maxForce\":20.0," +
-			"					\"maxTorque\":5.0," +
-			"					\"mayHaveContactWithChildModules\":true" +
-			"				}" +
-			"			]," +
-			"			\"joints\":[" +
-			"			]," +
-			"			\"links\":[" +
-			"			]" +
-			"		}," +
-			"		\"supportedMutations\": [" +
-			"		]," +
-			"		\"capabilities\":[" +
-			"		]" +
-			"	}," +
-			"	\"properties\":{}," +
-			"	\"calibrationData\":[" +
-			"	]," +
-			"	\"attachedTo\":null," +
-			"\"mountPointX\":1," +
-			"\"mountPointY\":10" +
-			"}";
-
-			
+	
 	/**
 	 * @param args
 	 * @throws Exception 
@@ -558,157 +62,43 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		HALTesterClassPickAndPlace htc = new HALTesterClassPickAndPlace();
 		htc = null;
 	}
-	public HALTesterClassPickAndPlace() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException {
+	public HALTesterClassPickAndPlace() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException, ParseException {
 		hal = new HardwareAbstractionLayer(equipletName, this, true);
 		
 		if(insertModules == true) {
-			FileInputStream fis;
-			byte[] content;
-	
-			File deltaRobotHal = new File(baseDir + "HAL/modules/" + "DeltaRobot.jar");
-			fis = new FileInputStream(deltaRobotHal);
-			content = new byte[(int) deltaRobotHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64DeltaRobotHal = new String(Base64.encodeBase64(content));
+			ModuleIdentifier moduleIdentifierDeltaRobot = new ModuleIdentifier("HU", "delta_robot_type_B", "1");
+			StaticSettings staticSettingsDeltaRobot = getStaticSettings(moduleIdentifierDeltaRobot);
+			DynamicSettings dynamicSettingsDeltaRobot = new DynamicSettings();
+			dynamicSettingsDeltaRobot.mountPointX = 3;
+			dynamicSettingsDeltaRobot.mountPointY = 1;
 			
-			File workplaneHal = new File(baseDir + "HAL/modules/" + "Workplane.jar");
-			fis = new FileInputStream(workplaneHal);
-			content = new byte[(int) workplaneHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64WorkplaneHal = new String(Base64.encodeBase64(content));
+			ModuleIdentifier moduleIdentifierGripper = new ModuleIdentifier("HU", "gripper_type_A", "1");
+			StaticSettings staticSettingsGripper = getStaticSettings(moduleIdentifierGripper);
+			DynamicSettings dynamicSettingsGripper = new DynamicSettings();
+			dynamicSettingsGripper.attachedTo = moduleIdentifierDeltaRobot;
 			
-			File penHal = new File(baseDir + "HAL/modules/" + "Pen.jar");
-			fis = new FileInputStream(penHal);
-			content = new byte[(int) penHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64PenHal = new String(Base64.encodeBase64(content));
+			ModuleIdentifier moduleIdentifierCamera = new ModuleIdentifier("The_Imaging_Source_Europe_GmbH", "DFK_22AUC03", "1");
+			StaticSettings staticSettingsCamera = getStaticSettings(moduleIdentifierCamera);
+			DynamicSettings dynamicSettingsCamera = new DynamicSettings();
+			dynamicSettingsCamera.mountPointX = 3;
+			dynamicSettingsCamera.mountPointY = 16;
 			
-			File gripperHal = new File(baseDir + "HAL/modules/" + "Gripper.jar");
-			fis = new FileInputStream(gripperHal);
-			content = new byte[(int) gripperHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64GripperHal = new String(Base64.encodeBase64(content));
+			ModuleIdentifier moduleIdentifierLens = new ModuleIdentifier("The_Imaging_Source_Europe_GmbH", "cheap_ass_lens", "1");
+			StaticSettings staticSettingsLens = getStaticSettings(moduleIdentifierLens);
+			DynamicSettings dynamicSettingsLens = new DynamicSettings();
+			dynamicSettingsLens.attachedTo = moduleIdentifierCamera;
 			
-			File deltaRobotRos = new File(baseDir + "nodes/" + "delta_robot.zip");
-			fis = new FileInputStream(deltaRobotRos);
-			content = new byte[(int) deltaRobotRos.length()];
-			fis.read(content);
-			fis.close();
-			String base64DeltaRobotRos = new String(Base64.encodeBase64(content));
+			ModuleIdentifier moduleIdentifierWorkplane = new ModuleIdentifier("HU", "workplane_type_A", "1");
+			StaticSettings staticSettingsWorkplane = getStaticSettings(moduleIdentifierWorkplane);
+			DynamicSettings dynamicSettingsWorkplane = new DynamicSettings();
+			dynamicSettingsWorkplane.mountPointX = 1;
+			dynamicSettingsWorkplane.mountPointY = 10;
 			
-			File gripperRos = new File(baseDir + "nodes/" + "gripper.zip");
-			fis = new FileInputStream(gripperRos);
-			content = new byte[(int) gripperRos.length()];
-			fis.read(content);
-			fis.close();
-			String base64GripperRos = new String(Base64.encodeBase64(content));
-			
-			File cameraRos = new File(baseDir + "nodes/" + "huniversal_camera.zip");
-			fis = new FileInputStream(cameraRos);
-			content = new byte[(int) cameraRos.length()];
-			fis.read(content);
-			fis.close();
-			String base64CameraRos = new String(Base64.encodeBase64(content));
-			
-			File workplaneRos = new File(baseDir + "nodes/" + "workplane.zip");
-			fis = new FileInputStream(workplaneRos);
-			content = new byte[(int) workplaneRos.length()];
-			fis.read(content);
-			fis.close();
-			String base64WorkplaneRos = new String(Base64.encodeBase64(content));
-			
-			File deltaRobotGazebo = new File(baseDir + "models/" + "delta_robot_type_B.zip");
-			fis = new FileInputStream(deltaRobotGazebo);
-			content = new byte[(int) deltaRobotGazebo.length()];
-			fis.read(content);
-			fis.close();
-			String base64DeltaRobotGazebo = new String(Base64.encodeBase64(content));
-			
-			File gripperGazebo = new File(baseDir + "models/" + "gripper_type_A.zip");
-			fis = new FileInputStream(gripperGazebo);
-			content = new byte[(int) gripperGazebo.length()];
-			fis.read(content);
-			fis.close();
-			String base64GripperGazebo = new String(Base64.encodeBase64(content));
-			
-			File cameraGazebo = new File(baseDir + "models/" + "camera.zip");
-			fis = new FileInputStream(cameraGazebo);
-			content = new byte[(int) cameraGazebo.length()];
-			fis.read(content);
-			fis.close();
-			String base64CameraGazebo = new String(Base64.encodeBase64(content));
-			
-			File lensGazebo = new File(baseDir + "models/" + "lens.zip");
-			fis = new FileInputStream(lensGazebo);
-			content = new byte[(int) lensGazebo.length()];
-			fis.read(content);
-			fis.close();
-			String base64LensGazebo = new String(Base64.encodeBase64(content));
-			
-			File workplaneGazebo = new File(baseDir + "models/" + "workplane_type_A.zip");
-			fis = new FileInputStream(workplaneGazebo);
-			content = new byte[(int) workplaneGazebo.length()];
-			fis.read(content);
-			fis.close();
-			String base64WorkplaneGazebo = new String(Base64.encodeBase64(content));
-			
-			
-			File drawHal = new File(baseDir + "HAL/capabilities/" + "Draw.jar");
-			fis = new FileInputStream(drawHal);
-			content = new byte[(int) drawHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64Draw = new String(Base64.encodeBase64(content));
-			
-			File pickAndPlaceHal = new File(baseDir + "HAL/capabilities/" + "PickAndPlace.jar");
-			fis = new FileInputStream(pickAndPlaceHal);
-			content = new byte[(int) pickAndPlaceHal.length()];
-			fis.read(content);
-			fis.close();
-			String base64PickAndPlace = new String(Base64.encodeBase64(content));
-			
-			
-			// deltarobot
-			String moduleA = moduleA_01 + base64DeltaRobotRos + moduleA_02 + base64DeltaRobotHal + 
-					moduleA_03 + base64DeltaRobotGazebo + moduleA_04 + base64Draw + moduleA_05 + base64PickAndPlace + moduleA_06; 
-			JSONObject a = new JSONObject(new JSONTokener(moduleA));
-			// gripper
-			String moduleB = moduleB_01 + base64GripperRos + moduleB_02 + base64GripperHal + 
-					moduleB_03 + base64GripperGazebo + moduleB_04; 
-			JSONObject b = new JSONObject(new JSONTokener(moduleB));
-			
-			// camera
-			String moduleC = moduleC_01 + base64CameraRos + moduleC_02 + base64PenHal + 
-					moduleC_03 + base64CameraGazebo + moduleC_04;
-			JSONObject c = new JSONObject(new JSONTokener(moduleC));
-			
-			// lens
-			// TODO fix non hal software
-			String moduleD = moduleD_01 + "" + moduleD_02 + base64LensGazebo + moduleD_03;
-			JSONObject d = new JSONObject(new JSONTokener(moduleD));
-			
-			// workplane
-			String moduleE = moduleE_01 + base64WorkplaneRos + moduleE_02 + base64WorkplaneHal + 
-					moduleE_03 + base64WorkplaneGazebo + moduleE_04;
-			JSONObject e = new JSONObject(new JSONTokener(moduleE));
-			
-			a.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
-			b.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
-			b.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
-			c.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
-			d.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
-			d.getJSONObject("attachedTo").put("serialNumber", String.valueOf(serialNumber));
-			e.getJSONObject("moduleIdentifier").put("serialNumber", String.valueOf(serialNumber));
-			
-			hal.insertModule(a, a);
-			hal.insertModule(b, b);
-			hal.insertModule(c, c);
-			hal.insertModule(d, d);
-			hal.insertModule(e, e);
+			hal.insertModule(staticSettingsDeltaRobot.serialize(), dynamicSettingsDeltaRobot.serialize());
+			hal.insertModule(staticSettingsGripper.serialize(), dynamicSettingsGripper.serialize());
+			hal.insertModule(staticSettingsCamera.serialize(), dynamicSettingsCamera.serialize());
+			hal.insertModule(staticSettingsLens.serialize(), dynamicSettingsLens.serialize());
+			hal.insertModule(staticSettingsWorkplane.serialize(), dynamicSettingsWorkplane.serialize());
 		}
 		
 		if(translateSteps == true) {
@@ -785,34 +175,14 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 	
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
+		super.onTranslationFinished(productStep, hardwareSteps);
 		hal.executeHardwareSteps(hardwareSteps);
 		//hal.translateProductStep("place", criteria2);
 	}
 
 	@Override
-	public void onTranslationFailed(ProductStep productStep) {
-		Logger.log(LogSection.NONE, LogLevel.NOTIFICATION, "Translation failed of the following product step:", productStep);
-	}
-
-	@Override
-	public void onProcessStatusChanged(Module module, HardwareStep hardwareStep) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The status of " + hardwareStep + " (being processed by module " + module + ") has changed to " + hardwareStep.getStatus());
-	}
-
-	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
-	}
-
-	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
-	}
-
-	@Override
 	public void onExecutionFinished() {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Execution finished");
+		super.onExecutionFinished();
 		if(state == false) {
 			hal.translateProductStep("place", criteria2);
 			state = true;
@@ -822,23 +192,4 @@ public class HALTesterClassPickAndPlace implements HardwareAbstractionLayerListe
 		}
 	}
 
-	@Override
-	public void onEquipletStateChanged(Mast.State state) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of equiplet " + equipletName + " has changed to " + state);
-	}
-
-	@Override
-	public void onEquipletModeChanged(Mast.Mode mode) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of equiplet " + equipletName + " has changed to " + mode);
-	}
-
-	@Override
-	public void onExecutionFailed() {
-		Logger.log(LogSection.NONE, LogLevel.ERROR, "Execution failed");
-	}
-
-	@Override
-	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
-		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
-	}
 }

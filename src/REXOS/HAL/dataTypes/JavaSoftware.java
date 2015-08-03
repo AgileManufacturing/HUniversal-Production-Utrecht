@@ -168,7 +168,11 @@ public class JavaSoftware implements JarFileLoader, Serializable{
 		JavaSoftware output = new JavaSoftware();
 		
 		output.buildNumber = input.getInt(BUILD_NUMBER);
-		output.jarFile = Base64.decodeBase64(input.getString(JAR_FILE).getBytes());
+		if(input.isNull(JAR_FILE) == false) {
+			output.jarFile = Base64.decodeBase64(input.getString(JAR_FILE).getBytes());
+		} else {
+			output.jarFile = null;
+		}
 		output.className = input.getString(CLASS_NAME);
 		
 		return output;
@@ -177,7 +181,11 @@ public class JavaSoftware implements JarFileLoader, Serializable{
 		JSONObject output = new JSONObject();
 		
 		output.put(BUILD_NUMBER, buildNumber);
-		output.put(JAR_FILE, new String(Base64.encodeBase64(jarFile)));
+		if(jarFile != null) {
+			output.put(JAR_FILE, new String(Base64.encodeBase64(jarFile)));
+		} else {
+			output.put(JAR_FILE, JSONObject.NULL);
+		}
 		output.put(CLASS_NAME, className);
 		
 		return output;

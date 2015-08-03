@@ -15,6 +15,7 @@ import HAL.dataTypes.RosSoftware;
 import HAL.libraries.knowledgedb_client.KnowledgeDBClient;
 
 public class EquipletRecordLoader {
+	static final String baseDir = "generatedOutput/";
 	
 	static String equipletName = "EQ2";
 	
@@ -35,7 +36,7 @@ public class EquipletRecordLoader {
 		
 		JSONObject gazeboModelJson = new JSONObject();
 		gazeboModelJson.put(GazeboModel.BUILD_NUMBER, 1);
-		File modelZipFile = new File("generatedOutput/models/equiplet.zip");
+		File modelZipFile = new File(baseDir + "models/equiplets/EQ.zip");
 		FileInputStream modelZipFileStream = new FileInputStream(modelZipFile);
 		byte[] modelZipFileContent = new byte[(int) modelZipFile.length()];
 		modelZipFileStream.read(modelZipFileContent);
@@ -54,7 +55,7 @@ public class EquipletRecordLoader {
 		
 		JSONObject rosSoftwareJson = new JSONObject();
 		rosSoftwareJson.put(RosSoftware.BUILD_NUMBER, 1);
-		File nodeZipFile = new File("generatedOutput/nodes/equiplet.zip");
+		File nodeZipFile = new File(baseDir + "nodes/equiplet.zip");
 		FileInputStream nodeZipFileStream = new FileInputStream(nodeZipFile);
 		byte[] nodeZipFileContent = new byte[(int) nodeZipFile.length()];
 		nodeZipFileStream.read(nodeZipFileContent);
