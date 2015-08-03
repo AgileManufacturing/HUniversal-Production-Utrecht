@@ -124,7 +124,7 @@ public class PartRecordLoader {
 		PartType partType = PartType.deSerialize(partTypeJson);
 		partType.insertIntoDatabase(client);
 		
-		File qrCodeFile = new File("generatedOutput/models/_qrCodes/" + partName + ".png");
+		File qrCodeFile = new File(baseDir + "generatedOutput/models/parts/_qrCodes/" + partName + ".png");
 		byte[] qrCodeFileContent = null;
 		if(qrCodeFile.exists() == true) {
 			FileInputStream qrCodeFileStream = new FileInputStream(qrCodeFile);

@@ -126,7 +126,7 @@ namespace rexos_model_spawner {
 		std::string robotNamespace = "";
 		if(isShadow == true) robotNamespace = "shadow";
 		
-		bool success = spawnModel(&gazeboModel, modelName, gazeboSdfFileString, pose, parentGazeboModel, parentModelName);
+		bool success = spawnModel(&gazeboModel, modelName, gazeboSdfFileString, pose, parentGazeboModel, parentModelName, robotNamespace);
 		delete parentGazeboModel;
 		return success;
 	}
@@ -188,7 +188,6 @@ namespace rexos_model_spawner {
 		
 		// relative to
 		rexos_knowledge_database::GazeboModel* parentGazeboModel = NULL;
-		std::string referenceLink = "";
 		rexos_datatypes::OriginPlacement::OriginPlacementType originPlacementType = originPlacement.getOriginPlacementType();
 		std::string relativeTo = originPlacement.getParameters()["relativeTo"].asString();
 		
@@ -198,7 +197,6 @@ namespace rexos_model_spawner {
 			positionX += equipletGazeboModel.getChildLinkOffsetX();
 			positionY += equipletGazeboModel.getChildLinkOffsetY();
 			positionZ += equipletGazeboModel.getChildLinkOffsetZ();
-			referenceLink = equipletGazeboModel.getParentLink();
 		} else if(originPlacementType == rexos_datatypes::OriginPlacement::RELATIVE_TO_MODULE_ORIGIN) {
 			// The origin of the gazebo model (and thus the reference frame) is at the mount point. The module origin is at mount point + midpoint
 			std::vector<std::string> identifierSegments;
@@ -221,11 +219,10 @@ namespace rexos_model_spawner {
 			positionZ += properties["midPointZ"].asDouble();
 			
 			// midPoint is calculated from the moint position, thus we need the parent link
-			referenceLink = modelGazeboModel.getParentLink();
+			parentGazeboModel = new rexos_knowledge_database::GazeboModel(identifier);
 		} else if (originPlacementType == rexos_datatypes::OriginPlacement::RELATIVE_TO_PART_ORIGIN) {
 			rexos_knowledge_database::Part parentPart = rexos_knowledge_database::Part(relativeTo);
 			parentGazeboModel = new rexos_knowledge_database::GazeboModel(parentPart);
-			referenceLink = parentGazeboModel->getParentLink();
 		}
 		// nothing to do for RELATIVE_TO_WORLD_ORIGIN
 		
@@ -298,6 +295,7 @@ namespace rexos_model_spawner {
 		return removeModel(&gazeboModel, equipletName);
 	}
 	bool ModelSpawner::removePartModel(std::string partName) {
+		REXOS_INFO_STREAM("Removing part model for " << partName);
 		rexos_knowledge_database::Part part = rexos_knowledge_database::Part(partName);
 		rexos_knowledge_database::GazeboModel gazeboModel = rexos_knowledge_database::GazeboModel(part);
 		

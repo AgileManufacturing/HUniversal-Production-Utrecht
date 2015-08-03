@@ -1,20 +1,15 @@
 package MAS.simulation.test;
 
-import jade.core.AID;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.ui.RefineryUtilities;
-import org.json.JSONObject;
-
 import MAS.equiplet.Job;
 import MAS.product.Graph;
 import MAS.product.Node;
@@ -22,7 +17,6 @@ import MAS.product.Product;
 import MAS.product.ProductStep;
 import MAS.product.ProductionStep;
 import MAS.simulation.graphics.GanttChart;
-import MAS.simulation.simulation.Grid;
 import MAS.util.Pair;
 import MAS.util.Position;
 import MAS.util.Tick;
@@ -73,10 +67,6 @@ class Test {
 
 	private void removeOutTreeSet() {
 		TreeSet<Job> map = new TreeSet<>();
-
-		map.add(new Job(0, new AID("P0"), "service", new JSONObject(), new Tick(1), new Tick(5), new Tick(20)));
-		map.add(new Job(1, new AID("P1"), "service", new JSONObject(), new Tick(5), new Tick(10), new Tick(20)));
-		map.add(new Job(2, new AID("P2"), "service", new JSONObject(), new Tick(15), new Tick(20), new Tick(20)));
 
 		Job nr2 = null;
 		int i = 0;
@@ -211,9 +201,6 @@ class Test {
 		// Product p1 = new Product("PFAILED", 0, productSteps, new Position(0,0));
 
 		// System.out.println("P1: " + p1);
-
-		Grid grid = Grid.getInstance();
-		System.out.println("grid: " + grid);
 	}
 
 	/**

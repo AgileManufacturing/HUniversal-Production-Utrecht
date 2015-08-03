@@ -36,12 +36,13 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 	@Override
 	public synchronized void run() {
 		try{
+			Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Waiting for part models to spawn");
 			addParts();
 			hal.getRosInterface().addViolationListener(this);
 			
 			hal.executeHardwareSteps(hardwareSteps, this);
-			Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Waiting for part model to spawn");
 			wait();
+			Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Waiting for part models to be removed");
 			removeParts();
 			
 			if(testFailed == false) listener.onTestFinished(productStep, hardwareSteps);
@@ -124,7 +125,7 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 			
 			for (JSONObject part : parts) {
 				JSONObject equipletCommand = new JSONObject();
-				equipletCommand.put("command", "spawnPartModel");
+				equipletCommand.put("command", "removePartModel");
 				equipletCommand.put("status", "WAITING");
 				
 				JSONObject parameters = new JSONObject();
@@ -132,7 +133,6 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 				equipletCommand.put("parameters", parameters);
 				
 				hal.removePartModel(equipletCommand, this);
-				Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Waiting for part model to be removed");
 			}
 		} catch(JSONException ex) {
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);

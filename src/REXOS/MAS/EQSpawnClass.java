@@ -43,9 +43,6 @@ import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
-
-import java.util.Date;
-
 import MAS.equiplet.EquipletAgent;
 import util.configuration.ServerConfigurations;
 
@@ -74,7 +71,6 @@ public class EQSpawnClass extends Agent {
 	 * main() Spawns the EquipletAgent on the selected server.
 	 */
 	public static void main(String[] args) throws Exception {
-		Date date = new Date();
 		// Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
 		Profile profile = new ProfileImpl();

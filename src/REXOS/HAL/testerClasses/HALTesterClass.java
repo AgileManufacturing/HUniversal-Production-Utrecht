@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -67,54 +66,6 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 	public HALTesterClass() throws KnowledgeException, BlackboardUpdateException, IOException, JSONException, InvalidMastModeException, ParseException {
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "Starting");
-		
-		hal = new HardwareAbstractionLayer(equipletName, this);
-
-		if(insertModules == true) {
-			ModuleIdentifier moduleIdentifier;
-			
-			moduleIdentifier = new ModuleIdentifier("HU", "dummy_module_type_A", "1");
-			StaticSettings staticSettingsDummyA = getStaticSettings(moduleIdentifier);
-			DynamicSettings dynamicSettingsDummyA = new DynamicSettings();
-			dynamicSettingsDummyA.mountPointX = 1;
-			dynamicSettingsDummyA.mountPointY = 10;
-			
-			moduleIdentifier = new ModuleIdentifier("HU", "dummy_module_type_B", "1");
-			StaticSettings staticSettingsDummyB = getStaticSettings(moduleIdentifier);
-			DynamicSettings dynamicSettingsDummyB = new DynamicSettings();
-			dynamicSettingsDummyB.mountPointX = 3;
-			dynamicSettingsDummyB.mountPointY = 4;
-			
-			staticSettingsDummyA.moduleIdentifier.serialNumber = String.valueOf(serialNumber);
-			staticSettingsDummyB.moduleIdentifier.serialNumber = String.valueOf(serialNumber);
-			
-			hal.insertModule(staticSettingsDummyA.serialize(), dynamicSettingsDummyA.serialize());
-			hal.insertModule(staticSettingsDummyB.serialize(), dynamicSettingsDummyB.serialize());
-		}
-		
-		// we are done if we are not going to translate hw steps
-		if(translateSteps == false) {
-			hal.shutdown();
-		} else {
-			// wait for ros node to come online
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			hal.changeState(Mast.State.SAFE);
-			
-			synchronized (this) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
 	}
 	
 	protected StaticSettings getStaticSettings(ModuleIdentifier moduleIdentifier) throws JSONException, FileNotFoundException, ParseException {
@@ -146,12 +97,12 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	}
 
 	@Override
-	public void onModuleStateChanged(Module module, Mast.State state) {
+	public void onModuleStateChanged(ModuleIdentifier module, Mast.State state) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The state of module " + module + " has changed to " + state);
 	}
 
 	@Override
-	public void onModuleModeChanged(Module module, Mast.Mode mode) {
+	public void onModuleModeChanged(ModuleIdentifier module, Mast.Mode mode) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "The mode of module " + module + " has changed to " + mode);
 	}
 

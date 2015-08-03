@@ -42,6 +42,13 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			"SELECT manufacturer, typeNumber, serialNumber \n" + 
 			"FROM Module \n" + 
 			"WHERE equiplet = ?;";
+	private static final String getModulesWithHalSoftware = 
+			"SELECT Module.manufacturer, Module.typeNumber, Module.serialNumber \n" + 
+			"FROM Module \n" +
+			"JOIN ModuleType ON ModuleType.manufacturer = Module.manufacturer AND " + 
+			"	ModuleType.typeNumber = Module.typeNumber \n" +
+			"WHERE equiplet = ? AND \n" + 
+			"	halSoftware IS NOT NULL";
 	/**
 	 * SQL query for selecting the moduleIdentifiers of the physicalModuleTrees for a functionalModuleTree of a capabilityType on an equiplet
 	 * Input: capabilityTypeName, capabilityTypeFunctionalTreeNumber, equipletName
@@ -86,7 +93,7 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	 * @throws KnowledgeException
 	 */
 	public ModuleFactory(ModuleListener moduleListener, AbstractHardwareAbstractionLayer hal) throws KnowledgeException{
-		super(new KnowledgeDBClient());
+		super(Module.class, new KnowledgeDBClient());
 		this.moduleListener = moduleListener;
 		this.hal = hal;
 	}
@@ -136,11 +143,8 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 		return modules;
 	}
 	
-	/**
-	 * This moethod will return all the modules currently connected to the equiplet.
-	 */
-	public ArrayList<ModuleIdentifier> getModules() {
-		ArrayList<ModuleIdentifier> modules = new ArrayList<ModuleIdentifier>();
+	protected ArrayList<ModuleIdentifier> getModuleIdentifiers() {
+		ArrayList<ModuleIdentifier> moduleIdentifiers = new ArrayList<ModuleIdentifier>();
 		
 		Row[] rows = knowledgeDBClient.executeSelectQuery(getModules, hal.getEquipletName());
 		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModules", rows);
@@ -148,10 +152,26 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 			String manufacturer = (String) row.get("manufacturer");
 			String typeNumber = (String) row.get("typeNumber");
 			String serialNumber = (String) row.get("serialNumber");
-			
-			modules.add(new ModuleIdentifier(manufacturer, typeNumber, serialNumber));
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			moduleIdentifiers.add(identifier);
 		}
+		return moduleIdentifiers;
+	}
+	/**
+	 * This moethod will return all the modules currently connected to the equiplet.
+	 */
+	public ArrayList<Module> getModules() {
+		ArrayList<Module> modules = new ArrayList<Module>();
 		
+		Row[] rows = knowledgeDBClient.executeSelectQuery(getModulesWithHalSoftware, hal.getEquipletName());
+		logSqlResult(LogSection.HAL_MODULE_FACTORY_SQL, "getModules", rows);
+		for (Row row : rows) {
+			String manufacturer = (String) row.get("manufacturer");
+			String typeNumber = (String) row.get("typeNumber");
+			String serialNumber = (String) row.get("serialNumber");
+			ModuleIdentifier identifier = new ModuleIdentifier(manufacturer, typeNumber, serialNumber);
+			modules.add(getItemForIdentifier(identifier));
+		}
 		return modules;
 	}
 	
@@ -170,6 +190,6 @@ public class ModuleFactory extends Factory<ModuleIdentifier, Module> {
 	
 	@Override
 	protected ArrayList<ModuleIdentifier> getKeysToKeepInCache() {
-		return getModules();
+		return getModuleIdentifiers();
 	}
 }

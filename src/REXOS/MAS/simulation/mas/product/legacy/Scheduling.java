@@ -1,20 +1,10 @@
 package MAS.simulation.mas.product.legacy;
 
 import jade.core.AID;
-import jade.lang.acl.ACLMessage;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import org.json.JSONException;
-
 import MAS.product.ProductStep;
-import MAS.product.ProductionStep;
-import MAS.util.Ontology;
-import MAS.util.Parser;
 import MAS.util.Position;
-import MAS.util.Tick;
 import MAS.util.Tuple;
 
 public class Scheduling {
@@ -107,14 +97,10 @@ public class Scheduling {
 
 
 	private void schedule(double time, Position position, ArrayList<Tuple<AID, List<String>, Double, Double>> equiplets, ArrayList<ProductStep> productSteps, double[][] matrix) {
-		ArrayList<ProductionStep> productionPath = new ArrayList<ProductionStep>();
-
 		// for each product step
 		for (int column = 0; column < matrix[0].length; column++) {
 			// the index with the highest score
 			int highestEquipletScoreIndex = -1;
-
-			ProductStep productStep = productSteps.get(column);
 
 			// look for the equiplet with the highest score for performing the product step
 			for (int row = 0; row < matrix.length; row++) {
@@ -135,45 +121,6 @@ public class Scheduling {
 			
 			// TODO construct production path
 			Math.max(time, firstPossibility);
-		}
-	}
-	
-	private void sendScheduleMessages(ArrayList<ProductionStep> productionPath, Tick deadline) {
-		// group the production path by equiplets, so to send multiple product steps schedule requests at once to one equiplet. 
-		HashMap<AID, ArrayList<ProductionStep>> sendMap = new HashMap<>();
-		
-		for(ProductionStep productionStep : productionPath) {
-			AID equipletAid = productionStep.getEquiplet();
-			
-			if(!sendMap.keySet().contains(equipletAid)){
-				//item doesn't exists, insert the productStep schedule
-				sendMap.put(equipletAid, new ArrayList<ProductionStep>());
-			}
-			sendMap.get(equipletAid).add(productionStep);
-		}
-				
-		for (AID equipletAid : sendMap.keySet()) {
-			try {
-				ArrayList<ProductionStep> steps = sendMap.get(equipletAid);
-				String content = Parser.parseScheduleRequest(steps, deadline);
-				
-				// Ask the equiplet to schedule the service
-				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-				message.addReceiver(equipletAid);
-				message.setOntology(Ontology.GRID_ONTOLOGY);
-				message.setConversationId(Ontology.CONVERSATION_SCHEDULE);
-				message.setReplyWith(Ontology.CONVERSATION_SCHEDULE + System.currentTimeMillis());
-				message.setContent(content);
-				// send(message);
-				
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		
-			// wait on confirmations
-			// check if all succeeded
 		}
 	}
 }

@@ -43,12 +43,12 @@ public class Draw extends Capability {
 			JSONObject target = criteria.getJSONObject(Criteria.TARGET);
 			
 			if(service.equals(SERVICE_IDENTIFIER) == false) {
-				String message = "Recieved a service (" + service + "which is not supported by this capability.";
+				String message = "Received a service (" + service + "which is not supported by this capability.";
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);	
 			}
 			if(target == null) {
-				String message = "Recieved a illegaly formatted job: " + service + " with criteria " + criteria;
+				String message = "Received a illegaly formatted job: " + service + " with criteria " + criteria;
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}

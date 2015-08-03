@@ -54,21 +54,28 @@ namespace joint_plugin {
 	bool JointPlugin::addJoint(joint_plugin::addJoint::Request& request, 
 			joint_plugin::addJoint::Response& response) {
 		REXOS_INFO_STREAM("Adding joint " << request.model << "::" << request.joint);
-		physics::ModelPtr model = world->GetModel(request.model);
-		if(model == NULL) return false;
-		physics::JointPtr joint = model->GetJoint(request.joint);
-		if(joint == NULL) return false;
+		physics::ModelPtr modelPtr = world->GetModel(request.model);
+		if(modelPtr == NULL) return false;
+		physics::JointPtr jointPtr = modelPtr->GetJoint(request.joint);
+		if(jointPtr == NULL) return false;
 		
-		Joint Joint(joint, request.maxErrorDistance, nodeHandle);
-		joints.push_back(Joint);
+		Joint joint(jointPtr, request.maxErrorDistance, nodeHandle);
+		joints.push_back(joint);
 		return true;
 	}
 	bool JointPlugin::removeJoint(joint_plugin::removeJoint::Request& request, 
 			joint_plugin::removeJoint::Response& response) {
 		REXOS_INFO_STREAM("Removing joint " << request.model << "::" << request.joint);
+		physics::ModelPtr modelPtr = world->GetModel(request.model);
+		if(modelPtr == NULL) return false;
+		physics::JointPtr jointPtr = modelPtr->GetJoint(request.joint);
+		if(jointPtr == NULL) return false;
+		
 		for(auto it = joints.begin(); it < joints.end(); it++) {
-			joints.erase(it);
-			return true;
+			if(it->joint == jointPtr) {
+				joints.erase(it);
+				return true;
+			}
 		}
 		return false;
 	}

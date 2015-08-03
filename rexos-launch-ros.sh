@@ -262,10 +262,10 @@ elif [ "$chosenOption" == 4 ]; then
 elif [ "$chosenOption" == "Q" ] || [ "$chosenOption" == "q" ]; 
 then
 	echo "Exiting"
-	exit
+	return
 else 
 	echo "Invalid option"
-	exit
+	return
 fi
 
 exitRequested=false 

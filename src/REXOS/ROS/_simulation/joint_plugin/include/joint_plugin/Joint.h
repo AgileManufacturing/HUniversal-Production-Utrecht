@@ -20,7 +20,7 @@ namespace joint_plugin {
 		Joint(physics::JointPtr joint, double maxErrorPose, ros::NodeHandle* nodeHandle);
 		
 		void handleUpdate(common::Time currentTime);
-	protected:
+	public:
 		physics::JointPtr joint;
 		double maxErrorPose;
 		ros::Publisher violationPublisher;

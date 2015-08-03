@@ -43,15 +43,12 @@ import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-
-import util.configuration.ServerConfigurations;
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import util.configuration.ServerConfigurations;
 
 public class CreateAgent {
 	/**

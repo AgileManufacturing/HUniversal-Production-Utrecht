@@ -25,8 +25,10 @@ public abstract class Factory <K ,V> {
 	protected KnowledgeDBClient knowledgeDBClient;
 	private DynamicClassFactory<?> dynamicClassFactory;
 	private HashMap<K , V> instancesCache;
+	private Class<V> vClass;
 	
-	public Factory(KnowledgeDBClient knowledgeDBClient) {
+	public Factory(Class<V> vClass, KnowledgeDBClient knowledgeDBClient) {
+		this.vClass = vClass;
 		this.knowledgeDBClient = knowledgeDBClient;
 		dynamicClassFactory = new DynamicClassFactory<V>();
 		instancesCache = new HashMap<K,V>();
@@ -39,15 +41,20 @@ public abstract class Factory <K ,V> {
 	
 	protected abstract JavaSoftware getJavaSoftware(K identifier);
 	protected abstract V getConstuctorforThisFactory(Class<V> myClass, K key) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException;
-	public V getItemForIdentifier(K identifier) {
+	public V getItemForIdentifier(K identifier) throws NullPointerException{
 		if(instancesCache.containsKey(identifier)) {
 			return instancesCache.get(identifier);
 		}
 		try {
-			DynamicClassDescription description = getJavaSoftware(identifier).getDynamicClassDescription();
-			@SuppressWarnings("unchecked")
-			Class<V> tempclass = (Class<V>) dynamicClassFactory.getClassFromDescription(description);
-			V returnvalue = getConstuctorforThisFactory(tempclass, identifier);
+			V returnvalue;
+			if(getJavaSoftware(identifier) == null) {
+				returnvalue = getConstuctorforThisFactory(vClass, identifier);
+			} else {
+				DynamicClassDescription description = getJavaSoftware(identifier).getDynamicClassDescription();
+				@SuppressWarnings("unchecked")
+				Class<V> tempclass = (Class<V>) dynamicClassFactory.getClassFromDescription(description);
+				returnvalue = getConstuctorforThisFactory(tempclass, identifier);
+			}
 			instancesCache.put(identifier, returnvalue);
 			return returnvalue;
 		} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | 

@@ -1,7 +1,7 @@
 {
     "moduleIdentifier": {
         "manufacturer": "HU",
-        "typeNumber": "six_axis_type_A",
+        "typeNumber": "stewart_gough_type_A",
         "serialNumber": "1"
     },
     "type": {

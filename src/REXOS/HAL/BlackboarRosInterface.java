@@ -7,12 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bson.types.ObjectId;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import util.configuration.Configuration;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
+import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.BlackboardUpdateException;
 import HAL.libraries.blackboard_client.BlackboardClient;
 import HAL.libraries.blackboard_client.data_classes.BasicOperationSubscription;
@@ -59,6 +61,7 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 	 * 
 	 */
 	public BlackboarRosInterface(AbstractHardwareAbstractionLayer hal) {
+		super(hal.getModuleFactory());
 		this.hal = hal;
 		this.hardwareSteps = new HashMap<ObjectId, HardwareStep>();
 		String equipletName = hal.getEquipletName();
@@ -109,16 +112,36 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 		try{
 			String collectionName = entry.getNamespace().split("\\.")[1];
 			if(collectionName.equals((String) Configuration.getProperty("rosInterface/equipletState/blackboardName/", hal.getEquipletName()))) { 
-				Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "EQ state or mode changed");
+				Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.DEBUG, "State or mode changed");
 				dbObject = stateBlackboardBBClient.findDocumentById(entry.getTargetObjectId());
 				if(dbObject != null) {
 					if(dbObject.containsField("state")){
 						String state = dbObject.get("state").toString();
-						this.onEquipletStateChanged(Mast.State.valueOf(state));
+						if(dbObject.containsField("moduleIdentifier")) {
+							String moduleIdentifierString = dbObject.get("moduleIdentifier").toString();
+							JSONObject moduleIdentifierJson = new JSONObject(moduleIdentifierString);
+							ModuleIdentifier identifier = new ModuleIdentifier(
+									moduleIdentifierJson.getString("manufacturer"),
+									moduleIdentifierJson.getString("typeNumber"),
+									moduleIdentifierJson.getString("serialNumber"));
+							this.onModuleStateChanged(identifier, Mast.State.valueOf(state));
+						} else {
+							this.onEquipletStateChanged(Mast.State.valueOf(state));
+						}
 					}
 					if(dbObject.containsField("mode")){
 						String mode = dbObject.get("mode").toString();
-						this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
+						if(dbObject.containsField("moduleIdentifier")) {
+							String moduleIdentifierString = dbObject.get("moduleIdentifier").toString();
+							JSONObject moduleIdentifierJson = new JSONObject(moduleIdentifierString);
+							ModuleIdentifier identifier = new ModuleIdentifier(
+									moduleIdentifierJson.getString("manufacturer"),
+									moduleIdentifierJson.getString("typeNumber"),
+									moduleIdentifierJson.getString("serialNumber"));
+							this.onModuleModeChanged(identifier, Mast.Mode.valueOf(mode));
+						} else {
+							this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
+						}
 					}
 				}
 			} else if(collectionName.equals((String) Configuration.getProperty("rosInterface/hardwareSteps/blackboardName/", hal.getEquipletName()))) {
@@ -157,7 +180,7 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 					this.onViolationOccured(type, message);
 				}
 			}
-		} catch(InvalidDBNamespaceException | GeneralMongoException ex) {
+		} catch(InvalidDBNamespaceException | GeneralMongoException | JSONException ex) {
 			Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Unknown exception occured:", ex);
 		}
 	}

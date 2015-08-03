@@ -12,6 +12,7 @@ LIBRARIES rexos_configuration
 CATKIN_DEPENDS 
 DEPENDS Jsoncpp)
 
+
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(rexos_configuration ${sources})

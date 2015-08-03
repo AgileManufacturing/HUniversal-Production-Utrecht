@@ -47,6 +47,7 @@ public class BridgeRosInterface extends RosInterface {
 	AbstractHardwareAbstractionLayer hal;
 	
 	protected BridgeRosInterface(final AbstractHardwareAbstractionLayer hal) {
+		super(hal.getModuleFactory());
 		this.hal = hal;
 		this.hardwareSteps = new HashMap<Integer, HardwareStep>();
 		this.hardwareStepId = 1;
@@ -109,8 +110,7 @@ public class BridgeRosInterface extends RosInterface {
 						JSONObject moduleIdentifierJson = messageJson.getJSONObject("moduleIdentifier");
 						ModuleIdentifier identifier = new ModuleIdentifier(moduleIdentifierJson.getString("manufacturer"), 
 								moduleIdentifierJson.getString("typeNumber"), moduleIdentifierJson.getString("serialNumber"));
-						Module module = hal.getModuleFactory().getItemForIdentifier(identifier);
-						BridgeRosInterface.this.onModuleStateChanged(module, Mast.State.valueOf(state));
+						BridgeRosInterface.this.onModuleStateChanged(identifier, Mast.State.valueOf(state));
 					} else {
 						BridgeRosInterface.this.onEquipletStateChanged(Mast.State.valueOf(state));
 					}
@@ -130,8 +130,7 @@ public class BridgeRosInterface extends RosInterface {
 						JSONObject moduleIdentifierJson = messageJson.getJSONObject("moduleIdentifier");
 						ModuleIdentifier identifier = new ModuleIdentifier(moduleIdentifierJson.getString("manufacturer"), 
 								moduleIdentifierJson.getString("typeNumber"), moduleIdentifierJson.getString("serialNumber"));
-						Module module = hal.getModuleFactory().getItemForIdentifier(identifier);
-						BridgeRosInterface.this.onModuleModeChanged(module, Mast.Mode.valueOf(mode));
+						BridgeRosInterface.this.onModuleModeChanged(identifier, Mast.Mode.valueOf(mode));
 					} else {
 						BridgeRosInterface.this.onEquipletModeChanged(Mast.Mode.valueOf(mode));
 					}
