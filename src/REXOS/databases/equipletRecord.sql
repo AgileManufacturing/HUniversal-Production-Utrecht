@@ -4,7 +4,7 @@ values(1, "", "equiplet");
 
 insert into RosSoftware
 (buildNumber, zipFile, command)
-values(1, LOAD_FILE("/home/t/git/HUniversal-Production-Utrecht/build.xml"), "rosrun equiplet_node equiplet_node {equipletName}");
+values(1, "", "rosrun equiplet_node equiplet_node {equipletName}");
 
 insert into GazeboModel
 (buildNumber, zipFile, sdfFilename, parentLink, childLink, childLinkOffsetX, childLinkOffsetY, childLinkOffsetZ)
