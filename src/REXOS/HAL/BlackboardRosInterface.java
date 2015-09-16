@@ -41,7 +41,7 @@ import com.mongodb.DBObject;
  * @author Lars Veenendaal
  * 
  */
-public class BlackboarRosInterface extends RosInterface implements BlackboardSubscriber {
+public class BlackboardRosInterface extends RosInterface implements BlackboardSubscriber {
 	private BlackboardClient stateBlackboardBBClient;
 	private BlackboardClient hardwareStepsBBClient;
 	private BlackboardClient equipletCommandsBBClient;
@@ -60,7 +60,7 @@ public class BlackboarRosInterface extends RosInterface implements BlackboardSub
 	 * @throws BlackboardUpdateException 
 	 * 
 	 */
-	public BlackboarRosInterface(AbstractHardwareAbstractionLayer hal) {
+	public BlackboardRosInterface(AbstractHardwareAbstractionLayer hal) {
 		super(hal.getModuleFactory());
 		this.hal = hal;
 		this.hardwareSteps = new HashMap<ObjectId, HardwareStep>();

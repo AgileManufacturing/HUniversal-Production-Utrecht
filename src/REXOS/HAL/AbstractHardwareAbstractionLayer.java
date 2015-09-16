@@ -12,6 +12,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.configuration.Configuration;
 import util.log.LogLevel;
 import util.log.LogSection;
 import util.log.Logger;
@@ -46,6 +47,11 @@ import HAL.tasks.TranslationProcess;
  * @see http://wiki.agilemanufacturing.nl/index.php/HAL
  */
 public abstract class AbstractHardwareAbstractionLayer implements ModuleListener, EquipletListener, TranslationProcessListener {
+	public static final String ROS_INTERFACE_IMPLEMENTATION_PATH = "rosInterface/usedImplementation/";
+	public static final String BLACKBOARD_IMPLEMENTATION = "blackboard";
+	public static final String BRIDGE_IMPLEMENTATION = "rosBridge";
+	public static final String JAVA_NODE_IMPLEMENTATION = "javaNode";
+	
 	protected CapabilityFactory capabilityFactory;
 	protected ModuleFactory moduleFactory;
 	protected ReconfigHandler reconfigHandler;
@@ -98,8 +104,15 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		capabilityFactory = new CapabilityFactory(this);
 		moduleFactory = new ModuleFactory(this, this);
 		reconfigHandler = new ReconfigHandler(this, capabilityFactory, moduleFactory);
-		this.rosInterface = new BlackboarRosInterface(this);
+		
+		// select correct ros interface implementation (this must match the one used by ROS)
+		String usedImplementation = (String) Configuration.getProperty(ROS_INTERFACE_IMPLEMENTATION_PATH, equipletName);
+		if(usedImplementation.equals(BLACKBOARD_IMPLEMENTATION)) this.rosInterface = new BlackboardRosInterface(this);
+		else if(usedImplementation.equals(BRIDGE_IMPLEMENTATION)) this.rosInterface = new BridgeRosInterface(this);
+		else if(usedImplementation.equals(JAVA_NODE_IMPLEMENTATION)) this.rosInterface = new NodeRosInterface(this);
+		else throw new RuntimeException("rosInterface implementation is unknown");
 		this.rosInterface.addEquipletListener(this);
+		
 		this.translationProcesses = new HashMap<ProductStep, TranslationProcess>();
 	}
 	

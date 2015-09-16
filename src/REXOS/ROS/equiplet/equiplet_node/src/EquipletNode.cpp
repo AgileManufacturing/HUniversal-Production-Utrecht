@@ -52,17 +52,24 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 		isSimulated(isSimulated),
 		isShadow(isShadow),
 		nh(),
-		scada(this, &moduleRegistry, scadaPort),
-		halInterface(equipletName, isShadow, this, blackboardIp)
-//		halInterface(equipletName, isShadow, this)
+		scada(this, &moduleRegistry, scadaPort)
 {
+	std::string usedImplementation = rexos_configuration::Configuration::getProperty(ROS_INTERFACE_IMPLEMENTATION_PATH, equipletName).asString();
+	if(usedImplementation == BLACKBOARD_IMPLEMENTATION) {
+		halInterface = new BlackBoardHalInterface(equipletName, isShadow, this, blackboardIp);
+	} else if(usedImplementation == BRIDGE_IMPLEMENTATION || usedImplementation == JAVA_NODE_IMPLEMENTATION) {
+		halInterface = new NodeHalInterface(equipletName, isShadow, this);
+	} else {
+		throw std::runtime_error("rosInterface implementation is unknown");
+	}
+	
 	if(isShadow) {
 		spawnPartClient = nodeHandle.serviceClient<model_spawner_node::spawnPart>(equipletName + "/model/spawnPart/");
 		removePartClient = nodeHandle.serviceClient<model_spawner_node::removePart>(equipletName + "/model/removePart/");
 		
-		/*accelerationViolationSubscriber = 	nodeHandle.subscribe(equipletName + "/acceleration/violation/", 5, &EquipletNode::onAccelerationViolation, this);
+		accelerationViolationSubscriber = 	nodeHandle.subscribe(equipletName + "/acceleration/violation/", 5, &EquipletNode::onAccelerationViolation, this);
 		collisionViolationSubscriber = 		nodeHandle.subscribe(equipletName + "/collision/violation/", 5, &EquipletNode::onCollisionViolation, this);
-		jointViolationSubscriber = 			nodeHandle.subscribe(equipletName + "/joint/violation/", 5, &EquipletNode::onJointViolation, this);*/
+		jointViolationSubscriber = 			nodeHandle.subscribe(equipletName + "/joint/violation/", 5, &EquipletNode::onJointViolation, this);
 		accelerationViolationSubscriber = 	nodeHandle.subscribe("/acceleration/violation/", 5, &EquipletNode::onAccelerationViolation, this);
 		collisionViolationSubscriber = 		nodeHandle.subscribe("/collision/violation/", 5, &EquipletNode::onCollisionViolation, this);
 		jointViolationSubscriber = 			nodeHandle.subscribe("/joint/violation/", 5, &EquipletNode::onJointViolation, this);
@@ -71,30 +78,34 @@ EquipletNode::EquipletNode(std::string equipletName, bool isSimulated, bool isSh
 	REXOS_INFO_STREAM("Equiplet node started. equipletName: " << equipletName);
 }
 
+EquipletNode::~EquipletNode() {
+	delete halInterface;
+}
+
 void EquipletNode::onHardwareStepCompleted(rexos_module::ModuleInterface* moduleInterface, rexos_datatypes::HardwareStep hardwareStep) {
 	//moduleProxy->changeState(rexos_statemachine::STATE_STANDBY);
-	halInterface.postHardwareStepStatus(hardwareStep);
+	halInterface->postHardwareStepStatus(hardwareStep);
 }
 
 void EquipletNode::onStateChanged(rexos_statemachine::State state){
 	EquipletStateMachine::onStateChanged(state);
-	halInterface.postStateChange(state);
+	halInterface->postStateChange(state);
 }
 
 
 void EquipletNode::onModeChanged(rexos_statemachine::Mode mode){
 	EquipletStateMachine::onModeChanged(mode);
-	halInterface.postModeChange(mode);
+	halInterface->postModeChange(mode);
 }
 void EquipletNode::onModuleModeChanged(rexos_module::ModuleProxy* moduleProxy, 
 		rexos_statemachine::Mode newMode, rexos_statemachine::Mode prevMode) {
 	EquipletStateMachine::onModuleModeChanged(moduleProxy, newMode, prevMode);
-	halInterface.postModeChange(moduleProxy->getModuleIdentifier(), newMode);
+	halInterface->postModeChange(moduleProxy->getModuleIdentifier(), newMode);
 }
 void EquipletNode::onModuleStateChanged(rexos_module::ModuleProxy* moduleProxy, 
 	rexos_statemachine::State newState, rexos_statemachine::State prevState) {
 	EquipletStateMachine::onModuleStateChanged(moduleProxy, newState, prevState);
-	halInterface.postStateChange(moduleProxy->getModuleIdentifier(), newState);
+	halInterface->postStateChange(moduleProxy->getModuleIdentifier(), newState);
 }
 std::string EquipletNode::getEquipletName() {
 	return equipletName;
@@ -137,14 +148,14 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 	if (currentMode != rexos_statemachine::MODE_NORMAL) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
 		hardwareStep.setStatus(rexos_datatypes::HardwareStep::FAILED);
-		halInterface.postHardwareStepStatus(hardwareStep);
+		halInterface->postHardwareStepStatus(hardwareStep);
 		return;
 	}
 	rexos_statemachine::State currentState = getCurrentState();
 	if (currentState != rexos_statemachine::STATE_NORMAL && currentState != rexos_statemachine::STATE_STANDBY) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current state is %s", rexos_statemachine::state_txt[currentState]);
 		hardwareStep.setStatus(rexos_datatypes::HardwareStep::FAILED);
-		halInterface.postHardwareStepStatus(hardwareStep);
+		halInterface->postHardwareStepStatus(hardwareStep);
 		return;
 	}
 	
@@ -156,7 +167,7 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 		if(result == Json::Value::null) {
 			// could not find anything in the lookup handler, failing hardware step
 			hardwareStep.setStatus(rexos_datatypes::HardwareStep::FAILED);
-			halInterface.postHardwareStepStatus(hardwareStep);
+			halInterface->postHardwareStepStatus(hardwareStep);
 			return;
 		} else {
 			originPlacement.setLookupResult(result);
@@ -169,12 +180,12 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 	if(prox == NULL) {
 		REXOS_WARN("Recieved equiplet step for module which is not in the moduleRegister");
 		hardwareStep.setStatus(rexos_datatypes::HardwareStep::FAILED);
-		halInterface.postHardwareStepStatus(hardwareStep);
+		halInterface->postHardwareStepStatus(hardwareStep);
 		return;
 	}
 	//prox->changeState(rexos_statemachine::STATE_NORMAL);
 	hardwareStep.setStatus(rexos_datatypes::HardwareStep::IN_PROGRESS);
-	halInterface.postHardwareStepStatus(hardwareStep);
+	halInterface->postHardwareStepStatus(hardwareStep);
 	prox->executeHardwareStep(hardwareStep);
 }
 void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand) {
@@ -190,7 +201,7 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		}
 		REXOS_ERROR("Unknown state");
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::FAILED);
-		halInterface.postEquipletCommandStatus(equipletCommand);
+		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "changeMode") {
 		for(int i = 0; i < MODE_COUNT; i++) {
 			if(parameters["desiredMode"] == rexos_statemachine::mode_txt[i]) {
@@ -200,7 +211,7 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		}
 		REXOS_ERROR("Unknown mode");
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::FAILED);
-		halInterface.postEquipletCommandStatus(equipletCommand);
+		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "reload") {
 		moduleRegistry.reloadModules();
 	} else if(equipletCommand.getCommand() == "spawnPartModel") {
@@ -224,7 +235,7 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		spawnPartClient.call(call);
 		
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
-		halInterface.postEquipletCommandStatus(equipletCommand);
+		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "removePartModel") {
 		if(isSimulated == false) {
 			REXOS_WARN("Unable to spawn part because not simulated");
@@ -236,7 +247,7 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		removePartClient.call(call);
 		
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
-		halInterface.postEquipletCommandStatus(equipletCommand);
+		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "removePartModel") {
 		if(isSimulated == false) {
 			REXOS_WARN("Unable to remove part because not simulated");
@@ -249,17 +260,17 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		removePartClient.call(call);
 		
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
-		halInterface.postEquipletCommandStatus(equipletCommand);
+		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else {
 		REXOS_WARN_STREAM("Unknown equiplet command, ignoring input");
 	}
 }
 void EquipletNode::onAccelerationViolation(std_msgs::String message) {
-	halInterface.postViolation("ACCELERATION", message.data);
+	halInterface->postViolation("ACCELERATION", message.data);
 }
 void EquipletNode::onCollisionViolation(std_msgs::String message) {
-	halInterface.postViolation("COLLISION", message.data);
+	halInterface->postViolation("COLLISION", message.data);
 }
 void EquipletNode::onJointViolation(std_msgs::String message) {
-	halInterface.postViolation("JOINT", message.data);
+	halInterface->postViolation("JOINT", message.data);
 }

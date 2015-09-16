@@ -54,6 +54,10 @@
 #include <actionlib/client/simple_action_client.h>
 
 namespace equiplet_node {
+#define ROS_INTERFACE_IMPLEMENTATION_PATH "rosInterface/usedImplementation/"
+#define BLACKBOARD_IMPLEMENTATION "blackboard"
+#define BRIDGE_IMPLEMENTATION "rosBridge"
+#define JAVA_NODE_IMPLEMENTATION "javaNode"
 
 /**
  * The equipletNode, will manage all modules and keep track of their states
@@ -62,6 +66,7 @@ class EquipletNode : public EquipletStateMachine, protected HalInterfaceListener
 {
 public:
 	EquipletNode(std::string equipletName, bool isSimulated, bool isShadow, std::string blackboardIp, int scadaPort);
+	~EquipletNode();
 	
 	std::string getEquipletName();
 	ros::NodeHandle& getNodeHandle();
@@ -85,8 +90,7 @@ private:
 	
 	ros::NodeHandle nh;
 	equiplet_node::scada::EquipletScada scada;
-	BlackBoardHalInterface halInterface;
-	//NodeHalInterface halInterface;
+	HalInterface* halInterface;
 	ros::ServiceClient spawnPartClient;
 	ros::ServiceClient removePartClient;
 	

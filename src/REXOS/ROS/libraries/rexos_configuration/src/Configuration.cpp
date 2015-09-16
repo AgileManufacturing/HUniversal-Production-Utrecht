@@ -15,6 +15,7 @@ namespace rexos_configuration {
 		Json::Value currentObject = configuration;
 		
 		std::vector<std::string> pathSegments;
+		boost::trim_if(path, boost::is_any_of("/"));
 		boost::split(pathSegments, path, boost::is_any_of("/"));
 		for(std::string pathSegment : pathSegments) {
 			if(currentObject.isMember(pathSegment) == true) {

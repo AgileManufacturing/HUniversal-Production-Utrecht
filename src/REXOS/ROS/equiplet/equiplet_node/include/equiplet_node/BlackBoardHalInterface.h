@@ -12,7 +12,7 @@ namespace equiplet_node {
 	class BlackBoardHalInterface : public HalInterface, public Blackboard::BlackboardSubscriber {
 	public:
 		BlackBoardHalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener, std::string blackboardIp);
-		~BlackBoardHalInterface();
+		virtual ~BlackBoardHalInterface();
 		
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep);
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand);

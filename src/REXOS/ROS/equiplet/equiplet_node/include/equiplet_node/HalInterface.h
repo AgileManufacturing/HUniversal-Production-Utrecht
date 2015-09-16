@@ -12,11 +12,11 @@ namespace equiplet_node {
 	protected:
 		HalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener) :
 				equipletName(equipletName), isShadow(isShadow), listener(listener) {}
-		
 		std::string equipletName;
 		bool isShadow;
 		HalInterfaceListener* listener;
 	public:
+		virtual ~HalInterface(){ }; // virtual destructor must be implemented
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep) = 0;
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand) = 0;
 		virtual void postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) = 0;

@@ -1,5 +1,8 @@
 {
 	"rosInterface": {
+		"usedImplementation": {
+			"default": "javaNode"
+		},
 		"connectionsPerHost": {
 			"default": 10
 		},
@@ -8,7 +11,7 @@
 		},
 		"hardwareSteps": {
 			"ip": {
-				"default": "127.0.0.1"
+				"default": "10.0.1.20"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -24,7 +27,7 @@
 		},
 		"equipletCommands": {
 			"ip": { 
-				"default": "127.0.0.1"
+				"default": "10.0.1.20"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -40,7 +43,7 @@
 		},
 		"equipletState": {
 			"ip": {
-				"default": "127.0.0.1"
+				"default": "10.0.1.20"
 			},
 			"databaseName": {
 				"default": "EQ",
@@ -56,7 +59,7 @@
 		},
 		"violations": {
 			"ip": {
-				"default": "127.0.0.1"
+				"default": "10.0.1.20"
 			},
 			"databaseName": {
 				"default": "EQ",
