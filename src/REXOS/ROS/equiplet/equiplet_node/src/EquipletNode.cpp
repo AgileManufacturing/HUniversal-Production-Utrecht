@@ -191,6 +191,7 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 	prox->executeHardwareStep(hardwareStep);
 }
 void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand) {
+	REXOS_INFO_STREAM("Equiplet command received" << equipletCommand.getCommand());
 	equipletCommand.setStatus(rexos_datatypes::EquipletCommand::IN_PROGRESS);
 	
 	Json::Value parameters = equipletCommand.getParameters();

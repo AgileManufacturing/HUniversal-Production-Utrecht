@@ -20,8 +20,6 @@ namespace equiplet_node {
 		virtual void postModeChange(rexos_statemachine::Mode mode);
 		virtual void postViolation(std::string type, std::string message);
 	private:
-		HalInterfaceListener* listener;
-		
 		ros::NodeHandle nh;
 		
 		ros::Publisher hardwareStepStatusChangedPublisher;
