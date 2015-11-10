@@ -6,7 +6,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 public class ServerConfigurations {
-	public static final String WSS_URI = "ws://127.0.0.1:8887";
+	public static final String WSS_URI = "ws://10.0.1.104:8887";
 	public static final String WSS_PORT = "8887";
 	public static final String GS_IP = "";
 	public static final String GS_PORT = "1099";
@@ -33,7 +33,9 @@ public class ServerConfigurations {
 		        }
 		    }
 		} catch (SocketException e) {
+			System.out.println("Exception!");
 		    throw new RuntimeException(e);
+		    
 		}
 		return ip;
 	}

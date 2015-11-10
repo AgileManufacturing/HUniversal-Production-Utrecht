@@ -121,6 +121,7 @@ ros::NodeHandle& EquipletNode::getNodeHandle() {
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
 Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameters){
+	REXOS_INFO_STREAM("Called lookup handler");
  	environment_cache::getData msg;
 
 	msg.request.identifier = originPlacementParameters["identifier"].asString();
@@ -144,6 +145,7 @@ Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameter
 }
 
 void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
+	REXOS_INFO_STREAM("Hardware step received");
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	if (currentMode != rexos_statemachine::MODE_NORMAL) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);

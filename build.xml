@@ -29,8 +29,8 @@
 			<include name="*.jar" />
 		</fileset>
 	</path>
-	<target name="all" depends="MAS, HAL, generic, util, generate-all" />
-	<target name="MAS" depends="util, generic, HAL">
+	<target name="all" depends="MAS, HAL, generic, util,scada, generate-all" />
+	<target name="MAS" depends="util, generic, HAL, scada">
 		<mkdir dir="build/REXOS/MAS" />
 		<rexos.javac destdir="build/REXOS">
 			<src path="${rexos-src-folder}/MAS" />
@@ -48,6 +48,15 @@
 			<src path="${rexos-src-folder}/generic" />
 		</rexos.javac>
 	</target>
+
+	<target name="scada" depends="">
+		<mkdir dir="build/REXOS/SCADA" />
+		<rexos.javac destdir="build/REXOS">
+			<src path="${rexos-src-folder}/MAS" />
+			<src path="${rexos-src-folder}/SCADA" />
+		</rexos.javac>
+	</target>
+	
 	<target name="util">
 		<mkdir dir="build/REXOS/util" />
 		<rexos.javac destdir="build/REXOS">

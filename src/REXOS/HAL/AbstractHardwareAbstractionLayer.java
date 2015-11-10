@@ -107,12 +107,14 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		
 		// select correct ros interface implementation (this must match the one used by ROS)
 		String usedImplementation = (String) Configuration.getProperty(ROS_INTERFACE_IMPLEMENTATION_PATH, equipletName);
+		Logger.log(LogSection.HAL, LogLevel.DEBUG,"In abstract one, fetched implementation");
 		if(usedImplementation.equals(BLACKBOARD_IMPLEMENTATION)) this.rosInterface = new BlackboardRosInterface(this);
 		else if(usedImplementation.equals(BRIDGE_IMPLEMENTATION)) this.rosInterface = new BridgeRosInterface(this);
 		else if(usedImplementation.equals(JAVA_NODE_IMPLEMENTATION)) this.rosInterface = new NodeRosInterface(this);
 		else throw new RuntimeException("rosInterface implementation is unknown");
+		Logger.log(LogSection.HAL, LogLevel.DEBUG,"In abstract one, adding listener");
 		this.rosInterface.addEquipletListener(this);
-		
+		Logger.log(LogSection.HAL, LogLevel.DEBUG,"In abstract one, added listener");
 		this.translationProcesses = new HashMap<ProductStep, TranslationProcess>();
 	}
 	

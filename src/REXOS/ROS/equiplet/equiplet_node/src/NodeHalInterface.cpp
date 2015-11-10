@@ -82,6 +82,7 @@ namespace equiplet_node {
 		violationOccuredPublisher.publish(blackBoardMessage);
 	}
 	void NodeHalInterface::onHardwareStepMessage(const std_msgs::StringConstPtr& message) {
+		REXOS_INFO_STREAM("In NodehallInterface onhwardwarestep message");
 		Json::Value hardwareStepJson;
 		if(jsonReader.parse(message->data, hardwareStepJson) == true) {
 			rexos_datatypes::HardwareStep step(hardwareStepJson);
