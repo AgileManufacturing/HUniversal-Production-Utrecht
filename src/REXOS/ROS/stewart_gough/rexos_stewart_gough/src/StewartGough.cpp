@@ -52,7 +52,6 @@ namespace rexos_stewart_gough{
 			effectorLocation() {
 		REXOS_INFO("StewartGough constructor entering...");
 		readJSONNode(node);
-		REXOS_INFO_STREAM("HERE");
 		sixAxisCalculations = new SixAxisCalculations(stewartGoughMeasures);
 
 		REXOS_INFO("end of constructor reached");
@@ -74,7 +73,6 @@ namespace rexos_stewart_gough{
 	 * @return if the path between two points is valid.
 	 **/
 	bool StewartGough::checkPath(const StewartGoughLocation& begin, const StewartGoughLocation& end) {
-		REXOS_INFO_STREAM("HERE");
 		return sixAxisCalculations->checkPath(begin, end);
 	}
 			
@@ -90,7 +88,6 @@ namespace rexos_stewart_gough{
 	 * @return the acceleration in radians/s²
 	 **/
 	double StewartGough::getAccelerationForRotation(double relativeAngle, double moveTime){
-		REXOS_INFO_STREAM("HERE");
 		return (4 * fabs(relativeAngle)) / (moveTime * moveTime);
 	}
 
@@ -104,13 +101,11 @@ namespace rexos_stewart_gough{
 	 * @return the speed in radians/s
 	 **/
 	double StewartGough::getSpeedForRotation(double relativeAngle, double moveTime, double acceleration){
-		REXOS_INFO_STREAM("HERE");
 		return (acceleration/2) * (moveTime - sqrt((moveTime * moveTime) - (4 * fabs(relativeAngle) / acceleration)));
 	}
 
 
 	void StewartGough::moveTo(StewartGoughLocation point, double maxAcceleration){
-		REXOS_INFO_STREAM("HERE");
 		// check whether the motors are powered on.
 		if(!motorManager->isPoweredOn()){
 			throw std::runtime_error("motor drivers are not powered on");
@@ -256,7 +251,6 @@ namespace rexos_stewart_gough{
 	* @return true if the calibration was succesful. False otherwise (e.g. failure on sensors.)
 	**/
 	bool StewartGough::calibrateMotors(){
-		REXOS_INFO_STREAM("HERE");
 		/*for(uint i = 0; i < motors.size(); i += 2) {
 			std::vector<rexos_motor::MotorInterface*> motorsToCalibrate;
 			std::vector<rexos_sensor::ContactSensor*> sensorsToUse;
