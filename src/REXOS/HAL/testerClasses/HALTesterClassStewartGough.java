@@ -152,7 +152,17 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 			targetMove2Approach.put("y", 0);
 			targetMove2Approach.put("z", 20);
 			targetMove2.put("approach", targetMove2Approach);
+			JSONObject targetRotate2 = new JSONObject();
+			targetRotate2.put("x", 0);
+			targetRotate2.put("y", 0);
+			targetRotate2.put("z", 0);
+			JSONObject targetRotate2Approach = new JSONObject();
+			targetRotate2Approach.put("x", 0);
+			targetRotate2Approach.put("y", 0);
+			targetRotate2Approach.put("z", 0);
+			targetRotate2.put("approach", targetRotate2Approach);
 			target2.put("move", targetMove2);
+			target2.put("rotate", targetRotate2);
 			target2.put("identifier", "GC4x4MB_6");
 	
 			JSONArray subjects2 = new JSONArray();
@@ -162,12 +172,22 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 			subjectMove2.put("y", -5.5);
 			subjectMove2.put("z", 13.8);
 			subjectMove2.put("maxAcceleration", 50.0);
+			JSONObject subjectRotate2 = new JSONObject();
+			subjectRotate2.put("x", 0);
+			subjectRotate2.put("y", 0);
+			subjectRotate2.put("z", 0);
 			JSONObject subjectMove2Approach = new JSONObject();
 			subjectMove2Approach.put("x", 0);
 			subjectMove2Approach.put("y", 0);
 			subjectMove2Approach.put("z", 20);
+			JSONObject subjectRotate2Approach = new JSONObject();
+			subjectRotate2Approach.put("x", 0);
+			subjectRotate2Approach.put("y", 0);
+			subjectRotate2Approach.put("z", 0);
 			subjectMove2.put("approach", subjectMove2Approach);
+			subjectRotate2.put("approach", subjectRotate2Approach);
 			subject2.put("move", subjectMove2);
+			subject2.put("rotate", subjectRotate2);
 			subject2.put("identifier", "GC4x4MB_1");
 			subjects2.put(subject2);
 	
@@ -176,10 +196,11 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 	
 			criteria2.put("target", target2);
 			criteria2.put("subjects", subjects2);
-			
-			System.out.println(criteria1);
 	
-			hal.translateProductStep("place", criteria1);
+			for(int i = 1; i<100; i++){
+				hal.translateProductStep("place", criteria1);
+				hal.translateProductStep("place", criteria2);
+			}
 		}
 		
 		// we are done if we are not going to translate hw steps
