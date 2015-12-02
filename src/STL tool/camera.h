@@ -4,8 +4,7 @@
 #include <glm/glm.hpp>
 
 
-class Camera
-{
+class Camera{
 public:
     Camera();
 

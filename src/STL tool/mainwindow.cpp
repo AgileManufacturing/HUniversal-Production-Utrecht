@@ -9,6 +9,8 @@
 #include <QLineEdit>
 #include <QLabel>
 
+#include "QInputDialog"
+
 #include <QColor>
 
 #include "camerasetuplayout.h"
@@ -100,11 +102,16 @@ void MainWindow::open()
 }
 
 void MainWindow::save(){
-    int cameraNr = 1;
-    for(cameraSetupLayout* camera : cameras){
-        camera->useCamera();
-        m_imageFactory->save(glwidget->grabFramebuffer(),"image" + to_string(cameraNr));
-        cameraNr++;
+    bool succes;
+    QString imageName = QInputDialog::getText(this,"Save","Image name:",QLineEdit::Normal,"",&succes);
+    if(succes){
+        m_imageFactory->save(glwidget->grabFramebuffer(),imageName.toStdString());
+//        int cameraNr = 1;
+//        for(cameraSetupLayout* camera : cameras){
+//            camera->useCamera();
+//            m_imageFactory->save(glwidget->grabFramebuffer(),imageName.toStdString() + to_string(cameraNr));
+//            cameraNr++;
+//        }
     }
 }
 

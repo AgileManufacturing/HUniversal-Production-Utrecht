@@ -84,40 +84,46 @@ QSize GLWidget::sizeHint() const{
 void GLWidget::keyPressEvent(QKeyEvent* e){
     switch(e->key()) {
         case Qt::Key_W :
-            cout << "Pressing W" << endl;
             camera->position += glm::vec3(0.0f,0.0f,2.0f);
             camera->facing += glm::vec3(0.0f,0.0f,2.0f);
             break;
+        case Qt::Key_Z:
+            camera->position += glm::vec3(0.0f,-2.0f,0.0f);
+            camera->facing += glm::vec3(0.0f,-2.0f,0.0f);
+            break;
+        case Qt::Key_C:
+            camera->position += glm::vec3(0.0f,2.0f,0.0f);
+            camera->facing += glm::vec3(0.0f,2.0f,0.0f);
+            break;
+        case Qt::Key_Q:
+            m_stlObject->m_trans = glm::rotate(m_stlObject->m_trans,glm::radians(3.0f),glm::vec3(0.0f,0.0f,1.0f));
+            break;
+        case Qt::Key_E:
+            m_stlObject->m_trans = glm::rotate(m_stlObject->m_trans,glm::radians(-3.0f),glm::vec3(0.0f,0.0f,1.0f));
+            break;
         case Qt::Key_Up:
-            cout << "Pressing up arrow" << endl;
-            m_stlObject->m_trans = glm::rotate(trans,glm::radians(3.0f),glm::vec3(1.0f,0.0f,0.0f));
+            m_stlObject->m_trans = glm::rotate(m_stlObject->m_trans,glm::radians(3.0f),glm::vec3(1.0f,0.0f,0.0f));
             break;
         case Qt::Key_A:
-            cout << "Pressing A" << endl;
             camera->position += glm::vec3(-2.0f,0.0f,0.0f);
             camera->facing += glm::vec3(-2.0f,0.0f,0.0f);
             break;
         case Qt::Key_Left:
-            cout << "Pressing left arrow" << endl;
-            m_stlObject->m_trans  = glm::rotate(trans,glm::radians(3.0f),glm::vec3(0.0f,1.0f,0.0f));
+            m_stlObject->m_trans  = glm::rotate(m_stlObject->m_trans,glm::radians(3.0f),glm::vec3(0.0f,1.0f,0.0f));
             break;
         case Qt::Key_S:
-            cout << "Pressing S" << endl;
             camera->position += glm::vec3(0.0f,0.0f,-2.0f);
             camera->facing += glm::vec3(0.0f,0.0f,-2.0f);
             break;
         case Qt::Key_Down:
-            cout << "Pressing down arrow" << endl;
-            m_stlObject->m_trans  = glm::rotate(trans,glm::radians(-3.0f),glm::vec3(1.0f,0.0f,0.0f));
+            m_stlObject->m_trans  = glm::rotate(m_stlObject->m_trans,glm::radians(-3.0f),glm::vec3(1.0f,0.0f,0.0f));
             break;
         case Qt::Key_D:
-            cout << "Pressing D" << endl;
             camera->position += glm::vec3(2.0f,0.0f,0.0f);
             camera->facing += glm::vec3(2.0f,0.0f,0.0f);
             break;
         case Qt::Key_Right:
-            cout << "Pressing right arrow" << endl;
-            m_stlObject->m_trans  = glm::rotate(trans,glm::radians(-3.0f),glm::vec3(0.0f,1.0f,0.0f));
+            m_stlObject->m_trans  = glm::rotate(m_stlObject->m_trans,glm::radians(-3.0f),glm::vec3(0.0f,1.0f,0.0f));
             break;
         case Qt::Key_X:
             cout << "Pressing X" << endl;

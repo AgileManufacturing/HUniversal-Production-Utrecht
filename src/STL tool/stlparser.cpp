@@ -28,6 +28,8 @@ void STLParser::open(QString path){
         char* tri = triangleCountArray.data();
         char triangleCount[4] = {tri[0],tri[1],tri[2],tri[3]};
         long triangles = *((long*) triangleCount);
+        //Checking wether the file is in binary format by multiplying the size
+        //of each triangle by the size of each triangle + the size of the file header
         if(((triangles*50) + 84) == m_stlFile.size()){
             binary = true;
             cout << "This is binary" << endl;
@@ -35,7 +37,7 @@ void STLParser::open(QString path){
             binary = false;
         }
         m_stlFile.close();
-        m_stlFile.open(QIODevice::ReadOnly | QIODevice::Text);
+        m_stlFile.open(QIODevice::ReadOnly);
     }
 }
 
@@ -49,6 +51,7 @@ std::vector<float> STLParser::getVertices(){
         }
         textStream.setDevice(&m_stlFile);
         if(binary){
+
             cout << "Reading binary file!" << endl;
             //get file header (80 bytes)
             QByteArray headerArray = textStream.read(80).toLocal8Bit();
@@ -59,6 +62,7 @@ std::vector<float> STLParser::getVertices(){
             long triangles = *((long*) triangleCount);
             cout << triangles << endl;
             vertices.resize(triangles * 18);
+
             int offset;
             for(int i = 0; i < triangles; ++i){
                 offset = i * 18;
@@ -137,9 +141,6 @@ std::vector<float> STLParser::getVertices(){
                 }
             }
         }
-//        for(int i = 0; i < vertices.size();i+=6){
-//            cout << vertices[i] << "," << vertices[i+1] << "," << vertices[i+2] << " - " << vertices[i+3] << ","<< vertices[i+4] << ","<< vertices[i+5] << endl;
-//        }
         std::cout << "Reading took: " << timer.elapsed() << " milliseconds" << std::endl;
         return vertices;
     }

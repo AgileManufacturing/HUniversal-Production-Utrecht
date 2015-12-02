@@ -37,7 +37,7 @@ void STLObject::initialize(){
             "in vec3 testColor;\n"
             "out vec4 outColor;\n"
             "void main() {\n"
-            "   vec3 lightDirection = vec3(0,0,-1);\n"
+            "   vec3 lightDirection = vec3(-1,1,-1);\n"
             "   float diffuseFactor = max(dot(-lightDirection,outNormal), 0);\n"
             "   outColor = vec4(fragColor,1.0) * diffuseFactor;\n"
             "}\n";

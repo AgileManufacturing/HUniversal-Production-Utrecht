@@ -22,8 +22,10 @@ CppApplication {
 
     cpp.staticLibraries: [
         "opengl32.lib",
-        "C:/opencv/build/x64/vc12/lib/opencv_ts300d.lib",
-        "C:/opencv/build/x64/vc12/lib/opencv_world300d.lib"
+//        "C:/opencv/build/x64/vc12/lib/opencv_ts300d.lib",dd
+//        "C:/opencv/build/x64/vc12/lib/opencv_world300d.lib",
+        "C:/opencv/build/x64/vc12/lib/opencv_ts300.lib",
+        "C:/opencv/build/x64/vc12/lib/opencv_world300.lib"
     ]
 
     cpp.libraryPaths:[
