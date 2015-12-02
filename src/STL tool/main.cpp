@@ -36,7 +36,9 @@ using namespace std;
 using namespace cv;
 
 bool tool = false;
-bool testing = true;
+bool testing = false;
+
+bool camerafeed = true;
 
 bool actually_find_chessboard_corners(const cv::Mat& frame, cv::Mat& corners, const cv::Size& size, int flags) {
     int count = size.area();
@@ -50,7 +52,41 @@ bool actually_find_chessboard_corners(const cv::Mat& frame, cv::Mat& corners, co
 
 int main(int argc, char *argv[])
 {
+
     QElapsedTimer timer;
+    timer.start();
+    if(camerafeed){
+        VideoCapture cap(1);
+        Mat cameraFrame;
+
+        while(true){
+            timer.restart();
+            cap >> cameraFrame;
+            cvtColor(cameraFrame,cameraFrame,cv::COLOR_RGB2GRAY);
+            cameraFrame = ImageFactory::applyOtsuThreshold(cameraFrame);
+            vector<vector<Point>> blobs;
+            blobs = FeatureFactory::findConnectedComponents(cameraFrame);
+            vector<VisionObject> objects;
+            objects = ImageFactory::filterObjects(blobs,cameraFrame);
+
+            int height = objects[0].objectImage.size().height;
+            int width = objects[0].objectImage.size().width;
+            int fixedSize = (height + width) / 2;
+            resize(objects[0].objectImage,cameraFrame,Size(fixedSize,fixedSize));
+            vector<vector<Point>> contours = FeatureFactory::getContours(objects[0].objectImage);
+            vector<vector<Point>> hull(1);
+            convexHull(contours[0],hull[0]);
+            drawContours(objects[0].objectImage,hull,0,Scalar(255,255,255));
+//            cout << timer.elapsed() << endl;
+
+            imshow("Floe",objects[0].objectImage);
+
+            imshow("camerafeed",cameraFrame);
+            if(waitKey(30) >= 0){
+                break;
+            }
+        }
+    }
     if(testing){
 
         vector<vector<Point>> blobs;
