@@ -28,7 +28,6 @@ public:
 private:
     Camera* m_camera;
 
-    string m_vertexSource, m_fragmentSource;
     GLuint m_verticeCount = 0;
 
     GLuint m_uniFragColor,m_uniView,m_uniProj,m_uniTrans;

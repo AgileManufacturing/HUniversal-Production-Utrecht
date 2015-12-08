@@ -1,4 +1,6 @@
 #include "shader.h"
+#include "QDir"
+#include "QTextstream"
 #include <iostream>
 
 using namespace std;
@@ -25,6 +27,24 @@ void Shader::addSource(const GLchar* shaderSource){
 void Shader::addSource(string shaderSource){
     const GLchar* shaderData = shaderSource.data();
     glShaderSource(m_shaderHandle,1,&shaderData,nullptr);
+}
+
+void Shader::addSourceFile(string filename){
+    QString filePath = QDir::currentPath() + "/Shaders/" + QString(filename.data());
+    cout << filePath.toStdString() << endl;
+    //TODO: FIX CHECK
+//    if(!QDir(filePath).exists()){
+//        qWarning("Shader file does not exist");
+//    }else{
+        QFile shaderFile;
+        shaderFile.setFileName(filePath);
+        shaderFile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QTextStream inStream(&shaderFile);
+        QString data = inStream.readAll();
+        const GLchar* shaderData = data.toStdString().data();
+        glShaderSource(m_shaderHandle,1,&shaderData,nullptr);
+        shaderFile.close();
+//    }
 }
 
 void Shader::compile(){

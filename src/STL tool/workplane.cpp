@@ -62,14 +62,6 @@ void Workplane::setGridColors(glm::vec3 lightColor, glm::vec3 darkColor){
     m_darkGridColor = glm::vec4(darkColor,0);
 }
 
-string Workplane::getVertexSource(){
-    return m_vertexSource;
-}
-
-string Workplane::getFragmentSource(){
-    return m_fragmentSource;
-}
-
 vector<float> Workplane::getWorkplaneData(){
     for(int i = 0; i < m_workplaneData.size(); i+=6){
         cout << m_workplaneData[i] << "," << m_workplaneData[i+1] << "," << m_workplaneData[i+2] << " - "
@@ -105,32 +97,12 @@ void Workplane::initialize(){
 
     create(glm::vec2(45,40),glm::vec2(10,10));
 
-    m_vertexSource =
-            "#version 330\n"
-            "uniform mat4 proj;\n"
-            "uniform mat4 view;\n"
-            "in vec3 position;\n"
-            "in vec3 color;\n"
-            "out vec3 fragmentColor;\n"
-            "void main(){\n"
-            "   gl_Position = proj * view * vec4(position,1.0);\n"
-            "   fragmentColor = color;\n"
-            "}\n";
-
-    m_fragmentSource =
-            "#version 330\n"
-            "in vec3 fragmentColor;\n"
-            "out vec3 outColor;\n"
-            "void main(){\n"
-            "   outColor = fragmentColor;\n"
-            "}\n";
-
     m_vertexShader.create(GL_VERTEX_SHADER);
-    m_vertexShader.addSource(m_vertexSource.data());
+    m_vertexShader.addSourceFile("workplane.vert");
     m_vertexShader.compile();
 
     m_fragmentShader.create(GL_FRAGMENT_SHADER);
-    m_fragmentShader.addSource(m_fragmentSource.data());
+    m_fragmentShader.addSourceFile("workplane.frag");
     m_fragmentShader.compile();
 
     m_workplaneProgram.create();

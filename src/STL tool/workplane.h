@@ -36,8 +36,6 @@ private:
 
     vector<float> m_workplaneData;
 
-    string m_vertexSource, m_fragmentSource;
-
     GLint m_uniProj, m_uniView;
 
     OpenGL::Shader m_vertexShader;

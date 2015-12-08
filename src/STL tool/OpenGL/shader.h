@@ -18,6 +18,8 @@ public:
     void addSource(const GLchar* shaderSource);
     void addSource(string shaderSource);
 
+    void addSourceFile(string filename);
+
     void compile();
 
     std::string getLog();

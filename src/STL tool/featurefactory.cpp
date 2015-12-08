@@ -130,14 +130,14 @@ vector<vector<Point>> FeatureFactory::findConnectedComponents(const Mat& image){
 vector<vector<Point> > FeatureFactory::getContours(const Mat &image){
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
-    findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);
+    findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_NONE);
     return contours;
 }
 
 pair<vector<vector<Point>>, vector<Vec4i>> FeatureFactory::getContoursHierarchy(const Mat &image){
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
-    findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);
+    findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_NONE);
     return make_pair(contours,hierarchy);
 }
 
