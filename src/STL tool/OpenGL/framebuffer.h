@@ -2,7 +2,7 @@
 #define FRAMEBUFFER_H
 
 #include <vector>
-
+#include <iostream>
 #include "GL/glew.h"
 #include "renderbuffer.h"
 
@@ -23,7 +23,7 @@ public:
 
     void bindRenderBuffer(RenderBuffer& renderbuffer);
 
-    vector<unsigned int> read(vector<unsigned int>& data, RenderBuffer &renderbuffer);
+    void read(vector<int> &data, RenderBuffer &renderbuffer);
 private:
     GLenum m_target;
     GLuint m_fboHandle;

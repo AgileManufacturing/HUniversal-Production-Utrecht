@@ -6,7 +6,11 @@ namespace OpenGL{
 RenderBuffer::RenderBuffer(GLuint width = 0, GLuint height = 0):
     m_width{width},
     m_height{height}
-{}
+{
+//    if(!setStorage()){
+//        cout << "Renderbuffer storage size has not yet been set" << endl;
+//    }
+}
 
 void OpenGL::RenderBuffer::create(){
     glGenRenderbuffers(1,&m_rboHandle);
@@ -30,12 +34,16 @@ void RenderBuffer::setBufferSize(GLuint width, GLuint height){
     m_height = height;
 }
 
+int RenderBuffer::getBufferSize(){
+    return m_width * m_height;
+}
+
 bool RenderBuffer::setStorage(){
     if(m_width <= 0 && m_height <= 0){
         cout << "Buffer size has not been set" << endl;
         return false;
     }else{
-        glRenderbufferStorage(GL_RENDERBUFFER,GL_RGBA8UI,m_width,m_height);
+        glRenderbufferStorage(GL_RENDERBUFFER,GL_BGRA,m_width,m_height);
         return true;
     }
 }

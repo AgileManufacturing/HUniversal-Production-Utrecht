@@ -34,13 +34,36 @@
 #include <math.h>
 
 
+#include "glsurface.h"
+
 using namespace std;
 using namespace cv;
 
 bool tool = false;
 bool testing = false;
 bool imagetaker = false;
-bool camerafeed = true;
+bool camerafeed = false;
+bool offscreentest = false;
+bool templatetest = true;
+
+Point rotate_point(float cx,float cy,float angle,Point p)
+{
+    float s = sin(angle);
+    float c = cos(angle);
+
+    // translate point back to origin:
+    p.x -= cx;
+    p.y -= cy;
+
+    // rotate point
+    float xnew = p.x * c - p.y * s;
+    float ynew = p.x * s + p.y * c;
+
+    // translate point back:
+    p.x = xnew + cx;
+    p.y = ynew + cy;
+    return p;
+}
 
 vector<vector<Point>> filterCurves(vector<Point>& convex, Mat& image){
     vector<vector<Point>> curves;
@@ -189,11 +212,79 @@ double getOrientation(const vector<Point> &pts, Mat &img)
     return angle;
 }
 
+vector<vector<Point>> generateGripperTemp(int arms,float armHeight,float armWidth,float maxDist,float minDist){
+    vector<vector<Point>> templates;
+    Mat templateImage = Mat::zeros(maxDist,maxDist,CV_8U);
+
+
+//    if(minDist == 0){
+//        minDist = armWidth * 0.5;
+//    }
+//    float distSteps = (maxDist - minDist) / 10;
+//    float currentDist = minDist;
+//    float angleBetweenArms = (360/arms)/(180/M_PI);
+//    float sX = minDist,sY = armHeight/2;
+//    float eX = minDist + armWidth, eY =  -armHeight/2;
+//    cout << "ey" << eY * sin(0) << endl;
+//    float oldX = sX, oldY = sY;
+//    vector<int> test;
+//    test.resize(((maxDist+ minDist) * 2) * ((maxDist+ minDist) * 2));
+//    float centerX = (sqrt(test.size())/2),centerY = (sqrt(test.size())/2);
+//    //    cout << oldX << " - " << oldY << endl;
+//    int nX,nY;
+//    test[(centerY * (centerX * 2)) + centerX] = 9;
+//    cout << centerX << " - " << centerY << endl;
+//    float csX = sX,ceX = eX,csY=sY,ceY=eY;
+//    for(int i = 0; i < arms;++i){
+//        if(i != 0){
+//            csX = centerX + (sX * cos(i*angleBetweenArms)) - (sY * sin(i*angleBetweenArms));
+//            ceX = centerX + (eX * cos(i*angleBetweenArms)) - (eY * sin(i*angleBetweenArms));
+//            csY = centerY + (sX * sin(i*angleBetweenArms)) + (sY * cos(i*angleBetweenArms));
+//            ceY = centerY + (eX * cos(i*angleBetweenArms)) + (eY * sin(i*angleBetweenArms));
+//        }
+//        cout << "(" << csX << "," << csY << ") - (" << ceX << "," << ceY <<")" << endl;
+//    }
+
+//    for(int i = 0; i < arms; ++i){
+//        for(int y = 0; y < armHeight; ++y){
+//            for(int x = 0; x < armWidth;++x){
+//                nX = ((sX+x) * cos(i*angleBetweenArms)) - ((sY-y) * sin(i*angleBetweenArms));
+//                nY = ((sX+x )* sin(i*angleBetweenArms)) + ((sY-y) * cos(i*angleBetweenArms));
+//                int index = (nY+centerY)  * sqrt(test.size());
+//                index += (nX+centerX);
+//                test[index] = 1;
+//            }
+//        }
+//    }
+//    for(int y = 0; y < (test.size()/(centerX*2));++y){
+//        cout << endl;
+//        for(int x = 0 ; x < (centerX*2);++x){
+//            cout << test[(y * (centerX * 2)) + x] << " ";
+//        }
+//    }
+    //    for(int i = 1; i < arms;++i){
+    //        cX = (oldX * cos(angleBetweenArms)) - (oldY * sin(angleBetweenArms));
+    //        cY = (oldX * sin(angleBetweenArms)) + (oldY * cos(angleBetweenArms));
+    //        oldX = cX; oldY = cY;
+    //        cout << oldX << " - " << oldY << endl;
+    //    }
+//    for(int i = 0; i < arms; ++i){
+
+//        cout << centerX +  (sX * cos(i*angleBetweenArms)) - (sY * sin(i*angleBetweenArms)) << " - ";
+//        cout << centerY + (sX * sin(i*angleBetweenArms)) + (sY * cos(i*angleBetweenArms)) << endl;
+//    }
+    return templates;
+}
+
 int main(int argc, char *argv[])
 {
 
     QElapsedTimer timer;
     timer.start();
+    if(templatetest){
+
+        generateGripperTemp(4,10,5,20,5);
+    }
     if(imagetaker){
         QApplication app(argc,argv);
         QWidget inputwidget;
@@ -282,22 +373,18 @@ int main(int argc, char *argv[])
         }
     }
     if(testing){
-
         vector<vector<Point>> blobs;
         vector<VisionObject> objects;
-        Mat testImage = imread(QDir::currentPath().toStdString() + "/positives/testImage15.bmp",CV_LOAD_IMAGE_GRAYSCALE);
+        Mat testImage = imread(QDir::currentPath().toStdString() + "/namedimages/Floe3-45degrees2.bmp",CV_LOAD_IMAGE_GRAYSCALE);
         //        Mat testImage = imread(QDir::currentPath().toStdString() + "/images/image1.jpg",CV_LOAD_IMAGE_GRAYSCALE);
         timer.start();
         testImage = ImageFactory::applyOtsuThreshold(testImage);
-        cout << timer.elapsed() << endl;
         blobs = FeatureFactory::findConnectedComponents(testImage);
-
         objects = ImageFactory::filterObjects(blobs,testImage);
         //        FeatureFactory::savePartConfig(FeatureFactory::createParameterMap(objects[1]),"EdwinVinger");
         //        vector<vector<Point>> hull;
         //        hull.resize(1);
         //        vector<Vec4i> convexityDefects;
-        cout << objects.size() << endl;
         for(int i = 0; i < objects.size(); ++i){
 
             //            int size = (objects[i].objectImage.size().height + objects[i].objectImage.size().width) / 2;
@@ -308,12 +395,19 @@ int main(int argc, char *argv[])
             vector<vector<Point>> contours = FeatureFactory::getContours(objects[i].objectImage);
             vector<RotatedRect> rects(contours.size());
             vector<Moments> mu(contours.size());
+            vector<vector<Point>> holes = FeatureFactory::getHoles(objects[0].objectImage);
+            cout <<"Hole count: " <<  holes.size() << endl;
+            for(int j = 0; j < holes.size();++j){
+                cout << holes[i].size() << endl;
+                drawContours(objects[0].objectImage,holes,i,Scalar(255,255,255),3);
+            }
+
             int biggestContour = 0;
             for(int j = 0; j < contours.size(); ++j){
                 if (arcLength(contours[j],false) > biggestContour){
                     biggestContour = j;
                 }
-                mu[j] = moments(contours[j],false);
+                mu[j] = moments(contours[j],true);
             }
             vector<Point> mc(contours.size());
             for(int j = 0; j < contours.size(); ++j){
@@ -327,16 +421,20 @@ int main(int argc, char *argv[])
 
             vector<vector<Point>> hull(2);
             convexHull(contours[0],hull[0]);
+            drawContours(objects[0].objectImage,hull,0,Scalar(255,255,255),3);
+
             if(mu[0].m20 != mu[0].m02){
-                double theta = 0.5 * atan((2 * mu[0].mu11)/(mu[0].mu20 - mu[0].mu02));
-                double thetaGrade = theta * (180/M_PI);
-                line(objects[0].objectImage,Point((mc[0].x - 200) * cos(theta),(mc[0].y - 200 )* cos(theta)),Point((mc[0].x + 200 )* cos(theta),(mc[0].y + 200 )* cos(theta))
-                        ,Scalar(255,255,255),3);
+                double theta = 0.5 * atan2((2 * mu[0].mu11),(mu[0].mu20 - mu[0].mu02));
+                double thetaGrade = (theta + M_PI) * (180/M_PI);
+//                line(objects[0].objectImage,rotate_point(mc[0].x,mc[0].y,theta,Point(mc[0].x-100,mc[0].y)),rotate_point(mc[0].x,mc[0].y,theta,Point(mc[0].x+100,mc[0].y))
+//                        ,Scalar(255,255,255),3);
+//                line(objects[0].objectImage,Point((mc[0].x - 200) * sin(theta),mc[0].y * cos(theta)),Point((mc[0].x + 200)* sin(theta),mc[0].y* cos(theta))
+//                        ,Scalar(255,255,255),3);
                 cout << "Axis theta: " << thetaGrade << endl;
                 Mat rot_mat = cv::getRotationMatrix2D(mc[0],thetaGrade,1.0);
-                //            Mat dst;
-                //            cv::warpAffine(objects[0].objectImage,dst,rot_mat,objects[0].objectImage.size());
-                //            imshow("warped",dst);
+                Mat dst;
+                cv::warpAffine(objects[0].objectImage,dst,rot_mat,objects[0].objectImage.size());
+                imshow("warped",dst);
                 //            drawContours(objects[i].objectImage,hull,0,Scalar(255,255,255));
                 //            cout << contours.size() << " - " << biggestContour << endl;
                 //            rects[0] = minAreaRect(contours[biggestContour]);
@@ -346,9 +444,12 @@ int main(int argc, char *argv[])
                 //                line( objects[i].objectImage, rect_points[0], rect_points[(k+1)%4],Scalar(255,255,255), 1, 8 );
                 //            }
             }
+            RotatedRect testRect = fitEllipse(hull[0]);
 
-
+            ellipse(objects[i].objectImage,testRect,Scalar(125,125,125),3);
             cout << "Object" + to_string(i) + " - " << contours.size() << endl;
+            float e = (pow(mu[0].mu20-mu[0].mu02,2))-( 4 * pow(mu[0].mu11,2))/pow(mu[0].mu20+mu[0].mu02,2);
+            cout << "eccentricity: " << e << endl;
             //            convexHull(objects[i].data, hull[0],false,false);
             //            drawContours(testImage,hull,0,Scalar(255,255,255));
             //            cv::convexityDefects(objects[i].data,hull[0],convexityDefects);
@@ -377,6 +478,15 @@ int main(int argc, char *argv[])
         window.show();
         return app.exec();
     }
+    if(offscreentest){
+        QApplication app(argc,argv);
+        cout << "no crash?" << endl;
+        GLSurface offscreensurface;
+        offscreensurface.renderGL();
+        cout << "nooo crash?" << endl;
+        return app.exec();
+    }
+
 
     return 0;
 }

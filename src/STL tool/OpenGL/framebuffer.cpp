@@ -26,10 +26,9 @@ void Framebuffer::bindRenderBuffer(RenderBuffer& renderbuffer){
     glFramebufferRenderbuffer(m_target,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER, renderbuffer.rboHandle());
 }
 
-vector<unsigned int> Framebuffer::read(vector<unsigned int>& data,RenderBuffer& renderbuffer){
+void Framebuffer::read(vector<int> &data, RenderBuffer& renderbuffer){
     glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glReadPixels(0,0,renderbuffer.width(),renderbuffer.height(),GL_RGB,GL_UNSIGNED_BYTE,&data[0]);
-    return data;
+    glReadPixels(0,0,renderbuffer.width(),renderbuffer.height(),GL_RGBA,GL_UNSIGNED_INT,&data[0]);
 }
 
 

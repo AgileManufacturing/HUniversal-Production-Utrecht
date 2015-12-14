@@ -29,6 +29,7 @@ public:
     void setWidth(const GLuint &width);
     void setHeight(const GLuint &height);
 
+    int getBufferSize();
 private:
     GLuint m_rboHandle;
     GLuint m_width,m_height;

@@ -44,7 +44,7 @@ vector<VisionObject> ImageFactory::filterObjects(vector<vector<Point>>& objects,
     int minx = 1080,maxx = 0;
     int miny = 1920,maxy = 0;
     for(int i = 0; i < objects.size();++i){
-        if(objects[i].size() < 100000 && objects[i].size() > 1000){
+        if(objects[i].size() < 100000 && objects[i].size() > 500){
             minx = 1080,maxx = 0;
             miny = 1920,maxy = 0;
             for(int j = 0; j < objects[i].size();j++){
@@ -63,6 +63,11 @@ vector<VisionObject> ImageFactory::filterObjects(vector<vector<Point>>& objects,
                     miny = y;
                 }
             }
+            //create a small border for some extra space around the object in the objectimage
+            maxx+=10;
+            maxy+=10;
+            minx-=10;
+            miny-=10;
             Mat objectImage = Mat::zeros(maxy - miny,maxx-minx,CV_8U);
             for(int j = 0; j < objects[i].size();++j){
                 //TODO(Edwin): zoek uit waarom deze check nodig is...
@@ -71,6 +76,7 @@ vector<VisionObject> ImageFactory::filterObjects(vector<vector<Point>>& objects,
                             image.at<uchar>(objects[i][j].y,objects[i][j].x);
                 }
             }
+            imshow("testttt",objectImage);
             VisionObject filteredObject;
             filteredObject.data = objects[i];
             filteredObject.objectImage = objectImage;

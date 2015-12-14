@@ -3,8 +3,10 @@
 #include "QDir"
 #include "QFile"
 #include "QTextStream"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
-
+#include <iostream>
 
 void FeatureFactory::savePartConfig(const map<string, double>& parameterMap,const QString partName){
     QString path = QDir::currentPath() + "/parts/" + partName + ".config";
@@ -130,22 +132,25 @@ vector<vector<Point>> FeatureFactory::findConnectedComponents(const Mat& image){
 vector<vector<Point> > FeatureFactory::getContours(const Mat &image){
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
-    findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_NONE);
+    Mat test = image;
+    findContours(test,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_NONE);
     return contours;
 }
 
 pair<vector<vector<Point>>, vector<Vec4i>> FeatureFactory::getContoursHierarchy(const Mat &image){
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
-    findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_NONE);
+    Mat test = image;
+    findContours(test,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_NONE);
     return make_pair(contours,hierarchy);
 }
 
 vector<vector<Point>> FeatureFactory::getHoles(const pair<vector<vector<Point> >, vector<Vec4i> >& contours){
     vector<vector<Point>> holes;
-    for(int i = 0; i < contours.first .size(); ++i){
+    cout << "Contours found: " << contours.first.size() << endl;
+    for(int i = 0; i < contours.first.size(); ++i){
         // The size check is to filter out the smallest insignificant holes
-        if(contours.second[i][3] != -1 && contours.first[i].size() > 100){
+        if(contours.second[i][3] != -1){ //&& contours.first[i].size() > 10*M_PI){
             holes.push_back(contours.first[i]);
         }
     }

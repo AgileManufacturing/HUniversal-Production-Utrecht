@@ -41,7 +41,8 @@ void Shader::addSourceFile(string filename){
         shaderFile.open(QIODevice::ReadOnly | QIODevice::Text);
         QTextStream inStream(&shaderFile);
         QString data = inStream.readAll();
-        const GLchar* shaderData = data.toStdString().data();
+        string stringData  = data.toStdString();
+        const GLchar* shaderData = stringData.data();
         glShaderSource(m_shaderHandle,1,&shaderData,nullptr);
         shaderFile.close();
 //    }
