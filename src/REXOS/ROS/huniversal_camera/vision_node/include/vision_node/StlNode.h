@@ -10,7 +10,7 @@ class StlNode{
 public:
     StlNode();
 
-    void handleFrame(cv::Mat& frame);
+    void handleFrame(cv::Mat& frame,cv::Mat* testframe);
 
 private:
 };
