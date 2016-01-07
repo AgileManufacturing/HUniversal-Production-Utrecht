@@ -47,6 +47,7 @@ VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifi
                 isStlNodeEnabled(true),
 		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
+                stlNode(imgTransport),
 		fishEyeCorrector(nodeHandle),
 		exposure(0.015)
 {
@@ -175,7 +176,7 @@ void VisionNode::handleFrame(cv::Mat& camFrame) {
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 	}
         if(isStlNodeEnabled){
-            stlNode.handleFrame(camFrame,&camFrame);
+            stlNode.handleFrame(camFrame);
         }
 	cv::Mat grayScaleFrame;
 	if(isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true){

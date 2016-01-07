@@ -27,8 +27,7 @@ struct VisionObject{
 };
 
 StlNode::StlNode(image_transport::ImageTransport& imageTransport){
-    debugImagePublisher1 = imageTransport.advertise("camera/stl_debug_image1", 1);
-    debugImagePublisher2 = imageTransport.advertise("camera/stl_debug_image2", 1);
+    debugImagePublisher = imageTransport.advertise("camera/stl_debug_image", 1);
 }
 
 Mat applyOtsuThreshold(const Mat &image){
@@ -162,30 +161,19 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
 }
 
 
-void StlNode::handleFrame(cv::Mat& frame,cv::Mat* testframe){
-    cv_bridge::CvImage cvi1;
-    cv_bridge::CvImage cvi2;
+void StlNode::handleFrame(cv::Mat& frame){
+    cv_bridge::CvImage cvi;
 
     if(!frame.empty()){
         ros::Time time = ros::Time::now();
-        cvi1.header.stamp = time;
-        cvi1.header.frame_id = "stl_debug_image1";
-        cvi1.encoding = sensor_msgs::image_encodings::BGR8;
-        cvi1.image = frame;
+        cvi.header.stamp = time;
+        cvi.header.frame_id = "stl_debug_image";
+        cvi.encoding = sensor_msgs::image_encodings::BGR8;
+        cvi.image = frame;
         debugImagePublisher1.publish(cvi.toImageMsg());
 
     }else{
         REXOS_INFO("STL VISION: Given clone frame was empty.");
-    }
-    if(!testframe->empty()){
-        ros::Time time = ros::Time::now();
-        cvi2.header.stamp = time;
-        cvi2.header.frame_id = "stl_debug_image2";
-        cvi2.encoding = sensor_msgs::image_encodings::BGR8;
-        cvi2.image = &testframe;
-        debugImagePublisher2.publish(cvi.toImageMsg());
-    }else{
-        REXOS_INFO("STL VISION: Given pointer frame was empty");
     }
 
 }

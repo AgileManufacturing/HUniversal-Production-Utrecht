@@ -10,13 +10,12 @@
 
 class StlNode{
 public:
-    StlNode();
+    StlNode(image_transport::ImageTransport& imageTransport);
 
-    void handleFrame(cv::Mat& frame,cv::Mat* testframe);
+    void handleFrame(cv::Mat& frame);
 
 private:
-    image_transport::Publisher debugImagePublisher1;
-    image_transport::Publisher debugImagePublisher1;
+    image_transport::Publisher debugImagePublisher;
 
 };
 
