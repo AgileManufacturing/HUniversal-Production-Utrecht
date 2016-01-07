@@ -7,15 +7,30 @@
 #include <opencv2/objdetect/objdetect.hpp>
 
 #include <iostream>
+#include <vector>
 
-using namespace opencv;
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+using namespace cv;
+using namespace std;
+
+struct VisionObject{
+    Mat objectImage;
+    vector<Point> data;
+};
 
 StlNode::StlNode(){}
 
+Mat applyOtsuThreshold(const Mat &image){
+    Mat thresholdImage;
+    threshold(image,thresholdImage,0,255,THRESH_BINARY | THRESH_OTSU);
+    return thresholdImage;
+}
 
-vector<vector<Point>> FeatureFactory::findConnectedComponents(const Mat& image){
+vector<vector<Point>> findConnectedComponents(const Mat& image){
     vector<vector<Point>> blobs;
-    Mat workingImage = ImageFactory::applyOtsuThreshold(image);
+    Mat workingImage = applyOtsuThreshold(image);
     // Fill the label_image with the blobs
     // 0  - background
     // 1  - unlabelled foreground
@@ -56,21 +71,21 @@ vector<vector<Point>> FeatureFactory::findConnectedComponents(const Mat& image){
     return blobs;
 }
 
-vector<vector<Point> > FeatureFactory::getContours(const Mat &image){
+vector<vector<Point> > getContours(const Mat &image){
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
     findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);
     return contours;
 }
 
-pair<vector<vector<Point>>, vector<Vec4i>> FeatureFactory::getContoursHierarchy(const Mat &image){
+pair<vector<vector<Point>>, vector<Vec4i>> getContoursHierarchy(const Mat &image){
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
     findContours(image,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE);
     return make_pair(contours,hierarchy);
 }
 
-vector<vector<Point>> FeatureFactory::getHoles(const pair<vector<vector<Point> >, vector<Vec4i> >& contours){
+vector<vector<Point>> getHoles(const pair<vector<vector<Point> >, vector<Vec4i> >& contours){
     vector<vector<Point>> holes;
     for(int i = 0; i < contours.first.size(); ++i){
         // The size check is to filter out the smallest insignificant holes
@@ -84,11 +99,11 @@ vector<vector<Point>> FeatureFactory::getHoles(const pair<vector<vector<Point> >
     return holes;
 }
 
-vector<vector<Point> > FeatureFactory::getHoles(const Mat &image){
+vector<vector<Point> > getHoles(const Mat &image){
     return getHoles(getContoursHierarchy(image));
 }
 
-vector<VisionObject> ImageFactory::filterObjects(vector<vector<Point>>& objects,Mat& image){
+vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
     vector<VisionObject> visionObjects;
     int x,y;
     int minx = 1080,maxx = 0;
@@ -146,9 +161,9 @@ void StlNode::handleFrame(cv::Mat& frame,cv::Mat* testframe){
     }else{
         REXOS_INFO("STL VISION: Given clone frame was empty.");
     }
-    if(!&testframe.empty()){
+    if(!testframe->empty()){
         cv::namedWindow("Testing pointer mat");
-        cv::imshow("Testing pointer mat",&testframe);
+        cv::imshow("Testing pointer mat",*testframe);
     }else{
         REXOS_INFO("STL VISION: Given pointer frame was empty");
     }
