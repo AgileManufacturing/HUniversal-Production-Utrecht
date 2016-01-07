@@ -175,7 +175,7 @@ void VisionNode::handleFrame(cv::Mat& camFrame) {
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 	}
         if(isStlNodeEnabled){
-            stlNode.handleFrame(camFrame.clone());
+            stlNode.handleFrame(camFrame.clone(),&camFrame);
         }
 	cv::Mat grayScaleFrame;
 	if(isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true){
