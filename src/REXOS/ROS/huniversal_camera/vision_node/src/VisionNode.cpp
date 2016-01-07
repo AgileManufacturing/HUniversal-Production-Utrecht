@@ -43,7 +43,8 @@
 VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, int deviceNumber, int formatNumber) : 
 		isSimulated(isSimulated), nodeHandle(),
 		isCameraEnabled(true), isFishEyeCorrectorEnabled(false),
-		isQrCodeReaderEnabled(true), isFudicialDetectorEnabled(false),
+                isQrCodeReaderEnabled(false), isFudicialDetectorEnabled(false),
+                isStlNodeEnabled(true),
 		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
 		fishEyeCorrector(nodeHandle),
@@ -173,14 +174,16 @@ void VisionNode::handleFrame(cv::Mat& camFrame) {
 	if(isFishEyeCorrectorEnabled == true){
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 	}
-	
+        if(isStlNodeEnabled){
+            stlNode.handleFrame(camFrame);
+        }
 	cv::Mat grayScaleFrame;
 	if(isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true){
 		// convert to grayscale, because these readers / detecors need grayscale images
 		cvtColor(camFrame, grayScaleFrame, CV_RGB2GRAY);
 	}
 	
-	if(isQrCodeReaderEnabled == true){
+        if(isQrCodeReaderEnabled == true){
 		qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
 	}
 
