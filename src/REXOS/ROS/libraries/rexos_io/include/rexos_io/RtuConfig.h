@@ -24,5 +24,5 @@ namespace rexos_io {
 			STOP_BITS	= 1
 		};
 	};
-	const char RtuConfig::DEVICE[] = "/dev/ttyS0";
+	const char RtuConfig::DEVICE[] = "/dev/ttyUSB0";
 }

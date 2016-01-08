@@ -94,9 +94,9 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		}
 		//for(;;){
 			if(translateSteps == true) {
-				double xMoveDist = -2.0;
-				double yMoveDist = -3.0;
-				double sub1xrot = 0.25;
+				double xMoveDist = 0.0;
+				double yMoveDist = 0.0;
+				double sub1xrot = 0.0;
 				double sub1xrotap = 0.0;
 				double sub2zrot = 0.0;
 				//System.out.println("Putting step data...");
