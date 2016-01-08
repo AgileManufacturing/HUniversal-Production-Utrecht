@@ -83,7 +83,7 @@ public class GripAndPlace extends Capability {
 			}
 			// We assume that the first subject is the subject to pick
 			JSONObject subject = subjects.getJSONObject(0);
-			ArrayList<HardwareStep> dynamicCompositeSteps = generateStepFromOffset(check,subject); // NULL unless the rotation is wrong, in which case it returns the steps as arraylist 
+			ArrayList<CompositeStep> dynamicCompositeSteps = generateStepFromOffset(check,subject); // NULL unless the rotation is wrong, in which case it returns the steps as arraylist 
 			// pick
 			JSONObject subjectMoveCommand = subject.getJSONObject("move");
 			JSONObject subjectRotateCommand = subject.getJSONObject("rotate");
@@ -121,14 +121,15 @@ public class GripAndPlace extends Capability {
 			ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
 			compositeSteps.add(pick);
 			compositeSteps.add(place);
-			if (dynamicCompositeSteps != NULL){ // add in the dynamic extra steps with the normal procedure steps
-				ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, dynamicCompositeSteps);
+			ArrayList<HardwareStep> hardwareSteps;
+			if (dynamicCompositeSteps != null){ // add in the dynamic extra steps with the normal procedure steps
+				hardwareSteps = translateCompositeStep(modules, dynamicCompositeSteps);
 				ArrayList<HardwareStep> hardwareSteps2 = translateCompositeStep(modules, compositeSteps);
 				for (HardwareStep step : hardwareSteps2){
 					hardwareSteps.add(step);
 				}
 			} else {
-				ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
+				hardwareSteps = translateCompositeStep(modules, compositeSteps);
 			}
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
 			return hardwareSteps;
@@ -138,8 +139,8 @@ public class GripAndPlace extends Capability {
 		}
 	}
 
-	private final ALLOWED_ROTATION_DIFFERENCE = 1.0;
-	private generateStepFromOffset(JSONObject subjectCheck,JSONObject subjectLocation){
+	private final double ALLOWED_ROTATION_DIFFERENCE = 1.0;
+	private ArrayList<CompositeStep> generateStepFromOffset(JSONObject subjectCheck,JSONObject subjectLocation){
 		double desiredRotation = subjectCheck.getDouble("desiredRotation");
 		double detectedRotation = subjectCheck.getDouble("detectedRotation");
 		if (Math.abs(desiredRotation - detectedRotation) > ALLOWED_ROTATION_DIFFERENCE){
@@ -149,7 +150,7 @@ public class GripAndPlace extends Capability {
 			// pick
 			JSONObject pickCommand = new JSONObject();
 			pickCommand.put("pick", JSONObject.NULL);
-			pickCommand.put("move",subjectLocation.getJSONObject("move"))
+			pickCommand.put("move",subjectLocation.getJSONObject("move"));
 			JSONObject rotateCommand = new JSONObject();
 			rotateCommand.put("x", 0.0);
 			rotateCommand.put("y", 0.0);
@@ -169,10 +170,10 @@ public class GripAndPlace extends Capability {
 			JSONObject placeCommand = new JSONObject();
 			placeCommand.put("place", JSONObject.NULL);
 			placeCommand.put("move", subjectLocation.getJSONObject("move"));
-			JSONObject rotateCommand = new JSONObject();
-			rotateCommand.put("x", 0.0);
-			rotateCommand.put("y", 0.0);
-			rotateCommand.put("z", requiredRotation);
+			JSONObject rotateCommand2 = new JSONObject();
+			rotateCommand2.put("x", 0.0);
+			rotateCommand2.put("y", 0.0);
+			rotateCommand2.put("z", requiredRotation);
 			placeCommand.put("rotate", JSONObject.NULL);
 
 			CompositeStep place = new CompositeStep(service,placeCommand, pickOriginPlacement);
@@ -183,9 +184,9 @@ public class GripAndPlace extends Capability {
 
 			//ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
 
-			return compositeSteps // returns the extra compositeSteps to perform the dynamic step (not translated here to avoid double module lookup)
+			return compositeSteps; // returns the extra compositeSteps to perform the dynamic step (not translated here to avoid double module lookup)
 		} else {
-			return NULL // no extra step required
+			return null; // no extra step required
 		}
 	}
 }
