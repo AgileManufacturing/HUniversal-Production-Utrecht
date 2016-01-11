@@ -15,5 +15,6 @@
 
 	<group>
 		<node pkg="image_view" type="image_view" name="image_view" args="image:=camera/qr_debug_image" />
+		<node pkg="image_view" type="image_view" name="image_view_stl" args="image:=camera/stl_debug_image"/>
 	</group>
 </launch>
