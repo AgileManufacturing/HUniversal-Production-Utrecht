@@ -54,12 +54,16 @@ VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifi
 	// Connect to camera. On failure an exception will be thrown.
 	REXOS_INFO("Initializing camera");
 	if(isSimulated == true) {
-		cam = new camera::SimulatedCamera(equipletName, identifier, this, 5, nodeHandle);
+		QRCam = new camera::SimulatedCamera(equipletName, identifier, this, 5, nodeHandle);
 	} else {
-		auto cvCam = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier, this, 5, deviceNumber, formatNumber);
-		cvCam->setAutoWhiteBalance(true);
-		cvCam->setExposure(exposure);
-		cam = cvCam;
+		auto QRCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier, this, 5, 2, formatNumber);
+		QRCamCV->setAutoWhiteBalance(true);
+		QRCamCV->setExposure(exposure);
+		QRCam = QRCamCV;
+		auto STLCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier, this, 5, 1, formatNumber);
+		STLCamCV->setAutoWhiteBalance(true);
+		STLCamCV->setExposure(exposure);
+		STLCam = STLCamCV;
 	}
 	
 	REXOS_INFO("Advertising services");
@@ -81,7 +85,7 @@ VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifi
 }
 
 VisionNode::~VisionNode() {
-	delete cam;
+	delete QRCam;
 }
 
 bool VisionNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
@@ -92,12 +96,15 @@ bool VisionNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 		REXOS_DEBUG("Service decreaseExposure ");
 		exposure *= 1.125;
 		REXOS_DEBUG_STREAM("exposure=" << exposure);
-		if(cam) {
-			((camera::unicap_cv_bridge::UnicapCvCamera*) cam)->setExposure(exposure);
+		if(QRCam && STLCam) {
+			((camera::unicap_cv_bridge::UnicapCvCamera*) QRCam)->setExposure(exposure);
+			((camera::unicap_cv_bridge::UnicapCvCamera*) STLCam)->setExposure(exposure);
 			return true;
-		} else {
-			return false;
+		} else if (QRCam){
+			((camera::unicap_cv_bridge::UnicapCvCamera*) QRCam)->setExposure(exposure);
+			return true;
 		}
+		return false;
 	}
 }
 bool VisionNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
@@ -108,12 +115,15 @@ bool VisionNode::decreaseExposure(std_srvs::Empty::Request &request, std_srvs::E
 		REXOS_DEBUG("Service decreaseExposure ");
 		exposure /= 1.125;
 		REXOS_DEBUG_STREAM("exposure=" << exposure);
-		if(cam) {
-			((camera::unicap_cv_bridge::UnicapCvCamera*) cam)->setExposure(exposure);
+		if(QRCam && STLCam) {
+			((camera::unicap_cv_bridge::UnicapCvCamera*) QRCam)->setExposure(exposure);
+			((camera::unicap_cv_bridge::UnicapCvCamera*) STLCam)->setExposure(exposure);
 			return true;
-		} else {
-			return false;
+		} else if (QRCam){
+			((camera::unicap_cv_bridge::UnicapCvCamera*) QRCam)->setExposure(exposure);
+			return true;
 		}
+		return false;
 	}
 }
 bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& request, vision_node::autoWhiteBalance::Response& response) {
@@ -124,32 +134,35 @@ bool VisionNode::autoWhiteBalance(vision_node::autoWhiteBalance::Request& reques
 		REXOS_DEBUG("Service decreaseExposure ");
 		exposure *= 1.125;
 		REXOS_DEBUG_STREAM("exposure=" << exposure);
-		if(cam) {
-			((camera::unicap_cv_bridge::UnicapCvCamera*) cam)->setAutoWhiteBalance(request.enable);
+		if(QRCam && STLCam) {
+			((camera::unicap_cv_bridge::UnicapCvCamera*) QRCam)->setAutoWhiteBalance(request.enable);
+			((camera::unicap_cv_bridge::UnicapCvCamera*) STLCam)->setAutoWhiteBalance(request.enable);
 			return true;
-		} else {
-			return false;
+		} else if (QRCam){
+			((camera::unicap_cv_bridge::UnicapCvCamera*) QRCam)->setAutoWhiteBalance(request.enable);
+			return true;
 		}
+		return false;
 	}
 }
 bool VisionNode::enableFishEyeCorrector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	REXOS_DEBUG_STREAM("Service fishEyeCorrection " << request.enable);
 	
 	if(request.enable == true) {
-		cv::Size camFramSize = cam->getFrameSize();
+		cv::Size camFramSize = QRCam->getFrameSize();
 		fishEyeCorrector.setFrameSize(camFramSize);
 	}
-	if(cam && fishEyeCorrector.isReady() == true) {
+	if(QRCam && fishEyeCorrector.isReady() == true) {
 		isFishEyeCorrectorEnabled = request.enable;
 		return true;
 	} else {
 		return false;
 	}
-
 }
+
 bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	REXOS_DEBUG_STREAM("Service enableCamera " << request);
-	if(cam) {
+	if(QRCam) {
 		isCameraEnabled = request.enable;
 		return true;
 	} else {
@@ -158,7 +171,7 @@ bool VisionNode::enableCamera(vision_node::enableComponent::Request& request, vi
 }
 bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response) {
 	REXOS_DEBUG_STREAM("Service enableQrCodeReader " << request);
-	if(cam) {
+	if(QRCam) {
 		isQrCodeReaderEnabled = request.enable;
 		return true;
 	} else {
@@ -167,7 +180,7 @@ bool VisionNode::enableQrCodeReader(vision_node::enableComponent::Request& reque
 }
 
 void VisionNode::run() {
-	if(!cam) throw std::runtime_error("Camera not initialized!");
+	if(!QRCam) throw std::runtime_error("Camera not initialized!");
 	ros::spin();
 }
 

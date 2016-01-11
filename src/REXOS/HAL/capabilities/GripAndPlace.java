@@ -140,7 +140,7 @@ public class GripAndPlace extends Capability {
 	}
 
 	private final double ALLOWED_ROTATION_DIFFERENCE = 1.0;
-	private ArrayList<CompositeStep> generateStepFromOffset(JSONObject subjectCheck,JSONObject subjectLocation){
+	private ArrayList<CompositeStep> generateStepFromOffset(JSONObject subjectCheck,JSONObject subjectLocation) throws JSONException {
 		double desiredRotation = subjectCheck.getDouble("desiredRotation");
 		double detectedRotation = subjectCheck.getDouble("detectedRotation");
 		if (Math.abs(desiredRotation - detectedRotation) > ALLOWED_ROTATION_DIFFERENCE){

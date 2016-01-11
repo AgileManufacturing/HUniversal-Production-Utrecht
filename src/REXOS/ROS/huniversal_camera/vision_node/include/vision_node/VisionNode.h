@@ -72,7 +72,8 @@ public:
 	
 	virtual void handleFrame(cv::Mat& camFrame);
 private:
-	camera::Camera * cam;
+	camera::Camera * STLCam;
+	camera::Camera * QRCam;
 	bool isSimulated;
 
 	ros::NodeHandle nodeHandle;

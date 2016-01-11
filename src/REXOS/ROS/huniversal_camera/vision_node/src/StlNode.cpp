@@ -51,18 +51,18 @@ vector<vector<Point>> findConnectedComponents(const Mat& image){
 
     int labelCount = 2; // starts at 2 because 0,1 are used already
 
-    for(int y=0; y < workingImage.rows; y++) {
+    for(unsigned int y=0; y < workingImage.rows; y++) {
         int *row = (int*)workingImage.ptr(y);
-        for(int x=0; x < workingImage.cols; x++) {
+        for(unsigned int x=0; x < workingImage.cols; x++) {
             if(row[x] != 1) {
                 continue;
             }
             cv::Rect rect;
             cv::floodFill(workingImage, cv::Point(x,y), labelCount, &rect, 0, 0, 4);
             std::vector <cv::Point> blob;
-            for(int i=rect.y; i < (rect.y+rect.height); i++) {
+            for(unsigned int i=rect.y; i < (rect.y+rect.height); i++) {
                 int *row2 = (int*)workingImage.ptr(i);
-                for(int j=rect.x; j < (rect.x+rect.width); j++) {
+                for(unsigned int j=rect.x; j < (rect.x+rect.width); j++) {
                     if(row2[j] != labelCount) {
                         continue;
                     }
@@ -95,13 +95,13 @@ pair<vector<vector<Point>>, vector<Vec4i>> getContoursHierarchy(const Mat &image
 
 vector<vector<Point>> getHoles(const pair<vector<vector<Point> >, vector<Vec4i> >& contours){
     vector<vector<Point>> holes;
-    for(int i = 0; i < contours.first.size(); ++i){
+    for(unsigned int i = 0; i < contours.first.size(); ++i){
         // The size check is to filter out the smallest insignificant holes
         if(contours.second[i][3] != -1 && contours.first[i].size() > 10*M_PI){
             holes.push_back(contours.first[i]);
         }
     }
-    for(int i = 0; i < holes.size();++i){
+    for(unsigned int i = 0; i < holes.size();++i){
         cout << "Holes check: " << holes[i].size() << endl;
     }
     return holes;
@@ -142,7 +142,7 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
             minx-=10;
             miny-=10;
             Mat objectImage = Mat::zeros(maxy - miny,maxx-minx,CV_8U);
-            for(int j = 0; j < objects[i].size();++j){
+            for(unsigned int j = 0; j < objects[i].size();++j){
                 //TODO(Edwin): zoek uit waarom deze check nodig is...
                 if(objects[i][j].x - minx < objectImage.size().width && objects[i][j].y - miny < objectImage.size().height){
                     objectImage.at<uchar>(objects[i][j].y - miny,objects[i][j].x - minx) =
@@ -170,7 +170,7 @@ void StlNode::handleFrame(cv::Mat& frame){
         cvi.header.frame_id = "stl_debug_image";
         cvi.encoding = sensor_msgs::image_encodings::BGR8;
         cvi.image = frame;
-        debugImagePublisher1.publish(cvi.toImageMsg());
+        debugImagePublisher.publish(cvi.toImageMsg());
 
     }else{
         REXOS_INFO("STL VISION: Given clone frame was empty.");
