@@ -162,10 +162,10 @@ public class GripAndPlace extends Capability {
 			pickCommand.put("rotate", rotateCommand);
 
 			JSONObject pickOriginPlacementParameters = new JSONObject();
-			pickOriginPlacementParameters.put("identifier", subject.getString(CompositeStep.IDENTIFIER));
+			pickOriginPlacementParameters.put("identifier", subjectLocation.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement pickOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_PART_ORIGIN, pickOriginPlacementParameters);
 
-			CompositeStep pick = new CompositeStep(service, pickCommand, pickOriginPlacement);
+			CompositeStep pick = new CompositeStep(SERVICE_IDENTIFIER, pickCommand, pickOriginPlacement);
 
 			JSONObject placeCommand = new JSONObject();
 			placeCommand.put("place", JSONObject.NULL);
@@ -176,7 +176,7 @@ public class GripAndPlace extends Capability {
 			rotateCommand2.put("z", requiredRotation);
 			placeCommand.put("rotate", JSONObject.NULL);
 
-			CompositeStep place = new CompositeStep(service,placeCommand, pickOriginPlacement);
+			CompositeStep place = new CompositeStep(SERVICE_IDENTIFIER,placeCommand, pickOriginPlacement);
 
 			ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
 			compositeSteps.add(pick);
