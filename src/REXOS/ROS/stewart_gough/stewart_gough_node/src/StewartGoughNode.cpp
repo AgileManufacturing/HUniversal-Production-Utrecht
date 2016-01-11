@@ -72,6 +72,7 @@ StewartGoughNode::StewartGoughNode(std::string equipletName, rexos_datatypes::Mo
 	ROS_INFO("%s", writer.write(jsonNode).c_str());
 		
 	// Create a stewart gough robot
+	REXOS_INFO_STREAM("Creating new stewart");
 	stewartGough = new rexos_stewart_gough::StewartGough(equipletName, moduleIdentifier, isSimulated, jsonNode);
 }
 
@@ -82,6 +83,7 @@ StewartGoughNode::~StewartGoughNode() {
 
 
 void StewartGoughNode::onExecuteHardwareStep(const rexos_module::ExecuteHardwareStepGoalConstPtr &goal) {
+	REXOS_INFO_STREAM("at hardwarestep now");
 	REXOS_INFO_STREAM("parsing hardwareStep: " << goal->json);
 	Json::Reader reader;
 	Json::Value equipletStepNode;
@@ -213,6 +215,7 @@ void StewartGoughNode::onExecuteHardwareStep(const rexos_module::ExecuteHardware
  * @return true if the calibration was successful else false 
  **/
 bool StewartGoughNode::calibrate(){
+	REXOS_INFO_STREAM("Calibrate called");
 	if(!stewartGough->calibrateMotors()){
 		REXOS_ERROR("Calibration FAILED. EXITING.");
 		return false;
@@ -235,6 +238,7 @@ bool StewartGoughNode::calibrate(){
  * @return false if the path is illegal, true if the motion is executed succesfully.
  **/
 bool StewartGoughNode::moveToPoint(rexos_stewart_gough::StewartGoughLocation to, double maxAcceleration){
+	REXOS_INFO_STREAM("MoveToPoint called");
 	if(maxAcceleration > 20){
 		maxAcceleration = 20;
 	}

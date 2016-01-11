@@ -14,6 +14,8 @@ namespace equiplet_node {
 		
 		hardwareStepSubscriber = nh.subscribe(path + "hardwareSteps", 10, &NodeHalInterface::onHardwareStepMessage, this);
 		equipletCommandSubscriber = nh.subscribe(path + "equipletCommands", 10, &NodeHalInterface::onEquipletCommandMessage, this);
+		std::string isExistingListener = (listener == nullptr ? "" : "not ");
+		REXOS_INFO_STREAM("In the constructor the pointer is " + isExistingListener + "a nullptr"); // returns the pointer is a nullptr
 	}
 	void NodeHalInterface::postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep) {
 		Json::Value messageJson;
@@ -82,14 +84,31 @@ namespace equiplet_node {
 		violationOccuredPublisher.publish(blackBoardMessage);
 	}
 	void NodeHalInterface::onHardwareStepMessage(const std_msgs::StringConstPtr& message) {
+		REXOS_INFO_STREAM("Trying to print message");
+		REXOS_INFO_STREAM(message->data);
+		REXOS_INFO_STREAM("In NodehallInterface onhardwarestep message");
 		Json::Value hardwareStepJson;
+		REXOS_INFO_STREAM("Created JSON step");
 		if(jsonReader.parse(message->data, hardwareStepJson) == true) {
+			REXOS_INFO_STREAM("If-statement returns true");
 			rexos_datatypes::HardwareStep step(hardwareStepJson);
+			REXOS_INFO_STREAM("If-statement returns true, now here");
 			step.setId(hardwareStepJson["id"].asString());
+			REXOS_INFO_STREAM("If-statement returns true, asString worked");
+			REXOS_INFO_STREAM("Trying to print listener");
+			REXOS_INFO_STREAM(listener);
+			// check whether listener exists
+			std::string isExistingListener = (listener == nullptr ? "" : "not ");
+			REXOS_INFO_STREAM("The pointer is " + isExistingListener + "a nullptr"); // returns the pointer is a nullptr
+			REXOS_INFO_STREAM("Trying to print step");
+			REXOS_INFO_STREAM(hardwareStepJson);
+			REXOS_INFO_STREAM("Both listener and step exist!");
 			listener->onHardwareStep(step);
+			REXOS_INFO_STREAM("Listener found successfully");
 		} else {
 			REXOS_ERROR("Reading hardware step failed");
 		}
+		REXOS_INFO_STREAM("The step was successful");
 	}
 	void NodeHalInterface::onEquipletCommandMessage(const std_msgs::StringConstPtr& message) {
 		Json::Value equipletCommandJson;

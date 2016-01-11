@@ -52,7 +52,6 @@ namespace rexos_stewart_gough{
 			effectorLocation() {
 		REXOS_INFO("StewartGough constructor entering...");
 		readJSONNode(node);
-		
 		sixAxisCalculations = new SixAxisCalculations(stewartGoughMeasures);
 
 		REXOS_INFO("end of constructor reached");

@@ -33,7 +33,9 @@ public class ServerConfigurations {
 		        }
 		    }
 		} catch (SocketException e) {
+			System.out.println("Exception!");
 		    throw new RuntimeException(e);
+		    
 		}
 		return ip;
 	}

@@ -32,7 +32,7 @@
 #include <jsoncpp/json/value.h>
 
 #define DEFAULT_PROPERTY_NAME "default"
-#define DEFAULT_PROPERTIES_FILE_PATH "/home/t/git/HUniversal-Production-Utrecht/src/REXOS/util/configuration/settings.json"
+#define DEFAULT_PROPERTIES_FILE_PATH "/home/rexos/git/HUniversal-Production-Utrecht/src/REXOS/util/configuration/settings.json"
 
 /**
  * @brief this class provides a system to read a settings file and use it as a configuration.

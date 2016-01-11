@@ -84,6 +84,7 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 
 	@Override
 	public void onStart(ConnectedNode node) {
+		Logger.log(LogSection.HAL, LogLevel.DEBUG, "In NodeRosInterface");
 		String path = hal.getEquipletName() + "/";
 		
 		hardwareStepStatusChangedSubscriber = node.newSubscriber(path + "hardwareStepStatus", std_msgs.String._TYPE);

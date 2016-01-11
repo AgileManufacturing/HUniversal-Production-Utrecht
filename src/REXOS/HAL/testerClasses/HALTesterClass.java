@@ -84,6 +84,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
+		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
