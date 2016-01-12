@@ -39,8 +39,8 @@
 
 using namespace camera;
 
-Camera::Camera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps) : 
-		equipletName(equipletName), identifier(identifier), isCameraEnabled(false), listener(listener), fps(fps)
+Camera::Camera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps, int deviceIndex) : 
+		equipletName(equipletName), identifier(identifier), isCameraEnabled(false), listener(listener), fps(fps), deviceIndex(deviceIndex)
 {
 }
 Camera::~Camera() {
@@ -51,7 +51,7 @@ void Camera::enableCamera(bool enabled) {
 }
 void Camera::onNewFrame() {
 	if(listener != NULL) {
-		listener->handleFrame(camFrame);
+		listener->handleFrame(camFrame, deviceIndex);
 	}
 }
 bool Camera::isNewFrameRequired() {

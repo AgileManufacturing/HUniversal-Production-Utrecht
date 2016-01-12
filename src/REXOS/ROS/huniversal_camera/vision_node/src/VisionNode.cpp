@@ -40,11 +40,11 @@
 
 #include <stdexcept>
 
-VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, int deviceNumber, int formatNumber) : 
+VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::ModuleIdentifier> identifier, bool isSimulated, int deviceNumber, int formatNumber) : 
 		isSimulated(isSimulated), nodeHandle(),
 		isCameraEnabled(true), isFishEyeCorrectorEnabled(false),
-                isQrCodeReaderEnabled(false), isFudicialDetectorEnabled(false),
-                isStlNodeEnabled(true),
+                isQrCodeReaderEnabled(true), isFudicialDetectorEnabled(false),
+                isStlNodeEnabled(false),
 		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
                 stlNode(imgTransport),
@@ -54,16 +54,17 @@ VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifi
 	// Connect to camera. On failure an exception will be thrown.
 	REXOS_INFO("Initializing camera");
 	if(isSimulated == true) {
-		QRCam = new camera::SimulatedCamera(equipletName, identifier, this, 5, nodeHandle);
+		QRCam = new camera::SimulatedCamera(equipletName, identifier[0], this, 5, nodeHandle);
 	} else {
-		auto QRCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier, this, 5, 2, formatNumber);
+		auto QRCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[0], this, 5, QR_CAM_ID, formatNumber);
 		QRCamCV->setAutoWhiteBalance(true);
 		QRCamCV->setExposure(exposure);
 		QRCam = QRCamCV;
-		auto STLCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier, this, 5, 1, formatNumber);
+		auto STLCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[1], this, 5, STL_CAM_ID, formatNumber);
 		STLCamCV->setAutoWhiteBalance(true);
 		STLCamCV->setExposure(exposure);
 		STLCam = STLCamCV;
+		REXOS_INFO("Initialized cameras");
 	}
 	
 	REXOS_INFO("Advertising services");
@@ -86,6 +87,7 @@ VisionNode::VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifi
 
 VisionNode::~VisionNode() {
 	delete QRCam;
+	delete STLCam;
 }
 
 bool VisionNode::increaseExposure(std_srvs::Empty::Request &request, std_srvs::Empty::Response &response) {
@@ -184,24 +186,29 @@ void VisionNode::run() {
 	ros::spin();
 }
 
-void VisionNode::handleFrame(cv::Mat& camFrame) {
-	if(isFishEyeCorrectorEnabled == true){
+void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
+	//REXOS_WARN_STREAM("\n Now handling frame from camera " << CameraID);
+	if(isFishEyeCorrectorEnabled == true && CameraID == QR_CAM_ID){
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
+		//REXOS_WARN_STREAM("Handled by FishEye");
 	}
-        if(isStlNodeEnabled){
+        if(isStlNodeEnabled && CameraID == STL_CAM_ID){
             stlNode.handleFrame(camFrame);
+	    //REXOS_WARN_STREAM("Handled by STL");
         }
 	cv::Mat grayScaleFrame;
-	if(isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true){
-		// convert to grayscale, because these readers / detecors need grayscale images
+	if((isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true)  && CameraID == QR_CAM_ID){
+		// convert to grayscale, because these readers / detectors need grayscale images
 		cvtColor(camFrame, grayScaleFrame, CV_RGB2GRAY);
 	}
 	
-        if(isQrCodeReaderEnabled == true){
+        if(isQrCodeReaderEnabled){
 		qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
+		//REXOS_WARN_STREAM("Handled by QR");
 	}
 
 	if(cameraFeedPublisher.getNumSubscribers() != 0){
+		//REXOS_WARN_STREAM("Subscribers is more than 0");
 		ros::Time time = ros::Time::now();
 		cv_bridge::CvImage cvi;
 		cvi.header.stamp = time;
@@ -209,5 +216,7 @@ void VisionNode::handleFrame(cv::Mat& camFrame) {
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
 		cvi.image = camFrame;
 		cameraFeedPublisher.publish(cvi.toImageMsg());
+	} else {
+		//REXOS_WARN_STREAM("No subscribers");
 	}
 }

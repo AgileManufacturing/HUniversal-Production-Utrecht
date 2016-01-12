@@ -96,8 +96,9 @@ int main(int argc, char* argv[]) {
 	REXOS_WARN_STREAM("formatNumber" << formatNumber);
 	
 	std::string equipletName = std::string(argv[argumentOffset + 0]);
-	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argumentOffset + 1], argv[argumentOffset + 2], argv[argumentOffset + 3]);
-	
+	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argumentOffset + 1], argv[argumentOffset + 2], "1");
+	rexos_datatypes::ModuleIdentifier moduleIdentifier2(argv[argumentOffset + 1], argv[argumentOffset + 2], "2");
+	std::vector<rexos_datatypes::ModuleIdentifier> cameraModules = {moduleIdentifier,moduleIdentifier2};
 	// set up node namespace and name
 	if(isShadow == true) {
 		if(setenv("ROS_NAMESPACE", "shadow", 1) != 0) {
@@ -111,7 +112,7 @@ int main(int argc, char* argv[]) {
 	REXOS_WARN_STREAM(nodeName);
 	
 	
-	VisionNode visionNode(equipletName, moduleIdentifier, isSimulated, deviceNumber, formatNumber);
+	VisionNode visionNode(equipletName, cameraModules, isSimulated, deviceNumber, formatNumber);
 	visionNode.run();
 
 	return 0;

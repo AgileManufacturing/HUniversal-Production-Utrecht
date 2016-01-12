@@ -40,7 +40,7 @@
 namespace camera {
 class Camera {
 public:
-	Camera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps);
+	Camera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps, int deviceIndex);
 	virtual ~Camera() = 0;
 	
 	virtual void enableCamera(bool enabled) = 0;
@@ -54,6 +54,7 @@ protected:
 	cv::Mat camFrame;
 	CameraListener* listener;
 	double fps;
+	int deviceIndex;
 	
 	ros::Time lastPublication;
 	

@@ -93,6 +93,7 @@ namespace rexos_vision{
 				}
 			}
 		} catch (std::exception &e){
+			REXOS_WARN_STREAM("Why doesn't our reader have a proper error message!");
 			return;
 		}
 	}

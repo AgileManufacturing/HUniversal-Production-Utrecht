@@ -50,11 +50,12 @@ QrCodeReader::QrCodeReader(ros::NodeHandle& nodeHandle, image_transport::ImageTr
 }
 
 void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
+	//REXOS_INFO("In QR Code reader");
 	vision_node::QrCodes message;
 	std::vector<rexos_datatypes::QrCode> qrCodes;
 	
 	qrCodeDetector.detectQRCodes(frame, qrCodes);
-	
+	REXOS_INFO("QR Codes detected");
 	REXOS_DEBUG_STREAM("QrCodes detected=" << qrCodes.size());
 	for(uint i = 0; i < qrCodes.size(); i++){
 		vision_node::QrCode qrCode;
@@ -98,6 +99,8 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 		
 		debugImagePublisher.publish(cvi.toImageMsg());
 		//cv::imwrite("/home/t/Desktop/test_results/trollolololol.png", *image);
+	} else {
+		REXOS_WARN_STREAM("No QR-Codes found");
 	}
 	
 	

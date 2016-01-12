@@ -198,7 +198,7 @@ namespace unicap_cv_bridge {
 
 	UnicapCvCamera::UnicapCvCamera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps, 
 			int deviceIndex, int formatIndex) :
-			Camera(equipletName, identifier, listener, fps) {
+			Camera(equipletName, identifier, listener, fps, deviceIndex) {
 		if (!SUCCESS(unicap_enumerate_devices(NULL, &device, deviceIndex))) {
 			throw UnicapCvException("Failed to get device info");
 		}
