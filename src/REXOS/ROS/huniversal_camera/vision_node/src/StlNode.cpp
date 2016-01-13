@@ -1,4 +1,6 @@
 #include "vision_node/StlNode.h"
+#include <stdio.h>
+
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -17,6 +19,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include "sensor_msgs/Image.h"
 #include <sensor_msgs/image_encodings.h>
+
+#include <unistd.h>
 
 using namespace cv;
 using namespace std;
@@ -162,6 +166,13 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
 
 
 void StlNode::handleFrame(cv::Mat& frame){
+    char currentPath[FILENAME_MAX];
+
+    if (getcwd(currentPath, sizeof(currentPath))){
+        REXOS_INFO(currentPath);
+    }
+
+
     cv_bridge::CvImage cvi;
 
     if(!frame.empty()){
