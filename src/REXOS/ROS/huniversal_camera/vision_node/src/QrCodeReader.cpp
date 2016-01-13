@@ -53,7 +53,7 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	//REXOS_INFO("In QR Code reader");
 	vision_node::QrCodes message;
 	std::vector<rexos_datatypes::QrCode> qrCodes;
-	
+	REXOS_INFO("QR Codes detected welcome");
 	qrCodeDetector.detectQRCodes(frame, qrCodes);
 	REXOS_INFO("QR Codes detected");
 	REXOS_DEBUG_STREAM("QrCodes detected=" << qrCodes.size());
@@ -82,29 +82,34 @@ void QrCodeReader::handleFrame(cv::Mat& frame, cv::Mat* debugFrame) {
 	
 		REXOS_DEBUG_STREAM("QR-code\tpointA = " << pointA << " pointB = " << pointB << " pointC = " << pointC << "Value = " << qrCode.value);
 	}
+	REXOS_INFO("QR Codes detected 1");
 	if(debugFrame != NULL && debugImagePublisher.getNumSubscribers() != 0){
 		// we are changing the image, so we need a copy
+		REXOS_INFO("QR Codes detected 2");
 		cv::Mat debugImage = cv::Mat(*debugFrame);
 		
 		for(uint i = 0; i < qrCodes.size(); i++){
 			qrCodes[i].draw(debugImage);
 		}
-		
+		REXOS_INFO("QR Codes detected 3");
 		cv_bridge::CvImage cvi;
 		ros::Time time = ros::Time::now();
+		REXOS_INFO("QR Codes detected 6");
 		cvi.header.stamp = time;
 		cvi.header.frame_id = "qr_debug_image";
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
 		cvi.image = debugImage;
-		
+		REXOS_INFO("QR Codes detected 7");
 		debugImagePublisher.publish(cvi.toImageMsg());
+		REXOS_INFO("QR Codes detected 8");
+		
 		//cv::imwrite("/home/t/Desktop/test_results/trollolololol.png", *image);
 	} else {
 		REXOS_WARN_STREAM("No QR-Codes found");
 	}
 	
-	
+	REXOS_INFO("QR Codes detected 5");
 	
 	qrCodesPublisher.publish(message);
-	
+	REXOS_INFO("All good?");
 	}
