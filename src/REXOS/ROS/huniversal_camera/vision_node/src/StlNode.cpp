@@ -51,7 +51,7 @@ vector<vector<Point>> findConnectedComponents(const Mat& image){
     threshold(workingImage,workingImage,0.0,1.0,THRESH_BINARY);
     workingImage.convertTo(workingImage, CV_32SC1);
 
-    //TODO(Edwin): Do i really need this?
+    //TODO: Do i really need this?
 
     int labelCount = 2; // starts at 2 because 0,1 are used already
 
@@ -147,7 +147,7 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
             miny-=10;
             Mat objectImage = Mat::zeros(maxy - miny,maxx-minx,CV_8U);
             for(unsigned int j = 0; j < objects[i].size();++j){
-                //TODO(Edwin): zoek uit waarom deze check nodig is...
+                //TODO: zoek uit waarom deze check nodig is...
                 if(objects[i][j].x - minx < objectImage.size().width && objects[i][j].y - miny < objectImage.size().height){
                     objectImage.at<uchar>(objects[i][j].y - miny,objects[i][j].x - minx) =
                             image.at<uchar>(objects[i][j].y,objects[i][j].x);
@@ -163,13 +163,16 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
     }
     return visionObjects;
 }
+string parsePartFile(){
 
+}
 
 void StlNode::handleFrame(cv::Mat& frame){
     char currentPath[FILENAME_MAX];
 
     if (getcwd(currentPath, sizeof(currentPath))){
-        REXOS_INFO(currentPath);
+        string dir = currentPath;
+        REXOS_INFO(dir);
     }
 
 
