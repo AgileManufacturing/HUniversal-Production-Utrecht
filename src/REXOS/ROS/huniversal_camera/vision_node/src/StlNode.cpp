@@ -203,25 +203,32 @@ Part parsePart(string partName){
     char currentPath[FILENAME_MAX];
     Part part;
     string directory;
+    REXOS_INFO("Kom ik hier?1");
     if (getcwd(currentPath, sizeof(currentPath))){
         directory = currentPath;
         directory += "/parts/" + partName;
     }
+    REXOS_INFO("Kom ik hier?2");
     ifstream file;
     file.open(directory);
     char buffer[256];
+    REXOS_INFO("Kom ik hier?3");
     string currentLine;
     while(!file.eof()){
+        REXOS_INFO("Kom ik hier?4");
         file.getline(buffer,256);
         currentLine = buffer;
+        REXOS_INFO("Kom ik hier?5");
         if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
             string message = "STL VISION: Tried to open the file" + part.name;
             REXOS_WARN_STREAM(message);
             part.name = currentLine.substr(currentLine.find(":=")+2);
         }else if(currentLine == "/parameters"){
+            REXOS_INFO("Kom ik hier?6");
             while(!file.eof()){
                 file.getline(buffer,256);
                 currentLine = buffer;
+                REXOS_INFO("Kom ik hier?7");
                 if(currentLine[0] != '/'){
                     part.parameters.insert(pair<string,double>(
                                                currentLine.substr(0,currentLine.find(":=")),
