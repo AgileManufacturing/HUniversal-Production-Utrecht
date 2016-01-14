@@ -163,9 +163,6 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
     }
     return visionObjects;
 }
-string parsePartFile(){
-
-}
 
 void StlNode::handleFrame(cv::Mat& frame){
     char currentPath[FILENAME_MAX];
