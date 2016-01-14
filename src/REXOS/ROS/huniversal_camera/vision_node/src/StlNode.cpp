@@ -179,11 +179,11 @@ void StlNode::handleFrame(cv::Mat& frame){
     if((dir = opendir(directory)) != NULL){
         while((ent = readdir(dir)) != NULL){
             string currentRotzooi = ent->d_name;
-            REXOS_INFO(currentRotzooi);
+//            REXOS_INFO(currentRotzooi);
         }
         closedir(dir);
     }else{
-        REXOS_INFO("COULD NOT OPEN DIRECTORY");
+//        REXOS_INFO("COULD NOT OPEN DIRECTORY");
     }
 
 
