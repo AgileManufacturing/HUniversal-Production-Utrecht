@@ -225,16 +225,13 @@ Part parsePart(string partName){
                 if(currentLine[0] != '/'){
                     part.parameters.insert(pair<string,double>(
                                                currentLine.substr(0,currentLine.find(":=")-1),
-                                               atof(currentLine.substr(currentLine.find(":=")+2,256).c_str()));
+                                               atof(currentLine.substr(currentLine.find(":=")+2,256).c_str())));
                 }else{
                     break;
                 }
             }
         }
-
-
     }
-
     return part;
 }
 
