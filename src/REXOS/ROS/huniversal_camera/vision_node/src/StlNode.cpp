@@ -228,7 +228,7 @@ Part parsePart(string partName){
             while(!file.eof()){
                 file.getline(buffer,256);
                 currentLine = buffer;
-                if(currentLine[0] != '/'){
+                if(currentLine[0] != '/' && !file.eof()){
                     REXOS_INFO("Kom ik hier?7");
                     part.parameters.insert(pair<string,double>(
                                                currentLine.substr(0,currentLine.find(":=")),
