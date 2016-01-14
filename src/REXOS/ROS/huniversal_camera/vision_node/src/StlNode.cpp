@@ -181,7 +181,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     if((dir = opendir(directory.c_str())) != NULL){
         while((ent = readdir(dir)) != NULL){
             string currentFile = ent->d_name;
-            if(substr(currentFile.find("."),100) == "config"){
+            if(currnetFile.substr(currentFile.find("."),100) == "config"){
                 fileList.push_back(currentFile);
             }
         }
