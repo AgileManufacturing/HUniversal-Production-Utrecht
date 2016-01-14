@@ -179,7 +179,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     if((dir = opendir(directory.c_str())) != NULL){
         while((ent = readdir(dir)) != NULL){
             string currentRotzooi = ent->d_name;
-            REXOS_INFO(currentRotzooi);
+            REXOS_INFO("STL VISION: %s",currentRotzooi);
         }
         closedir(dir);
     }else{
