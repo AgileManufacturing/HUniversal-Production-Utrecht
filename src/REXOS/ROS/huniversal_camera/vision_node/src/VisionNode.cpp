@@ -190,7 +190,7 @@ void VisionNode::run() {
 }
 
 void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
-	REXOS_WARN_STREAM("\n Now handling frame from camera " << CameraID);
+	//REXOS_WARN_STREAM("\n Now handling frame from camera " << CameraID);
 	if(isFishEyeCorrectorEnabled == true && CameraID == QR_CAM_ID){
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 		//REXOS_WARN_STREAM("Handled by FishEye");
@@ -204,12 +204,12 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 		// convert to grayscale, because these readers / detectors need grayscale images
 
 		cvtColor(camFrame, grayScaleFrame, CV_RGB2GRAY);
-		REXOS_WARN_STREAM("black white succeeded");
+		//REXOS_WARN_STREAM("black white succeeded");
 	}
 	
         if(isQrCodeReaderEnabled && CameraID == QR_CAM_ID){
 		qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
-		REXOS_WARN_STREAM("Handled by QR");
+		//REXOS_WARN_STREAM("Handled by QR");
 	}
 
 	if(cameraFeedPublisher.getNumSubscribers() != 0){
@@ -221,8 +221,8 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 		cvi.encoding = sensor_msgs::image_encodings::BGR8;
 		cvi.image = camFrame;
 		cameraFeedPublisher.publish(cvi.toImageMsg());
-		REXOS_WARN_STREAM("Done this, been there");
+		//REXOS_WARN_STREAM("Done this, been there");
 	} else {
-		REXOS_WARN_STREAM("No subscribers");
+		//REXOS_WARN_STREAM("No subscribers");
 	}
 }

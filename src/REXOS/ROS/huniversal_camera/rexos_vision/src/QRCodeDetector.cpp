@@ -57,7 +57,7 @@ namespace rexos_vision{
 	 * @param criteria Criteria (with a default value) for the refinement of corner pixels on the detected QR codes. OpenCV termcriteria: "Criteria for termination of the iterative process of corner refinement. That is, the process of corner position refinement stops either after a certain number of iterations or when a required accuracy is achieved. The criteria may specify either of or both the maximum number of iteration and the required accuracy."
 	 **/
 	void QRCodeDetector::detectQRCodes(cv::Mat& image, std::vector<rexos_datatypes::QrCode> &qrCodes, cv::TermCriteria criteria){
-		REXOS_WARN_STREAM("EDWIN WAS RIGHT 1!");
+		//REXOS_WARN_STREAM("EDWIN WAS RIGHT 1!");
 		try{
 			// create an image in zbar with:
 			// width
@@ -66,15 +66,15 @@ namespace rexos_vision{
 			// pointer to image.data
 			// area of the image
 			zbar::Image zbarImage(image.cols, image.rows, "Y800", (void*)image.data, image.cols * image.rows);
-			REXOS_WARN_STREAM("EDWIN WAS RIGHT 2!");
+			//REXOS_WARN_STREAM("EDWIN WAS RIGHT 2!");
 			int amountOfScannedResults = scanner.scan(zbarImage);
 
 			if(amountOfScannedResults > 0){
-				REXOS_WARN_STREAM("EDWIN WAS RIGHT 3!");
+				//REXOS_WARN_STREAM("EDWIN WAS RIGHT 3!");
 				for(zbar::Image::SymbolIterator it = zbarImage.symbol_begin(); it!=zbarImage.symbol_end(); ++it){
 					// Add all "position" corners of a qr code to a vector
 					std::vector<cv::Point2f> corners;
-					REXOS_WARN_STREAM("EDWIN WAS RIGHT 3!");
+					//REXOS_WARN_STREAM("EDWIN WAS RIGHT 3!");
 					corners.push_back(cv::Point2f(it->get_location_x(1), it->get_location_y(1)));
 					corners.push_back(cv::Point2f(it->get_location_x(0), it->get_location_y(0)));
 					corners.push_back(cv::Point2f(it->get_location_x(3), it->get_location_y(3)));
@@ -90,19 +90,19 @@ namespace rexos_vision{
 					// 455 px distance = (7 x 7) windowsSize > (15 x 15) window
 					// 520 px distance = (8 x 8) windowsSize > (17 x 17) window
 					// etc...
-					REXOS_WARN_STREAM("EDWIN WAS RIGHT 4!");
+					//REXOS_WARN_STREAM("EDWIN WAS RIGHT 4!");
 					float windowsSize = 2.0 * (rexos_datatypes::QrCode::distance(corners[0], corners[2]) / 130.0);
-					REXOS_WARN_STREAM("EDWIN WAS RIGHT 5!");
+					//REXOS_WARN_STREAM("EDWIN WAS RIGHT 5!");
 					// The cornerSubPix function iterates to find the sub-pixel accurate location of corners or radial saddle points. Corners is now updated!
 					cv::cornerSubPix(image, corners, cv::Size(windowsSize,windowsSize), cv::Size(-1,-1), criteria);
-					REXOS_WARN_STREAM("EDWIN WAS RIGHT 6d!");
+					//REXOS_WARN_STREAM("EDWIN WAS RIGHT 6d!");
 					qrCodes.push_back(rexos_datatypes::QrCode(it->get_data(), corners));
 				}
 			} else {
-				REXOS_WARN_STREAM("EDWIN WAS RIGHT 88!");
+				//REXOS_WARN_STREAM("EDWIN WAS RIGHT 88!");
 			}
 		} catch (std::exception &e){
-			REXOS_WARN_STREAM("EDWIN WAS RIGHT!");
+			//REXOS_WARN_STREAM("EDWIN WAS RIGHT!");
 			return;
 		}
 	}
