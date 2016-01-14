@@ -364,18 +364,26 @@ pair<Part,double> matchPart(map<string, double>& partFeatures){
 
 
 void StlNode::handleFrame(cv::Mat& frame){
-    vector<string> partList = getPartList();
-    for(unsigned i = 0; i < partList.size();++i){
-        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
+//    vector<string> partList = getPartList();
+//    for(unsigned i = 0; i < partList.size();++i){
+//        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
+//    }
+//    Part p = parsePart(partList[0]);
+//    REXOS_WARN_STREAM(p.name);
+//    map<string,double>::iterator it;
+//    for(it = p.parameters.begin(); it != p.parameters.end();++it){
+//        REXOS_WARN_STREAM(it->first + to_string(it->second));
+//    }
+    vector<vector<Point>> blobs = findConnectedComponents(frame);
+    vector<VisionObject> objects = filterObjects(blobs,frame);
+    for(int p = 0; p < objects.size();++p){
+        pair<Part,double> match = matchPart(FeatureFactory::createParameterMap(objects[p]));
+        if(match.second > 80){
+            REXOS_WARN_STREAM(match.first.name + " - " + to_string(match.second));
+            frame = objects[p].objectImage;
+        }
     }
-    Part p = parsePart(partList[0]);
-    REXOS_WARN_STREAM(p.name);
-    map<string,double>::iterator it;
-    for(it = p.parameters.begin(); it != p.parameters.end();++it){
-        REXOS_WARN_STREAM(it->first + to_string(it->second));
-    }
-
-    parseAllParts();
+//    parseAllParts();
 
     cv_bridge::CvImage cvi;
     if(!frame.empty()){
