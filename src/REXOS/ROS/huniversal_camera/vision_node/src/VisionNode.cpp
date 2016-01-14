@@ -195,10 +195,6 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 		//REXOS_WARN_STREAM("Handled by FishEye");
 	}
-        if(isStlNodeEnabled && CameraID == STL_CAM_ID){
-            stlNode.handleFrame(camFrame);
-	    //REXOS_WARN_STREAM("Handled by STL");
-        }
 	cv::Mat grayScaleFrame;
 	if((isQrCodeReaderEnabled == true || isFudicialDetectorEnabled == true)  && CameraID == QR_CAM_ID){
 		// convert to grayscale, because these readers / detectors need grayscale images
@@ -206,6 +202,10 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 		cvtColor(camFrame, grayScaleFrame, CV_RGB2GRAY);
 		//REXOS_WARN_STREAM("black white succeeded");
 	}
+        if(isStlNodeEnabled && CameraID == STL_CAM_ID){
+            stlNode.handleFrame(grayScaleFrame);
+            //REXOS_WARN_STREAM("Handled by STL");
+        }
 	
         if(isQrCodeReaderEnabled && CameraID == QR_CAM_ID){
 		qrCodeReader.handleFrame(grayScaleFrame, &camFrame);
