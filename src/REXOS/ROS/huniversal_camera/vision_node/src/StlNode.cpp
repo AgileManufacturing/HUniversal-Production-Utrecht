@@ -214,7 +214,6 @@ Part parsePart(string partName){
         currentLine = buffer;
         if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
             part.name = currentLine.substr(currentLine.find(":=")+2);
-            string message = "STL VISION: Tried to open the file: " + part.name;
             REXOS_WARN_STREAM(message);
         }else if(currentLine == "/parameters"){
             while(!file.eof()){
@@ -398,12 +397,11 @@ void StlNode::handleFrame(cv::Mat& frame){
     vector<VisionObject> objects = filterObjects(blobs,grayFrame);
     for(int p = 0; p < objects.size();++p){
         pair<Part,double> match = matchPart(createParameterMap(objects[p]));
-        REXOS_WARN_STREAM(match.second);
         if(match.second > 80){
             string matchResult = match.first.name + " - " + to_string(match.second);
             REXOS_WARN_STREAM(matchResult);
-            frame = objects[p].objectImage;
-            cvtColor(frame,frame,CV_GRAY2BGR);
+
+
             if(!frame.empty()){
                 ros::Time time = ros::Time::now();
                 cvi.header.stamp = time;
