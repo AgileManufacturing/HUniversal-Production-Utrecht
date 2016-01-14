@@ -178,7 +178,8 @@ void StlNode::handleFrame(cv::Mat& frame){
     struct dirent *ent;
     if((dir = opendir(directory)) != NULL){
         while((ent = readdir(dir)) != NULL){
-            REXOS_INFO(ent->d_name);
+            string currentRotzooi = ent->d_name;
+            REXOS_INFO(currentRotzooi);
         }
         closedir(dir);
     }else{
