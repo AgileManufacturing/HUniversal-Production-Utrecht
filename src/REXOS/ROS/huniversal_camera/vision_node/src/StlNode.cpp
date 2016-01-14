@@ -181,14 +181,13 @@ void StlNode::handleFrame(cv::Mat& frame){
     if((dir = opendir(directory.c_str())) != NULL){
         while((ent = readdir(dir)) != NULL){
             string currentFile = ent->d_name;
-            REXOS_WARN_STREAM(currentFile.substr(currentFile.find("."),100));
-            if(currentFile.substr(currentFile.find("."),100) == "config"){
+            if(currentFile.substr(currentFile.find("."),100) == ".config"){
                 fileList.push_back(currentFile);
             }
         }
-//        for(unsigned int i = 0; i < fileList.size();++i){
-//            REXOS_WARN_STREAM(fileList[i]);
-//        }
+        for(unsigned int i = 0; i < fileList.size();++i){
+            REXOS_WARN_STREAM(fileList[i]);
+        }
         closedir(dir);
     }else{
         REXOS_INFO("COULD NOT OPEN DIRECTORY");
