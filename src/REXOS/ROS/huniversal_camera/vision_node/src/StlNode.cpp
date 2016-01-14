@@ -220,9 +220,9 @@ Part parsePart(string partName){
         currentLine = buffer;
         REXOS_INFO("Kom ik hier?5");
         if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
+            part.name = currentLine.substr(currentLine.find(":=")+2);
             string message = "STL VISION: Tried to open the file" + part.name;
             REXOS_WARN_STREAM(message);
-            part.name = currentLine.substr(currentLine.find(":=")+2);
         }else if(currentLine == "/parameters"){
             REXOS_INFO("Kom ik hier?6");
             while(!file.eof()){
