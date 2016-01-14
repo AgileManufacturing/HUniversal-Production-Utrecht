@@ -217,6 +217,10 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "reload") {
 		moduleRegistry.reloadModules();
+	} else if (equipletCommand.getCommand() == "info"){
+		REXOS_WARN_STREAM("Info command received, no handler defined yet");
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
+		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "spawnPartModel") {
 		if(isSimulated == false) {
 			REXOS_WARN("Unable to spawn part because not simulated");

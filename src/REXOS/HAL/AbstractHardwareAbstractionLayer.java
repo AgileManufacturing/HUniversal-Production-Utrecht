@@ -327,6 +327,19 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
 		}
 	}
+	public void requestPartInfo(std::String partIdentifier){
+		try{
+			JSONObject equipletCommand = new JSONObject();
+			equipletCommand.put("command", "info");
+			equipletCommand.put("status", "WAITING");
+			JSONObject paramaters = new JSONObject();
+			parameters.put("info", partIdentifier);
+			equipletCommand.put("parameters",parameters);
+			rosInteface.postEquipletCommand(equipletCommand);
+		} catch(JSONException ex){
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
+		}
+	}
 	public void reloadRos() {
 		try{
 			JSONObject equipletCommand = new JSONObject();
