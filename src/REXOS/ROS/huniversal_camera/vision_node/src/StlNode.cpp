@@ -214,7 +214,7 @@ Part parsePart(string partName){
     while(!file.eof()){
         file.getline(buffer,256);
         currentLine = buffer;
-        if(currentLine.substr(0,currentLine.find(":=")-1) == "Partname"){
+        if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
             string message = "STL VISION: Tried to open the file" + part.name;
             REXOS_WARN_STREAM(message);
             part.name = currentLine.substr(currentLine.find(":=")+2,256);
