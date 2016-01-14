@@ -342,7 +342,7 @@ pair<Part, double> matchPart(map<string, double>& partFeatures, Part referencePa
     return make_pair(referencePart,matchSum / partFeatures.size());
 }
 
-pair<Part,double> matchPart(map<string, double>& partFeatures){
+pair<Part,double> matchPart(map<string, double> partFeatures){
     vector<Part> parts = parseAllParts();
     vector<pair<Part,double> > matchPercentages;
     matchPercentages.resize(parts.size());
