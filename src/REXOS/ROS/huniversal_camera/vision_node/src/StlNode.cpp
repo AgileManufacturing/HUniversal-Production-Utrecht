@@ -36,8 +36,8 @@ struct VisionObject{
 };
 
 struct Part{
-   string name;
-   map<string,double> parameters;
+    string name;
+    map<string,double> parameters;
 };
 
 
@@ -203,39 +203,30 @@ Part parsePart(string partName){
     char currentPath[FILENAME_MAX];
     Part part;
     string directory;
-    REXOS_INFO("Kom ik hier?1");
     if (getcwd(currentPath, sizeof(currentPath))){
         directory = currentPath;
         directory += "/parts/" + partName;
     }
-    REXOS_INFO("Kom ik hier?2");
     ifstream file;
     file.open(directory);
     char buffer[256];
-    REXOS_INFO("Kom ik hier?3");
     string currentLine;
     while(!file.eof()){
-        REXOS_INFO("Kom ik hier?4");
         file.getline(buffer,256);
         currentLine = buffer;
-        REXOS_INFO("Kom ik hier?5");
         if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
             part.name = currentLine.substr(currentLine.find(":=")+2);
-            string message = "STL VISION: Tried to open the file" + part.name;
+            string message = "STL VISION: Tried to open the file: " + part.name;
             REXOS_WARN_STREAM(message);
         }else if(currentLine == "/parameters"){
-            REXOS_INFO("Kom ik hier?6");
             while(!file.eof()){
                 file.getline(buffer,256);
                 currentLine = buffer;
                 if(currentLine[0] != '/' && !file.eof()){
-                    REXOS_INFO("Kom ik hier?7");
                     part.parameters.insert(pair<string,double>(
                                                currentLine.substr(0,currentLine.find(":=")),
                                                atof(currentLine.substr(currentLine.find(":=")+2).c_str())));
-                    REXOS_INFO("Kom ik hier?8");
                 }else{
-                    REXOS_INFO("Kom ik hier?9");
                     break;
                 }
             }
@@ -249,7 +240,12 @@ void StlNode::handleFrame(cv::Mat& frame){
     for(unsigned i = 0; i < partList.size();++i){
         REXOS_WARN_STREAM("STL VISION: " + partList[i]);
     }
-    parsePart(partList[0]);
+    Part p = parsePart(partList[0]);
+    REXOS_WARN_STREAM(p.name);
+    map<string,double>::iterator it;
+    for(it = p.parameters.begin(); it != p.parameters.end();++it){
+        REXOS_WARN_STREAM(it->first + to_string(it->second);
+    }
 
     cv_bridge::CvImage cvi;
     if(!frame.empty()){
