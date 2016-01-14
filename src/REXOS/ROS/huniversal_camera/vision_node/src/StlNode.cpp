@@ -395,9 +395,10 @@ void StlNode::handleFrame(cv::Mat& frame){
 //    for(it = p.parameters.begin(); it != p.parameters.end();++it){
 //        REXOS_WARN_STREAM(it->first + to_string(it->second));
 //    }
-    cvtColor(frame,frame,CV_RGB2GRAY);
-    vector<vector<Point>> blobs = findConnectedComponents(frame);
-    vector<VisionObject> objects = filterObjects(blobs,frame);
+    Mat grayFrame;
+    cvtColor(frame,grayFrame,CV_RGB2GRAY);
+    vector<vector<Point>> blobs = findConnectedComponents(grayFrame);
+    vector<VisionObject> objects = filterObjects(blobs,grayFrame);
     for(int p = 0; p < objects.size();++p){
         pair<Part,double> match = matchPart(createParameterMap(objects[p]));
         REXOS_WARN_STREAM(match.second);
