@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include <dirent.h>
+#include <map>
 
 using namespace cv;
 using namespace std;
@@ -32,6 +33,12 @@ struct VisionObject{
     Mat objectImage;
     vector<Point> data;
 };
+
+struct Part{
+   string name;
+   map<string,double> parameters;
+};
+
 
 StlNode::StlNode(image_transport::ImageTransport& imageTransport){
     debugImagePublisher = imageTransport.advertise("camera/stl_debug_image", 1);
@@ -167,8 +174,7 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
     return visionObjects;
 }
 
-
-void StlNode::handleFrame(cv::Mat& frame){
+vector<string> getPartList(){
     char currentPath[FILENAME_MAX];
     string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
@@ -185,17 +191,59 @@ void StlNode::handleFrame(cv::Mat& frame){
                 fileList.push_back(currentFile);
             }
         }
-        for(unsigned int i = 0; i < fileList.size();++i){
-            REXOS_WARN_STREAM(fileList[i]);
-        }
         closedir(dir);
     }else{
         REXOS_INFO("COULD NOT OPEN DIRECTORY");
     }
+    return fileList;
+}
 
+Part parsePart(string partName){
+    Part part;
+    string directory;
+    if (getcwd(currentPath, sizeof(currentPath))){
+        directory = currentPath;
+        directory += "/parts/" + partName;
+    }
+    ifstream file;
+    file.open(directory);
+    char buffer[256];
+    string currentLine;
+    while(!file.eof()){
+        file.getline(buffer,256);
+        currentLine = buffer;
+        if(currentLine.substr(0,currentLine.find(":=")-1) == "Partname"){
+            string message = "STL VISION: Tried to open the file" + part.name;
+            REXOS_WARN_STREAM(message);
+            part.name = currentLine.substr(currentLine.find(":=")+2,256);
+        }else if(currentLine == "/parameters"){
+            while(!file.eof()){
+                file.getline(buffer,256);
+                currentLine = buffer;
+                if(currentLine[0] != '/'){
+                    part.parameters.insert(<pair<string,double>(
+                                               currentLine.substr(0,currentLine.find(":=")-1),
+                                               atof(currentLine.substr(currentLine.find(":=")+2,256).c_str()));
+                }else{
+                    break;
+                }
+            }
+        }
+
+
+    }
+
+    return part;
+}
+
+void StlNode::handleFrame(cv::Mat& frame){
+    vector<string> partList = getPartList();
+    for(unsigned i = 0; i < partList.size();++i){
+        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
+    }
+    parsePart(partList[0]);
 
     cv_bridge::CvImage cvi;
-
     if(!frame.empty()){
         ros::Time time = ros::Time::now();
         cvi.header.stamp = time;
@@ -203,7 +251,6 @@ void StlNode::handleFrame(cv::Mat& frame){
         cvi.encoding = sensor_msgs::image_encodings::BGR8;
         cvi.image = frame;
         debugImagePublisher.publish(cvi.toImageMsg());
-
     }else{
         REXOS_INFO("STL VISION: Given clone frame was empty.");
     }
