@@ -57,18 +57,18 @@ vector<vector<Point>> findConnectedComponents(const Mat& image){
 
     int labelCount = 2; // starts at 2 because 0,1 are used already
 
-    for(unsigned int y=0; y < workingImage.rows; y++) {
+    for(int y=0; y < workingImage.rows; y++) {
         int *row = (int*)workingImage.ptr(y);
-        for(unsigned int x=0; x < workingImage.cols; x++) {
+        for(int x=0; x < workingImage.cols; x++) {
             if(row[x] != 1) {
                 continue;
             }
             cv::Rect rect;
             cv::floodFill(workingImage, cv::Point(x,y), labelCount, &rect, 0, 0, 4);
             std::vector <cv::Point> blob;
-            for(unsigned int i=rect.y; i < (rect.y+rect.height); i++) {
+            for( int i=rect.y; i < (rect.y+rect.height); i++) {
                 int *row2 = (int*)workingImage.ptr(i);
-                for(unsigned int j=rect.x; j < (rect.x+rect.width); j++) {
+                for( int j=rect.x; j < (rect.x+rect.width); j++) {
                     if(row2[j] != labelCount) {
                         continue;
                     }
@@ -122,11 +122,11 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
     int x,y;
     int minx = 1080,maxx = 0;
     int miny = 1920,maxy = 0;
-    for(int i = 0; i < objects.size();++i){
+    for(unsigned int i = 0; i < objects.size();++i){
         if(objects[i].size() < 100000 && objects[i].size() > 500){
             minx = 1080,maxx = 0;
             miny = 1920,maxy = 0;
-            for(int j = 0; j < objects[i].size();j++){
+            for(unsigned int j = 0; j < objects[i].size();j++){
                 x = objects[i][j].x;
                 y = objects[i][j].y;
                 if(x > maxx){
