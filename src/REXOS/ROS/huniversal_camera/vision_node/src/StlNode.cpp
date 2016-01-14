@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -171,7 +172,8 @@ void StlNode::handleFrame(cv::Mat& frame){
     char currentPath[FILENAME_MAX];
     string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
-        directory = currentPath + "/parts";
+        directory = currentPath;
+        directory += "/parts";
     }
     DIR* dir;
     struct dirent *ent;
