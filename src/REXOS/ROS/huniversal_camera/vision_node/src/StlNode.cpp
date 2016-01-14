@@ -399,6 +399,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     vector<VisionObject> objects = filterObjects(blobs,frame);
     for(int p = 0; p < objects.size();++p){
         pair<Part,double> match = matchPart(createParameterMap(objects[p]));
+        REXOS_WARN_STREAM(match.second);
         if(match.second > 80){
             string matchResult = match.first.name + " - " + to_string(match.second);
             REXOS_WARN_STREAM(matchResult);
