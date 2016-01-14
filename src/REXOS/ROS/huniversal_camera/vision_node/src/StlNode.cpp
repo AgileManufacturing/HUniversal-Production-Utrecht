@@ -400,7 +400,8 @@ void StlNode::handleFrame(cv::Mat& frame){
     for(int p = 0; p < objects.size();++p){
         pair<Part,double> match = matchPart(createParameterMap(objects[p]));
         if(match.second > 80){
-            REXOS_WARN_STREAM(match.first.name + " - " + to_string(match.second));
+            string matchResult = match.first.name + " - " + to_string(match.second);
+            REXOS_WARN_STREAM(matchResult);
             frame = objects[p].objectImage;
         }
     }
