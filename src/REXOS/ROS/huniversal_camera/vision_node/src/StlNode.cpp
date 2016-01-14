@@ -9,6 +9,7 @@
 #include <opencv2/objdetect/objdetect.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 
@@ -199,13 +200,14 @@ vector<string> getPartList(){
 }
 
 Part parsePart(string partName){
+    char currentPath[FILENAME_MAX];
     Part part;
     string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
         directory = currentPath;
         directory += "/parts/" + partName;
     }
-    ifstream file;
+    ifstream file();
     file.open(directory);
     char buffer[256];
     string currentLine;
@@ -221,7 +223,7 @@ Part parsePart(string partName){
                 file.getline(buffer,256);
                 currentLine = buffer;
                 if(currentLine[0] != '/'){
-                    part.parameters.insert(<pair<string,double>(
+                    part.parameters.insert(pair<string,double>(
                                                currentLine.substr(0,currentLine.find(":=")-1),
                                                atof(currentLine.substr(currentLine.find(":=")+2,256).c_str()));
                 }else{
