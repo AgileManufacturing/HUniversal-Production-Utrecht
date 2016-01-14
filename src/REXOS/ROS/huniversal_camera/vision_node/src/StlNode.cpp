@@ -171,15 +171,20 @@ void StlNode::handleFrame(cv::Mat& frame){
     char currentPath[FILENAME_MAX];
     string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
-        directory = currentPath;
-        REXOS_WARN_STREAM(directory);
+        directory = currentPath + "/parts";
     }
     DIR* dir;
     struct dirent *ent;
+    vector<string> fileList;
     if((dir = opendir(directory.c_str())) != NULL){
         while((ent = readdir(dir)) != NULL){
-            string currentRotzooi = ent->d_name;
-            REXOS_WARN_STREAM(currentRotzooi);
+            string currentFile = ent->d_name;
+            if(substr(currentFile.find("."),100) == "config"){
+                fileList.push_back(currentFile);
+            }
+        }
+        for(unsigned int i = 0; i < fileList.size();++i){
+            REXOS_WARN_STREAM(fileList[i]);
         }
         closedir(dir);
     }else{
