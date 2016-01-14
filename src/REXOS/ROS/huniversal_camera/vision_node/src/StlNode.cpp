@@ -172,7 +172,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
         directory = currentPath;
-        REXOS_INFO(directory);
+//        REXOS_INFO(directory);
     }
     DIR* dir;
     struct dirent *ent;
