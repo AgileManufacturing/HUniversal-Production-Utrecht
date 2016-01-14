@@ -22,6 +22,8 @@
 
 #include <unistd.h>
 
+#include <dirent.h>
+
 using namespace cv;
 using namespace std;
 
@@ -164,12 +166,23 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
     return visionObjects;
 }
 
+
 void StlNode::handleFrame(cv::Mat& frame){
     char currentPath[FILENAME_MAX];
-
+    string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
-        string dir = currentPath;
-        REXOS_INFO(dir);
+        directory = currentPath;
+        REXOS_INFO(directory);
+    }
+    DIR* dir;
+    struct dirent *ent;
+    if((dir = opendir(directory)) != NULL){
+        while((ent = readdir(dir)) != NULL){
+            REXOS_INFO(ent->d_name);
+        }
+        closedir(dir);
+    }else{
+        REXOS_WARNING("COULD NOT OPEN DIRECTORY");
     }
 
 
