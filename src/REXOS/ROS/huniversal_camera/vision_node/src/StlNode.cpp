@@ -118,9 +118,6 @@ vector<vector<Point>> getHoles(const pair<vector<vector<Point> >, vector<Vec4i> 
             holes.push_back(contours.first[i]);
         }
     }
-    for(unsigned int i = 0; i < holes.size();++i){
-        cout << "Holes check: " << holes[i].size() << endl;
-    }
     return holes;
 }
 
@@ -166,7 +163,6 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
                             image.at<uchar>(objects[i][j].y,objects[i][j].x);
                 }
             }
-            imshow("testttt",objectImage);
 
             VisionObject filteredObject;
             filteredObject.data = objects[i];
@@ -395,6 +391,7 @@ void StlNode::handleFrame(cv::Mat& frame){
 //    for(it = p.parameters.begin(); it != p.parameters.end();++it){
 //        REXOS_WARN_STREAM(it->first + to_string(it->second));
 //    }
+    cv_bridge::CvImage cvi;
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
     vector<vector<Point>> blobs = findConnectedComponents(grayFrame);
@@ -405,21 +402,21 @@ void StlNode::handleFrame(cv::Mat& frame){
         if(match.second > 80){
             string matchResult = match.first.name + " - " + to_string(match.second);
             REXOS_WARN_STREAM(matchResult);
-//            frame = objects[p].objectImage;
+            frame = objects[p].objectImage;
+            cvtColor(frame,frame,CV_GRAY2BGR);
+            if(!frame.empty()){
+                ros::Time time = ros::Time::now();
+                cvi.header.stamp = time;
+                cvi.header.frame_id = "stl_debug_image";
+                cvi.encoding = sensor_msgs::image_encodings::BGR8;
+                cvi.image = frame;
+                debugImagePublisher.publish(cvi.toImageMsg());
+            }else{
+                REXOS_INFO("STL VISION: Given clone frame was empty.");
+            }
         }
     }
 //    parseAllParts();
 
-    cv_bridge::CvImage cvi;
-    if(!frame.empty()){
-        ros::Time time = ros::Time::now();
-        cvi.header.stamp = time;
-        cvi.header.frame_id = "stl_debug_image";
-        cvi.encoding = sensor_msgs::image_encodings::BGR8;
-        cvi.image = frame;
-        debugImagePublisher.publish(cvi.toImageMsg());
-    }else{
-        REXOS_INFO("STL VISION: Given clone frame was empty.");
-    }
 
 }
