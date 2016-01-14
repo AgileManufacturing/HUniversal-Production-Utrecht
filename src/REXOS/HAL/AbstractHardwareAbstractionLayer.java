@@ -288,6 +288,9 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		equipletListener.onEquipletCommandStatusChanged(status);
 		
 	}
+	public void onEquipletCommandReply(JSONObject reply){
+		equipletListener.onEquipletCommandReply(reply);
+	}
 
 	public void shutdown() {
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "HAL is shutting down");

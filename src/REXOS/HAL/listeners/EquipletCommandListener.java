@@ -10,6 +10,7 @@ public interface EquipletCommandListener {
 	public enum EquipletCommandStatus {
 		WAITING, IN_PROGRESS, DONE, FAILED
 	}
-	
+	public void onEquipletCommandReply();
+
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status);
 }

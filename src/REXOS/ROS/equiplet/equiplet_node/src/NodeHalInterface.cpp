@@ -35,6 +35,11 @@ namespace equiplet_node {
 		message.data = jsonWriter.write(messageJson);
 		equipletCommandStatusChangedPublisher.publish(message);
 	}
+	void NodeHalInterface::postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand){
+		Json::Value replyJson;
+		replyJson["id"] = 
+
+	}
 	void NodeHalInterface::postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) {
 		Json::Value messageJson;
 		messageJson["moduleIdentifier"]["manufacturer"] = identifier.getManufacturer();
