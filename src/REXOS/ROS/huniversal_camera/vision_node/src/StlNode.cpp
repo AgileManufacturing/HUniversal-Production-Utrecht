@@ -217,15 +217,15 @@ Part parsePart(string partName){
         if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
             string message = "STL VISION: Tried to open the file" + part.name;
             REXOS_WARN_STREAM(message);
-            part.name = currentLine.substr(currentLine.find(":=")+2,256);
+            part.name = currentLine.substr(currentLine.find(":=")+2);
         }else if(currentLine == "/parameters"){
             while(!file.eof()){
                 file.getline(buffer,256);
                 currentLine = buffer;
                 if(currentLine[0] != '/'){
                     part.parameters.insert(pair<string,double>(
-                                               currentLine.substr(0,currentLine.find(":=")-1),
-                                               atof(currentLine.substr(currentLine.find(":=")+2,256).c_str())));
+                                               currentLine.substr(0,currentLine.find(":=")),
+                                               atof(currentLine.substr(currentLine.find(":=")+2).c_str())));
                 }else{
                     break;
                 }
