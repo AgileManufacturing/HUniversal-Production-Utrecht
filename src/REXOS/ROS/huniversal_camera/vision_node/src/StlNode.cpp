@@ -207,7 +207,7 @@ Part parsePart(string partName){
         directory = currentPath;
         directory += "/parts/" + partName;
     }
-    ifstream file();
+    ifstream file;
     file.open(directory);
     char buffer[256];
     string currentLine;
