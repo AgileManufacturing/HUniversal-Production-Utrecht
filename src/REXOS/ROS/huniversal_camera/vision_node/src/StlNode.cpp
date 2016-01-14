@@ -214,7 +214,6 @@ Part parsePart(string partName){
         currentLine = buffer;
         if(currentLine.substr(0,currentLine.find(":=")) == "Partname"){
             part.name = currentLine.substr(currentLine.find(":=")+2);
-            REXOS_WARN_STREAM(message);
         }else if(currentLine == "/parameters"){
             while(!file.eof()){
                 file.getline(buffer,256);
