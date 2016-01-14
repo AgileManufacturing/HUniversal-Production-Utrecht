@@ -182,7 +182,7 @@ void StlNode::handleFrame(cv::Mat& frame){
         }
         closedir(dir);
     }else{
-        REXOS_WARNING("COULD NOT OPEN DIRECTORY");
+        REXOS_INFO("COULD NOT OPEN DIRECTORY");
     }
 
 
