@@ -125,7 +125,7 @@ vector<vector<Point> > getHoles(const Mat &image){
     return getHoles(getContoursHierarchy(image));
 }
 
-vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
+vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image,Mat& debugImage){
     vector<VisionObject> visionObjects;
     int x,y;
     int minx = 1080,maxx = 0;
@@ -155,6 +155,10 @@ vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image){
             maxy+=10;
             minx-=10;
             miny-=10;
+            line(debugImage,Point(maxx,maxy),Point(maxx,maxy),Scalar(0,200,0),5);
+            line(debugImage,Point(maxx,miny),Point(maxx,miny),Scalar(0,200,0),5);
+            line(debugImage,Point(minx,maxy),Point(minx,maxy),Scalar(0,200,0),5);
+            line(debugImage,Point(minx,miny),Point(minx,miny),Scalar(0,200,0),5);
             Mat objectImage = Mat::zeros(maxy - miny,maxx-minx,CV_8U);
             for(unsigned int j = 0; j < objects[i].size();++j){
                 //TODO: zoek uit waarom deze check nodig is...
@@ -393,7 +397,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
     vector<vector<Point>> blobs = findConnectedComponents(grayFrame);
-    vector<VisionObject> objects = filterObjects(blobs,grayFrame);
+    vector<VisionObject> objects = filterObjects(blobs,grayFrame,frame);
     for(int p = 0; p < objects.size();++p){
         pair<Part,double> match = matchPart(createParameterMap(objects[p]));
         if(match.second > 80){
