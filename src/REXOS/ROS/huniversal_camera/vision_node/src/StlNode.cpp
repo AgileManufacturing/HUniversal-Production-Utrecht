@@ -362,6 +362,27 @@ pair<Part,double> matchPart(map<string, double>& partFeatures){
     return bestMatch;
 }
 
+map<string, double> createParameterMap(const VisionObject& object){
+    map<string,double> parameters;
+    // - 20 to remove the 10 pixel wide border around the edges
+    double height = object.objectImage.size().height - 20;
+    double width = object.objectImage.size().width - 20;
+    double area = height * width;
+    double surfacePercentage = (object.data.size()/area) * 100;
+    vector<vector<Point>> holes = getHoles(getContoursHierarchy(object.objectImage));
+    double numberOfHoles = holes.size();
+
+    //Add parameters to map
+
+    parameters.insert(make_pair("Height",height));
+    parameters.insert(make_pair("Width",width));
+    //parameters.insert(make_pair("Area",area));
+    //surfacepercentage
+    parameters.insert(make_pair("SurfacePercentage",surfacePercentage));
+    //number of holes
+    parameters.insert(make_pair("NumberOfHoles",numberOfHoles));
+    return parameters;
+}
 
 void StlNode::handleFrame(cv::Mat& frame){
 //    vector<string> partList = getPartList();
