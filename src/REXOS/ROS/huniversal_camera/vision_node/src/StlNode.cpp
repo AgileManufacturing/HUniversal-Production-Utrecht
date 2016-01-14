@@ -244,7 +244,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     REXOS_WARN_STREAM(p.name);
     map<string,double>::iterator it;
     for(it = p.parameters.begin(); it != p.parameters.end();++it){
-        REXOS_WARN_STREAM(it->first + to_string(it->second);
+        REXOS_WARN_STREAM(it->first + to_string(it->second));
     }
 
     cv_bridge::CvImage cvi;
