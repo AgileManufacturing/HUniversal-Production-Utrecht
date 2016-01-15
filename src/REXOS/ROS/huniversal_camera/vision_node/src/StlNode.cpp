@@ -348,6 +348,7 @@ pair<Part,double> matchPart(map<string, double> partFeatures){
     for(int i = 0; i < parts.size(); ++i){
         matchPercentages[i] = make_pair(parts[i],matchPart(partFeatures,parts[i].parameters));
 //        cout <<  parts[i].name << " - " << matchPercentages[i] << endl;
+        REXOS_WARN_STREAM(matchPercentages[i].first.name + " - " + to_string(matchPercentages[i].second));
     }
     pair<Part,double> bestMatch;
     bestMatch.second = 0;
