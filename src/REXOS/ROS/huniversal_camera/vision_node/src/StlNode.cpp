@@ -406,17 +406,17 @@ void StlNode::handleFrame(cv::Mat& frame){
             REXOS_WARN_STREAM(matchResult);
 
 
-            if(!frame.empty()){
-                ros::Time time = ros::Time::now();
-                cvi.header.stamp = time;
-                cvi.header.frame_id = "stl_debug_image";
-                cvi.encoding = sensor_msgs::image_encodings::BGR8;
-                cvi.image = frame;
-                debugImagePublisher.publish(cvi.toImageMsg());
             }else{
                 REXOS_INFO("STL VISION: Given clone frame was empty.");
             }
         }
+    if(!frame.empty()){
+        ros::Time time = ros::Time::now();
+        cvi.header.stamp = time;
+        cvi.header.frame_id = "stl_debug_image";
+        cvi.encoding = sensor_msgs::image_encodings::BGR8;
+        cvi.image = frame;
+        debugImagePublisher.publish(cvi.toImageMsg());
     }
 //    parseAllParts();
 
