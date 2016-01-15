@@ -313,7 +313,7 @@ double matchPart(map<string,double>& partFeatures,map<string,double>& matchFeatu
             }
         }
     }
-    return matchSum /averageWeight +=1;
+    return matchSum /averageWeight;
 }
 
 pair<Part, double> matchPart(map<string, double>& partFeatures, Part referencePart){
@@ -353,7 +353,7 @@ pair<Part, double> matchPart(map<string, double>& partFeatures, Part referencePa
             }
         }
     }
-    return make_pair(referencePart,matchSum / partFeatures.size());
+    return make_pair(referencePart,matchSum / averageWeight);
 }
 
 pair<Part,double> matchPart(map<string, double> partFeatures){
