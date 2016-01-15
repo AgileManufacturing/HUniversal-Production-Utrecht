@@ -286,27 +286,34 @@ double matchPart(map<string,double>& partFeatures,map<string,double>& matchFeatu
         }
     }
     double matchSum = 0;
+    int averageWeight = 0;
     for(it = partFeatures.begin(); it != partFeatures.end();it++){
         //Matching is based of of the percentage that the current value
         //deviates from the "known value"
         if(it->first == "SurfacePercentage"){
             matchSum += 100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100;
+            averageWeight +=1;
         }
         if(it->first == "Height" || it->first == "Width"){
             matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
+            averageWeight +=1;
         }
         if(it->first == "NumberOfHoles"){
+            int holesWeight = 3;
             int numberOfHoles = matchFeatures.find(it->first)->second;
             if(numberOfHoles == it->second){
-                matchSum += 100;
+                matchSum += 100 * holesWeight;
+                averageWeight +=holesWeight;
             }else if(numberOfHoles == 0){
-                matchSum += 0;
+                matchSum += 0 * holesWeight;
+                averageWeight +=holesWeight;
             }else{
-                matchSum += 100 - abs(1 -(it->second / numberOfHoles)) * 100;
+                matchSum += (100 - abs(1 -(it->second / numberOfHoles)) * 100) * holesWeight;
+                averageWeight +=holesWeight;
             }
         }
     }
-    return matchSum / partFeatures.size();
+    return matchSum /averageWeight +=1;
 }
 
 pair<Part, double> matchPart(map<string, double>& partFeatures, Part referencePart){
@@ -317,24 +324,32 @@ pair<Part, double> matchPart(map<string, double>& partFeatures, Part referencePa
         }
     }
     double matchSum = 0;
+    int averageWeight = 0;
     for(it = partFeatures.begin(); it != partFeatures.end();it++){
         //Matching is based of of the percentage that the current value
         //deviates from the "known value"
         if(it->first == "SurfacePercentage"){
             matchSum += 100 - abs(1 - (it->second / referencePart.parameters.find(it->first)->second)) * 100;
+            averageWeight +=1;
         }
         if(it->first == "Height" || it->first == "Width"){
             matchSum += 100 -
                     abs(1 -(pow(it->second,2) / pow(referencePart.parameters.find(it->first)->second,2))) * 100;
+            averageWeight +=1;
         }
+        //Number of holes has a stronger weight
         if(it->first == "NumberOfHoles"){
+            int holesWeight = 3;
             int numberOfHoles = referencePart.parameters.find(it->first)->second;
             if(numberOfHoles == it->second){
-                matchSum += 100;
+                matchSum += 100 * holesWeight;
+                averageWeight +=holesWeight;
             }else if(numberOfHoles == 0){
-                matchSum += 0;
+                matchSum += 0 * holesWeight;
+                averageWeight +=holesWeight;
             }else{
-                matchSum += 100 - abs(1 -(it->second / numberOfHoles)) * 100;
+                matchSum += (100 - abs(1 -(it->second / numberOfHoles)) * 100) * holesWeight;
+                averageWeight +=holesWeight;
             }
         }
     }
@@ -347,7 +362,7 @@ pair<Part,double> matchPart(map<string, double> partFeatures){
     matchPercentages.resize(parts.size());
     for(int i = 0; i < parts.size(); ++i){
         matchPercentages[i] = make_pair(parts[i],matchPart(partFeatures,parts[i].parameters));
-//        cout <<  parts[i].name << " - " << matchPercentages[i] << endl;
+        //        cout <<  parts[i].name << " - " << matchPercentages[i] << endl;
         REXOS_WARN_STREAM(matchPercentages[i].first.name + " - " + to_string(matchPercentages[i].second));
     }
     pair<Part,double> bestMatch;
@@ -385,16 +400,16 @@ map<string, double> createParameterMap(const VisionObject& object){
 }
 
 void StlNode::handleFrame(cv::Mat& frame){
-//    vector<string> partList = getPartList();
-//    for(unsigned i = 0; i < partList.size();++i){
-//        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
-//    }
-//    Part p = parsePart(partList[0]);
-//    REXOS_WARN_STREAM(p.name);
-//    map<string,double>::iterator it;
-//    for(it = p.parameters.begin(); it != p.parameters.end();++it){
-//        REXOS_WARN_STREAM(it->first + to_string(it->second));
-//    }
+    //    vector<string> partList = getPartList();
+    //    for(unsigned i = 0; i < partList.size();++i){
+    //        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
+    //    }
+    //    Part p = parsePart(partList[0]);
+    //    REXOS_WARN_STREAM(p.name);
+    //    map<string,double>::iterator it;
+    //    for(it = p.parameters.begin(); it != p.parameters.end();++it){
+    //        REXOS_WARN_STREAM(it->first + to_string(it->second));
+    //    }
     cv_bridge::CvImage cvi;
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
@@ -407,10 +422,8 @@ void StlNode::handleFrame(cv::Mat& frame){
             REXOS_WARN_STREAM(matchResult);
 
 
-            }else{
-                REXOS_INFO("STL VISION: Given clone frame was empty.");
-            }
         }
+    }
     if(!frame.empty()){
         ros::Time time = ros::Time::now();
         cvi.header.stamp = time;
@@ -418,8 +431,10 @@ void StlNode::handleFrame(cv::Mat& frame){
         cvi.encoding = sensor_msgs::image_encodings::BGR8;
         cvi.image = frame;
         debugImagePublisher.publish(cvi.toImageMsg());
+    }else{
+        REXOS_INFO("STL VISION: Given clone frame was empty.");
     }
-//    parseAllParts();
+    //    parseAllParts();
 
 
 }
