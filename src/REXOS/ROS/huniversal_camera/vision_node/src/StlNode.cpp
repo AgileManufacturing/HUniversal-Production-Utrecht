@@ -301,6 +301,7 @@ double matchPart(map<string,double>& partFeatures,map<string,double>& matchFeatu
         if(it->first == "NumberOfHoles"){
             int holesWeight = 3;
             int numberOfHoles = matchFeatures.find(it->first)->second;
+            REXOS_WARN_STREAM("Number of holes: " + to_string(it->second) +  " Found: " + to_string(numberOfHoles));
             if(numberOfHoles == it->second){
                 matchSum += 100 * holesWeight;
                 averageWeight +=holesWeight;
