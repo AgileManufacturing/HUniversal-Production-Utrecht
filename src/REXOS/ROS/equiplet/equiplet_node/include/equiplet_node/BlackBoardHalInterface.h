@@ -16,6 +16,7 @@ namespace equiplet_node {
 		
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep);
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand);
+		virtual void postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand);
 		virtual void postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state);
 		virtual void postModeChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::Mode mode);
 		virtual void postStateChange(rexos_statemachine::State state);
