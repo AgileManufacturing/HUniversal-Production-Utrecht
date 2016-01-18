@@ -55,7 +55,7 @@ public class HardwareAbstractionLayer extends AbstractHardwareAbstractionLayer i
 
 	@Override
 	public void onEquipletCommandReply(JSONObject reply){
-		translationProcessListener.onEquipletCommandReply(reply);
+		equipletCommandListener.onEquipletCommandReply(reply);
 	}
 
 	@Override
@@ -99,9 +99,8 @@ public class HardwareAbstractionLayer extends AbstractHardwareAbstractionLayer i
 	}
 
 	@Override
-	public void requestPartInfo(std::String partIdentifier){
-		super.requestPartInfo(std::String partIdentifier);
+	public void requestPartInfo(String partIdentifier){
+		super.requestPartInfo(partIdentifier);
 	}
-	@Override
-	public void request
 }
+

@@ -239,7 +239,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		//hal.executeHardwareSteps(hardwareSteps);
 		//hal.translateProductStep("place", criteria2);
 	}
-	@override 
+	@Override 
 	public void onEquipletCommandReply(JSONObject reply){
 		System.out.println("Received a reply omg");
 	}

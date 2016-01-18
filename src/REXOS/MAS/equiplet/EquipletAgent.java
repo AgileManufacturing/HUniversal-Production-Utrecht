@@ -1068,4 +1068,10 @@ public class EquipletAgent extends Agent implements HardwareAbstractionLayerList
 	public EquipletReconfigureHandler getReconfigureHandler(){
 		return reconfigHandler;
 	}
+
+	@Override
+	public void onEquipletCommandReply(JSONObject reply) {
+		// TODO Auto-generated method stub
+		
+	}
 }

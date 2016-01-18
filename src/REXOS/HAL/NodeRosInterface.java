@@ -30,6 +30,7 @@ import HAL.steps.HardwareStep.HardwareStepStatus;
 public class NodeRosInterface extends RosInterface implements NodeMain {
 	private Subscriber<std_msgs.String> hardwareStepStatusChangedSubscriber;
 	private Subscriber<std_msgs.String> equipletCommandStatusChangedSubscriber;
+	private Subscriber<std_msgs.String> equipletCommandReplySubscriber;
 	private Subscriber<std_msgs.String> stateChangedSubscriber;
 	private Subscriber<std_msgs.String> modeChangedSubscriber;
 	private Subscriber<std_msgs.String> violationSubscriber;
@@ -200,7 +201,7 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 			this.notifyAll();
 		}
 	}
-	
+
 	@Override
 	public void onShutdown(Node node) {
 	}
