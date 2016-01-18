@@ -5,8 +5,13 @@
 #include <string>
 #include <map>
 
+#include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
+
 #include "vision_node/Part.h"
 #include "vision_node/VisionObject.h"
+
+#include <ifstream>
 
 using namespace std;
 using namespace cv;

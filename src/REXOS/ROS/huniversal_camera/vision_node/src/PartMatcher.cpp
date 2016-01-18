@@ -1,4 +1,5 @@
 #include "vision_node/PartMatcher.h"
+#include "vision_node/ObjectDetector.h"
 
 #include <unistd.h>
 #include <dirent.h>
@@ -65,7 +66,7 @@ vector<Part> PartMatcher::parseAllParts(){
     vector<Part> parts;
     vector<string> partList = getPartList();
     parts.resize(partList.size());
-    for(int i = 0; i < partList.size(); ++i){
+    for(unsigned int i = 0; i < partList.size(); ++i){
         parts[i] = parsePart(partList[i]);
     }
     return parts;
@@ -170,14 +171,13 @@ pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures){
     vector<Part> parts = parseAllParts();
     vector<pair<Part,double> > matchPercentages;
     matchPercentages.resize(parts.size());
-    for(int i = 0; i < parts.size(); ++i){
+    for(unsigned int i = 0; i < parts.size(); ++i){
         matchPercentages[i] = make_pair(parts[i],matchPart(partFeatures,parts[i].parameters));
-//        cout <<  parts[i].name << " - " << matchPercentages[i] << endl;
     }
     pair<Part,double> bestMatch;
     bestMatch.second = 0;
 
-    for(int i = 0; i < matchPercentages.size(); ++i){
+    for(unsigned int i = 0; i < matchPercentages.size(); ++i){
         if(matchPercentages[i].second > bestMatch.second){
             bestMatch = matchPercentages[i];
         }
@@ -192,7 +192,8 @@ map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     double width = object.objectImage.size().width - 20;
     double area = height * width;
     double surfacePercentage = (object.data.size()/area) * 100;
-    vector<vector<Point>> holes = getHoles(getContoursHierarchy(object.objectImage));
+    vector<vector<Point>> holes =
+            ObjectDetector::getHoles(ObjectDetector::getContoursHierarchy(object.objectImage));
     double numberOfHoles = holes.size();
 
     //Add parameters to map

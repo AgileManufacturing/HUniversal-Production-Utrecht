@@ -1,6 +1,9 @@
 #ifndef OBJECTDETECTOR_H
 #define OBJECTDETECTOR_H
 
+#include "ros/ros.h"
+#include "rexos_logger/rexos_logger.h"
+
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include "vision_node/VisionObject.h"
