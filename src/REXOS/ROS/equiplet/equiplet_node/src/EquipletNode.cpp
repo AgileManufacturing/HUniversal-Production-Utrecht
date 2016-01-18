@@ -222,7 +222,7 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
 		equipletCommand.setId("lookup_result");
 		Json::Value angleAnswer;
-		angleAnswer = doubleToString(1337.0); // valid angle totally 
+		angleAnswer = rexos_utilities::doubleToString(1337.0); // valid angle totally 
 		equipletCommand.setParameters(angleAnswer);
 		halInterface->postEquipletCommandReply(equipletCommand);
 	} else if(equipletCommand.getCommand() == "spawnPartModel") {
