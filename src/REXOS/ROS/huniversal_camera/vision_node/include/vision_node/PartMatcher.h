@@ -5,8 +5,8 @@
 #include <string>
 #include <map>
 
-#include "Part.h"
-#include "VisionObject.h"
+#include "vision_node/Part.h"
+#include "vision_node/VisionObject.h"
 
 class PartMatcher{
 public:

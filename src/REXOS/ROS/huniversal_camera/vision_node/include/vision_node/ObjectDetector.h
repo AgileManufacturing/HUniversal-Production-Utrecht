@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <opencv2/core/core.hpp>
-#include <VisionObject.h>
+#include "vision_node/VisionObject.h"
 
 class ObjectDetector{
 public:

@@ -1,4 +1,4 @@
-#include "ObjectDetector.h"
+#include "vision_node/ObjectDetector.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
