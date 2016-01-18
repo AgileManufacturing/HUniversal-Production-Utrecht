@@ -21,6 +21,7 @@ public:
    static vector<vector<Point>> getHoles(const Mat &image);
    static vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image,Mat& debugImage);
 
+
 private:
 };
 

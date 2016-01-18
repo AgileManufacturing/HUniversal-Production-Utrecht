@@ -189,10 +189,24 @@ pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures){
 
 map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     map<string,double> parameters;
-    // - 20 to remove the 10 pixel wide border around the edges
-    double height = object.objectImage.size().height - 20;
-    double width = object.objectImage.size().width - 20;
+    // calculating width and height of the object, the broadest side is always set
+    // as width
+    RotatedRect rect = minAreaRect(object.data);
+    Point2f vertices[4];
+    rect.points(vertices);
+    double maxLength = -INFINITY, minLength = INFINITY;
+    for(int i = 0; i < 4;++i){
+        double dX,dY;
+        dX = vertices[i].x - vertices[(i+1)%4].x;
+        dY = vertices[i].y - vertices[(i+1)%4].y;
+        double length = sqrt((dX * dX) + (dY * dY));
+        (length <= minLength)? minLength = length : minLength = minLength;
+        (length >= maxLength)? maxLength = length : maxLength = maxLength;
+    }
+    double height = minLength;
+    double width = maxLength;
     double area = height * width;
+
     double surfacePercentage = (object.data.size()/area) * 100;
     vector<vector<Point>> holes =
             ObjectDetector::getHoles(ObjectDetector::getContoursHierarchy(object.objectImage));
