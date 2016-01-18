@@ -89,16 +89,18 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             //deviates from the "known value"
             if(it->first == "SurfacePercentage"){
                 matchSum += 100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100;
+                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
                 averageWeight +=1;
             }
             if(it->first == "Height" || it->first == "Width"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
+                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
                 averageWeight +=1;
             }
             if(it->first == "NumberOfHoles"){
                 int holesWeight = 3;
                 int numberOfHoles = matchFeatures.find(it->first)->second;
-                REXOS_WARN_STREAM("Number of holes: " + to_string(it->second) +  " Found: " + to_string(numberOfHoles));
+                REXOS_WARN_STREAM("Number of holes: " + to_string(numberOfHoles) +  " Found: " + to_string(it->second));
                 if(numberOfHoles == it->second){
                     matchSum += 100 * holesWeight;
                     averageWeight +=holesWeight;
@@ -132,6 +134,7 @@ pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures, stri
         }
         if(it->first == "Height" || it->first == "Width"){
             matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchPart.parameters.find(it->first)->second,2))) * 100;
+
         }
         if(it->first == "NumberOfHoles"){
             int numberOfHoles = matchPart.parameters.find(it->first)->second;
