@@ -3,7 +3,7 @@
 
 
 #include <opencv2/core/core.hpp>
-//#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 //#include <opencv2/calib3d/calib3d.hpp>
 //#include <opencv2/objdetect/objdetect.hpp>
@@ -49,6 +49,13 @@ void StlNode::handleFrame(cv::Mat& frame){
     vector<vector<Point>> blobs = ObjectDetector::findConnectedComponents(grayFrame);
     vector<VisionObject> objects = ObjectDetector::filterObjects(blobs,grayFrame,frame);
     for(int p = 0; p < objects.size();++p){
+        RotatedRect rect = minAreaRect(objects[p].data);
+        Point2f vertices[4];
+        rect.points(vertices);
+        for(int i = 0; i < 4;++i){
+            line(frame,vertices[i],vertices[(i+1)%4],Scalar(0,0,255));
+        }
+
         pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));
         if(match.second > 80){
             string matchResult = match.first.name + " - " + to_string(match.second);
