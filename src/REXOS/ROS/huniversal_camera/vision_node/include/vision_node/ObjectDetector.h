@@ -5,7 +5,13 @@
 #include "rexos_logger/rexos_logger.h"
 
 #include <vector>
+
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
+
 #include "vision_node/VisionObject.h"
 
 using namespace std;
