@@ -39,6 +39,7 @@ namespace equiplet_node {
 	void NodeHalInterface::postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand){
 		Json::Value replyJson;
 		replyJson["id"] = equipletCommand.getId();
+		replyJson["parameters"] = equipletCommand.getParameters();
 		std_msgs::String message;
 		message.data = jsonWriter.write(replyJson);
 		equipletCommandReplyPublisher.publish(message);
