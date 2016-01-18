@@ -53,7 +53,7 @@ void StlNode::handleFrame(cv::Mat& frame){
         Point2f vertices[4];
         rect.points(vertices);
         for(int i = 0; i < 4;++i){
-            line(frame,vertices[i],vertices[(i+1)%4],Scalar(0,0,255));
+            line(frame,vertices[i],vertices[(i+1)%4],Scalar(0,0,255),5);
         }
 
         pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));

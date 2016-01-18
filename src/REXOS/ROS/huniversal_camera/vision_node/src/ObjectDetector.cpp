@@ -117,10 +117,6 @@ vector<VisionObject> ObjectDetector::filterObjects(vector<vector<Point>>& object
             minx-=10;
             miny-=10;
 
-            line(debugImage,Point(minx,maxy),Point(maxx,maxy),Scalar(0,200,0),5);
-            line(debugImage,Point(minx,miny),Point(maxx,miny),Scalar(0,200,0),5);
-            line(debugImage,Point(minx,miny),Point(minx,maxy),Scalar(0,200,0),5);
-            line(debugImage,Point(maxx,miny),Point(maxx,maxy),Scalar(0,200,0),5);
             Mat objectImage = Mat::zeros(maxy - miny,maxx-minx,CV_8U);
             for(unsigned int j = 0; j < objects[i].size();++j){
                 //TODO: zoek uit waarom deze check nodig is...
