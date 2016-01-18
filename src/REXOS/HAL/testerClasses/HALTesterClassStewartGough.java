@@ -256,7 +256,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		System.out.println("Received the following:\n");
 		//System.out.print(reply);
 		try {
-			if (currentQuery == reply.get("id")){
+			if (currentQuery.equals(reply.get("id"))){
 				currentReply = Double.parseDouble((String) reply.get("parameters"));
 				replyReceived = true;
 				currentQuery = "";
@@ -269,7 +269,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 			e.printStackTrace();
 		}
 		System.out.print(currentReply);
-		System.out.println("Succesfully received reply to query\n");
+		System.out.println("\nSuccesfully received reply to query\n");
 	}
 
 	@Override
