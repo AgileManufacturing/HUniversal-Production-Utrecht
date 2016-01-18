@@ -58,7 +58,7 @@ void StlNode::handleFrame(cv::Mat& frame){
 
         pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));
         string matchResult = match.first.name + " - " + to_string(match.second);
-        REXOS_WARN_STREAM(matchResult);
+//        REXOS_WARN_STREAM(matchResult);
         if(match.second > 80){
         }
     }
