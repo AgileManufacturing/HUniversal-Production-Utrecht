@@ -33,18 +33,6 @@
 using namespace cv;
 using namespace std;
 
-struct VisionObject{
-    Mat objectImage;
-    vector<Point> data;
-};
-
-struct Part{
-    string name;
-    map<string,double> parameters;
-};
-
-
-
 StlNode::StlNode(image_transport::ImageTransport& imageTransport){
     debugImagePublisher = imageTransport.advertise("camera/stl_debug_image", 1);
 }
