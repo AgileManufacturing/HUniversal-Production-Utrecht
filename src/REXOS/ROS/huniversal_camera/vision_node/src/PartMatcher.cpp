@@ -3,6 +3,8 @@
 
 #include <unistd.h>
 #include <dirent.h>
+#include <iostream>
+#include <fstream>
 
 vector<string> PartMatcher::getPartList(){
     char currentPath[FILENAME_MAX];
