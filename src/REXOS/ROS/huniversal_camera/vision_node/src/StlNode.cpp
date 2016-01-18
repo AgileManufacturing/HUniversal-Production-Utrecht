@@ -421,8 +421,6 @@ void StlNode::handleFrame(cv::Mat& frame){
         if(match.second > 80){
             string matchResult = match.first.name + " - " + to_string(match.second);
             REXOS_WARN_STREAM(matchResult);
-
-
         }
     }
     if(!frame.empty()){

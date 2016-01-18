@@ -18,8 +18,8 @@ public:
     static pair<Part, double> matchPart(map<string, double> partFeatures, Part referencePart);
     static pair<Part, double> matchPart(map<string, double> partFeatures);
 
-
-
+    // NOG NIET IN CPP
+    map<string, double> createParameterMap(const VisionObject& object);
 
 private:
 };
