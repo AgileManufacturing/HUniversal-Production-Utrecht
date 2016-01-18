@@ -25,6 +25,7 @@ namespace equiplet_node {
 		
 		ros::Publisher hardwareStepStatusChangedPublisher;
 		ros::Publisher equipletCommandStatusChangedPublisher;
+		ros::Publisher equipletCommandReplyPublisher;
 		ros::Publisher stateChangedPublisher;
 		ros::Publisher modeChangedPublisher;
 		ros::Publisher violationOccuredPublisher;

@@ -40,8 +40,8 @@ namespace equiplet_node {
 		Json::Value replyJson;
 		replyJson["id"] = equipletCommand.getId();
 		std_msgs::String message;
-		message.data = jsonwrite.write(replyJson);
-		equipletCommandReplyPublisher.publish(message)
+		message.data = jsonWriter.write(replyJson);
+		equipletCommandReplyPublisher.publish(message);
 	}
 	void NodeHalInterface::postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) {
 		Json::Value messageJson;
