@@ -32,6 +32,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 	static boolean insertModules = false;
 	static boolean translateSteps = true;
 	static boolean replyReceived = false;
+	static double replyValue = 0;
 	
 	/**
 	 * @param args
@@ -241,7 +242,13 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 	}
 	@Override 
 	public void onEquipletCommandReply(JSONObject reply){
-		System.out.println("Received a reply omg");
+		System.out.println("Received the following angle:\n");
+		try {
+			replyValue = (double) reply.get("parameters");
+			System.out.print(replyValue);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
