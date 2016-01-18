@@ -19,8 +19,8 @@
 #include <image_transport/image_transport.h>
 #include <opencv/cvwimage.h>
 #include <cv_bridge/cv_bridge.h>
-#include "sensor_msgs/Image.h"
-#include <sensor_msgs/image_encodings.h"
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
 
 #include "vision_node/ObjectDetector.h"
 #include "vision_node/PartMatcher.h"
