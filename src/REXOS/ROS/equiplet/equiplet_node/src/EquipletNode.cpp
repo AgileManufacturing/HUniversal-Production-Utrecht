@@ -220,7 +220,6 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 	} else if (equipletCommand.getCommand() == "info"){
 		REXOS_WARN_STREAM("Info command received, no handler defined yet");
 		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
-		equipletCommand.setId("lookup_result");
 		Json::Value angleAnswer;
 		angleAnswer = rexos_utilities::doubleToString(1337.0); // valid angle totally 
 		equipletCommand.setParameters(angleAnswer);

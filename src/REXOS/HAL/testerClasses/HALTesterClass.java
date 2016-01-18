@@ -18,7 +18,6 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.dataTypes.DynamicSettings;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.dataTypes.StaticSettings;
 import HAL.exceptions.BlackboardUpdateException;

@@ -3,6 +3,8 @@ package HAL.testerClasses;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.UUID;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +34,8 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 	static boolean insertModules = false;
 	static boolean translateSteps = true;
 	static boolean replyReceived = false;
-	static double replyValue = 0;
+	static String currentQuery = "";
+	static Double currentReply;
 	
 	/**
 	 * @param args
@@ -97,8 +100,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		//for(;;){
 			if(translateSteps == true) {
 
-				hal.requestPartInfo("banana");
-
+				uniqueRequest("banana");
 				while(!replyReceived){
 					try{
 						Thread.sleep(1000);
@@ -106,7 +108,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 						System.out.println("Woke up?");
 					}
 				}
-
+				replyReceived = false;
 				double xMoveDist = 0.0;
 				double yMoveDist = 0.0;
 				double sub1xrot = 0.0;
@@ -234,6 +236,15 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 			hal.shutdown();
 		}
 	}
+	public void uniqueRequest(String identifier){
+		if (currentQuery != ""){
+			System.out.println("Error processing request as a request has already been sent");
+			return;
+		}
+		currentQuery = UUID.randomUUID().toString();
+		hal.requestPartInfo(identifier,currentQuery);
+	}
+	
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		super.onTranslationFinished(productStep, hardwareSteps);
@@ -241,16 +252,24 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		//hal.translateProductStep("place", criteria2);
 	}
 	@Override 
-	public void onEquipletCommandReply(JSONObject reply){
+	public void onEquipletCommandReply(JSONObject reply){ // TODO: check unique reply
 		System.out.println("Received the following:\n");
 		//System.out.print(reply);
 		try {
-			replyValue = Double.parseDouble((String) reply.get("parameters"));
-			System.out.print(replyValue);
-			replyReceived = true;
+			if (currentQuery == reply.get("id")){
+				currentReply = Double.parseDouble((String) reply.get("parameters"));
+				replyReceived = true;
+				currentQuery = "";
+			} else{
+				System.out.println("Id doesn't match or no Id found!");
+				return;
+			}
 		} catch (JSONException e) {
+			currentReply = -1.0;
 			e.printStackTrace();
 		}
+		System.out.print(currentReply);
+		System.out.println("Succesfully received reply to query\n");
 	}
 
 	@Override

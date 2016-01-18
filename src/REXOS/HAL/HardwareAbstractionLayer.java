@@ -99,8 +99,8 @@ public class HardwareAbstractionLayer extends AbstractHardwareAbstractionLayer i
 	}
 
 	@Override
-	public void requestPartInfo(String partIdentifier){
-		super.requestPartInfo(partIdentifier);
+	public void requestPartInfo(String partIdentifier, String currentQuery){
+		super.requestPartInfo(partIdentifier,currentQuery);
 	}
 }
 
