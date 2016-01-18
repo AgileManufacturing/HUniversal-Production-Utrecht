@@ -69,6 +69,9 @@ namespace equiplet_node {
 		equipletCommandsBlackboardClient->updateDocumentById(mongo::OID(equipletCommand.getId()), 
 				"{$set : {status: \"" + equipletCommand.getStatusAsString() + "\"} } ");
 	}
+	void BlackBoardHalInterface::postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand){
+		
+	}
 	void BlackBoardHalInterface::postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) {
 		Json::Value messageJson;
 		messageJson["moduleIdentifier"]["manufacturer"] = identifier.getManufacturer();
