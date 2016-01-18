@@ -243,10 +243,11 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 	@Override 
 	public void onEquipletCommandReply(JSONObject reply){
 		System.out.println("Received the following:\n");
-		System.out.print(reply);
+		//System.out.print(reply);
 		try {
-			replyValue = (double) reply.get("parameters");
+			replyValue = Double.parseDouble((String) reply.get("parameters"));
 			System.out.print(replyValue);
+			replyReceived = true;
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
