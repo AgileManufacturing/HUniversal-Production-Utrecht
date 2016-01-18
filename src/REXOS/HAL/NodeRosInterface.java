@@ -124,6 +124,18 @@ public class NodeRosInterface extends RosInterface implements NodeMain {
 				}
 			}
 		}, 10);
+		equipletCommandReplySubscriber = node.newSubscriber(path + "equipletCommandReply", std_msgs.String._TYPE);
+		equipletCommandReplySubscriber.addMessageListener(new MessageListener<std_msgs.String>() {
+			@Override
+			public void onNewMessage(std_msgs.String message) {
+				try {
+					JSONObject messageJson = new JSONObject(message.getData());
+					NodeRosInterface.this.onEquipletCommandReply(messageJson);
+				} catch (JSONException ex) {
+					Logger.log(LogSection.HAL_ROS_INTERFACE, LogLevel.ERROR, "Reading equiplet command reply failed", ex);
+				}
+			}
+		}, 10);
 		stateChangedSubscriber = node.newSubscriber(path + "stateChanged", std_msgs.String._TYPE);
 		stateChangedSubscriber.addMessageListener(new MessageListener<std_msgs.String>() {
 			@Override

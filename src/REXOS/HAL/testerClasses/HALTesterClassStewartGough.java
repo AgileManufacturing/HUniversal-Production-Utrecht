@@ -31,6 +31,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = false;
 	static boolean translateSteps = true;
+	static boolean replyReceived = false;
 	
 	/**
 	 * @param args
@@ -94,6 +95,17 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		}
 		//for(;;){
 			if(translateSteps == true) {
+
+				hal.requestPartInfo("banana");
+
+				while(!replyReceived){
+					try{
+						Thread.sleep(1000);
+					} catch(Exception e){
+						System.out.println("Woke up?");
+					}
+				}
+
 				double xMoveDist = 0.0;
 				double yMoveDist = 0.0;
 				double sub1xrot = 0.0;
@@ -226,6 +238,10 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		super.onTranslationFinished(productStep, hardwareSteps);
 		//hal.executeHardwareSteps(hardwareSteps);
 		//hal.translateProductStep("place", criteria2);
+	}
+	@override 
+	public void onEquipletCommandReply(JSONObject reply){
+		System.out.println("Received a reply omg");
 	}
 
 	@Override

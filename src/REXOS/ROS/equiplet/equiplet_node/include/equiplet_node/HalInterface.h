@@ -19,6 +19,7 @@ namespace equiplet_node {
 		virtual ~HalInterface(){ }; // virtual destructor must be implemented
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep) = 0;
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand) = 0;
+		//virtual void postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand);
 		virtual void postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) = 0;
 		virtual void postModeChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::Mode mode) = 0;
 		virtual void postStateChange(rexos_statemachine::State state) = 0;

@@ -11,6 +11,7 @@ namespace equiplet_node {
 		stateChangedPublisher = nh.advertise<std_msgs::String>(path + "stateChanged", 10);
 		modeChangedPublisher = nh.advertise<std_msgs::String>(path + "modeChanged", 10);
 		violationOccuredPublisher = nh.advertise<std_msgs::String>(path + "violationOccured", 10);
+		equipletCommandReplyPublisher = nh.advertise<std_msgs::String>(path + "equipletCommandReply", 10);
 		
 		hardwareStepSubscriber = nh.subscribe(path + "hardwareSteps", 10, &NodeHalInterface::onHardwareStepMessage, this);
 		equipletCommandSubscriber = nh.subscribe(path + "equipletCommands", 10, &NodeHalInterface::onEquipletCommandMessage, this);
@@ -37,8 +38,10 @@ namespace equiplet_node {
 	}
 	void NodeHalInterface::postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand){
 		Json::Value replyJson;
-		replyJson["id"] = 
-
+		replyJson["id"] = equipletCommand.getId();
+		std_msgs::String message;
+		message.data = jsonwrite.write(replyJson);
+		equipletCommandReplyPublisher.publish(message)
 	}
 	void NodeHalInterface::postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state) {
 		Json::Value messageJson;

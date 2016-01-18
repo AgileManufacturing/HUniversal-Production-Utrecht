@@ -52,6 +52,12 @@ public class HardwareAbstractionLayer extends AbstractHardwareAbstractionLayer i
 			translationProcessListener.onTranslationFinished(step, hardwareSteps);
 		}
 	}
+
+	@Override
+	public void onEquipletCommandReply(JSONObject reply){
+		translationProcessListener.onEquipletCommandReply(reply);
+	}
+
 	@Override
 	public void onTestFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		shadowHalSemaphore.release();
@@ -91,4 +97,11 @@ public class HardwareAbstractionLayer extends AbstractHardwareAbstractionLayer i
 	public void executeHardwareSteps(ArrayList<HardwareStep> hardwareSteps) {
 		super.executeHardwareSteps(hardwareSteps);
 	}
+
+	@Override
+	public void requestPartInfo(std::String partIdentifier){
+		super.requestPartInfo(std::String partIdentifier);
+	}
+	@Override
+	public void request
 }

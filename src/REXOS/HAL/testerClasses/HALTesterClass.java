@@ -136,4 +136,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
 	}
+	public void onEquipletCommandReply(JSONObject reply){
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reply on equipletcommand");
+	}
 }

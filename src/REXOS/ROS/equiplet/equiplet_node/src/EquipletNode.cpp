@@ -223,7 +223,7 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		Json::Value angleAnswer;
 		angleAnswer["parameters"] = 1337; // valid angle totally 
 		equipletCommand.setParameters(angleAnswer);
-		halInterface->postEquipletCommandStatus(equipletCommand);
+		halInterface->postEquipletCommandReply(equipletCommand);
 	} else if(equipletCommand.getCommand() == "spawnPartModel") {
 		if(isSimulated == false) {
 			REXOS_WARN("Unable to spawn part because not simulated");
