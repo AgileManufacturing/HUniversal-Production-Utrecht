@@ -417,10 +417,10 @@ void StlNode::handleFrame(cv::Mat& frame){
     cv_bridge::CvImage cvi;
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
-    vector<vector<Point>> blobs = findConnectedComponents(grayFrame);
-    vector<VisionObject> objects = filterObjects(blobs,grayFrame,frame);
+    vector<vector<Point>> blobs = ObjectDetector::findConnectedComponents(grayFrame);
+    vector<VisionObject> objects = ObjectDetector::filterObjects(blobs,grayFrame,frame);
     for(int p = 0; p < objects.size();++p){
-        pair<Part,double> match = matchPart(createParameterMap(objects[p]));
+        pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));
         if(match.second > 80){
             string matchResult = match.first.name + " - " + to_string(match.second);
             REXOS_WARN_STREAM(matchResult);

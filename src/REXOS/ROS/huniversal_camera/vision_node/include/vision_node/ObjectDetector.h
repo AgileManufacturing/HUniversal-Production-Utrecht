@@ -7,7 +7,6 @@
 
 class ObjectDetector{
 public:
-    //NOG NIET IN CPP
    static Mat applyOtsuThreshold(const Mat &image);
    static vector<vector<Point>> findConnectedComponents(const Mat& image);
    static vector<vector<Point>> getContours(const Mat &image);

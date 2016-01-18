@@ -3,8 +3,10 @@
 
 #include <vector>
 #include <string>
-#include <Part.h>
+#include <map>
 
+#include "Part.h"
+#include "VisionObject.h"
 
 class PartMatcher{
 public:
@@ -18,8 +20,7 @@ public:
     static pair<Part, double> matchPart(map<string, double> partFeatures, Part referencePart);
     static pair<Part, double> matchPart(map<string, double> partFeatures);
 
-    // NOG NIET IN CPP
-    map<string, double> createParameterMap(const VisionObject& object);
+    static map<string, double> createParameterMap(const VisionObject& object);
 
 private:
 };
