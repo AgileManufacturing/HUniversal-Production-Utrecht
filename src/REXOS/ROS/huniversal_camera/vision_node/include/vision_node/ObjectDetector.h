@@ -5,6 +5,9 @@
 #include <opencv2/core/core.hpp>
 #include "vision_node/VisionObject.h"
 
+using namespace std;
+using namespace cv;
+
 class ObjectDetector{
 public:
    static Mat applyOtsuThreshold(const Mat &image);

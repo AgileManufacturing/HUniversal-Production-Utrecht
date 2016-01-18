@@ -8,6 +8,9 @@
 #include "vision_node/Part.h"
 #include "vision_node/VisionObject.h"
 
+using namespace std;
+using namespace cv;
+
 class PartMatcher{
 public:
     static vector<string> getPartList();
