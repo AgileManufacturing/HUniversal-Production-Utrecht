@@ -84,6 +84,8 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             return 0;
         }
     }
+    REXOS_WARN_STREAM(partFeatures.size());
+    REXOS_WARN_STREAM(matchFeatures.size());
     double matchSum = 0;
         int averageWeight = 0;
         for(it = partFeatures.begin(); it != partFeatures.end();it++){
