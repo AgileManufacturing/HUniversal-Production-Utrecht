@@ -213,10 +213,10 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 	}
 
 	if(cameraFeedPublisher.getNumSubscribers() != 0){
-		if (CameraID == QR_CAMERA_ID || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true)){
+		if (CameraID == QR_CAM_ID || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true)){
 			//REXOS_WARN_STREAM("Subscribers is more than 0");
 			ros::Time time = ros::Time::now();
-			cv_bridge::CvImage cvi;
+			cv_bridge::CvImage cvi;	
 			cvi.header.stamp = time;
 			cvi.header.frame_id = "image";
 			cvi.encoding = sensor_msgs::image_encodings::BGR8;
