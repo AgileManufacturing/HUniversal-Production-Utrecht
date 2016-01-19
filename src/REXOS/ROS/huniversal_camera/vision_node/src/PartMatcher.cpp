@@ -100,7 +100,8 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             if(it->first == "Height" || it->first == "Width"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
 //                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
-                REXOS_WARN_STREAM(it->first + " - " + to_string(it->second/matchFeatures.find(it->first).second));
+                string test = it->first + " - " + to_string(it->second/matchFeatures.find(it->first).second);
+                REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
             if(it->first == "NumberOfHoles"){
