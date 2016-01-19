@@ -98,6 +98,7 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             }
             if(it->first == "Aspect"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
+                averageWeight+=1;
             }
             if(it->first == "Height" || it->first == "Width"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
@@ -129,11 +130,11 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
 pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures, string partName){
     Part matchPart = parsePart(partName);
     map<string,double>::iterator it;
-    for(it = partFeatures.begin(); it != partFeatures.end();++it){
-        if(matchPart.parameters.find(it->first) == matchPart.parameters.end()){
-            return make_pair(matchPart,0);
-        }
-    }
+//    for(it = partFeatures.begin(); it != partFeatures.end();++it){
+//        if(matchPart.parameters.find(it->first) == matchPart.parameters.end()){
+//            return make_pair(matchPart,0);
+//        }
+//    }
     double matchSum = 0;
     for(it = partFeatures.begin(); it != partFeatures.end();++it){
         //Matching is based of of the percentage that the current value
