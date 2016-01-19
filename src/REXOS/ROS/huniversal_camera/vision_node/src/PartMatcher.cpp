@@ -93,17 +93,20 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             //deviates from the "known value"
             if(it->first == "SurfacePercentage"){
                 matchSum += 100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100;
-                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
+                string test = it->first + " - " + to_string(100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100);
+                REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
             if(it->first == "Aspect"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
+                string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100);
+                REXOS_WARN_STREAM(test);
                 averageWeight+=1;
             }
             if(it->first == "Height" || it->first == "Width"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
 //                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
-                string test = it->first + " - " + to_string(it->second/matchFeatures.find(it->first)->second);
+                string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100);
                 REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
@@ -113,12 +116,18 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
                 REXOS_WARN_STREAM("Number of holes: " + to_string(numberOfHoles) +  " Found: " + to_string(it->second));
                 if(numberOfHoles == it->second){
                     matchSum += 100 * holesWeight;
+                    string test = it->first + " - " + to_string(100);
+                    REXOS_WARN_STREAM(test);
                     averageWeight +=holesWeight;
                 }else if(numberOfHoles == 0){
                     matchSum += 0 * holesWeight;
+                    string test = it->first + " - " + to_string(0);
+                    REXOS_WARN_STREAM(test);
                     averageWeight +=holesWeight;
                 }else{
-                    matchSum += (100 - abs(1 -(it->second / numberOfHoles)) * 100) * holesWeight;
+                    matchSum += (100 - abs(1 -(pow(it->second,2) / pow(numberOfHoles,2))) * 100) * holesWeight;
+                    string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(numberOfHoles,2))) * 100);
+                    REXOS_WARN_STREAM(test);
                     averageWeight +=holesWeight;
                 }
             }
