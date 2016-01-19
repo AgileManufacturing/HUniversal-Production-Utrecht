@@ -79,38 +79,45 @@ vector<Part> PartMatcher::parseAllParts(){
 ///
 double PartMatcher::matchPart(map<string, double> partFeatures, map<string, double> matchFeatures){
     map<string,double>::iterator it;
-//    for(it = partFeatures.begin(); it != partFeatures.end();it++){
-//        if(matchFeatures.find(it->first) == matchFeatures.end()){
-//            return 0;
-//        }
-//    }
-//    REXOS_WARN_STREAM(partFeatures.size());
-//    REXOS_WARN_STREAM(matchFeatures.size());
+    //    for(it = partFeatures.begin(); it != partFeatures.end();it++){
+    //        if(matchFeatures.find(it->first) == matchFeatures.end()){
+    //            return 0;
+    //        }
+    //    }
+    //    REXOS_WARN_STREAM(partFeatures.size());
+    //    REXOS_WARN_STREAM(matchFeatures.size());
     double matchSum = 0;
-        int averageWeight = 0;
-        for(it = partFeatures.begin(); it != partFeatures.end();it++){
-            //Matching is based of of the percentage that the current value
-            //deviates from the "known value"
-            if(it->first == "SurfacePercentage"){
+    int averageWeight = 0;
+    for(it = partFeatures.begin(); it != partFeatures.end();it++){
+        //Matching is based of of the percentage that the current value
+        //deviates from the "known value"
+        if(it->first == "SurfacePercentage"){
+            if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 matchSum += 100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100;
                 string test = it->first + " - " + to_string(100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100);
                 REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
-            if(it->first == "Aspect"){
+        }
+        if(it->first == "Aspect"){
+            if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
                 string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100);
                 REXOS_WARN_STREAM(test);
                 averageWeight+=1;
             }
-            if(it->first == "Height" || it->first == "Width"){
+        }
+        if(it->first == "Height" || it->first == "Width"){
+            if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
-//                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
+                //                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
                 string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100);
                 REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
-            if(it->first == "NumberOfHoles"){
+        }
+        if(it->first == "NumberOfHoles"){
+            if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 int holesWeight = 3;
                 int numberOfHoles = matchFeatures.find(it->first)->second;
                 REXOS_WARN_STREAM("Number of holes: " + to_string(numberOfHoles) +  " Found: " + to_string(it->second));
@@ -132,18 +139,19 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
                 }
             }
         }
-        return matchSum /averageWeight;
+    }
+    return matchSum /averageWeight;
 }
 
 ///TODO:UPDATE THIS FUNCTION
 pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures, string partName){
     Part matchPart = parsePart(partName);
     map<string,double>::iterator it;
-//    for(it = partFeatures.begin(); it != partFeatures.end();++it){
-//        if(matchPart.parameters.find(it->first) == matchPart.parameters.end()){
-//            return make_pair(matchPart,0);
-//        }
-//    }
+    //    for(it = partFeatures.begin(); it != partFeatures.end();++it){
+    //        if(matchPart.parameters.find(it->first) == matchPart.parameters.end()){
+    //            return make_pair(matchPart,0);
+    //        }
+    //    }
     double matchSum = 0;
     for(it = partFeatures.begin(); it != partFeatures.end();++it){
         //Matching is based of of the percentage that the current value
@@ -177,36 +185,36 @@ pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures, Part
         }
     }
     double matchSum = 0;
-        int averageWeight = 0;
-        for(it = partFeatures.begin(); it != partFeatures.end();it++){
-            //Matching is based of of the percentage that the current value
-            //deviates from the "known value"
-            if(it->first == "SurfacePercentage"){
-                matchSum += 100 - abs(1 - (it->second / referencePart.parameters.find(it->first)->second)) * 100;
-                averageWeight +=1;
-            }
-            if(it->first == "Height" || it->first == "Width"){
-                matchSum += 100 -
-                        abs(1 -(pow(it->second,2) / pow(referencePart.parameters.find(it->first)->second,2))) * 100;
-                averageWeight +=1;
-            }
-            //Number of holes has a stronger weight
-            if(it->first == "NumberOfHoles"){
-                int holesWeight = 3;
-                int numberOfHoles = referencePart.parameters.find(it->first)->second;
-                if(numberOfHoles == it->second){
-                    matchSum += 100 * holesWeight;
-                    averageWeight +=holesWeight;
-                }else if(numberOfHoles == 0){
-                    matchSum += 0 * holesWeight;
-                    averageWeight +=holesWeight;
-                }else{
-                    matchSum += (100 - abs(1 -(it->second / numberOfHoles)) * 100) * holesWeight;
-                    averageWeight +=holesWeight;
-                }
+    int averageWeight = 0;
+    for(it = partFeatures.begin(); it != partFeatures.end();it++){
+        //Matching is based of of the percentage that the current value
+        //deviates from the "known value"
+        if(it->first == "SurfacePercentage"){
+            matchSum += 100 - abs(1 - (it->second / referencePart.parameters.find(it->first)->second)) * 100;
+            averageWeight +=1;
+        }
+        if(it->first == "Height" || it->first == "Width"){
+            matchSum += 100 -
+                    abs(1 -(pow(it->second,2) / pow(referencePart.parameters.find(it->first)->second,2))) * 100;
+            averageWeight +=1;
+        }
+        //Number of holes has a stronger weight
+        if(it->first == "NumberOfHoles"){
+            int holesWeight = 3;
+            int numberOfHoles = referencePart.parameters.find(it->first)->second;
+            if(numberOfHoles == it->second){
+                matchSum += 100 * holesWeight;
+                averageWeight +=holesWeight;
+            }else if(numberOfHoles == 0){
+                matchSum += 0 * holesWeight;
+                averageWeight +=holesWeight;
+            }else{
+                matchSum += (100 - abs(1 -(it->second / numberOfHoles)) * 100) * holesWeight;
+                averageWeight +=holesWeight;
             }
         }
-        return make_pair(referencePart,matchSum / averageWeight);
+    }
+    return make_pair(referencePart,matchSum / averageWeight);
 }
 
 pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures){
