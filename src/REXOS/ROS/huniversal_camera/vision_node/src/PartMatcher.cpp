@@ -74,7 +74,9 @@ vector<Part> PartMatcher::parseAllParts(){
     }
     return parts;
 }
-
+//////////////////////////////////
+///TESTING WITH THIS FUNCTION UPDATE OTHERS ACCORDINGLY
+///
 double PartMatcher::matchPart(map<string, double> partFeatures, map<string, double> matchFeatures){
     map<string,double>::iterator it;
     for(it = partFeatures.begin(); it != partFeatures.end();it++){
@@ -92,9 +94,13 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
                 REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
                 averageWeight +=1;
             }
+            if(it->first == "Aspect"){
+                matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
+            }
             if(it->first == "Height" || it->first == "Width"){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
-                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
+//                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
+                REXOS_WARN_STREAM(it->first + " - " + to_string(it->second/matchFeatures.find(it->first).second));
                 averageWeight +=1;
             }
             if(it->first == "NumberOfHoles"){
@@ -236,7 +242,7 @@ map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     double numberOfHoles = holes.size();
 
     //Add parameters to map
-
+    parameters.insert(make_pair("Aspect",width/height));
     parameters.insert(make_pair("Height",height));
     parameters.insert(make_pair("Width",width));
     //parameters.insert(make_pair("Area",area));

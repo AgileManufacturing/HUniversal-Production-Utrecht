@@ -33,8 +33,6 @@ StlNode::StlNode(image_transport::ImageTransport& imageTransport){
 }
 
 void StlNode::handleFrame(cv::Mat& frame){
-    REXOS_WARN_STREAM(frame.size().height);
-    REXOS_WARN_STREAM(frame.size().width);
     //    vector<string> partList = getPartList();
     //    for(unsigned i = 0; i < partList.size();++i){
     //        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
