@@ -191,7 +191,7 @@ void VisionNode::run() {
 
 void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 	//REXOS_WARN_STREAM("\n Now handling frame from camera " << CameraID);
-	if(isFishEyeCorrectorEnabled == true && CameraID == QR_CAM_ID){
+	if(isFishEyeCorrectorEnabled == true){
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 		//REXOS_WARN_STREAM("Handled by FishEye");
 	}
