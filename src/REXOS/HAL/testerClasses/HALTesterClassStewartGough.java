@@ -138,7 +138,6 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				targetRotate1Approach.put("y", 0);
 				targetRotate1Approach.put("z", 0);
 				targetRotate1.put("approach", targetRotate1Approach);
-				target1.put("check",targetCheck1);
 				target1.put("move", targetMove1);
 				target1.put("rotate", targetRotate1);
 				target1.put("identifier", "GC4x4MB_1");
@@ -221,7 +220,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 		
 				criteria1.put("target", target1);
 				criteria1.put("subjects", subjects1);
-
+				criteria1.put("check",targetCheck1);
 		
 				criteria2.put("target", target2);
 				criteria2.put("subjects", subjects2);
