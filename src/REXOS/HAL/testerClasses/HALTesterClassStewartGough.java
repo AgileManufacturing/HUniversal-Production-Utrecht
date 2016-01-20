@@ -31,7 +31,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = false;
+	static boolean insertModules = true;
 	static boolean translateSteps = true;
 	static boolean replyReceived = false;
 	static String currentQuery = "";
