@@ -73,7 +73,6 @@ Part PartMatcher::parsePart(string partName){
                 }
             }
         }
-        break;
     }
     return part;
 }

@@ -34,7 +34,6 @@
  **/
  
 package HAL.capabilities;
-
 import generic.Criteria;
 
 import java.util.ArrayList;
@@ -81,6 +80,7 @@ public class GripAndPlace extends Capability {
 				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.ERROR, message);
 				throw new IllegalArgumentException(message);
 			}
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "IS THERE ANYBODY OUT THERE?");
 			// We assume that the first subject is the subject to pick
 			JSONObject subject = subjects.getJSONObject(0);
 			ArrayList<CompositeStep> dynamicCompositeSteps = generateStepFromOffset(check,subject); // NULL unless the rotation is wrong, in which case it returns the steps as arraylist 
@@ -123,12 +123,14 @@ public class GripAndPlace extends Capability {
 			compositeSteps.add(place);
 			ArrayList<HardwareStep> hardwareSteps;
 			if (dynamicCompositeSteps != null){ // add in the dynamic extra steps with the normal procedure steps
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "Executing extra step!");
 				hardwareSteps = translateCompositeStep(modules, dynamicCompositeSteps);
 				ArrayList<HardwareStep> hardwareSteps2 = translateCompositeStep(modules, compositeSteps);
 				for (HardwareStep step : hardwareSteps2){
 					hardwareSteps.add(step);
 				}
 			} else {
+				Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "No extra step");
 				hardwareSteps = translateCompositeStep(modules, compositeSteps);
 			}
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());
@@ -139,7 +141,7 @@ public class GripAndPlace extends Capability {
 		}
 	}
 
-	private final double ALLOWED_ROTATION_DIFFERENCE = 1.0;
+	private final double ALLOWED_ROTATION_DIFFERENCE = 0.1;
 	private ArrayList<CompositeStep> generateStepFromOffset(JSONObject subjectCheck,JSONObject subjectLocation) throws JSONException {
 		double desiredRotation = subjectCheck.getDouble("desiredRotation");
 		double detectedRotation = subjectCheck.getDouble("detectedRotation");

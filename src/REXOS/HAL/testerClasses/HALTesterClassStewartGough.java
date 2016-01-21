@@ -31,7 +31,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = true;
+	static boolean insertModules = false;
 	static boolean translateSteps = true;
 	static boolean replyReceived = false;
 	static String currentQuery = "";
@@ -101,6 +101,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 			if(translateSteps == true) {
 
 				uniqueRequest("banana");
+				replyReceived = true;
 				while(!replyReceived){
 					try{
 						Thread.sleep(1000);
@@ -117,8 +118,8 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				//System.out.println("Putting step data...");
 				JSONObject target1 = new JSONObject();
 				JSONObject targetCheck1 = new JSONObject();
-				targetCheck1.put("desiredRotation",1.1);
-				targetCheck1.put("detectedRotation",-0.1);
+				targetCheck1.put("desiredRotation",-2);
+				targetCheck1.put("detectedRotation",2.2);
 				JSONObject targetMove1 = new JSONObject();
 				targetMove1.put("x", xMoveDist);//5.5 -5.5 13.8
 				targetMove1.put("y", yMoveDist);
@@ -147,7 +148,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				JSONObject subjectMove1 = new JSONObject();
 				subjectMove1.put("x", xMoveDist);
 				subjectMove1.put("y", yMoveDist);
-				subjectMove1.put("z", -32.0);
+				subjectMove1.put("z", -20.0);
 				subjectMove1.put("maxAcceleration", 4.0);
 				JSONObject subjectRotate1 = new JSONObject();
 				subjectRotate1.put("x", 0.0);

@@ -33,16 +33,17 @@ StlNode::StlNode(image_transport::ImageTransport& imageTransport){
 }
 
 void StlNode::handleFrame(cv::Mat& frame){
-    //    vector<string> partList = getPartList();
-    //    for(unsigned i = 0; i < partList.size();++i){
-    //        REXOS_WARN_STREAM("STL VISION: " + partList[i]);
-    //    }
-    //    Part p = parsePart(partList[0]);
-    //    REXOS_WARN_STREAM(p.name);
-    //    map<string,double>::iterator it;
-    //    for(it = p.parameters.begin(); it != p.parameters.end();++it){
-    //        REXOS_WARN_STREAM(it->first + to_string(it->second));
-    //    }
+    vector<string> partList = PartMatcher::getPartList();
+    for(unsigned i = 0; i < partList.size();++i){
+       REXOS_WARN_STREAM("STL VISION: " + partList[i]);
+    }
+    Part p = PartMatcher::parsePart(partList[0]);
+    REXOS_WARN_STREAM(p.name);
+    map<string,double>::iterator it;
+    for(it = p.parameters.begin(); it != p.parameters.end();++it){
+       REXOS_WARN_STREAM(it->first + to_string(it->second));
+    }
+    //REXOS_WARN_STREAM("Casper was here");
     cv_bridge::CvImage cvi;
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
