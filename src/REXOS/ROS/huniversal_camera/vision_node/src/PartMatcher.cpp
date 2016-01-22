@@ -276,13 +276,13 @@ map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     double numberOfHoles = holes.size();
 
     //Add parameters to map
-    parameters.insert(make_pair("Aspect",width/height));
-    parameters.insert(make_pair("Height",height));
-    parameters.insert(make_pair("Width",width));
-    //parameters.insert(make_pair("Area",area));
+    parameters.insert(make_pair("pAspect",width/height));
+    parameters.insert(make_pair("pHeight",height));
+    parameters.insert(make_pair("pWidth",width));
+    //parameters.insert(make_pair("pArea",area));
     //surfacepercentage
-    parameters.insert(make_pair("SurfacePercentage",surfacePercentage));
+    parameters.insert(make_pair("pSurfacePercentage",surfacePercentage));
     //number of holes
-    parameters.insert(make_pair("NumberOfHoles",numberOfHoles));
+    parameters.insert(make_pair("pNumberOfHoles",numberOfHoles));
     return parameters;
 }
