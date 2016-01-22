@@ -33,17 +33,6 @@ StlNode::StlNode(image_transport::ImageTransport& imageTransport){
 }
 
 void StlNode::handleFrame(cv::Mat& frame){
-//    vector<string> partList = PartMatcher::getPartList();
-//    for(unsigned i = 0; i < partList.size();++i){
-//       REXOS_WARN_STREAM("STL VISION: " + partList[i]);
-//    }
-//    Part p = PartMatcher::parsePart(partList[0]);
-//    REXOS_WARN_STREAM(p.name);
-//    map<string,double>::iterator it;
-//    for(it = p.parameters.begin(); it != p.parameters.end();++it){
-//       REXOS_WARN_STREAM(it->first + to_string(it->second));
-//    }
-    //REXOS_WARN_STREAM("Casper was here");
     cv_bridge::CvImage cvi;
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
@@ -58,9 +47,9 @@ void StlNode::handleFrame(cv::Mat& frame){
         }
 
         pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));
-        string matchResult = match.first.name + " - " + to_string(match.second);
-        REXOS_WARN_STREAM(matchResult);
         if(match.second > 80){
+            string matchResult = match.first.name + " - " + to_string(match.second);
+            REXOS_WARN_STREAM(matchResult);
         }
     }
     if(!frame.empty()){
@@ -73,7 +62,6 @@ void StlNode::handleFrame(cv::Mat& frame){
     }else{
         REXOS_INFO("STL VISION: Given clone frame was empty.");
     }
-    //    parseAllParts();
 
 
 }
