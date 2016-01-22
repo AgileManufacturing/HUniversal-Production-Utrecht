@@ -103,6 +103,7 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
     for(it = partFeatures.begin(); it != partFeatures.end();it++){
         //Matching is based of of the percentage that the current value
         //deviates from the "known value"
+        REXOS_WARN_STREAM(it->first);
         if(it->first == "pSurfacePercentage"){
             if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 matchSum += 100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100;
