@@ -107,7 +107,7 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 matchSum += 100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100;
                 string test = it->first + " - " + to_string(100 - abs(1 - (it->second / matchFeatures.find(it->first)->second)) * 100);
-                REXOS_WARN_STREAM(test);
+//                REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
         }
@@ -115,7 +115,7 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
                 string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100);
-                REXOS_WARN_STREAM(test);
+//                REXOS_WARN_STREAM(test);
                 averageWeight+=1;
             }
         }
@@ -124,7 +124,7 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
                 matchSum += 100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100;
                 //                REXOS_WARN_STREAM(it->first + ": " + to_string(it->second) + " Found: " + to_string(matchFeatures.find(it->first)->second));
                 string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(matchFeatures.find(it->first)->second,2))) * 100);
-                REXOS_WARN_STREAM(test);
+//                REXOS_WARN_STREAM(test);
                 averageWeight +=1;
             }
         }
@@ -132,21 +132,21 @@ double PartMatcher::matchPart(map<string, double> partFeatures, map<string, doub
             if(matchFeatures.find(it->first)!=matchFeatures.end()){
                 int holesWeight = 3;
                 int numberOfHoles = matchFeatures.find(it->first)->second;
-                REXOS_WARN_STREAM("Number of holes: " + to_string(numberOfHoles) +  " Found: " + to_string(it->second));
+//                REXOS_WARN_STREAM("Number of holes: " + to_string(numberOfHoles) +  " Found: " + to_string(it->second));
                 if(numberOfHoles == it->second){
                     matchSum += 100 * holesWeight;
                     string test = it->first + " - " + to_string(100);
-                    REXOS_WARN_STREAM(test);
+//                    REXOS_WARN_STREAM(test);
                     averageWeight +=holesWeight;
                 }else if(numberOfHoles == 0){
                     matchSum += 0 * holesWeight;
                     string test = it->first + " - " + to_string(0);
-                    REXOS_WARN_STREAM(test);
+//                    REXOS_WARN_STREAM(test);
                     averageWeight +=holesWeight;
                 }else{
                     matchSum += (100 - abs(1 -(pow(it->second,2) / pow(numberOfHoles,2))) * 100) * holesWeight;
                     string test = it->first + " - " + to_string(100 - abs(1 -(pow(it->second,2) / pow(numberOfHoles,2))) * 100);
-                    REXOS_WARN_STREAM(test);
+//                    REXOS_WARN_STREAM(test);
                     averageWeight +=holesWeight;
                 }
             }
