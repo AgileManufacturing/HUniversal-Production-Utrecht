@@ -236,7 +236,7 @@ pair<Part, double> PartMatcher::matchPart(map<string, double> partFeatures){
     for(unsigned int i = 0; i < parts.size(); ++i){
         matchPercentages[i] = make_pair(parts[i],matchPart(partFeatures,parts[i].parameters));
         string matchResult = matchPercentages[i].first.name + " - " + to_string(matchPercentages[i].second);
-//        REXOS_WARN_STREAM(matchResult);
+        REXOS_WARN_STREAM(matchResult);
     }
     pair<Part,double> bestMatch;
     bestMatch.second = 0;
