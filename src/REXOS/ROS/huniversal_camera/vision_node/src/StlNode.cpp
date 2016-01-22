@@ -1,20 +1,9 @@
 #include "vision_node/StlNode.h"
 #include <stdio.h>
 
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-//#include <opencv2/calib3d/calib3d.hpp>
-//#include <opencv2/objdetect/objdetect.hpp>
-
-//#include <iostream>
-//#include <fstream>
-//#include <vector>
-//#include <string>
-
-//#define _USE_MATH_DEFINES
-//#include <math.h>
 
 #include <image_transport/image_transport.h>
 #include <opencv/cvwimage.h>
