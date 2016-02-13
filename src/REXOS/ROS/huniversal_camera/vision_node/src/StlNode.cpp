@@ -22,12 +22,14 @@ StlNode::StlNode(image_transport::ImageTransport& imageTransport){
 }
 
 void StlNode::handleFrame(cv::Mat& frame){
+    //CvImage is used to convert cv images to publishable images
     cv_bridge::CvImage cvi;
     Mat grayFrame;
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
     vector<vector<Point>> blobs = ObjectDetector::findConnectedComponents(grayFrame);
     vector<VisionObject> objects = ObjectDetector::filterObjects(blobs,grayFrame,frame);
     for(int p = 0; p < objects.size();++p){
+        //Draws a rotated box around each object
         RotatedRect rect = minAreaRect(objects[p].data);
         Point2f vertices[4];
         rect.points(vertices);
