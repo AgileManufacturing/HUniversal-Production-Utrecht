@@ -78,6 +78,14 @@ public abstract class RosInterface {
 			}
 		}
 	}
+	
+	protected void onEquipletCommandReply(JSONObject reply) {
+		synchronized (equipletSubscribers) {
+			for (EquipletListener equipletListener : equipletSubscribers) {
+				equipletListener.onEquipletCommandReply(reply);
+			}
+		}
+	}
 
 	protected void onModuleStateChanged(ModuleIdentifier module, State state) {
 		moduleFactory.getItemForIdentifier(module).onModuleStateChanged(module, state);

@@ -10,7 +10,7 @@ using namespace camera;
 
 SimulatedCamera::SimulatedCamera(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, CameraListener* listener, double fps, 
 		ros::NodeHandle& nodeHandle) : 
-		Camera(equipletName, identifier, listener, fps), nodeHandle(nodeHandle), frameSize(0, 0)
+		Camera(equipletName, identifier, listener, fps,1), nodeHandle(nodeHandle), frameSize(0, 0)
 {
 	cameraFeedSubscriber = nodeHandle.subscribe(equipletName + "/" + 
 			identifier.getManufacturer() + "/" + identifier.getTypeNumber() + "/" + identifier.getSerialNumber() + "/camera/image_raw",

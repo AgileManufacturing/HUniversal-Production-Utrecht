@@ -107,12 +107,14 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		
 		// select correct ros interface implementation (this must match the one used by ROS)
 		String usedImplementation = (String) Configuration.getProperty(ROS_INTERFACE_IMPLEMENTATION_PATH, equipletName);
+		Logger.log(LogSection.HAL, LogLevel.DEBUG,"In abstract one, fetched implementation");
 		if(usedImplementation.equals(BLACKBOARD_IMPLEMENTATION)) this.rosInterface = new BlackboardRosInterface(this);
 		else if(usedImplementation.equals(BRIDGE_IMPLEMENTATION)) this.rosInterface = new BridgeRosInterface(this);
 		else if(usedImplementation.equals(JAVA_NODE_IMPLEMENTATION)) this.rosInterface = new NodeRosInterface(this);
 		else throw new RuntimeException("rosInterface implementation is unknown");
+		Logger.log(LogSection.HAL, LogLevel.DEBUG,"In abstract one, adding listener");
 		this.rosInterface.addEquipletListener(this);
-		
+		Logger.log(LogSection.HAL, LogLevel.DEBUG,"In abstract one, added listener");
 		this.translationProcesses = new HashMap<ProductStep, TranslationProcess>();
 	}
 	
@@ -286,6 +288,9 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 		equipletListener.onEquipletCommandStatusChanged(status);
 		
 	}
+	public void onEquipletCommandReply(JSONObject reply){
+		equipletListener.onEquipletCommandReply(reply);
+	}
 
 	public void shutdown() {
 		Logger.log(LogSection.HAL, LogLevel.DEBUG, "HAL is shutting down");
@@ -322,6 +327,20 @@ public abstract class AbstractHardwareAbstractionLayer implements ModuleListener
 			equipletCommand.put("parameters", parameters);
 			rosInterface.postEquipletCommand(equipletCommand);
 		} catch(JSONException ex) {
+			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
+		}
+	}
+	public void requestPartInfo(String partIdentifier, String currentQuery){
+		try{
+			JSONObject equipletCommand = new JSONObject();
+			equipletCommand.put("command", "info");
+			equipletCommand.put("status", "WAITING");
+			equipletCommand.put("id",currentQuery);
+			JSONObject parameters = new JSONObject();
+			parameters.put("info", partIdentifier);
+			equipletCommand.put("parameters",parameters);
+			rosInterface.postEquipletCommand(equipletCommand);
+		} catch(JSONException ex){
 			Logger.log(LogSection.HAL, LogLevel.EMERGENCY, "Error occured which is considered to be impossible", ex);
 		}
 	}

@@ -189,9 +189,34 @@
         },
         "supportedMutations": [
             "move",
-            "rotate"
+            "rotate",
+            "check"              
         ],
         "capabilities": [
+            {
+                "name": "GripAndPlace",
+                "treeNumber": 1,
+                "halSoftware": {
+                    "buildNumber": 1,
+                    "jarFile": null,
+                    "className": "HAL.capabilities.GripAndPlace"
+                },
+                "requiredMutationsTrees": [
+                    {
+                        "treeNumber": 1,
+                        "mutations": [
+                            "move",
+                            "rotate",
+                            "pick",
+                            "place",
+                            "check"
+                        ]
+                    }
+                ],
+                "services": [
+                    "place"
+                ]
+            },
             {
                 "name": "Draw",
                 "treeNumber": 1,

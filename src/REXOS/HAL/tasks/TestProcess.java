@@ -175,4 +175,10 @@ public class TestProcess implements Runnable, ExecutionProcessListener, Equiplet
 		Logger.log(LogSection.HAL_TEST, LogLevel.DEBUG, "Violation occured of type " + violationType, message);
 		testFailed = true;
 	}
+
+	@Override
+	public void onEquipletCommandReply(JSONObject reply) {
+		// TODO Auto-generated method stub
+		
+	}
 }

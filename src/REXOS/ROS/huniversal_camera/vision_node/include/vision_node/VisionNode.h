@@ -48,6 +48,7 @@
 #include <vision_node/getCorrectionMatrices.h>
 
 #include <vision_node/QrCodeReader.h>
+#include <vision_node/StlNode.h>
 #include <vision_node/FishEyeCorrector.h>
 
 
@@ -57,7 +58,7 @@
 
 class VisionNode : public camera::CameraListener{
 public:
-	VisionNode(std::string equipletName, rexos_datatypes::ModuleIdentifier identifier, bool isSimulated, int deviceNumber, int formatNumber);
+	VisionNode(std::string equipletName, std::vector<rexos_datatypes::ModuleIdentifier> identifier, bool isSimulated, int deviceNumber, int formatNumber);
 	~VisionNode();
 	void run();
 
@@ -69,9 +70,14 @@ public:
 	bool enableFudicialDetector(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
 	bool enableCamera(vision_node::enableComponent::Request& request, vision_node::enableComponent::Response& response);
 	
-	virtual void handleFrame(cv::Mat& camFrame);
+	virtual void handleFrame(cv::Mat& camFrame, int CameraID);
 private:
-	camera::Camera * cam;
+	camera::Camera *STLCam;
+	camera::Camera *QRCam;
+
+	int STL_CAM_ID = 1;
+	int QR_CAM_ID = 2;
+
 	bool isSimulated;
 
 	ros::NodeHandle nodeHandle;
@@ -80,6 +86,7 @@ private:
 	bool isFishEyeCorrectorEnabled;
 	bool isQrCodeReaderEnabled;
 	bool isFudicialDetectorEnabled;
+        bool isStlNodeEnabled;
 	
 	ros::ServiceServer increaseExposureService;
 	ros::ServiceServer decreaseExposureService;
@@ -91,6 +98,7 @@ private:
 	image_transport::ImageTransport imgTransport;
 	image_transport::Publisher cameraFeedPublisher;
 	QrCodeReader qrCodeReader;
+        StlNode stlNode;
 	FishEyeCorrector fishEyeCorrector;
 	
 	double exposure;

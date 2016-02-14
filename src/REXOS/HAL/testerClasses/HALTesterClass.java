@@ -18,7 +18,6 @@ import util.log.LogSection;
 import util.log.Logger;
 import HAL.HardwareAbstractionLayer;
 import HAL.Module;
-import HAL.dataTypes.DynamicSettings;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.dataTypes.StaticSettings;
 import HAL.exceptions.BlackboardUpdateException;
@@ -84,6 +83,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Translation finished");
+		hal.executeHardwareSteps(hardwareSteps);
 	}
 
 	@Override
@@ -134,5 +134,8 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 	@Override
 	public void onEquipletCommandStatusChanged(EquipletCommandStatus status) {
 		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reloading has: " + status);
+	}
+	public void onEquipletCommandReply(JSONObject reply){
+		Logger.log(LogSection.NONE, LogLevel.INFORMATION, "Reply on equipletcommand");
 	}
 }

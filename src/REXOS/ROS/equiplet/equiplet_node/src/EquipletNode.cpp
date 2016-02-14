@@ -121,6 +121,7 @@ ros::NodeHandle& EquipletNode::getNodeHandle() {
  * @param payload the payload, contains data that will get combined with environmentcache data
  **/
 Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameters){
+	REXOS_INFO_STREAM("Called lookup handler");
  	environment_cache::getData msg;
 
 	msg.request.identifier = originPlacementParameters["identifier"].asString();
@@ -144,6 +145,7 @@ Json::Value EquipletNode::callLookupHandler(Json::Value originPlacementParameter
 }
 
 void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
+	REXOS_INFO_STREAM("Hardware step received");
 	rexos_statemachine::Mode currentMode = getCurrentMode();
 	if (currentMode != rexos_statemachine::MODE_NORMAL) {
 		REXOS_WARN("Hardware step received but but cannot be processed because current mode is %s", rexos_statemachine::mode_txt[currentMode]);
@@ -189,6 +191,7 @@ void EquipletNode::onHardwareStep(rexos_datatypes::HardwareStep hardwareStep) {
 	prox->executeHardwareStep(hardwareStep);
 }
 void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCommand) {
+	REXOS_INFO_STREAM("Equiplet command received" << equipletCommand.getCommand());
 	equipletCommand.setStatus(rexos_datatypes::EquipletCommand::IN_PROGRESS);
 	
 	Json::Value parameters = equipletCommand.getParameters();
@@ -214,6 +217,13 @@ void EquipletNode::onEquipletCommand(rexos_datatypes::EquipletCommand equipletCo
 		halInterface->postEquipletCommandStatus(equipletCommand);
 	} else if(equipletCommand.getCommand() == "reload") {
 		moduleRegistry.reloadModules();
+	} else if (equipletCommand.getCommand() == "info"){
+		REXOS_WARN_STREAM("Info command received, no handler defined yet");
+		equipletCommand.setStatus(rexos_datatypes::EquipletCommand::DONE);
+		Json::Value angleAnswer;
+		angleAnswer = rexos_utilities::doubleToString(1337.0); // valid angle totally 
+		equipletCommand.setParameters(angleAnswer);
+		halInterface->postEquipletCommandReply(equipletCommand);
 	} else if(equipletCommand.getCommand() == "spawnPartModel") {
 		if(isSimulated == false) {
 			REXOS_WARN("Unable to spawn part because not simulated");

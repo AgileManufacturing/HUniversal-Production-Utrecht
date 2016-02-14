@@ -14,18 +14,18 @@ namespace equiplet_node {
 		NodeHalInterface(std::string equipletName, bool isShadow, HalInterfaceListener* listener);
 		virtual void postHardwareStepStatus(rexos_datatypes::HardwareStep hardwareStep);
 		virtual void postEquipletCommandStatus(rexos_datatypes::EquipletCommand equipletCommand);
+		virtual void postEquipletCommandReply(rexos_datatypes::EquipletCommand equipletCommand);
 		virtual void postStateChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::State state);
 		virtual void postModeChange(rexos_datatypes::ModuleIdentifier identifier, rexos_statemachine::Mode mode);
 		virtual void postStateChange(rexos_statemachine::State state);
 		virtual void postModeChange(rexos_statemachine::Mode mode);
 		virtual void postViolation(std::string type, std::string message);
 	private:
-		HalInterfaceListener* listener;
-		
 		ros::NodeHandle nh;
 		
 		ros::Publisher hardwareStepStatusChangedPublisher;
 		ros::Publisher equipletCommandStatusChangedPublisher;
+		ros::Publisher equipletCommandReplyPublisher;
 		ros::Publisher stateChangedPublisher;
 		ros::Publisher modeChangedPublisher;
 		ros::Publisher violationOccuredPublisher;

@@ -36,6 +36,7 @@ class CameraListener {
 protected:
 	CameraListener() {}
 public:	
-	virtual void handleFrame(cv::Mat& camFrame) = 0;
+	//virtual void handleFrame(cv::Mat& camFrame)=0;
+	virtual void handleFrame(cv::Mat& camFrame, int deviceIndex)=0;
 };
 }
