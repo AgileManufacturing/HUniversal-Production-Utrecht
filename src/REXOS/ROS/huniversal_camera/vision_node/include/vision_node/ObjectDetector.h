@@ -58,7 +58,7 @@ public:
     * them in a vector. The contours also come with aditional information which specifies whether
     * a contour has a parent or a child contour.
     * @param image The image that contours are extracted from.
-    * @return Returns a pair of contours and their Heirarchy information
+    * @return Returns a pair of contours and their Heirarchy information.
     */
    static pair<vector<vector<Point>>, vector<Vec4i>> getContoursHierarchy(const Mat &image);
    /**
@@ -85,7 +85,7 @@ public:
     * findConnectedComponents() function.
     * @param objects The pixel data of al the connected components found by the findConnectedComponents() function.
     * @param image The UNALTERED image that the connected components were detected from.
-    * @param debugImage An extra image that can be used to draw debug data on (CURRENTLY NOT USED)
+    * @param debugImage An extra image that can be used to draw debug data on (CURRENTLY NOT USED).
     * @return
     */
    static vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image,Mat& debugImage);

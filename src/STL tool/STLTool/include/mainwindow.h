@@ -13,14 +13,38 @@
 
 
 class cameraSetupLayout;
-
+/**
+ * @brief The MainWindow class
+ *
+ * The main window that contains al the other widgets for the GUI.
+ */
 class MainWindow: public QMainWindow{
 public:
+    /**
+     * @brief MainWindow constructor
+     *
+     * Sets up al the layouts and widgets and connects the buttons
+     * to the corresponding functions.
+     */
     MainWindow();
-
+    /**
+     * @brief open
+     *
+     * Calls the open function in order to open a STL file.
+     */
     void open();
+    /**
+     * @brief save
+     *
+     * Calls the save function that saves information regarding a part and its
+     * image.
+     */
     void save();
-
+    /**
+     * @brief keyPressEvent
+     *
+     * Manages the keyboards inputs from the user.
+     */
     void keyPressEvent(QKeyEvent *) override;
 
 
