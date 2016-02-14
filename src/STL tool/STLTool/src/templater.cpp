@@ -6,9 +6,6 @@
 using namespace std;
 
 vector<vector<vector<int>>> Templater::generateGripperTemp(int arms,float armHeight,float armWidth,float maxDist){
-    // [0-1] = distance
-    // [0-1][0-35] = rotation
-    // [0-1][0-35][0...n] = pixel info
     vector<vector<vector<int>>> templates;
     //currently only supports min distance and max distance as the gripper
     //can only fully grip or fully expand
