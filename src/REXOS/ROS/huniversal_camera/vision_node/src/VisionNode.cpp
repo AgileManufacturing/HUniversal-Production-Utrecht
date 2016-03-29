@@ -48,6 +48,7 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
                 stlNode(imgTransport),
+				stlNode2(imgTransport),
 		fishEyeCorrector(nodeHandle),
 		exposure(0.015)
 {
