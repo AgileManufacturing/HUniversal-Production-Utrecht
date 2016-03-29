@@ -195,8 +195,14 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 		//REXOS_WARN_STREAM("Handled by FishEye");
 	}
-        if(isStlNodeEnabled && CameraID == STL_CAM_ID){
-            stlNode.handleFrame(camFrame);
+        if(isStlNodeEnabled){
+			if(CameraID == STL_CAM_ID){
+				stlNode.handleFrame(camFrame);
+			}
+			else if(CameraID == STL_CAM_ID2){
+				stlNode2.handleFrame(camFrame);
+			}
+            //stlNode.handleFrame(camFrame);
             //REXOS_WARN_STREAM("Handled by STL");
         }
 	cv::Mat grayScaleFrame;
@@ -213,7 +219,7 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 	}
 
 	if(cameraFeedPublisher.getNumSubscribers() != 0){
-		if (CameraID == QR_CAM_ID || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true)){
+		if (CameraID == QR_CAM_ID || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true) || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true)){
 			//REXOS_WARN_STREAM("Subscribers is more than 0");
 			ros::Time time = ros::Time::now();
 			cv_bridge::CvImage cvi;	

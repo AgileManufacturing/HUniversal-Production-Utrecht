@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
 	std::string equipletName = std::string(argv[argumentOffset + 0]);
 	rexos_datatypes::ModuleIdentifier moduleIdentifier(argv[argumentOffset + 1], argv[argumentOffset + 2], "1");
 	rexos_datatypes::ModuleIdentifier moduleIdentifier2(argv[argumentOffset + 1], argv[argumentOffset + 2], "2");
+	rexos_datatypes::ModuleIdentifier moduleIdentifier3(argv[argumentOffset + 1], argv[argumentOffset + 2], "3");
 	std::vector<rexos_datatypes::ModuleIdentifier> cameraModules = {moduleIdentifier,moduleIdentifier2};
 	// set up node namespace and name
 	if(isShadow == true) {
