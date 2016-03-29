@@ -1,5 +1,5 @@
-#ifndef STLNODE_H
-#define STLNODE_H
+#ifndef STLNODE2_H
+#define STLNODE2_H
 
 #include "ros/ros.h"
 #include "rexos_logger/rexos_logger.h"
