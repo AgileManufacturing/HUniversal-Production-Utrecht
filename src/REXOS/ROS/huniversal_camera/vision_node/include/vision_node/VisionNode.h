@@ -102,7 +102,7 @@ private:
 	image_transport::Publisher cameraFeedPublisher;
 	QrCodeReader qrCodeReader;
     StlNode stlNode;
-	StlVerticalNode.h stlNode2;
+	StlVerticalNode stlNode2;
 	FishEyeCorrector fishEyeCorrector;
 	
 	double exposure;
