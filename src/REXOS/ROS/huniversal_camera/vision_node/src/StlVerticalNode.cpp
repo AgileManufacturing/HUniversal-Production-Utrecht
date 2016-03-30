@@ -13,7 +13,6 @@
 
 #include "vision_node/ObjectDetector.h"
 #include "vision_node/PartMatcher.h"
-#error HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOi
 
 using namespace cv;
 using namespace std;
