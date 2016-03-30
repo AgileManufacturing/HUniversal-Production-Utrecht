@@ -201,7 +201,7 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 				stlNode.handleFrame(camFrame);
 			}
 			else if(CameraID == STL_CAM_ID2){
-				stlNode2.handleFrame(camFrame);
+				//stlNode2.handleFrame(camFrame);
 			}
             //stlNode.handleFrame(camFrame);
             //REXOS_WARN_STREAM("Handled by STL");
