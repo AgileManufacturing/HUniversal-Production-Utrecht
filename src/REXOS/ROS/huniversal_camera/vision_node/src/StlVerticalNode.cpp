@@ -18,7 +18,7 @@ using namespace cv;
 using namespace std;
 
 StlVerticalNode::StlVerticalNode(image_transport::ImageTransport& imageTransport){
-    debugImagePublisher = imageTransport.advertise("camera/stl_debug_image", 1);
+    //debugImagePublisher = imageTransport.advertise("camera/stl_debug_image", 1);
 }
 
 void StlVerticalNode::handleFrame(cv::Mat& frame){
