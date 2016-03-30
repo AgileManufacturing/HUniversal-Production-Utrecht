@@ -1,4 +1,4 @@
-#include "vision_node/StlNode2.h"
+#include "vision_node/StlVerticalNode.h"
 #include <stdio.h>
 
 #include <opencv2/core/core.hpp>
@@ -17,11 +17,11 @@
 using namespace cv;
 using namespace std;
 
-StlNode2::StlNode2(image_transport::ImageTransport& imageTransport){
+StlVerticalNode::StlVerticalNode(image_transport::ImageTransport& imageTransport){
     debugImagePublisher = imageTransport.advertise("camera/stl_debug_image", 1);
 }
 
-void StlNode2::handleFrame(cv::Mat& frame){
+void StlVerticalNode::handleFrame(cv::Mat& frame){
     //CvImage is used to convert cv images to publishable images
     cv_bridge::CvImage cvi;
     Mat grayFrame;

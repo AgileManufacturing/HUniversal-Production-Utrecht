@@ -1,5 +1,5 @@
-#ifndef STLNODE2_H
-#define STLNODE2_H
+#ifndef STL_VERTICAL_NODE_H
+#define STL_VERTICAL_NODE_H
 
 #include "ros/ros.h"
 #include "rexos_logger/rexos_logger.h"
@@ -8,19 +8,19 @@
 #include <opencv2/core/core.hpp>
 
 /**
- * @brief The StlNode2 class
+ * @brief The StlVerticalNode class
  *
  * This class handles the camera frames that are used for STL based part
  * recognition.
  */
-class StlNode2{
+class StlVerticalNode{
 public:
 
     /**
-     * @brief StlNode2 constructor
+     * @brief StlVerticalNode constructor
      * @param imageTransport Used for transporting images in ROS.
      */
-    StlNode2(image_transport::ImageTransport& imageTransport);
+    StlVerticalNode(image_transport::ImageTransport& imageTransport);
     /**
      * @brief handleFrame
      *

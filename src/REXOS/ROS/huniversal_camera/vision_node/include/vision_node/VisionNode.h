@@ -49,7 +49,7 @@
 
 #include <vision_node/QrCodeReader.h>
 #include <vision_node/StlNode.h>
-#include <vision_node/StlNode2.h>
+#include <vision_node/StlVerticalNode.h>
 #include <vision_node/FishEyeCorrector.h>
 
 
@@ -101,8 +101,8 @@ private:
 	image_transport::ImageTransport imgTransport;
 	image_transport::Publisher cameraFeedPublisher;
 	QrCodeReader qrCodeReader;
-        StlNode stlNode;
-		StlNode2 stlNode2;
+    StlNode stlNode;
+	StlVerticalNode.h stlNode2;
 	FishEyeCorrector fishEyeCorrector;
 	
 	double exposure;
