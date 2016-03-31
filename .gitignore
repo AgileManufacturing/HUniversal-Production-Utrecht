@@ -50,3 +50,4 @@ src/6D Vision Testing/Makefile
 src/6D Vision Testing/Makefile
 src/6D Vision Testing/Vision6D.exe
 *.user
+*.d
