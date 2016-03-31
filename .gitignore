@@ -23,7 +23,7 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
+#*.a
 
 # Generated file types
 *~
@@ -48,3 +48,4 @@ simulation/log.log
 
 src/6D Vision Testing/Makefile
 src/6D Vision Testing/Makefile
+src/6D Vision Testing/Vision6D.exe
