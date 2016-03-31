@@ -65,7 +65,7 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 		STLCamCV->setAutoWhiteBalance(true);
 		STLCamCV->setExposure(exposure);
 		STLCam = STLCamCV;
-		auto STLCam2CV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[2], this, 5, STL_CAM2_ID, formatNumber);
+		auto STLCam2CV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[2], this, 5, STL_CAM_ID2, formatNumber);
 		STLCam2CV->setAutoWhiteBalance(true);
 		STLCam2CV->setExposure(exposure);
 		STLCam2 = STLCam2CV;
