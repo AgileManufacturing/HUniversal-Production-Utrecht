@@ -1,0 +1,13 @@
+include/opencv
+include/opencv2
+include/opencv2/calib3d
+include/opencv2/core
+include/opencv2/core/hal
+include/opencv2/flann
+include/opencv2/highgui
+include/opencv2/imgcodecs
+include/opencv2/imgproc
+include/opencv2/objdetect
+include/opencv2/photo
+include/opencv2/video
+include/opencv2/videoio
