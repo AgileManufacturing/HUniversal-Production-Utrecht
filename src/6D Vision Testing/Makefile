@@ -5,7 +5,7 @@ LDFLAGS				= -Llib
 LDLIBS				= -lopencv_core310 -lopencv_imgproc310 -lopencv_highgui310 -lopencv_imgcodecs310
 INCLUDES			= -Iinclude
 
-Vision6D: $(OBJECTS)
+6DTool: $(OBJECTS)
 	g++ $(CCFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
 	
 %.o: %.cpp
