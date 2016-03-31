@@ -48,7 +48,7 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
                 stlNode(imgTransport),
-				stlNode2(imgTransport),
+				/*stlNode2(imgTransport),*/
 		fishEyeCorrector(nodeHandle),
 		exposure(0.015)
 {
@@ -65,10 +65,10 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 		STLCamCV->setAutoWhiteBalance(true);
 		STLCamCV->setExposure(exposure);
 		STLCam = STLCamCV;
-		auto STLCam2CV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[2], this, 5, STL_CAM_ID2, formatNumber);
+		/*auto STLCam2CV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[2], this, 5, STL_CAM_ID2, formatNumber);
 		STLCam2CV->setAutoWhiteBalance(true);
 		STLCam2CV->setExposure(exposure);
-		STLCam2 = STLCam2CV;
+		STLCam2 = STLCam2CV;*/
 		REXOS_INFO("Initialized cameras");
 	}
 	
