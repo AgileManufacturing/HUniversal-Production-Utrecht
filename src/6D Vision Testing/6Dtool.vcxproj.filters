@@ -18,9 +18,6 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="incl\TestClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="incl\StlNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>

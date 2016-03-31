@@ -1,9 +1,7 @@
 #include "ObjectDetector.h"
-
-
-
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 Mat ObjectDetector::applyOtsuThreshold(const Mat& image){
     Mat thresholdImage;

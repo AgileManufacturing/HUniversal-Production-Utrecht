@@ -1,17 +1,6 @@
-﻿Build started 31/03/2016 16:36:02.
-     1>Project "C:\Users\Edwin\Documents\GitHub\HUniversal-Production-Utrecht\src\6D Vision Testing\6Dtool.vcxproj" on node 2 (Build target(s)).
-     1>Build:
-         mingw32-make
-         g++ -std=c++11 -MMD -IOpenCV/include -Iincl/ -c -o src/ObjectDetector.o src/ObjectDetector.cpp
-         src/ObjectDetector.cpp:1:40: fatal error: vision_node/ObjectDetector.h: No such file or directory
-          #include "vision_node/ObjectDetector.h"
-                                                 ^
-         compilation terminated.
-         Makefile:12: recipe for target 'src/ObjectDetector.o' failed
-         mingw32-make: *** [src/ObjectDetector.o] Error 1
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.MakeFile.Targets(38,5): error MSB3073: The command "mingw32-make" exited with code 2.
-     1>Done Building Project "C:\Users\Edwin\Documents\GitHub\HUniversal-Production-Utrecht\src\6D Vision Testing\6Dtool.vcxproj" (Build target(s)) -- FAILED.
-
-Build FAILED.
-
-Time Elapsed 00:00:00.16
+﻿  g++ -std=c++11 -MMD -IOpenCV/include -Iincl/ -c -o src/Main.o src/Main.cpp
+  In file included from src/Main.cpp:5:0:
+  incl/ObjectDetector.h:4:21: fatal error: ros/ros.h: No such file or directory
+  compilation terminated.
+  mingw32-make: *** [src/Main.o] Error 1
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.MakeFile.Targets(37,5): error MSB3073: The command "mingw32-make" exited with code 2.

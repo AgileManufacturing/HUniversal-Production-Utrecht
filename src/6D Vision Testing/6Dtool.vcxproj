@@ -82,7 +82,6 @@
     <ClInclude Include="incl\Part.h" />
     <ClInclude Include="incl\PartMatcher.h" />
     <ClInclude Include="incl\StlNode.h" />
-    <ClInclude Include="incl\TestClass.h" />
     <ClInclude Include="incl\VisionObject.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,13 @@
-#include "vision_node/PartMatcher.h"
-#include "vision_node/ObjectDetector.h"
+#include "PartMatcher.h"
+#include "ObjectDetector.h"
+#include <opencv2/imgproc/imgproc.hpp>
 
-#include <unistd.h>
-#include <dirent.h>
 #include <iostream>
 #include <fstream>
 
 
 vector<string> PartMatcher::getPartList(){
+	/*
     char currentPath[FILENAME_MAX];
     string directory;
     if (getcwd(currentPath, sizeof(currentPath))){
@@ -28,17 +28,19 @@ vector<string> PartMatcher::getPartList(){
     }else{
         REXOS_INFO("COULD NOT OPEN DIRECTORY");
     }
-    return fileList;
+    return fileList;*/
+	std::vector<string> dummy;
+	return dummy;
 }
 
 Part PartMatcher::parsePart(string partName){
     char currentPath[FILENAME_MAX];
     Part part;
     string directory;
-    if (getcwd(currentPath, sizeof(currentPath))){
+    /*if (getcwd(currentPath, sizeof(currentPath))){
         directory = currentPath;
         directory += "/parts/" + partName;
-    }
+    }*/
     ifstream file;
     file.open(directory);
     char buffer[256];
@@ -251,7 +253,7 @@ map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     map<string,double> parameters;
     // calculating width and height of the object, the broadest side is always set
     // as width
-    RotatedRect rect = minAreaRect(object.data);
+    RotatedRect rect = cv::minAreaRect(object.data);
     Point2f vertices[4];
     rect.points(vertices);
     double maxLength = -INFINITY, minLength = INFINITY;

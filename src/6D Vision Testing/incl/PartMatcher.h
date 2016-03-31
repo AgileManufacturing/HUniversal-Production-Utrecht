@@ -2,14 +2,10 @@
 #define PARTMATCHER_H
 
 #include <vector>
-#include <string>
 #include <map>
 
-#include "ros/ros.h"
-#include "rexos_logger/rexos_logger.h"
-
-#include "vision_node/Part.h"
-#include "vision_node/VisionObject.h"
+#include "Part.h"
+#include "VisionObject.h"
 
 using namespace std;
 using namespace cv;
