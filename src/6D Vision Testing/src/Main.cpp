@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include "TestClass.h"
+#include "ObjectDetector.h"
 
 TestClass testObject;
 
