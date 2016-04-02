@@ -1,2 +1,1 @@
-﻿  g++ -std=c++11 -MMD -IOpenCV/include -Iincl/ -c -o src/6DTool.o src/6DTool.cpp
-  g++ -std=c++11 -MMD -LOpenCV/lib -o 6DTool src/ObjectDetector.o src/6DTool.o src/PartMatcher.o -lopencv_core310 -lopencv_imgproc310 -lopencv_highgui310 -lopencv_imgcodecs310
+﻿  g++ -std=c++11 -MMD -LOpenCV/lib -o 6DTool src/ObjectDetector.o src/6DTool.o src/PartMatcher.o -lopencv_core310 -lopencv_imgproc310 -lopencv_highgui310 -lopencv_imgcodecs310

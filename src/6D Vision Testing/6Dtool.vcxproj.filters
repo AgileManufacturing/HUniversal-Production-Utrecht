@@ -32,13 +32,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ObjectDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PartMatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\6DTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
