@@ -1,11 +1,7 @@
 #ifndef VISIONOBJECT_H
 #define VISIONOBJECT_H
-
 #include <vector>
-#include "opencv2/core/core.hpp"
-
-using namespace std;
-using namespace cv;
+#include <opencv2/core/mat.hpp>
 
 /**
  * @brief The VisionObject struct
@@ -14,8 +10,8 @@ using namespace cv;
  * fromt a camera frame.
  */
 struct VisionObject{
-    Mat objectImage;
-    vector<Point> data;
+	cv::Mat objectImage;
+	std::vector<cv::Point> data;
 };
 
 #endif // VISIONOBJECT_H

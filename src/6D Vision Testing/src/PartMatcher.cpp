@@ -1,8 +1,6 @@
 #include "PartMatcher.h"
 #include "ObjectDetector.h"
 #include <opencv2/imgproc/imgproc.hpp>
-
-#include <iostream>
 #include <fstream>
 
 
@@ -253,8 +251,8 @@ map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     map<string,double> parameters;
     // calculating width and height of the object, the broadest side is always set
     // as width
-    RotatedRect rect = cv::minAreaRect(object.data);
-    Point2f vertices[4];
+	cv::RotatedRect rect = cv::minAreaRect(object.data);
+	cv::Point2f vertices[4];
     rect.points(vertices);
     double maxLength = -INFINITY, minLength = INFINITY;
     for(int i = 0; i < 4;++i){
@@ -270,7 +268,7 @@ map<string, double> PartMatcher::createParameterMap(const VisionObject& object){
     double area = height * width;
 
     double surfacePercentage = (object.data.size()/area) * 100;
-    vector<vector<Point>> holes =
+    vector<vector<cv::Point>> holes =
             ObjectDetector::getHoles(ObjectDetector::getContoursHierarchy(object.objectImage));
     double numberOfHoles = holes.size();
 

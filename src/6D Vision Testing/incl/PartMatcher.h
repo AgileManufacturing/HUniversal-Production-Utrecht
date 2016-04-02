@@ -1,14 +1,9 @@
-#ifndef PARTMATCHER_H
-#define PARTMATCHER_H
-
-#include <vector>
-#include <map>
-
+#ifndef _PARTMATCHER_H
+#define _PARTMATCHER_H
 #include "Part.h"
 #include "VisionObject.h"
-
-using namespace std;
-using namespace cv;
+#include <vector>
+#include <map>
 
 /**
  * @brief The PartMatcher class
@@ -90,9 +85,5 @@ public:
      * @return Returns the parameter map of the VisionObject.
      */
     static map<string, double> createParameterMap(const VisionObject& object);
-
-private:
 };
-
-
 #endif // PARTMATCHER_H

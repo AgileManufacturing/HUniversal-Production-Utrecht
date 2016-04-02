@@ -62,10 +62,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>mingw32-make</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>mingw32-make 6DTool</NMakeBuildCommandLine>
     <NMakeOutput>6DTool.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>incl;OpenCV/include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeCleanCommandLine>mingw32-make clean</NMakeCleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>mingw32-make</NMakeBuildCommandLine>
@@ -81,14 +82,12 @@
     <ClInclude Include="incl\ObjectDetector.h" />
     <ClInclude Include="incl\Part.h" />
     <ClInclude Include="incl\PartMatcher.h" />
-    <ClInclude Include="incl\StlNode.h" />
     <ClInclude Include="incl\VisionObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\6DTool.cpp" />
     <ClCompile Include="src\ObjectDetector.cpp" />
     <ClCompile Include="src\PartMatcher.cpp" />
-    <ClCompile Include="src\StlNode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

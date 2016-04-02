@@ -1,6 +1,2 @@
-﻿  g++ -std=c++11 -MMD -IOpenCV/include -Iincl/ -c -o src/Main.o src/Main.cpp
-  In file included from src/Main.cpp:5:0:
-  incl/ObjectDetector.h:4:21: fatal error: ros/ros.h: No such file or directory
-  compilation terminated.
-  mingw32-make: *** [src/Main.o] Error 1
-C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.MakeFile.Targets(37,5): error MSB3073: The command "mingw32-make" exited with code 2.
+﻿  g++ -std=c++11 -MMD -IOpenCV/include -Iincl/ -c -o src/6DTool.o src/6DTool.cpp
+  g++ -std=c++11 -MMD -LOpenCV/lib -o 6DTool src/ObjectDetector.o src/6DTool.o src/PartMatcher.o -lopencv_core310 -lopencv_imgproc310 -lopencv_highgui310 -lopencv_imgcodecs310

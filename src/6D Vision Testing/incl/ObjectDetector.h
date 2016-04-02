@@ -1,14 +1,9 @@
-#ifndef OBJECTDETECTOR_H
-#define OBJECTDETECTOR_H
+#ifndef _OBJECTDETECTOR_H
+#define _OBJECTDETECTOR_H
 
 #include <vector>
-
-#include <opencv2/core/core.hpp>
-
 #include "VisionObject.h"
 
-using namespace std;
-using namespace cv;
 /**
  * @brief The ObjectDetector class
  *
@@ -25,7 +20,7 @@ public:
     * @param image The image that the tresholding is applied to.
     * @return Returns a thresholded image.
     */
-   static Mat applyOtsuThreshold(const Mat &image);
+   static cv::Mat applyOtsuThreshold(const cv::Mat &image);
    /**
     * @brief findConnectedComponents
     *
@@ -34,7 +29,7 @@ public:
     * @param image The image that the connected components are extracted from.
     * @return Returns a vector that contains the pixel information of each object.
     */
-   static vector<vector<Point>> findConnectedComponents(const Mat& image);
+   static std::vector<std::vector<cv::Point>> findConnectedComponents(const cv::Mat& image);
    /**
     * @brief getContours
     *
@@ -43,7 +38,7 @@ public:
     * @param image The image that contours are extracted from.
     * @return Returns a vector that contains pixel data of each detected contour.
     */
-   static vector<vector<Point>> getContours(const Mat &image);
+   static std::vector<std::vector<cv::Point>> getContours(const cv::Mat &image);
    /**
     * @brief getContoursHierarchy
     *
@@ -53,7 +48,7 @@ public:
     * @param image The image that contours are extracted from.
     * @return Returns a pair of contours and their Heirarchy information.
     */
-   static pair<vector<vector<Point>>, vector<Vec4i>> getContoursHierarchy(const Mat &image);
+   static std::pair<std::vector<std::vector<cv::Point>>, std::vector<cv::Vec4i>> getContoursHierarchy(const cv::Mat &image);
    /**
     * @brief getHoles
     *
@@ -61,7 +56,7 @@ public:
     * @param contours The contours and their corresponding heirarchy.
     * @return Returns a vector of contours that are holes.
     */
-   static vector<vector<Point>> getHoles(const pair<vector<vector<Point>>, vector<Vec4i>>& contours);
+   static std::vector<std::vector<cv::Point>> getHoles(const std::pair<std::vector<std::vector<cv::Point>>, std::vector<cv::Vec4i>>& contours);
    /**
     * @brief getHoles
     *
@@ -70,7 +65,7 @@ public:
     * @param image The image that the contour heirarchy is extracted from.
     * @return Returns a vector of contours that are holes.
     */
-   static vector<vector<Point>> getHoles(const Mat &image);
+   static std::vector<std::vector<cv::Point>> getHoles(const cv::Mat &image);
    /**
     * @brief filterObjects
     *
@@ -81,10 +76,6 @@ public:
     * @param debugImage An extra image that can be used to draw debug data on (CURRENTLY NOT USED).
     * @return
     */
-   static vector<VisionObject> filterObjects(vector<vector<Point>>& objects,Mat& image,Mat& debugImage);
-
-
-private:
+   static std::vector<VisionObject> filterObjects(std::vector<std::vector<cv::Point>>& objects, cv::Mat& image);
 };
-
 #endif // OBJECTDETECTOR_H
