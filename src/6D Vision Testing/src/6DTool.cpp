@@ -2,6 +2,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <ObjectDetector.h>
 #include "TopDownDetector.h"
+#include <SideDetector.h>
 
 cv::Mat topDownImage;
 cv::Mat sideImage;
@@ -45,6 +46,8 @@ void topDownCalculations()
 
 void sideCalculations()
 {
+	auto Height = SideDetector::getZ(part);
+	std::cout << "Z: " << Height << std::endl;
 }
 
 int main(int argc, char** argv)
