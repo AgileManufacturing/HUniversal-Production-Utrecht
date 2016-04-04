@@ -1,6 +1,6 @@
 SOURCES				= $(wildcard src/*.cpp)
 OBJECTS				= $(SOURCES:.cpp=.o)
-CCFLAGS				= -std=c++11 -MMD
+CCFLAGS				= -std=c++11 -MMD -O3 -D__NO_INLINE__
 LDFLAGS				= -LOpenCV/lib
 LDLIBS				= -lopencv_core310 -lopencv_imgproc310 -lopencv_highgui310 -lopencv_imgcodecs310
 INCLUDES			= -IOpenCV/include -Iincl/
