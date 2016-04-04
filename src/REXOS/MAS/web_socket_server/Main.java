@@ -108,7 +108,7 @@ public class Main extends WebSocketServer {
 	}
 
 	public static void main( String[] args ) throws InterruptedException , IOException {
-		WebSocketImpl.DEBUG = true;
+		WebSocketImpl.DEBUG = false;
 		int port = Integer.parseInt(ServerConfigurations.WSS_PORT); // 843 flash policy port
 		try {
 			port = Integer.parseInt( args[ 0 ] );
