@@ -3,10 +3,50 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs/imgcodecs_c.h>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "ObjectDetector.h"
+#include <iostream>
 
-float TopDownDetector::getYaw(const VisionObject& part)
+float TopDownDetector::getYaw(VisionObject& part)
 {
-	auto templateImage = loadTemplateImage(part.typeName);
+
+	std::cout << "banaan" << std::endl;
+	auto templateImage = cv::imread(std::string("images/stlImages/stlfloe3.jpg"), CV_LOAD_IMAGE_GRAYSCALE);
+
+	auto connectedComponents = ObjectDetector::findConnectedComponents(templateImage);
+	auto objects = ObjectDetector::filterObjects(connectedComponents, templateImage);
+
+	cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
+
+	//for (unsigned int i = 0; i < part.data.size(); ++i) {
+	//	
+	//}
+	part.objectImage = ObjectDetector::applyOtsuThreshold(part.objectImage);
+	//for (int y = 0; y < objects[0].objectImage.size().height;++y) {
+	//	for (int x = 0; x < objects[0].objectImage.size().width;++x) {
+	//		std::cout << (int)objects[0].objectImage.at<uchar>(cv::Point(x, y)) << " ";
+	//	}
+	//	std::cout << std::endl;
+	//}
+	int posCount = 0;
+	int minx = 1000, miny = 1000;
+	for (cv::Point p : part.data) {
+		if (p.x < minx) {
+			minx = p.x;
+		}
+		if (p.y < miny) {
+			miny = p.y;
+		}
+	}
+	for (cv::Point p : part.data) {
+		if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x, p.y)) > 0) {
+			++posCount;
+			cv::line(part.objectImage, cv::Point(p.x - minx, p.y - miny), cv::Point(p.x - minx, p.y - miny), cv::Scalar(125, 125, 125));
+		}
+	}
+	std::cout << "Total: " << part.data.size() << " matched: " << posCount << std::endl;
+	cv::imshow("Testing", objects[0].objectImage);
+	cv::imshow("OTesting", part.objectImage);
 }
 
 cv::Point TopDownDetector::getXY(const VisionObject& part)

@@ -39,9 +39,9 @@ void detectPart()
 void topDownCalculations()
 {
 	auto center = TopDownDetector::getXY(part);
-	auto yaw = TopDownDetector::getYaw(part);
+	//auto yaw = TopDownDetector::getYaw(part);
 	std::cout << "XY: " << center << std::endl;
-	std::cout << "Yaw: " << yaw << std::endl;
+	//std::cout << "Yaw: " << yaw << std::endl;
 }
 
 void sideCalculations()
