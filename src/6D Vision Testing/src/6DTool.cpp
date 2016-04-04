@@ -3,6 +3,10 @@
 #include <ObjectDetector.h>
 #include "TopDownDetector.h"
 
+cv::Mat topDownImage;
+cv::Mat sideImage;
+VisionObject part;
+
 void checkParameters(int argc, char** argv)
 {
 	//The program expects two parameters from the user. Since C++ adds it's own first
@@ -14,29 +18,45 @@ void checkParameters(int argc, char** argv)
 	}
 }
 
-void topDownCalculations(cv::Mat& topDownImage)
+void readImages(char** argv)
+{
+	topDownImage = cv::imread(std::string("images/testImages/") + argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+	//sideMatrix = cv::imread(std::string("images/testImages/") + argv[2], CV_LOAD_IMAGE_GRAYSCALE);
+	part.typeName = "Floe3";
+}
+
+void detectPart()
 {
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	auto connectedComponents = ObjectDetector::findConnectedComponents(topDownImage);
 	auto objects = ObjectDetector::filterObjects(connectedComponents, topDownImage);
+	part.objectImage = objects[0].objectImage;
+	part.data = objects[0].data;
+}
 
-	cv::imshow("Test", objects[0].objectImage);
+void topDownCalculations()
+{
+	auto center = TopDownDetector::getXY(part);
+	auto yaw = TopDownDetector::getYaw(part);
+	std::cout << "XY: " << center << std::endl;
+	std::cout << "Yaw: " << yaw << std::endl;
+}
 
-	auto center = TopDownDetector::getXY(objects[0]);
+void sideCalculations()
+{
 }
 
 int main(int argc, char** argv)
 {
 	//checkParameters(argc, argv);
+	readImages(argv);
+	detectPart();
+	topDownCalculations();	
+	sideCalculations();
 
-	//auto sideMatrix = cv::imread(std::string("images/testImages/") + argv[2], CV_LOAD_IMAGE_GRAYSCALE);
-	auto topDownImage = cv::imread(std::string("images/testImages/") + argv[1], CV_LOAD_IMAGE_GRAYSCALE);
-
-	topDownCalculations(topDownImage);	
-
-	namedWindow("Output image", cv::WINDOW_AUTOSIZE);
-	cv::imshow("Output image", topDownImage);
+	cv::imshow("Part", part.objectImage);
+	cv::imshow("Original", topDownImage);
 	cv::waitKey(0);
     return EXIT_SUCCESS;
 }
