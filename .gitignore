@@ -44,7 +44,10 @@ log.txt
 simulation/output/
 simulation/log.log
 
-
+# Unnecessary visual studio files
+*.sdf
+*.VC.opendb
+*.suo
 
 src/6D Vision Testing/Makefile
 src/6D Vision Testing/Makefile
