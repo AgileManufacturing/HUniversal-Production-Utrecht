@@ -21,6 +21,8 @@ void topDownCalculations(cv::Mat& topDownImage)
 	auto connectedComponents = ObjectDetector::findConnectedComponents(topDownImage);
 	auto objects = ObjectDetector::filterObjects(connectedComponents, topDownImage);
 
+	cv::imshow("Test", objects[0].objectImage);
+
 	auto center = TopDownDetector::getXY(objects[0]);
 }
 
