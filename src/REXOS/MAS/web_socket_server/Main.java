@@ -75,18 +75,18 @@ public class Main extends WebSocketServer {
 	@Override
 	public void onOpen( WebSocket conn, ClientHandshake handshake ) { 
 		//this.sendToAll( "new connection: " + handshake.getResourceDescriptor() );
-		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + " entered the room!" );
+		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": entered the room!" );
 	}
 
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
 		//this.sendToAll( conn + " has left the room!" );
-		System.out.println( conn + " has left the room!" );
+		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": has left the room!" );
 	}
 
 	@Override
 	public void onMessage( WebSocket conn, String receivedMessage ) {
-		System.out.println( conn + ": " + receivedMessage );
+		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + receivedMessage );
 		try {
 			JSONObject message = new JSONObject(new JSONTokener(receivedMessage));
 			if (message.getString("receiver").equals("webSocketServer")){
@@ -104,7 +104,7 @@ public class Main extends WebSocketServer {
 
 	@Override
 	public void onFragment( WebSocket conn, Framedata fragment ) {
-		System.out.println( "received fragment: " + fragment );
+		//System.out.println( "received fragment: " + fragment );
 	}
 
 	public static void main( String[] args ) throws InterruptedException , IOException {
