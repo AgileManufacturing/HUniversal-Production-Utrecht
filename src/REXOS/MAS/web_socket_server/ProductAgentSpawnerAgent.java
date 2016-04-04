@@ -22,14 +22,14 @@ public class ProductAgentSpawnerAgent extends Agent {
 		  aid.addAddresses(ServerConfigurations.GS_ADDRESS);
 		  acl.addReceiver(aid);
 		  acl.setContent(message);
-		  System.out.println("Send acl: " + acl);
+		  System.out.println("PAS: Send acl: " + acl);
 		  send(acl);
-		  System.out.println("Send message: " + message);
+		  System.out.println("PAS: Send message: " + message);
 	}
 	protected void setup(){
-		System.out.println("Hello. My name is "+this.getLocalName());
+		System.out.println("PAS: Hello. My name is "+this.getLocalName());
 		System.out.println(productSteps);
-		System.out.println("Agent name: "+ this.getName());
+		System.out.println("PAS: Agent name: "+ this.getName());
 		sendMessage(productSteps, 0);
 		try {
 			getContainerController().kill();

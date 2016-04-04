@@ -75,18 +75,18 @@ public class Main extends WebSocketServer {
 	@Override
 	public void onOpen( WebSocket conn, ClientHandshake handshake ) { 
 		//this.sendToAll( "new connection: " + handshake.getResourceDescriptor() );
-		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": entered the room!" );
+		System.out.println("WSS:" + conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": entered the room!" );
 	}
 
 	@Override
 	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
 		//this.sendToAll( conn + " has left the room!" );
-		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": has left the room!" );
+		System.out.println("WSS:" + conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": has left the room!" );
 	}
 
 	@Override
 	public void onMessage( WebSocket conn, String receivedMessage ) {
-		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + receivedMessage );
+		System.out.println("WSS:" + conn.getRemoteSocketAddress().getAddress().getHostAddress() + ": " + receivedMessage );
 		try {
 			JSONObject message = new JSONObject(new JSONTokener(receivedMessage));
 			if (message.getString("receiver").equals("webSocketServer")){
@@ -116,7 +116,7 @@ public class Main extends WebSocketServer {
 		}
 		Main s = new Main( port );
 		s.start();
-		System.out.println( "WebSocketServer started on port: " + s.getPort());
+		System.out.println("WSS: started on port: " + s.getPort());
 
 		BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
 		while ( true ) {

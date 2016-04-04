@@ -57,7 +57,7 @@ public class CreateAgent {
 	private static final String CONTAINER_NAME = "ProductAgentSpawnerAgent";
 	
 	public CreateAgent() {
-		System.out.println("CreateAgent constructor");
+		System.out.println("CA: CreateAgent constructor");
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class CreateAgent {
 		Date date = new Date();
 		// Spawning EquipletAgent in the container that has the selected IP/Port
 		jade.core.Runtime runtime = jade.core.Runtime.instance();
-		System.out.println("Creating agent");
+		System.out.println("CA: Creating agent");
 
 		try {
 			Profile profile = new ProfileImpl();
@@ -82,7 +82,7 @@ public class CreateAgent {
 			ProductAgentSpawnerAgent agent = new ProductAgentSpawnerAgent();
 			agent.setProductSteps(args);
 			
-			System.out.println("Create Agent trying to create an agent [agent=" + agent + ", container=" + container.getContainerName() + identifier + "]");
+			System.out.println("CA: Create Agent trying to create an agent [agent=" + agent + ", container=" + container.getContainerName() + identifier + "]");
 			
 			MyWebsocket mws = new MyWebsocket(new URI(ServerConfigurations.WSS_URI));
 			try {
@@ -101,7 +101,7 @@ public class CreateAgent {
 				mws.connectBlocking();
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
-				System.out.println("Impossible, URL format incorrect: " + ServerConfigurations.WSS_URI);
+				System.out.println("CA: Impossible, URL format incorrect: " + ServerConfigurations.WSS_URI);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -127,7 +127,7 @@ public class CreateAgent {
 		@Override
 		public void onOpen(ServerHandshake handshakedata) {
 			// TODO Auto-generated method stub
-			System.out.println("onOpen");
+			//System.out.println("onOpen");
 			if (created) {
 				send("{\"receiver\":\"interface\", \"message\":\"Created product\", \"type\":\"success\"}");
 			} else {
