@@ -1,7 +1,7 @@
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <ObjectDetector.h>
-#include <opencv2/imgproc/imgproc.hpp>
+#include "TopDownDetector.h"
 
 void checkParameters(int argc, char** argv)
 {
@@ -14,43 +14,27 @@ void checkParameters(int argc, char** argv)
 	}
 }
 
-void preprocessImages(char** argv)
+void topDownCalculations(cv::Mat& topDownImage)
 {
-	//auto sideMatrix = cv::imread(argv[2], CV_LOAD_IMAGE_GRAYSCALE);
-	auto topDownMatrix = cv::imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
-
-	std::vector<std::vector<cv::Point> > contours;
+	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
+	auto connectedComponents = ObjectDetector::findConnectedComponents(topDownImage);
+	auto objects = ObjectDetector::filterObjects(connectedComponents, topDownImage);
 
-	auto connectedComponents = ObjectDetector::findConnectedComponents(topDownMatrix);
-	auto objects = ObjectDetector::filterObjects(connectedComponents, topDownMatrix);
-	auto objectImage = objects[0].objectImage;
-
-	cv::Moments moments = cv::moments(objectImage, true);
-	cv::Point objectCenter{ moments.m10 / moments.m00, moments.m01 / moments.m00 };
-
-	findContours(objectImage.clone(), contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-	std::vector<std::vector<cv::Point>> hull(contours.size());
-	for (size_t i = 0; i < contours.size(); i++)
-	{
-		convexHull(cv::Mat(contours[i]), hull[i], false);
-	}
-
-	//Draw stuff
-	for (size_t i = 0; i< contours.size(); i++)
-	{
-		drawContours(objectImage, hull, i, cv::Scalar(128, 128, 128, 255));
-	}
-	cv::rectangle(objectImage, objectCenter - cv::Point(1, 1), objectCenter + cv::Point(1, 1), cv::Scalar(0, 0, 0, 255), 3);
-
-	namedWindow("Output image", cv::WINDOW_AUTOSIZE);
-	cv::imshow("Output image", objectImage);
-	cv::waitKey(0);
+	auto center = TopDownDetector::getXY(objects[0]);
 }
 
 int main(int argc, char** argv)
 {
 	//checkParameters(argc, argv);
-	preprocessImages(argv);
+
+	//auto sideMatrix = cv::imread(std::string("images/testImages/") + argv[2], CV_LOAD_IMAGE_GRAYSCALE);
+	auto topDownImage = cv::imread(std::string("images/testImages/") + argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+
+	topDownCalculations(topDownImage);	
+
+	namedWindow("Output image", cv::WINDOW_AUTOSIZE);
+	cv::imshow("Output image", topDownImage);
+	cv::waitKey(0);
     return EXIT_SUCCESS;
 }

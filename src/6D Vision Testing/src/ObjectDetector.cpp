@@ -106,11 +106,6 @@ std::vector<VisionObject> ObjectDetector::filterObjects(std::vector<std::vector<
                     miny = y;
                 }
             }
-            //create a small border for some extra space around the object in the objectimage
-            maxx+=10;
-            maxy+=10;
-            minx-=10;
-            miny-=10;
 
 	        cv::Mat objectImage = cv::Mat::zeros(maxy - miny,maxx-minx,CV_8U);
             for(unsigned int j = 0; j < objects[i].size();++j){

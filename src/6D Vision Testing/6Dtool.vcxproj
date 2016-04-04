@@ -39,14 +39,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="incl\ObjectDetector.h" />
-    <ClInclude Include="incl\Part.h" />
-    <ClInclude Include="incl\PartMatcher.h" />
+    <ClInclude Include="incl\SideDetector.h" />
+    <ClInclude Include="incl\TopDownDetector.h" />
     <ClInclude Include="incl\VisionObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\6DTool.cpp" />
     <ClCompile Include="src\ObjectDetector.cpp" />
-    <ClCompile Include="src\PartMatcher.cpp" />
+    <ClCompile Include="src\SideDetector.cpp" />
+    <ClCompile Include="src\TopDownDetector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

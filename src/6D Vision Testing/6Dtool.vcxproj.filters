@@ -18,16 +18,16 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="incl\Part.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="incl\ObjectDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="incl\PartMatcher.h">
+    <ClInclude Include="incl\VisionObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="incl\VisionObject.h">
+    <ClInclude Include="incl\SideDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="incl\TopDownDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,10 +35,13 @@
     <ClCompile Include="src\ObjectDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PartMatcher.cpp">
+    <ClCompile Include="src\6DTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\6DTool.cpp">
+    <ClCompile Include="src\SideDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TopDownDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

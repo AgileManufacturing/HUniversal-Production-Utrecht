@@ -1,17 +1,14 @@
-#ifndef VISIONOBJECT_H
-#define VISIONOBJECT_H
+#ifndef _VISION_OBJECT_H
+#define _VISION_OBJECT_H
 #include <vector>
 #include <opencv2/core/mat.hpp>
 
-/**
- * @brief The VisionObject struct
- *
- * Contains the information of and object that is extracted
- * fromt a camera frame.
- */
-struct VisionObject{
+class VisionObject
+{
+public:
 	cv::Mat objectImage;
 	std::vector<cv::Point> data;
+	std::string typeName;
 };
 
-#endif // VISIONOBJECT_H
+#endif
