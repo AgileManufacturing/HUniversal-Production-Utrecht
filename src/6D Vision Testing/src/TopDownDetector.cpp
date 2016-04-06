@@ -7,27 +7,15 @@
 #include "ObjectDetector.h"
 #include <iostream>
 
-float TopDownDetector::getYaw(VisionObject& part)
-{
-
-	std::cout << "banaan" << std::endl;
+float TopDownDetector::getYaw(VisionObject& part){
 	auto templateImage = cv::imread(std::string("images/stlImages/stlfloe3.jpg"), CV_LOAD_IMAGE_GRAYSCALE);
 
 	auto connectedComponents = ObjectDetector::findConnectedComponents(templateImage);
 	auto objects = ObjectDetector::filterObjects(connectedComponents, templateImage);
 
 	cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
-
-	//for (unsigned int i = 0; i < part.data.size(); ++i) {
-	//	
-	//}
 	part.objectImage = ObjectDetector::applyOtsuThreshold(part.objectImage);
-	//for (int y = 0; y < objects[0].objectImage.size().height;++y) {
-	//	for (int x = 0; x < objects[0].objectImage.size().width;++x) {
-	//		std::cout << (int)objects[0].objectImage.at<uchar>(cv::Point(x, y)) << " ";
-	//	}
-	//	std::cout << std::endl;
-	//}
+
 	int posCount = 0;
 	int minx = 1000, miny = 1000;
 	for (cv::Point p : part.data) {
@@ -38,15 +26,35 @@ float TopDownDetector::getYaw(VisionObject& part)
 			miny = p.y;
 		}
 	}
+	cv::Point centrePoint = cv::Point(part.objectImage.cols / 2, part.objectImage.rows / 2);
+	cv::Mat rotMat;
+	cv::Mat tempImage;
+	int bestMatch = 0;
+	int highestMatch = 0;
+	for (int i = 0; i < 360;++i) {
+		rotMat = cv::getRotationMatrix2D(centrePoint, i, 1);
+		cv::warpAffine(objects[0].objectImage, tempImage, rotMat, part.objectImage.size());
+		for (cv::Point p : part.data) {
+			if ((int)tempImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
+				++posCount;
+			}
+		}		
+		if (highestMatch < ((posCount * 100) / part.data.size())) {
+			highestMatch = (posCount * 100) / part.data.size();
+			bestMatch = i;
+			std::cout << "Best match: " << i << " Match percentage: " << highestMatch << std::endl;
+		}
+		posCount = 0;
+	}
+	rotMat = cv::getRotationMatrix2D(centrePoint, bestMatch, 1);
+	cv::warpAffine(objects[0].objectImage, tempImage, rotMat, part.objectImage.size());
 	for (cv::Point p : part.data) {
-		if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x, p.y)) > 0) {
-			++posCount;
+		if ((int)tempImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
 			cv::line(part.objectImage, cv::Point(p.x - minx, p.y - miny), cv::Point(p.x - minx, p.y - miny), cv::Scalar(125, 125, 125));
 		}
 	}
-	std::cout << "Total: " << part.data.size() << " matched: " << posCount << std::endl;
-	cv::imshow("Testing", objects[0].objectImage);
-	cv::imshow("OTesting", part.objectImage);
+	cv::imshow("Plswork", part.objectImage);
+	return bestMatch;
 }
 
 cv::Point TopDownDetector::getXY(const VisionObject& part)
