@@ -1006,6 +1006,7 @@
           <File Name="src/REXOS/MAS/grid_server/MonitoringAgent.java"/>
           <File Name="src/REXOS/MAS/grid_server/SupplyAgent.java"/>
           <File Name="src/REXOS/MAS/grid_server/AgentData.java"/>
+          <File Name="src/REXOS/MAS/grid_server/GridAgentListenerBehaviour.java"/>
         </VirtualDirectory>
         <File Name="src/REXOS/MAS/TestRunner.java"/>
         <File Name="src/REXOS/MAS/build.xml"/>
