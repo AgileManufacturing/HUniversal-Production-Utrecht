@@ -26,11 +26,18 @@ public class ServerConfigurations {
 		            continue;
 		
 		        Enumeration<InetAddress> addresses = iface.getInetAddresses();
+				int addrCount = 0;
 		        while(addresses.hasMoreElements()) {
 		            InetAddress addr = addresses.nextElement();
 		            ip = addr.getHostAddress();
 		            System.out.println(iface.getDisplayName() + " " + ip);
+					addrCount += 1;
 		        }
+				
+				if(iface.getDisplayName().startsWith("wlan") && addrCount > 0){
+					//wlan is recommend above other eth0 connections
+					break;
+				}
 		    }
 		} catch (SocketException e) {
 			System.out.println("Exception!");
