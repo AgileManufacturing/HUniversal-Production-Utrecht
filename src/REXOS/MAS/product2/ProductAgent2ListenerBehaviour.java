@@ -26,7 +26,9 @@ public class ProductAgent2ListenerBehaviour extends Behaviour {
     
     @Override
 	public void action() {
-		ACLMessage msg = pa.blockingReceive();
+        System.out.println("PA:" + pa.getLocalName() + " in action!");
+        
+		ACLMessage msg = pa.receive();
 		if (msg != null) {
 			switch (msg.getPerformative()) {
 			
@@ -42,7 +44,9 @@ public class ProductAgent2ListenerBehaviour extends Behaviour {
                 System.out.println("PA:" + pa.getLocalName() + " recieved new unkown command: " + msg.getContent().toString() );
 				break;
 			}
-		}
+		}else{
+            block();
+        }
 	}
     /**
 	 * done, default
