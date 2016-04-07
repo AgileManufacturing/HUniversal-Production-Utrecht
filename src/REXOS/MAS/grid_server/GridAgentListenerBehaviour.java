@@ -12,6 +12,10 @@ import jade.lang.acl.ACLMessage;
 import jade.proto.SubscriptionInitiator;
 import java.util.LinkedList;
 
+import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +30,7 @@ import MAS.product.ProductAgent2;
 import MAS.product.ProductStep;
 
 public class GridAgentListenerBehaviour extends Behaviour {
+    private long productCounter = 0;
 	boolean done = false;
 	GridAgent gridAgent = null;
 	SubscriptionInitiator test = null;
@@ -144,7 +149,7 @@ public class GridAgentListenerBehaviour extends Behaviour {
 
 					for (ProductStep productStep : productSteps) {
 						// replace the criteria in each productstep by the actual identifiers of crates and objects
-						productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
+						productStep.updateCriteria(gridAgent.fillProductCriteria(productStep.getCriteria()));
 					}
 
 					// TODO hard coded, need to come from arguments

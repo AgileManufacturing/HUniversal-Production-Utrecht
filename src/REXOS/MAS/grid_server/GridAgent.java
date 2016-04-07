@@ -208,7 +208,7 @@ public class GridAgent extends Agent {
 	// be completely rewritten in order to make it compatible)
 	// TODO delete completely!!!!!!!!! (because it is wrong, ugly and it should
 	// feels bad)
-	private JSONObject fillProductCriteria(JSONObject criteria) {
+	public JSONObject fillProductCriteria(JSONObject criteria) {
 		if (criteria.length() > 0) {
 			AID supplyAgent = new AID(MASConfiguration.SUPPLY_AGENT,
 					AID.ISLOCALNAME);
