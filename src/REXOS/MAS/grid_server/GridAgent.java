@@ -98,7 +98,7 @@ public class GridAgent extends Agent {
 	protected void setup() {
 		spawnTrafficAgent();
 		spawnSupplyAgent();
-		spawnEquipletAgent("EQ0", "hal");
+		spawnEquipletAgent("EQ3", "hal");
 		// TODO No arguments are given
 		spawnProductAgent("PA1", null );
         spawnProductAgent2("PA2", null);
