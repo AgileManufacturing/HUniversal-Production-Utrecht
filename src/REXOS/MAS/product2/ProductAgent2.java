@@ -28,6 +28,8 @@ public class ProductAgent2 extends Agent {
 		this.created = new Tick();
         
         System.out.println("PA:" + getLocalName() + " created!");
+        
+        addBehaviour(new ProductAgent2ListenerBehaviour(this));
 	}
 
 	/**

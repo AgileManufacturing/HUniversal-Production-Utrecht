@@ -1001,12 +1001,12 @@
           <File Name="src/REXOS/MAS/grid_server/ScheduleDispatcher.java"/>
           <File Name="src/REXOS/MAS/grid_server/build.xml"/>
           <File Name="src/REXOS/MAS/grid_server/TrafficManager.java"/>
-          <File Name="src/REXOS/MAS/grid_server/GridAgent.java"/>
           <File Name="src/REXOS/MAS/grid_server/HeartBeatBehaviour.java"/>
           <File Name="src/REXOS/MAS/grid_server/MonitoringAgent.java"/>
           <File Name="src/REXOS/MAS/grid_server/SupplyAgent.java"/>
           <File Name="src/REXOS/MAS/grid_server/AgentData.java"/>
           <File Name="src/REXOS/MAS/grid_server/GridAgentListenerBehaviour.java"/>
+          <File Name="src/REXOS/MAS/grid_server/GridAgent.java"/>
         </VirtualDirectory>
         <File Name="src/REXOS/MAS/TestRunner.java"/>
         <File Name="src/REXOS/MAS/build.xml"/>
@@ -1014,6 +1014,7 @@
         <File Name="src/REXOS/MAS/EQSpawnClass.java"/>
         <VirtualDirectory Name="product2">
           <File Name="src/REXOS/MAS/product2/ProductAgent2.java"/>
+          <File Name="src/REXOS/MAS/product2/ProductAgent2ListenerBehaviour.java"/>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="external_libraries">
