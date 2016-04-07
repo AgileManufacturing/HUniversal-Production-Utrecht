@@ -41,6 +41,7 @@
     <ClInclude Include="incl\ObjectDetector.h" />
     <ClInclude Include="incl\SideDetector.h" />
     <ClInclude Include="incl\TopDownDetector.h" />
+    <ClInclude Include="incl\Utilities.h" />
     <ClInclude Include="incl\VisionObject.h" />
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +49,7 @@
     <ClCompile Include="src\ObjectDetector.cpp" />
     <ClCompile Include="src\SideDetector.cpp" />
     <ClCompile Include="src\TopDownDetector.cpp" />
+    <ClCompile Include="src\Utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,14 +6,15 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "ObjectDetector.h"
 #include <iostream>
+#include "Utilities.h"
 
 float TopDownDetector::getYaw(VisionObject& part){
 	auto templateImage = cv::imread(std::string("images/stlImages/stlfloe3.jpg"), CV_LOAD_IMAGE_GRAYSCALE);
+	//auto connectedComponents = ObjectDetector::findConnectedComponents(templateImage);
+	//auto objects = ObjectDetector::filterObjects(connectedComponents, templateImage);
 
-	auto connectedComponents = ObjectDetector::findConnectedComponents(templateImage);
-	auto objects = ObjectDetector::filterObjects(connectedComponents, templateImage);
+	//cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
 
-	cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
 	part.objectImage = ObjectDetector::applyOtsuThreshold(part.objectImage);
 
 	int posCount = 0;
@@ -26,34 +27,37 @@ float TopDownDetector::getYaw(VisionObject& part){
 			miny = p.y;
 		}
 	}
-	cv::Point centrePoint = cv::Point(part.objectImage.cols / 2, part.objectImage.rows / 2);
-	cv::Mat rotMat;
 	cv::Mat tempImage;
 	int bestMatch = 0;
 	int highestMatch = 0;
-	for (int i = 0; i < 360;++i) {
-		rotMat = cv::getRotationMatrix2D(centrePoint, i, 1);
-		cv::warpAffine(objects[0].objectImage, tempImage, rotMat, part.objectImage.size());
+	for (int i = 0; i < 360;i+=2) {
+		Utilities::rotateImage(templateImage, tempImage, i);
+		auto connectedComponents = ObjectDetector::findConnectedComponents(tempImage);
+		auto objects = ObjectDetector::filterObjects(connectedComponents, tempImage);
+		cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
 		for (cv::Point p : part.data) {
-			if ((int)tempImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
+			if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
 				++posCount;
 			}
 		}		
 		if (highestMatch < ((posCount * 100) / part.data.size())) {
 			highestMatch = (posCount * 100) / part.data.size();
 			bestMatch = i;
-			std::cout << "Best match: " << i << " Match percentage: " << highestMatch << std::endl;
 		}
 		posCount = 0;
 	}
-	rotMat = cv::getRotationMatrix2D(centrePoint, bestMatch, 1);
-	cv::warpAffine(objects[0].objectImage, tempImage, rotMat, part.objectImage.size());
+	Utilities::rotateImage(templateImage, tempImage, bestMatch);
+	auto connectedComponents = ObjectDetector::findConnectedComponents(tempImage);
+	auto objects = ObjectDetector::filterObjects(connectedComponents, tempImage);
+	cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
+	cv::imshow("Rotated template", objects[0].objectImage);
+	std::cout << "Best match: " << bestMatch << " Match percentage: " << highestMatch << std::endl;
 	for (cv::Point p : part.data) {
-		if ((int)tempImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
+		if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
 			cv::line(part.objectImage, cv::Point(p.x - minx, p.y - miny), cv::Point(p.x - minx, p.y - miny), cv::Scalar(125, 125, 125));
 		}
 	}
-	cv::imshow("Plswork", part.objectImage);
+	//cv::imshow("Plswork", part.objectImage);
 	return bestMatch;
 }
 
@@ -64,7 +68,7 @@ cv::Point TopDownDetector::getXY(const VisionObject& part)
 	cv::Point absoluteCenter;
 
 	//Calculate center of mass
-	centerOfMass = getCenterOfMass(part.objectImage);
+	centerOfMass = Utilities::getCenterOfMass(part.objectImage);
 
 	//Find the top left corner of the part by drawing
 	//a bounding rectangle around the part data
@@ -76,20 +80,6 @@ cv::Point TopDownDetector::getXY(const VisionObject& part)
 	//added to the origin of the part image relative to its original image
 	absoluteCenter = partImageOrigin + centerOfMass;
 	return absoluteCenter;
-}
-
-cv::Point TopDownDetector::getCenterOfMass(const cv::Mat& partImage)
-{
-	cv::Moments moments;
-	cv::Point centerOfMass;
-
-	//Use the first order moments to calculate the 
-	//center of mass of the object.
-	moments = cv::moments(partImage, true);
-	centerOfMass.x = moments.m10 / moments.m00;
-	centerOfMass.y = moments.m01 / moments.m00;
-
-	return centerOfMass;
 }
 
 cv::Mat TopDownDetector::loadTemplateImage(const std::string typeName)

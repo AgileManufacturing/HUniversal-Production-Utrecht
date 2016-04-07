@@ -8,6 +8,8 @@ cv::Mat topDownImage;
 cv::Mat sideImage;
 VisionObject part;
 
+#define EDWINHACKYMAIN
+
 void checkParameters(int argc, char** argv)
 {
 	//The program expects two parameters from the user. Since C++ adds it's own first
@@ -50,6 +52,7 @@ void sideCalculations()
 	std::cout << "Z: " << Height << std::endl;
 }
 
+#ifndef EDWINHACKYMAIN
 int main(int argc, char** argv)
 {
 	//checkParameters(argc, argv);
@@ -63,3 +66,23 @@ int main(int argc, char** argv)
 	cv::waitKey(0);
     return EXIT_SUCCESS;
 }
+#endif
+#ifdef EDWINHACKYMAIN
+int main(int argc, char** argv)
+{
+	//checkParameters(argc, argv);
+	//readImages(argv);
+	for (int i = 0; i < 10; ++i) {
+		topDownImage = cv::imread(std::string("images/testImages/Floe3Rot" + std::to_string(i) + ".bmp"), CV_LOAD_IMAGE_GRAYSCALE);
+		std::cout << "Floe3Rot" + std::to_string(i) + ".bmp" << std::endl;
+		detectPart();
+		topDownCalculations();
+		sideCalculations();
+
+		cv::imshow("Part", part.objectImage);
+		//cv::imshow("Original" + std::to_string(i), topDownImage);
+		cv::waitKey(0);
+	}
+	return EXIT_SUCCESS;
+}
+#endif
