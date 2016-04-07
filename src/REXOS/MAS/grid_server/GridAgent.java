@@ -62,6 +62,7 @@ import org.json.JSONObject;
 
 import MAS.equiplet.EquipletAgent;
 import MAS.product.ProductAgent;
+import MAS.product.ProductAgent2;
 import MAS.product.ProductStep;
 import MAS.simulation.config.Config;
 import MAS.simulation.config.Configuration;
