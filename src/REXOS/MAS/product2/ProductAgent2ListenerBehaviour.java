@@ -39,7 +39,7 @@ public class ProductAgent2ListenerBehaviour extends Behaviour {
 					// TODO Auto-generated catch block
 				//	e.printStackTrace();
 				//}
-				//break;
+				break;
 			default:
                 System.out.println("PA:" + pa.getLocalName() + " recieved new unkown command: " + msg.getContent().toString() );
 				break;
