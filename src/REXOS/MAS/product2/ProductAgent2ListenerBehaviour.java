@@ -43,7 +43,16 @@ public class ProductAgent2ListenerBehaviour extends Behaviour {
 				break;
 			}
 		}
-
+	}
+    /**
+	 * done, default
+	 * TODO implement method
+	 * @return done 
+	 */
+	@Override
+	public boolean done() {
+		// TODO Auto-generated method stub
+		return done;
 	}
     
 }
