@@ -30,7 +30,7 @@ public class ProductAgentSpawnerAgent extends Agent {
 		System.out.println("PAS: Hello. My name is "+this.getLocalName());
 		System.out.println(productSteps);
 		System.out.println("PAS: Agent name: "+ this.getName());
-		sendMessage(productSteps, 0);
+		sendMessage(productSteps, ALCMessage.ACCEPT_PROPOSAL);
 		try {
 			getContainerController().kill();
 		} catch (StaleProxyException e) {

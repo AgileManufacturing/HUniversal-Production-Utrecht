@@ -1,10 +1,6 @@
 package MAS.grid_server;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import util.log.Logger;
-import MAS.util.Ontology;
 import SCADA.BasicAgentInfo;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
@@ -14,6 +10,16 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.proto.SubscriptionInitiator;
+import java.util.LinkedList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import MAS.util.Tick;
+import MAS.util.Position;
+import MAS.util.Parser;
+import MAS.util.Ontology;
 
 public class GridAgentListenerBehaviour extends Behaviour {
 	boolean done = false;
@@ -122,6 +128,35 @@ public class GridAgentListenerBehaviour extends Behaviour {
 					handleCreateAgent(msg);
 				}
 				break;
+            case ALCMessage.ACCEPT_PROPOSAL:
+                System.out.println(getLocalName() + ": received new request to spwan agent.");
+
+				try {
+					ContainerController cc = getContainerController();
+					String name = "PA" + productCounter++;
+
+					// parse configurations
+					LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(msg.getContent());
+
+					for (ProductStep productStep : productSteps) {
+						// replace the criteria in each productstep by the actual identifiers of crates and objects
+						productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
+					}
+
+					// TODO hard coded, need to come from arguments
+					Position startPosition = new Position(0, 0);
+					Tick deadline = new Tick().add(1000000);
+
+					Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
+					AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
+					ac.start();
+
+				} catch (StaleProxyException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
+				}
+                break;
 			default:
 				break;
 			}
