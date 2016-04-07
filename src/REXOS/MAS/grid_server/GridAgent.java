@@ -161,7 +161,7 @@ public class GridAgent extends Agent {
 	 * @return
 	 * @throws JSONException
 	 */
-	private LinkedList<ProductStep> parseConfigurationProductSteps(String source) throws JSONException {
+	public LinkedList<ProductStep> parseConfigurationProductSteps(String source) throws JSONException {
 		JSONObject json = new JSONObject(source);
 		if (json.has("productSteps")) {
 			JSONArray jsonSteps = json.getJSONArray("productSteps");

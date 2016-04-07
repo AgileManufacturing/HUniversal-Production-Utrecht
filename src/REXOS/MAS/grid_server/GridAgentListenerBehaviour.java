@@ -21,6 +21,10 @@ import MAS.util.Position;
 import MAS.util.Parser;
 import MAS.util.Ontology;
 
+import MAS.product.ProductAgent;
+import MAS.product.ProductAgent2;
+import MAS.product.ProductStep;
+
 public class GridAgentListenerBehaviour extends Behaviour {
 	boolean done = false;
 	GridAgent gridAgent = null;
@@ -128,15 +132,15 @@ public class GridAgentListenerBehaviour extends Behaviour {
 					handleCreateAgent(msg);
 				}
 				break;
-            case ALCMessage.ACCEPT_PROPOSAL:
-                System.out.println(getLocalName() + ": received new request to spwan agent.");
+            case ACLMessage.ACCEPT_PROPOSAL:
+                System.out.println(gridAgent.getLocalName() + ": received new request to spwan agent.");
 
 				try {
-					ContainerController cc = getContainerController();
+					ContainerController cc = gridAgent.getContainerController();
 					String name = "PA" + productCounter++;
 
 					// parse configurations
-					LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(msg.getContent());
+					LinkedList<ProductStep> productSteps = gridAgent.parseConfigurationProductSteps(msg.getContent());
 
 					for (ProductStep productStep : productSteps) {
 						// replace the criteria in each productstep by the actual identifiers of crates and objects
@@ -154,7 +158,7 @@ public class GridAgentListenerBehaviour extends Behaviour {
 				} catch (StaleProxyException e) {
 					e.printStackTrace();
 				} catch (JSONException e) {
-					System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
+					System.err.println(gridAgent.getLocalName() + ": failed to parse product configurations: " + e.getMessage());
 				}
                 break;
 			default:
