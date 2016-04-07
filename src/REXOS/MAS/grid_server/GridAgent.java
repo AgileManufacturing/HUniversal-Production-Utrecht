@@ -273,7 +273,7 @@ public class GridAgent extends Agent {
     public void spawnProductAgent2(String name, String inputArguments){
         try {
 			ContainerController cc = getContainerController();
-            AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), null);
+            AgentController ac = cc.createNewAgent(name, ProductAgent2.class.getName(), null);
             ac.start();
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
