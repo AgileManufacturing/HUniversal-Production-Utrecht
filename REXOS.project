@@ -1011,6 +1011,9 @@
         <File Name="src/REXOS/MAS/build.xml"/>
         <File Name="src/REXOS/MAS/MASTestFinder.java"/>
         <File Name="src/REXOS/MAS/EQSpawnClass.java"/>
+        <VirtualDirectory Name="product2">
+          <File Name="src/REXOS/MAS/product2/ProductAgent2.java"/>
+        </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="external_libraries">
         <File Name="src/REXOS/external_libraries/APDescription.txt"/>
@@ -1119,4 +1122,15 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Project Name="REXOS" Path="REXOS.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Environment/>
+      <Project Name="REXOS" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="REXOS" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
 </CodeLite_Project>
