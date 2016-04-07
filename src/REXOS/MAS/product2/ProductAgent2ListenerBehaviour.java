@@ -26,7 +26,7 @@ public class ProductAgent2ListenerBehaviour extends Behaviour {
     
     @Override
 	public void action() {
-		ACLMessage msg = gridAgent.blockingReceive();
+		ACLMessage msg = pa.blockingReceive();
 		if (msg != null) {
 			switch (msg.getPerformative()) {
 			
@@ -39,6 +39,7 @@ public class ProductAgent2ListenerBehaviour extends Behaviour {
 				//}
 				//break;
 			default:
+                System.out.println("PA:" + pa.getLocalName() + " recieved new unkown command: " + msg.getContent().toString() );
 				break;
 			}
 		}
