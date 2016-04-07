@@ -26,6 +26,8 @@ public class ProductAgent2 extends Agent {
 	public void setup() {
 		Object[] args = getArguments();
 		this.created = new Tick();
+        
+        System.out.println("PA:" + getLocalName() + " created!");
 	}
 
 	/**

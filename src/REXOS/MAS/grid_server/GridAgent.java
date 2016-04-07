@@ -100,6 +100,7 @@ public class GridAgent extends Agent {
 		spawnEquipletAgent("EQ0", "hal");
 		// TODO No arguments are given
 		spawnProductAgent("PA1", null );
+        spawnProductAgent2("PA2", null);
 		
 		addBehaviour(new GridAgentListenerBehaviour(this));
 	
@@ -268,6 +269,21 @@ public class GridAgent extends Agent {
 					+ ": failed to create supply agent");
 		}
 	}
+    
+    public void spawnProductAgent2(String name, String inputArguments){
+        try {
+			ContainerController cc = getContainerController();
+            AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), inputArguments);
+            ac.start();
+		} catch (StaleProxyException e) {
+			e.printStackTrace();
+		}catch (JSONException e) {
+			System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
+		} catch (ConfigException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 	
 	/**
 	 * Create a product agent (for now)
