@@ -277,12 +277,13 @@ public class GridAgent extends Agent {
             ac.start();
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
-		}catch (JSONException e) {
-			System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
-		} catch (ConfigException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        }
+		//}catch (JSONException e) {
+		//	System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
+		//} catch (ConfigException e) {
+		//	// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
     }
 	
 	/**
