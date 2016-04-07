@@ -109,52 +109,6 @@ public class GridAgent extends Agent {
 	}
 
 	/**
-	 * This isn't used by GridAgent anymore but might need to be added into GridAgentListenerBehaviour
-	 * TODO check this
-	 *
-	 */
-	class GridListenerBehaviour extends CyclicBehaviour {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public void action() {
-			ACLMessage msg = blockingReceive();
-			if (msg != null) {
-				System.out.println(getLocalName() + ": received new request to spwan agent.");
-
-				try {
-					ContainerController cc = getContainerController();
-					String name = "PA" + productCounter++;
-
-					// parse configurations
-					LinkedList<ProductStep> productSteps = parseConfigurationProductSteps(msg.getContent());
-
-					for (ProductStep productStep : productSteps) {
-						// replace the criteria in each productstep by the actual identifiers of crates and objects
-						productStep.updateCriteria(fillProductCriteria(productStep.getCriteria()));
-					}
-
-					// TODO hard coded, need to come from arguments
-					Position startPosition = new Position(0, 0);
-					Tick deadline = new Tick().add(1000000);
-
-					Object[] arguments = new Object[] { Parser.parseProductConfiguration(productSteps, startPosition, deadline) };
-					AgentController ac = cc.createNewAgent(name, ProductAgent.class.getName(), arguments);
-					ac.start();
-
-				} catch (StaleProxyException e) {
-					e.printStackTrace();
-				} catch (JSONException e) {
-					System.err.println(getLocalName() + ": failed to parse product configurations: " + e.getMessage());
-				}
-			}
-		}
-	};
-
-	/**
 	 * TODO replace with Parser.parseProductConfiguration!
 	 * 
 	 * @param source

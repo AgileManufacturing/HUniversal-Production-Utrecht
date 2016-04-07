@@ -142,7 +142,7 @@ public class GridAgentListenerBehaviour extends Behaviour {
 
 				try {
 					ContainerController cc = gridAgent.getContainerController();
-					String name = "PA" + productCounter++;
+					String name = "GPA" + productCounter++;
 
 					// parse configurations
 					LinkedList<ProductStep> productSteps = gridAgent.parseConfigurationProductSteps(msg.getContent());
