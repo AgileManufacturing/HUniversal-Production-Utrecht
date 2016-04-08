@@ -7,7 +7,8 @@
 
 cv::Mat topDownImage;
 cv::Mat sideImage;
-VisionObject part;
+VisionObject topDownPart;
+VisionObject sidePart;
 
 cv::Point3i position;
 cv::Point3f rotation;
@@ -34,11 +35,12 @@ void initialise(int argc, char** argv)
 		Utilities::exitWithMessage("Path to side view image is invalid.");
 	}
 
-	part.typeName = argv[3];
+	topDownPart.typeName = argv[3];
+	sidePart.typeName = argv[3];
 	savePath = argv[4];
 }
 
-void detectPart()
+void detectParts()
 {
 	auto connectedComponents = ObjectDetector::findConnectedComponents(topDownImage);
 	auto objects = ObjectDetector::filterObjects(connectedComponents, topDownImage);
@@ -46,14 +48,23 @@ void detectPart()
 	{
 		Utilities::exitWithMessage("Unable to locate part in top-down view image.");
 	}
-	part.objectImage = objects[0].objectImage;
-	part.data = objects[0].data;
+	topDownPart.objectImage = objects[0].objectImage;
+	topDownPart.data = objects[0].data;
+
+	connectedComponents = ObjectDetector::findConnectedComponents(sideImage);
+	objects = ObjectDetector::filterObjects(connectedComponents, sideImage);
+	if(objects.size() == 0)
+	{
+		Utilities::exitWithMessage("Unable to locate part in side view image");
+	}
+	sidePart.objectImage = objects[0].objectImage;
+	sidePart.data = objects[0].data;
 }
 
 void calculateTopDownValues()
 {
-	auto xy = TopDownDetector::getXY(part);
-	auto yaw = TopDownDetector::getYaw(part);
+	auto xy = TopDownDetector::getXY(topDownPart);
+	auto yaw = TopDownDetector::getYaw(topDownPart);
 	position.x = xy.x;
 	position.y = xy.y;
 	rotation.x = yaw;
@@ -61,8 +72,8 @@ void calculateTopDownValues()
 
 void calculateSideValues()
 {
-	auto z = SideDetector::getZ(part);
-	auto rollPitch = SideDetector::getRollPitch(part);
+	auto z = SideDetector::getZ(sidePart);
+	auto rollPitch = SideDetector::getRollPitch(sidePart);
 	position.z = z;
 	rotation.y = rollPitch.x;
 	rotation.z = rollPitch.y;
@@ -87,7 +98,7 @@ void saveValues()
 int main(int argc, char** argv)
 {
 	initialise(argc, argv);
-	detectPart();
+	detectParts();
 	calculateTopDownValues();	
 	calculateSideValues();
 	saveValues();
