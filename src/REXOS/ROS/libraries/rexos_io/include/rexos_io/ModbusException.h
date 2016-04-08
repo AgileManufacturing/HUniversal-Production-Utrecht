@@ -40,8 +40,8 @@ namespace rexos_io{
 		 **/
 		ModbusException(const std::string msg) : InputOutputException(""), errorCode(errno), message(){
 			std::stringstream stream;
-			stream << msg << std::endl;
 			stream << "modbus error[" << errorCode << "]: " << modbus_strerror(errorCode);
+			stream << "message by error" << msg << std::endl;
 			message = stream.str();
 		}
 
