@@ -77,6 +77,7 @@ namespace rexos_io {
 		if(r == -1){
 			// When broadcasting; ignore timeout errors
 			if(currentSlave == MODBUS_BROADCAST_ADDRESS && errno == MODBUS_ERRNO_TIMEOUT) return;
+			else if(errno == MODBUS_ERRNO_TIMEOUT) throw ModbusException("Error writing u16 array: TIMEOUT");
 			else throw ModbusException("Error writing u16 array");
 		}
 	}
