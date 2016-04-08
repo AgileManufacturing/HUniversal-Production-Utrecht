@@ -1,88 +1,96 @@
-#include <iostream>
+#include "TopDownDetector.h"
+#include "SideDetector.h"
+#include "Utilities.h"
+#include <fstream>
 #include <opencv2/highgui/highgui.hpp>
 #include <ObjectDetector.h>
-#include "TopDownDetector.h"
-#include <SideDetector.h>
 
 cv::Mat topDownImage;
 cv::Mat sideImage;
 VisionObject part;
 
-#define EDWINHACKYMAIN
+cv::Point3i position;
+cv::Point3f rotation;
+std::string savePath;
 
-void checkParameters(int argc, char** argv)
+void initialise(int argc, char** argv)
 {
 	//The program expects two parameters from the user. Since C++ adds it's own first
 	//runtime parameter to argc the total equals 3.
-	if (argc != 3)
+	if (argc != 5)
 	{
-		std::cerr << "Incorrect number of parameters entered, expected 2. Terminating program.";
-		exit(EXIT_FAILURE);
+		Utilities::exitWithMessage("Incorrect number of parameters entered. Expected 4 got " + std::to_string(argc-1) + ".");
 	}
-}
 
-void readImages(char** argv)
-{
-	topDownImage = cv::imread(std::string("images/testImages/") + argv[1], CV_LOAD_IMAGE_GRAYSCALE);
-	//sideMatrix = cv::imread(std::string("images/testImages/") + argv[2], CV_LOAD_IMAGE_GRAYSCALE);
-	part.typeName = "Floe3";
+	topDownImage = cv::imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+	if(topDownImage.data == nullptr)
+	{
+		Utilities::exitWithMessage("Path to top-down view image is invalid.");
+	}
+
+	sideImage = cv::imread(argv[2], CV_LOAD_IMAGE_GRAYSCALE);
+	if(sideImage.data == nullptr)
+	{
+		Utilities::exitWithMessage("Path to side view image is invalid.");
+	}
+
+	part.typeName = argv[3];
+	savePath = argv[4];
 }
 
 void detectPart()
 {
-	std::vector<std::vector<cv::Point>> contours;
-	std::vector<cv::Vec4i> hierarchy;
 	auto connectedComponents = ObjectDetector::findConnectedComponents(topDownImage);
 	auto objects = ObjectDetector::filterObjects(connectedComponents, topDownImage);
+	if(objects.size() == 0)
+	{
+		Utilities::exitWithMessage("Unable to locate part in top-down view image.");
+	}
 	part.objectImage = objects[0].objectImage;
 	part.data = objects[0].data;
 }
 
-void topDownCalculations()
+void calculateTopDownValues()
 {
-	auto center = TopDownDetector::getXY(part);
+	auto xy = TopDownDetector::getXY(part);
 	auto yaw = TopDownDetector::getYaw(part);
-	std::cout << "XY: " << center << std::endl;
-	//std::cout << "Yaw: " << yaw << std::endl;
+	position.x = xy.x;
+	position.y = xy.y;
+	rotation.x = yaw;
 }
 
-void sideCalculations()
+void calculateSideValues()
 {
-	auto Height = SideDetector::getZ(part);
-	std::cout << "Z: " << Height << std::endl;
+	auto z = SideDetector::getZ(part);
+	auto rollPitch = SideDetector::getRollPitch(part);
+	position.z = z;
+	rotation.y = rollPitch.x;
+	rotation.z = rollPitch.y;
 }
 
-#ifndef EDWINHACKYMAIN
+void saveValues()
+{
+	std::ofstream outputFile{ savePath + "/output.txt" };
+	if(!outputFile.is_open())
+	{
+		Utilities::exitWithMessage("Unable to create output file.");
+	}
+	outputFile << "X: " << position.x << std::endl;
+	outputFile << "Y: " << position.y << std::endl;
+	outputFile << "Z: " << position.z << std::endl;
+	outputFile << "Yaw: " << rotation.x << std::endl;
+	outputFile << "Roll: " << rotation.y << std::endl;
+	outputFile << "Pitch: " << rotation.z << std::endl;
+	outputFile.close();
+}
+
 int main(int argc, char** argv)
 {
-	//checkParameters(argc, argv);
-	readImages(argv);
+	initialise(argc, argv);
 	detectPart();
-	topDownCalculations();	
-	sideCalculations();
+	calculateTopDownValues();	
+	calculateSideValues();
+	saveValues();
 
-	cv::imshow("Part", part.objectImage);
-	cv::imshow("Original", topDownImage);
-	cv::waitKey(0);
     return EXIT_SUCCESS;
 }
-#endif
-#ifdef EDWINHACKYMAIN
-int main(int argc, char** argv)
-{
-	//checkParameters(argc, argv);
-	//readImages(argv);
-	for (int i = 0; i < 10; ++i) {
-		topDownImage = cv::imread(std::string("images/testImages/Floe3Rot" + std::to_string(i) + ".bmp"), CV_LOAD_IMAGE_GRAYSCALE);
-		std::cout << "Floe3Rot" + std::to_string(i) + ".bmp" << std::endl;
-		detectPart();
-		topDownCalculations();
-		sideCalculations();
-
-		cv::imshow("Part", part.objectImage);
-		//cv::imshow("Original" + std::to_string(i), topDownImage);
-		cv::waitKey(0);
-	}
-	return EXIT_SUCCESS;
-}
-#endif

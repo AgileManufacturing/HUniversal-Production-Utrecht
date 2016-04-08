@@ -1,36 +1,17 @@
 #include "Utilities.h"
 #include <opencv2/imgproc.hpp>
+#include <iostream>
 
-
-cv::Mat Utilities::rotateImage(const cv::Mat& srcImage,cv::Mat& dstImage, double angle, double scale) {
-	//int minx = INFINITY, maxx = 0;
-	//int miny = INFINITY, maxy = 0;
-	//for (int y = 0; y < srcImage.size().height; ++y) {
-	//	for (int x = 0; x < srcImage.size().width; ++x) {
-	//		if ((int)srcImage.at<uchar>(cv::Point(x, y)) > 0) {
-	//			if (x > maxx) {
-	//				maxx = x;
-	//			}
-	//			if (x < minx) {
-	//				minx = x;
-	//			}
-	//			if (y > maxy) {
-	//				maxy = y;
-	//			}
-	//			if (y < miny) {
-	//				miny = y;
-	//			}
-	//		}
-	//	}
-	//}	
-	//cv::Point centrePoint = cv::Point((maxx - minx)/ 2, (maxy - miny) / 2);
-	cv::Point centrePoint = getCenterOfMass(srcImage);
-	cv::Mat rotMat = cv::getRotationMatrix2D(centrePoint, angle, scale);
+cv::Mat Utilities::rotateImage(const cv::Mat& srcImage,cv::Mat& dstImage, double angle, double scale) 
+{
+	auto centrePoint = getCenterOfMass(srcImage);
+	auto rotMat = cv::getRotationMatrix2D(centrePoint, angle, scale);
 	cv::warpAffine(srcImage, dstImage, rotMat, srcImage.size());
 	return dstImage;
 }
 
-cv::Point Utilities::getCenterOfMass(const cv::Mat& partImage){
+cv::Point Utilities::getCenterOfMass(const cv::Mat& partImage)
+{
 	cv::Moments moments;
 	cv::Point centerOfMass;
 
@@ -41,4 +22,25 @@ cv::Point Utilities::getCenterOfMass(const cv::Mat& partImage){
 	centerOfMass.y = moments.m01 / moments.m00;
 
 	return centerOfMass;
+}
+
+void Utilities::exitWithMessage(std::string message)
+{
+	std::cerr << message << std::endl;
+	std::cerr << "Terminating program";
+	exit(EXIT_FAILURE);
+}
+
+std::istream& operator>>(std::istream& input, cv::Point& point)
+{
+	char discardC;
+	//Read x
+	input >> point.x;
+	//Discard ,
+	input >> discardC;
+	//Read y
+	input >> point.y;
+	//Discard ; and possible newline
+	input >> discardC;
+	return input;
 }

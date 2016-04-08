@@ -10,7 +10,6 @@ public:
 	static float getYaw(VisionObject& part);
 	static cv::Point getXY(const VisionObject& part);
 private:
-	static cv::Point getCenterOfMass(const cv::Mat& partImage);
-	static cv::Mat loadTemplateImage(const std::string typeName);
+	static cv::Mat loadTemplateImage(const VisionObject& part);
 };
 #endif

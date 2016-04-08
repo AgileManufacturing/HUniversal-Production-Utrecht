@@ -3,18 +3,12 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs/imgcodecs_c.h>
 #include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include "ObjectDetector.h"
-#include <iostream>
 #include "Utilities.h"
 
-float TopDownDetector::getYaw(VisionObject& part){
-	auto templateImage = cv::imread(std::string("images/stlImages/stlfloe3.jpg"), CV_LOAD_IMAGE_GRAYSCALE);
-	//auto connectedComponents = ObjectDetector::findConnectedComponents(templateImage);
-	//auto objects = ObjectDetector::filterObjects(connectedComponents, templateImage);
-
-	//cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
-
+float TopDownDetector::getYaw(VisionObject& part)
+{
+	auto templateImage = loadTemplateImage(part);
 	part.objectImage = ObjectDetector::applyOtsuThreshold(part.objectImage);
 
 	int posCount = 0;
@@ -50,14 +44,11 @@ float TopDownDetector::getYaw(VisionObject& part){
 	auto connectedComponents = ObjectDetector::findConnectedComponents(tempImage);
 	auto objects = ObjectDetector::filterObjects(connectedComponents, tempImage);
 	cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
-	cv::imshow("Rotated template", objects[0].objectImage);
-	std::cout << "Best match: " << bestMatch << " Match percentage: " << highestMatch << std::endl;
 	for (cv::Point p : part.data) {
 		if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
 			cv::line(part.objectImage, cv::Point(p.x - minx, p.y - miny), cv::Point(p.x - minx, p.y - miny), cv::Scalar(125, 125, 125));
 		}
 	}
-	//cv::imshow("Plswork", part.objectImage);
 	return bestMatch;
 }
 
@@ -82,8 +73,13 @@ cv::Point TopDownDetector::getXY(const VisionObject& part)
 	return absoluteCenter;
 }
 
-cv::Mat TopDownDetector::loadTemplateImage(const std::string typeName)
+cv::Mat TopDownDetector::loadTemplateImage(const VisionObject& part)
 {
-	auto path = "templateImages/topDown/" + typeName;
-	return cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE);
+	auto path = "data/" + part.typeName + ".jpg";
+	auto image = cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE);
+	if(image.data == nullptr)
+	{
+		Utilities::exitWithMessage("Unable to find template file for part type: " + part.typeName + " in data folder.");
+	}
+	return image;
 }

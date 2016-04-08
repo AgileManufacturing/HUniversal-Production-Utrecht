@@ -4,7 +4,7 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>Floe3Rot2.bmp</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>testImages/Floe3Rot2.bmp testImages/Floe3Sideways0.bmp Floe3 output</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
