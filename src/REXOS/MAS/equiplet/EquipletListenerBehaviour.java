@@ -75,7 +75,9 @@ public class EquipletListenerBehaviour extends Behaviour {
 			// messagetype holding the requested state for the equiplet
 			case ACLMessage.PROPOSE:
 				if(msg.getConversationId().equals(Ontology.CONVERSATION_EQUIPLET_COMMAND)){
-					equiplet.passEquipletCommand(msg);
+					System.out.print("###CHANGE REQUEST:#### ");
+					System.out.println(msg);
+					//equiplet.passEquipletCommand(msg);
 				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_LISTENER_COMMAND)){
 					equiplet.passOnChangedCommand(msg);
 				}else if(msg.getConversationId().equals(Ontology.CONVERSATION_MODIFY_AGENT)){
