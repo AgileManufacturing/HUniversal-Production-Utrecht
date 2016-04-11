@@ -30,8 +30,8 @@ namespace rexos_statemachine{
 	void StateMachineController::changeState(rexos_statemachine::State state) {
 		rexos_statemachine::ChangeStateGoal goal;
 		goal.desiredState = state;
-		if(changeStateActionClient.waitForServer(ros::Duration(30.0)) == false) {
-			throw std::runtime_error("changeStateActionServer took too long to respond");
+		if(changeStateActionClient.waitForServer(ros::Duration(60.0)) == false) {
+			throw std::runtime_error("changeStateActionServer took too long to respond for state");
 		}
 		changeStateActionClient.sendGoal(goal);
 	}
@@ -39,8 +39,8 @@ namespace rexos_statemachine{
 	void StateMachineController::changeMode(rexos_statemachine::Mode mode) {
 		rexos_statemachine::ChangeModeGoal goal;
 		goal.desiredMode = mode;
-		if(changeModeActionClient.waitForServer(ros::Duration(30.0)) == false) {
-			throw std::runtime_error("changeModeActionServer took too long to respond");
+		if(changeModeActionClient.waitForServer(ros::Duration(60.0)) == false) {
+			throw std::runtime_error("changeModeActionServer took too long to respond for mode");
 		}
 		changeModeActionClient.sendGoal(goal);
 	}
