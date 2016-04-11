@@ -79,10 +79,10 @@ public class EQMessageAgent extends Agent {
 			sleep(5000);
 			//Change to save
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(3500);//Give equiplet time to go through init state
+			sleep(10000);//Give equiplet time to go through init state
 			//Get state again
 			sendGetData(getState);
-			sleep(3000);
+			sleep(10000);
 			//Return to offline
 			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 		}
