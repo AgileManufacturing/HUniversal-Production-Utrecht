@@ -1,13 +1,45 @@
 #include "SideDetector.h"
 #include "VisionObject.h"
 #include "Utilities.h"
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include "ObjectDetector.h"
 
-cv::Point SideDetector::getRollPitch(VisionObject part)
+cv::Point SideDetector::getRollPitch(VisionObject part, int yaw)
 {
 	auto values = getPossibleRollPitchValues(part);
+	for (auto v : values) {
+		cv::Mat currentImage = cv::imread("dataset/Test0" 
+			"r" + std::to_string(v.x) +
+			"p" + std::to_string(v.y) +
+			"y" + std::to_string(222) + ".jpg",
+			CV_LOAD_IMAGE_GRAYSCALE);
+		for (int i = 0; i < 360; i += 2) {
+			cv::Mat currentImage = cv::imread("dataset/Test0"
+				"r" + std::to_string(v.x) +
+				"p" + std::to_string(v.y) +
+				"y" + std::to_string(i) + ".jpg",
+				CV_LOAD_IMAGE_GRAYSCALE);
+			cv::imshow("Test", currentImage);
+			cv::waitKey(100);
+		}
+
+		auto connectedComponents = ObjectDetector::findConnectedComponents(currentImage);
+		auto templateObjects = ObjectDetector::filterObjects(connectedComponents, currentImage);
+		//auto templateContours = ObjectDetector::getContours(templateObjects[0].objectImage);
+		cv::resize(part.objectImage, part.objectImage,
+			cv::Size(templateObjects[0].objectImage.size().width,
+				templateObjects[0].objectImage.size().height));
+		//auto contours = ObjectDetector::getContours(part.objectImage);
+		cv::imshow("Contour1", templateObjects[0].objectImage);
+		cv::imshow("Contours2", part.objectImage);
+		cv::waitKey(0);
+		//std::cout << "Match: " << cv::matchShapes(templateContours[0],contours[0], CV_CONTOURS_MATCH_I1,0) << std::endl;
+
+	}
 	return { 0, 0 };
 }
 
