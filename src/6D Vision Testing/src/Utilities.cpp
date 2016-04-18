@@ -44,3 +44,4 @@ std::istream& operator>>(std::istream& input, cv::Point& point)
 	input >> discardC;
 	return input;
 }
+

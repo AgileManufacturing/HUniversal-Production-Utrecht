@@ -73,7 +73,7 @@ void calculateTopDownValues()
 void calculateSideValues()
 {
 	auto z = SideDetector::getZ(sidePart);
-	auto rollPitch = SideDetector::getRollPitch(sidePart);
+	auto rollPitch = SideDetector::getRollPitch(sidePart, rotation.x);
 	position.z = z;
 	rotation.y = rollPitch.x;
 	rotation.z = rollPitch.y;
