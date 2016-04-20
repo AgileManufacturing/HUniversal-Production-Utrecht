@@ -8,39 +8,41 @@
 #include <iostream>
 #include "ObjectDetector.h"
 
-cv::Point SideDetector::getRollPitch(VisionObject part, int yaw)
+cv::Point3i SideDetector::getRollPitchYaw(VisionObject part, std::vector<int> yaws)
 {
 	auto values = getPossibleRollPitchValues(part);
-	for (auto v : values) {
-		cv::Mat currentImage = cv::imread("dataset/Test0" 
-			"r" + std::to_string(v.x) +
-			"p" + std::to_string(v.y) +
-			"y" + std::to_string(222) + ".jpg",
-			CV_LOAD_IMAGE_GRAYSCALE);
-		for (int i = 0; i < 360; i += 2) {
+	cv::Point2i partOffsets = Utilities::getPartOffsets(part);
+	//creating list of decent size
+	std::vector<std::pair<int, cv::Point3i>> matchList(values.size() * yaws.size());
+	for (auto yaw : yaws) {
+		std::cout << yaw << std::endl;
+		for (auto v : values) {
 			cv::Mat currentImage = cv::imread("dataset/Test0"
 				"r" + std::to_string(v.x) +
 				"p" + std::to_string(v.y) +
-				"y" + std::to_string(i) + ".jpg",
+				"y" + std::to_string(Utilities::addDegrees(yaw, 180)) + ".jpg",
 				CV_LOAD_IMAGE_GRAYSCALE);
-			cv::imshow("Test", currentImage);
-			cv::waitKey(100);
+
+			auto connectedComponents = ObjectDetector::findConnectedComponents(currentImage);
+			auto templateObjects = ObjectDetector::filterObjects(connectedComponents, currentImage);
+
+			cv::resize(templateObjects[0].objectImage, templateObjects[0].objectImage,
+				cv::Size(part.objectImage.size().width,
+					part.objectImage.size().height));
+			int posCount = 0;
+			for (cv::Point p : part.data) {
+				if ((int)templateObjects[0].objectImage.at<uchar>(cv::Point(p.x - partOffsets.x, p.y - partOffsets.y)) > 0) {
+					++posCount;
+				}
+			}
+			int matchPercentage = (posCount * 100) / part.data.size();
+			Utilities::insertMatch(matchList, std::make_pair(matchPercentage, cv::Point3i(v.x, v.y, yaw)));
 		}
-
-		auto connectedComponents = ObjectDetector::findConnectedComponents(currentImage);
-		auto templateObjects = ObjectDetector::filterObjects(connectedComponents, currentImage);
-		//auto templateContours = ObjectDetector::getContours(templateObjects[0].objectImage);
-		cv::resize(part.objectImage, part.objectImage,
-			cv::Size(templateObjects[0].objectImage.size().width,
-				templateObjects[0].objectImage.size().height));
-		//auto contours = ObjectDetector::getContours(part.objectImage);
-		cv::imshow("Contour1", templateObjects[0].objectImage);
-		cv::imshow("Contours2", part.objectImage);
-		cv::waitKey(0);
-		//std::cout << "Match: " << cv::matchShapes(templateContours[0],contours[0], CV_CONTOURS_MATCH_I1,0) << std::endl;
-
 	}
-	return { 0, 0 };
+	for (auto m : matchList) {
+		std::cout << "Match: " << m.first << " - (" << m.second.x << "," << m.second.y << "," << m.second.z << ")" << std::endl;
+	}
+	return matchList[0].second;
 }
 
 int SideDetector::getZ(const VisionObject & part)

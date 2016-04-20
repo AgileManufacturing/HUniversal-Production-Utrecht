@@ -8,7 +8,7 @@ class SideDetector
 {
 public:
 	static int getZ(const VisionObject& part);
-	static cv::Point getRollPitch(VisionObject part, int yaw);
+	static cv::Point3i getRollPitchYaw(VisionObject part, std::vector<int> yaws);
 private:
 	static cv::Point getCenterOfMass(const cv::Mat& partImage);
 	static std::vector<cv::Point> getPossibleRollPitchValues(const VisionObject& part);

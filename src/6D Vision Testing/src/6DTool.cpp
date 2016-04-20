@@ -2,6 +2,7 @@
 #include "SideDetector.h"
 #include "Utilities.h"
 #include <fstream>
+#include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <ObjectDetector.h>
 
@@ -10,8 +11,11 @@ cv::Mat sideImage;
 VisionObject topDownPart;
 VisionObject sidePart;
 
+std::vector<int> possibleYaws;
+
 cv::Point3i position;
 cv::Point3f rotation;
+
 std::string savePath;
 
 void initialise(int argc, char** argv)
@@ -67,16 +71,17 @@ void calculateTopDownValues()
 	auto yaw = TopDownDetector::getYaw(topDownPart);
 	position.x = xy.x;
 	position.y = xy.y;
-	rotation.x = yaw;
+	possibleYaws = yaw;
 }
 
 void calculateSideValues()
 {
 	auto z = SideDetector::getZ(sidePart);
-	auto rollPitch = SideDetector::getRollPitch(sidePart, rotation.x);
+	auto rollPitchYaw = SideDetector::getRollPitchYaw(sidePart, possibleYaws);
 	position.z = z;
-	rotation.y = rollPitch.x;
-	rotation.z = rollPitch.y;
+	rotation.x = rollPitchYaw.x;
+	rotation.y = rollPitchYaw.y;
+	rotation.z = rollPitchYaw.z;
 }
 
 void saveValues()
@@ -89,10 +94,23 @@ void saveValues()
 	outputFile << "X: " << position.x << std::endl;
 	outputFile << "Y: " << position.y << std::endl;
 	outputFile << "Z: " << position.z << std::endl;
-	outputFile << "Yaw: " << rotation.x << std::endl;
-	outputFile << "Roll: " << rotation.y << std::endl;
-	outputFile << "Pitch: " << rotation.z << std::endl;
+	outputFile << "Roll: " << rotation.x << std::endl;
+	outputFile << "Pitch: " << rotation.y << std::endl;
+	outputFile << "Yaw: " << rotation.z << std::endl;
 	outputFile.close();
+
+	cv::Mat templateImage = cv::imread("dataset/Test0"
+		"r" + std::to_string((int)rotation.x) +
+		"p" + std::to_string((int)rotation.y) +
+		"y" + std::to_string(Utilities::addDegrees(rotation.z, 180)) + ".jpg",
+		CV_LOAD_IMAGE_GRAYSCALE);
+	std::cout << "dataset/Test0"
+		"r" + std::to_string((int)rotation.x) +
+		"p" + std::to_string((int)rotation.y) +
+		"y" + std::to_string(Utilities::addDegrees(rotation.z, 180)) + ".jpg" << std::endl;
+	cv::imshow("Side image", sideImage);
+	cv::imshow("Best matching template image", templateImage);
+	cv::waitKey(0);
 }
 
 int main(int argc, char** argv)

@@ -1,55 +1,41 @@
 #include "TopDownDetector.h"
 #include "VisionObject.h"
 #include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs/imgcodecs_c.h>
 #include <opencv2/imgcodecs.hpp>
 #include "ObjectDetector.h"
 #include "Utilities.h"
+#include <iostream>
 
-float TopDownDetector::getYaw(VisionObject& part)
+std::vector<int> TopDownDetector::getYaw(VisionObject& part)
 {
 	auto templateImage = loadTemplateImage(part);
 	part.objectImage = ObjectDetector::applyOtsuThreshold(part.objectImage);
+	cv::imshow("Test", part.objectImage);
+	
+	cv::Point2i partOffsets = Utilities::getPartOffsets(part);
 
-	int posCount = 0;
-	int minx = 1000, miny = 1000;
-	for (cv::Point p : part.data) {
-		if (p.x < minx) {
-			minx = p.x;
-		}
-		if (p.y < miny) {
-			miny = p.y;
-		}
-	}
 	cv::Mat tempImage;
 	int bestMatch = 0;
+	std::vector<std::pair<int, int>> matchList(180);
 	int highestMatch = 0;
 	for (int i = 0; i < 360;i+=2) {
 		Utilities::rotateImage(templateImage, tempImage, i);
 		auto connectedComponents = ObjectDetector::findConnectedComponents(tempImage);
 		auto objects = ObjectDetector::filterObjects(connectedComponents, tempImage);
 		cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
+
+		int posCount = 0;
 		for (cv::Point p : part.data) {
-			if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
+			if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x - partOffsets.x, p.y - partOffsets.y)) > 0) {
 				++posCount;
 			}
-		}		
-		if (highestMatch < ((posCount * 100) / part.data.size())) {
-			highestMatch = (posCount * 100) / part.data.size();
-			bestMatch = i;
 		}
-		posCount = 0;
+		int matchPercentage = (posCount * 100) / part.data.size();
+		Utilities::insertMatch(matchList, std::make_pair(matchPercentage, i));
 	}
-	Utilities::rotateImage(templateImage, tempImage, bestMatch);
-	auto connectedComponents = ObjectDetector::findConnectedComponents(tempImage);
-	auto objects = ObjectDetector::filterObjects(connectedComponents, tempImage);
-	cv::resize(objects[0].objectImage, objects[0].objectImage, cv::Size(part.objectImage.size().width, part.objectImage.size().height));
-	for (cv::Point p : part.data) {
-		if ((int)objects[0].objectImage.at<uchar>(cv::Point(p.x - minx, p.y - miny)) > 0) {
-			cv::line(part.objectImage, cv::Point(p.x - minx, p.y - miny), cv::Point(p.x - minx, p.y - miny), cv::Scalar(125, 125, 125));
-		}
-	}
-	return bestMatch;
+	return Utilities::filterYaw(matchList);
 }
 
 cv::Point TopDownDetector::getXY(const VisionObject& part)

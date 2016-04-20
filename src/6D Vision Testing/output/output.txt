@@ -1,6 +1,6 @@
-X: 284
-Y: 218
-Z: 224
-Yaw: 50
-Roll: 0
-Pitch: 0
+X: 313
+Y: 231
+Z: 266
+Roll: 11
+Pitch: 19
+Yaw: 198

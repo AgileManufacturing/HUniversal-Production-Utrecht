@@ -7,7 +7,7 @@ class VisionObject;
 class TopDownDetector
 {
 public:
-	static float getYaw(VisionObject& part);
+	static std::vector<int> getYaw(VisionObject& part);
 	static cv::Point getXY(const VisionObject& part);
 private:
 	static cv::Mat loadTemplateImage(const VisionObject& part);
