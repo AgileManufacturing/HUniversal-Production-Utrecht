@@ -38,6 +38,7 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="incl\basetimer.h" />
     <ClInclude Include="incl\ObjectDetector.h" />
     <ClInclude Include="incl\SideDetector.h" />
     <ClInclude Include="incl\TopDownDetector.h" />
@@ -46,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\6DTool.cpp" />
+    <ClCompile Include="src\basetimer.cpp" />
     <ClCompile Include="src\ObjectDetector.cpp" />
     <ClCompile Include="src\SideDetector.cpp" />
     <ClCompile Include="src\TopDownDetector.cpp" />

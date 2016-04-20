@@ -1,6 +1,7 @@
 #include "TopDownDetector.h"
 #include "SideDetector.h"
 #include "Utilities.h"
+#include "basetimer.h"
 #include <fstream>
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
@@ -110,16 +111,19 @@ void saveValues()
 		"y" + std::to_string(Utilities::addDegrees(rotation.z, 180)) + ".jpg" << std::endl;
 	cv::imshow("Side image", sideImage);
 	cv::imshow("Best matching template image", templateImage);
-	cv::waitKey(0);
 }
 
 int main(int argc, char** argv)
 {
+	BaseTimer timer;
+	timer.start();
 	initialise(argc, argv);
 	detectParts();
 	calculateTopDownValues();	
 	calculateSideValues();
 	saveValues();
-
+	timer.stop();
+	std::cout << "Elapsed time in milliseconds: " << timer.elapsedMilliSeconds() << std::endl;
+	cv::waitKey(0);
     return EXIT_SUCCESS;
 }
