@@ -57,7 +57,25 @@ public class EQMessageAgent extends Agent {
 			public void action (){ 
 				ACLMessage msg = this.myAgent.receive();
 				if(msg != null){
-					Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
+					switch (msg.getPerformative()) {
+					case ACLMessage.INFORM:
+						JSONObject messageContent = new JSONObject(msg.getContent());
+				
+						//Identifying requested equiplet command
+						String command = messageContent.getString("command");
+				
+						//Delegate command to corresponding functions
+						switch(command){
+						case "GET_CURRENT_EQUIPLET_STATE":
+							Logger.log("CURRENT EQUIPLET STATE: " + messageContent.getString("state") + " !!!");
+							break;
+						default:
+							Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
+						}
+						break;
+					default:
+						Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
+					}
 				}
 			}
 		});
