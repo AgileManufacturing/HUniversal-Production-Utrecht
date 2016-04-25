@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 ###################### SETTINGS ######################
-keepWindowOpenAfterCommandEnds=true
+keepWindowOpenAfterCommandEnds=false
 defaultManufacturer="HU"
 defaultTypeNumber="workplane_type_A"
 defaultSerialNumber="1"

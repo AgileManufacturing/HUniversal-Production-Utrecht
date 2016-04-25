@@ -2,6 +2,7 @@ package HAL.testerClasses;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +19,8 @@ import HAL.exceptions.BlackboardUpdateException;
 import HAL.exceptions.InvalidMastModeException;
 import HAL.libraries.knowledgedb_client.KnowledgeException;
 import HAL.listeners.HardwareAbstractionLayerListener;
+import HAL.steps.HardwareStep;
+import HAL.steps.ProductStep;
 
 public class HALTesterClassStewartGough extends HALTesterClass implements HardwareAbstractionLayerListener {
 	JSONObject criteria1 = new JSONObject();
@@ -26,7 +29,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
-	static boolean insertModules = true;
+	static boolean insertModules = false;
 	static boolean translateSteps = true;
 	
 	/**
@@ -89,102 +92,147 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 			hal.insertModule(staticSettingsLens.serialize(), dynamicSettingsLens.serialize());
 			hal.insertModule(staticSettingsWorkplane.serialize(), dynamicSettingsWorkplane.serialize());
 		}
+		//for(;;){
+			if(translateSteps == true) {
+				double xMoveDist = -2.0;
+				double yMoveDist = -3.0;
+				double sub1xrot = 0.25;
+				double sub1xrotap = 0.0;
+				double sub2zrot = 0.0;
+				//System.out.println("Putting step data...");
+				JSONObject target1 = new JSONObject();
+				JSONObject targetMove1 = new JSONObject();
+				targetMove1.put("x", xMoveDist);//5.5 -5.5 13.8
+				targetMove1.put("y", yMoveDist);
+				targetMove1.put("z", -11.0);
+				targetMove1.put("maxAcceleration", 4.0);
+				JSONObject targetMove1Approach = new JSONObject();
+				targetMove1Approach.put("x", xMoveDist);
+				targetMove1Approach.put("y", yMoveDist);
+				targetMove1Approach.put("z", 30.0);
+				targetMove1.put("approach", targetMove1Approach);
+				JSONObject targetRotate1 = new JSONObject();
+				targetRotate1.put("x", sub1xrot);
+				targetRotate1.put("y", 0);
+				targetRotate1.put("z", 0);
+				JSONObject targetRotate1Approach = new JSONObject();
+				targetRotate1Approach.put("x", sub1xrotap);
+				targetRotate1Approach.put("y", 0);
+				targetRotate1Approach.put("z", 0);
+				targetRotate1.put("approach", targetRotate1Approach);
+				target1.put("move", targetMove1);
+				target1.put("rotate", targetRotate1);
+				target1.put("identifier", "GC4x4MB_1");
 		
-		if(translateSteps == true) {
-			JSONObject target1 = new JSONObject();
-			JSONObject targetMove1 = new JSONObject();
-			targetMove1.put("x", 5.5);
-			targetMove1.put("y", -5.5);
-			targetMove1.put("z", 13.8);
-			targetMove1.put("maxAcceleration", 50.0);
-			JSONObject targetMove1Approach = new JSONObject();
-			targetMove1Approach.put("x", 0);
-			targetMove1Approach.put("y", 0);
-			targetMove1Approach.put("z", 20);
-			targetMove1.put("approach", targetMove1Approach);
-			JSONObject targetRotate1 = new JSONObject();
-			targetRotate1.put("x", 0);
-			targetRotate1.put("y", 0);
-			targetRotate1.put("z", 0);
-			JSONObject targetRotate1Approach = new JSONObject();
-			targetRotate1Approach.put("x", 0);
-			targetRotate1Approach.put("y", 0);
-			targetRotate1Approach.put("z", 0);
-			targetRotate1.put("approach", targetRotate1Approach);
-			target1.put("move", targetMove1);
-			target1.put("rotate", targetRotate1);
-			target1.put("identifier", "GC4x4MB_1");
-	
-			JSONArray subjects1 = new JSONArray();
-			JSONObject subject1 = new JSONObject();
-			JSONObject subjectMove1 = new JSONObject();
-			subjectMove1.put("x", 5.5);
-			subjectMove1.put("y", -5.5);
-			subjectMove1.put("z", 13.8);
-			subjectMove1.put("maxAcceleration", 50.0);
-			JSONObject subjectRotate1 = new JSONObject();
-			subjectRotate1.put("x", 0);
-			subjectRotate1.put("y", 0);
-			subjectRotate1.put("z", 0);
-			JSONObject subjectMove1Approach = new JSONObject();
-			subjectMove1Approach.put("x", 0);
-			subjectMove1Approach.put("y", 0);
-			subjectMove1Approach.put("z", 20);
-			JSONObject subjectRotate1Approach = new JSONObject();
-			subjectRotate1Approach.put("x", 0);
-			subjectRotate1Approach.put("y", 0);
-			subjectRotate1Approach.put("z", 0);
-			subjectMove1.put("approach", subjectMove1Approach);
-			subjectRotate1.put("approach", subjectRotate1Approach);
-			subject1.put("move", subjectMove1);
-			subject1.put("rotate", subjectRotate1);
-			subject1.put("identifier", "GC4x4MB_6");
-			subjects1.put(subject1);
-	
-			JSONObject target2 = new JSONObject();
-			JSONObject targetMove2 = new JSONObject();
-			targetMove2.put("x", 5.5);
-			targetMove2.put("y", -5.5);
-			targetMove2.put("z", 13.8);
-			targetMove2.put("maxAcceleration", 50.0);
-			JSONObject targetMove2Approach = new JSONObject();
-			targetMove2Approach.put("x", 0);
-			targetMove2Approach.put("y", 0);
-			targetMove2Approach.put("z", 20);
-			targetMove2.put("approach", targetMove2Approach);
-			target2.put("move", targetMove2);
-			target2.put("identifier", "GC4x4MB_6");
-	
-			JSONArray subjects2 = new JSONArray();
-			JSONObject subject2 = new JSONObject();
-			JSONObject subjectMove2 = new JSONObject();
-			subjectMove2.put("x", 5.5);
-			subjectMove2.put("y", -5.5);
-			subjectMove2.put("z", 13.8);
-			subjectMove2.put("maxAcceleration", 50.0);
-			JSONObject subjectMove2Approach = new JSONObject();
-			subjectMove2Approach.put("x", 0);
-			subjectMove2Approach.put("y", 0);
-			subjectMove2Approach.put("z", 20);
-			subjectMove2.put("approach", subjectMove2Approach);
-			subject2.put("move", subjectMove2);
-			subject2.put("identifier", "GC4x4MB_1");
-			subjects2.put(subject2);
-	
-			criteria1.put("target", target1);
-			criteria1.put("subjects", subjects1);
-	
-			criteria2.put("target", target2);
-			criteria2.put("subjects", subjects2);
-			
-			System.out.println(criteria1);
-	
-			hal.translateProductStep("place", criteria1);
-		}
+				JSONArray subjects1 = new JSONArray();
+				JSONObject subject1 = new JSONObject();
+				JSONObject subjectMove1 = new JSONObject();
+				subjectMove1.put("x", xMoveDist);
+				subjectMove1.put("y", yMoveDist);
+				subjectMove1.put("z", -32.0);
+				subjectMove1.put("maxAcceleration", 4.0);
+				JSONObject subjectRotate1 = new JSONObject();
+				subjectRotate1.put("x", 0.0);
+				subjectRotate1.put("y", 0.0);
+				subjectRotate1.put("z", sub2zrot);
+				JSONObject subjectMove1Approach = new JSONObject();
+				subjectMove1Approach.put("x", 0);
+				subjectMove1Approach.put("y", 0);
+				subjectMove1Approach.put("z", 20.0);
+				JSONObject subjectRotate1Approach = new JSONObject();
+				subjectRotate1Approach.put("x", 0);
+				subjectRotate1Approach.put("y", 0);
+				subjectRotate1Approach.put("z", 0);
+				subjectMove1.put("approach", subjectMove1Approach);
+				subjectRotate1.put("approach", subjectRotate1Approach);
+				subject1.put("move", subjectMove1);
+				subject1.put("rotate", subjectRotate1);
+				subject1.put("identifier", "GC4x4MB_6");
+				subjects1.put(subject1);
 		
+				JSONObject target2 = new JSONObject();
+				JSONObject targetMove2 = new JSONObject();
+				targetMove2.put("x", xMoveDist);//5.5 -5.5 23.8
+				targetMove2.put("y", yMoveDist);
+				targetMove2.put("z", -20.0);
+				targetMove2.put("maxAcceleration", 4.0);
+				JSONObject targetMove2Approach = new JSONObject();
+				targetMove2Approach.put("x", xMoveDist);
+				targetMove2Approach.put("y", yMoveDist);
+				targetMove2Approach.put("z", 20.0);
+				targetMove2.put("approach", targetMove2Approach);
+				JSONObject targetRotate2 = new JSONObject();
+				targetRotate2.put("x", 0);
+				targetRotate2.put("y", 0);
+				targetRotate2.put("z", sub2zrot);
+				JSONObject targetRotate2Approach = new JSONObject();
+				targetRotate2Approach.put("x", 0);
+				targetRotate2Approach.put("y", 0);
+				targetRotate2Approach.put("z", 0);
+				targetRotate2.put("approach", targetRotate2Approach);
+				target2.put("move", targetMove2);
+				target2.put("rotate", targetRotate2);
+				target2.put("identifier", "GC4x4MB_6");
+		
+				JSONArray subjects2 = new JSONArray();
+				JSONObject subject2 = new JSONObject();
+				JSONObject subjectMove2 = new JSONObject();
+				subjectMove2.put("x", xMoveDist);
+				subjectMove2.put("y", yMoveDist);
+				subjectMove2.put("z", -11.0);
+				subjectMove2.put("maxAcceleration", 4.0);
+				JSONObject subjectRotate2 = new JSONObject();
+				subjectRotate2.put("x", sub1xrot);
+				subjectRotate2.put("y", 0);
+				subjectRotate2.put("z", 0);
+				JSONObject subjectMove2Approach = new JSONObject();
+				subjectMove2Approach.put("x", xMoveDist);
+				subjectMove2Approach.put("y", yMoveDist);
+				subjectMove2Approach.put("z", 30.0);
+				JSONObject subjectRotate2Approach = new JSONObject();
+				subjectRotate2Approach.put("x", sub1xrotap);
+				subjectRotate2Approach.put("y", 0);
+				subjectRotate2Approach.put("z", 0);
+				subjectMove2.put("approach", subjectMove2Approach);
+				subjectRotate2.put("approach", subjectRotate2Approach);
+				subject2.put("move", subjectMove2);
+				subject2.put("rotate", subjectRotate2);
+				subject2.put("identifier", "GC4x4MB_1");
+				subjects2.put(subject2);
+		
+				criteria1.put("target", target1);
+				criteria1.put("subjects", subjects1);
+
+		
+				criteria2.put("target", target2);
+				criteria2.put("subjects", subjects2);
+				//System.out.println("Done putting step, now translating...");
+				hal.translateProductStep("place", criteria1);
+				//System.out.println("Done translating");
+				//hal.translateProductStep("place", criteria2);
+			}
+		//}
 		// we are done if we are not going to translate hw steps
 		if(translateSteps == false) {
 			hal.shutdown();
+		}
+	}
+	@Override
+	public void onTranslationFinished(ProductStep productStep, ArrayList<HardwareStep> hardwareSteps) {
+		super.onTranslationFinished(productStep, hardwareSteps);
+		//hal.executeHardwareSteps(hardwareSteps);
+		//hal.translateProductStep("place", criteria2);
+	}
+
+	@Override
+	public void onExecutionFinished() {
+		super.onExecutionFinished();
+		if(state == false) {
+			hal.translateProductStep("place", criteria2);
+			state = true;
+		} else {
+			hal.translateProductStep("place", criteria1);
+			state = false;
 		}
 	}
 }
