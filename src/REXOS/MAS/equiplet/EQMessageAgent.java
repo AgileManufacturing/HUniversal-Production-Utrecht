@@ -53,6 +53,8 @@ public class EQMessageAgent extends Agent {
 	 * @author Kevin Bosman
 	 */
 	public void setup(){
+		Logger.log("SETUP EQ MESSAGE AGENT START");
+		
 		//Receive messages handling
 		this.addBehaviour(new CyclicBehaviour (){ 
 			private static final long serialVersionUID = 1L;
@@ -162,6 +164,8 @@ public class EQMessageAgent extends Agent {
 			sleep(5000);
 			sendCommand(deleteJSON);
 		}
+		
+		Logger.log("SETUP EQ MESSAGE AGENT DONE");
 	}
 	
 	public void takeDown(){
