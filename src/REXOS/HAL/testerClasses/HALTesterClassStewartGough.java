@@ -101,6 +101,9 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				double sub2zrot = 0.0;
 				//System.out.println("Putting step data...");
 				JSONObject target1 = new JSONObject();
+				JSONObject targetCheck1 = new JSONObject();
+				targetCheck1.put("desiredRotation",1.1);
+				targetCheck1.put("detectedRotation",-0.1);
 				JSONObject targetMove1 = new JSONObject();
 				targetMove1.put("x", xMoveDist);//5.5 -5.5 13.8
 				targetMove1.put("y", yMoveDist);
@@ -120,6 +123,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				targetRotate1Approach.put("y", 0);
 				targetRotate1Approach.put("z", 0);
 				targetRotate1.put("approach", targetRotate1Approach);
+				target1.put("check",targetCheck1);
 				target1.put("move", targetMove1);
 				target1.put("rotate", targetRotate1);
 				target1.put("identifier", "GC4x4MB_1");

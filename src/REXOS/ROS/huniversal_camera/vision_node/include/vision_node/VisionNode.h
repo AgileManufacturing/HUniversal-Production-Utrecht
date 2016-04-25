@@ -48,6 +48,7 @@
 #include <vision_node/getCorrectionMatrices.h>
 
 #include <vision_node/QrCodeReader.h>
+#include <vision_node/StlNode.h>
 #include <vision_node/FishEyeCorrector.h>
 
 
@@ -80,6 +81,7 @@ private:
 	bool isFishEyeCorrectorEnabled;
 	bool isQrCodeReaderEnabled;
 	bool isFudicialDetectorEnabled;
+        bool isStlNodeEnabled;
 	
 	ros::ServiceServer increaseExposureService;
 	ros::ServiceServer decreaseExposureService;
@@ -91,6 +93,7 @@ private:
 	image_transport::ImageTransport imgTransport;
 	image_transport::Publisher cameraFeedPublisher;
 	QrCodeReader qrCodeReader;
+        StlNode stlNode;
 	FishEyeCorrector fishEyeCorrector;
 	
 	double exposure;
