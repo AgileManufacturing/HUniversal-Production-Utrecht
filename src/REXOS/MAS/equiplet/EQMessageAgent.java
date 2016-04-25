@@ -3,6 +3,8 @@ package MAS.equiplet;
 import java.util.ArrayList;
 
 import org.json.JSONException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import util.log.Logger;
 import MAS.product.ProductionStep;
