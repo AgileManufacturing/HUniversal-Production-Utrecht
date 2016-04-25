@@ -34,14 +34,14 @@ public class EQMessageAgent extends Agent {
 	 * 
 	 * @author Kevin Bosman
 	 */
-	private String insertJSON = "{\n\t\"command\": \"INSERT_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
-	private String deleteJSON = "{\n\t\"command\": \"DELETE_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
-	private String getAllStates = "{\"command\": \"GET_ALL_POSIBLE_STATES\"}";
-	private String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
-	private String getState = "{\"command\": \"GET_CURRENT_EQUIPLET_STATE\"}";
-	private String getSchedule = "{\"command\": \"GET_SCHEDULE\"}";
-	private String getMode = "{\"command\": \"GET_CURRENT_MAST_MODE\"}";
-	private String registerMastState = "{\"command\": \"ON_EQUIPLET_STATE_CHANGED\", \"action\": \"REGISTER_LISTENER\"}";
+	public static final String insertJSON = "{\n\t\"command\": \"INSERT_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
+	public static final String deleteJSON = "{\n\t\"command\": \"DELETE_MODULE\",\n\t\"modules\": [{\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"delta_robot_type_B\",\n\t\t\"serialNumber\": \"1\"\n\t}, {\n\t\t\"manufacturer\": \"HU\",\n\t\t\"typeNumber\": \"gripper_type_A\",\n\t\t\"serialNumber\": \"1\"\n\t}, ]\n}";
+	public static final String getAllStates = "{\"command\": \"GET_ALL_POSIBLE_STATES\"}";
+	public static final String getAllModes = "{\"command\": \"GET_ALL_POSIBLE_MODES\"}";
+	public static final String getState = "{\"command\": \"GET_CURRENT_EQUIPLET_STATE\"}";
+	public static final String getSchedule = "{\"command\": \"GET_SCHEDULE\"}";
+	public static final String getMode = "{\"command\": \"GET_CURRENT_MAST_MODE\"}";
+	public static final String registerMastState = "{\"command\": \"ON_EQUIPLET_STATE_CHANGED\", \"action\": \"REGISTER_LISTENER\"}";
 	/**
 	 * 
 	 */
@@ -56,114 +56,9 @@ public class EQMessageAgent extends Agent {
 		Logger.log("SETUP EQ MESSAGE AGENT START");
 		
 		//Receive messages handling
-		this.addBehaviour(new CyclicBehaviour (){ 
-			private static final long serialVersionUID = 1L;
-			public void action (){ 
-				ACLMessage msg = this.myAgent.receive();
-				if(msg != null){
-					switch (msg.getPerformative()) {
-					case ACLMessage.INFORM:
-						try{
-							JSONObject messageContent = new JSONObject(msg.getContent());
-					
-							//Identifying requested equiplet command
-							String command = messageContent.getString("command");
-					
-							//Delegate command to corresponding functions
-							switch(command){
-							case "GET_CURRENT_EQUIPLET_STATE":
-								Logger.log("CURRENT EQUIPLET STATE: " + messageContent.getString("state") + " !!!");
-								break;
-							default:
-								Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
-							}
-							break;
-						}catch(JSONException e){
-							e.printStackTrace();
-							break;
-						}
-					default:
-						Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
-					}
-				}
-			}
-		});
+		this.addBehaviour(new EQMessageBehaviour());
 		
-		boolean testMastStateChange = true;
-		boolean getModuleList = false;
-		boolean getAllStateTest = false;
-		boolean scheduleTest = false;
-		boolean addRemoveModules = false;
-		
-		
-		//Test a state change and the listener
-		if(testMastStateChange){
-			sleep(15000);
-			//Register onChange listener
-			sendOnChangeRequest(registerMastState);
-			//Get current state
-			sendGetData(getState);
-			sleep(5000);
-			//Change to save
-			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(10000);//Give equiplet time to go through init state
-			//Get state again
-			sendGetData(getState);
-			sleep(10000);
-			//Return to offline
-			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
-		}
-		
-		//Test get all modules
-		if(getModuleList){
-			sendCommand(insertJSON);
-			sleep(5000);
-			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
-			sleep(5000);
-			sendCommand(deleteJSON);
-			sleep(5000);
-			sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
-		}
-		
-		//Test get all possible states and modes
-		if(getAllStateTest){
-			sendGetData(getAllStates);
-			sleep(5000);
-			sendGetData(getAllModes);
-			sleep(5000);
-			sendGetData(getMode);
-			sleep(5000);
-		}
-		
-		//Test get schedule
-		if(scheduleTest){
-			
-			try {
-				addScheduleJob(Parser.parseScheduleRequest(new ArrayList<ProductionStep>(), new Tick(50)));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}	
-			sleep(5000);
-			sendGetData(getSchedule);
-			sleep(5000);
-		}
-
-			
-		
-		//Add and remove modules
-		if(addRemoveModules){
-			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"NORMAL\"}");
-			sleep(5000);
-			sendCommand(insertJSON);
-			//Should not work in normal mode
-			sleep(5000);
-			sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			sleep(5000);
-			sendCommand(insertJSON);
-			sleep(5000);
-			sendCommand(deleteJSON);
-		}
+		new Thread(new EQMessageAgentTester(this)).start();
 		
 		Logger.log("SETUP EQ MESSAGE AGENT DONE");
 	}
@@ -294,18 +189,5 @@ public class EQMessageAgent extends Agent {
 		this.send(message);
 		Logger.log("Equiplet getter test message: " + data);
 	}
-	
-	/**
-	 * Simple sleep with catch block
-	 * 
-	 * @param MS to sleep
-	 * @author Kevin Bosman
-	 */
-	public void sleep(int ms){
-		try {
-			Thread.sleep(ms);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+
 }
