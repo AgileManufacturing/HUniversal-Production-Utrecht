@@ -6,14 +6,14 @@ import org.json.JSONException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import jade.core.*; 
+import jade.core.behaviours.*; 
+
 import util.log.Logger;
 import MAS.product.ProductionStep;
 import MAS.util.Ontology;
 import MAS.util.Parser;
 import MAS.util.Tick;
-import jade.core.AID;
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
