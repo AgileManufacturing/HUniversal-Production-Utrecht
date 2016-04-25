@@ -55,10 +55,13 @@ public class EQMessageAgent extends Agent {
 	public void setup(){
 		Logger.log("SETUP EQ MESSAGE AGENT START");
 		
+		ThreadedBehaviourFactory tbf = new ThreadedBehaviourFactory();
+		
 		//Receive messages handling
 		this.addBehaviour(new EQMessageBehaviour());
 		
-		new Thread(new EQMessageAgentTester(this)).start();
+		Behaviour b = new EQMessageAgentTester(this);
+		addBehaviour(tbf.wrap(b));
 		
 		Logger.log("SETUP EQ MESSAGE AGENT DONE");
 	}
@@ -162,7 +165,7 @@ public class EQMessageAgent extends Agent {
             return agents;
         }
         catch (FIPAException fe) { fe.printStackTrace(); }
-        return null;
+        return new AID[0];
     }
 	
 	/**

@@ -21,14 +21,14 @@ import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
-public class EQMessageAgentTester implements Runnable {
-	EQMessageAgent myAgent;
+public class EQMessageAgentTester extends OneShotBehaviour {
+	EQMessageAgent myTestAgent;
 	
-	public EQMessageAgentTester(EQMessageAgent myAgent){
-		this.myAgent = myAgent;
+	public EQMessageAgentTester(EQMessageAgent myTestAgent){
+		this.myTestAgent = myTestAgent;
 	}
 
-    public void run() {
+    public void action() {
         boolean testMastStateChange = true;
 		boolean getModuleList = false;
 		boolean getAllStateTest = false;
@@ -40,38 +40,38 @@ public class EQMessageAgentTester implements Runnable {
 		if(testMastStateChange){
 			sleep(15000);
 			//Register onChange listener
-			myAgent.sendOnChangeRequest(EQMessageAgent.registerMastState);
+			myTestAgent.sendOnChangeRequest(EQMessageAgent.registerMastState);
 			//Get current state
-			myAgent.sendGetData(EQMessageAgent.getState);
+			myTestAgent.sendGetData(EQMessageAgent.getState);
 			sleep(5000);
 			//Change to save
-			myAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+			myTestAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
 			sleep(10000);//Give equiplet time to go through init state
 			//Get state again
-			myAgent.sendGetData(EQMessageAgent.getState);
+			myTestAgent.sendGetData(EQMessageAgent.getState);
 			sleep(10000);
 			//Return to offline
-			myAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
+			myTestAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"OFFLINE\"}");
 		}
 		
 		//Test get all modules
 		if(getModuleList){
-			myAgent.sendCommand(EQMessageAgent.insertJSON);
+			myTestAgent.sendCommand(EQMessageAgent.insertJSON);
 			sleep(5000);
-			myAgent.sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
+			myTestAgent.sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 			sleep(5000);
-			myAgent.sendCommand(EQMessageAgent.deleteJSON);
+			myTestAgent.sendCommand(EQMessageAgent.deleteJSON);
 			sleep(5000);
-			myAgent.sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
+			myTestAgent.sendGetData("{\"command\": \"GET_ALL_MODULES\"}");
 		}
 		
 		//Test get all possible states and modes
 		if(getAllStateTest){
-			myAgent.sendGetData(EQMessageAgent.getAllStates);
+			myTestAgent.sendGetData(EQMessageAgent.getAllStates);
 			sleep(5000);
-			myAgent.sendGetData(EQMessageAgent.getAllModes);
+			myTestAgent.sendGetData(EQMessageAgent.getAllModes);
 			sleep(5000);
-			myAgent.sendGetData(EQMessageAgent.getMode);
+			myTestAgent.sendGetData(EQMessageAgent.getMode);
 			sleep(5000);
 		}
 		
@@ -79,12 +79,12 @@ public class EQMessageAgentTester implements Runnable {
 		if(scheduleTest){
 			
 			try {
-				myAgent.addScheduleJob(Parser.parseScheduleRequest(new ArrayList<ProductionStep>(), new Tick(50)));
+				myTestAgent.addScheduleJob(Parser.parseScheduleRequest(new ArrayList<ProductionStep>(), new Tick(50)));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}	
 			sleep(5000);
-			myAgent.sendGetData(EQMessageAgent.getSchedule);
+			myTestAgent.sendGetData(EQMessageAgent.getSchedule);
 			sleep(5000);
 		}
 
@@ -92,17 +92,17 @@ public class EQMessageAgentTester implements Runnable {
 		
 		//Add and remove modules
 		if(addRemoveModules){
-			myAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
-			myAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"NORMAL\"}");
+			myTestAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+			myTestAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"NORMAL\"}");
 			sleep(5000);
-			myAgent.sendCommand(EQMessageAgent.insertJSON);
+			myTestAgent.sendCommand(EQMessageAgent.insertJSON);
 			//Should not work in normal mode
 			sleep(5000);
-			myAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
+			myTestAgent.sendCommand("{\"command\": \"CHANGE_EQUIPLET_MACHINE_STATE\", \"state\": \"SAFE\"}");
 			sleep(5000);
-			myAgent.sendCommand(EQMessageAgent.insertJSON);
+			myTestAgent.sendCommand(EQMessageAgent.insertJSON);
 			sleep(5000);
-			myAgent.sendCommand(EQMessageAgent.deleteJSON);
+			myTestAgent.sendCommand(EQMessageAgent.deleteJSON);
 		}
     }
 	

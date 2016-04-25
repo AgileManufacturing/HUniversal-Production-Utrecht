@@ -46,6 +46,7 @@ public class EQMessageBehaviour extends CyclicBehaviour{
 					break;
 				}catch(JSONException e){
 					e.printStackTrace();
+					Logger.log(msg.getSender().getLocalName() + " -> " + this.myAgent.getLocalName() + " - " + msg.getContent() + " - " + ACLMessage.getPerformative(msg.getPerformative()));
 					break;
 				}
 			default:
