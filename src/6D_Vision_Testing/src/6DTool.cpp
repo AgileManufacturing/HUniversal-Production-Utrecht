@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <ObjectDetector.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
 
 cv::Mat topDownImage;
 cv::Mat sideImage;
