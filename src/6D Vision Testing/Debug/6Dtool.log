@@ -1,3 +1,0 @@
-﻿  g++ -std=c++11 -MMD -O3 -D__NO_INLINE__ -IOpenCV/include -Iincl/ -c -o src/6DTool.o src/6DTool.cpp
-  g++ -std=c++11 -MMD -O3 -D__NO_INLINE__ -IOpenCV/include -Iincl/ -c -o src/TopDownDetector.o src/TopDownDetector.cpp
-  g++ -std=c++11 -MMD -O3 -D__NO_INLINE__ -LOpenCV/lib -o 6DTool src/TopDownDetector.o src/SideDetector.o src/6DTool.o src/basetimer.o src/ObjectDetector.o src/Utilities.o -lopencv_core310 -lopencv_imgproc310 -lopencv_highgui310 -lopencv_imgcodecs310
