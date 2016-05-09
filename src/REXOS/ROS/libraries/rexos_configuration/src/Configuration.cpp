@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <string>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -35,6 +36,12 @@ namespace rexos_configuration {
 	void Configuration::initialize() {
 		Json::Reader reader;
 		std::ifstream settingsFile(DEFAULT_PROPERTIES_FILE_PATH, std::ifstream::binary);
+		
+		if (!settingsFile.is_open()) {
+			std::string message("Could not open settings file: ")
+			message += DEFAULT_PROPERTIES_FILE_PATH
+			throw std::runtime_error(message);
+		}
 		
 		if(reader.parse(settingsFile, configuration) == false) {
 			throw std::runtime_error("rexos_configuration: Parsing of settings file failed");
