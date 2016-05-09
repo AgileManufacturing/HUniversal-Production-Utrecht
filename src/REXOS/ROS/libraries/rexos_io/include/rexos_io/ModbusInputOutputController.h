@@ -49,7 +49,7 @@ extern "C"{
  * #define MODBUS_LOGGING "/home/agileman/modbus.log"
  * @endcond
  **/
-#define MODBUS_LOGGING "/home/rexos/modbus.log"
+#define MODBUS_LOGGING "/home/agileman/modbus.log"
 
 namespace rexos_io {
 	/**
