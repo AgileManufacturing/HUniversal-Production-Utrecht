@@ -60,8 +60,8 @@ public class EQMessageAgent extends Agent {
 		//Receive messages handling
 		this.addBehaviour(new EQMessageBehaviour());
 		
-		Behaviour b = new EQMessageAgentTester(this);
-		addBehaviour(tbf.wrap(b));
+		//Behaviour b = new EQMessageAgentTester(this);
+		//addBehaviour(tbf.wrap(b));
 		
 		Logger.log("SETUP EQ MESSAGE AGENT DONE");
 	}
