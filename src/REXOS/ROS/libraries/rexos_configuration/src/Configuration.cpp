@@ -39,7 +39,7 @@ namespace rexos_configuration {
 		
 		if (!settingsFile.is_open()) {
 			std::string message("Could not open settings file: ")
-			message += DEFAULT_PROPERTIES_FILE_PATH
+			message += DEFAULT_PROPERTIES_FILE_PATH;
 			throw std::runtime_error(message);
 		}
 		
