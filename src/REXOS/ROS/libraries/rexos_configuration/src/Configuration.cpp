@@ -38,7 +38,7 @@ namespace rexos_configuration {
 		std::ifstream settingsFile(DEFAULT_PROPERTIES_FILE_PATH, std::ifstream::binary);
 		
 		if (!settingsFile.is_open()) {
-			std::string message("Could not open settings file: ")
+			std::string message("Could not open settings file: ");
 			message += DEFAULT_PROPERTIES_FILE_PATH;
 			throw std::runtime_error(message);
 		}
