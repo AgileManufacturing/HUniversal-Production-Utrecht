@@ -75,8 +75,8 @@ private:
 	camera::Camera *STLCam;
 	camera::Camera *QRCam;
 
-	int STL_CAM_ID = 1;
-	int QR_CAM_ID = 2;
+	int STL_CAM_ID = 0;
+	int QR_CAM_ID = 1;
 
 	bool isSimulated;
 

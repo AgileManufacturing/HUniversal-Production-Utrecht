@@ -56,10 +56,12 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 	if(isSimulated == true) {
 		QRCam = new camera::SimulatedCamera(equipletName, identifier[0], this, 5, nodeHandle);
 	} else {
+		REXOS_INFO("QRCam");
 		auto QRCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[0], this, 5, QR_CAM_ID, formatNumber);
 		QRCamCV->setAutoWhiteBalance(true);
 		QRCamCV->setExposure(exposure);
 		QRCam = QRCamCV;
+		REXOS_INFO("STLCam");
 		auto STLCamCV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[1], this, 5, STL_CAM_ID, formatNumber);
 		STLCamCV->setAutoWhiteBalance(true);
 		STLCamCV->setExposure(exposure);
