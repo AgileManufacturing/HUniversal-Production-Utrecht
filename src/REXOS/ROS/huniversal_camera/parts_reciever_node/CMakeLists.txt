@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(part_reciever_node)
+project(parts_reciever_node)
 
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs rexos_utilities rexos_logger)
 
@@ -20,6 +20,6 @@ DEPENDS cv_bridge)
 
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(part_reciever_node ${sources})
-add_dependencies(part_reciever_node part_reciever_node_gencpp )
-target_link_libraries(part_reciever_node ${catkin_LIBRARIES})
+add_executable(parts_reciever_node ${sources})
+add_dependencies(parts_reciever_node parts_reciever_node_gencpp )
+target_link_libraries(parts_reciever_node ${catkin_LIBRARIES})

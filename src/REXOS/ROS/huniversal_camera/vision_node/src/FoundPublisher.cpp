@@ -2,8 +2,8 @@
 
 #include "std_msgs/String.h"
 #include <sstream>
-#include "part_reciever_node/PartPro.h"
-#include "part_reciever_node/PartParameter.h"
+#include "vision_node/PartPro.h"
+#include "vision_node/PartParameter.h"
 
 FoundPublisher::FoundPublisher(){
 	ros::NodeHandle n;
