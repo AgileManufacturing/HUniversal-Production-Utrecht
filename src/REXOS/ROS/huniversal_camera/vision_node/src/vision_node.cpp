@@ -36,7 +36,7 @@
 
 int main(int argc, char* argv[]) {
 	REXOS_INFO("This node must be run with ROOT priveleges or the device must be added to the correct group when using the DFK 22AUC03");
-	
+
 	if(argc < 7){
 		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber deviceNumber formatNumber");
 		return -1;
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 	ros::init(argc, argv, nodeName);
 	
 	REXOS_WARN_STREAM(nodeName);
-	
+
 	
 	VisionNode visionNode(equipletName, cameraModules, isSimulated, deviceNumber, formatNumber);
 	visionNode.run();

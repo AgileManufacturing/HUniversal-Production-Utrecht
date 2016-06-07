@@ -3,7 +3,7 @@ project(vision_node)
 
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation camera rexos_vision rexos_utilities image_transport rexos_logger)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation camera rexos_vision rexos_utilities image_transport rexos_logger parts_reciever_node)
 find_package(OpenCV REQUIRED COMPONENTS)
 find_package(cv_bridge REQUIRED COMPONENTS)
 
@@ -18,7 +18,7 @@ DIRECTORY srv
 FILES ${srvs} )
 
 generate_messages (
-	DEPENDENCIES std_msgs
+	DEPENDENCIES std_msgs parts_reciever_node
 )
 
 
@@ -32,5 +32,5 @@ DEPENDS cv_bridge)
 file(GLOB_RECURSE sources "src" "*.cpp" "*.c")
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(vision_node ${sources})
-add_dependencies(vision_node vision_node_gencpp )
+add_dependencies(vision_node vision_node_gencpp)
 target_link_libraries(vision_node ${catkin_LIBRARIES} ${cv_bridge_LIBRARIES})

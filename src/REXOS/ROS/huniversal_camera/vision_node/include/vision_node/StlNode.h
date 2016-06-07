@@ -3,6 +3,7 @@
 
 #include "ros/ros.h"
 #include "rexos_logger/rexos_logger.h"
+#include "vision_node/FoundPublisher.h"
 
 #include <image_transport/image_transport.h>
 #include <opencv2/core/core.hpp>
@@ -32,7 +33,7 @@ public:
 
 private:
     image_transport::Publisher debugImagePublisher;
-
+    FoundPublisher part_publisher;
 };
 
 

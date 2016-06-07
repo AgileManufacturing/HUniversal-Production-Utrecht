@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
-  <name>6d_vision_node</name>
+  <name>parts_reciever_node</name>
   <version>0.0.0</version>
-  <description>The 6d_vision_node package</description>
-  <maintainer email="lowcostvision@gmail.com">Leau Caust</maintainer>
-  <license>newBSD</license>
+  <description>The parts_reciever_node package</description>
+  <maintainer email="pizza@dinges.com">Daniel Telgen</maintainer>
+  <license>BSD</license>
   <url type="website">https://github.com/AgileManufacturing/HUniversal-Production-Utrecht</url>
   <author>Pizza bakker</author>
   <buildtool_depend>catkin</buildtool_depend>
