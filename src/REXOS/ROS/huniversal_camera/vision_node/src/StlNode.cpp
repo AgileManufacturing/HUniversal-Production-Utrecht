@@ -13,6 +13,7 @@
 
 #include "vision_node/ObjectDetector.h"
 #include "vision_node/PartMatcher.h"
+#include "vision_node/FoundPublisher.h"
 
 using namespace cv;
 using namespace std;
@@ -28,7 +29,7 @@ void StlNode::handleFrame(cv::Mat& frame){
     cvtColor(frame,grayFrame,CV_RGB2GRAY);
     vector<vector<Point>> blobs = ObjectDetector::findConnectedComponents(grayFrame);
     vector<VisionObject> objects = ObjectDetector::filterObjects(blobs,grayFrame,frame);
-    for(int p = 0; p < objects.size();++p){
+    for(unsigned int p = 0; p < objects.size();++p){
         //Draws a rotated box around each object
         RotatedRect rect = minAreaRect(objects[p].data);
         Point2f vertices[4];
@@ -39,6 +40,8 @@ void StlNode::handleFrame(cv::Mat& frame){
 
         pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));
         if(match.second > 80){
+        	this->part_publisher.publish(match.first);
+
             string matchResult = match.first.name + " - " + to_string(match.second);
             REXOS_WARN_STREAM(matchResult);
         }
