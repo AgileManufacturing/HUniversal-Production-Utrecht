@@ -29,8 +29,6 @@
 
 #include "vision_node/VisionNode.h"
 #include "rexos_utilities/Utilities.h"
-#include "vision_node/FoundPublisher.h"
-#include "vision_node/Part.h"
 
 #include <camera/unicap_cv_bridge.h>
 
@@ -38,18 +36,6 @@
 
 int main(int argc, char* argv[]) {
 	REXOS_INFO("This node must be run with ROOT priveleges or the device must be added to the correct group when using the DFK 22AUC03");
-
-	ros::init(argc, argv, "vision_node");
-
-	FoundPublisher fp;
-	Part p;
-	p.name = "Flow";
-
-	for(;;){
-		fp.publish(p);
-
-		ros::spinOnce();
-	}
 
 	if(argc < 7){
 		REXOS_ERROR("Usage: part_locator_node (--isSimulated | --isShadow) equipletName manufacturer typeNumber serialNumber deviceNumber formatNumber");
