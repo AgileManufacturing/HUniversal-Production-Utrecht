@@ -1,10 +1,10 @@
 #include "ros/ros.h"
-#include "vision_node/PartPro.h"
+#include "parts_reciever_node/PartPro.h"
 #include "rexos_logger/rexos_logger.h"
 #include <string>
 #include <sstream>
 
-void chatterCallback(const boost::shared_ptr<vision_node::PartPro const> & msg){
+void chatterCallback(const boost::shared_ptr<parts_reciever_node::PartPro const> & msg){
 	std::stringstream ss;
 	ss << msg->name << "{";
 
