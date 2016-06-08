@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(parts_reciever_node)
 
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs rexos_utilities rexos_logger)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation rexos_utilities rexos_logger)
 
 file(GLOB_RECURSE msgs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/msg" "*.msg")
 add_message_files(
