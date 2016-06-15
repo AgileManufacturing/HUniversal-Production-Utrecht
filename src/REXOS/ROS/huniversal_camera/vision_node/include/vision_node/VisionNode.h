@@ -49,6 +49,7 @@
 
 #include <vision_node/QrCodeReader.h>
 #include <vision_node/StlNode.h>
+//#include <vision_node/StlVerticalNode.h>
 #include <vision_node/FishEyeCorrector.h>
 
 
@@ -73,10 +74,12 @@ public:
 	virtual void handleFrame(cv::Mat& camFrame, int CameraID);
 private:
 	camera::Camera *STLCam;
+	//camera::Camera *STLCam2;
 	camera::Camera *QRCam;
 
 	int STL_CAM_ID = 0;
 	int QR_CAM_ID = 1;
+	//int STL_CAM_ID2 = 3;
 
 	bool isSimulated;
 
@@ -98,7 +101,8 @@ private:
 	image_transport::ImageTransport imgTransport;
 	image_transport::Publisher cameraFeedPublisher;
 	QrCodeReader qrCodeReader;
-        StlNode stlNode;
+    StlNode stlNode;
+	//StlVerticalNode stlNode2;
 	FishEyeCorrector fishEyeCorrector;
 	
 	double exposure;

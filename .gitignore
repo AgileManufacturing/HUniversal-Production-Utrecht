@@ -23,7 +23,7 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
+#*.a
 
 # Generated file types
 *~
@@ -44,5 +44,14 @@ log.txt
 simulation/output/
 simulation/log.log
 
+# Unnecessary visual studio files
+*.sdf
+*.VC.opendb
+*.suo
 
-
+src/6D Vision Testing/Makefile
+src/6D Vision Testing/Makefile
+src/6D Vision Testing/Vision6D.exe
+*.user
+*.d
+*.exe
