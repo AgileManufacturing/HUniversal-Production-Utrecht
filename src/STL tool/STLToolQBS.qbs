@@ -4,7 +4,7 @@ CppApplication {
     type: "application" // To suppress bundle generation on Mac
     Depends {
         name: "Qt"
-        submodules: ["quick","gui","widgets","gui"]
+        submodules: ["quick","gui","widgets"]
     }
     //Setting up source path for openCV
     property string glewSourcePath: {

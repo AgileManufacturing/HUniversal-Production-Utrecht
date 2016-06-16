@@ -48,6 +48,7 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 		imgTransport(nodeHandle),
 		qrCodeReader(nodeHandle, imgTransport),
                 stlNode(imgTransport),
+				/*stlNode2(imgTransport),*/
 		fishEyeCorrector(nodeHandle),
 		exposure(0.015)
 {
@@ -66,6 +67,10 @@ VisionNode::VisionNode(std::string equipletName, std::vector<rexos_datatypes::Mo
 		STLCamCV->setAutoWhiteBalance(true);
 		STLCamCV->setExposure(exposure);
 		STLCam = STLCamCV;
+		/*auto STLCam2CV = new camera::unicap_cv_bridge::UnicapCvCamera(equipletName, identifier[2], this, 5, STL_CAM_ID2, formatNumber);
+		STLCam2CV->setAutoWhiteBalance(true);
+		STLCam2CV->setExposure(exposure);
+		STLCam2 = STLCam2CV;*/
 		REXOS_INFO("Initialized cameras");
 	}
 	
@@ -197,8 +202,14 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 		camFrame = fishEyeCorrector.handleFrame(camFrame);
 		//REXOS_WARN_STREAM("Handled by FishEye");
 	}
-        if(isStlNodeEnabled && CameraID == STL_CAM_ID){
-            stlNode.handleFrame(camFrame);
+        if(isStlNodeEnabled){
+			if(CameraID == STL_CAM_ID){
+				stlNode.handleFrame(camFrame);
+			}
+			else if(CameraID == STL_CAM_ID2){
+				//stlNode2.handleFrame(camFrame);
+			}
+            //stlNode.handleFrame(camFrame);
             //REXOS_WARN_STREAM("Handled by STL");
         }
 	cv::Mat grayScaleFrame;
@@ -215,7 +226,7 @@ void VisionNode::handleFrame(cv::Mat& camFrame, int CameraID) {
 	}
 
 	if(cameraFeedPublisher.getNumSubscribers() != 0){
-		if (CameraID == QR_CAM_ID || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true)){
+		if (CameraID == QR_CAM_ID || (CameraID == STL_CAM_ID && isFishEyeCorrectorEnabled == true) || (CameraID == STL_CAM_ID2 && isFishEyeCorrectorEnabled == true)){
 			//REXOS_WARN_STREAM("Subscribers is more than 0");
 			ros::Time time = ros::Time::now();
 			cv_bridge::CvImage cvi;	
