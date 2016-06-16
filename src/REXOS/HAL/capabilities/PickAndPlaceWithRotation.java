@@ -116,6 +116,7 @@ public class PickAndPlaceWithRotation extends Capability {
 
 			JSONObject placeCommand = new JSONObject();
 			placeCommand.put("place", JSONObject.NULL);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "teruggezet");
 			placeCommand.put("move", targetMoveCommand);
 			placeCommand.put("rotate", targetRotateCommand);
 

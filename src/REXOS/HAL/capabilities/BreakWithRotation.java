@@ -115,7 +115,7 @@ public class BreakWithRotation extends Capability {
 			JSONObject targetRotateCommand = target.getJSONObject("rotate");
 
 			JSONObject breakCommand = new JSONObject();
-			//placeCommand.put("place", JSONObject.NULL);
+			breakCommand.put("place", JSONObject.NULL);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "break");
 			breakCommand.put("move", targetMoveCommand);
 			breakCommand.put("rotate", targetRotateCommand);

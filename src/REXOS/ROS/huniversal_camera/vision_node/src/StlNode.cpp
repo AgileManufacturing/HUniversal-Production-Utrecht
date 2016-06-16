@@ -40,10 +40,10 @@ void StlNode::handleFrame(cv::Mat& frame){
 
         pair<Part,double> match = PartMatcher::matchPart(PartMatcher::createParameterMap(objects[p]));
         if(match.second > 80){
-        	this->part_publisher.publish(match.first);
+            this->part_publisher.publish(match.first);
 
             string matchResult = match.first.name + " - " + to_string(match.second);
-            REXOS_WARN_STREAM(matchResult);
+            REXOS_INFO_STREAM_THROTTLE(10, matchResult);
         }
     }
     if(!frame.empty()){

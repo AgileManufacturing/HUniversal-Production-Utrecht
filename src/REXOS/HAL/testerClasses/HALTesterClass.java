@@ -30,7 +30,7 @@ import HAL.steps.ProductStep;
 public class HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 	
-	static String equipletName = "EQ0";
+	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
@@ -128,7 +128,7 @@ public class HALTesterClass implements HardwareAbstractionLayerListener {
 
 	@Override
 	public void onExecutionFailed() {
-		Logger.log(LogSection.NONE, LogLevel.ERROR, equipletName + " Execution failed");
+		Logger.log(LogSection.NONE, LogLevel.ERROR, equipletName + " Execution failed!");
 	}
 
 	@Override

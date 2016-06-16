@@ -26,7 +26,7 @@ vector<string> PartMatcher::getPartList(){
         }
         closedir(dir);
     }else{
-        REXOS_INFO("COULD NOT OPEN DIRECTORY");
+        REXOS_ERROR_THROTTLE(10, "Could not open part directory: %s", directory.c_str());
     }
     return fileList;
 }

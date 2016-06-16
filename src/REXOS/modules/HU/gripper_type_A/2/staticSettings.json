@@ -9,7 +9,7 @@
         "properties": {
             "modbusAddress": 8001,
             "modbusDevicePin": 0,
-            "gripperSize": 18.5,
+            "gripperSize": 42.0,
             "gripperEnabledMaxSeconds": 60,
             "gripperEnabledWarningSeconds": 50,
             "gripperEnabledCooldownSeconds": 180,

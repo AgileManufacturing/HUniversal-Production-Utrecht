@@ -20,7 +20,7 @@ import HAL.listeners.HardwareAbstractionLayerListener;
 public class HALTesterClassDummy extends HALTesterClass implements HardwareAbstractionLayerListener {
 	HardwareAbstractionLayer hal;
 
-	static String equipletName = "EQ0";
+	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
