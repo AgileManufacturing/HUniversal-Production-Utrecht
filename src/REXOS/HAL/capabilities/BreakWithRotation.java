@@ -98,6 +98,10 @@ public class BreakWithRotation extends Capability {
 			JSONObject subjectMoveCommand = subject.getJSONObject("move");
 			JSONObject subjectRotateCommand = subject.getJSONObject("rotate");
 
+			JSONObject subject2 = subjects.getJSONObject(1);
+			JSONObject subject2MoveCommand = subject2.getJSONObject("move");
+			JSONObject subject2RotateCommand = subject2.getJSONObject("rotate");
+
 			JSONObject pickCommand = new JSONObject();
 			pickCommand.put("pick", JSONObject.NULL);
 			pickCommand.put("move", subjectMoveCommand);
@@ -111,27 +115,43 @@ public class BreakWithRotation extends Capability {
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "pick: " + pick);
 
 			// break
-			JSONObject targetMoveCommand = target.getJSONObject("move");
-			JSONObject targetRotateCommand = target.getJSONObject("rotate");
-
 			JSONObject breakCommand = new JSONObject();
 			//placeCommand.put("place", JSONObject.NULL);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "break");
-			breakCommand.put("move", targetMoveCommand);
-			breakCommand.put("rotate", targetRotateCommand);
+			breakCommand.put("move", subject2MoveCommand);
+			breakCommand.put("rotate", subject2RotateCommand);
 
 			JSONObject breakOriginPlacementParameters = new JSONObject();
-			breakOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
+			breakOriginPlacementParameters.put("identifier", subject2.getString(CompositeStep.IDENTIFIER));
 			OriginPlacement breakOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_PART_ORIGIN, breakOriginPlacementParameters);
 
 			CompositeStep breakStep = new CompositeStep(service, breakCommand, breakOriginPlacement);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "break: " + breakStep);
 
+			// place
+			JSONObject targetMoveCommand = target.getJSONObject("move");
+			JSONObject targetRotateCommand = target.getJSONObject("rotate");
+
+			JSONObject placeCommand = new JSONObject();
+			placeCommand.put("place", JSONObject.NULL);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place");
+			placeCommand.put("move", targetMoveCommand);
+			placeCommand.put("rotate", targetRotateCommand);
+
+			JSONObject placeOriginPlacementParameters = new JSONObject();
+			placeOriginPlacementParameters.put("identifier", target.getString(CompositeStep.IDENTIFIER));
+			OriginPlacement placeOriginPlacement = new OriginPlacement(OriginPlacementType.RELATIVE_TO_PART_ORIGIN, placeOriginPlacementParameters);
+
+			CompositeStep placeStep = new CompositeStep(service, placeCommand, placeOriginPlacement);
+			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place: " + placeStep);
+			
 			// Translate to hardwareSteps
 			ArrayList<ModuleActor> modules = moduleFactory.getBottomModulesForFunctionalModuleTree(this, 1);
 			ArrayList<CompositeStep> compositeSteps = new ArrayList<CompositeStep>();
 			compositeSteps.add(pick);
 			compositeSteps.add(breakStep);
+			compositeSteps.add(placeStep);
+
 
 			ArrayList<HardwareStep> hardwareSteps = translateCompositeStep(modules, compositeSteps);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.INFORMATION, "Translated hardware steps: " + hardwareSteps.toString());

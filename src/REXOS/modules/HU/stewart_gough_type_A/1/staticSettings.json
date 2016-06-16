@@ -239,12 +239,12 @@
                 ]
             },
             {
-                "name": "PickAndPlaceWithRotation",
+                "name": "BreakWithRotation",
                 "treeNumber": 1,
                 "halSoftware": {
                     "buildNumber": 1,
                     "jarFile": null,
-                    "className": "HAL.capabilities.PickAndPlaceWithRotation"
+                    "className": "HAL.capabilities.BreakWithRotation"
                 },
                 "requiredMutationsTrees": [
                     {
@@ -258,7 +258,7 @@
                     }
                 ],
                 "services": [
-                    "place"
+                    "break"
                 ]
             }
         ]
