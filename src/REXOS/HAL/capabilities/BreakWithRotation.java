@@ -103,7 +103,7 @@ public class BreakWithRotation extends Capability {
 			JSONObject subject2RotateCommand = subject2.getJSONObject("rotate");
 
 			JSONObject pickCommand = new JSONObject();
-			pickCommand.put("pick", JSONObject.NULL);
+			pickCommand.put("place", JSONObject.NULL);
 			pickCommand.put("move", subjectMoveCommand);
 			pickCommand.put("rotate", subjectRotateCommand);
 
@@ -133,7 +133,7 @@ public class BreakWithRotation extends Capability {
 			JSONObject targetRotateCommand = target.getJSONObject("rotate");
 
 			JSONObject placeCommand = new JSONObject();
-			placeCommand.put("place", JSONObject.NULL);
+			placeCommand.put("pick", JSONObject.NULL);
 			Logger.log(LogSection.HAL_CAPABILITIES, LogLevel.DEBUG, "place");
 			placeCommand.put("move", targetMoveCommand);
 			placeCommand.put("rotate", targetRotateCommand);
