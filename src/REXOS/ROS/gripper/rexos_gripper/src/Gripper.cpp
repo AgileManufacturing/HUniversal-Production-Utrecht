@@ -102,7 +102,7 @@ namespace rexos_gripper {
 		
 		void Gripper::activate() {
 			if (overheated == false) {
-				valveOutputDevice->enable();
+				valveOutputDevice->disable();
 				isActivated = true;
 				REXOS_INFO("activated gripper");
 			} else {
@@ -111,7 +111,7 @@ namespace rexos_gripper {
 		}
 			
 		void Gripper::deactivate() {
-			valveOutputDevice->disable();
+			valveOutputDevice->enable();
 			isActivated = false;
 			REXOS_INFO("deactivated gripper");
 		}
