@@ -168,9 +168,9 @@ namespace rexos_gripper {
 						// Test for max time, and close valve when reached.
 						if (enabledDuration > device->gripperEnabledMax) {
 							REXOS_ERROR_STREAM("[GRIPPER WATCHDOG] Valve open time has reached the limit of " << device->gripperEnabledMax << " milliseconds. Gripper will go in cooldown mode now." << std::endl);
-							device->overheated = true;
-							device->notifyObservers(Overheated);
-							device->timeCooldownStarted = ros::Time::now();
+							//device->overheated = true;
+							//device->notifyObservers(Overheated);
+							//device->timeCooldownStarted = ros::Time::now();
 							device->valveOutputDevice->disable();
 							device->wasActivated = device->isActivated = false;
 
