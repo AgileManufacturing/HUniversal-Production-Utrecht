@@ -46,7 +46,7 @@ public class CompositeStep {
 
 	public JSONObject popCommandIdentifier(String identifier) throws ModuleTranslatingException {
 		if (command.has(identifier) == false) {
-			throw new ModuleTranslatingException("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command, this);
+			throw new RuntimeException("Module didn't find a \"" + identifier + "\" key in CompositeStep command: " + command);
 		}
 		JSONObject mutation = command.optJSONObject(identifier);
 		command.remove(identifier);

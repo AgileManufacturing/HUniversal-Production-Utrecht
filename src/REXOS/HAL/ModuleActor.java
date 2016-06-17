@@ -41,9 +41,9 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 	protected static final String MOVE_Z = "z";
 	protected static final String MOVE_MAX_ACCELERATION = "maxAcceleration";
 	
-	protected static final String ROTATION_X = "rotationX";
-	protected static final String ROTATION_Y = "rotationY";
-	protected static final String ROTATION_Z = "rotationZ";
+	protected static final String ROTATION_X = "x";
+	protected static final String ROTATION_Y = "y";
+	protected static final String ROTATION_Z = "z";
 	
 	protected static final String MOVE = "move";
 	protected static final String ROTATE = "rotate";
@@ -80,8 +80,10 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 	 * @throws JSONException 
 	 */
 	protected ArrayList<HardwareStep> forwardCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
+		Logger.log(LogSection.HAL, LogLevel.ERROR, moduleIdentifier.toString());
 		ModuleActor moduleActor = (ModuleActor) getParentModule();
 		if (moduleActor != null) {
+			Logger.log(LogSection.HAL, LogLevel.ERROR, getParentModule().moduleIdentifier.toString());
 			// forward to parent
 			ArrayList<HardwareStep> hardwareSteps = moduleActor.translateCompositeStep(compositeStep);
 			if (hardwareSteps != null){
@@ -89,6 +91,7 @@ public abstract class ModuleActor extends Module implements ProcessListener {
 			}
 			return new ArrayList<HardwareStep>();
 		} else {
+			Logger.log(LogSection.HAL, LogLevel.ERROR, "NULL");
 			// root module, no more parents			
 			// if commands remain then the modules were not able to fully translate the compositeStep
 			if (compositeStep.getCommand().keys().hasNext() == true){

@@ -73,7 +73,7 @@ public class Gripper extends ModuleActor {
 		if (compositeStep.getCommand().has(PICK) == true) {
 			compositeStep.popCommandIdentifier(PICK);
 			isPick = true;
-		} else {
+		} else if (compositeStep.getCommand().has(PLACE) == true){
 			compositeStep.popCommandIdentifier(PLACE);
 			isPlace = true;
 		}

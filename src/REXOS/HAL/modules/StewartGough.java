@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import util.log.Logger;
 import HAL.ModuleActor;
 import HAL.dataTypes.ModuleIdentifier;
 import HAL.exceptions.FactoryException;
@@ -30,6 +31,7 @@ public class StewartGough extends ModuleActor {
 
 	@Override
 	public ArrayList<HardwareStep> translateCompositeStep(CompositeStep compositeStep) throws ModuleTranslatingException, FactoryException, JSONException {
+		Logger.log("Stewart gough is translating compositeStep: " + compositeStep.toJSON().toString());
 		ArrayList<HardwareStep> translatedHardwareSteps = new ArrayList<HardwareStep>();
 		JSONObject commandMove = compositeStep.popCommandIdentifier(MOVE_COMMAND_IDENTIFIER);
 		JSONObject commandRotate = compositeStep.popCommandIdentifier(ROTATE_COMMAND_IDENTIFIER);
@@ -67,10 +69,17 @@ public class StewartGough extends ModuleActor {
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, instructionData, originPlacement));	
 		} else {
 			//Approach
-			JSONObject commandApproach = commandMove.getJSONObject(APPROACH);
+			JSONObject commandApproachMove = commandMove.getJSONObject(APPROACH);
+			JSONObject commandApproachRotate = commandRotate.getJSONObject(APPROACH);
 			JSONObject approachInstructionData = new JSONObject();
-			approachInstructionData.put(MOVE, commandApproach);
-			approachInstructionData.put(ROTATE, commandRotate);
+			commandApproachMove.put(MOVE_X, commandApproachMove.getDouble(MOVE_X) + commandMove.getDouble(MOVE_X));
+			commandApproachMove.put(MOVE_Y, commandApproachMove.getDouble(MOVE_Y) + commandMove.getDouble(MOVE_Y));
+			commandApproachMove.put(MOVE_Z, commandApproachMove.getDouble(MOVE_Z) + commandMove.getDouble(MOVE_Z));
+			approachInstructionData.put(MOVE, commandApproachMove);
+			commandApproachRotate.put(ROTATION_X, commandApproachRotate.getDouble(ROTATION_X) + commandRotate.getDouble(ROTATION_X));
+			commandApproachRotate.put(ROTATION_Y, commandApproachRotate.getDouble(ROTATION_Y) + commandRotate.getDouble(ROTATION_Y));
+			commandApproachRotate.put(ROTATION_Z, commandApproachRotate.getDouble(ROTATION_Z) + commandRotate.getDouble(ROTATION_Z));
+			approachInstructionData.put(ROTATE, commandApproachRotate);
 			
 			//Entry point
 			translatedHardwareSteps.add(new HardwareStep(moduleIdentifier, compositeStep, HardwareStepStatus.WAITING, approachInstructionData, originPlacement));
