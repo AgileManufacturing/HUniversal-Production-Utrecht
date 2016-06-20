@@ -31,6 +31,8 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 
 	static String equipletName = "EQ3";
 	static final String baseDir = "generatedOutput/";
+
+	//Put this on true if running fullReset.sh, otherwise can be kept on false
 	static boolean insertModules = true;
 	static boolean translateSteps = true;
 	static boolean replyReceived = false;
@@ -115,23 +117,18 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				double sub1xrot = 0.0;
 				double sub1xrotap = 0.0;
 				double sub2zrot = 0.0;
-				//double zFloeDestroyer = 60.0;
-				//double zFloeDestroyerApproach = 100.0;
-				//double zFloeSource = 53.0;
-				//double zFloeSourceApproach = 100.0;
-				//System.out.println("Putting step data...");
 				
-				// -- BAKJE (loslaten) -- 3
+				// -- BAKJE (loslaten) -- 3 
 				JSONObject target1 = new JSONObject();
 				JSONObject targetMove1 = new JSONObject();
 				targetMove1.put("x", xMoveDist);//5.5 -5.5 13.8
 				targetMove1.put("y", yMoveDist);
-				targetMove1.put("z", 60.0);
+				targetMove1.put("z", 55.0);
 				targetMove1.put("maxAcceleration", 4.0);
 				JSONObject targetMove1Approach = new JSONObject();
 				targetMove1Approach.put("x", xMoveDist);
 				targetMove1Approach.put("y", yMoveDist);
-				targetMove1Approach.put("z", 50.0);
+				targetMove1Approach.put("z", 15.0);
 				targetMove1.put("approach", targetMove1Approach);
 				JSONObject targetRotate1 = new JSONObject();
 				targetRotate1.put("x", sub1xrot);
@@ -146,13 +143,13 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				target1.put("rotate", targetRotate1);
 				target1.put("identifier", "GC4x4MB_3");
 		
-				// -- OPPAKKEN (PICK)-- 1
+				// -- OPPAKKEN (PICK)-- 1 
 				JSONArray subjects1 = new JSONArray();
 				JSONObject subject1 = new JSONObject();
 				JSONObject subjectMove1 = new JSONObject();
 				subjectMove1.put("x", xMoveDist);
 				subjectMove1.put("y", yMoveDist);
-				subjectMove1.put("z", 60.0);
+				subjectMove1.put("z", 26.5);
 				subjectMove1.put("maxAcceleration", 4.0);
 				JSONObject subjectRotate1 = new JSONObject();
 				subjectRotate1.put("x", 0.0);
@@ -161,7 +158,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				JSONObject subjectMove1Approach = new JSONObject();
 				subjectMove1Approach.put("x", 0);
 				subjectMove1Approach.put("y", 0);
-				subjectMove1Approach.put("z", 50.0);
+				subjectMove1Approach.put("z", 45.0);
 				JSONObject subjectRotate1Approach = new JSONObject();
 				subjectRotate1Approach.put("x", 0);
 				subjectRotate1Approach.put("y", 0);
@@ -172,12 +169,12 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				subject1.put("rotate", subjectRotate1);
 				subject1.put("identifier", "GC4x4MB_1");
 
-				// -- BREKEN -- 6
+				// -- BREKEN -- 6 
 				JSONObject subject2 = new JSONObject();
 				JSONObject subjectMove2 = new JSONObject();
-				subjectMove2.put("x", xMoveDist);
-				subjectMove2.put("y", yMoveDist);
-				subjectMove2.put("z", 60.0);
+				subjectMove2.put("x", -3.5);
+				subjectMove2.put("y", -2.0);
+				subjectMove2.put("z", 45.0);
 				subjectMove2.put("maxAcceleration", 4.0);
 				JSONObject subjectRotate2 = new JSONObject();
 				subjectRotate2.put("x", 0.0);
@@ -186,7 +183,7 @@ public class HALTesterClassStewartGough extends HALTesterClass implements Hardwa
 				JSONObject subjectMove2Approach = new JSONObject();
 				subjectMove2Approach.put("x", 0);
 				subjectMove2Approach.put("y", 0);
-				subjectMove2Approach.put("z", 50.0);
+				subjectMove2Approach.put("z", 35.0);
 				JSONObject subjectRotate2Approach = new JSONObject();
 				subjectRotate2Approach.put("x", 0);
 				subjectRotate2Approach.put("y", 0);
